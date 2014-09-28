@@ -72,8 +72,8 @@ public class LazyDatabaseMetaDataWrapper implements DatabaseMetaData {
     }
 
     // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
+    //                                                                Java6 Implementation
+    //                                                                ====================
     public <T> T unwrap(Class<T> class1) throws SQLException {
         return getActualMetaData().unwrap(class1);
     }
@@ -779,5 +779,17 @@ public class LazyDatabaseMetaDataWrapper implements DatabaseMetaData {
 
     public ResultSet getFunctionColumns(String s, String s1, String s2, String s3) throws SQLException {
         return getActualMetaData().getFunctionColumns(s, s1, s2, s3);
+    }
+
+    // ===================================================================================
+    //                                                                Java8 Implementation
+    //                                                                ====================
+    public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern,
+            String columnNamePattern) throws SQLException {
+        return getActualMetaData().getPseudoColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern);
+    }
+
+    public boolean generatedKeyAlwaysReturned() throws SQLException {
+        return getActualMetaData().generatedKeyAlwaysReturned();
     }
 }

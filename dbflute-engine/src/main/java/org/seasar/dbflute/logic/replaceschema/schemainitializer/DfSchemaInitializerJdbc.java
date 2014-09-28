@@ -372,17 +372,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 try {
                     st.execute(dropTableSql);
                 } catch (SQLException e) {
-                    // = = = = = = = = = = = =
-                    // for materialized view!
-                    // = = = = = = = = = = = =
-                    final String dropMaterializedViewSql = callback.buildDropMaterializedViewSql(tableMeta);
-                    try {
-                        st.execute(dropMaterializedViewSql);
-                        logReplaceSql("  (o) retry: " + dropMaterializedViewSql);
-                    } catch (SQLException ignored) {
-                        logReplaceSql("  (x) retry: " + dropMaterializedViewSql);
-                        throw e;
-                    }
+                    handleDroppingRetry(callback, st, tableMeta, e);
                 }
             }
         } catch (SQLException e) {
@@ -390,6 +380,18 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             throw new SQLFailureException(msg, e);
         } finally {
             closeStatement(st);
+        }
+    }
+
+    protected void handleDroppingRetry(DfDropTableByJdbcCallback callback, Statement st, DfTableMeta tableMeta,
+            SQLException e) throws SQLException {
+        final String dropMaterializedViewSql = callback.buildDropMaterializedViewSql(tableMeta);
+        try {
+            st.execute(dropMaterializedViewSql);
+            logReplaceSql("  (o) retry: " + dropMaterializedViewSql);
+        } catch (SQLException ignored) {
+            logReplaceSql("  (x) retry: " + dropMaterializedViewSql);
+            throw e;
         }
     }
 

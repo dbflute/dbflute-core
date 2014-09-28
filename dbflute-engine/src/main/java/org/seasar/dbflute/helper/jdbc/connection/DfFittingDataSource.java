@@ -25,12 +25,21 @@ import org.seasar.dbflute.util.DfTypeUtil;
  */
 public class DfFittingDataSource extends DfCushionDataSource {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final DfConnectionProvider _dataSourceProvider;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfFittingDataSource(DfDataSourceHandler dataSourceProvider) {
         _dataSourceProvider = dataSourceProvider;
     }
 
+    // ===================================================================================
+    //                                                                 Connection Handling
+    //                                                                 ===================
     public Connection getConnection() throws SQLException {
         return _dataSourceProvider.getConnection();
     }
@@ -39,6 +48,9 @@ public class DfFittingDataSource extends DfCushionDataSource {
         return _dataSourceProvider.newConnection();
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     @Override
     public String toString() {
         return DfTypeUtil.toClassTitle(this) + ":" + _dataSourceProvider;

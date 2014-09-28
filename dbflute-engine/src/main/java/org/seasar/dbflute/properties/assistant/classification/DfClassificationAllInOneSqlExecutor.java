@@ -55,10 +55,7 @@ public class DfClassificationAllInOneSqlExecutor {
             while (rs.next()) {
                 final String tmpClassificationNameValue = rs.getString("classificationName");
                 final String tmpCodeValue = rs.getString(DfClassificationElement.KEY_CODE);
-                if (tmpCodeValue == null) {
-                    String msg = "The sql should have 'code' column. But null: sql=" + sql;
-                    throw new IllegalStateException(msg);
-                }
+                assertCodeExists(sql, tmpCodeValue);
                 String tmpNameValue = rs.getString(DfClassificationElement.KEY_NAME);
                 if (tmpNameValue == null) {
                     tmpNameValue = tmpCodeValue;
@@ -91,6 +88,13 @@ public class DfClassificationAllInOneSqlExecutor {
             new DfClassificationSqlResourceCloser().closeStatement(st, rs);
         }
         return elementList;
+    }
+
+    protected void assertCodeExists(String sql, final String tmpCodeValue) {
+        if (tmpCodeValue == null) {
+            String msg = "The sql should have 'code' column. But null: sql=" + sql;
+            throw new IllegalStateException(msg);
+        }
     }
 
     protected String ln() {

@@ -32,18 +32,28 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 /**
  * @author jflute
  */
 public class DfFittingConnection implements Connection {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final Connection _realConnection;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfFittingConnection(Connection realConnection) {
         _realConnection = realConnection;
     }
 
+    // ===================================================================================
+    //                                                                Java6 Implementation
+    //                                                                ====================
     public void clearWarnings() throws SQLException {
         _realConnection.clearWarnings();
     }
@@ -247,5 +257,28 @@ public class DfFittingConnection implements Connection {
 
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
         _realConnection.setClientInfo(name, value);
+    }
+
+    // ===================================================================================
+    //                                                                Java8 Implementation
+    //                                                                ====================
+    public void setSchema(String schema) throws SQLException {
+        _realConnection.setSchema(schema);
+    }
+
+    public String getSchema() throws SQLException {
+        return _realConnection.getSchema();
+    }
+
+    public void abort(Executor executor) throws SQLException {
+        _realConnection.abort(executor);
+    }
+
+    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+        _realConnection.setNetworkTimeout(executor, milliseconds);
+    }
+
+    public int getNetworkTimeout() throws SQLException {
+        return _realConnection.getNetworkTimeout();
     }
 }

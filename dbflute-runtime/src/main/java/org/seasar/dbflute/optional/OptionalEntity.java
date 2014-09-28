@@ -270,6 +270,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
+    @SuppressWarnings("unchecked")
     public <RESULT> OptionalObject<RESULT> map(OptionalObjectFunction<? super ENTITY, ? extends RESULT> mapper) {
         return (OptionalObject<RESULT>) callbackMapping(mapper); // downcast allowed because factory is overridden
     }

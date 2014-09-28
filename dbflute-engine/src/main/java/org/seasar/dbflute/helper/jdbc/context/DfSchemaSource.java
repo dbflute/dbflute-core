@@ -18,6 +18,8 @@ package org.seasar.dbflute.helper.jdbc.context;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -50,16 +52,8 @@ public class DfSchemaSource implements DataSource {
     }
 
     // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    @Override
-    public String toString() {
-        return "{" + DfTypeUtil.toClassTitle(_dataSource) + ":" + _schema + "}";
-    }
-
-    // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
+    //                                                                Java6 Implementation
+    //                                                                ====================
     public PrintWriter getLogWriter() throws SQLException {
         return _dataSource.getLogWriter();
     }
@@ -90,6 +84,21 @@ public class DfSchemaSource implements DataSource {
 
     public Connection getConnection(String s, String s1) throws SQLException {
         return _dataSource.getConnection(s, s1);
+    }
+
+    // ===================================================================================
+    //                                                                Java8 Implementation
+    //                                                                ====================
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        return null;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + DfTypeUtil.toClassTitle(_dataSource) + ":" + _schema + "}";
     }
 
     // ===================================================================================

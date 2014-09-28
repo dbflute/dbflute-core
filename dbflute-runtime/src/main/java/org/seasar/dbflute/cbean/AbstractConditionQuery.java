@@ -2727,7 +2727,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return DfCollectionUtil.newArrayListSized(size);
     }
 
-    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
+    protected <ELEMENT> List<ELEMENT> newArrayList(@SuppressWarnings("unchecked") ELEMENT... elements) {
         return DfCollectionUtil.newArrayList(elements);
     }
 

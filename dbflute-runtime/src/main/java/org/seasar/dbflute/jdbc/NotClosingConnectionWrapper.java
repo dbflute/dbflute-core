@@ -32,6 +32,7 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 /**
  * The connection wrapper that is not closed in the method 'close()'. <br />
@@ -85,8 +86,8 @@ public class NotClosingConnectionWrapper implements Connection {
     }
 
     // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
+    //                                                                Java6 Implementation
+    //                                                                ====================
     public void clearWarnings() throws SQLException {
         _actualConnection.clearWarnings();
     }
@@ -290,5 +291,28 @@ public class NotClosingConnectionWrapper implements Connection {
 
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
         _actualConnection.setClientInfo(name, value);
+    }
+
+    // ===================================================================================
+    //                                                                Java8 Implementation
+    //                                                                ====================
+    public void setSchema(String schema) throws SQLException {
+        _actualConnection.setSchema(schema);
+    }
+
+    public String getSchema() throws SQLException {
+        return _actualConnection.getSchema();
+    }
+
+    public void abort(Executor executor) throws SQLException {
+        _actualConnection.abort(executor);
+    }
+
+    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+        _actualConnection.setNetworkTimeout(executor, milliseconds);
+    }
+
+    public int getNetworkTimeout() throws SQLException {
+        return _actualConnection.getNetworkTimeout();
     }
 }

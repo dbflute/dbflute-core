@@ -1211,7 +1211,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         return DfCollectionUtil.newArrayList();
     }
 
-    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
+    protected <ELEMENT> List<ELEMENT> newArrayList(@SuppressWarnings("unchecked") ELEMENT... elements) {
         final List<ELEMENT> list = newArrayList();
         for (ELEMENT element : elements) {
             list.add(element);

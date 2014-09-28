@@ -18,6 +18,8 @@ package org.seasar.dbflute.helper.jdbc.connection;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -26,6 +28,9 @@ import javax.sql.DataSource;
  */
 public abstract class DfCushionDataSource implements DataSource {
 
+    // ===================================================================================
+    //                                                                Java6 Implementation
+    //                                                                ====================
     public Connection getConnection() throws SQLException {
         return null;
     }
@@ -54,5 +59,12 @@ public abstract class DfCushionDataSource implements DataSource {
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                Java8 Implementation
+    //                                                                ====================
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        return null;
     }
 }

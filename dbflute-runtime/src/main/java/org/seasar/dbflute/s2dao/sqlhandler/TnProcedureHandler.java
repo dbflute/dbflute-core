@@ -137,6 +137,7 @@ public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
      * @param executed The return value of execute() that means whether the first result is a result set. 
      * @throws SQLException
      */
+    @SuppressWarnings("resource")
     protected void handleNotParamResult(Connection conn, CallableStatement cs, Object pmb, boolean executed)
             throws SQLException {
         if (pmb == null) {

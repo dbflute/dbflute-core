@@ -18,6 +18,7 @@ package org.seasar.dbflute.resource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,6 +30,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -93,6 +95,10 @@ public class ManualThreadDataSourceTest extends PlainTestCase {
 
         public boolean isWrapperFor(Class<?> class1) throws SQLException {
             return false;
+        }
+
+        public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+            return null;
         }
     }
 
