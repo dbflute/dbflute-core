@@ -17,7 +17,7 @@ ${database.allClassCopyright}package ${myExtendedDtoMapperPackageName};
 #set ($myClassName = "${myExtendedDtoMapperClassName}")
 
 import java.util.Map;
-import org.seasar.dbflute.Entity;
+import org.dbflute.Entity;
 import ${myBaseDtoMapperPackageName}.${myBaseDtoMapperClassName};
 
 /**

@@ -50,13 +50,13 @@ import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.BehaviorSelector;
-import org.seasar.dbflute.bhv.AbstractBehaviorReadable;
-import org.seasar.dbflute.bhv.AbstractBehaviorWritable;
-import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
-import org.seasar.dbflute.bhv.core.InvokerAssistant;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.BehaviorSelector;
+import org.dbflute.bhv.AbstractBehaviorReadable;
+import org.dbflute.bhv.AbstractBehaviorWritable;
+import org.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.dbflute.bhv.core.CommonColumnAutoSetupper;
+import org.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 
 import ${glPackageExtendedBhv}.*;
 

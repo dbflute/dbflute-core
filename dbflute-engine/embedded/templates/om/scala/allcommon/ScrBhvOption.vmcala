@@ -15,9 +15,9 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import org.seasar.dbflute.bhv._;
-import org.seasar.dbflute.cbean._;
-import org.seasar.dbflute.jdbc.StatementConfig;
+import org.dbflute.bhv._;
+import org.dbflute.cbean._;
+import org.dbflute.jdbc.StatementConfig;
 
 /**
  * The option of insert as Scala runtime.

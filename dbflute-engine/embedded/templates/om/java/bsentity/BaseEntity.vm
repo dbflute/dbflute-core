@@ -25,14 +25,14 @@ import java.util.Date;
 #end
 
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
-import org.seasar.dbflute.Entity;
+import org.dbflute.Entity;
 #end
-import org.seasar.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.DBMeta;
 #if ($table.needsMappingValueType())
-import org.seasar.dbflute.dbmeta.MappingValueType;
+import org.dbflute.dbmeta.MappingValueType;
 #end
 #if ($table.isEntityDerivedMappable())
-import org.seasar.dbflute.dbmeta.DerivedMappable;
+import org.dbflute.dbmeta.DerivedMappable;
 #end
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};

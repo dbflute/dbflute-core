@@ -17,9 +17,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import java.util.Date;
 
-import org.seasar.dbflute.cbean.ManualOrderBean;
-import org.seasar.dbflute.cbean.coption._;
-import org.seasar.dbflute.cbean.chelper.HpMobConnectedBean
+import org.dbflute.cbean.ManualOrderBean;
+import org.dbflute.cbean.coption._;
+import org.dbflute.cbean.chelper.HpMobConnectedBean
 
 /**
  * The option of like-search as Scala runtime.

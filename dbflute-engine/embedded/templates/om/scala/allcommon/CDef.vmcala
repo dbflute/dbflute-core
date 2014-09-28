@@ -20,10 +20,10 @@ import scala.collection.JavaConverters._;
 
 import java.util._;
 
-import org.seasar.dbflute.jdbc.Classification;
-import org.seasar.dbflute.jdbc.ClassificationCodeType;
-import org.seasar.dbflute.jdbc.ClassificationMeta;
-import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
+import org.dbflute.jdbc.Classification;
+import org.dbflute.jdbc.ClassificationCodeType;
+import org.dbflute.jdbc.ClassificationMeta;
+import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 
 /**
  * The definition of classification.

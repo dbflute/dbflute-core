@@ -18,15 +18,15 @@ ${database.allClassCopyright}package ${glPackageBaseCQ};
 #set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
 import java.util.*;
 
-import org.seasar.dbflute.cbean.*;
-import org.seasar.dbflute.cbean.chelper.*;
-import org.seasar.dbflute.cbean.ckey.*;
-import org.seasar.dbflute.cbean.coption.*;
-import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.cbean.*;
+import org.dbflute.cbean.chelper.*;
+import org.dbflute.cbean.ckey.*;
+import org.dbflute.cbean.coption.*;
+import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.dbmeta.DBMetaProvider;
 #if ($database.isAvailableJodaTimeEntity())
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.ReadableInstant;
@@ -1480,9 +1480,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param conditionValue The condition value embedded without binding (by MySQL restriction) but escaped. (NullAllowed: if null or empty, no condition)
      * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, No modifier specified)
      */
-    public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn
+    public void match(org.dbflute.dbmeta.info.ColumnInfo textColumn
                     , String conditionValue
-                    , org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
+                    , org.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue, modifier);
     }
@@ -1494,9 +1494,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param conditionValue The condition value embedded without binding (by MySQL restriction) but escaped. (NullAllowed: if null or empty, no condition)
      * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, no modifier specified)
      */
-    public void match(List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList
+    public void match(List<org.dbflute.dbmeta.info.ColumnInfo> textColumnList
                     , String conditionValue
-                    , org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
+                    , org.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
         xdoMatchForMySQL(textColumnList, conditionValue, modifier);
     }
 #end
@@ -1510,7 +1510,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
+    public void match(org.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue);
     }
@@ -1520,7 +1520,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
+    public void match(List<org.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
         xdoMatchByLikeSearch(textColumnList, conditionValue);
     }
 
@@ -1535,7 +1535,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 
     @Override
-    protected org.seasar.dbflute.dbway.ExtensionOperand xgetPostgreSQLMatchOperand() {
+    protected org.dbflute.dbway.ExtensionOperand xgetPostgreSQLMatchOperand() {
         return ${glDBFluteConfig}.getInstance().getFullTextSearchOperand();
     }
 #end
@@ -1549,7 +1549,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
+    public void match(org.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue);
     }
@@ -1560,7 +1560,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
+    public void match(List<org.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
         xdoMatchByLikeSearch(textColumnList, conditionValue);
     }
 

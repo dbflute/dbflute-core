@@ -18,13 +18,13 @@ ${database.allClassCopyright}package ${glPackageBaseCQ};
 
 import java.util.Map;
 
-import org.seasar.dbflute.cbean.*;
-import org.seasar.dbflute.cbean.chelper.*;
-import org.seasar.dbflute.cbean.coption.*;
-import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.cbean.*;
+import org.dbflute.cbean.chelper.*;
+import org.dbflute.cbean.coption.*;
+import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.sqlclause.SqlClause;
 #if ($table.isAvailableMyselfInlineView())
-import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.dbflute.exception.IllegalConditionBeanOperationException;
 import ${glPackageCIQ}.*;
 #end
 import ${glPackageCB}.*;

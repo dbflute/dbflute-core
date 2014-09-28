@@ -15,8 +15,8 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import org.seasar.dbflute.optional.RelationOptionalFactory;
-import org.seasar.dbflute.optional.OptionalObjectExceptionThrower;
+import org.dbflute.optional.RelationOptionalFactory;
+import org.dbflute.optional.OptionalObjectExceptionThrower;
 
 /**
  * @author ${database.classAuthor}

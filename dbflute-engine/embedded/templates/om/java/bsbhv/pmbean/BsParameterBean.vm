@@ -19,30 +19,30 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 import java.util.*;
 
 #if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
-import org.seasar.dbflute.cbean.SimplePagingBean;
+import org.dbflute.cbean.SimplePagingBean;
 #end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-import org.seasar.dbflute.outsidesql.ProcedurePmb;
+import org.dbflute.outsidesql.ProcedurePmb;
 #else
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
-import org.seasar.dbflute.outsidesql.typed.*;
+import org.dbflute.outsidesql.typed.*;
 #else
-import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
+import org.dbflute.twowaysql.pmbean.ParameterBean;
 #end
 #end
-import org.seasar.dbflute.jdbc.*;
-import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
+import org.dbflute.jdbc.*;
+import org.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
-import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.dbflute.cbean.coption.LikeSearchOption;
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
-import org.seasar.dbflute.cbean.coption.FromToOption;
+import org.dbflute.cbean.coption.FromToOption;
 #end
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 #if ($database.hasPmbMetaDataPropertyUseOriginalException($pmbClassName))
-import org.seasar.dbflute.exception.*;
+import org.dbflute.exception.*;
 #end
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 #if ($database.isAvailableJodaTimeEntity())
 #if ($database.isAvailableJodaTimeLocalDateEntity())
 import org.joda.time.LocalDate;

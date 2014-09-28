@@ -18,18 +18,18 @@ ${database.allClassCopyright}package ${myBaseBhvPackageName};
 
 import java.util.List;
 
-import org.seasar.dbflute.*;
-import org.seasar.dbflute.bhv.*;
-import org.seasar.dbflute.cbean.*;
-import org.seasar.dbflute.cbean.chelper.HpSLSFunction;
-import org.seasar.dbflute.exception.*;
+import org.dbflute.*;
+import org.dbflute.bhv.*;
+import org.dbflute.cbean.*;
+import org.dbflute.cbean.chelper.HpSLSFunction;
+import org.dbflute.exception.*;
 #if ($table.needsBasicOptionalEntityImport())
 import ${database.basicOptionalEntityClassName};
 #end
 #if ($table.needsRelationOptionalEntityNextImport())
 import ${database.relationOptionalEntityClassName};
 #end
-import org.seasar.dbflute.outsidesql.executor.*;
+import org.dbflute.outsidesql.executor.*;
 #if ($table.hasPrimaryKeyForcedClassificationSetting())
 import ${glPackageBaseCommon}.${glCDef};
 #end

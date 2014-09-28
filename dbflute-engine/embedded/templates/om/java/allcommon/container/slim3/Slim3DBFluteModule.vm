@@ -19,12 +19,12 @@ import javax.sql.DataSource;
 
 import org.slim3.container.S3Container;
 import org.slim3.container.S3ContainerFactory;
-import org.seasar.dbflute.BehaviorSelector;
-import org.seasar.dbflute.bhv.BehaviorReadable;
-import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
-import org.seasar.dbflute.bhv.core.InvokerAssistant;
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.BehaviorSelector;
+import org.dbflute.bhv.BehaviorReadable;
+import org.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.dbflute.bhv.core.CommonColumnAutoSetupper;
+import org.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.util.DfTypeUtil;
 import ${glPackageExtendedBhv}.*;
 
 /**

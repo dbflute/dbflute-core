@@ -18,9 +18,9 @@ ${database.allClassCopyright}package ${myReferrerLoaderPackageName};
 
 import java.util.List;
 
-import org.seasar.dbflute.*;
+import org.dbflute.*;
 #if ($table.hasLoadReferrer())
-import org.seasar.dbflute.bhv.*;
+import org.dbflute.bhv.*;
 #end
 import ${glPackageExtendedBhv}.*;
 import ${glPackageExtendedEntity}.*;

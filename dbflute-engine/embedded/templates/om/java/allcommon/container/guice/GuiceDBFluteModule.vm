@@ -18,10 +18,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 import javax.sql.DataSource;
 
 import com.google.inject.AbstractModule;
-import org.seasar.dbflute.BehaviorSelector;
-import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
-import org.seasar.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.BehaviorSelector;
+import org.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.dbflute.bhv.core.CommonColumnAutoSetupper;
+import org.dbflute.bhv.core.InvokerAssistant;
 import ${glPackageExtendedBhv}.*;
 
 /**

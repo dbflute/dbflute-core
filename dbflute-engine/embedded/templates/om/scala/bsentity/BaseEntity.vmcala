@@ -33,26 +33,26 @@ import java.util.Date;
 #end
 
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
-import org.seasar.dbflute.Entity;
+import org.dbflute.Entity;
 #end
-import org.seasar.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.DBMeta;
 #if ($table.needsMappingValueType())
-import org.seasar.dbflute.dbmeta.MappingValueType;
+import org.dbflute.dbmeta.MappingValueType;
 #end
 #if ($table.isEntityDerivedMappable())
-import org.seasar.dbflute.dbmeta.DerivedMappable;
+import org.dbflute.dbmeta.DerivedMappable;
 #end
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
 #end
-import org.seasar.dbflute.Entity.EntityUniqueDrivenProperties;
-import org.seasar.dbflute.Entity.EntityModifiedProperties;
+import org.dbflute.Entity.EntityUniqueDrivenProperties;
+import org.dbflute.Entity.EntityModifiedProperties;
 #if ($table.isEntityDerivedMappable())
-import org.seasar.dbflute.Entity.EntityDerivedMap;
+import org.dbflute.Entity.EntityDerivedMap;
 #end
-import org.seasar.dbflute.Entity.FunCustodial;
-import org.seasar.dbflute.helper.beans.DfCoupleProperties;
-import org.seasar.dbflute.immutable.DBableEntity;
+import org.dbflute.Entity.FunCustodial;
+import org.dbflute.helper.beans.DfCoupleProperties;
+import org.dbflute.immutable.DBableEntity;
 #if ($table.hasAllCommonColumn())
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
 #end

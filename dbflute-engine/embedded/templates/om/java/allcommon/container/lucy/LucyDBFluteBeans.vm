@@ -26,7 +26,7 @@
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}">
         <inject method="setContainer">lucy</inject>
     </component>
-    <component name="${database.behaviorCommandInvokerComponentName}" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker">
+    <component name="${database.behaviorCommandInvokerComponentName}" class="org.dbflute.bhv.core.BehaviorCommandInvoker">
         <inject method="setInvokerAssistant">${database.invokerAssistantComponentName}</inject>
     </component>
     

@@ -16,21 +16,21 @@
 ${database.allClassCopyright}package ${glPackageBaseCB};
 #set ($myClassName = "${myBaseConditionBeanClassName}")
 
-import org.seasar.dbflute.cbean.AbstractConditionBean;
-import org.seasar.dbflute.cbean.AbstractConditionBean._;
-import org.seasar.dbflute.cbean.AndQuery;
-import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.ConditionQuery;
-import org.seasar.dbflute.cbean.OrQuery;
-import org.seasar.dbflute.cbean.SpecifyQuery;
-import org.seasar.dbflute.cbean.SubQuery;
-import org.seasar.dbflute.cbean.UnionQuery;
-import org.seasar.dbflute.cbean.chelper._
-import org.seasar.dbflute.cbean.coption._
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
-import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.dbflute.cbean.AbstractConditionBean;
+import org.dbflute.cbean.AbstractConditionBean._;
+import org.dbflute.cbean.AndQuery;
+import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.ConditionQuery;
+import org.dbflute.cbean.OrQuery;
+import org.dbflute.cbean.SpecifyQuery;
+import org.dbflute.cbean.SubQuery;
+import org.dbflute.cbean.UnionQuery;
+import org.dbflute.cbean.chelper._
+import org.dbflute.cbean.coption._
+import org.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 #if ($table.hasPrimaryKeyForcedClassificationSetting())
 import ${glPackageBaseCommon}.${glCDef};
 #end
@@ -313,11 +313,11 @@ class ${myClassName} extends AbstractConditionBean {
     { if (xhelpIsSqlClausePostgreSql()) { xhelpGettingSqlClausePostgreSql().lockForUpdateNoWait(); } return this; }
 
     protected def xhelpIsSqlClausePostgreSql(): Boolean = {
-        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql;
+        return getSqlClause() instanceof org.dbflute.cbean.sqlclause.SqlClausePostgreSql;
     }
 
-    protected def xhelpGettingSqlClausePostgreSql(): org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql = {
-        return .asInstanceOf[org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql)getSqlClause(];
+    protected def xhelpGettingSqlClausePostgreSql(): org.dbflute.cbean.sqlclause.SqlClausePostgreSql = {
+        return .asInstanceOf[org.dbflute.cbean.sqlclause.SqlClausePostgreSql)getSqlClause(];
     }
 #end
 #if ($database.isDatabaseOracle())
@@ -331,11 +331,11 @@ class ${myClassName} extends AbstractConditionBean {
     { if (xhelpIsSqlClauseOracle()) { xhelpGettingSqlClauseOracle().lockForUpdateWait(waitSec); } return this; }
 
     protected def xhelpIsSqlClauseOracle(): Boolean = {
-        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
+        return getSqlClause() instanceof org.dbflute.cbean.sqlclause.SqlClauseOracle;
     }
 
-    protected def xhelpGettingSqlClauseOracle(): org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle = {
-        return .asInstanceOf[org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause(];
+    protected def xhelpGettingSqlClauseOracle(): org.dbflute.cbean.sqlclause.SqlClauseOracle = {
+        return .asInstanceOf[org.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause(];
     }
 #end
 #if ($database.isDatabaseDB2())
@@ -351,11 +351,11 @@ class ${myClassName} extends AbstractConditionBean {
     def lockWithUR(): Unit = { if (xhelpIsSqlClauseDb2()): Unit = { xhelpGettingSqlClauseDb2().lockWithUR(); } }
 
     protected def xhelpIsSqlClauseDb2(): Boolean = {
-        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2;
+        return getSqlClause() instanceof org.dbflute.cbean.sqlclause.SqlClauseDb2;
     }
 
-    protected def xhelpGettingSqlClauseDb2(): org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2 = {
-        return .asInstanceOf[org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2)getSqlClause(];
+    protected def xhelpGettingSqlClauseDb2(): org.dbflute.cbean.sqlclause.SqlClauseDb2 = {
+        return .asInstanceOf[org.dbflute.cbean.sqlclause.SqlClauseDb2)getSqlClause(];
     }
 #end
 #end

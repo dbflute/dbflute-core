@@ -18,12 +18,12 @@ ${database.allClassCopyright}package ${glPackageBaseCQ};
 
 import java.util.Map;
 
-import org.seasar.dbflute.cbean._
-import org.seasar.dbflute.cbean.chelper._
-import org.seasar.dbflute.cbean.coption._
-import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.dbflute.cbean._
+import org.dbflute.cbean.chelper._
+import org.dbflute.cbean.coption._
+import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.exception.IllegalConditionBeanOperationException;
 import ${glPackageCIQ}._
 import ${glPackageCB}._
 import ${glPackageCQ}._

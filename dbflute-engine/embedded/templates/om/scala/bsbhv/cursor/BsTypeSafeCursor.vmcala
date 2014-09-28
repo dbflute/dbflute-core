@@ -19,8 +19,8 @@ ${database.allClassCopyright}package ${myBaseCursorPackageName};
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
+import org.dbflute.jdbc.ValueType;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
  * The cursor of ${table.basicInfoDispString}. <br />

@@ -18,7 +18,7 @@ ${database.allClassCopyright}package ${myBaseCursorPackageName};
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.seasar.dbflute.jdbc.CursorHandler;
+import org.dbflute.jdbc.CursorHandler;
 import ${myExtendedCursorPackageName}.${myExtendedTypeSafeCursorClassName};
 import ${myExtendedCursorPackageName}.${myExtendedTypeSafeCursorHandlerClassName};
 

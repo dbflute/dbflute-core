@@ -58,7 +58,7 @@
     centralize them and clean up the targets.
   -->
   <taskdef name="df-replace-schema" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.DfReplaceSchemaTask"/>
+    classname="org.dbflute.task.DfReplaceSchemaTask"/>
   <taskdef name="df-jdbc" classpathref="torque-classpath"
     classname="org.apache.torque.task.TorqueJDBCTransformTask"/>
   <taskdef name="df-doc" classpathref="torque-classpath"
@@ -66,21 +66,21 @@
   <taskdef name="df-generate" classpathref="torque-classpath"
     classname="org.apache.torque.task.TorqueDataModelTask"/>
   <taskdef name="df-outside-sql-test" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.DfOutsideSqlTestTask"/>
+    classname="org.dbflute.task.DfOutsideSqlTestTask"/>
   <taskdef name="df-sql2entity" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
+    classname="org.dbflute.task.DfSql2EntityTask"/>
 
   <taskdef name="df-refresh" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.manage.DfRefreshTask"/>
+    classname="org.dbflute.task.manage.DfRefreshTask"/>
   <taskdef name="df-freegen" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.manage.DfFreeGenTask"/>
+    classname="org.dbflute.task.manage.DfFreeGenTask"/>
   <taskdef name="df-take-assert" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.manage.DfTakeAssertTask"/>
+    classname="org.dbflute.task.manage.DfTakeAssertTask"/>
 
   <taskdef name="df-intro" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.manage.DfIntroTask"/>
+    classname="org.dbflute.task.manage.DfIntroTask"/>
   <taskdef name="df-upgrade" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.manage.DfUpgradeTask"/>
+    classname="org.dbflute.task.manage.DfUpgradeTask"/>
 
   <!--
     for Ant-Contrib
