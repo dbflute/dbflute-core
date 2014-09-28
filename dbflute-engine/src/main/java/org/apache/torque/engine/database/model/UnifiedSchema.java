@@ -74,11 +74,11 @@
  */
 package org.apache.torque.engine.database.model;
 
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfDatabaseProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.dbflute.DfBuildProperties;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfDatabaseProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.Srl;
 

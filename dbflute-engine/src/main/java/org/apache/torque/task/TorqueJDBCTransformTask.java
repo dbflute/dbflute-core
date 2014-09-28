@@ -76,10 +76,10 @@ package org.apache.torque.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
-import org.seasar.dbflute.task.DfDBFluteTaskStatus;
-import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
-import org.seasar.dbflute.task.bs.DfAbstractTask;
+import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
+import org.dbflute.task.DfDBFluteTaskStatus;
+import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
+import org.dbflute.task.bs.DfAbstractTask;
 
 /**
  * @author modified by jflute (originated in Apache Torque)

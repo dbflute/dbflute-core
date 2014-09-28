@@ -18,10 +18,10 @@ package org.apache.torque.engine.database.model;
 import java.math.BigDecimal;
 
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.DfBuildProperties;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 

@@ -76,15 +76,15 @@ package org.apache.torque.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
-import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
-import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
-import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
-import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.task.DfDBFluteTaskStatus;
-import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
-import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
+import org.dbflute.logic.generate.language.DfLanguageDependency;
+import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
+import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
+import org.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.task.DfDBFluteTaskStatus;
+import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
+import org.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
 /**
  * The DBFlute task generating classes from schema meta data.

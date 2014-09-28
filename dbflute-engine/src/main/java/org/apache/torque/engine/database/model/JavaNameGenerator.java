@@ -129,8 +129,8 @@ package org.apache.torque.engine.database.model;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.DfBuildProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.Srl;
 
 /**

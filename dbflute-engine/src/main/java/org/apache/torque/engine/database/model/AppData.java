@@ -75,9 +75,9 @@
 package org.apache.torque.engine.database.model;
 
 import org.apache.torque.engine.database.transform.DTDResolver;
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
+import org.dbflute.DfBuildProperties;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 

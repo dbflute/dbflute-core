@@ -135,10 +135,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.torque.engine.EngineException;
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.generate.column.DfColumnListToStringBuilder;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
-import org.seasar.dbflute.properties.DfBasicProperties;
+import org.dbflute.DfBuildProperties;
+import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
+import org.dbflute.logic.generate.language.DfLanguageDependency;
+import org.dbflute.properties.DfBasicProperties;
 import org.xml.sax.Attributes;
 
 /**

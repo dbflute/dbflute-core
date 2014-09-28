@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow" enabled="true" name="_arrow">-&gt; ${newName}</template><template autoinsert="true" context="java" deleted="false" description="Java8: forEach()" enabled="true" name="_foreach">${var}.forEach(${newName} -&gt; {
+});</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow" enabled="true" name="_la">${var} -&gt; ${var}${cursor}</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow with Brace" enabled="true" name="_ll">${var} -&gt; {
+    ${cursor}
+}</template><template autoinsert="true" context="java-members" deleted="false" description="Commons Logging Logger" enabled="true" name="_logger">${:import(org.apache.commons.logging.Log,
+				org.apache.commons.logging.LogFactory)}
+				private static final Log
+				LOG =
+				LogFactory.getLog(${enclosing_type}.class);</template><template autoinsert="true" context="java" deleted="false" description="Review comment" enabled="true" name="_review">    // #review ${cursor} by ${user}</template><template autoinsert="true" context="java" deleted="false" description="Java8: stream().filter()" enabled="true" name="_sfilter">${var}.stream().filter(${newName} -&gt; {
+    return ${newName}${cursor};
+});</template><template autoinsert="true" context="java" deleted="false" description="Slf4j Logger" enabled="true" name="_slogger">${:import(org.slf4j.Logger,
+				org.slf4j.LoggerFactory)}
+				private static final Logger
+				LOG =
+				LoggerFactory.getLogger(${enclosing_type}.class);</template><template autoinsert="true" context="java" deleted="false" description="Java8: stream().map()" enabled="true" name="_smap">${var}.stream().map(${newName} -&gt; {
+    return ${newName}${cursor};
+});</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Accessor" enabled="true" name="_taacce">    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Attribute" enabled="true" name="_taattr">    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Basic Override" enabled="true" name="_tabaov">    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Callback" enabled="true" name="_tacallb">    // ===================================================================================
+    //                                                                            Callback
+    //                                                                            ========</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Constructor" enabled="true" name="_taconst">    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Convert methods for Form and WebBean and so on..." enabled="true" name="_taconv">    // ===================================================================================
+    //                                                                           Converter
+    //                                                                           =========</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Definition" enabled="true" name="_tadef">    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========</template><template autoinsert="true" context="java" deleted="false" description="Nest tag comment for DI components" enabled="true" name="_tadicom">    // -----------------------------------------------------
+    //                                          DI Component
+    //                                          ------------</template><template autoinsert="true" context="java" deleted="false" description="Nest tag comment for display data of Action" enabled="true" name="_tadisp">    // -----------------------------------------------------
+    //                                          Display Data
+    //                                          ------------</template><template autoinsert="true" context="java" deleted="false" description="Execute Methods of Action" enabled="true" name="_taexec">    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Xxx" enabled="true" name="_tafree">    // ===================================================================================
+    //                                                                           Free Item
+    //                                                                           =========</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Xxx Helper" enabled="true" name="_tahelp">    // ===================================================================================
+    //                                                                          Xxx Helper
+    //                                                                          ==========</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Initialize" enabled="true" name="_tainit">    // ===================================================================================
+    //                                                                          Initialize
+    //                                                                          ==========</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Mapping" enabled="true" name="_tamapp">    // ===================================================================================
+    //                                                                             Mapping
+    //                                                                             =======</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Nested Comment" enabled="true" name="_tanest">    // -----------------------------------------------------
+    //                                                XxxYyy
+    //                                                ------</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Xxx Override" enabled="true" name="_taover">    // ===================================================================================
+    //                                                                        Xxx Override
+    //                                                                        ============</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Request Mapping" enabled="true" name="_tareqmp">    // ===================================================================================
+    //                                                                     Request Mapping
+    //                                                                     ===============</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Small Helper" enabled="true" name="_tasmhp">	// ===================================================================================
+	//                                                                        Small Helper
+	//                                                                        ============</template><template autoinsert="true" context="java" deleted="false" description="Validation methods for Action" enabled="true" name="_tavalid">    // ===================================================================================
+    //                                                                          Validation
+    //                                                                          ==========</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: Source Code Review Feedback" enabled="true" name="_tdfeedback">// TODO feedback by ${user} #${branchId} ${content}</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: Hopefully To Be Fixed" enabled="true" name="_tdhope">// #hope by ${user}(${date}) ${content}</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: To Be Fixed Sometime" enabled="true" name="_tdreview">// #review by ${user}(${date}) ${content}</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: Todo Comment for Yourself" enabled="true" name="_tdself">// TODO ${user} #${branchId} ${content}</template><template autoinsert="true" context="java" deleted="false" description="TODO comment" enabled="true" name="_todo">    // TODO ${user} ${cursor}</template></templates>
