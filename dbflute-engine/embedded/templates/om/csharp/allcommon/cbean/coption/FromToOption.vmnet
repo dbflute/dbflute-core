@@ -1,0 +1,95 @@
+#set ($myClassName = "${glFromToOption}")
+
+using System;
+
+using ${glPackageBaseCommonCKey};
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommonCOption} {
+
+public class ${myClassName} : ${glSimpleStringOption} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected bool _fromDateGreaterThan;
+    protected bool _toDateLessThan;
+    protected bool _compareAsDate;
+    protected bool _toDateMaxValue; // CSharp Only
+
+    // ===================================================================================
+    //                                                                         Rear Option
+    //                                                                         ===========
+    public override String getRearOption() {
+        String msg = "Thie option does not use getRearOption()!";
+        throw new UnsupportedOperationException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
+    public ${myClassName} GreaterThan() {
+        _fromDateGreaterThan = true; return this;
+    }
+
+    public ${myClassName} LessThan() {
+        _toDateLessThan = true; return this;
+    }
+
+    public ${myClassName} CompareAsDate() {
+        _compareAsDate = true; return this;
+    }
+
+    // ===================================================================================
+    //                                                                       Internal Main
+    //                                                                       =============
+    public DateTime? filterFromDate(DateTime? fromDate) {
+        if (fromDate == null) {
+            return null;
+        }
+        if (_compareAsDate) {
+            DateTime cloneDate = new DateTime(fromDate.Value.Year, fromDate.Value.Month, fromDate.Value.Day);
+            return cloneDate;
+        }
+        return fromDate;
+    }
+
+    public DateTime? filterToDate(DateTime? toDate) {
+        if (toDate == null) {
+            return null;
+        }
+        if (_compareAsDate) {
+            DateTime cloneDate = new DateTime(toDate.Value.Year, toDate.Value.Month, toDate.Value.Day);
+            if (cloneDate.Date.Equals(DateTime.MaxValue.Date)) { // CSharp Only
+                _toDateMaxValue = true;
+                return DateTime.MaxValue;
+            }
+            return cloneDate.AddDays(1);
+        }
+        return toDate;
+    }
+
+    public ${glConditionKey} getFromDateConditionKey() {
+        if (_compareAsDate) {
+            return ${glConditionKey}.CK_GREATER_EQUAL;
+        }
+        if (_fromDateGreaterThan) {
+            return ${glConditionKey}.CK_GREATER_THAN;// Default!
+        } else {
+            return ${glConditionKey}.CK_GREATER_EQUAL;// Default!
+        }
+    }
+
+    public ${glConditionKey} getToDateConditionKey() {
+        if (_compareAsDate) {
+            return _toDateMaxValue ? ${glConditionKey}.CK_LESS_EQUAL : ${glConditionKey}.CK_LESS_THAN;
+        }
+        if (_toDateLessThan) {
+            return ${glConditionKey}.CK_LESS_THAN;// Default!
+        } else {
+            return ${glConditionKey}.CK_LESS_EQUAL;// Default!
+        }
+    }
+}
+
+}

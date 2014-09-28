@@ -1,0 +1,54 @@
+#set ($myClassName = "${glSqlClause}H2")
+
+using System;
+
+namespace ${glPackageBaseCommonSqlClause} {
+
+[System.Serializable]
+public class ${myClassName} : ${glAbstractSqlClause} {
+
+    protected String _fetchScopeSqlSuffix = "";
+    protected String _lockSqlSuffix = "";
+
+    public ${myClassName}(String tableName)
+        : base(tableName) {}
+
+	protected override OrderByNullsSetupper createOrderByNullsSetupper() {
+	    return new OrderByNullsSetupperByCaseWhen();
+	}
+	
+    protected override void doFetchFirst() {
+        doFetchPage();
+    }
+
+    protected override void doFetchPage() {
+        _fetchScopeSqlSuffix = " limit " + this.getFetchSize() + " offset " + this.getPageStartIndex();;
+    }
+
+    protected override void doClearFetchPageClause() {
+        _fetchScopeSqlSuffix = "";
+    }
+
+    public override ${glSqlClause} lockForUpdate() {
+        _lockSqlSuffix = " for update";
+        return this;
+    }
+
+    protected override String createSelectHint() {
+        return "";
+    }
+
+    protected override String createFromBaseTableHint() {
+        return "";
+    }
+
+    protected override String createFromHint() {
+        return "";
+    }
+
+    protected override String createSqlSuffix() {
+        return _fetchScopeSqlSuffix + _lockSqlSuffix;
+    }
+}
+	
+}

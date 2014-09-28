@@ -1,0 +1,15 @@
+
+using System;
+
+using Seasar.Quill.Attrs;
+using ${glPackageBaseCommonBhv};
+
+namespace ${glPackageBaseCommon} {
+
+    [Implementation(typeof(${glCacheBehaviorSelector}))]
+    public interface ${glBehaviorSelector} {
+        void InitializeConditionBeanMetaData();
+        BEHAVIOR Select<BEHAVIOR>() where BEHAVIOR : ${glBehaviorReadable};
+        ${glBehaviorReadable} ByName(String tableFlexibleName);
+    }
+}

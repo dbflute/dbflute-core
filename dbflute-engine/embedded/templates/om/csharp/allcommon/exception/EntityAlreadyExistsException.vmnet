@@ -1,0 +1,15 @@
+
+using System;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the entity already exists on the database.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public class ${glEntityAlreadyExistsException} : ${glSQLFailureException} {
+
+        public ${glEntityAlreadyExistsException}(String msg, Exception e)
+        : base(msg,e) {}
+    }
+}

@@ -1,0 +1,217 @@
+#set ($myClassName = "${myExtendedParameterBeanClassName}")
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+using ${glPackageBaseCommon};
+#if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
+using ${glPackageBaseCommonCBean};
+#end
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+using ${glPackageBaseCommonCBeanOutsidesql};
+#end
+using ${glPackageBaseCommonCOption};
+#if ($database.isPmbMetaDataProcedureRefCustomizeEntity($pmbClassName))
+using ${glPackageExtendedCustomizeEntity};
+#end
+
+namespace ${glPackageExtendedParameterBean} {
+
+    /// <summary>
+    /// The parametaer-bean of ${pmbClassName}.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    [System.Serializable]
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+    public partial class ${myClassName} : ${glProcedurePmb} {
+#else
+    public partial class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} {
+#end
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        // -------------------------------------------------
+        //                               Procedure Parameter
+        //                               -------------------
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($annotationPropName = $database.initUncap(${propertyName}))
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#set ($columnName = $database.getPmbMetaDataPropertyColumnName($pmbClassName, $propertyName))
+#if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
+        public static readonly String ${annotationPropName}_PROCEDURE_PARAMETER = "${columnName}, in";
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterOut($pmbClassName, $propertyName))
+        public static readonly String ${annotationPropName}_PROCEDURE_PARAMETER = "${columnName}, out";
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterInOut($pmbClassName, $propertyName))
+        public static readonly String ${annotationPropName}_PROCEDURE_PARAMETER = "${columnName}, inout";
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
+        public static readonly String ${annotationPropName}_PROCEDURE_PARAMETER = "${columnName}, return";
+#end
+#end
+#end
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($variableName = "_$database.initUncap(${propertyName})")
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#if ($database.isPmbMetaDataPropertyOptionClassificationFixedElement($pmbClassName, $propertyName))
+        protected ${propertyType} ${variableName} = ${database.getPmbMetaDataPropertyOptionClassificationFixedElementValueExp($pmbClassName, $propertyName)};
+#else
+        protected ${propertyType} ${variableName};
+#end
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
+        protected ${glLikeSearchOption} ${variableName}InternalLikeSearchOption;
+
+#end
+#end
+    
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+        // ===============================================================================
+        //                                                        Procedure Implementation
+        //                                                        ========================
+        public virtual String ProcedureName { get {
+            return "${database.getPmbMetaDataProcedureName($pmbClassName)}";
+        }}
+
+#end
+        // ===============================================================================
+        //                                                                   Assist Helper
+        //                                                                   =============
+        protected String ConvertEmptyToNullIfString(String value) {
+            return FilterRemoveEmptyString(value);
+        }
+
+        protected String FilterRemoveEmptyString(String value) {
+            return ((value != null && !"".Equals(value)) ? value : null);
+        }
+
+        protected String FormatByteArray(byte[] bytes) {
+            return "byte[" + (bytes != null ? bytes.Length.ToString() : "null") + "]";
+        }
+
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
+        protected void AssertLikeSearchOptionValid(String name, ${glLikeSearchOption} option) {
+            if (option == null) {
+                String msg = "The argument '" + name + "' should not be null!";
+                throw new SystemException(msg);
+            }
+            if (option.isSplit()) {
+                String msg = "The split of like-search is NOT available on parameter-bean.";
+                msg = msg + " Don't use SplitByXxx(): " + option;
+                throw new SystemException(msg);
+            }
+        }
+
+#end
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
+        public override String ToString() {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("${myClassName}:");
+            sb.Append(xbuildColumnString());
+            return sb.ToString();
+        }
+        private String xbuildColumnString() {
+            String c = ", ";
+            StringBuilder sb = new StringBuilder();
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($variableName = "_$database.initUncap(${propertyName})")
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#if ($propertyType.equals("byte[]"))
+            sb.Append(c).Append(FormatByteArray(${variableName}));
+#else
+            sb.Append(c).Append(${variableName});
+#end
+#end
+            if (sb.Length > 0) { sb.Remove(0, c.Length); }
+            sb.Insert(0, "{").Append("}");
+            return sb.ToString();
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($variableName = "_$database.initUncap(${propertyName})")
+#set ($argumentName = "$database.initUncap(${propertyName})")
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+        public ${propertyType} ${database.initCap($propertyName)} {
+#if ($propertyType.endsWith("String"))
+            get { return ($propertyType)ConvertEmptyToNullIfString(${variableName}); }
+#else
+            get { return ${variableName}; }
+#end
+#if (!$database.hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter($pmbClassName, $propertyName))
+            set { ${variableName} = value; }
+#end
+        }
+#if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}(${propertyType} ${argumentName}, ${glLikeSearchOption} ${argumentName}Option) {
+            AssertLikeSearchOptionValid("${argumentName}Option", ${argumentName}Option);
+            ${variableName} = ${argumentName};
+            ${variableName}InternalLikeSearchOption = ${argumentName}Option;
+        }
+#end
+#if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${argumentName}) {
+            ${variableName} = ${argumentName};
+            ${variableName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikePrefix();
+        }
+#end
+#if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${argumentName}) {
+            ${variableName} = ${argumentName};
+            ${variableName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikeContain();
+        }
+#end
+#if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${argumentName}) {
+            ${variableName} = ${argumentName};
+            ${variableName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikeSuffix();
+        }
+#end
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
+
+        public ${glLikeSearchOption} ${database.initCap($propertyName)}InternalLikeSearchOption { get {
+            return ${variableName}InternalLikeSearchOption;
+        }}
+#end
+#if ($database.isPmbMetaDataPropertyOptionFromDate($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}) {
+            ${variableName} = new ${glFromToOption}().CompareAsDate().filterFromDate(${argumentName});
+        }
+#end
+#if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}) {
+            ${variableName} = new ${glFromToOption}().CompareAsDate().filterToDate(${argumentName});
+        }
+#end
+#if ($database.isPmbMetaDataPropertyOptionClassificationSetter($pmbClassName, $propertyName))
+#set ($classificationName = $database.getPmbMetaDataPropertyOptionClassificationName($pmbClassName, $propertyName))
+#set ($propertyTypeRemovedCSharpNullable = $database.getPmbMetaDataPropertyTypeRemovedCSharpNullable($pmbClassName, $propertyName))
+#foreach ($classificationElement in $database.getPmbMetaDataPropertyOptionClassificationTop($pmbClassName, $propertyName).classificationElementList)
+
+        public void Set${database.initCap($propertyName)}_${classificationElement.name}() {
+#if ($database.isPmbMetaDataPropertyJavaNativeStringObject($pmbClassName, $propertyName))
+            this.${database.initCap($propertyName)} = ${glCDef}.${classificationName}.${classificationElement.name}.Code;
+#else
+            this.${database.initCap($propertyName)} = ${propertyTypeRemovedCSharpNullable}.Parse(${glCDef}.${classificationName}.${classificationElement.name}.Code);
+#end
+        }
+#end
+#end
+
+#end
+    }
+}

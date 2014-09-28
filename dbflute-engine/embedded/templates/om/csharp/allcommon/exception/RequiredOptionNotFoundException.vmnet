@@ -1,0 +1,20 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the required option is not found.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public class ${glRequiredOptionNotFoundException} : SystemException {
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param="msg">Exception message.</param>
+        public ${glRequiredOptionNotFoundException}(String msg)
+        : base(msg) {}
+    }
+}

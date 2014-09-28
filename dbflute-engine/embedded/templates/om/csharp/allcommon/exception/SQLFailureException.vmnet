@@ -1,0 +1,54 @@
+
+using System;
+using System.Data.Common;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the SQL failed to execute.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public class ${glSQLFailureException} : SystemException {
+
+        protected DbException _causeDbException;
+
+        public ${glSQLFailureException}(String msg, Exception e)
+        : base(msg,e) {
+            SetupCauseDbException(e);
+        }
+
+        protected void SetupCauseDbException(Exception e) {
+            if (e is DbException) {
+                _causeDbException = (DbException)e;
+                return;
+            }
+            if (e == null) { return; }
+            e = e.InnerException;
+            if (e is DbException) {
+                _causeDbException = (DbException)e;
+                return;
+            }
+            if (e == null) { return; }
+            e = e.InnerException;
+            if (e is DbException) {
+                _causeDbException = (DbException)e;
+                return;
+            }
+            if (e == null) { return; }
+            e = e.InnerException;
+            if (e is DbException) {
+                _causeDbException = (DbException)e;
+                return;
+            }
+            if (e == null) { return; }
+            e = e.InnerException;
+            if (e is DbException) {
+                _causeDbException = (DbException)e;
+                return;
+            }
+            // It doesn't use recursive call by design because ADO.NET is unpredictable fellow.
+        }
+
+        public DbException CauseDbException { get { return _causeDbException; } }
+    }
+}

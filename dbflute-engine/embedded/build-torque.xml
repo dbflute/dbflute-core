@@ -1,0 +1,267 @@
+<project name="Torque" default="jdbc" basedir=".">
+  <!--
+    Note - You should not have to edit this file.
+
+    Instead, if calling build-torque.xml directly, edit the build.properties
+    that is in the same directory. If calling build-torque.xml via another
+    build file, you can also use the build.properties in the same directory,
+    or set the property torque.contextProperties to the file
+    to use in place of build.properties (e.g. project.properties).
+  -->
+
+  <!--
+    For us to load the default.properties from the classpath, we need to bootstrap.
+    To know the right lib.dir for the torque-classpath, we need to manually
+    figure out torque.lib.dir, but to do that, we need to manually figure
+    out torque.contextProperties and load that so that any old configurations
+    still work propertly. Then we can go on and do the rest of the mappings via
+    old.properties.
+   -->
+  <property name="build.properties" value="build.properties"/>
+  <property name="torque.contextProperties" value="${build.properties}"/>
+  <property file="${torque.contextProperties}"/>
+  <property name="lib.dir" value="lib"/>
+  <property name="torque.lib.dir" value="${lib.dir}"/>
+  <property name="logprop.dir" value="etc/logprop"/>
+
+  <!--
+    Build the classpath. Specifically point to each file we're including to avoid
+    version conflicts in the case of the torque.lib.dir being something like lib.repo.
+    However, we still need to pull in the user's database driver and since we don't
+    know which jar that will be, after we've got all of our specific, version-safe jars,
+    do a general inclusion of the torque.lib.dir to catch any drivers.
+  -->
+  <path id="torque-classpath">
+    <!-- The log4j.properties (should be valid at first) -->
+    <dirset dir=".">
+      <include name="${logprop.dir}"/>
+    </dirset>
+
+  	<!-- Embedded Libraries -->
+    <fileset dir="${torque.lib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <!--
+    The default.properties file will map old properties to the new ones along
+    with setting the correct defaults.
+  -->
+  <property resource="org/apache/torque/default.properties">
+    <classpath>
+      <path refid="torque-classpath"/>
+    </classpath>
+  </property>
+
+  <!--
+    Do forward declarations of all of our tasks to
+    centralize them and clean up the targets.
+  -->
+  <taskdef name="df-replace-schema" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.DfReplaceSchemaTask"/>
+  <taskdef name="df-jdbc" classpathref="torque-classpath"
+    classname="org.apache.torque.task.TorqueJDBCTransformTask"/>
+  <taskdef name="df-doc" classpathref="torque-classpath"
+    classname="org.apache.torque.task.TorqueDocumentationTask"/>
+  <taskdef name="df-generate" classpathref="torque-classpath"
+    classname="org.apache.torque.task.TorqueDataModelTask"/>
+  <taskdef name="df-outside-sql-test" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.DfOutsideSqlTestTask"/>
+  <taskdef name="df-sql2entity" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
+
+  <taskdef name="df-refresh" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.manage.DfRefreshTask"/>
+  <taskdef name="df-freegen" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.manage.DfFreeGenTask"/>
+  <taskdef name="df-take-assert" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.manage.DfTakeAssertTask"/>
+
+  <taskdef name="df-intro" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.manage.DfIntroTask"/>
+  <taskdef name="df-upgrade" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.manage.DfUpgradeTask"/>
+
+  <!--
+    for Ant-Contrib
+  -->
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+
+  <!-- ================================================================ -->
+  <!-- C H E C K  U S E C L A S S P A T H                               -->
+  <!-- ================================================================ -->
+  <!-- Temporary hack around the propertiesUtil bug. Should             -->
+  <!-- be fixed soon.                                                   -->
+  <!-- ================================================================ -->
+
+  <target name="check-use-classpath">
+    <condition property="torque.internal.useClasspath">
+      <equals arg1="${torque.useClasspath}" arg2="true"/>
+    </condition>
+  </target>
+
+  <!-- ================================================================ -->
+  <!-- C H E C K  R U N  O N L Y  O N  S C H E M A  C H A N G E         -->
+  <!-- ================================================================ -->
+  <!-- Maps the torque.runOnlyOnSchemaChange to                         -->
+  <!-- torque.internal.runOnlyOnSchemaChange                            -->
+  <!-- ================================================================ -->
+
+  <target name="check-run-only-on-schema-change">
+    <condition property="torque.internal.runOnlyOnSchemaChange">
+      <equals arg1="${torque.runOnlyOnSchemaChange}" arg2="true"/>
+    </condition>
+  </target>
+
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                   ReplaceSchema -->
+  <!--                                                                   nnnnnnnnnnnnn -->
+  <target name="replace-schema" description="ReplaceSchema task">
+    <df-replace-schema
+        contextProperties="${torque.contextProperties}"
+        controlTemplate="${torque.template.doc}"
+        templatePath="${torque.templatePath}"
+        useClasspath="${torque.useClasspath}"
+        environmentType="${dfenv}"
+        areYouReadyAnswer="${dfans}"
+        varyingArg="${dfvarg}">
+    </df-replace-schema>
+  </target>
+
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                            JDBC -->
+  <!--                                                                            nnnn -->
+  <target name="jdbc" description="JDBC task">
+    <df-jdbc
+      contextProperties="${torque.contextProperties}"
+      environmentType="${dfenv}">
+    </df-jdbc>
+  </target>
+
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                             Doc -->
+  <!--                                                                             nnn -->
+  <target name="doc" description="Doc task">
+    <df-doc
+      contextProperties="${torque.contextProperties}"
+      controlTemplate="${torque.template.doc}"
+      templatePath="${torque.templatePath}"
+      useClasspath="${torque.useClasspath}"
+      environmentType="${dfenv}"
+      varyingArg="${dfvarg}">
+    </df-doc>
+  </target>
+
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                        Generate -->
+  <!--                                                                        nnnnnnnn -->
+  <target name="generate" depends="check-use-classpath" description="Generate task">
+    <antcall target="om-classpath"/>
+    <antcall target="om-template"/>
+  </target>
+
+  <target name="om-classpath" if="torque.internal.useClasspath">
+    <df-generate
+      contextProperties="${torque.contextProperties}"
+      controlTemplate="${torque.template.om}"
+      useClasspath="${torque.useClasspath}"
+      environmentType="${dfenv}">
+    </df-generate>
+  </target>
+
+  <target name="om-template" unless="torque.internal.useClasspath">
+    <df-generate
+      contextProperties="${torque.contextProperties}"
+      controlTemplate="${torque.template.om}"
+      templatePath="${torque.templatePath}"
+      environmentType="${dfenv}">
+    </df-generate>
+  </target>
+
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                  OutsideSqlTest -->
+  <!--                                                                  nnnnnnnnnnnnnn -->
+  <target name="outside-sql-test" description="OutsideSqlTest task">
+    <df-outside-sql-test
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}"
+        specifiedSqlFile="${dfsql}">
+    </df-outside-sql-test>
+  </target>
+
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                      Sql2Entity -->
+  <!--                                                                      nnnnnnnnnn -->
+  <target name="sql2entity" description="Sql2Entity task">
+    <!--
+      Parameters, outputDirectory and outputFile, are actually unused (as old).
+      But the parameters may be referred to by Velocity so it remains.
+    -->
+    <df-sql2entity
+        contextProperties="${torque.contextProperties}"
+        controlTemplate="${torque.template.sql2entity}"
+        templatePath="${torque.templatePath}"
+        environmentType="${dfenv}"
+        specifiedSqlFile="${dfsql}">
+    </df-sql2entity>
+  </target>
+
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                          Manage -->
+  <!--                                                                          nnnnnn -->
+  <target name="renewal" description="Renewal task">
+  	<antcall target="replace-schema"/>
+  	<antcall target="jdbc"/>
+  	<antcall target="doc"/>
+  	<antcall target="generate"/>
+  	<antcall target="outside-sql-test"/>
+  	<antcall target="sql2entity"/>
+  </target>
+
+  <target name="regenerate" description="Regenerate task">
+  	<antcall target="jdbc"/>
+  	<antcall target="doc"/>
+  	<antcall target="generate"/>
+  	<antcall target="outside-sql-test"/>
+  	<antcall target="sql2entity"/>
+  </target>
+
+  <target name="refresh" description="Refresh task">
+    <df-refresh
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}"
+        refreshProject="${dfprj}">
+    </df-refresh>
+  </target>
+
+  <target name="freegen" description="FreeGen task">
+    <df-freegen
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}"
+        genTarget="${gentgt}">
+    </df-freegen>
+  </target>
+
+  <target name="take-assert" description="TakeAssert task">
+    <df-take-assert
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}"
+        sqlRootDir="${dfdir}">
+    </df-take-assert>
+  </target>
+
+  <target name="intro" description="DBFlute Intro task">
+    <df-intro
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}">
+    </df-intro>
+  </target>
+
+  <target name="upgrade" description="DBFlute Upgrade task">
+    <df-upgrade
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}"
+    	version="${dfver}">
+    </df-upgrade>
+  </target>
+</project>

@@ -1,0 +1,1699 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCQ};
+#set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
+
+import scala.collection.immutable;
+import scala.collection.JavaConverters._;
+
+import java.util.Collection;
+import java.util.Date;
+
+import org.seasar.dbflute.cbean._;
+import org.seasar.dbflute.cbean.AbstractConditionQuery._;
+import org.seasar.dbflute.cbean.chelper._;
+import org.seasar.dbflute.cbean.ckey._;
+import org.seasar.dbflute.cbean.coption._;
+import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
+#if ($database.isAvailableJodaTimeEntity())
+import org.seasar.dbflute.util.DfTypeUtil;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
+#end
+import ${glPackageBaseCommon}._;
+import ${glPackageCB}._;
+import ${glPackageCQ}._;
+
+/**
+ * The abstract condition-query of ${table.tableDbName}.
+ * @author ${database.classAuthor}
+ */
+abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasName: String, nestLevel: Integer)
+        extends AbstractConditionQuery(referrerQuery, sqlClause, aliasName, nestLevel) {
+
+    // ===================================================================================
+    //                                                                     DBMeta Provider
+    //                                                                     ===============
+    @Override
+    protected def xgetDBMetaProvider(): DBMetaProvider = {
+        return ${glDBMetaInstanceHandler}.getProvider();
+    }
+
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
+    def getTableDbName(): String = {
+        return "${table.tableDbName}";
+    }
+
+#set ($columnLoopIndex = 0)
+#foreach ($col in $table.columns)
+#if ($columnLoopIndex == 0)
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
+#else
+
+#end
+#set ($tmpJavaName = "${col.javaName}")
+#set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
+#set ($fk = $col.foreignKey)
+#if (${col.isJavaNativeStringObject()})
+    /**
+     * Equal(=). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null (or empty), no condition)
+     */
+    ${col.propertySettingModifierAsPrefix}def set${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        doSet${tmpJavaName}_Equal(fRES(${tmpUncapitalisedJavaName}));
+    }
+#if (${col.isAvailableStringEmptyString()})
+
+    /**
+     * Equal(=). As the empty-string. And OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     */
+    ${col.propertySettingModifierAsPrefix}def set${tmpJavaName}_Equal_EmptyString(): Unit = {
+        doSet${tmpJavaName}_Equal("");
+    }
+#end
+#if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+
+    /**
+     * Equal(=). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_Equal_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
+        doSet${tmpJavaName}_Equal(if (cdef != null) { cdef.code } else { null });
+    }
+#if ($classificationTop.isSisterBooleanHandling())
+
+    /**
+     * Equal(=). As boolean for ${col.classificationName}. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param determination The determination, true or false. (NullAllowed: if null, no condition)
+     */
+    def set${col.javaName}_Equal_AsBoolean(determination: Boolean): Unit = {
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
+    }
+#end
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+
+    /**
+     * Equal(=). As ${classificationElement.name} (${classificationElement.code}). And OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+     */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
+    def set${tmpJavaName}_Equal_${classificationElement.name}(): Unit = {
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
+    }
+#end
+#end
+
+    protected def doSet${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
+#if ($database.isShortCharHandlingValid() && $col.isJdbcTypeChar())
+        reg${tmpJavaName}(CK_EQ, hSC("${col.name}", ${tmpUncapitalisedJavaName}, ${col.columnSizeSettingExpression}, "${database.shortCharHandlingModeCode}"));
+#else
+        reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
+#end
+    }
+#if (${col.isAvailableStringNotEqual()})
+
+    /**
+     * NotEqual(&lt;&gt;). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual. (NullAllowed: if null (or empty), no condition)
+     */
+    ${col.propertySettingModifierAsPrefix}def set${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        doSet${tmpJavaName}_NotEqual(fRES(${tmpUncapitalisedJavaName}));
+    }
+#if (${col.isAvailableStringEmptyString()})
+
+    /**
+     * NotEqual(&lt;&gt;). As the empty-string. And OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     */
+    ${col.propertySettingModifierAsPrefix}def set${tmpJavaName}_NotEqual_EmptyString(): Unit = {
+        doSet${tmpJavaName}_NotEqual("");
+    }
+#end
+#if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+
+    /**
+     * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_NotEqual_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
+        doSet${tmpJavaName}_NotEqual(if (cdef != null) { cdef.code } else { null });
+    }
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+
+    /**
+     * NotEqual(&lt;&gt;). As ${classificationElement.name} (${classificationElement.code}). And OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+     */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
+    def set${tmpJavaName}_NotEqual_${classificationElement.name}(): Unit = {
+        set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
+    }
+#end
+#end
+
+    protected def doSet${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
+#if ($database.isShortCharHandlingValid() && $col.isJdbcTypeChar())
+        reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, hSC("${col.name}", ${tmpUncapitalisedJavaName}, ${col.columnSizeSettingExpression}, "${database.shortCharHandlingModeCode}"));
+#else
+        reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, ${tmpUncapitalisedJavaName});
+#end
+    }
+#end
+#if (${col.isAvailableStringGreaterThan()})
+
+    /**
+     * GreaterThan(&gt;). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_GreaterThan(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        reg${tmpJavaName}(CK_GT, fRES(${tmpUncapitalisedJavaName}));
+    }
+#end
+#if (${col.isAvailableStringLessThan()})
+
+    /**
+     * LessThan(&lt;). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_LessThan(${tmpUncapitalisedJavaName}: $col.immutableJavaNative): Unit = {
+        reg${tmpJavaName}(CK_LT, fRES(${tmpUncapitalisedJavaName}));
+    }
+#end
+#if (${col.isAvailableStringGreaterEqual()})
+
+    /**
+     * GreaterEqual(&gt;=). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_GreaterEqual(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        reg${tmpJavaName}(CK_GE, fRES(${tmpUncapitalisedJavaName}));
+    }
+#end
+#if (${col.isAvailableStringLessEqual()})
+
+    /**
+     * LessEqual(&lt;=). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_LessEqual(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        reg${tmpJavaName}(CK_LE, fRES(${tmpUncapitalisedJavaName}));
+    }
+#end
+#if (${col.isAvailableStringInScope()})
+
+    /**
+     * InScope {in ('a', 'b')}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: List[${col.immutableJavaNative}]): Unit = {
+        doSet${tmpJavaName}_InScope(toMutableValueCollectionImplicitly(${tmpUncapitalisedJavaName}List));
+    }
+#if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+
+    /**
+     * InScope {in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_InScope_As${col.classificationName}(cdefList: List[${glCDef}.${col.classificationName}]): Unit = {
+        doSet${tmpJavaName}_InScope(cTStrL(cdefList.asJava));
+    }
+#foreach ($group in $classificationTop.groupList)
+
+    /**
+     * InScope {in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc} <br />
+#end
+#if ($group.hasGroupComment())
+     * ${group.groupCommentForJavaDoc} <br />
+#end
+     * ${group.buildElementDisp()}
+     */
+    def set${tmpJavaName}_InScope_${group.groupNameInitCap}(): Unit = {
+        set${tmpJavaName}_InScope_As${col.classificationName}(${glCDef}.${col.classificationName}.listOf${group.groupNameInitCap}());
+    }
+#end
+#end
+
+    protected def doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
+        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+    }
+#end
+#if (${col.isAvailableStringNotInScope()})
+
+    /**
+     * NotInScope {not in ('a', 'b')}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: List[${col.immutableJavaNative}]): Unit = {
+        doSet${tmpJavaName}_NotInScope(if (${tmpUncapitalisedJavaName}List != null) { ${tmpUncapitalisedJavaName}List.map(_.asInstanceOf[${col.javaNative}]).asJava } else { null });
+    }
+#if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+
+    /**
+     * NotInScope {not in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_NotInScope_As${col.classificationName}(cdefList: List[${glCDef}.${col.classificationName}]): Unit = {
+        doSet${tmpJavaName}_NotInScope(cTStrL(cdefList.asJava));
+    }
+#end
+
+    protected def doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
+        regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+    }
+#end
+#if (${col.isAvailableStringPrefixSearch()})
+
+    /**
+     * PrefixSearch {like 'xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_PrefixSearch(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
+        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName})(_.likePrefix);
+    }
+#end
+#if (${col.isAvailableStringLikeSearch()})
+
+    /**
+     * LikeSearch with various options. (versatile) {like '%xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * <pre>e.g. set${tmpJavaName}_LikeSearch("xxx", new <span style="color: #DD4747">LikeSearchOption</span>().likeContain());</pre>
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch. (NullAllowed: if null (or empty), no condition)
+     * @param optionCall The callback for option of like-search. (NotNull)
+     */
+    def set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}: ${col.javaNative})(optionCall: (ScrLikeSearchOption) => Unit): Unit = {
+        regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", callbackLSOP(optionCall));
+    }
+#end
+#if (${col.isAvailableStringNotLikeSearch()})
+
+    /**
+     * NotLikeSearch with various options. (versatile) {not like 'xxx%' escape ...} <br />
+     * And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch. (NullAllowed: if null (or empty), no condition)
+     * @param optionCall The callback for option of not-like-search. (NotNull)
+     */
+    def set${tmpJavaName}_NotLikeSearch(${tmpUncapitalisedJavaName}: ${col.javaNative})(optionCall: (ScrLikeSearchOption) => Unit): Unit = {
+        regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", callbackLSOP(optionCall));
+    }
+#end
+#foreach ($referrer in $col.existsReferrerReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyName = "${referrer.referrerPropertyName}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up ExistsReferrer (correlated sub-query). <br />
+     * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * <pre>
+     * cb.query().<span style="color: #DD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     *     public void query(${relatedCBClassName} subCB) {
+     *         subCB.query().setXxx...
+     *     }
+     * });
+     * </pre>
+     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
+     */
+    def exists${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#foreach ($referrer in $col.existsReferrerReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyName = "${referrer.referrerPropertyName}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up NotExistsReferrer (correlated sub-query). <br />
+     * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * <pre>
+     * cb.query().<span style="color: #DD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     *     public void query(${relatedCBClassName} subCB) {
+     *         subCB.query().setXxx...
+     *     }
+     * });
+     * </pre>
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
+     */
+    def notExists${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerNotExistsReferrer(cb.query(), "${col.name}", "${referrer.FirstLocalColumnName}", pp, "${relationPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up InScopeRelation (sub-query). <br />
+     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
+     */
+    def inScope${fk.foreignPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#foreach ($referrer in $col.inScopeRelationReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyName = "${referrer.referrerPropertyName}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up InScopeRelation (sub-query). <br />
+     * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
+     */
+    def inScope${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up NotInScopeRelation (sub-query). <br />
+     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
+     */
+    def notInScope${fk.foreignPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerNotInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#foreach ($referrer in $col.inScopeRelationReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyName = "${referrer.referrerPropertyName}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up NotInScopeRelation (sub-query). <br />
+     * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
+     */
+    def notInScope${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerNotInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#foreach ($referrer in $col.derivedReferrerReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+
+    def xsderive${referrer.referrerPropertyNameInitCap}(fn: String, sq: SubQuery[${relatedCBClassName}], al: String, op: DerivedReferrerOption): Unit = {
+        assertObjectNotNull("subQuery", sq);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
+        try { lock(); sq.query(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerSpecifyDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${referrer.referrerPropertyName}", al, op);
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#foreach ($referrer in $col.derivedReferrerReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+
+    /**
+     * Prepare for (Query)DerivedReferrer (correlated sub-query). <br />
+     * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * <pre>
+     * cb.query().<span style="color: #DD4747">derived${referrer.referrerPropertyNameInitCap}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     *     public void query(${relatedCBClassName} subCB) {
+     *         subCB.specify().<span style="color: #DD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
+     *     }
+     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// condition to derived column</span>
+     * </pre>
+     * @return The object to set up a function for referrer table. (NotNull)
+     */
+    def derived${referrer.referrerPropertyNameInitCap}(): ScrHpQDRFunction[${relatedCBClassName}] = {
+        return toScalaQDRFunction(xcreateQDRFunction${referrer.referrerPropertyNameInitCap}());
+    }
+    protected def xcreateQDRFunction${referrer.referrerPropertyNameInitCap}(): HpQDRFunction[${relatedCBClassName}] = {
+        return new HpQDRFunction[${relatedCBClassName}](new HpQDRSetupper[${relatedCBClassName}]() {
+            def setup(fn: String, sq: SubQuery[${relatedCBClassName}], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
+                xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
+            }
+        });
+    }
+    def xqderive${referrer.referrerPropertyNameInitCap}(fn: String, sq: SubQuery[${relatedCBClassName}], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
+        assertObjectNotNull("subQuery", sq);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
+        try { lock(); sq.query(cb); } finally { unlock(); }
+        val sqpp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        val prpp: String = keep${subQueryPropertyNameInitCap}Parameter(vl);
+        registerQueryDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", sqpp, "${referrer.referrerPropertyName}", rd, vl, prpp, op);
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+    def keep${subQueryPropertyNameInitCap}Parameter(vl: Object): String;
+#end
+#end
+#if (${col.isJavaNativeNumberObject()})
+    /**
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
+     */
+    ${col.propertySettingModifierAsPrefix}def set${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        doSet${tmpJavaName}_Equal(${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})});
+    }
+#if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+
+    /**
+     * Equal(=). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_Equal_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
+        doSet${tmpJavaName}_Equal(cTNum(if (cdef != null) { cdef.code } else { null }, classOf[${col.javaNative}]));
+    }
+#if ($classificationTop.isSisterBooleanHandling())
+
+    /**
+     * Equal(=). As boolean for ${col.classificationName}. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param determination The determination, true or false. (NullAllowed: if null, no condition)
+     */
+    def set${col.javaName}_Equal_AsBoolean(determination: Boolean): Unit = {
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
+    }
+#end
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+
+    /**
+     * Equal(=). As ${classificationElement.name} (${classificationElement.code}). And NullIgnored, OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+     */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
+    def set${tmpJavaName}_Equal_${classificationElement.name}(): Unit = {
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
+    }
+#end
+#end
+
+    protected def doSet${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
+        reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
+    }
+#if (${col.isAvailableNumberNotEqual()})
+
+    /**
+     * NotEqual(&lt;&gt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual. (NullAllowed: if null, no condition)
+     */
+    ${col.propertySettingModifierAsPrefix}def set${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        doSet${tmpJavaName}_NotEqual(${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})});
+    }
+#if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+
+    /**
+     * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_NotEqual_As${col.classificationName}(cdef: ${glCDef}.${col.classificationName}): Unit = {
+        doSet${tmpJavaName}_NotEqual(cTNum(if (cdef != null) { cdef.code } else { null }, classOf[${col.javaNative}]));
+    }
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+
+    /**
+     * NotEqual(&lt;&gt;). As ${classificationElement.name} (${classificationElement.code}). And NullIgnored, OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+     */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
+    def set${tmpJavaName}_NotEqual_${classificationElement.name}(): Unit = {
+        set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
+    }
+#end
+#end
+
+    protected def doSet${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName}: ${col.javaNative}): Unit = {
+        reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, ${tmpUncapitalisedJavaName});
+    }
+#end
+#if (${col.isAvailableNumberGreaterThan()})
+
+    /**
+     * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_GreaterThan(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        reg${tmpJavaName}(CK_GT, ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})});
+    }
+#end
+#if (${col.isAvailableNumberLessThan()})
+
+    /**
+     * LessThan(&lt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_LessThan(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        reg${tmpJavaName}(CK_LT, ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})});
+    }
+#end
+#if (${col.isAvailableNumberGreaterEqual()})
+
+    /**
+     * GreaterEqual(&gt;=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_GreaterEqual(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        reg${tmpJavaName}(CK_GE, ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})});
+    }
+#end
+#if (${col.isAvailableNumberLessEqual()})
+
+    /**
+     * LessEqual(&lt;=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_LessEqual(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        reg${tmpJavaName}(CK_LE, ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})});
+    }
+#end
+#if (${col.isAvailableNumberRangeOf()})
+
+    /**
+     * RangeOf with various options. (versatile) <br />
+     * {(default) minNumber &lt;= column &lt;= maxNumber} <br />
+     * And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param minNumber The min number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
+     * @param maxNumber The max number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
+     * @param optionCall The callback for option of range-of. (NotNull)
+     */
+    def set${tmpJavaName}_RangeOf(minNumber: ${col.immutableJavaNative}, maxNumber: ${col.immutableJavaNative})(optionCall: (RangeOfOption) => Unit): Unit = {
+        regROO(minNumber, maxNumber, getCValue${tmpJavaName}(), "${col.name}", callbackROOP(optionCall));
+    }
+#end
+#if (${col.isAvailableNumberInScope()})
+
+    /**
+     * InScope {in (1, 2)}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: List[${col.immutableJavaNative}]): Unit = {
+        doSet${tmpJavaName}_InScope(toMutableValueCollectionImplicitly(${tmpUncapitalisedJavaName}List));
+    }
+#if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+
+    /**
+     * InScope {in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_InScope_As${col.classificationName}(cdefList: List[${glCDef}.${col.classificationName}]): Unit = {
+        doSet${tmpJavaName}_InScope(cTNumL(cdefList.asJava, classOf[${col.javaNative}]));
+    }
+#foreach ($group in $classificationTop.groupList)
+
+    /**
+     * InScope {in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc} <br />
+#end
+#if ($group.hasGroupComment())
+     * ${group.groupCommentForJavaDoc} <br />
+#end
+     * ${group.buildElementDisp()}
+     */
+    def set${tmpJavaName}_InScope_${group.groupNameInitCap}(): Unit = {
+        set${tmpJavaName}_InScope_As${col.classificationName}(${glCDef}.${col.classificationName}.listOf${group.groupNameInitCap}());
+    }
+#end
+#end
+
+    protected def doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
+        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+    }
+#end
+#if (${col.isAvailableNumberNotInScope()})
+
+    /**
+     * NotInScope {not in (1, 2)}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: List[${col.immutableJavaNative}]): Unit = {
+        doSet${tmpJavaName}_NotInScope(if (${tmpUncapitalisedJavaName}List != null) { ${tmpUncapitalisedJavaName}List.map(_.asInstanceOf[${col.javaNative}]).asJava } else { null });
+    }
+#if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+
+    /**
+     * NotInScope {not in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_NotInScope_As${col.classificationName}(cdefList: List[${glCDef}.${col.classificationName}]): Unit = {
+        doSet${tmpJavaName}_NotInScope(cTNumL(cdefList.asJava, classOf[${col.javaNative}]));
+    }
+#end
+
+    protected def doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
+        regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+    }
+#end
+#foreach ($referrer in $col.existsReferrerReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyName = "${referrer.referrerPropertyName}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up ExistsReferrer (correlated sub-query). <br />
+     * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * <pre>
+     * cb.query().<span style="color: #DD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     *     public void query(${relatedCBClassName} subCB) {
+     *         subCB.query().setXxx...
+     *     }
+     * });
+     * </pre>
+     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
+     */
+    def exists${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#foreach ($referrer in $col.existsReferrerReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyName = "${referrer.referrerPropertyName}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up NotExistsReferrer (correlated sub-query). <br />
+     * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * <pre>
+     * cb.query().<span style="color: #DD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     *     public void query(${relatedCBClassName} subCB) {
+     *         subCB.query().setXxx...
+     *     }
+     * });
+     * </pre>
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
+     */
+    def notExists${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerNotExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up InScopeRelation (sub-query). <br />
+     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
+     */
+    def inScope${fk.foreignPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#foreach ($referrer in $col.inScopeRelationReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyName = "${referrer.referrerPropertyName}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up InScopeRelation (sub-query). <br />
+     * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
+     */
+    def inScope${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up NotInScopeRelation (sub-query). <br />
+     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
+     */
+    def notInScope${fk.foreignPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerNotInScopeRelation(cb.query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#foreach ($referrer in $col.inScopeRelationReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyName = "${referrer.referrerPropertyName}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up NotInScopeRelation (sub-query). <br />
+     * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
+     */
+    def notInScope${relationPropertyNameInitCap}(subQuery: (${relatedCBClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerNotInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#foreach ($referrer in $col.derivedReferrerReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+
+    def xsderive${referrer.referrerPropertyNameInitCap}(fn: String, sq: SubQuery[${relatedCBClassName}], al: String, op: DerivedReferrerOption): Unit = {
+        assertObjectNotNull("subQuery", sq);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
+        try { lock(); sq.query(cb); } finally { unlock(); }
+        val pp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerSpecifyDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${referrer.referrerPropertyName}", al, op);
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+#end
+#foreach ($referrer in $col.derivedReferrerReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+
+    /**
+     * Prepare for (Query)DerivedReferrer (correlated sub-query). <br />
+     * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * <pre>
+     * cb.query().<span style="color: #DD4747">derived${referrer.referrerPropertyNameInitCap}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     *     public void query(${relatedCBClassName} subCB) {
+     *         subCB.specify().<span style="color: #DD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
+     *     }
+     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// condition to derived column</span>
+     * </pre>
+     * @return The object to set up a function for referrer table. (NotNull)
+     */
+    def derived${referrer.referrerPropertyNameInitCap}(): ScrHpQDRFunction[${relatedCBClassName}] = {
+        return toScalaQDRFunction(xcreateQDRFunction${referrer.referrerPropertyNameInitCap}());
+    }
+    protected def xcreateQDRFunction${referrer.referrerPropertyNameInitCap}(): HpQDRFunction[${relatedCBClassName}] = {
+        return new HpQDRFunction[${relatedCBClassName}](new HpQDRSetupper[${relatedCBClassName}]() {
+            def setup(fn: String, sq: SubQuery[${relatedCBClassName}], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
+                xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
+            }
+        });
+    }
+    def xqderive${referrer.referrerPropertyNameInitCap}(fn: String, sq: SubQuery[${relatedCBClassName}], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
+        assertObjectNotNull("subQuery", sq);
+        val cb: ${relatedCBClassName} = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(this);
+        try { lock(); sq.query(cb); } finally { unlock(); }
+        val sqpp: String = keep${subQueryPropertyNameInitCap}(cb.query());
+        val prpp: String = keep${subQueryPropertyNameInitCap}Parameter(vl);
+        registerQueryDerivedReferrer(fn, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", sqpp, "${referrer.referrerPropertyName}", rd, vl, prpp, op);
+    }
+    def keep${subQueryPropertyNameInitCap}(sq: ${relatedCQClassName}): String;
+    def keep${subQueryPropertyNameInitCap}Parameter(vl: Object): String;
+#end
+#end
+#if (${col.isJavaNativeDateObject()})
+    /**
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: $col.immutableJavaNative): Unit = {
+        reg${tmpJavaName}(CK_EQ, #if ($col.isJavaNativeUtilDate()) fCTPD(${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})})#else ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})}#end);
+    }
+#if (${col.isAvailableDateNotEqual()})
+
+    /**
+     * NotEqual(&lt;&gt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName}: $col.immutableJavaNative): Unit = {
+        reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, #if ($col.isJavaNativeUtilDate()) fCTPD(${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})})#else ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})}#end);
+    }
+#end
+#if (${col.isAvailableDateGreaterThan()})
+
+    /**
+     * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_GreaterThan(${tmpUncapitalisedJavaName}: $col.immutableJavaNative): Unit = {
+        reg${tmpJavaName}(CK_GT, #if ($col.isJavaNativeUtilDate()) fCTPD(${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})})#else ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})}#end);
+    }
+#end
+#if (${col.isAvailableDateLessThan()})
+
+    /**
+     * LessThan(&lt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_LessThan(${tmpUncapitalisedJavaName}: $col.immutableJavaNative): Unit = {
+        reg${tmpJavaName}(CK_LT, #if ($col.isJavaNativeUtilDate()) fCTPD(${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})})#else ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})}#end);
+    }
+#end
+#if (${col.isAvailableDateGreaterEqual()})
+
+    /**
+     * GreaterEqual(&gt;=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_GreaterEqual(${tmpUncapitalisedJavaName}: $col.immutableJavaNative): Unit = {
+        reg${tmpJavaName}(CK_GE, #if ($col.isJavaNativeUtilDate()) fCTPD(${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})})#else ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})}#end);
+    }
+#end
+#if (${col.isAvailableDateLessEqual()})
+
+    /**
+     * LessEqual(&lt;=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_LessEqual(${tmpUncapitalisedJavaName}: $col.immutableJavaNative): Unit = {
+        reg${tmpJavaName}(CK_LE,#if ($col.isJavaNativeUtilDate()) fCTPD(${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})})#else ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})}#end);
+    }
+#end
+#if (${col.isAvailableDateFromTo()})
+
+    /**
+     * FromTo with various options. (versatile) {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
+     * And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, new <span style="color: #DD4747">FromToOption</span>().compareAsDate());</pre>
+     * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
+     * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
+     * @param fromToOption The option of from-to. (NotNull)
+     */
+    def set${tmpJavaName}_FromTo(fromDatetime: ${col.fromToJavaNativeDate}, toDatetime: ${col.fromToJavaNativeDate})(optionCall: (ScrFromToOption) => Unit): Unit = {
+#if ($col.isJavaNativeUtilDate())
+        regFTQ(fCTPD(fromDatetime), fCTPD(toDatetime), getCValue${tmpJavaName}(), "${col.name}", callbackFTOP(optionCall));
+#elseif ($col.isJavaNativeNextLocalDate())
+        regFTQ(toUtilDate(fromDatetime), toUtilDate(toDatetime), getCValue${tmpJavaName}(), "${col.name}", callbackFTOP(optionCall));
+#elseif ($col.isJavaNativeNextLocalDateTime())
+        regFTQ(toTimestamp(fromDatetime), toTimestamp(toDatetime), getCValue${tmpJavaName}(), "${col.name}", callbackFTOP(optionCall));
+#else
+        regFTQ(if (fromDatetime != null) { new ${col.javaNative}(fromDatetime.getTime()) } else { null }, if (toDatetime != null) { new ${col.javaNative}(toDatetime.getTime()) } else { null }, getCValue${tmpJavaName}(), "${col.name}", callbackFTOP(optionCall));
+#end
+    }
+#end
+#if (${col.isAvailableDateDateFromTo()})
+
+    /**
+     * DateFromTo. (Date means yyyy/MM/dd) {fromDate &lt;= column &lt; toDate + 1 day} <br />
+     * And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * <pre>
+     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
+     *  column &gt;= '2007/04/10 00:00:00' and column <span style="color: #DD4747">&lt; '2007/04/17 00:00:00'</span>
+     * </pre>
+     * @param fromDate The from-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
+     * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
+     */
+    def set${tmpJavaName}_DateFromTo(fromDate: ${col.fromToJavaNativeDate}, toDate: ${col.fromToJavaNativeDate}): Unit = {
+        set${tmpJavaName}_FromTo(fromDate, toDate)(_.compareAsDate);
+    }
+#end
+#if (${col.isAvailableDateInScope()})
+
+    /**
+     * InScope {in ('1965-03-03', '1966-09-15')}. And NullOrEmptyIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: List[${col.immutableJavaNative}]): Unit = {
+        doSet${tmpJavaName}_InScope(toMutableValueCollectionImplicitly(${tmpUncapitalisedJavaName}List));
+    }
+
+    protected def doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
+        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+    }
+#end
+#if (${col.isAvailableDateNotInScope()})
+
+    /**
+     * NotInScope {not in ('1965-03-03', '1966-09-15')}. And NullOrEmptyIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: List[${col.immutableJavaNative}]): Unit = {
+        doSet${tmpJavaName}_NotInScope(toMutableValueCollectionImplicitly(${tmpUncapitalisedJavaName}List));
+    }
+
+    protected def doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List: Collection[${col.javaNative}]): Unit = {
+        regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+    }
+#end
+#end
+#if (${col.isJavaNativeBooleanObject()})
+    /**
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        reg${tmpJavaName}(CK_EQ, ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})});
+    }
+#if ($col.hasClassification())
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+
+    /**
+     * Equal(=). As ${classificationElement.name}. And OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+     */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
+    def set${tmpJavaName}_Equal_${classificationElement.name}(): Unit = {
+        reg${tmpJavaName}(CK_EQ, ${col.javaNative}.valueOf(${glCDef}.${col.classificationName}.${classificationElement.name}.code()));
+    }
+#end
+#end
+#end
+#if (${col.isJavaNativeUUIDObject()})
+    /**
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
+     */
+    def set${tmpJavaName}_Equal(${tmpUncapitalisedJavaName}: ${col.immutableJavaNative}): Unit = {
+        reg${tmpJavaName}(CK_EQ, ${col.convertToMutableJavaNativeValue(${tmpUncapitalisedJavaName})}${tmpUncapitalisedJavaName}));
+    }
+#if (${col.isAvailableStringInScope()})
+
+    /**
+     * InScope {in ('a', 'b')}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
+     */
+    def set${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List: List[${col.immutableJavaNative}]): Unit = {
+        regINS(CK_INS, cTL(toMutableValueCollectionImplicitly((${tmpUncapitalisedJavaName}List)), getCValue${tmpJavaName}(), "${col.name}");
+    }
+#end
+#end
+#if (!${col.isNotNull()} || ${col.isPrimaryKey()})
+
+    /**
+     * IsNull {is null}. And OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     */
+    def set${tmpJavaName}_IsNull(): Unit = { reg${tmpJavaName}(CK_ISN, AbstractConditionQuery.DOBJ); }
+#if ($col.isMakeIsNullOrEmpty())
+
+    /**
+     * IsNullOrEmpty {is null or empty}. And OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     */
+    def set${tmpJavaName}_IsNullOrEmpty(): Unit = { reg${tmpJavaName}(CK_ISNOE, AbstractConditionQuery.DOBJ); }
+#end
+
+    /**
+     * IsNotNull {is not null}. And OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     */
+    def set${tmpJavaName}_IsNotNull(): Unit = { reg${tmpJavaName}(CK_ISNN, AbstractConditionQuery.DOBJ); }
+#end
+
+    protected def reg${tmpJavaName}(ky: ConditionKey, vl: Any): Unit = { regQ(ky, vl, getCValue${tmpJavaName}(), "${col.name}"); }
+    protected def getCValue${tmpJavaName}(): ConditionValue;
+#set ($columnLoopIndex = $columnLoopIndex + 1)
+#end
+#if ($table.isAvailableMyselfScalarCondition())
+
+    // ===================================================================================
+    //                                                                     ScalarCondition
+    //                                                                     ===============
+    /**
+     * Prepare ScalarCondition as equal. <br />
+     * {where FOO = (select max(BAR) from ...)
+     * <pre>
+     * cb.query().<span style="color: #DD4747">scalar_Equal()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} subCB) {
+     *         subCB.specify().setXxx... <span style="color: #3F7E5E">// derived column for function</span>
+     *         subCB.query().setYyy...
+     *     }
+     * });
+     * </pre>
+     * @return The object to set up a function. (NotNull)
+     */
+    def scalar_Equal(): ScrHpSSQFunction[${myConditionBeanClassName}] = {
+        return toScalaSSQFunction(xcreateSSQFunction(CK_EQ, classOf[${myConditionBeanClassName}]));
+    }
+
+    /**
+     * Prepare ScalarCondition as equal. <br />
+     * {where FOO &lt;&gt; (select max(BAR) from ...)
+     * <pre>
+     * cb.query().<span style="color: #DD4747">scalar_NotEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} subCB) {
+     *         subCB.specify().setXxx... <span style="color: #3F7E5E">// derived column for function</span>
+     *         subCB.query().setYyy...
+     *     }
+     * });
+     * </pre>
+     * @return The object to set up a function. (NotNull)
+     */
+    def scalar_NotEqual(): ScrHpSSQFunction[${myConditionBeanClassName}] = {
+        return toScalaSSQFunction(xcreateSSQFunction(CK_NES, classOf[${myConditionBeanClassName}]));
+    }
+
+    /**
+     * Prepare ScalarCondition as greaterThan. <br />
+     * {where FOO &gt; (select max(BAR) from ...)
+     * <pre>
+     * cb.query().<span style="color: #DD4747">scalar_GreaterThan()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} subCB) {
+     *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
+     *         subCB.query().setBar...
+     *     }
+     * });
+     * </pre>
+     * @return The object to set up a function. (NotNull)
+     */
+    def scalar_GreaterThan(): ScrHpSSQFunction[${myConditionBeanClassName}] = {
+        return toScalaSSQFunction(xcreateSSQFunction(CK_GT, classOf[${myConditionBeanClassName}]));
+    }
+
+    /**
+     * Prepare ScalarCondition as lessThan. <br />
+     * {where FOO &lt; (select max(BAR) from ...)
+     * <pre>
+     * cb.query().<span style="color: #DD4747">scalar_LessThan()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} subCB) {
+     *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
+     *         subCB.query().setBar...
+     *     }
+     * });
+     * </pre>
+     * @return The object to set up a function. (NotNull)
+     */
+    def scalar_LessThan(): ScrHpSSQFunction[${myConditionBeanClassName}] = {
+        return toScalaSSQFunction(xcreateSSQFunction(CK_LT, classOf[${myConditionBeanClassName}]));
+    }
+
+    /**
+     * Prepare ScalarCondition as greaterEqual. <br />
+     * {where FOO &gt;= (select max(BAR) from ...)
+     * <pre>
+     * cb.query().<span style="color: #DD4747">scalar_GreaterEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} subCB) {
+     *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
+     *         subCB.query().setBar...
+     *     }
+     * });
+     * </pre>
+     * @return The object to set up a function. (NotNull)
+     */
+    def scalar_GreaterEqual(): ScrHpSSQFunction[${myConditionBeanClassName}] = {
+        return toScalaSSQFunction(xcreateSSQFunction(CK_GE, classOf[${myConditionBeanClassName}]));
+    }
+
+    /**
+     * Prepare ScalarCondition as lessEqual. <br />
+     * {where FOO &lt;= (select max(BAR) from ...)
+     * <pre>
+     * cb.query().<span style="color: #DD4747">scalar_LessEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} subCB) {
+     *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
+     *         subCB.query().setBar...
+     *     }
+     * });
+     * </pre>
+     * @return The object to set up a function. (NotNull)
+     */
+    def scalar_LessEqual(): ScrHpSSQFunction[${myConditionBeanClassName}] = {
+        return toScalaSSQFunction(xcreateSSQFunction(CK_LE, classOf[${myConditionBeanClassName}]));
+    }
+
+    protected def toScalaSSQFunction(function: HpSSQFunction[${myConditionBeanClassName}]): ScrHpSSQFunction[${myConditionBeanClassName}] =
+    { new ScrHpSSQFunction(function) }
+
+    override protected def xscalarCondition[CB <: ConditionBean](fn: String, sq: SubQuery[CB], rd: String, op: HpSSQOption[CB]): Unit = {
+        assertObjectNotNull("subQuery", sq);
+        val cb: ${myConditionBeanClassName} = xcreateScalarConditionCB(); sq.query(cb.asInstanceOf[CB]);
+        val pp: String = keepScalarCondition(cb.query()); // for saving query-value
+        op.setPartitionByCBean(xcreateScalarConditionPartitionByCB().asInstanceOf[CB]); // for using partition-by
+        registerScalarCondition(fn, cb.query(), pp, rd, op);
+    }
+    def keepScalarCondition(sq: ${myConditionQueryClassName}): String;
+
+    protected def xcreateScalarConditionCB(): ${myConditionBeanClassName} = {
+        val cb: ${myConditionBeanClassName} = newMyCB(); cb.xsetupForScalarCondition(this); return cb;
+    }
+
+    protected def xcreateScalarConditionPartitionByCB(): ${myConditionBeanClassName} = {
+        val cb: ${myConditionBeanClassName} = newMyCB(); cb.xsetupForScalarConditionPartitionBy(this); return cb;
+    }
+#end
+#if ($table.hasSinglePrimaryKey())
+#if ($table.isAvailableMyselfMyselfDerived())
+
+    // ===================================================================================
+    //                                                                       MyselfDerived
+    //                                                                       =============
+    def xsmyselfDerive(fn: String, sq: SubQuery[${myConditionBeanClassName}], al: String, op: DerivedReferrerOption): Unit = {
+        assertObjectNotNull("subQuery", sq);
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForDerivedReferrer(this);
+        try { lock(); sq.query(cb); } finally { unlock(); }
+        val pp: String = keepSpecifyMyselfDerived(cb.query());
+        val pk: String = "${table.primaryKeyAsOne.name}";
+        registerSpecifyMyselfDerived(fn, cb.query(), pk, pk, pp, "myselfDerived", al, op);
+    }
+    def keepSpecifyMyselfDerived(sq: ${myConditionQueryClassName}): String;
+
+    /**
+     * Prepare for (Query)MyselfDerived (correlated sub-query).
+     * @return The object to set up a function for myself table. (NotNull)
+     */
+    def myselfDerived(): ScrHpQDRFunction[${myConditionBeanClassName}] = {
+        return toScalaQDRFunction(xcreateQDRFunctionMyselfDerived(classOf[${myConditionBeanClassName}]));
+    }
+    override protected def xqderiveMyselfDerived[CB <: ConditionBean](fn: String, sq: SubQuery[CB], rd: String, vl: Object, op: DerivedReferrerOption): Unit = {
+        assertObjectNotNull("subQuery", sq);
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForDerivedReferrer(this); sq.query(cb.asInstanceOf[CB]);
+        val pk: String = "${table.primaryKeyAsOne.name}";
+        val sqpp: String = keepQueryMyselfDerived(cb.query()); // for saving query-value.
+        val prpp: String = keepQueryMyselfDerivedParameter(vl);
+        registerQueryMyselfDerived(fn, cb.query(), pk, pk, sqpp, "myselfDerived", rd, vl, prpp, op);
+    }
+    def keepQueryMyselfDerived(sq: ${myConditionQueryClassName}): String;
+    def keepQueryMyselfDerivedParameter(vl: Object): String;
+#end
+#if ($table.isAvailableMyselfMyselfExists())
+
+    // ===================================================================================
+    //                                                                        MyselfExists
+    //                                                                        ============
+    /**
+     * Prepare for MyselfExists (correlated sub-query).
+     * @param subQuery The implementation of sub-query. (NotNull)
+     */
+    def myselfExists(subQuery: (${myConditionBeanClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForMyselfExists(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keepMyselfExists(cb.query());
+        registerMyselfExists(cb.query(), pp);
+    }
+    def keepMyselfExists(sq: ${myConditionQueryClassName}): String;
+#end
+#if ($table.isAvailableMyselfMyselfInScope())
+
+    // ===================================================================================
+    //                                                                       MyselfInScope
+    //                                                                       =============
+    /**
+     * Prepare for MyselfInScope (sub-query).
+     * @param subQuery The implementation of sub-query. (NotNull)
+     */
+    def myselfInScope(subQuery: (${myConditionBeanClassName}) => Unit): Unit = {
+        assertObjectNotNull("subQuery", subQuery);
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForMyselfInScope(this);
+        try { lock(); subQuery(cb); } finally { unlock(); }
+        val pp: String = keepMyselfInScope(cb.query());
+        registerMyselfInScope(cb.query(), pp);
+    }
+    def keepMyselfInScope(sq: ${myConditionQueryClassName}): String;
+#end
+#end
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabaseMySQL())
+
+    // ===================================================================================
+    //                                                                    Full Text Search
+    //                                                                    ================
+    /**
+     * Match for full-text search. <br />
+     * Bind variable is unused because the condition value should be literal in MySQL.
+     * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
+     * @param conditionValue The condition value embedded without binding (by MySQL restriction) but escaped. (NullAllowed: if null or empty, no condition)
+     * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, No modifier specified)
+     */
+    public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn
+                    , String conditionValue
+                    , org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
+        assertObjectNotNull("textColumn", textColumn);
+        match(newArrayList(textColumn), conditionValue, modifier);
+    }
+
+    /**
+     * Match for full-text search. <br />
+     * Bind variable is unused because the condition value should be literal in MySQL.
+     * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
+     * @param conditionValue The condition value embedded without binding (by MySQL restriction) but escaped. (NullAllowed: if null or empty, no condition)
+     * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, no modifier specified)
+     */
+    public void match(List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList
+                    , String conditionValue
+                    , org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
+        xdoMatchForMySQL(textColumnList, conditionValue, modifier);
+    }
+#end
+#if ($database.isDatabasePostgreSQL())
+
+    // ===================================================================================
+    //                                                                    Full Text Search
+    //                                                                    ================
+    /**
+     * Match for full-text search. <br />
+     * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
+     * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
+     */
+    def match(textColumn: org.seasar.dbflute.dbmeta.info.ColumnInfo, conditionValue: String): Unit = {
+        assertObjectNotNull("textColumn", textColumn);
+        match(newArrayList(textColumn), conditionValue);
+    }
+
+    /**
+     * Match for full-text search. <br />
+     * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
+     * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
+     */
+    def match(textColumnList: List[org.seasar.dbflute.dbmeta.info.ColumnInfo], conditionValue: String): Unit = {
+        xdoMatchByLikeSearch(textColumnList, conditionValue);
+    }
+
+    @Override
+    protected def xescapeFullTextSearchValue(conditionValue: String): String = {
+        return conditionValue; // non escape
+    }
+
+    @Override
+    protected def xcreateMatchLikeSearch(): LikeSearchOption = {
+        return new PostgreSQLMatchLikeSearch();
+    }
+
+    @Override
+    protected def xgetPostgreSQLMatchOperand(): org.seasar.dbflute.dbway.ExtensionOperand = {
+        return ${glDBFluteConfig}.getFullTextSearchOperand();
+    }
+#end
+#if ($database.isDatabaseOracle())
+
+    // ===================================================================================
+    //                                                                    Full Text Search
+    //                                                                    ================
+    /**
+     * Match for full-text search. <br />
+     * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
+     * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
+     */
+    def match(textColumn: org.seasar.dbflute.dbmeta.info.ColumnInfo, conditionValue: String): Unit = {
+        assertObjectNotNull("textColumn", textColumn);
+        match(newArrayList(textColumn), conditionValue);
+    }
+
+    /**
+     * Match for full-text search. <br />
+     * The specified condition value is escaped in this method automatically.
+     * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
+     * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
+     */
+    def match(textColumnList: List[org.seasar.dbflute.dbmeta.info.ColumnInfo], conditionValue: String): Unit = {
+        xdoMatchByLikeSearch(textColumnList, conditionValue);
+    }
+
+    @Override
+    protected def xescapeFullTextSearchValue(conditionValue: String): String = {
+        return xescapeOracleFullTextSearchValue(conditionValue);
+    }
+
+    @Override
+    protected def xcreateMatchLikeSearch(): LikeSearchOption = {
+        return new OracleMatchLikeSearch();
+    }
+#end
+#end
+
+    // ===================================================================================
+    //                                                                            Order By
+    //                                                                            ========
+    /**
+     * Order along manual ordering information.
+     * <pre>
+     * MemberCB cb = new MemberCB();
+     * ManualOrderBean mob = new ManualOrderBean();
+     * mob.<span style="color: #DD4747">when_GreaterEqual</span>(priorityDate); <span style="color: #3F7E5E">// e.g. 2000/01/01</span>
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+     * <span style="color: #3F7E5E">// order by </span>
+     * <span style="color: #3F7E5E">//   case</span>
+     * <span style="color: #3F7E5E">//     when BIRTHDATE &gt;= '2000/01/01' then 0</span>
+     * <span style="color: #3F7E5E">//     else 1</span>
+     * <span style="color: #3F7E5E">//   end asc, ...</span>
+     *
+     * MemberCB cb = new MemberCB();
+     * ManualOrderBean mob = new ManualOrderBean();
+     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Withdrawal);
+     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Formalized);
+     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Provisional);
+     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+     * <span style="color: #3F7E5E">// order by </span>
+     * <span style="color: #3F7E5E">//   case</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'FML' then 1</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'PRV' then 2</span>
+     * <span style="color: #3F7E5E">//     else 3</span>
+     * <span style="color: #3F7E5E">//   end asc, ...</span>
+     * </pre>
+     * <p>This function with Union is unsupported!</p>
+     * <p>The order values are bound (treated as bind parameter).</p>
+     * @param mob The bean of manual order containing order values. (NotNull)
+     */
+    def withManualOrder(mobCall: (ScrManualOrderBean) => Unit): Unit = { // is user public!
+        assertObjectNotNull("withManualOrder(mobCall)", mobCall);
+        xdoWithManualOrder(callbackMOB(mobCall));
+    }
+
+#if ($database.isAvailableJodaTimeEntity())
+    protected def toUtilDate(date: Object): Date = {
+        if (date != null && date.isInstanceOf[ReadablePartial]) {
+            return new Date(date.asInstanceOf[ReadablePartial].toDateTime(null).getMillis());
+        } else if (date != null && date.isInstanceOf[ReadableInstant]) {
+            return new Date(date.asInstanceOf[ReadableInstant].getMillis());
+        }
+        return DfTypeUtil.toDate(date);
+    }
+
+    protected def toTimestamp(date: Object): java.sql.Timestamp = {
+        if (date != null && date.isInstanceOf[ReadablePartial]) {
+            return new java.sql.Timestamp(date.asInstanceOf[ReadablePartial].toDateTime(null).getMillis());
+        } else if (date != null && date.isInstanceOf[ReadableInstant]) {
+            return new java.sql.Timestamp(date.asInstanceOf[ReadableInstant].getMillis());
+        }
+        return DfTypeUtil.toTimestamp(date);
+    }
+
+    override protected def filterFromToRegisteredDate(date: Date, columnDbName: String): Object = {
+        if (date.isInstanceOf[java.sql.Timestamp]) {
+            return LocalDateTime.fromDateFields(date);
+        } else { // basically pure Date
+            return LocalDate.fromDateFields(date);
+        }
+    }
+
+#end
+    // ===================================================================================
+    //                                                                       Create Option
+    //                                                                       =============
+    protected def callbackLSOP(optionCall: (ScrLikeSearchOption) => Unit): LikeSearchOption =
+    { val op = createLikeSearchOption(); optionCall(op); return op; }
+    protected def createLikeSearchOption(): ScrLikeSearchOption = { new ScrLikeSearchOption() }
+
+    protected def callbackFTOP(optionCall: (ScrFromToOption) => Unit): FromToOption =
+    { val op = createFromToOption(); optionCall(op); return op; }
+    protected def createFromToOption(): ScrFromToOption = { new ScrFromToOption() }
+
+    protected def callbackROOP(optionCall: (ScrRangeOfOption) => Unit): RangeOfOption =
+    { val op = createRangeOfOption(); optionCall(op); return op; }
+    protected def createRangeOfOption(): ScrRangeOfOption = { new ScrRangeOfOption() }
+
+    protected def callbackMOB(mobCall: (ScrManualOrderBean) => Unit): ManualOrderBean =
+    { val mob = createManualOrderBean(); mobCall(mob); return mob; }
+    protected def createManualOrderBean(): ScrManualOrderBean = { new ScrManualOrderBean() }
+
+    // ===================================================================================
+    //                                                                        Invoke Query
+    //                                                                        ============
+    override protected def xfilterInvokeQueryParameterType(colName: String, ckey: String, parameterType: Class[_]): Class[_] =
+    { if (classOf[Collection[_]].isAssignableFrom(parameterType)) { classOf[List[_]] } else { parameterType } }
+
+    override protected def xfilterInvokeQueryParameterValue(colName: String, ckey: String, parameterValue: Object): Object =
+    { if (parameterValue.isInstanceOf[Collection[_]]) { toScalaList(parameterValue.asInstanceOf[Collection[_]]) } else { parameterValue } }
+
+    // ===================================================================================
+    //                                                                        Scala Helper
+    //                                                                        ============
+    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): immutable.List[ENTITY] = {
+        if (javaList == null) { immutable.List() }
+        return immutable.List.fromArray(javaList.toArray()).asInstanceOf[immutable.List[ENTITY]];
+    }
+
+    protected def toMutableValueCollectionImplicitly[SCALA, JAVA](ls: immutable.List[SCALA]): Collection[JAVA] =
+    { if (ls != null) { ls.map(_.asInstanceOf[JAVA]).asJava } else { null } }
+
+    protected def toScalaQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]): ScrHpQDRFunction[CB] =
+    { new ScrHpQDRFunction[CB](function) }
+
+    // ===================================================================================
+    //                                                                       Very Internal
+    //                                                                       =============
+    protected def newMyCB(): ${myConditionBeanClassName} = {
+        return new ${myConditionBeanClassName}();
+    }
+    // very internal (for suppressing warn about 'Not Use Import')
+    protected def xabUDT(): String = { return classOf[Date].getName(); }
+    protected def xabCQ(): String = { return classOf[${myConditionQueryClassName}].getName(); }
+    protected def xabLSO(): String = { return classOf[LikeSearchOption].getName(); }
+    protected def xabSSQS(): String = { return classOf[HpSSQSetupper[_]].getName(); }
+#if ($database.isDatabaseMSAccess())
+    @Override
+    protected def xsuppressEscape(): Boolean = { return true; } // bacause MS-Access does not support escape
+#end
+}

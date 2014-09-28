@@ -1,0 +1,10 @@
+#set ($myClassName = "${myExtendedObjectClassName}")
+
+using System;
+using System.Collections.Generic;
+
+namespace ${myExtendedEntityPackageName} {
+
+    partial class $myClassName {
+    }
+}

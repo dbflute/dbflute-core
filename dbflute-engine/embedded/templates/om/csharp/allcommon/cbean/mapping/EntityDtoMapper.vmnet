@@ -1,0 +1,7 @@
+
+using System;
+
+namespace ${glPackageBaseCommonCBeanMapping} {
+
+    public delegate DTO ${glEntityDtoMapper}<ENTITY, DTO>(ENTITY entity);
+}

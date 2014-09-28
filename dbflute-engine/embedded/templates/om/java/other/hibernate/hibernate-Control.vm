@@ -1,0 +1,167 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+
+##
+## Use the mode before DBFlute-0.9.0
+## because it does not use DBFlute runtime.
+##
+#set ($database = $schemaData.database)
+$database.enableGenerateOutputDirectory()
+
+## - - - - - - - - - - - -
+## Initialize properties.
+## - - - - - - - - - - - -
+$database.initializeAdditionalPrimaryKey()
+$database.initializeAdditionalUniqueKey()
+$database.initializeAdditionalForeignKey()
+$database.initializeClassificationDeployment()
+$database.initializeIncludeQuery()
+$database.checkProperties()
+
+## *****************************************************************************************************************
+##                                                                                                   Global Paramter
+##                                                                                                   ***************
+## ===================================================================================
+##                                                                            Language
+##                                                                            ========
+#set ($glTargetLanguage = ${database.targetLanguage})
+
+## ===================================================================================
+##                                                                  Resource Directory
+##                                                                  ==================
+#set ($glResourceDirectory = "${database.resourceDirectory}/other/hibernate")
+
+## ===================================================================================
+##                                                                           Extension
+##                                                                           =========
+#set ($glTemplateFileExtension = ${database.templateFileExtension})
+#set ($glClassFileExtension = ${database.classFileExtension})
+
+## ===================================================================================
+##                                                                              Prefix
+##                                                                              ======
+#set ($glProjectPrefix = ${database.projectPrefix})
+#set ($glBasePrefix = ${database.basePrefix})
+#set ($glBaseSuffixForEntity = ${database.baseSuffixForEntity})
+
+## ===================================================================================
+##                                                                          Class Name
+##                                                                          ==========
+## -----------------------------------------------------
+##                                               Regular
+##                                               -------
+## [AllCommon]
+#set ($glAccessContext = "${glProjectPrefix}AccessContext")
+#set ($glCDef = "${glProjectPrefix}CDef")
+#set ($glCommonColumnAutoSetupper = "${glProjectPrefix}CommonColumnAutoSetupper")
+#set ($glEntity = "${glProjectPrefix}Entity")
+#set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
+
+## ===================================================================================
+##                                                                             Package
+##                                                                             =======
+## -----------------------------------------------------
+##                                               Regular
+##                                               -------
+#set ($glPackageBaseCommon = "${database.baseCommonPackage}")
+#set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
+#set ($glPackageBaseDao = "${database.baseDaoPackage}" )
+#set ($glPackageBaseCustomizeDao = "${database.baseDaoPackage}.customize" )
+#set ($glPackageBaseEntity = "${database.baseEntityPackage}")
+#set ($glPackageBaseCustomizeEntity = "${database.baseEntityPackage}.customize" )
+#set ($glPackageExtendedBhv = "${database.extendedBehaviorPackage}")
+#set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
+#set ($glPackageExtendedCustomizeDao = "${database.extendedDaoPackage}.customize" )
+#set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
+#set ($glPackageExtendedCustomizeEntity = "${database.extendedEntityPackage}.customize" )
+#set ($glPackageBaseCB = "${database.conditionBeanPackage}.bs")
+#set ($glPackageCB = "${database.extendedConditionBeanPackage}")
+#set ($glPackageBaseCQ = "${database.conditionBeanPackage}.cq.bs")
+#set ($glPackageCQ = "${database.extendedConditionBeanPackage}.cq")
+#set ($glPackageCIQ = "${database.conditionBeanPackage}.cq.ciq")
+#set ($glPackageNss = "${database.conditionBeanPackage}.nss")
+#set ($glPackageBaseDBMeta = "${glPackageBaseEntity}.dbmeta")
+#set ($glPackageBaseCustomizeDBMeta = "${glPackageBaseCustomizeEntity}.dbmeta")
+
+## *****************************************************************************************************************
+##                                                                                                           Parsing
+##                                                                                                           *******
+## ===================================================================================
+##                                                                           AllCommon
+##                                                                           =========
+$database.info("public void parseAllCommon() {")
+
+#set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
+$database.makeDirectory($path)
+
+$database.info("    parse('AccessContext');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glAccessContext}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/HibernateAccessContext.${glTemplateFileExtension}",$path ,"", "")
+
+#if ($database.hasClassificationDefinition())
+  $database.info("    parse('CDef');")
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCDef}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/allcommon/HibernateCDef.${glTemplateFileExtension}",$path ,"" ,"")
+#end
+
+$database.info("    parse('CommonColumnAutoSetupper');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCommonColumnAutoSetupper}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/HibernateCommonColumnAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
+
+$database.info("    parse('Entity');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntity}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/HibernateEntity.${glTemplateFileExtension}",$path ,"", "")
+
+$database.info("    parse('EntityDefinedCommonColumn');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntityDefinedCommonColumn}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/HibernateEntityDefinedCommonColumn.${glTemplateFileExtension}",$path ,"", "")
+
+$database.info("}")
+
+## ===================================================================================
+##                                                                    Hibernate Entity
+##                                                                    ================
+#if ($database.hasHibernateDefinition())
+  $database.debug("parseHibernateEntity() {")
+  #set ($myBaseEntityPackageName = "${database.hibernateBaseEntityPackage}")
+  #set ($myExtendedEntityPackageName = "${database.hibernateExtendedEntityPackage}")
+
+  #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
+  $database.makeDirectory($path)
+
+  #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
+  $database.makeDirectory($path)
+
+  #foreach ($table in $database.tables)
+    #set ($myBaseObjectClassName = "${database.hibernateBaseEntityPrefix}${table.javaName}")
+    #set ($myExtendedObjectClassName = "${table.javaName}")
+
+    $database.debug("    parse('${myExtendedObjectClassName}')")
+	
+    #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/bsentity/HibernateBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+
+    #if (!$database.isStopGenerateExtendedEntity())
+      #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+      #if (!$files.file(${generator.OutputPath},$path).exists())
+        $generator.parse("om/${glResourceDirectory}/exentity/HibernateExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+      #end
+	#end
+
+  #end
+  $database.debug("}")
+#end
+

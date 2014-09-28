@@ -1,0 +1,309 @@
+#set ($myClassName = "${myDBMetaClassName}")
+
+using System;
+using System.Reflection;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonDBMetaInfo};
+using ${glPackageBaseCommonJavaLike};
+using ${myExtendedEntityPackageName};
+#if (${isExistDao})
+
+using ${myExtendedDaoPackageName};
+#end
+#if (${isExistConditionBean})
+using ${glPackageCB};
+
+#end
+namespace ${myDBMetaPackageName} {
+
+    public class ${myClassName} : ${glAbstractDBMeta} {
+
+        public static readonly Type ENTITY_TYPE = typeof(${myExtendedObjectClassName});
+
+        private static readonly ${myClassName} _instance = new ${myClassName}();
+        private ${myClassName}() {
+            InitializeColumnInfo();
+            InitializeColumnInfoList();
+            InitializeEntityPropertySetupper();
+        }
+        public static ${myClassName} GetInstance() {
+            return _instance;
+        }
+
+        // ===============================================================================
+        //                                                                      Table Info
+        //                                                                      ==========
+        public override String TableDbName { get { return "${table.tableDbName}"; } }
+        public override String TablePropertyName { get { return "$table.javaName"; } }
+        public override String TableSqlName { get { return "$table.tableSqlName"; } }
+#if ($table.hasAlias())
+        public override String TableAlias { get { return "$table.alias"; } }
+#end
+#if ($table.isCommentForDBMetaValid())
+        public override String TableComment { get { return "$table.commentForDBMeta"; } }
+#end
+
+        // ===============================================================================
+        //                                                                     Column Info
+        //                                                                     ===========
+#foreach ($col in $table.columns)
+        protected ${glColumnInfo} _column${col.javaName};
+#end
+
+#foreach ($col in $table.columns)
+        public ${glColumnInfo} Column${col.javaName} { get { return _column${col.javaName}; } }
+#end
+
+        protected void InitializeColumnInfo() {
+#foreach ($col in $table.columns)
+            _column${col.javaName} = cci("${col.name}", "${col.columnSqlName}", ${col.synonymSettingExpression}, ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaName}", ${col.javaNativeTypeLiteral}, ${col.isPrimaryKey()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpressionNotNull}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression});
+#end
+        }
+
+        protected void InitializeColumnInfoList() {
+            _columnInfoList = new ArrayList<${glColumnInfo}>();
+#foreach ($col in $table.columns)
+            _columnInfoList.add(Column${col.javaName});
+#end
+        }
+
+        // ===============================================================================
+        //                                                                     Unique Info
+        //                                                                     ===========
+        public override ${glUniqueInfo} PrimaryUniqueInfo { get {
+#if ($table.hasPrimaryKey())
+#if ($table.hasSinglePrimaryKey())
+            return cpui(Column${table.primaryKeyAsOne.javaName});
+#else
+            List<${glColumnInfo}> ls = new ArrayList<${glColumnInfo}>();
+#foreach ($col in $table.primaryKey)
+            ls.add(Column${col.javaName});
+#end
+            return cpui(ls);
+#end
+#else
+            throw new NotSupportedException("The table does not have primary key: " + TableDbName);
+#end
+        }}
+
+        // -------------------------------------------------
+        //                                   Primary Element
+        //                                   ---------------
+        public override bool HasPrimaryKey { get { return ${table.hasPrimaryKey()}; } }
+        public override bool HasCompoundPrimaryKey { get { return ${table.hasCompoundPrimaryKey()}; } }
+
+        // ===============================================================================
+        //                                                                   Relation Info
+        //                                                                   =============
+        // -------------------------------------------------
+        //                                   Foreign Element
+        //                                   ---------------
+#foreach ($fk in $table.foreignKeys)
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
+        public ${glForeignInfo} Foreign${fk.foreignJavaBeansRulePropertyNameInitCap} { get {
+            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
+#foreach ($col in $fk.localColumnList)
+            map.put(Column${col.javaBeansRulePropertyNameInitCap}, ${fk.foreignTableDBMetaClassName}.GetInstance().Column${fk.getForeignColumnByLocalColumn(${col}).javaBeansRulePropertyNameInitCap});
+#end
+            return cfi("${fk.foreignJavaBeansRulePropertyNameInitCap}", this, ${fk.foreignTableDBMetaClassName}.GetInstance(), map, ${table.resolveForeignIndex($fk)}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()});
+        }}
+#end
+
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
+        public ${glForeignInfo} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} { get {
+            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
+#foreach ($col in $referrer.foreignColumnList)
+            map.put(Column${col.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap});
+#end
+            return cfi("${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()});
+        }}
+#end
+
+        // -------------------------------------------------
+        //                                  Referrer Element
+        //                                  ----------------
+#foreach ($referrer in $table.referrerAsManyList)
+#set ($genericsColumnInfoMap = "${glColumnInfo}, ${glColumnInfo}")
+#set ($referrerTable = $referrer.table)
+        public ${glReferrerInfo} Referrer${referrer.referrerJavaBeansRulePropertyNameInitCap} { get {
+            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
+#foreach ($col in $referrer.foreignColumnList)
+            map.put(Column${col.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap});
+#end
+            return cri("${referrer.referrerJavaBeansRulePropertyNameInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${referrer.isOneToOne()});
+        }}
+#end
+
+        // ===============================================================================
+        //                                                                    Various Info
+        //                                                                    ============
+#if ($table.isUseIdentity())
+        public override bool HasIdentity { get { return true; } }
+#end
+#if ($table.isUseSequence())
+        public override bool HasSequence { get { return true; } }
+        public override String SequenceName { get { return "${table.sequenceSqlName}"; } }
+        public override String SequenceNextValSql { get { return "${table.sequenceNextValSql}"; } }
+        public override int? SequenceIncrementSize { get { return ${table.sequenceIncrementSizeExpression}; } }
+        public override int? SequenceCacheSize { get { return ${table.sequenceCacheSizeExpression}; } }
+#end
+#if ($table.isUseVersionNo())
+        public override bool HasVersionNo { get { return true; } }
+        public override ${glColumnInfo} VersionNoColumnInfo { get { return _column${table.versionNoJavaName}; } }
+#end
+#if ($table.isUseUpdateDate())
+        public override bool HasUpdateDate { get { return true; } }
+        public override ${glColumnInfo} UpdateDateColumnInfo { get { return _column${table.updateDateJavaName}; } }
+#end
+        public override bool HasCommonColumn { get { return ${table.hasAllCommonColumn()}; } }
+
+        // ===============================================================================
+        //                                                                 Name Definition
+        //                                                                 ===============
+        #region Name
+
+        // -------------------------------------------------
+        //                                             Table
+        //                                             -----
+        public static readonly String TABLE_DB_NAME = "${table.tableDbName}";
+        public static readonly String TABLE_PROPERTY_NAME = "$table.javaName";
+
+        // -------------------------------------------------
+        //                                    Column DB-Name
+        //                                    --------------
+#foreach ($col in $table.columns)
+        public static readonly String DB_NAME_${col.name} = "$col.name";
+#end
+
+        // -------------------------------------------------
+        //                              Column Property-Name
+        //                              --------------------
+#foreach ($col in $table.columns)
+        public static readonly String PROPERTY_NAME_${col.name} = "$col.javaName";
+#end
+
+        // -------------------------------------------------
+        //                                      Foreign Name
+        //                                      ------------
+#foreach ($foreignKeys in $table.foreignKeys)
+        public static readonly String FOREIGN_PROPERTY_NAME_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.foreignPropertyNameInitCap";
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+        public static readonly String FOREIGN_PROPERTY_NAME_${referrer.referrerPropertyNameInitCapAsOne} = "$foreignKeys.foreignPropertyNameInitCap";
+#end
+        // -------------------------------------------------
+        //                                     Referrer Name
+        //                                     -------------
+#foreach ($referrer in $table.referrerAsManyList)
+        public static readonly String REFERRER_PROPERTY_NAME_${referrer.referrerPropertyNameInitCap} = "$referrer.referrerPropertyNameInitCap";
+#end
+
+        // -------------------------------------------------
+        //                               DB-Property Mapping
+        //                               -------------------
+        protected static readonly Map<String, String> _dbNamePropertyNameKeyToLowerMap;
+        protected static readonly Map<String, String> _propertyNameDbNameKeyToLowerMap;
+
+        static ${myClassName}() {
+            {
+                Map<String, String> map = new LinkedHashMap<String, String>();
+                map.put(TABLE_DB_NAME.ToLower(), TABLE_PROPERTY_NAME);
+#foreach ($col in $table.columns)
+                map.put(DB_NAME_${col.name}.ToLower(), PROPERTY_NAME_${col.name});
+#end
+                _dbNamePropertyNameKeyToLowerMap = map;
+            }
+
+            {
+                Map<String, String> map = new LinkedHashMap<String, String>();
+                map.put(TABLE_PROPERTY_NAME.ToLower(), TABLE_DB_NAME);
+#foreach ($col in $table.Columns)
+                map.put(PROPERTY_NAME_${col.name}.ToLower(), DB_NAME_${col.name});
+#end
+                _propertyNameDbNameKeyToLowerMap = map;
+            }
+        }
+
+        #endregion
+
+        // ===============================================================================
+        //                                                                        Name Map
+        //                                                                        ========
+        #region Name Map
+        public override Map<String, String> DbNamePropertyNameKeyToLowerMap { get { return _dbNamePropertyNameKeyToLowerMap; } }
+        public override Map<String, String> PropertyNameDbNameKeyToLowerMap { get { return _propertyNameDbNameKeyToLowerMap; } }
+        #endregion
+
+        // ===============================================================================
+        //                                                                       Type Name
+        //                                                                       =========
+        public override String EntityTypeName { get { return "${myExtendedEntityPackageName}.${myExtendedObjectClassName}"; } }
+#if (${isExistDao})
+        public override String DaoTypeName { get { return "${myExtendedDaoPackageName}.${myExtendedDaoClassName}"; } }
+#else
+        public override String DaoTypeName { get { return null; } }
+#end
+#if (${isExistConditionBean})
+        public override String ConditionBeanTypeName { get { return "${glPackageCB}.${myConditionBeanClassName}"; } }
+#else
+        public override String ConditionBeanTypeName { get { return null; } }
+#end
+#if (${isExistBehavior})
+        public override String BehaviorTypeName { get { return "${myExtendedBhvPackageName}.${myExtendedBhvClassName}"; } }
+#else
+        public override String BehaviorTypeName { get { return null; } }
+#end
+
+        // ===============================================================================
+        //                                                                     Object Type
+        //                                                                     ===========
+        public override Type EntityType { get { return ENTITY_TYPE; } }
+
+        // ===============================================================================
+        //                                                                 Object Instance
+        //                                                                 ===============
+        public override ${glEntity} NewEntity() { return NewMyEntity(); }
+        public ${myExtendedObjectClassName} NewMyEntity() { return new ${myExtendedObjectClassName}(); }
+#if (${isExistConditionBean})
+        public override ${glConditionBean} NewConditionBean() { return NewMyConditionBean(); }
+#else
+        public override ${glConditionBean} NewConditionBean() {
+            String msg = "The entity does not have condition-bean. So this method is invalid.";
+            throw new SystemException(msg + " dbmeta=" + ToString());
+        }
+#end
+#if (${isExistConditionBean})
+        public ${myConditionBeanClassName} NewMyConditionBean() { return new ${myConditionBeanClassName}(); }
+#end
+
+        // ===============================================================================
+        //                                                           Entity Property Setup
+        //                                                           =====================
+        protected Map<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap = new LinkedHashMap<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
+
+        protected void InitializeEntityPropertySetupper() {
+#foreach ($col in $table.columns)
+            RegisterEntityPropertySetupper("$col.name", "$col.javaName", new EntityProperty${col.javaName}Setupper(), _entityPropertySetupperMap);
+#end
+        }
+
+        public override bool HasEntityPropertySetupper(String propertyName) {
+            return _entityPropertySetupperMap.containsKey(propertyName);
+        }
+
+        public override void SetupEntityProperty(String propertyName, Object entity, Object value) {
+            EntityPropertySetupper<${myExtendedObjectClassName}> callback = _entityPropertySetupperMap.get(propertyName);
+            callback.Setup((${myExtendedObjectClassName})entity, value);
+        }
+
+#foreach ($col in $table.columns)
+        public class EntityProperty${col.javaName}Setupper : EntityPropertySetupper<${myExtendedObjectClassName}> {
+            public void Setup(${myExtendedObjectClassName} entity, Object value) { entity.${col.javaName} = (value != null) ? (${col.javaNative})value : null; }
+        }
+#end
+    }
+}

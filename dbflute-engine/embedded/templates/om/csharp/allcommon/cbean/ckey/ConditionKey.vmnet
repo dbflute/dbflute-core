@@ -1,0 +1,166 @@
+#set ($myClassName = "${glConditionKey}")
+
+using System;
+
+using ${glPackageBaseCommonCOption};
+using ${glPackageBaseCommonCValue};
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommonCKey} {
+
+public abstract class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** The condition key of equal. */
+    public static readonly ${myClassName} CK_EQUAL = new ${myClassName}Equal();
+
+    /** The condition key of notEqual as standard. */
+    public static readonly ${myClassName} CK_NOT_EQUAL_STANDARD = new ${myClassName}NotEqualStandard();
+
+    /** The condition key of notEqual as tradition. */
+    public static readonly ${myClassName} CK_NOT_EQUAL_TRADITION = new ${myClassName}NotEqualTradition();
+
+    /** The condition key of greaterThan. */
+    public static readonly ${myClassName} CK_GREATER_THAN = new ${myClassName}GreaterThan();
+
+    /** The condition key of lessrThan. */
+    public static readonly ${myClassName} CK_LESS_THAN = new ${myClassName}LessThan();
+
+    /** The condition key of greaterEqual. */
+    public static readonly ${myClassName} CK_GREATER_EQUAL = new ${myClassName}GreaterEqual();
+
+    /** The condition key of lessEqual. */
+    public static readonly ${myClassName} CK_LESS_EQUAL = new ${myClassName}LessEqual();
+
+    /** The condition key of prefixSearch. */
+    public static readonly ${myClassName} CK_PREFIX_SEARCH = new ${myClassName}PrefixSearch();
+
+    /** The condition key of inScope. */
+    public static readonly ${myClassName} CK_IN_SCOPE = new ${myClassName}InScope();
+
+    /** The condition key of notInScope. */
+    public static readonly ${myClassName} CK_NOT_IN_SCOPE = new ${myClassName}NotInScope();
+
+    /** The condition key of likeSearch. */
+    public static readonly ${myClassName} CK_LIKE_SEARCH = new ${myClassName}LikeSearch();
+
+    /** The condition key of notLikeSearch. */
+    public static readonly ${myClassName} CK_NOT_LIKE_SEARCH = new ${myClassName}NotLikeSearch();
+
+    /** The condition key of isNull. */
+    public static readonly ${myClassName} CK_IS_NULL = new ${myClassName}IsNull();
+
+    /** The condition key of isNotNull. */
+    public static readonly ${myClassName} CK_IS_NOT_NULL = new ${myClassName}IsNotNull();
+
+    /** Dummy-object for IsNull and IsNotNull and so on... */
+    protected static readonly Object DUMMY_OBJECT = new Object();
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Condition-key. */
+    protected String _conditionKey;
+
+    /** Operand. */
+    protected String _operand;
+
+    // ===================================================================================
+    //                                                                         Main Method
+    //                                                                         ===========
+    public String getConditionKey() {
+        // Because initial charactor of property name is capital in dotNet world.
+        return (_conditionKey != null ? _conditionKey.Substring(0, 1).ToUpper() + _conditionKey.Substring(1) : null);
+    }
+
+    public String getOperand() {
+        return _operand;
+    }
+
+    abstract public bool isValidRegistration(${glConditionValue} conditionValue, Object value, String callerName);
+
+    public ${myClassName} addWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value) {
+        if (value == null) {
+            String msg = "Argument[value] must not be null:";
+            throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
+        }
+        doAddWhereClause(conditionList, columnName, value);
+        return this;
+    }
+
+    public ${myClassName} addWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option) {
+        if (value == null) {
+            String msg = "Argument[value] must not be null:";
+            throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
+        }
+        doAddWhereClause(conditionList, columnName, value, option);
+        return this;
+    }
+	
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value);
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option);
+
+    public ${glConditionValue} setupConditionValue(${glConditionValue} conditionValue, Object value, String location) {
+        if (conditionValue == null) {
+            String msg = "Argument[conditionValue] must not be null:";
+            throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
+        }
+        doSetupConditionValue(conditionValue, value, location);
+        return conditionValue;
+    }
+
+    public ${glConditionValue} setupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
+        if (conditionValue == null) {
+            String msg = "Argument[conditionValue] must not be null:";
+            throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
+        }
+        doSetupConditionValue(conditionValue, value, location, option);
+        return conditionValue;
+    }
+	
+    abstract protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location);
+    abstract protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option);
+
+    protected String buildBindClause(String columnName, String location) {
+        return columnName + " " + getOperand() + " " + "/*pmb." + location + "*/null";
+    }
+
+    protected String buildBindClauseWithRearOption(String columnName, String location, String rearOption) {
+        return columnName + " " + getOperand() + " " + "/*pmb." + location + "*/null" + rearOption;
+    }
+
+    protected String buildBindClause(String columnName, String location, String dummyValue) {
+        return columnName + " " + getOperand() + " " + "/*pmb." + location + "*/" + dummyValue;
+    }
+
+    protected String buildClauseWithoutValue(String columnName) {
+        return columnName + " " + getOperand();
+    }
+
+    protected String getWildCard() {
+        return "${database.WildCard}";
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public override int GetHashCode() {
+        return getConditionKey().GetHashCode();
+    }
+
+    public override bool Equals(Object other) {
+        if (other is ${myClassName}) {
+            if (this.getConditionKey().Equals(((${myClassName})other).getConditionKey())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public override String ToString() {
+        return "${myClassName}: " + getConditionKey() + " " + getOperand() + " wild-card=[" + getWildCard() + "]";
+    }
+}
+}

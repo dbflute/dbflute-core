@@ -1,0 +1,52 @@
+
+using System;
+using System.Collections.Generic;
+
+namespace ${glPackageBaseCommonCBean} {
+
+    public class ${glResultBeanBuilder}<ENTITY> {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected String _tableDbName;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glResultBeanBuilder}(String tableDbName) {
+            _tableDbName = tableDbName;
+        }
+
+        // ===============================================================================
+        //                                                                         Builder
+        //                                                                         =======
+        public ${glListResultBean}<ENTITY> BuildListResultBean(IList<ENTITY> selectedList) {
+            ${glListResultBean}<ENTITY> rb = new ${glListResultBean}<ENTITY>();
+            rb.TableDbName = _tableDbName;
+            rb.AllRecordCount = selectedList.Count;
+            rb.SelectedList = selectedList;
+            return rb;
+        }
+
+        public ${glListResultBean}<ENTITY> BuildListResultBean(${glConditionBean} ob, IList<ENTITY> selectedList) {
+            ${glListResultBean}<ENTITY> rb = new ${glListResultBean}<ENTITY>();
+            rb.TableDbName = _tableDbName;
+            rb.AllRecordCount = selectedList.Count;
+            rb.SelectedList = selectedList;
+            rb.OrderByClause = ob.SqlComponentOfOrderByClause;
+            return rb;
+        }
+
+        public ${glPagingResultBean}<ENTITY> BuildPagingResultBean(${glPagingBean} pb, int allRecordCount, IList<ENTITY> selectedList) {
+            ${glPagingResultBean}<ENTITY> rb = new ${glPagingResultBean}<ENTITY>();
+            rb.TableDbName = _tableDbName;
+            rb.AllRecordCount = allRecordCount;
+            rb.SelectedList = selectedList;
+            rb.OrderByClause = pb.SqlComponentOfOrderByClause;
+            rb.CurrentPageNumber = pb.FetchPageNumber;
+            rb.PageSize = pb.FetchSize;
+            return rb;
+        }
+    }
+}

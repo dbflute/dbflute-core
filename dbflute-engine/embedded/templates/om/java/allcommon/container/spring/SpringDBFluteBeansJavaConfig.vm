@@ -1,0 +1,131 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Bean;
+import org.seasar.dbflute.BehaviorSelector;
+import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
+import org.seasar.dbflute.bhv.core.InvokerAssistant;
+import ${database.DBFluteInitializerClass};
+import ${glPackageExtendedBhv}.*;
+
+/**
+ * @author ${database.classAuthor}
+ */
+@Configuration
+public class ${glDBFluteBeansJavaConfig} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    // *according to dependency order
+    @Autowired
+    protected ApplicationContext _container;
+
+    @Resource(name="${database.DBFluteBeansDataSourceName}")
+    protected DataSource dataSource;
+
+    @Autowired
+    protected InvokerAssistant invokerAssistant;
+
+    @Autowired
+    protected BehaviorCommandInvoker behaviorCommandInvoker;
+
+    @Autowired
+    protected BehaviorSelector behaviorSelector;
+
+    @Autowired
+    protected CommonColumnAutoSetupper commonColumnAutoSetupper;
+
+    // ===================================================================================
+    //                                                                   Runtime Component
+    //                                                                   =================
+    @Bean(name="${database.DBFluteInitializerComponentName}")
+    public ${glDBFluteInitializer} createDBFluteInitializer() {
+        return new ${glDBFluteInitializer}(dataSource);
+    }
+
+    @Bean(name="${database.invokerAssistantComponentName}")
+    public InvokerAssistant createImplementedInvokerAssistant() {
+        ${glImplementedInvokerAssistant} assistant = newImplementedInvokerAssistant();
+        assistant.setDataSource(dataSource);
+        return assistant;
+    }
+
+    protected ${glImplementedInvokerAssistant} newImplementedInvokerAssistant() {
+        return new ${database.implementedInvokerAssistantClass}();
+    }
+
+    @Bean(name="${database.behaviorCommandInvokerComponentName}")
+    public BehaviorCommandInvoker createBehaviorCommandInvoker() {
+        BehaviorCommandInvoker invoker = newBehaviorCommandInvoker();
+        invoker.setInvokerAssistant(invokerAssistant);
+        return invoker;
+    }
+
+    protected BehaviorCommandInvoker newBehaviorCommandInvoker() {
+        return new BehaviorCommandInvoker();
+    }
+
+    @Bean(name="${database.behaviorSelectorComponentName}")
+    public ${glImplementedBehaviorSelector} createImplementedBehaviorSelector() {
+        ${glImplementedBehaviorSelector} selector = newImplementedBehaviorSelector();
+        selector.setContainer(_container);
+        return selector;
+    }
+
+    protected ${glImplementedBehaviorSelector} newImplementedBehaviorSelector() {
+        return new ${glImplementedBehaviorSelector}();
+    }
+
+    @Bean(name="${database.commonColumnAutoSetupperComponentName}")
+    public ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
+        return newImplementedCommonColumnAutoSetupper();
+    }
+
+    protected ${glImplementedCommonColumnAutoSetupper} newImplementedCommonColumnAutoSetupper() {
+        return new ${glImplementedCommonColumnAutoSetupper}();
+    }
+
+#set ($behaviorLoopIndex = 0)
+#foreach ($table in $database.behaviorTableList)
+#if ($behaviorLoopIndex == 0)
+    // ===================================================================================
+    //                                                                            Behavior
+    //                                                                            ========
+#else
+
+#end
+    @Bean(name={"${table.behaviorComponentName}"})
+    public ${table.extendedBehaviorClassName} create${table.extendedBehaviorClassName}() {
+        ${table.extendedBehaviorClassName} bhv = new${table.extendedBehaviorClassName}();
+        bhv.setBehaviorCommandInvoker(behaviorCommandInvoker); bhv.setBehaviorSelector(behaviorSelector);
+#if ($table.isWritable())
+        bhv.setCommonColumnAutoSetupper(commonColumnAutoSetupper);
+#end
+        return bhv;
+    }
+    protected ${table.extendedBehaviorClassName} new${table.extendedBehaviorClassName}() { return new ${table.extendedBehaviorClassName}(); }
+#set ($behaviorLoopIndex = $behaviorLoopIndex + 1)
+#end
+}

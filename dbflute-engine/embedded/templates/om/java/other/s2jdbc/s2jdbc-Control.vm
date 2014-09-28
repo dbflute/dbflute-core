@@ -1,0 +1,167 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($database = $schemaData.database)
+$database.enableGenerateOutputDirectory()
+
+$database.initializeAdditionalPrimaryKey()
+$database.initializeAdditionalUniqueKey()
+$database.initializeAdditionalForeignKey()
+$database.initializeClassificationDeployment()
+$database.initializeIncludeQuery()
+
+## *****************************************************************************************************************
+##                                                                                                   Global Paramter
+##                                                                                                   ***************
+## ===================================================================================
+##                                                                            Language
+##                                                                            ========
+#set ($glTargetLanguage = ${database.targetLanguage})
+
+## ===================================================================================
+##                                                                  Resource Directory
+##                                                                  ==================
+#set ($glResourceDirectory = ${database.resourceDirectory})
+
+## ===================================================================================
+##                                                                           Extension
+##                                                                           =========
+#set ($glTemplateFileExtension = ${database.templateFileExtension})
+#set ($glClassFileExtension = ${database.classFileExtension})
+
+## -----------------------------------------------------
+##                                                Prefix
+##                                                ------
+#set ($glProjectPrefix = ${database.projectPrefix})
+#set ($glBasePrefix = ${database.basePrefix})
+#set ($glBaseSuffixForEntity = ${database.baseSuffixForEntity})
+
+## -----------------------------------------------------
+##                                                 Dicon
+##                                                 -----
+#set ($glDBFluteDiconNamespace = "${database.DBFluteDiconNamespace}")
+#set ($glDBFluteDiconFileName = "${database.DBFluteDiconFileName}")
+#set ($glCreatorDiconFileName = "${database.DBFluteCreatorDiconFileName}")
+#set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
+#set ($glJ2eeDiconResourceName = "${database.j2eeDiconResourceName}")
+#set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
+
+## ===================================================================================
+##                                                                             Package
+##                                                                             =======
+## [Common]
+#set ($glPackageBaseCommon = "${database.baseCommonPackage}")
+#set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.annotation")
+#set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.bhv")
+#set ($glPackageBaseCommonBhvBatch = "${database.baseCommonPackage}.bhv.batch")
+#set ($glPackageBaseCommonBhvLoad = "${database.baseCommonPackage}.bhv.load")
+#set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.bhv.setup")
+#set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
+#set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.cbean.ckey")
+#set ($glPackageBaseCommonCBeanMapping = "${database.baseCommonPackage}.cbean.mapping")
+#set ($glPackageBaseCommonCBeanGrouping = "${database.baseCommonPackage}.cbean.grouping")
+#set ($glPackageBaseCommonCBeanOutsidesql = "${database.baseCommonPackage}.cbean.outsidesql")
+#set ($glPackageBaseCommonCBeanOutsidesqlExecutor = "${database.baseCommonPackage}.cbean.outsidesql.executor")
+#set ($glPackageBaseCommonCBeanPagenavi = "${database.baseCommonPackage}.cbean.pagenavi")
+#set ($glPackageBaseCommonCBeanPagenaviGroup = "${database.baseCommonPackage}.cbean.pagenavi.group")
+#set ($glPackageBaseCommonCBeanPagenaviRange = "${database.baseCommonPackage}.cbean.pagenavi.range")
+#set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.cbean.sqlclause")
+#set ($glPackageBaseCommonCValue = "${database.baseCommonPackage}.cbean.cvalue")
+#set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.cbean.coption")
+#set ($glPackageBaseCommonCOptionParts = "${database.baseCommonPackage}.cbean.coption.parts")
+#set ($glPackageBaseCommonCOptionPartsLocal = "${database.baseCommonPackage}.cbean.coption.parts.local")
+#set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
+#set ($glPackageBaseCommonDBMetaHierarchy = "${database.baseCommonPackage}.dbmeta.hierarchy")
+#set ($glPackageBaseCommonDBMetaHierarchyBasic = "${database.baseCommonPackage}.dbmeta.hierarchy.basic")
+#set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.dbmeta.info")
+#set ($glPackageBaseCommonException = "${database.baseCommonPackage}.exception")
+#set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
+#set ($glPackageBaseCommonHelperCharacter = "${database.baseCommonPackage}.helper.character")
+#set ($glPackageBaseCommonHelperCharacterImpl = "${database.baseCommonPackage}.helper.character.impl")
+#set ($glPackageBaseCommonHelperCollectionOrder = "${database.baseCommonPackage}.helper.collection.order")
+#set ($glPackageBaseCommonHelperCollectionOrderImpl = "${database.baseCommonPackage}.helper.collection.order.impl")
+#set ($glPackageBaseCommonHelperToken = "${database.baseCommonPackage}.helper.token")
+#set ($glPackageBaseCommonHelperTokenLine = "${database.baseCommonPackage}.helper.token.line")
+#set ($glPackageBaseCommonHelperTokenLineImpl = "${database.baseCommonPackage}.helper.token.line.impl")
+#set ($glPackageBaseCommonHelperTokenFile = "${database.baseCommonPackage}.helper.token.file")
+#set ($glPackageBaseCommonHelperTokenFileImpl = "${database.baseCommonPackage}.helper.token.file.impl")
+
+#set ($glPackageBaseCommonInterceptor = "${database.baseCommonPackage}.interceptor")
+#set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.javalike")
+#set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.jdbc")
+#set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.jdbc.history")
+#set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
+#set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.s2dao")
+#set ($glPackageBaseCommonS2DaoInternal = "${database.baseCommonPackage}.s2dao.internal")
+#set ($glPackageBaseCommonS2DaoInternalSqlCommand = "${database.baseCommonPackage}.s2dao.internal.sqlcommand")
+#set ($glPackageBaseCommonS2DaoInternalSqlHandler = "${database.baseCommonPackage}.s2dao.internal.sqlhandler")
+#set ($glPackageBaseCommonS2DaoInternalSqlLog = "${database.baseCommonPackage}.s2dao.internal.sqllog")
+#set ($glPackageBaseCommonS2DaoInternalSqlParser = "${database.baseCommonPackage}.s2dao.internal.sqlparser")
+#set ($glPackageBaseCommonS2DaoInternalUtil = "${database.baseCommonPackage}.s2dao.internal.util")
+#set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.util")
+
+## [Main]
+#set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
+#set ($glPackageBaseDao = "${database.baseDaoPackage}" )
+#set ($glPackageBaseCustomizeDao = "${database.baseDaoPackage}.customize" )
+#set ($glPackageBaseEntity = "${database.baseEntityPackage}")
+#set ($glPackageBaseCustomizeEntity = "${database.baseEntityPackage}.customize" )
+#set ($glPackageExtendedBhv = "${database.extendedBehaviorPackage}")
+#set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
+#set ($glPackageExtendedCustomizeDao = "${database.extendedDaoPackage}.customize" )
+#set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
+#set ($glPackageExtendedCustomizeEntity = "${database.extendedEntityPackage}.customize" )
+#set ($glPackageBaseDBMeta = "${glPackageBaseEntity}.dbmeta")
+#set ($glPackageBaseCustomizeDBMeta = "${glPackageBaseCustomizeEntity}.dbmeta")
+#set ($glPackageBaseSqlParameterBean = "${database.SqlParameterBeanPackage}.bsparam")
+#set ($glPackageExtendedSqlParameterBean = "${database.SqlParameterBeanPackage}.exparam")
+
+## *****************************************************************************************************************
+##                                                                                                           Parsing
+##                                                                                                           *******
+## ===================================================================================
+##                                                                       S2JDBC Entity
+##                                                                       =============
+#if ($database.hasS2jdbcDefinition())
+  $database.debug("parseS2jdbcEntity() {")
+  #set ($myBaseEntityPackageName = "${database.s2jdbcBaseEntityPackage}")
+  #set ($myExtendedEntityPackageName = "${database.s2jdbcExtendedEntityPackage}")
+
+  #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
+  $database.makeDirectory($path)
+  
+  #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
+  $database.makeDirectory($path)
+
+  #foreach ($table in $database.tables)
+    #set ($myBaseObjectClassName = "${database.s2jdbcBaseEntityPrefix}${table.javaName}")
+    #set ($myExtendedObjectClassName = "${table.javaName}")
+
+    $database.debug("    parse('${myExtendedObjectClassName}')")
+	
+    #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/other/s2jdbc/entity/S2jdbcBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+
+    #if (!$database.isStopGenerateExtendedEntity())
+      #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+      #if (!$files.file(${generator.OutputPath},$path).exists())
+        $generator.parse("om/${glResourceDirectory}/other/s2jdbc/entity/S2jdbcExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+      #end
+	#end
+
+  #end
+  $database.debug("}")
+#end
+

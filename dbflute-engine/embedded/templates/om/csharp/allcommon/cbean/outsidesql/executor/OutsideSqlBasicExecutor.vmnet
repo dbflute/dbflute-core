@@ -1,0 +1,117 @@
+
+using System;
+using System.Collections.Generic;
+
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonJdbc};
+using ${glPackageBaseCommonUtil};
+
+namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
+
+    public class ${glOutsideSqlBasicExecutor} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected ${glOutsideSqlDao} _outsideSqlDao;
+        protected String _tableDbName;
+        protected bool _dynamicBinding;
+        protected ${glStatementConfig} _statementConfig;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glOutsideSqlBasicExecutor}(${glOutsideSqlDao} outsideSqlDao, String tableDbName) {
+            _outsideSqlDao = outsideSqlDao;
+            _tableDbName = tableDbName;
+        }
+
+        // ===============================================================================
+        //                                                                          Select
+        //                                                                          ======
+#if (!$database.isCompatibleOutsideSqlResultOldStyle())
+        public ${glListResultBean}<ENTITY> SelectList<ENTITY>(String path, Object pmb) {
+            IList<ENTITY> resultList = ToGenericList<ENTITY>(_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), typeof(ENTITY)));
+            return new ${glResultBeanBuilder}<ENTITY>(_tableDbName).BuildListResultBean(resultList);
+            
+        }
+#else
+        public IList<ENTITY> SelectList<ENTITY>(String path, Object pmb) {
+            return ToGenericList<ENTITY>(_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), typeof(ENTITY)));
+        }
+#end
+
+        protected IList<ENTITY> ToGenericList<ENTITY>(System.Collections.IList plainList) {
+            return ${glDfCollectionUtil}.ToGenericList<ENTITY>(plainList);
+        }
+
+        // ===============================================================================
+        //                                                                         Execute
+        //                                                                         =======
+        public int Execute(String path, Object pmb) {
+            return _outsideSqlDao.Execute(path, pmb, CreateOutsideSqlOption());
+        }
+
+        // Implements at the future!
+        //    public int BatchExecute(String path, Object pmb) {
+        //        throw new UnsupportedOperationException("Sorry! The method of batchExecute() has not been implemented yet.");
+        //        // return _outsideSqlDao.batchExecute(path, pmb, CreateOutsideSqlOption());
+        //    }
+
+        // [DBFlute-0.8.0]
+        // ===============================================================================
+        //                                                                  Procedure Call
+        //                                                                  ==============
+        public void Call(${glProcedurePmb} pmb) {
+            if (pmb == null) { throw new ArgumentNullException("The argument of call() 'pmb' should not be null!"); }
+            _outsideSqlDao.Call(pmb.ProcedureName, pmb, CreateOutsideSqlOption());
+        }
+
+        // ===============================================================================
+        //                                                                          Option
+        //                                                                          ======
+        public ${glOutsideSqlCursorExecutor}<Object> CursorHandling() {
+            return new ${glOutsideSqlCursorExecutor}<Object>(_outsideSqlDao, CreateOutsideSqlOption());
+        }
+
+        public ${glOutsideSqlEntityExecutor}<Object> EntityHandling() {
+            return new ${glOutsideSqlEntityExecutor}<Object>(_outsideSqlDao, CreateOutsideSqlOption());
+        }
+
+        public ${glOutsideSqlPagingExecutor} AutoPaging() {
+            ${glOutsideSqlOption} option = CreateOutsideSqlOption();
+            option.AutoPaging();
+            return new ${glOutsideSqlPagingExecutor}(_outsideSqlDao, option, _tableDbName);
+        }
+
+        public ${glOutsideSqlPagingExecutor} ManualPaging() {
+            ${glOutsideSqlOption} option = CreateOutsideSqlOption();
+            option.ManualPaging();
+            return new ${glOutsideSqlPagingExecutor}(_outsideSqlDao, option, _tableDbName);
+        }
+
+        public ${glOutsideSqlBasicExecutor} DynamicBinding() {
+            _dynamicBinding = true;
+            return this;
+        }
+
+        public ${glOutsideSqlBasicExecutor} Configure(${glStatementConfig} statementConfig) {
+            _statementConfig = statementConfig;
+            return this;
+        }
+
+        // -------------------------------------------------
+        //                                            Helper
+        //                                            ------
+        protected ${glOutsideSqlOption} CreateOutsideSqlOption() {
+            ${glOutsideSqlOption} option = new ${glOutsideSqlOption}();
+            option.StatementConfig = _statementConfig;
+            if (_dynamicBinding) {
+                option.DynamicBinding();
+            }
+			option.TableDbName = _tableDbName;
+            return option;
+        }
+    }
+}

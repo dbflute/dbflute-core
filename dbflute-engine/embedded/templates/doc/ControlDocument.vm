@@ -1,0 +1,98 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($database = $schemaData.database)
+$database.enableDocumentOutputDirectory()
+
+## - - - - - - - - - - - -
+## Initialize properties.
+## - - - - - - - - - - - -
+$database.initializeVersion(90)
+#if ($selector.needsInitializeProperties())
+$database.initializeAdditionalPrimaryKey()
+$database.initializeAdditionalUniqueKey()
+$database.initializeAdditionalForeignKey()
+$database.initializeClassificationDeployment()
+#end
+
+## - - - - - - - - - - - - - - - - - - - -
+## Loading HTML resource before generation 
+##  o because it might be used others
+##  o but only sister HTMLs
+## - - - - - - - - - - - - - - - - - - - -
+#if ($selector.isHistoryHtml())
+$selector.loadSchemaHistoryAsCore()
+#end
+#if ($selector.isPropertiesHtml())
+$selector.loadPropertiesHtmlRequest()
+#end
+
+## - - - - - -
+## Schema HTML
+## - - - - - -
+## *the argument 'dataModel' might be unused on DBFlute
+#if ($selector.isSchemaHtml())
+$selector.markSchemaHtml()
+#set ($outFile = "${selector.schemaHtmlFileName}")
+$generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
+#end
+
+## - - - - - - -
+## History HTML
+## - - - - - - -
+#if ($selector.isHistoryHtml())
+$selector.markHistoryHtml()
+#if ($selector.existsSchemaHistory())
+#set ($outFile = "${selector.historyHtmlFileName}")
+$generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
+#end
+#end
+
+## - - - - - - - - - - - - - -
+## SchemaSyncCheck Result HTML
+## - - - - - - - - - - - - - -
+#if ($selector.isSchemaSyncCheckResultHtml())
+$selector.markSchemaSyncCheckResultHtml()
+$selector.loadSchemaHistoryAsSchemaSyncCheck()
+#if ($selector.existsSchemaHistory())
+#set ($outFile = "${selector.schemaSyncCheckResultFileName}")
+$generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
+#end
+#end
+
+## - - - - - - - - - - - -
+## AlterCheck Result HTML
+## - - - - - - - - - - - -
+#if ($selector.isAlterCheckResultHtml())
+$database.enableMigrationOutputDirectory()
+$selector.markAlterCheckResultHtml()
+$selector.loadSchemaHistoryAsAlterCheck()
+#if ($selector.existsSchemaHistory())
+#set ($outFile = "${selector.alterCheckResultFileName}")
+$generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
+#end
+$database.backToDocumentOutputDirectory()
+#end
+
+## - - - - - - - -
+## Properties HTML
+## - - - - - - - -
+#if ($selector.isPropertiesHtml())
+$selector.markPropertiesHtml()
+#if ($selector.existsPropertiesHtmlRequest())
+#set ($outFile = "${selector.propertiesHtmlFileName}")
+$generator.parse("doc/html/propmodel.vm", $outFile, "dataModel", $dataModel)
+#end
+#end

@@ -1,0 +1,82 @@
+
+using System;
+
+using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommonDBMetaInfo} {
+
+    public class ${glUniqueInfo} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected ${glDBMeta} dbmeta;
+        protected List<${glColumnInfo}> uniqueColumnList;
+        protected bool primary;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glUniqueInfo}(${glDBMeta} dbmeta, List<${glColumnInfo}> uniqueColumnList, bool primary) {
+            AssertObjectNotNull("dbmeta", dbmeta);
+            AssertObjectNotNull("uniqueColumnList", uniqueColumnList);
+            this.dbmeta = dbmeta;
+            this.uniqueColumnList = uniqueColumnList;
+            this.primary = primary;
+        }
+
+        // ===============================================================================
+        //                                                                     Easy-to-Use
+        //                                                                     ===========
+        public bool ContainsColumn(${glColumnInfo} columnInfo) {
+            return ContainsColumn(columnInfo.ColumnDbName);
+        }
+
+        protected bool ContainsColumn(String columnName) {
+            foreach (${glColumnInfo} columnInfo in uniqueColumnList) {
+                if (columnInfo.ColumnDbName.Equals(columnName)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        protected void AssertObjectNotNull(String variableName, Object value) {
+            if (variableName == null) {
+                String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+                throw new ArgumentException(msg);
+            }
+            if (value == null) {
+                String msg = "The value should not be null: variableName=" + variableName;
+                throw new ArgumentException(msg);
+            }
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+       public ${glDBMeta} DBMeta {
+           get { return dbmeta; }
+       }
+
+        public List<${glColumnInfo}> UniqueColumnList {
+            get { return uniqueColumnList; }
+        }
+
+        public ${glColumnInfo} FirstColumn {
+            get { return (${glColumnInfo})this.uniqueColumnList.get(0); }
+        }
+
+        public bool IsTwoOrMore {
+            get { return this.uniqueColumnList.size() > 1; }
+        }
+
+        public bool IsPrimary {
+            get { return this.primary; }
+        }
+    }
+}

@@ -1,0 +1,363 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${myDBMetaPackageName};
+#set ($myClassName = "${myDBMetaClassName}")
+
+// #avoided same name type in Java and Scala
+import java.lang.Long;
+import java.lang.Boolean;
+## to resolve implicit conversion? e.g. dgctb()
+import java.math.BigDecimal;
+
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap
+
+import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.Entity;
+#if ($table.needsRelationOptionalEntityImport())
+import ${database.relationOptionalEntityClassName};
+#end
+import org.seasar.dbflute.dbmeta.AbstractDBMeta;
+import org.seasar.dbflute.dbmeta.AbstractDBMeta._;
+import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType
+import org.seasar.dbflute.dbmeta.PropertyGateway;
+import org.seasar.dbflute.dbmeta.info._;
+import org.seasar.dbflute.dbmeta.name._;
+import org.seasar.dbflute.jdbc.Classification;
+import ${glPackageBaseCommon}._;
+import ${myExtendedEntityPackageName}._;
+
+/**
+ * The DB meta of ${table.tableDbName}. (Singleton)
+ * @author ${database.classAuthor}
+ */
+object ${myClassName} extends AbstractDBMeta {
+
+    // ===================================================================================
+    //                                                                       Current DBDef
+    //                                                                       =============
+    def getCurrentDBDef(): DBDef = { return ${glDBCurrent}.currentDBDef(); }
+
+    // ===================================================================================
+    //                                                                    Property Gateway
+    //                                                                    ================
+## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## These fields and methods should be defined before definitions of column info.
+## And the map should be plain map for performance.
+## - - - - - - - - - -/
+    // -----------------------------------------------------
+    //                                       Column Property
+    //                                       ---------------
+    protected val _epgMap: Map[String, PropertyGateway] = newHashMap();
+    {
+#foreach ($col in $table.columns)
+        setupEpg(_epgMap, new Epg${col.javaName}(), "${col.javaBeansRulePropertyName}");
+#end
+    }
+#foreach ($col in $table.columns)
+#set ($setupperClassName = "Epg${col.javaName}")
+#if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
+    class ${setupperClassName} extends PropertyGateway {
+        def read(et: Entity): Object = { return et.asInstanceOf[${myExtendedObjectClassName}].get${col.javaName}(); }
+        def write(et: Entity, vl: Object): Unit = {
+            val col: ColumnInfo = column${col.javaBeansRulePropertyNameInitCap}();
+#if ($col.isCheckSelectedClassification())
+            dgccls(col, vl);
+#end
+#if ($col.isForceClassificationSetting())
+            val cls = dggcls(col, vl).asInstanceOf[${glCDef}.${col.classificationName}];
+            if (cls != null) {
+                et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}As${col.classificationName}(cls);
+            } else {
+## undefined code or null here, use internal method for native mapping
+#if ($col.isJavaNativeNumberObject())
+                et.asInstanceOf[${myExtendedObjectClassName}].mynativeMapping${col.javaName}(dgctn(vl, classOf[${col.javaNative}]));
+#else
+                et.asInstanceOf[${myExtendedObjectClassName}].mynativeMapping${col.javaName}(vl.asInstanceOf[${col.javaNative}]);
+#end
+            }
+#else
+#if ($col.isJavaNativeNumberObject())
+            ((${myExtendedObjectClassName})et).set${col.javaName}(ctn(vl, ${col.javaNative}.class));
+#else
+            ((${myExtendedObjectClassName})et).set${col.javaName}((${col.javaNative})vl);
+#end
+#end
+        }
+#else
+## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## for different type between relation (Integer, Long and BigDecimal are prior)
+## - - - - - - - - - -/
+    class ${setupperClassName} extends PropertyGateway {
+        def read(et: Entity): Object = { return et.asInstanceOf[${myExtendedObjectClassName}].get${col.javaName}(); }
+#if ($col.isJavaNativeNumberObject())
+#if ($col.isJavaNativeInteger())
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(dgcti(vl)); }
+#elseif ($col.isJavaNativeLong())
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(dgctl(vl)); }
+#elseif ($col.isJavaNativeBigDecimal())
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(dgctb(vl)); }
+#else
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(dgctn(vl, classOf[${col.javaNative}])); }
+#end
+#else
+#if ($col.isJavaNativeUtilList())
+        @SuppressWarnings("unchecked")
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(vl.asInstanceOf[${col.javaNative}]); }
+#else
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}(vl.asInstanceOf[${col.javaNative}]); }
+#end
+#end
+#end
+    }
+#end
+    // #avoided delegating to protected static (illegal access error if directly call)
+    def dgcti(vl: Object): Integer = { cti(vl); }
+    def dgctl(vl: Object): Long = { ctl(vl); }
+    def dgctb(vl: Object): BigDecimal = { ctb(vl); }
+    def dgctn[NUMBER <: Number](vl: Object, tp: Class[NUMBER]): NUMBER = { ctn(vl, tp); }
+    def dggcls(col: ColumnInfo, cd: Object): Classification = { gcls(col, cd); }
+    def dgccls(col: ColumnInfo, cd: Object): Unit = { ccls(col, cd); }
+    override def findPropertyGateway(prop: String): PropertyGateway = { return doFindEpg(_epgMap, prop); }
+#if ($table.hasForeignKey() || $table.hasReferrerAsOne())
+
+    // -----------------------------------------------------
+    //                                      Foreign Property
+    //                                      ----------------
+    protected val _efpgMap: Map[String, PropertyGateway] = newHashMap();
+#if ($table.hasForeignKey())
+    {
+#foreach ($fk in $table.foreignKeys)
+        setupEfpg(_efpgMap, new Efpg${fk.foreignJavaBeansRulePropertyNameInitCap}(), "${fk.foreignJavaBeansRulePropertyName}");
+#end
+    }
+#foreach ($fk in $table.foreignKeys)
+#set ($setupperClassName = "Efpg${fk.foreignJavaBeansRulePropertyNameInitCap}")
+    class ${setupperClassName} extends PropertyGateway {
+        def read(et: Entity): Object = { return et.asInstanceOf[${myExtendedObjectClassName}].get${fk.foreignJavaBeansRulePropertyNameInitCap}(); }
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${fk.foreignJavaBeansRulePropertyNameInitCap}(vl.asInstanceOf[${fk.foreignPropertyEntityDefinitionType}]); }
+    }
+#end
+#end
+#if ($table.hasReferrerAsOne())
+    {
+#foreach ($referrer in $table.referrerAsOneList)
+        setupEfpg(_efpgMap, new Efpg${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(), "${referrer.referrerJavaBeansRulePropertyNameAsOne}");
+#end
+    }
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($setupperClassName = "Efpg${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}")
+    class ${setupperClassName} extends PropertyGateway {
+        def read(et: Entity): Object = { return et.asInstanceOf[${myExtendedObjectClassName}].get${referrer.referrerJavaBeansRulePropertyNameInitCapAsOne}(); }
+        def write(et: Entity, vl: Object): Unit = { et.asInstanceOf[${myExtendedObjectClassName}].set${referrer.referrerJavaBeansRulePropertyNameInitCapAsOne}(vl.asInstanceOf[${referrer.referrerPropertyEntityDefinitionTypeAsOne}]); }
+    }
+#end
+#end
+    override def findForeignPropertyGateway(prop: String): PropertyGateway = { return doFindEfpg(_efpgMap, prop); }
+#end
+
+    // ===================================================================================
+    //                                                                          Table Info
+    //                                                                          ==========
+    protected val _tableDbName: String = "${table.tableDbName}";
+    protected val _tablePropertyName: String = "${table.javaBeansRulePropertyName}";
+    protected val _tableSqlName: TableSqlName = new TableSqlName("${table.tableSqlName}", _tableDbName);
+    { _tableSqlName.xacceptFilter(${glDBFluteConfig}.getTableSqlNameFilter()); }
+    def getTableDbName(): String = { return _tableDbName; }
+    def getTablePropertyName(): String = { return _tablePropertyName; }
+    def getTableSqlName(): TableSqlName = { return _tableSqlName; }
+#if ($table.hasAlias())
+    protected val _tableAlias: String = "$table.alias";
+    override def getTableAlias(): String = { return _tableAlias; }
+#end
+#if ($table.isCommentForDBMetaValid())
+    protected val _tableComment: String = "$table.commentForDBMeta";
+    override def getTableComment(): String = { return _tableComment; }
+#end
+
+    // ===================================================================================
+    //                                                                         Column Info
+    //                                                                         ===========
+#foreach ($col in $table.columns)
+    protected val _column${col.javaBeansRulePropertyNameInitCap}: ColumnInfo = cci("${col.name}", "${col.columnSqlName}", ${col.synonymSettingExpression}, ${col.aliasSettingExpression}, ${col.javaNativeTypeLiteral}, "${col.javaBeansRulePropertyName}", ${col.propertyAccessTypeLiteral}, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, ${col.isNotNull()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.defaultValueSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression}, ${col.classificationMetaSettingExpression});
+#end
+
+#foreach ($col in $table.columns)
+    def column${col.javaBeansRulePropertyNameInitCap}(): ColumnInfo = { return _column${col.javaBeansRulePropertyNameInitCap}; }
+#end
+
+    protected def ccil(): List[ColumnInfo] = {
+        val ls: List[ColumnInfo] = newArrayList();
+#foreach ($col in $table.columns)
+        ls.add(column${col.javaBeansRulePropertyNameInitCap}());
+#end
+        return ls;
+    }
+
+    { initializeInformationResource(); }
+
+    // ===================================================================================
+    //                                                                         Unique Info
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                       Primary Element
+    //                                       ---------------
+#if ($table.hasPrimaryKey())
+#if ($table.hasSinglePrimaryKey())
+    protected def cpui(): UniqueInfo = { return hpcpui(column${table.primaryKeyAsOne.javaBeansRulePropertyNameInitCap}()); }
+#else
+    protected def cpui(): UniqueInfo = {
+        List<ColumnInfo> ls = newArrayListSized(4);val ls: List[ColumnInfo] = newArrayListSized(4);
+#foreach ($col in $table.primaryKey)
+        ls.add(column${col.javaBeansRulePropertyNameInitCap}());
+#end
+        return hpcpui(ls);
+    }
+#end
+#else
+    protected def cpui(): UniqueInfo = {
+        throw new UnsupportedOperationException("The table does not have primary key: " + getTableDbName());
+    }
+#end
+    def hasPrimaryKey(): scala.Boolean = { return ${table.hasPrimaryKey()}; }
+    def hasCompoundPrimaryKey(): scala.Boolean = { return ${table.hasCompoundPrimaryKey()}; }
+
+    // ===================================================================================
+    //                                                                       Relation Info
+    //                                                                       =============
+    // cannot cache because it uses related DB meta instance while booting
+    // (instead, cached by super's collection)
+    // -----------------------------------------------------
+    //                                      Foreign Property
+    //                                      ----------------
+#foreach ($fk in $table.foreignKeys)
+    def foreign${fk.foreignJavaBeansRulePropertyNameInitCap}(): ForeignInfo = {
+#if ($fk.isSimpleKeyFK())
+#set ($col = $fk.localColumnAsOne)
+#set ($yourCol = ${fk.getForeignColumnByLocalColumn(${col})})
+        val mp: Map[ColumnInfo, ColumnInfo] = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.column${yourCol.javaBeansRulePropertyNameInitCap}());
+#else
+        val mp: Map[ColumnInfo, ColumnInfo] = newLinkedHashMapSized(4);
+#foreach ($col in $fk.localColumnList)
+#set ($yourCol = ${fk.getForeignColumnByLocalColumn(${col})})
+        mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.column${yourCol.javaBeansRulePropertyNameInitCap}());
+#end
+#end
+        return cfi("${fk.name}", "${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}, mp, ${table.resolveForeignIndex($fk)}, ${fk.foreignPropertyAccessTypeMetaLiteral}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, false, ${fk.isAdditionalForeignKey()}, ${fk.fixedConditionArg}, ${fk.dynamicFixedConditionDBMetaSetupList}, ${fk.isFixedInline()}, ${fk.foreignReverseRelationPropertyNameArg});
+    }
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($genericsColumnInfoMap = "ColumnInfo, ColumnInfo")
+    def foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(): ForeignInfo = {
+#if ($referrer.isSimpleKeyFK())
+#set ($col = $referrer.foreignColumnAsOne)
+#set ($yourCol = ${referrer.getLocalColumnByForeignColumn(${col})})
+        val mp: Map[ColumnInfo, ColumnInfo] = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.column${yourCol.javaBeansRulePropertyNameInitCap}());
+#else
+        val mp: Map[ColumnInfo, ColumnInfo] = newLinkedHashMapSized(4);
+#foreach ($col in $referrer.foreignColumnList)
+#set ($yourCol = ${referrer.getLocalColumnByForeignColumn(${col})})
+        mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.column${yourCol.javaBeansRulePropertyNameInitCap}());
+#end
+#end
+        return cfi("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}, mp, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.referrerPropertyAccessTypeMetaLiteralAsOne}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, true, ${referrer.isAdditionalForeignKey()}, ${referrer.fixedConditionArg}, ${referrer.dynamicFixedConditionDBMetaSetupList}, ${referrer.isFixedInline()}, ${referrer.referrerReverseRelationPropertyNameArg});
+    }
+#end
+
+    // -----------------------------------------------------
+    //                                     Referrer Property
+    //                                     -----------------
+#foreach ($referrer in $table.referrerAsManyList)
+    def referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}(): ReferrerInfo = {
+#if ($referrer.isSimpleKeyFK())
+#set ($col = $referrer.foreignColumnAsOne)
+        val mp: Map[ColumnInfo, ColumnInfo] = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap}());
+#else
+        val mp: Map[ColumnInfo, ColumnInfo] = newLinkedHashMapSized(4);
+#foreach ($col in $referrer.foreignColumnList)
+        mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap}());
+#end
+#end
+        return cri("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyName}", this, ${referrer.referrerTableDBMetaClassName}, mp, ${referrer.isOneToOne()}, ${referrer.referrerReverseRelationPropertyNameArg});
+    }
+#end
+
+    // ===================================================================================
+    //                                                                        Various Info
+    //                                                                        ============
+#if ($table.isUseIdentity())
+    override def hasIdentity(): scala.Boolean = { return true; }
+#end
+#if ($table.isUseSequence())
+    override def hasSequence(): scala.Boolean = { return true; }
+    override def getSequenceName(): String = { return "${table.sequenceSqlName}"; }
+    override def getSequenceIncrementSize(): Integer = { return ${table.sequenceIncrementSizeExpression}; }
+    override def getSequenceCacheSize(): Integer = { return ${table.sequenceCacheSizeExpression}; }
+#end
+#if ($table.isUseVersionNo())
+    override def hasVersionNo(): scala.Boolean = { return true; }
+    override def getVersionNoColumnInfo(): ColumnInfo = { return _column${table.versionNoJavaName}; }
+#end
+#if ($table.isUseUpdateDate())
+    override def hasUpdateDate(): scala.Boolean = { return true; }
+    override def getUpdateDateColumnInfo(): ColumnInfo = { return _column${table.updateDateJavaName}; }
+#end
+#if ($table.hasAllCommonColumn())
+    override def hasCommonColumn(): scala.Boolean = { return true; }
+    override def getCommonColumnInfoList(): List[ColumnInfo] =
+    { return newArrayList(${table.commonColumnListSetupExpression}); }
+    override def getCommonColumnInfoBeforeInsertList(): List[ColumnInfo] =
+    { return newArrayList(${table.commonColumnBeforeInsertListSetupExpression}); }
+    override def getCommonColumnInfoBeforeUpdateList(): List[ColumnInfo] =
+    { return newArrayList(${table.commonColumnBeforeUpdateListSetupExpression}); }
+#end
+
+    // ===================================================================================
+    //                                                                           Type Name
+    //                                                                           =========
+    def getEntityTypeName(): String = { return "${myExtendedEntityPackageName}.${myExtendedObjectClassName}"; }
+#if ($isExistConditionBean)
+    def getConditionBeanTypeName(): String = { return "${glPackageCB}.${myConditionBeanClassName}"; }
+#else
+    def getConditionBeanTypeName(): String = { return null; }
+#end
+#if ($isExistBehavior)
+    def getBehaviorTypeName(): String = { return "${myExtendedBhvPackageName}.${myExtendedBhvClassName}"; }
+#else
+    def getBehaviorTypeName(): String = { return null; }
+#end
+
+    // ===================================================================================
+    //                                                                         Object Type
+    //                                                                         ===========
+    def getEntityType(): Class[${myExtendedObjectClassName}] = { return classOf[${myExtendedObjectClassName}]; }
+
+    // ===================================================================================
+    //                                                                     Object Instance
+    //                                                                     ===============
+    def newEntity(): ${myExtendedObjectClassName} = { return new ${myExtendedObjectClassName}(); }
+
+    // ===================================================================================
+    //                                                                   Map Communication
+    //                                                                   =================
+    def acceptPrimaryKeyMap(et: Entity, mp: Map[String, _]): Unit =
+    { doAcceptPrimaryKeyMap(et.asInstanceOf[${myExtendedObjectClassName}], mp); }
+    def acceptAllColumnMap(et: Entity, mp: Map[String, _]): Unit =
+    { doAcceptAllColumnMap(et.asInstanceOf[${myExtendedObjectClassName}], mp); }
+    def extractPrimaryKeyMap(et: Entity): Map[String, Object] = { return doExtractPrimaryKeyMap(et); }
+    def extractAllColumnMap(et: Entity): Map[String, Object] = { return doExtractAllColumnMap(et); }
+}

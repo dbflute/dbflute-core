@@ -1,0 +1,4 @@
+
+DBFlute uses MySQL's FOSS License Exception
+You can see the details by the page:
+http://www.mysql.com/about/legal/licensing/foss-exception/

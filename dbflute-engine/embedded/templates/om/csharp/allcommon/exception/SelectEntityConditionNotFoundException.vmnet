@@ -1,0 +1,14 @@
+
+using System;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the condition for selecting an entity is not found.
+    /// </summary>
+    public class ${glSelectEntityConditionNotFoundException} : SystemException {
+
+        public ${glSelectEntityConditionNotFoundException}(String msg)
+        : base(msg) {}
+    }
+}

@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ${glPackageBaseCommonHelper} {
+
+    /// <summary>
+    /// The interface of map-string-builder.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public interface ${glMapStringBuilder} {// Thank you koyak!
+
+        /// <summary>
+        /// The property of column-name array.
+        /// </summary>
+        String[] ColumnNames { set; }
+
+        /// <summary>
+        /// The property of map-mark for map-string.
+        /// </summary>
+        String MapStringMapMark { set; }
+
+        /// <summary>
+        /// The property of delimiter for map-string.
+        /// </summary>
+        String MapStringDelimiter { set; }
+
+        /// <summary>
+        /// The property of equal for map-string .
+        /// </summary>
+        String MapStringEqual { set; }
+
+        /// <summary>
+        /// The property of start-brace for map-string.
+        /// </summary>
+        String MapStringStartBrace { set; }
+
+        /// <summary>
+        /// The property of end-brace for map-string.
+        /// </summary>
+        String MapStringEndBrace { set; }
+
+        /// <summary>
+        /// Build by delimiter.
+        /// </summary>
+        /// <param name="values">String separated by delimiter. (NotNull)</param>
+        /// <param name="delimiter">Delimiter. (NotNull)</param>
+        /// <returns>Map-string. (NotNull)</returns>
+        /// <exception cref="DifferentDelimiterCountException"></exception>
+        String BuildByDelimiter(String values, String delimiter);
+    }
+
+    public class DifferentDelimiterCountException : ApplicationException {
+        protected String[] _columnNames;
+        protected String[] _values;
+        public DifferentDelimiterCountException(String msg, String[] columnNames, String[] values) 
+        : base(msg) {
+            _columnNames = columnNames;
+            _values = values;
+        }
+        public String[] getColumnNames() {
+            return _columnNames;
+        }
+        public String[] getValues() {
+            return _values;
+        }
+    }
+}

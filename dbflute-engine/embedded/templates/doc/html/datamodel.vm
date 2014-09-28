@@ -1,0 +1,868 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>${database.projectName} schema</title>
+#if ($database.isSchemaHtmlStyleSheetEmbedded())
+	<style type="text/css">
+${database.schemaHtmlStyleSheetEmbedded}
+	</style>
+#elseif ($database.isSchemaHtmlStyleSheetLink())
+	${database.schemaHtmlStyleSheetLink}
+#else
+	<style type="text/css">
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
+	font-size: 80%;
+	margin: 10px 5px 5px 15px;
+	background-color: #ffffe0;
+}
+
+/* heading */
+h1 {
+	font-size: 1.5em;
+	border-bottom: 2px solid #af0000;
+	border-top: 2px solid #af0000;
+}
+h2 {
+	margin: 30px 0 5px 0;
+	font-size: 1.8em;
+	border-bottom: 2px solid #af0000;
+	border-left: 10px solid #af0000;
+	text-indent: 10px;
+}
+h3 {
+	padding: 0 0 0 10px;
+	margin: 1em 10% 0 0;
+	border-top: double 3px #af0000;
+	border-bottom: solid 1px #333333;
+	font-size: 1.5em;
+	color: #333333;
+}
+h4 {
+	padding: 0 0 0 10px;
+	margin: 1em 10% 0 1em;
+	border-top: solid 1px #af0000;
+	border-bottom: solid 1px #af0000;
+	font-size: 1.4em;
+	color: #333333;
+}
+
+/* total info */
+.updatedate {
+	text-align: right;
+}
+.mainschema {
+	text-align: right;
+}
+.navilinkarea {
+	text-align: right;
+}
+.sublink {
+	margin-top: 0.1em;
+}
+.sisterlink {
+	margin-top: 0.6em;
+	font-size: 110%;
+}
+.sistersublink {
+	margin-top: 0.6em;
+	font-size: 80%;
+}
+
+/* keyword search */
+.keywordsearch {
+	padding: 0.7em 0 0.7em 0;
+}
+.searchmemo {
+	font-size: 0.9em;
+	color: #114488;
+}
+.suggestionarea {
+	padding: 0 0.2em 0.2em 0.2em;
+	margin: 0;
+	position: absolute;
+	zindex: 100;
+	background-color: #DDFFDD;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #CCCCCC;
+	list-style-type: none;
+}
+
+/* table */
+table {
+	border-collapse:collapse;
+}
+table, th {
+	border: 1px solid #555;
+}
+th {
+	background-color: #cc9;
+	font-size: 0.8em;
+}
+td {
+	border-bottom: 1px dotted #aaa;
+	border-left: 1px solid #555;
+	padding:2px;
+}
+.tablecomment {
+	font-size: 0.8em;
+	color: #3F7E5E;
+	padding:0 0 0.2em 1em;
+}
+.rownumhead {
+	text-align: center;
+	font-size: 0.4em;
+}
+.rownumcell {
+	text-align: center;
+	font-size: 0.4em;
+	color: #444;
+}
+.schemacell {
+	font-size: 0.8em;
+	white-space: nowrap;
+}
+.aliascell {
+	white-space: nowrap;
+}
+.flgcell {
+	text-align: center;
+}
+.flgplus {
+	font-size: 0.7em;
+}
+.typecell {
+	font-size: 0.6em;
+}
+.sizecell {
+	text-align: center;
+	font-size: 0.8em;
+}
+.defvalcell {
+	text-align: center;
+	font-size: 0.6em;
+}
+.relcell {
+	font-size: 0.7em;
+}
+.commentcell {
+	font-size: 0.7em;
+	color: #3F7E5E;
+}
+.subcell {
+	font-size: 0.6em;
+}
+.comcolcell {
+	color: #666;
+}
+.optcell {
+	font-style: italic;
+}
+.additionalpk {
+	font-style: italic;
+}
+.additionalfk {
+	font-style: italic;
+}
+.clstypecell {
+	text-align: center;
+	font-size: 0.8em;
+}
+.commentdesc {
+	color: #3F7E5E;
+}
+
+/* inner table */
+table.child {
+	margin: 3px;
+}
+table.child th {
+	font-size: 0.7em;
+}
+table.child, table.child td, table.child th {
+	border-top: none;
+	border-left: none;
+	border-bottom: 1px solid #aaa;
+	border-right: 1px solid #aaa;
+}
+.clsgroup {
+	font-size: 1.2em;
+	padding-left: 4px;
+	padding-right: 4px;
+}
+
+/* table supplementary info */
+span.tableschema {
+	font-size: 0.6em;
+}
+span.bqpcount {
+	font-size: 0.5em;
+}
+dl.bqplist {
+	padding-left: 2em;
+}
+dl.bqplist dt {
+	display: list-item;
+	font-size: 1.3em;
+	margin-top: 0.3em;
+}
+dl.bqplist dd {
+	padding-left: 1em;
+}
+dl.bqplist dd pre {
+	font-size: 1.1em;
+}
+dl.bqplist dd.subinfo {
+	padding-left: 2em;
+}
+dl.bqplist dd.subinfo span.sqlap {
+	font-style: italic;
+	color: #002266;
+}
+dl.bqplist dd.subinfo span.file {
+	font-style: italic;
+	color: #002266;
+}
+dl.bqplist dd.subinfo span.ctet {
+	color: green;
+}
+dl.bqplist dd.subinfo span.pmb {
+	color: green;
+}
+dl.procedurelist {
+	padding-left: 2em;
+}
+dl.procedurelist dt {
+	display: list-item;
+	font-size: 1.3em;
+	margin-top: 0.3em;
+}
+dl.procedurelist dt span.type {
+	font-size: 0.7em;
+	color: green;
+}
+dl.procedurelist dd {
+	padding-left: 1em;
+}
+dl.procedurelist dd pre {
+	font-size: 1.1em;
+}
+dl.procedurelist dd.column {
+	font-style: italic;
+	padding-left: 2em;
+}
+dl.procedurelist dd.column span.attrs {
+	font-size: 0.7em;
+	color: #125699;
+}
+dl.procedurelist dd.column span.type {
+	font-size: 0.9em;
+	color: green;
+}
+dl.procedurelist dd.column pre {
+	padding-left: 1em;
+}
+	</style>
+#end
+#if ($database.isSchemaHtmlJavaScriptEmbedded())
+	<script type="text/javascript">
+${database.schemaHtmlJavaScriptEmbedded}
+	</script>
+#elseif ($database.isSchemaHtmlJavaScriptLink())
+	${database.schemaHtmlJavaScriptLink}
+#end
+</head>
+
+<body>
+<h1>Schema for ${database.projectName} (${database.databaseName})</h1>
+#if ($database.hasDatabaseSchema())
+<p class="mainschema">generated from <strong>${database.databaseSchema.catalogSchema}</strong></p>
+#end
+<div class="navilinkarea">
+#if ($database.hasClassificationDefinition())
+<p class="sublink"><a href="#cdef">Classification Definition</a></p>
+#end
+#if ($database.isSchemaHtmlOutsideSqlValid())
+<p class="sublink"><a href="#outsidesql">OutsideSql List</a></p>
+#end
+#if ($database.isSchemaHtmlProcedureValid())
+<p class="sublink"><a href="#procedure">Procedure List</a></p>
+#end
+#if ($selector.isSchemaHtmlToHistoryHtmlLink())
+<p class="sisterlink"><a href="./${selector.historyHtmlFileName}">to HistoryHTML</a></p>
+#end
+#if ($selector.isSchemaHtmlToPropertiesHtmlLink())
+<p class="sistersublink"><a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a></p>
+#end
+</div>
+
+#set ($hasAdditionalSchema = $database.hasAdditionalSchema())
+#set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
+#set ($hasTableComment = $database.hasTableComment())
+<h2>Table List</h2>
+<div class="keywordsearch">
+	<input type="text" id="incremental-search-field" tabindex=1 value="" placeholder="Table Search" />
+	<ul id="suggestion-list" class="suggestionarea"></ul>
+	<span class="searchmemo">*Push 'tab' (primary tab order)</span>
+</div>
+<table summary="Tables in the Schema">
+	<thead>
+	<tr>
+		<th class="rownumhead">No.</th>
+#if ($isAliasDelimiterInDbCommentValid)
+		<th>Alias</th>
+#end
+		<th>Name</th>
+		<th>Type</th>
+#if ($hasAdditionalSchema)
+		<th>Schema</th>
+#end
+		<th>ForeignTable</th>
+		<th>ReferrerTable</th>
+#if ($hasTableComment)
+		<th>TableComment</th>
+#end
+		<th>EntityName</th>
+	</tr>
+	</thead>
+	<tbody id="table-list-body">
+#set ($rownum = 1)
+#foreach ($table in $database.tableDisplaySortedList)
+	<tr>
+		<td class="rownumcell">${rownum}</td>
+#if ($isAliasDelimiterInDbCommentValid)
+		<td class="aliascell">${table.alias}</td>
+#end
+		<td><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
+		<td class="typecell">${table.type}</td>
+#if ($hasAdditionalSchema)
+		<td class="schemacell">#if ($table.hasSchema()) ${table.documentSchema}#else &nbsp;#end</td>
+#end
+		<td class="relcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
+		<td class="relcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
+#if ($hasTableComment)
+		<td class="commentcell">#if ($table.hasComment()) ${table.commentForSchemaHtml}#else &nbsp;#end</td>
+#end
+		<td class="subcell">${table.javaName}</td>
+	</tr>
+#set ($rownum = $rownum + 1)
+#end
+	</tbody>
+</table>
+
+#foreach ($table in $database.tableDisplaySortedList)
+  $generator.parse("doc/html/table.vm", null, "table", $table)
+#end
+
+#if ($database.hasClassificationDefinition())
+<h2 id="cdef">Classification Definition</h2>
+<table summary="Classifications in the Schema">
+	<thead>
+	<tr>
+		<th>Classification</th>
+		<th>Type</th>
+		<th>Top Comment</th>
+		<th>Definition</th>
+	</tr>
+	</thead>
+	<tbody>
+#foreach ($classificationName in $database.classificationNameList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+	<tr>
+#if ($classificationTop.isDeprecated())
+		<td><del>${classificationName}</del></td>
+#else
+		<td>${classificationName}</td>
+#end
+		<td class="clstypecell">#if ($classificationTop.isTableClassification())table#else implicit#if ($classificationTop.isCheckImplicitSet())<br />(check)#end#end</td>
+		<td>#if ($classificationTop.hasTopComment())${classificationTop.topCommentForSchemaHtml}#else &nbsp;#end</td>
+		<td>
+			<table class="child">
+			<tr>
+				<th id="${classificationName}Cls">Code</th>
+				<th>Name</th>
+#if ($database.hasClassificationAlias($classificationName))
+				<th>Alias</th>
+#end
+				<th>Comment</th>
+#foreach ($group in $classificationTop.groupList)
+				<th><span class="clsgroup"${group.groupTitleForSchemaHtml}>${group.groupName}</span></th>
+#end
+#if ($classificationTop.hasSisterCode())
+				<th>Sisters</th>
+#end
+#if ($classificationTop.hasSubItem())
+				<th>SubItem</th>
+#end
+			</tr>
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+			<tr>
+				<td>${classificationElement.code}</td>
+#if ($classificationElement.isDeprecated())
+				<td><del>${classificationElement.name}</del></td>
+#else
+				<td>${classificationElement.name}</td>
+#end
+#if ($database.hasClassificationAlias($classificationName))
+				<td>#if ($classificationElement.hasAlias())${classificationElement.alias}#else &nbsp;#end</td>
+#end
+				<td class="commentcell">#if ($classificationElement.hasCommentDisp())${classificationElement.commentForSchemaHtml}#else &nbsp;#end</td>
+#foreach ($group in $classificationTop.groupList)
+				<td class="flgcell">#if ($classificationElement.isGroup($group.groupName))o#else &nbsp;#end</td>
+#end
+#if ($classificationTop.hasSisterCode())
+				<td>${classificationElement.buildSisterCodeExpForSchemaHtml()}</td>
+#end
+#if ($classificationTop.hasSubItem())
+				<td>${classificationElement.buildSubItemExpForSchemaHtml()}</td>
+#end
+			</tr>
+#end
+			</table>
+		</td>
+	</tr>
+#end
+	</tbody>
+</table>
+#end
+
+#if ($database.isSchemaHtmlOutsideSqlValid())
+<h2 id="outsidesql">OutsideSql List</h2>
+#foreach ($table in $database.tableDisplaySortedList)
+#if ($table.hasBehaviorQueryPath())
+<h3 id="${table.tableIdForSchemaHtml}_sql"><a href="#${table.tableIdForSchemaHtml}">${table.tableDispName}</a></h3>
+<dl class="bqplist">
+#foreach ($behaviorQueryPath in $table.behaviorQueryPathList)
+	<dt>$table.getBehaviorQueryPathTitleForSchemaHtml($behaviorQueryPath)$table.getBehaviorQueryPathDisplayName($behaviorQueryPath)</dt>
+#if ($table.hasBehaviorQueryPathDescription($behaviorQueryPath))
+	<dd>
+		<pre class="commentdesc">$table.getBehaviorQueryPathDescriptionForSchemaHtml($behaviorQueryPath)</pre>
+	</dd>
+#end
+	<dd class="subinfo">
+#if ($table.isBehaviorQueryPathSqlAp($behaviorQueryPath))
+        <span class="sqlap">(${table.getBehaviorQueryPathSqlApProjectName($behaviorQueryPath)})</span>
+#end
+		<span class="file">$table.getBehaviorQueryPathFileName($behaviorQueryPath)</span>
+#if ($table.hasBehaviorQueryPathCustomizeEntity($behaviorQueryPath))
+		<span class="ctet">(${table.getBehaviorQueryPathCustomizeEntity($behaviorQueryPath)}${table.getBehaviorQueryPathCursorForSchemaHtml($behaviorQueryPath)})</span>
+#end
+#if ($table.hasBehaviorQueryPathParameterBean($behaviorQueryPath))
+		<span class="pmb">(${table.getBehaviorQueryPathParameterBean($behaviorQueryPath)})</span>
+#end
+	</dd>
+#end
+</dl>
+#end
+#end
+#end
+#if ($database.isSchemaHtmlProcedureValid())
+<h2 id="procedure">Procedure</h2>
+#set ($hasSeveralProcedureSchema = $database.hasSeveralProcedureSchema())
+#foreach ($procedureEntry in $database.availableSchemaProcedureMap.entrySet())
+#set ($procedureSchema = $procedureEntry.key)
+#set ($procedureList = $procedureEntry.value)
+#if ($hasSeveralProcedureSchema)
+<h3>${procedureSchema}</h3>
+#end
+<dl class="procedurelist">
+#foreach ($procedure in $procedureList)
+	<dt>${procedure.procedureDisplayNameForSchemaHtml}</dt>
+#if ($procedure.hasProcedureComment())
+	<dd>
+		<pre class="commentcell">${procedure.procedureCommentForSchemaHtml}</pre>
+	</dd>
+#end
+#if ($procedure.procedureColumnList.isEmpty())
+	<dd class="column">*no arguments</dd>
+#else
+#foreach ($column in $procedure.procedureColumnList)
+	<dd class="column">
+		${column.columnDisplayNameForSchemaHtml}
+#if ($column.hasColumnComment())
+		<pre class="commentdesc">${column.columnCommentForSchemaHtml}</pre>
+#end
+	</dd>
+#end
+#end
+#end
+</dl>
+#end
+#end
+<script>
+/**
+ * Incremental Search contributed by makotot (Thanks!)
+ *
+ * and extended by jflute:
+ *  o style adjustment
+ *  o varying name index
+ *  o prefix search priority
+ */
+
+// this index value depends on DBFlute settings
+// so defines it here as global for easy-to-understand
+#if ($isAliasDelimiterInDbCommentValid)
+var NAME_INDEX = 2; // number, alias, name
+#else
+var NAME_INDEX = 1; // number, name
+#end
+
+function Incremental (targetInput, dist) {
+	this.targetInput = targetInput;
+	this.dist = dist;
+	this.query = '';
+	this.suggestionIdx = 0;
+	this.currentSuggestion = '';
+}
+
+Incremental.prototype = {
+
+	/**
+	 * @method init
+	 */
+	init: function () {
+		var dataList = this.getDataList();
+
+		this.distDataList = dataList.distList;
+		this.sectionList = dataList.sectionList;
+		this.buildSuggestList();
+		this.attachEvent();
+	},
+
+	/**
+	 * @method buildSuggetList
+	 */
+	buildSuggestList: function () {
+		var fragment = document.createDocumentFragment(),
+			ul = document.getElementById('suggestion-list');
+
+		this.ul = ul;
+		this.setupLinkElement(fragment); // for prefix area
+		this.setupLinkElement(fragment); // for contain area
+		ul.appendChild(fragment);
+
+		this.attachSuggestionEvent();
+	},
+
+	/**
+	 * @method setupLinkElement
+	 */
+	setupLinkElement: function (fragment) {
+		var li, anchor;
+		for (var i = 0, max = this.distDataList.length; i < max; i++) {
+			li = document.createElement('li');
+			li.style.display = 'none';
+			anchor = document.createElement('a');
+			anchor.href = this.sectionList[i];
+
+			var distData = this.distDataList[i];
+			if (document.body.dataset) {
+				anchor.dataset.name = distData;
+			} else {
+				anchor.setAttribute('data-name', distData); // for searching
+			}
+
+			this.util.setElemTxt(anchor, distData); // for display
+
+			li.appendChild(anchor);
+			fragment.appendChild(li);
+		}
+	},
+
+	/**
+	 * @method attachEvent
+	 */
+	attachEvent: function () {
+		var self = this,
+			eventHandler = function () {
+				self.displaySuggestion();
+			},
+			eventName = ('oninput' in window) ? 'input' : 'propertychange';
+
+		this.util.addEvent(this.targetInput, eventName, eventHandler);
+	},
+
+	/**
+	 * @method displaySuggestion
+	 */
+	displaySuggestion: function () {
+		this.query = (this.util.trim(this.targetInput.value)).toLowerCase();
+
+		var i, j, max;
+
+		this.resetSuggestion();
+
+		var visibleList;
+
+		if (this.query.length) {
+			var alreadyCheckedData = {}; // to suppress duplicate check (key only used)
+			var distDataCount = this.distDataList.length; // to determine prefix or contain area
+			var hitCount = 0; // to suppress large result (primitive counter just in case)
+			for (i = 0, max = this.ul.childNodes.length; i < max && hitCount <= 100; i++) {
+				var childNode = this.ul.childNodes[i];
+				var anchor = childNode.getElementsByTagName('a')[0]; // always only one
+				var dataName = anchor.getAttribute('data-name'); // e.g. table name
+				if (alreadyCheckedData[dataName] != null) { // to suppress duplicate check
+					continue;
+				}
+				if (i < distDataCount && dataName.lastIndexOf(this.query, 0) > -1) { // prefix hit
+					childNode.searchDirection = 'prefix';
+					alreadyCheckedData[dataName] = 'dummy';
+					++hitCount;
+				} else if (i >= distDataCount && dataName.indexOf(this.query) > -1) { // contain hit
+					childNode.searchDirection = 'contain';
+					alreadyCheckedData[dataName] = 'dummy';
+					++hitCount;
+				} else {
+					childNode.searchDirection = 'none';
+				}
+			}
+
+			visibleList = this.filterVisibleChild();
+
+			if (visibleList.length) {
+				visibleList[0].style.backgroundColor = '#CCCCCC';
+			}
+		} else {
+			for (i = 0, max = this.ul.childNodes.length; i < max; i++) {
+				var childNode = this.ul.childNodes[i];
+				childNode.searchDirection = null; // clear
+				childNode.style.display = 'none'; // all none
+			}
+		}
+	},
+
+	/**
+	 * @method getDataList
+	 */
+	getDataList: function () {
+		var tr = this.dist.getElementsByTagName('tr'),
+			distDataList = [],
+			sectionIdList = [];
+
+		for (var i = 0, max = tr.length; i < max; i++) {
+			distDataList.push(this.util.getElemTxt(tr[i].getElementsByTagName('td')[NAME_INDEX]).toLowerCase());
+			sectionIdList.push(tr[i].getElementsByTagName('td')[NAME_INDEX].getElementsByTagName('a')[0].getAttribute('href'));
+		}
+
+		return {
+			distList: distDataList,
+			sectionList: sectionIdList
+		};
+	},
+
+	/**
+	 * @method attachSuggestionEvent
+	 */
+	attachSuggestionEvent: function () {
+		var self = this;
+
+		this.util.addEvent(this.targetInput, 'keyup', function (e) {
+			self.selectSuggestion(e);
+			self.setInputValue(e);
+		});
+		this.util.addEvent(this.targetInput, 'blur', function () {
+			setTimeout(function () {
+				self.resetSuggestion();
+			}, 100);
+		});
+	},
+
+	/**
+	 * @method selectSuggestion
+	 */
+	selectSuggestion: function (ev) {
+		var keyCode = ev.keyCode,
+			visibleChildNodes = this.filterVisibleChild(),
+			prevIdx;
+
+		if (keyCode === 38 || keyCode === 40) {
+
+			if (visibleChildNodes.length) {
+				prevIdx = this.suggestionIdx;
+
+				if (keyCode === 40 && this.suggestionIdx < visibleChildNodes.length - 1) {
+					this.suggestionIdx++;
+				}
+
+				if (keyCode === 38 && this.suggestionIdx > 0) {
+					this.suggestionIdx--;
+				}
+
+				if (prevIdx > -1) {
+					visibleChildNodes[prevIdx].style.backgroundColor = '';
+				}
+
+				visibleChildNodes[this.suggestionIdx].style.backgroundColor = '#CCCCCC';
+				this.currentSuggestion = this.util.getElemTxt(visibleChildNodes[this.suggestionIdx]);
+
+			} else if (this.query.length) {
+
+				this.displaySuggestion();
+			}
+		}
+
+		if (!this.query.length) {
+			this.resetSuggestion();
+		}
+	},
+
+	/**
+	 * @method setInputValue
+	 * @param ev {Object}
+	 */
+	setInputValue: function (ev) {
+		var keyCode = ev.keyCode,
+			visibleChildNodes = this.filterVisibleChild(),
+			currentSuggestionTxt,
+			selectedSection;
+
+		if (visibleChildNodes.length) {
+			currentSuggestionTxt = this.util.getElemTxt(visibleChildNodes[this.suggestionIdx]);
+
+			if (keyCode === 13) {
+				this.targetInput.value = currentSuggestionTxt;
+				selectedSection = this.getSelectedSection(visibleChildNodes[this.suggestionIdx]);
+				this.clearSuggestion();
+				this.scrollToSelectedSection(selectedSection);
+				this.setHash(selectedSection);
+			}
+		}
+	},
+
+	/**
+	 * @method filterVisibleChild
+	 */
+	filterVisibleChild: function () {
+		var visibleChildNodes = [];
+
+		// ordered by prefix, contain
+		for (var i = 0, max = this.ul.childNodes.length; i < max; i++) {
+			var childNode = this.ul.childNodes[i];
+			if (childNode.searchDirection === 'prefix') {
+				visibleChildNodes.push(childNode);
+				childNode.style.display = 'block';
+			} else if (childNode.searchDirection === 'contain') {
+				visibleChildNodes.push(childNode);
+				childNode.style.display = 'block';
+			} else {
+				childNode.style.display = 'none';
+			}
+		}
+
+		return visibleChildNodes;
+	},
+
+	/**
+	 * @method clearSuggestion
+	 */
+	clearSuggestion: function () {
+		for (var i = 0, max = this.ul.childNodes.length; i < max; i++) {
+			var childNode = this.ul.childNodes[i];
+			childNode.searchDirection = null;
+			childNode.style.display = 'none';
+			childNode.style.backgroundColor = '';
+		}
+	},
+
+	/**
+	 * @method resetSuggestion
+	 */
+	resetSuggestion: function () {
+		this.clearSuggestion();
+
+		this.suggestionIdx = 0;
+	},
+
+	/**
+	 * @method getSelectedSection
+	 * @param suggestionNode {Object}
+	 * @return selectedIdx {Number}
+	 */
+	getSelectedSection: function (suggestionNode) {
+		var selectedIdx;
+
+		for (var i = 0, max = this.ul.childNodes.length; i < max; i++) {
+			if (this.ul.childNodes[i] === suggestionNode) {
+				selectedIdx = i;
+				break;
+			}
+		}
+
+		return selectedIdx;
+	},
+
+	/**
+	 * @method scrollToSelectedSection
+	 * @param idx {Number}
+	 */
+	scrollToSelectedSection: function (idx) {
+		var selectedId = this.ul.childNodes[idx].getElementsByTagName('a')[0].href.split('#')[1],
+			targetSection = document.getElementById(selectedId);
+
+		window.scrollTo(0, targetSection.offsetTop);
+		this.targetInput.blur();
+	},
+
+	/**
+	 * @method setHash
+	 */
+	setHash: function (idx) {
+		var selectedId = this.ul.childNodes[idx].getElementsByTagName('a')[0].href.split('#')[1];
+
+		window.location.hash = selectedId;
+	}
+};
+
+
+Incremental.prototype.util = {
+
+	addEvent: function (elem, ev, fn) {
+		if (elem.addEventListener) {
+			elem.addEventListener(ev, fn, false);
+		} else if (elem.attachEvent) {
+			elem.attachEvent('on' + ev, fn);
+		} else {
+			elem['on' + ev] = fn;
+		}
+	},
+
+	trim: function (txt) {
+		return (String.prototype.trim) ? txt.trim() : txt.replace(/^\s+|\s+$/g, '');
+	},
+
+	getElemTxt: function (elem) {
+		return (elem.innerText !== undefined) ? elem.innerText : elem.textContent;
+	},
+
+	setElemTxt: function (elem, data) {
+		return (elem.innerText !== undefined) ? (elem.innerText = data) : (elem.textContent = data);
+	}
+};
+
+var searcher = new Incremental(document.getElementById('incremental-search-field'), document.getElementById('table-list-body'));
+searcher.init();
+</script>
+</body>
+</html>

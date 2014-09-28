@@ -1,0 +1,172 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($database = $schemaData.database)
+$database.enableGenerateOutputDirectory()
+
+## - - - - - - - - - - - -
+## Initialize properties.
+## - - - - - - - - - - - -
+$database.initializeVersion(90)
+$database.initializeAdditionalPrimaryKey()
+$database.initializeAdditionalUniqueKey()
+$database.initializeAdditionalForeignKey()
+$database.initializeClassificationDeployment()
+$database.initializeIncludeQuery()
+$database.checkProperties()
+
+## *****************************************************************************************************************
+##                                                                                                   Global Paramter
+##                                                                                                   ***************
+## ===================================================================================
+##                                                                            Language
+##                                                                            ========
+#set ($glTargetLanguage = ${database.targetLanguage})
+
+## ===================================================================================
+##                                                                  Resource Directory
+##                                                                  ==================
+#set ($glResourceDirectory = ${database.resourceDirectory})
+
+## ===================================================================================
+##                                                                           Extension
+##                                                                           =========
+#set ($glTemplateFileExtension = ${database.templateFileExtension})
+#set ($glClassFileExtension = ${database.classFileExtension})
+
+## ===================================================================================
+##                                                                              Prefix
+##                                                                              ======
+#set ($glProjectPrefix = ${database.projectPrefix})
+#set ($glBasePrefix = ${database.basePrefix})
+#set ($glBaseSuffixForEntity = ${database.baseSuffixForEntity})
+
+## ===================================================================================
+##                                                                           Container
+##                                                                           =========
+#set ($glDBFluteDiconNamespace = "${database.DBFluteDiconNamespace}")
+#set ($glDBFluteDiconFileName = "${database.DBFluteDiconFileName}")
+#set ($glCreatorDiconFileName = "${database.DBFluteCreatorDiconFileName}")
+#set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
+#set ($glJ2eeDiconResourceName = "${database.j2eeDiconResourceName}")
+#set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
+#set ($glDBFluteModuleAp = "${database.DBFluteModuleBhvApClassName}")
+#set ($glDBFluteModuleLib = "${database.libraryProjectPrefix}DBFluteModule")
+
+## ===================================================================================
+##                                                                             Package
+##                                                                             =======
+## -----------------------------------------------------
+##                                               Regular
+##                                               -------
+#set ($glPackageBaseCommonAp = "${database.applicationAllCommonPackage}")
+#set ($glPackageBaseBhvAp = "${database.baseBehaviorPackage}")
+#set ($glPackageExtendedBhvAp = "${database.extendedBehaviorPackage}")
+#set ($glPackageBaseCommonLib = "${database.libraryAllCommonPackage}")
+#set ($glPackageExtendedBhvLib = "${database.libraryBehaviorPackage}")
+
+## *****************************************************************************************************************
+##                                                                                                           Parsing
+##                                                                                                           *******
+
+## ===================================================================================
+##                                                                     ContainerConfig
+##                                                                     ===============
+$database.info("public void parseContainerConfig() {")
+#if ($database.isTargetContainerSeasar())
+  #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+    #set ($path = "${dbfluteDiconPackageName}" )
+    $database.makeDirectory($path)
+
+    #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+    #set ($path = $database.filterDBFluteDiconBhvAp($path) )
+    $database.info("    ${path}")
+    $generator.parse("om/${glResourceDirectory}/plugin/bhvap/container/seasar/BhvApDBFluteDicon.${glTemplateFileExtension}", $path, "", "")
+  #end
+#end
+#if ($database.isTargetContainerSpring())
+  #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
+    #set ($path = "${dbfluteBeansPackageName}" )
+    $database.makeDirectory($path)
+
+    #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
+    #set ($path = $database.filterDBFluteBeansBhvAp($path) )
+    $database.info("    ${path}")
+    $generator.parse("om/${glResourceDirectory}/plugin/bhvap/container/spring/BhvApSpringDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
+  #end
+#end
+#if ($database.isTargetContainerLucy())
+  #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
+    #set ($path = "${dbfluteBeansPackageName}" )
+    $database.makeDirectory($path)
+
+    #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
+    #set ($path = $database.filterDBFluteBeansBhvAp($path) )
+    $database.info("    ${path}")
+    $generator.parse("om/${glResourceDirectory}/plugin/bhvap/container/lucy/BhvApLucyDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
+  #end
+#end
+#if ($database.isTargetContainerGuice())
+  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonAp}))
+  $database.makeDirectory($path)
+
+  #set ($path = "${database.getPackageAsPath(${glPackageBaseCommonAp})}${glDBFluteModuleAp}.${glClassFileExtension}" )
+  $database.info("    ${path}")
+  $generator.parse("om/${glResourceDirectory}/plugin/bhvap/container/guice/BhvApGuiceDBFluteModule.${glTemplateFileExtension}", $path, "", "")
+#end
+$database.info("}")
+
+## ===================================================================================
+##                                                                        Table Object
+##                                                                        ============
+#set ($path = $database.getPackageAsPath(${glPackageBaseBhvAp}))
+$database.makeDirectory($path)
+
+#set ($path = $database.getPackageAsPath(${glPackageExtendedBhvAp}))
+$database.makeDirectory($path)
+
+##
+## Delete old table classes.
+##
+$database.deleteOldTableClass()
+
+##
+## Loop by tables.
+##
+$database.info("public void parseTableClass() {")
+#foreach ($table in $database.tables)
+
+  $database.info("    parse('${table.tableDbName}');")
+
+  #set ($myBaseBhvApClassName = "${table.baseBehaviorApClassName}")
+  #set ($myExtendedBhvApClassName = "${table.extendedBehaviorApClassName}")
+  #set ($myExtendedBhvLibClassName = "${table.extendedBehaviorLibClassName}")
+
+  #if ($table.hasBehavior())
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhvAp})}${myBaseBhvApClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/plugin/bhvap/BhvApBaseBhv.${glTemplateFileExtension}", $path, "table", $table)
+
+    #if (!$database.isStopGenerateExtendedBhv())
+      #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhvAp})}${myExtendedBhvApClassName}.${glClassFileExtension}" )
+      #if (!$files.file(${generator.outputPath},$path).exists())
+        $generator.parse("om/${glResourceDirectory}/plugin/bhvap/BhvApExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
+      #end
+      $database.reflectAllExCopyright($path)
+    #end
+  #end
+#end
+$database.info("}")
+$database.info(" ")
+

@@ -1,0 +1,132 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($database = $schemaData.database)
+
+## ------------------------------------------------------------------
+##                                                    Global-Paramter
+##                                                    ---------------
+## ===================================================================================
+##                                                                            Language
+##                                                                            ========
+## [Language]
+#set ($glTargetLanguage = ${database.TargetLanguage})
+
+## ===================================================================================
+##                                                                  Resource Directory
+##                                                                  ==================
+#set ($glResourceDirectory = ${database.resourceDirectory})
+
+## [Extension]
+#set ($glTemplateFileExtension = ${database.TemplateFileExtension})
+#set ($glClassFileExtension = ${database.ClassFileExtension})
+
+## [Prefix-and-Suffix]
+#set ($glProjectPrefix = ${database.ProjectPrefix})
+#set ($glBasePrefix = ${database.BasePrefix})
+#set ($glBaseSuffixForEntity = ${database.BaseSuffixForEntity})
+
+## [Package]
+#set ($glPackageBaseCommon = "${database.baseCommonPackage}")
+#set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
+#set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.cbean.coption")
+#set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
+#set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.dbmeta.info")
+#set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
+#set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.javalike")
+#set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.jdbc")
+#set ($glPackageBaseDao = "${database.baseDaoPackage}" )
+#set ($glPackageBaseEntity = "${database.baseEntityPackage}")
+#set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
+#set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
+
+## -----------------------------------------------------------------------------------------------------
+##                                                                                Parse customize entity
+##                                                                                ----------------------
+## Setup output directory.
+$database.enableSql2EntityOutputDirectory()
+
+## for Sql2Entity
+#set ($isSql2Entity = true)
+
+#set ($glPackageBaseCustomizeEntity = "${database.s2jdbcBaseEntityPackage}.customize" )
+#set ($glPackageExtendedCustomizeEntity = "${database.s2jdbcExtendedEntityPackage}.customize" )
+
+#set ($path = $strings.getPackageAsPath(${glPackageBaseCustomizeEntity}))
+$database.makeDirectory($path)
+
+#set ($path = $strings.getPackageAsPath(${glPackageExtendedCustomizeEntity}))
+$database.makeDirectory($path)
+
+$database.debug("public void parseCustomizeEntity() {")
+$database.debug("    final List<String> tableNameList = getTableList();")
+$database.debug("    for (String tableName : tableNameList) {")
+#foreach ($table in $database.tableList)
+  #set ($myBaseObjectClassName = "${database.s2jdbcBaseEntityPrefix}${table.javaName}")
+  #set ($myBaseEntityPackageName = "${glPackageBaseCustomizeEntity}")
+  #set ($myExtendedObjectClassName = "${table.javaName}")
+  #set ($myExtendedEntityPackageName = "${glPackageExtendedCustomizeEntity}")
+
+  #set ($myEntityVariableName = "${table.uncapitalisedJavaName}")
+  #set ($myEntityListVariableName = "${table.uncapitalisedJavaName}List")
+
+  $database.debug("        parseBaseCustomizeEntity(tableName);     // ${myBaseObjectClassName}")
+  #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/other/s2jdbc/entity/S2jdbcBaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
+
+  #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+  #if (!$files.file(${generator.OutputPath},$path).exists())
+    $database.debug("        parseExtendedCustomizeEntity(tableName); // ${myExtendedObjectClassName}")
+    $generator.parse("om/${glResourceDirectory}/other/s2jdbc/entity/S2jdbcExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
+  #end
+#end
+$database.debug("    }")
+$database.debug("}")
+
+## -----------------------------------------------------------------------------------------------------
+##                                                                                  Parse parameter bean
+##                                                                                  --------------------
+#if ($database.isExistPmbMetaData())
+$database.debug("public void parseParameterBean() {")
+$database.debug("    final List<DfParameterBeanMetaData> parameterBeanList = getParameterBeanList();")
+$database.debug("    for (DfParameterBeanMetaData parameterBean : parameterBeanList) {")
+
+  #set ($glPackageBaseParameterBean = "${database.s2jdbcBaseEntityPackage}.pmbean" )
+  #set ($glPackageExtendedParameterBean = "${database.s2jdbcExtendedEntityPackage}.pmbean" )
+
+  #set ($path = $strings.getPackageAsPath(${glPackageBaseParameterBean}))
+  $database.makeDirectory($path)
+  #set ($path = $strings.getPackageAsPath(${glPackageExtendedParameterBean}))
+  $database.makeDirectory($path)
+
+  #foreach ($pmbMetaData in $database.pmbMetaDataList)
+    #set ($pmbClassName = "$pmbMetaData.className")
+    #set ($pmbSuperClassName = "$pmbMetaData.superClassName")
+    #set ($myBaseParameterBeanClassName = "${database.s2jdbcBaseEntityPrefix}${pmbClassName}")
+    #set ($myExtendedParameterBeanClassName = "${pmbClassName}")
+
+    $database.debug("        parseBaseParameterBean(parameterBean);     // ${myBaseParameterBeanClassName}")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseParameterBean})}${myBaseParameterBeanClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/other/s2jdbc/pmbean/S2jdbcBaseParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
+
+    #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedParameterBean})}${myExtendedParameterBeanClassName}.${glClassFileExtension}" )
+    #if (!$files.file(${generator.OutputPath},$path).exists())
+      $database.debug("        parseExtendedParameterBean(parameterBean); // ${myExtendedParameterBeanClassName}")
+      $generator.parse("om/${glResourceDirectory}/other/s2jdbc/pmbean/S2jdbcExtendedParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
+    #end
+  #end
+$database.debug("    }")
+$database.debug("}")
+#end

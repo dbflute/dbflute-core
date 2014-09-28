@@ -1,0 +1,47 @@
+
+using System;
+using System.Collections;
+using ${glPackageBaseCommonSqlClause};
+
+namespace ${glPackageBaseCommonCBean} {
+
+    /// <summary>
+    /// The condition-bean as interface.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public interface ${glOrderByBean} {
+
+        /// <summary>
+        /// The property of sql component of order-by clause.
+        /// </summary>
+        ${glOrderByClause} SqlComponentOfOrderByClause { get; }
+
+        /**
+         * Clear order-by.
+         * 
+         * @return this. (NotNull)
+         */
+        ${glOrderByBean} ClearOrderBy();
+
+	    /**
+	     * Ignore order-by.
+	     * 
+	     * @return this. (NotNull)
+	     */
+        ${glOrderByBean} IgnoreOrderBy();
+
+	    /**
+	     * Make order-by effective.
+	     * 
+	     * @return this. (NotNull)
+	     */
+        ${glOrderByBean} MakeOrderByEffective();
+
+	    /**
+	     * Get order-by clause.
+	     * 
+	     * @return Order-by clause. (NotNull)
+	     */
+	    String OrderByClause { get; }
+    }
+}

@@ -1,0 +1,13 @@
+
+using System;
+using System.Collections.Generic;
+
+namespace ${glPackageBaseCommonCBean} {
+
+    public interface ${glPagingHandler}<ENTITY> {
+
+        ${glPagingBean} PagingBean { get; }
+        int Count();
+        IList<ENTITY> Paging();
+    }
+}

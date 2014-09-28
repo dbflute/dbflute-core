@@ -1,0 +1,11 @@
+#set ($myClassName = "${myConditionBeanClassName}")
+
+using System;
+using System.Collections;
+
+namespace ${glPackageCB} {
+
+    [System.Serializable]
+    public class ${myClassName} : ${glPackageBaseCB}.${myBaseConditionBeanClassName} {
+    }
+}

@@ -1,0 +1,56 @@
+
+using System;
+using System.Collections.Generic;
+
+using ${glPackageBaseCommonJdbc};
+using ${glPackageBaseCommonS2DaoInternalSqlLog};
+
+namespace ${glPackageBaseCommonS2Dao} {
+
+    public class ${glSqlLogRegistryLatestSqlProvider} : ${glLatestSqlProvider} {
+
+        public String GetDisplaySql() {
+            return GetLastCompleteSql();
+        }
+
+        protected String GetLastCompleteSql() {
+            try {
+                ${glInternalSqlLogRegistry} sqlLogRegistry = Find${glInternalSqlLogRegistry}();
+                if (sqlLogRegistry == null) {
+                    return null;
+                }
+                ${glInternalSqlLog} sqlLog = sqlLogRegistry.Last;
+                if (sqlLog == null) {
+                    return null;
+                }
+                return sqlLog.CompleteSql;
+            } catch (Exception) {
+                return null;
+            }
+        }
+
+        public IList<String> ExtractDisplaySqlList() {
+            ${glInternalSqlLogRegistry} sqlLogRegistry = Find${glInternalSqlLogRegistry}();
+            if (sqlLogRegistry == null) {
+                return new List<String>();
+            }
+	        IList<String> sqlList = new List<String>();
+	        foreach (${glInternalSqlLog} sqlLog in sqlLogRegistry.SqlLogList) {
+	            sqlList.Add(sqlLog.CompleteSql);
+	        }
+	        return sqlList;
+	    }
+
+    	public void ClearSqlCache() {
+            ${glInternalSqlLogRegistry} sqlLogRegistry = Find${glInternalSqlLogRegistry}();
+            if (sqlLogRegistry == null) {
+                return;
+            }
+            sqlLogRegistry.Clear();
+        }
+
+    	protected ${glInternalSqlLogRegistry} Find${glInternalSqlLogRegistry}() {
+            return ${glInternalSqlLogRegistryLocator}.Instance;
+        }
+    }
+}

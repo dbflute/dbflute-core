@@ -1,0 +1,19 @@
+
+using System;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the entity has already been deleted (by other thread).
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public class ${glEntityAlreadyDeletedException} : SystemException {
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param="msg">Exception message. (NotNull)</param>
+        public ${glEntityAlreadyDeletedException}(String msg)
+        : base(msg) {}
+    }
+}

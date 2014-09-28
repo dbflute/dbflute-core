@@ -1,0 +1,26 @@
+
+using System.Collections;
+using System.Data;
+
+using Seasar.Dao;
+
+namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
+
+    public class ${glInternalBeanArrayMetaDataResultSetHandler} : ${glInternalBeanListMetaDataResultSetHandler} {
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalBeanArrayMetaDataResultSetHandler}(IBeanMetaData beanMetaData, IRowCreator rowCreator, IRelationRowCreator relationRowCreator)
+            : base(beanMetaData, rowCreator, relationRowCreator) {
+        }
+
+        // ===============================================================================
+        //                                                                          Handle
+        //                                                                          ======
+        public override object Handle(IDataReader dataReader) {
+            ArrayList list = (ArrayList) base.Handle(dataReader);
+            return list.ToArray(BeanMetaData.BeanType);
+        }
+    }
+}

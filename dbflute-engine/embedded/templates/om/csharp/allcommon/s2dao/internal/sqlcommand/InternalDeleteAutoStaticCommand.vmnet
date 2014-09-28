@@ -1,0 +1,34 @@
+
+using System.Text;
+using Seasar.Extension.ADO;
+using Seasar.Dao;
+using Seasar.Dao.Impl;
+
+using ${glPackageBaseCommonS2DaoInternalSqlHandler};
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
+
+    public class ${glInternalDeleteAutoStaticCommand} : ${glInternalAbstractAutoStaticCommand} {
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalDeleteAutoStaticCommand}(IDataSource dataSource, ICommandFactory commandFactory,
+            IBeanMetaData beanMetaData, string[] propertyNames)
+            : base(dataSource, commandFactory, beanMetaData, propertyNames) {
+        }
+
+        // ===============================================================================
+        //                                                                        Override
+        //                                                                        ========
+        protected override ${glInternalAbstractAutoHandler} CreateAutoHandler() {
+            return new ${glInternalDeleteAutoHandler}(DataSource, CommandFactory, BeanMetaData, PropertyTypes);
+        }
+        protected override void SetupSql() {
+            SetupDeleteSql();
+        }
+        protected override void SetupPropertyTypes(string[] propertyNames) {
+            SetupDeletePropertyTypes(propertyNames);
+        }
+	}
+}

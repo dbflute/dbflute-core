@@ -1,0 +1,32 @@
+
+using System;
+using System.Text;
+using Seasar.Extension.ADO;
+using Seasar.Dao;
+using Seasar.Dao.Impl;
+
+using ${glPackageBaseCommonS2DaoInternalSqlHandler};
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
+
+    public class ${glInternalUpdateDynamicCommand} : AbstractDynamicCommand {
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalUpdateDynamicCommand}(IDataSource dataSource, ICommandFactory commandFactory)
+            : base(dataSource, commandFactory) {
+        }
+
+        // ===============================================================================
+        //                                                                         Execute
+        //                                                                         =======
+        public override object Execute(object[] args) {
+            ICommandContext ctx = Apply(args);
+            ${glInternalBasicUpdateHandler} handler = new ${glInternalBasicUpdateHandler}(DataSource, ctx.Sql, CommandFactory);
+            Object[] bindVariables = ctx.BindVariables;
+            handler.LoggingMessageSqlArgs = bindVariables;
+            return handler.Execute(bindVariables, ctx.BindVariableTypes);
+        }
+	}
+}

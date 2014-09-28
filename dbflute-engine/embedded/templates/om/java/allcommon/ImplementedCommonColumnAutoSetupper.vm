@@ -1,0 +1,185 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
+
+/**
+ * The basic implementation of the auto set-upper of common column.
+ * @author ${database.classAuthor}
+ */
+public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAutoSetupper {
+
+    // =====================================================================================
+    //                                                                            Definition
+    //                                                                            ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(${glImplementedCommonColumnAutoSetupper}.class);
+#if ($database.isExistCommonColumnSetupElement())
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+#foreach ($resource in $database.commonColumnSetupResourceList)
+    /** The property of ${resource.propertyName}. */
+    protected ${resource.className} ${resource.propertyVariableName};
+
+    /**
+     * @return The value of ${resource.propertyName}.
+     */
+    public ${resource.className} get${resource.propertyNameInitCap}() {
+        return ${resource.propertyVariableName};
+    }
+
+    /**
+     * @param ${resource.propertyName} The value of ${resource.propertyName}.
+     */
+    public void set${resource.propertyNameInitCap}(${resource.className} ${resource.propertyName}) {
+        this.${resource.propertyVariableName} = ${resource.propertyName};
+    }
+
+#end
+    // =====================================================================================
+    //                                                                                Set up
+    //                                                                                ======
+    /**
+     * {@inheritDoc}
+     */
+    public void handleCommonColumnOfInsertIfNeeds(Entity targetEntity) {
+        final ${glEntityDefinedCommonColumn} entity = askIfEntitySetup(targetEntity);
+        if (entity == null) {
+            return;
+        }
+        if (isInternalDebugEnabled()) {
+            logSettingUp(entity, "INSERT");
+        }
+        doHandleCommonColumnOfInsertIfNeeds(entity);
+    }
+
+    protected void doHandleCommonColumnOfInsertIfNeeds(${glEntityDefinedCommonColumn} entity) {
+#foreach ($columnName in ${database.commonColumnNameList})
+#set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+#set ($entityCommonColumnMap = ${database.commonColumnMap})
+#set ($columnType = ${entityCommonColumnMap.get(${columnName})})
+#set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+#set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#if (${database.hasCommonColumnBeforeInsertLogic(${columnName})})
+#set ($logic = ${database.getCommonColumnBeforeInsertLogicByColumnName(${columnName})})
+#if ($database.isCommonColumnSetupInvokingLogic($logic))
+#set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+        ${filteredLogic}
+#else
+        final ${javaNative} ${uncapitalisedJavaName} = ${logic};
+        entity.set${javaName}(${uncapitalisedJavaName});
+#end
+#end
+#end
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void handleCommonColumnOfUpdateIfNeeds(Entity targetEntity) {
+        final ${glEntityDefinedCommonColumn} entity = askIfEntitySetup(targetEntity);
+        if (entity == null) {
+            return;
+        }
+        if (isInternalDebugEnabled()) {
+            logSettingUp(entity, "UPDATE");
+        }
+        doHandleCommonColumnOfUpdateIfNeeds(entity);
+    }
+
+    protected void doHandleCommonColumnOfUpdateIfNeeds(${glEntityDefinedCommonColumn} entity) {
+#foreach ($columnName in ${database.commonColumnNameList})
+#set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+#set ($entityCommonColumnMap = ${database.CommonColumnMap})
+#set ($columnType = ${entityCommonColumnMap.get(${columnName})})
+#set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+#set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#if (${database.hasCommonColumnBeforeUpdateLogic(${columnName})})
+#set ($logic = ${database.getCommonColumnBeforeUpdateLogicByColumnName(${columnName})})
+#if ($database.isCommonColumnSetupInvokingLogic($logic))
+#set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+        ${filteredLogic}
+#else
+        final ${javaNative} ${uncapitalisedJavaName} = ${logic};
+        entity.set${javaName}(${uncapitalisedJavaName});
+#end
+#end
+#end
+    }
+
+    // =====================================================================================
+    //                                                                         Assist Helper
+    //                                                                         =============
+    protected ${glEntityDefinedCommonColumn} askIfEntitySetup(Entity targetEntity) {
+        if (!hasCommonColumn(targetEntity)) {
+            return null;
+        }
+        final ${glEntityDefinedCommonColumn} entity = downcastEntity(targetEntity);
+        if (!canCommonColumnAutoSetup(entity)) {
+            return null;
+        }
+        return entity;
+    }
+
+    protected boolean hasCommonColumn(Entity targetEntity) {
+        return targetEntity instanceof ${glEntityDefinedCommonColumn};
+    }
+
+    protected boolean canCommonColumnAutoSetup(${glEntityDefinedCommonColumn} entity) {
+        return entity.canCommonColumnAutoSetup();
+    }
+
+    protected ${glEntityDefinedCommonColumn} downcastEntity(Entity targetEntity) {
+        return (${glEntityDefinedCommonColumn})targetEntity;
+    }
+#else
+
+    // =====================================================================================
+    //                                                                                Set up
+    //                                                                                ======
+    /**
+     * {@inheritDoc}
+     */
+    public void handleCommonColumnOfInsertIfNeeds(Entity targetEntity) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void handleCommonColumnOfUpdateIfNeeds(Entity targetEntity) {
+    }
+#end
+
+    // =====================================================================================
+    //                                                                               Logging
+    //                                                                               =======
+    protected boolean isInternalDebugEnabled() {
+        return ${glDBFluteConfig}.getInstance().isInternalDebug() && _log.isDebugEnabled();
+    }
+
+    protected void logSettingUp(${glEntityDefinedCommonColumn} entity, String keyword) {
+        _log.debug("...Setting up column columns of " + entity.getTableDbName() + " before " + keyword);
+    }
+}

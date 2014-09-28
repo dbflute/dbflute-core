@@ -1,0 +1,98 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+/**
+ * The auto set-upper of common column.
+ * @author ${database.classAuthor}
+ */
+public class ${glCommonColumnAutoSetupper} {
+
+    // =====================================================================================
+    //                                                                                Set up
+    //                                                                                ======
+    /**
+     * Handle common columns of insert if it needs.
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     */
+    public void handleCommonColumnOfInsertIfNeeds(${glEntity} targetEntity) {
+#if ($database.isExistCommonColumnSetupElement())
+        if (!(targetEntity instanceof ${glEntityDefinedCommonColumn})) {
+            return;
+        }
+        final ${glEntityDefinedCommonColumn} entity = (${glEntityDefinedCommonColumn})targetEntity;
+        if (!entity.canCommonColumnAutoSetup()) {
+            return;
+        }
+#foreach ($columnName in ${database.commonColumnNameList})
+#set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+#set ($entityCommonColumnMap = ${database.commonColumnMap})
+#set ($columnType = ${entityCommonColumnMap.get(${columnName})})
+#set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+#set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#if (${database.hasCommonColumnBeforeInsertLogic(${columnName})})
+#set ($logic = ${database.getCommonColumnBeforeInsertLogicByColumnName(${columnName})})
+#if ($database.isCommonColumnSetupInvokingLogic($logic))
+#set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+
+        ${filteredLogic}
+#else
+
+        final ${javaNative} ${uncapitalisedJavaName} = ${logic};
+        entity.set${javaName}(${uncapitalisedJavaName});
+#end
+#end
+#end
+#end
+    }
+
+    /**
+     * Handle common columns of update if it needs.
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     */
+    public void handleCommonColumnOfUpdateIfNeeds(${glEntity} targetEntity) {
+#if ($database.isExistCommonColumnSetupElement())
+        if (!(targetEntity instanceof ${glEntityDefinedCommonColumn})) {
+            return;
+        }
+        final ${glEntityDefinedCommonColumn} entity = (${glEntityDefinedCommonColumn})targetEntity;
+        if (!entity.canCommonColumnAutoSetup()) {
+            return;
+        }
+#foreach ($columnName in ${database.commonColumnNameList})
+#set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+#set ($entityCommonColumnMap = ${database.CommonColumnMap})
+#set ($columnType = ${entityCommonColumnMap.get(${columnName})})
+#set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+#set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#if (${database.hasCommonColumnBeforeUpdateLogic(${columnName})})
+#set ($logic = ${database.getCommonColumnBeforeUpdateLogicByColumnName(${columnName})})
+#if ($database.isCommonColumnSetupInvokingLogic($logic))
+#set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+
+        ${filteredLogic}
+#else
+
+        final ${javaNative} ${uncapitalisedJavaName} = ${logic};
+        entity.set${javaName}(${uncapitalisedJavaName});
+#end
+#end
+#end
+#end
+    }
+}

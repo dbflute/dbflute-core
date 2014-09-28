@@ -1,0 +1,507 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${myBaseEntityPackageName};
+#set ($myClassName = "${myImmutableBaseObjectClassName}")
+
+import scala.collection.immutable._;
+import scala.collection.JavaConverters._;
+
+import java.io.Serializable;
+import java.util.Collection;
+#if ($table.hasUtilDateColumn())
+import java.util.Date;
+#end
+
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.Entity.FunCustodial;
+#if ($table.needsRelationOptionalEntityImport())
+import ${database.relationOptionalEntityClassName};
+#end
+#if (!$isSql2Entity)
+import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
+#end
+#if ($table.hasClassification())
+import ${glPackageBaseCommon}.${glCDef};
+#end
+import ${myExtendedEntityPackageName}._;
+#if ($table.isLoadableCustomizeEntity())
+import ${glPackageExtendedEntity}._;
+#end
+#set ($myEntityInterfaceName = "")
+#if (${table.hasAllCommonColumn()})
+  #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumn})
+#else
+  #set ($myEntityInterfaceName = "Entity")
+#end
+#if ($table.hasRelationalNullObjectProviderImport())
+import ${table.relationalNullObjectProviderPackage}._;
+#end
+
+/**
+ * The immutable entity of ${table.basicInfoDispString}. <br />
+#if ($table.isCommentForJavaDocValid())
+ * ${table.commentForJavaDoc}
+#end
+ * <pre>
+ * [primary-key]
+ *     ${table.primaryKeyNameCommaString}
+ * 
+ * [column]
+ *     ${table.columnNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.definedSequenceName}
+ * 
+ * [identity]
+ *     ${table.identityColumnName}
+ * 
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ * 
+ * [foreign table]
+ *     ${table.foreignTableNameCommaString}
+ * 
+ * [referrer table]
+ *     ${table.referrerTableNameCommaString}
+ * 
+ * [foreign property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer property]
+ *     ${table.referrerPropertyNameCommaString}
+ * 
+ * [get template]
+ * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+#foreach ($col in $table.columns)
+ * val ${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType} = entity.${col.uncapitalisedJavaName}
+#end
+ * = = = = = = = = = =/
+ * </pre>
+ * @author ${database.classAuthor}
+ */
+abstract class $myClassName(dble: ${myExtendedObjectClassName}) extends Serializable {
+
+    // ===================================================================================
+    //                                                                           Case Like
+    //                                                                           =========
+    def copy(
+#set ($argIndex = 0)
+#foreach ($col in $table.columns)
+        #if ($argIndex > 0),#end ${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType} = ${col.uncapitalisedJavaName}
+#set ($argIndex = $argIndex + 1)
+#end
+    ): ${myImmutableExtendedObjectClassName} = {
+        val newDble = new ${myExtendedObjectClassName}
+        newDble.myuniqueDrivenProperties.addAll(dble.myuniqueDrivenProperties) // inherit
+        newDble.modifiedProperties.addAll(dble.modifiedProperties) // inherit
+#foreach ($col in $table.columns)
+        if (!${col.uncapitalisedJavaName}.equals(this.${col.uncapitalisedJavaName})) { newDble.set${col.javaName}${col.classificationMethodSuffix}(${col.convertToMutablePropertyValue("${col.uncapitalisedJavaName}")}) }
+#end
+        new ${myImmutableExtendedObjectClassName}(newDble)
+    }
+
+    // ===================================================================================
+    //                                                                         Entity Meta
+    //                                                                         ===========
+    def getTableDbName(): String = { dble.getTableDbName }
+    def getDBMeta(): DBMeta = { dble.getDBMeta }
+    def getMyUniqueDrivenProperties(): Set[String] = { toScalaStringSet(dble.myuniqueDrivenProperties) }
+    def getModifiedProperties(): Set[String] = { toScalaStringSet(dble.modifiedProperties) }
+
+    protected def toScalaStringSet(javaList: java.util.Collection[String]): Set[String] =
+    { Set(javaList.toArray).asInstanceOf[Set[String]] }
+
+#if ($table.hasClassification())
+    // ===================================================================================
+    //                                                             Classification Property
+    //                                                             =======================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+    /**
+     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
+     * @return The instance of classification definition (as ENUM type). (NullAllowed: when the column value is null)
+     */
+    def ${col.uncapitalisedJavaName}As${col.classificationName}: ${glCDef}.${col.classificationName} = { dble.get${col.javaName}As${col.classificationName} }
+
+#end
+#end
+#end
+    // ===================================================================================
+    //                                                        Classification Determination
+    //                                                        ============================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+    /**
+     * Is the value of ${col.uncapitalisedJavaName} ${classificationElement.name}? <br />
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+     * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
+     * @return The determination, true or false.
+     */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
+    def is${col.javaName}_${classificationElement.name}: Boolean = { dble.is${col.javaName}_${classificationElement.name} }
+
+#end
+#foreach ($group in $col.classificationTop.groupList)
+#if ($group.hasGroupComment())
+    /**
+     * ${group.groupCommentForJavaDoc} <br />
+     * ${group.buildElementDisp()}
+     * @return The determination, true or false.
+     */
+#end
+    def is${col.javaName}_${group.groupNameInitCap}: Boolean = { dble.is${col.javaName}_${group.groupNameInitCap} }
+
+#end
+#end
+#end
+#if ($table.hasImplicitClassification())
+    // ===================================================================================
+    //                                                           Classification Name/Alias
+    //                                                           =========================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#if (!$col.isTableClassification())
+#if ($col.hasClassificationName())
+    /**
+     * Get the value of the column '${col.uncapitalisedJavaName}' as classification name.
+     * @return The string of classification name. (NullAllowed: when the column value is null)
+     */
+    def ${col.uncapitalisedJavaName}Name: String = { dble.get${col.javaName}Name }
+
+#end
+#if (${col.hasClassificationAlias()})
+    /**
+     * Get the value of the column '${col.uncapitalisedJavaName}' as classification alias.
+     * @return The string of classification alias. (NullAllowed: when the column value is null)
+     */
+    def ${col.uncapitalisedJavaName}Alias: String = { dble.get${col.javaName}Alias }
+
+#end
+#end
+#end
+#end
+#end
+    // ===================================================================================
+    //                                                                    Foreign Property
+    //                                                                    ================
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignTable = $fk.foreignTable)
+#set ($foreignEntityClassName = "${fk.foreignPropertyImmutableEntityDefinitionType}")
+#set ($foreignVariableName = "_${fk.foreignPropertyName}")
+    /**
+     * [get] ${fk.foreignDispForJavaDoc}
+     * @return The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (EmptyAllowed: when e.g. null FK column, no setupSelect)
+     */
+    def ${fk.foreignPropertyName}: ${foreignEntityClassName} = { dble.toImmutable${fk.foreignJavaBeansRulePropertyNameInitCap} }
+
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerPropertyImmutableEntityDefinitionTypeAsOne}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+    /**
+     * [get] ${referrer.referrerDispAsOneForJavaDoc}
+     * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (EmptyAllowed: when e.g. no data, no setupSelect)
+     */
+    def ${referrer.referrerPropertyNameAsOne}: ${referrerEntityClassName} = { dble.toImmutable${referrer.referrerJavaBeansRulePropertyNameInitCapAsOne} }
+
+#end
+    // ===================================================================================
+    //                                                                   Referrer Property
+    //                                                                   =================
+#foreach ($referrer in $table.referrerAsManyList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerTableImmutableExtendedEntityClassName}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+    /**
+     * [get] ${referrer.referrerDispForJavaDoc}
+     * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: even if no loading, returns empty list)
+     */
+    def ${referrer.referrerPropertyName}: List[${referrerEntityClassName}] = { dble.toImmutable${referrer.referrerJavaBeansRulePropertyNameInitCap} }
+
+#end
+#if ($table.isEntityDerivedMappable())
+    // ===================================================================================
+    //                                                                    Derived Mappable
+    //                                                                    ================
+    /**
+     * Find the derived value from derived map.
+     * @param <VALUE> The type of the value.
+     * @param aliasName The alias name of derived-referrer. (NotNull)
+     * @return The derived value found in the map. (NullAllowed: when null selected)
+     */
+    def derived[VALUE](aliasName: String): VALUE = { dble.derived[VALUE](aliasName) }
+
+#end
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * Determine the object is equal with this. <br />
+     * If primary-keys or columns of the other are same as this one, returns true.
+     * @param obj The object as other entity. (NullAllowed: if null, returns false fixedly)
+     * @return Comparing result.
+     */
+    override def equals(obj: Any) = {
+        obj match {
+            case obj: $myClassName => {
+                val other: $myClassName = obj.asInstanceOf[$myClassName];
+                {(
+#set ($equalsCount = 0)
+#foreach ($col in $table.equalsHashcodeColumnList)
+                    #if ($equalsCount > 0)&&#end xSV(${col.uncapitalisedJavaName}, other.${col.uncapitalisedJavaName})
+#set ($equalsCount = $equalsCount + 1)
+#end
+                )}
+            }
+            case _ => false
+        }
+    }
+    protected def xSV(v1: Int, v2: Int): Boolean = { return v1 == v2; }
+    protected def xSV(v1: Long, v2: Long): Boolean = { return v1 == v2; }
+    protected def xSV(v1: Object, v2: Object): Boolean = { return FunCustodial.isSameValue(v1, v2) }
+
+    /**
+     * Calculate the hash-code from primary-keys or columns.
+     * @return The hash-code from primary-key or columns.
+     */
+    override def hashCode(): Int = { return dble.hashCode; }
+    def instanceHash(): Int = { return dble.instanceHash; }
+
+    /**
+     * Convert to display string of entity's data. (no relation data)
+     * @return The display string of all columns and relation existences. (NotNull)
+     */
+    override def toString(): String = { dble.buildDisplayString(FunCustodial.toClassTitle(this), true, true) }
+
+#set ($propertyLoopIndex = 0)
+#foreach ($col in $table.columns)
+#if ($propertyLoopIndex == 0)
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#else
+
+#end
+    /**
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+#if ($col.isImmutablePropertyOptional())
+     * @return The value of the column '${col.name}'. (basically NotNull if selected: for the constraint)
+#else
+     * @return The value of the column '${col.name}'. (NotNull but EmptyAllowed if null in database)
+#end
+     */
+    def ${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType} = { ${col.getImmutablePropertyGetterReturningValue("dble.get${col.javaName}")} }
+#set ($propertyLoopIndex = $propertyLoopIndex + 1)
+#end
+}
+
+/* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                  Immutable                                           _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                        Mutable                       _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                              Border                                  _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */
+/* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
+
+/**
+ * The mutable entity of ${table.basicInfoDispString}. <br />
+#if ($table.isCommentForJavaDocValid())
+ * ${table.commentForJavaDoc}
+#end
+ * [get/set template]
+ * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+#foreach ($col in $table.columns)
+ * val ${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType} = entity.${col.uncapitalisedJavaName}
+#end
+#foreach ($col in $table.columns)
+ * entity.${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName}
+#end
+ * = = = = = = = = = =/
+ * @author ${database.classAuthor}
+ */
+abstract class ${myMutableBaseObjectClassName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected val dble: ${myExtendedObjectClassName} = new ${myExtendedObjectClassName}();
+
+    // ===================================================================================
+    //                                                                      DB-able Entity
+    //                                                                      ==============
+    def toDBable(): ${myExtendedObjectClassName} = { dble }
+
+    // ===================================================================================
+    //                                                                    Immutable Entity
+    //                                                                    ================
+    def toImmutable(): ${myImmutableExtendedObjectClassName} = { dble.toImmutable() }
+
+    // ===================================================================================
+    //                                                                          Unique Key
+    //                                                                          ==========
+#foreach ($uq in $table.keyableUniqueList)
+    /**
+     * To be unique by the unique column. <br />
+     * You can update the entity by the key when entity update (NOT batch update).
+     * ${uq.argsJavaDocString}
+     */
+    def uniqueBy${uq.javaNameKeyword}(${uq.argsString}): Unit = { ${uq.getArgsSetupString("dble")} }
+
+#end
+#if ($table.hasClassification())
+    // ===================================================================================
+    //                                                             Classification Property
+    //                                                             =======================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+    /**
+     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
+     * @return The instance of classification definition (as ENUM type). (NullAllowed: when the column value is null)
+     */
+    def ${col.uncapitalisedJavaName}As${col.classificationName}: ${glCDef}.${col.classificationName} = { dble.get${col.javaName}As${col.classificationName} }
+
+    /**
+     * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, null value is set to the column)
+     */
+    def ${col.uncapitalisedJavaName}As${col.classificationName}_=(cdef: ${glCDef}.${col.classificationName}): Unit = { dble.set${col.javaName}As${col.classificationName}(cdef) }
+#if ($classificationTop.isSisterBooleanHandling())
+
+    /**
+     * Set the value of ${col.uncapitalisedJavaName} as boolean. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param determination The determination, true or false. (NullAllowed: if null, null value is set to the column)
+     */
+    def ${col.uncapitalisedJavaName}AsBoolean(determination: Boolean): Unit = { dble.set${col.javaName}As${col.classificationName}(determination) }
+#end
+
+#end
+#end
+    // ===================================================================================
+    //                                                              Classification Setting
+    //                                                              ======================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+    /**
+     * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name} (${classificationElement.code}). <br />
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+     */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
+    def ${col.uncapitalisedJavaName}_${classificationElement.name}: Unit = { dble.set${col.javaName}_${classificationElement.name} }
+
+#end
+#end
+#end
+    // ===================================================================================
+    //                                                        Classification Determination
+    //                                                        ============================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+    /**
+     * Is the value of ${col.uncapitalisedJavaName} ${classificationElement.name}? <br />
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+     * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
+     * @return The determination, true or false.
+     */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
+    def is${col.javaName}_${classificationElement.name}: Boolean = { dble.is${col.javaName}_${classificationElement.name} }
+
+#end
+#foreach ($group in $col.classificationTop.groupList)
+#if ($group.hasGroupComment())
+    /**
+     * ${group.groupCommentForJavaDoc} <br />
+     * ${group.buildElementDisp()}
+     * @return The determination, true or false.
+     */
+#end
+    def is${col.javaName}_${group.groupNameInitCap}: Boolean = { dble.is${col.javaName}_${group.groupNameInitCap} }
+
+#end
+#end
+#end
+#end
+#set ($propertyLoopIndex = 0)
+#foreach ($col in $table.columns)
+#if ($propertyLoopIndex == 0)
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#else
+
+#end
+    /**
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+#if ($col.isImmutablePropertyOptional())
+     * @return The value of the column '${col.name}'. (NotNull but EmptyAllowed if null in database)
+#else
+     * @return The value of the column '${col.name}'. (basically NotNull if selected: for the constraint)
+#end
+     */
+    def ${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType} = { ${col.getImmutablePropertyGetterReturningValue("dble.get${col.javaName}")} }
+
+    /**
+     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+#if ($col.isImmutablePropertyOptional())
+     * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (basically NotNull if update: for the constraint)
+#else
+     * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (NullAllowed: null update allowed for no constraint)
+#end
+     */
+    ${col.propertySettingModifierAsPrefix}def ${col.uncapitalisedJavaName}_=(${col.uncapitalisedJavaName}: ${col.immutablePropertyDefinitionType}) = { dble.set${col.javaName}${col.classificationMethodSuffix}(${col.convertToMutablePropertyValue("${col.uncapitalisedJavaName}")}) }
+#set ($propertyLoopIndex = $propertyLoopIndex + 1)
+#end
+}

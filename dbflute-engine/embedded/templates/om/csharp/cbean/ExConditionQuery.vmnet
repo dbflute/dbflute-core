@@ -1,0 +1,38 @@
+#set ($myClassName = "${myConditionQueryClassName}")
+
+using System;
+using System.Collections;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonSqlClause};
+using ${glPackageBaseCQ};
+
+namespace ${glPackageCQ} {
+
+    [System.Serializable]
+    public class ${myClassName} : ${myBaseConditionQueryClassName} {
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        // You should NOT touch with this constructor.
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="childQuery">Child query as interface. (NullAllowed: If null, this is base instance.)</param>
+        /// <param name="sqlClause">SQL clause instance. (NotNull)</param>
+        /// <param name="aliasName">My alias name. (NotNull)</param>
+        /// <param name="nestLevel">Nest level.</param>
+        public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel)
+            : base(childQuery, sqlClause, aliasName, nestLevel) {}
+
+        // ===============================================================================
+        //                                                                   Arrange Query
+        //                                                                   =============
+        // You can make your arranged query methods here.
+        //public void ArrangeXxx() {
+        //    ...
+        //}
+    }
+}

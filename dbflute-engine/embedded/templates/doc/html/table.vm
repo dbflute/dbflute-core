@@ -1,0 +1,88 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+<h2 id="${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>
+${table.aliasExpression}${table.tableDispName}
+#if ($database.hasAdditionalSchema() && $table.hasSchema())
+&nbsp;<span class="tableschema">on ${table.documentSchema}</span>
+#end
+#if ($database.isSchemaHtmlOutsideSqlValid() && $table.hasBehaviorQueryPath())
+&nbsp;<span class="bqpcount"><a href="${database.sharp}${table.tableIdForSchemaHtml}_sql">(outsideSql=${table.behaviorQueryPathList.size()})</a></span>
+#end
+</h2>
+#if ($table.hasComment())
+<p class="tablecomment">${table.commentForSchemaHtml}</p>
+#end
+#set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
+#set ($hasDefaultValue = $table.hasDefaultValueExceptAutoIncrement())
+#set ($hasColumnComment = $table.hasColumnComment())
+<table summary="Columns in ${table.tableDispName}">
+	<thead>
+	<tr>
+		<th class="rownumhead">No.</th>
+		<th>PK</th>
+		<th>ID</th>
+		<th>UQ</th>
+		<th>IX</th>
+		<th>Not<br />Null</th>
+#if ($isAliasDelimiterInDbCommentValid)
+		<th>Alias</th>
+#end
+		<th>Name</th>
+		<th>Type</th>
+		<th>Size</th>
+#if ($hasDefaultValue)
+		<th>Default</th>
+#end
+		<th>ForeignTable</th>
+		<th>ReferrerTable</th>
+		<th>Classification</th>
+#if ($hasColumnComment)
+		<th>ColumnComment</th>
+#end
+		<th>PropertyName</th>
+		<th>${table.database.targetLanguageInitCap}Type</th>
+	</tr>
+	</thead>
+#set ($rownum = 1)
+#foreach ($col in $table.columns)
+	<tr>
+		<td class="rownumcell">${rownum}</td>
+		<td class="flgcell#if ($col.isAdditionalPrimaryKey()) additionalpk#end"${col.primaryKeyTitleForSchemaHtml}>${col.primaryKeyMarkForSchemaHtml}</td>
+		<td class="flgcell">#if ($col.isIdentityOrSequence())o#else &nbsp;#end</td>
+		<td class="flgcell#if ($col.isUniqueAllAdditional()) additionalpk#end"${col.uniqueKeyTitleForSchemaHtml}>${col.uniqueKeyMarkForSchemaHtml}</td>
+		<td class="flgcell"${col.indexTitleForSchemaHtml}>${col.indexMarkForSchemaHtml}</td>
+		<td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>
+#if ($isAliasDelimiterInDbCommentValid)
+		<td class="${col.schemaHtmlColumnAliasCssClass}">${col.alias}</td>
+#end
+		<td#if ($col.hasSchemaHtmlColumnNameCssClass()) class="${col.schemaHtmlColumnNameCssClass}"#end id="${col.columnIdForSchemaHtml}">${col.name}</td>
+		<td class="typecell">${col.dbTypeExpression}</td>
+		<td class="sizecell">#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end</td>
+#if ($hasDefaultValue)
+		<td class="defvalcell">#if ($col.hasDefaultValueExceptAutoIncrement()) ${col.defaultValue}#else &nbsp;#end</td>
+#end
+		<td class="relcell">${col.foreignTableNameCommaStringWithHtmlHref}&nbsp;</td>
+		<td class="relcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
+		<td class="relcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}Cls">${col.classificationName}</a>#else &nbsp;#end</td>
+#if ($hasColumnComment)
+		<td class="commentcell">#if ($col.hasComment()) ${col.commentForSchemaHtml}#else &nbsp;#end</td>
+#end
+		<td class="subcell">${col.javaBeansRulePropertyName}</td>
+		<td class="subcell">${col.javaNativeRemovedPackage}</td>
+	</tr>
+#set ($rownum = $rownum + 1)
+#end
+</table>

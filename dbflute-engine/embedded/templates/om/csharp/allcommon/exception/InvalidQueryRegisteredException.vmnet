@@ -1,0 +1,14 @@
+
+using System;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when an invalid query is registered.
+    /// </summary>
+    public class ${glInvalidQueryRegisteredException} : SystemException {
+
+        public ${glInvalidQueryRegisteredException}(String msg)
+        : base(msg) {}
+    }
+}

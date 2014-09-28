@@ -1,0 +1,86 @@
+
+using System;
+using System.Collections;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+
+namespace ${glPackageBaseCommonCBean} {
+
+/**
+ * FetchNarrowing-Bean context. (referring to s2pager)
+ * 
+ * @author ${database.classAuthor}
+ */
+    public static class ${glFetchNarrowingBeanContext} {
+
+        /** The thread-local for this. */
+        private static LocalDataStoreSlot _fetchNarrowingBeanSlot = Thread.AllocateDataSlot();
+
+        /**
+         * Get fetch-narrowing-bean context on thread.
+         * 
+         * @return FetchNarrowing-bean. (NullAllowed)
+         */
+        public static ${glFetchNarrowingBean} GetFetchNarrowingBeanOnThread() {
+            return (${glFetchNarrowingBean})Thread.GetData(_fetchNarrowingBeanSlot);
+        }
+
+        /**
+         * Set fetch-narrowing-bean context on thread.
+         * 
+         * @param ${glAttachedCBArgsVariableName} FetchNarrowing-bean. (NotNull)
+         */
+        public static void SetFetchNarrowingBeanOnThread(${glFetchNarrowingBean} ${glAttachedCBArgsVariableName}) {
+            if (${glAttachedCBArgsVariableName} == null) {
+                String msg = "The argument[${glAttachedCBArgsVariableName}] must not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            Thread.SetData(_fetchNarrowingBeanSlot, ${glAttachedCBArgsVariableName});
+        }
+
+        /**
+         * Clear fetch-narrowing-bean context on thread.
+         */
+        public static void ClearFetchNarrowingBeanOnThread() {
+            Thread.SetData(_fetchNarrowingBeanSlot, null);
+        }
+
+        /**
+         * Is existing fetch-narrowing-bean context on thread?
+         * 
+         * @return The determination, true or false.
+         */
+        public static bool IsExistFetchNarrowingBeanOnThread() {
+            return (Thread.GetData(_fetchNarrowingBeanSlot) != null);
+        }
+
+        /**
+         * Is the argument fetch-narrowing-bean?
+         * 
+         * @param dtoInstance Dto instance.
+         * @return The determination, true or false.
+         */
+        public static bool IsTheArgumentFetchNarrowingBean(Object dtoInstance) {
+            if (dtoInstance is ${glFetchNarrowingBean}) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Is the type fetch-narrowing-bean?
+         * 
+         * @param dtoClass DtoClass.
+         * @return The determination, true or false.
+         */
+        public static bool IsTheTypeFetchNarrowingBean(Type dtoType) {
+            if (typeof(${glFetchNarrowingBean}).IsAssignableFrom(dtoType)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+}

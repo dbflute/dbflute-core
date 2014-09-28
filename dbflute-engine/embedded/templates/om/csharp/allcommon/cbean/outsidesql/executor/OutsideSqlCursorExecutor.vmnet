@@ -1,0 +1,46 @@
+
+using System;
+
+using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonJdbc};
+
+namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
+
+    public class ${glOutsideSqlCursorExecutor}<PARAMETER_BEAN> {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected ${glOutsideSqlDao} _outsideSqlDao;
+
+        protected ${glOutsideSqlOption} _outsideSqlOption;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glOutsideSqlCursorExecutor}(${glOutsideSqlDao} outsideSqlDao, ${glOutsideSqlOption} outsideSqlOption) {
+            this._outsideSqlDao = outsideSqlDao;
+            this._outsideSqlOption = outsideSqlOption;
+        }
+
+        // ===============================================================================
+        //                                                                          Select
+        //                                                                          ======
+        public Object SelectCursor(String path, PARAMETER_BEAN pmb, ${glCursorHandler} handler) {
+            return _outsideSqlDao.SelectCursor(path, pmb, _outsideSqlOption, handler);
+        }
+
+        // ===============================================================================
+        //                                                                          Option
+        //                                                                          ======
+        public ${glOutsideSqlCursorExecutor}<PARAMETER_BEAN> Configure(${glStatementConfig} statementConfig) {
+            _outsideSqlOption.StatementConfig = statementConfig;
+            return this;
+        }
+
+        public ${glOutsideSqlCursorExecutor}<PARAMETER_BEAN> DynamicBinding() {
+            _outsideSqlOption.DynamicBinding();
+            return this;
+        }
+    }
+}

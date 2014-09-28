@@ -1,0 +1,15 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the property on bind variable comment is not found about outsideSql.
+    /// </summary>
+    public class ${glBindVariableCommentNotFoundPropertyException} : SystemException {
+
+        public ${glBindVariableCommentNotFoundPropertyException}(String msg)
+        : base(msg) {}
+    }
+}

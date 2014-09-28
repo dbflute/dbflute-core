@@ -1,0 +1,167 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace ${glPackageBaseCommonHelper} {
+
+    /// <summary>
+    /// The implementation of map-string-builder.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public class ${glMapStringBuilderImpl} : ${glMapStringBuilder} {
+
+        /// <summary>The instance of regular-expressions.</summary>
+        protected Regex _regDelimiter;
+
+        /// <summary>The array of column-name.</summary>
+        protected String[] _columnNames;
+
+        /// <summary>The value of map-mark for map-string.</summary>
+        protected String _msMapMark;
+
+        /// <summary>The value of delimiter for map-string.</summary>
+        protected String _msDelimiter;
+
+        /// <summary>The value of equal for map-string.</summary>
+        protected String _msEqual;
+
+        /// <summary>The value of start-brace for map-string.</summary>
+        protected String _msStartBrace;
+
+        /// <summary>The value of end-brace for map-string.</summary>
+        protected String _msEndBrace;
+
+        /// <summary>
+        /// The property of column-name.
+        /// </summary>
+        public String[] ColumnNames {
+            set{ _columnNames = value; }
+        }
+
+        /// <summary>
+        /// The property of map-mark for map-string.
+        /// </summary>
+        public String MapStringMapMark {
+            set { _msMapMark = value; }
+        }
+
+        /// <summary>
+        /// The property of delimiter for map-string.
+        /// </summary>
+        public String MapStringDelimiter {
+            set { _msDelimiter = value; _regDelimiter = new Regex(String.Format("({0})$", _msDelimiter)); }
+        }
+
+        /// <summary>
+        /// The property of equal for map-string.
+        /// </summary>
+        public String MapStringEqual {
+            set { _msEqual = value; }
+        }
+
+        /// <summary>
+        /// The property of start-brace for map-string.
+        /// </summary>
+        public String MapStringStartBrace {
+            set { _msStartBrace = value; }
+        }
+
+        /// <summary>
+        /// The property of end-brace for map-string.
+        /// </summary>
+        public String MapStringEndBrace {
+            set { _msEndBrace = value; }
+        }
+
+        /// <summary>
+        /// Build by delimiter.
+        /// </summary>
+        /// <param name="values">String separated by delimiter. (NotNull)</param>
+        /// <param name="delimiter">Delimiter. (NotNull)</param>
+        /// <returns>Map-string. (NotNull)</returns>
+        /// <exception cref="DifferentDelimiterCountException"></exception>
+        public String BuildByDelimiter(String values, String delimiter) {
+            if (values == null) {
+                String msg = "The argument[values] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (delimiter == null) {
+                String msg = "The argument[delimiter] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            AssertStringComponent();
+
+            String[] valueArray = values.Split(delimiter.ToCharArray());
+            AssertValueArray(_columnNames, valueArray);
+
+            StringBuilder builder = new StringBuilder();
+            builder.Append(_msMapMark + _msStartBrace);
+            for (int i = 0; i < _columnNames.Length; i++ ) {
+                builder.AppendFormat("{0}{1}{2} {3}", _columnNames[i], _msEqual, valueArray[i], _msDelimiter);
+            }
+
+            return String.Format("{0}{1}", _regDelimiter.Replace(builder.ToString(), ""),  _msEndBrace); 
+        }
+
+        protected void AssertStringComponent() {
+            if (_columnNames == null) {
+                String msg = "The columnNames should not be null.";
+                throw new SystemException(msg);
+            }
+            if (_columnNames.Length == 0) {
+                String msg = "The columnNames should not be empty-array.";
+                throw new SystemException(msg);
+            }
+            if (_msMapMark == null) {
+                String msg = "The msMapMark should not be null.";
+                throw new SystemException(msg);
+            }
+            if (_msDelimiter == null) {
+                String msg = "The msDelimiter should not be null.";
+                throw new SystemException(msg);
+            }
+            if (_msEqual == null) {
+                String msg = "The msEqual should not be null.";
+                throw new SystemException(msg);
+            }
+            if (_msStartBrace == null) {
+                String msg = "The msStartBrace should not be null.";
+                throw new SystemException(msg);
+            }
+            if (_msEndBrace == null) {
+                String msg = "The msEndBrace should not be null.";
+                throw new SystemException(msg);
+            }
+        }
+
+        /// <summary>
+        /// Assert
+        /// </summary>
+        /// <param name="expected">The expected columns. (NotNull)</param>
+        /// <param name="actual">The actual values. (NotNull)</param>
+        /// <exception cref="DifferentDelimiterCountException"></exception>
+        protected void AssertValueArray(String[] expected, String[] actual) {
+            if (expected.Length != actual.Length) {
+                String msg = String.Format("StringArray's length is difference. ({0}, {1})",  expected.Length, actual.Length);
+                {
+                    StringBuilder sb = new StringBuilder();
+                    foreach (String str in expected) {
+                        sb.Append(", ").Append(str);
+                    }
+                    sb.Remove(0, ", ".Length);
+                    msg = msg + " expectedNames=" + sb.ToString();
+                }
+                {
+                    StringBuilder sb = new StringBuilder();
+                    foreach (String str in actual) {
+                        sb.Append(", ").Append(str);
+                    }
+                    sb.Remove(0, ", ".Length);
+                    msg = msg + " actualValues=" + sb.ToString();
+                }
+                throw new DifferentDelimiterCountException(msg, expected, actual);
+            }
+        }
+    }
+}

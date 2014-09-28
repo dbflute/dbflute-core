@@ -1,0 +1,628 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseParameterBean};
+#set ($myClassName = "${myBaseParameterBeanClassName}")
+
+import scala.collection.immutable;
+import scala.collection.JavaConverters._;
+
+import java.util._;
+
+#if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
+import org.seasar.dbflute.cbean.SimplePagingBean;
+#end
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+import org.seasar.dbflute.outsidesql.ProcedurePmb;
+#else
+#if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
+import org.seasar.dbflute.immutable.outsidesql._;
+#else
+import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
+#end
+#end
+import org.seasar.dbflute.jdbc._;
+import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+#end
+#if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
+import org.seasar.dbflute.cbean.coption.FromToOption;
+#end
+import org.seasar.dbflute.util.DfCollectionUtil;
+#if ($database.hasPmbMetaDataPropertyUseOriginalException($pmbClassName))
+import org.seasar.dbflute.exception._;
+#end
+import org.seasar.dbflute.util.DfTypeUtil;
+#if ($database.isAvailableJodaTimeEntity())
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+#end
+import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
+#end
+import ${glPackageBaseCommon}._;
+import ${glPackageExtendedParameterBean}.${myExtendedParameterBeanClassName};
+#if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
+#if ($database.isApplicationBehaviorProject())
+import ${database.libraryBehaviorPackage}._;
+#else
+import ${glPackageExtendedBhv}._;
+#end
+#end
+#if ($database.isPmbMetaDataTypedReturnDomainEntityPmb($pmbClassName))
+#if ($database.isApplicationBehaviorProject())
+import ${database.libraryEntityPackage}._;
+#else
+import ${glPackageExtendedEntity}._;
+#end
+#end
+import ${glPackageExtendedCustomizeEntity}._;
+
+/**
+ * The base class of companion object defined at extended class to create parameter-bean.
+ * @author ${database.classAuthor}
+ */
+abstract class ${myCompanionBaseClassName} {
+    def apply(pmbCall: (${myExtendedParameterBeanClassName}) => Unit): ${myExtendedParameterBeanClassName} =
+    { val pmb = newPmb(); pmbCall(pmb); return pmb; }
+    protected def newPmb(): ${myExtendedParameterBeanClassName} = { new ${myExtendedParameterBeanClassName}() }
+}
+
+/**
+#if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
+ * The base class for typed parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
+ * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}</span>" on ${database.getPmbMetaDataBehaviorClassName($pmbClassName)}.
+#else
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+ * The base class for procedure parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
+ * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataProcedureName($pmbClassName)}</span>".
+#else
+ * The base class for parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}.
+#end
+#end
+ * @author ${database.classAuthor}
+ */
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName} extends ProcedurePmb with FetchBean {
+#else
+${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}${database.getPmbMetaDataInterfaceDefinition($pmbClassName)} {
+#end
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                   Procedure Parameter
+    //                                   -------------------
+#if ($database.hasPmbMetaDataProcedureOverload($pmbClassName))
+    // this procedure has overload parameters so you need to extend this class
+    // and set up parameter annotations for one call of overload
+#end
+#set ($procedureParameterIndex = 0)
+#set ($procedureNotParamResultIndex = 1000)
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($annotationPropName = ${propertyName})
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
+    val ${annotationPropName}_PROCEDURE_PARAMETER: String = "in, ${procedureParameterIndex}";
+#set ($procedureParameterIndex = $procedureParameterIndex + 1)
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterOut($pmbClassName, $propertyName))
+    val ${annotationPropName}_PROCEDURE_PARAMETER: String = "out, ${procedureParameterIndex}";
+#set ($procedureParameterIndex = $procedureParameterIndex + 1)
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterInOut($pmbClassName, $propertyName))
+    val ${annotationPropName}_PROCEDURE_PARAMETER: String = "inout, ${procedureParameterIndex}";
+#set ($procedureParameterIndex = $procedureParameterIndex + 1)
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
+    val ${annotationPropName}_PROCEDURE_PARAMETER: String = "return, -1";
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterResult($pmbClassName, $propertyName))
+    val ${annotationPropName}_PROCEDURE_PARAMETER: String = "notParamResult, ${procedureNotParamResultIndex}";
+#set ($procedureNotParamResultIndex = $procedureNotParamResultIndex + 1)
+#end
+#if ($database.needsPmbMetaDataProcedureParameterStringClobHandling($pmbClassName, $propertyName))
+    val ${annotationPropName}_VALUE_TYPE: String = "stringClobType";
+#end
+#if ($database.needsPmbMetaDataProcedureParameterBytesOidHandling($pmbClassName, $propertyName))
+    val ${annotationPropName}_VALUE_TYPE: String = "bytesOidType";
+#end
+#if ($database.needsPmbMetaDataProcedureParameterFixedLengthStringHandling($pmbClassName, $propertyName))
+    val ${annotationPropName}_VALUE_TYPE: String = "fixedLengthStringType";
+#end
+#if ($database.needsPmbMetaDataProcedureParameterObjectBindingBigDecimalHandling($pmbClassName, $propertyName))
+    val ${annotationPropName}_VALUE_TYPE: String = "objectBindingBigDecimalType";
+#end
+#if ($database.needsPmbMetaDataProcedureParameterOracleArrayHandling($pmbClassName, $propertyName))
+    val ${annotationPropName}_VALUE_TYPE: ValueType
+            = new ${glDBFluteConfig}.ImplementedOracleArrayType
+                  ("${database.getPmbMetaDataProcedureParameterOracleArrayTypeName($pmbClassName, $propertyName)}", ${database.getPmbMetaDataProcedureParameterOracleArrayElementJavaNativeTypeLiteral($pmbClassName, $propertyName)});
+#end
+#if ($database.needsPmbMetaDataProcedureParameterOracleStructHandling($pmbClassName, $propertyName))
+    val ${annotationPropName}_VALUE_TYPE: ValueType
+            = new ${glDBFluteConfig}.ImplementedOracleStructType
+                  ("${database.getPmbMetaDataProcedureParameterOracleStructTypeName($pmbClassName, $propertyName)}", ${database.getPmbMetaDataProcedureParameterOracleStructEntityTypeTypeLiteral($pmbClassName, $propertyName)});
+#end
+#end
+#end
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($variableName = "_$database.initUncap(${propertyName})")
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#if ($database.isPmbMetaDataPropertyOptionClassificationFixedElement($pmbClassName, $propertyName))
+    /** The parameter of ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}. */
+    protected var ${variableName}: ${propertyType} = ${database.getPmbMetaDataPropertyOptionClassificationFixedElementValueExp($pmbClassName, $propertyName)};
+
+#else
+    /** The parameter of ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}. */
+    protected var ${variableName}: ${propertyType} =#if ($propertyType == "Boolean") false#else null#end;
+
+#end
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
+    /** The option of like-search for ${propertyName}. */
+    protected var ${variableName}InternalLikeSearchOption: LikeSearchOption = null;
+
+#end
+#end
+#if (!$database.hasPmbMetaDataCheckSafetyResult($pmbClassName))
+    /** The max size of safety result. */
+    protected var _safetyMaxResultSize: Int = 0;
+
+#end
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+#if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
+    {
+        if (${glDBFluteConfig}.isPagingCountLater()) {
+            enablePagingCountLater();
+        }
+    }
+#end
+
+#if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
+    // ===================================================================================
+    //                                                                Typed Implementation
+    //                                                                ====================
+    /**
+     * {@inheritDoc}
+     */
+    def getOutsideSqlPath(): String = { "${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}" }
+
+#if ($database.isPmbMetaDataTypedSelectPmb($pmbClassName))
+    /**
+     * Get the type of an entity for result. (implementation)
+     * @return The type instance of an entity, ${database.getPmbMetaDataCustomizeEntityLineDisp($pmbClassName)}. (NotNull)
+     */
+    def getEntityType(): Class[${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}] = { classOf[${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}] }
+
+#end
+#end
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
+    // ===================================================================================
+    //                                                            Procedure Implementation
+    //                                                            ========================
+    /**
+     * {@inheritDoc}
+     */
+    def getProcedureName(): String = { "${database.getPmbMetaDataProcedureName($pmbClassName)}" }
+
+    /**
+     * {@inheritDoc}
+     */
+     def isEscapeStatement(): Boolean = { true } // as default
+
+    /**
+     * {@inheritDoc}
+     */
+     def isCalledBySelect(): Boolean = { ${database.isPmbMetaDataProcedureCalledBySelect($pmbClassName)} } // resolved by generator
+
+#end
+#if (!$database.hasPmbMetaDataCheckSafetyResult($pmbClassName))
+    // ===================================================================================
+    //                                                                       Safety Result
+    //                                                                       =============
+    /**
+     * {@inheritDoc}
+     */
+    def checkSafetyResult(safetyMaxResultSize: Int): Unit = { _safetyMaxResultSize = safetyMaxResultSize }
+
+    /**
+     * {@inheritDoc}
+     */
+    def getSafetyMaxResultSize(): Int = { _safetyMaxResultSize }
+
+#end
+#if ($database.existsPmbMetaDataAlternateBooleanMethodNameSet($pmbClassName))
+    // ===================================================================================
+    //                                                                   Alternate Boolean
+    //                                                                   =================
+#foreach ($alternateBooleanMethodName in $database.getPmbMetaDataAlternateBooleanMethodNameSet($pmbClassName))
+    /**
+     * This is an alternate boolean method waiting for your overriding.
+     * @return The determination, true or false for your complex conditions.
+     */
+    public abstract boolean ${alternateBooleanMethodName}();
+
+#end
+#end
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected def filterStringParameter(value: String): String = {
+        if (isEmptyStringParameterAllowed()) { return value; }
+        return convertEmptyToNull(value);
+    }
+
+    protected def isEmptyStringParameterAllowed(): Boolean = {
+	    return ${glDBFluteConfig}.isEmptyStringParameterAllowed();
+    }
+
+    protected def convertEmptyToNull(value: String): String = {
+	    return ParameterUtil.convertEmptyToNull(value);
+    }
+
+    protected def handleShortChar(propertyName: String, value: String, size: Integer): String = {
+        val mode: ShortCharHandlingMode = getShortCharHandlingMode(propertyName,  value,  size);
+        return ParameterUtil.handleShortChar(propertyName, value, size, mode);
+    }
+
+    protected def getShortCharHandlingMode(propertyName: String, value: String, size: Integer): ShortCharHandlingMode = {
+        return ShortCharHandlingMode.${database.shortCharHandlingMode};
+    }
+
+    protected def newArrayList[ELEMENT](elements: ELEMENT*): List[ELEMENT] = { // might be called by option handling
+        return elements.asJava
+    }
+
+    protected def toNumber[NUMBER <: Number](obj: Object, tp: Class[NUMBER]): NUMBER = { // might be called by option handling
+        return DfTypeUtil.toNumber(obj, tp).asInstanceOf[NUMBER];
+    }
+
+    protected def toBoolean(obj: Object): Boolean = {
+        return DfTypeUtil.toBoolean(obj);
+    }
+
+#if ($database.isAvailableJodaTimeEntity())
+    protected def toUtilDate(date: Object): Date = {
+        if (date != null && date.isInstanceOf[ReadablePartial]) {
+            return new Date(date.asInstanceOf[ReadablePartial].toDateTime(null).getMillis());
+        } else if (date != null && date.isInstanceOf[ReadableInstant]) {
+            return new Date(date.asInstanceOf[ReadableInstant].getMillis());
+        }
+#else
+    protected def toUtilDate(date: Date): Date = {
+#end
+        return DfTypeUtil.toDate(date); // if sub class, re-create as pure date
+    }
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+
+    protected def toLocalDate[DATE](date: Date, localType: Class[DATE]): DATE = {
+        if (classOf[LocalDate].isAssignableFrom(localType)) {
+            return LocalDate.fromDateFields(date).asInstanceOf[DATE];
+        } else if (classOf[LocalDateTime].isAssignableFrom(localType)) {
+            return LocalDateTime.fromDateFields(date).asInstanceOf[DATE];
+        }
+        return null.asInstanceOf[DATE]; // unreachable
+    }
+#end
+
+    protected def formatUtilDate(date: Date): String = {
+#if ($database.isDatabaseOracle())
+        val pattern: String = "yyyy-MM-dd HH:mm:ss"; // for Oracle
+#else
+        val pattern: String = "yyyy-MM-dd";
+#end
+        return DfTypeUtil.toString(date, pattern);
+    }
+
+    protected def formatByteArray(bytes: Array[Byte]): String = {
+        return "byte[" + (if (bytes != null) { String.valueOf(bytes.length) } else { "null" }) + "]";
+    }
+
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
+    protected def assertLikeSearchOptionValid(name: String, option: LikeSearchOption): Unit = {
+        if (option == null) { // relic
+            val msg: String = "The like-search option is required!";
+            throw new RequiredOptionNotFoundException(msg);
+        }
+        if (option.isSplit()) {
+            var msg: String = "The split of like-search is NOT available on parameter-bean.";
+            msg = msg + " Don't use splitByXxx(): " + option;
+            throw new IllegalOutsideSqlOperationException(msg);
+        }
+    }
+
+    protected def callbackLSOP(optionCall: (ScrLikeSearchOption) => Unit): LikeSearchOption =
+    { val op = createLikeSearchOption(); optionCall(op); return op; }
+    protected def createLikeSearchOption(): ScrLikeSearchOption = { new ScrLikeSearchOption() }
+
+#end
+#if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
+    protected def assertFromToOptionValid(name: String, option: FromToOption): Unit = {
+        if (option == null) { // relic
+            val msg: String = "The from-to option is required!";
+            throw new RequiredOptionNotFoundException(msg);
+        }
+    }
+
+    protected def callbackFTOP(optionCall: (ScrFromToOption) => Unit): FromToOption =
+    { val op = createFromToOption(); optionCall(op); return op; }
+    protected def createFromToOption(): ScrFromToOption = { new ScrFromToOption() }
+
+#end
+    protected def toBindingType[PROP](obj: Any): PROP = { // except from-to Date
+        return if (obj.isInstanceOf[immutable.List[_]]) {
+            obj.asInstanceOf[immutable.List[_]].asJava.asInstanceOf[PROP]
+        } else {
+            obj.asInstanceOf[PROP]
+        }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * @return The display string of all parameters. (NotNull)
+     */
+    override def toString(): String = {
+        val sb: StringBuilder = new StringBuilder();
+        sb.append(DfTypeUtil.toClassTitle(this)).append(":");
+        sb.append(xbuildColumnString());
+        return sb.toString();
+    }
+    protected def xbuildColumnString(): String = {
+        val dm: String = ", ";
+        val sb: StringBuilder = new StringBuilder();
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($variableName = "_$database.initUncap(${propertyName})")
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#if ($propertyType.equals("Date") || $propertyType.equals("java.util.Date"))
+        sb.append(dm).append(formatUtilDate(${variableName}));
+#elseif ($propertyType.equals("byte[]"))
+        sb.append(dm).append(formatByteArray(${variableName}));
+#else
+        sb.append(dm).append(${variableName});
+#end
+#end
+        if (sb.length() > 0) { sb.delete(0, dm.length()); }
+        sb.insert(0, "{").append("}");
+        return sb.toString();
+    }
+
+#set ($propertyLoopIndex = 0)
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#if ($propertyLoopIndex == 0)
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#else
+
+#end
+#set ($variableName = "_$database.initUncap(${propertyName})")
+#set ($argumentName = "$database.initUncap(${propertyName})")
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+## cannot handle different property type between getter and setter
+## DfBeanDesc cannot treat such definition as property
+###set ($entryPropertyType = "")
+###if ($propertyType.startsWith("List["))
+###set ($entryPropertyType = "immutable.${propertyType}")
+###else
+###set ($entryPropertyType = "${propertyType}")
+###end
+#set ($entryPropertyType = "${propertyType}")
+    /**
+     * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @return The value of ${propertyName}. (NotNull, NotEmptyString(when String): if empty string, returns null)
+     */
+    def get${database.initCap($propertyName)}(): ${propertyType} = {
+#if ($propertyType.endsWith("String"))
+#if ($database.isShortCharHandlingValid() && $database.isPmbMetaDataPropertyRefColumnChar($pmbClassName, $propertyName))
+        var filtered: String = filterStringParameter(${variableName});
+        filtered = handleShortChar("${propertyName}", filtered, ${database.getPmbMetaDataPropertyRefSize($pmbClassName, $propertyName)});
+        return filtered;
+#else
+        return filterStringParameter(${variableName});
+#end
+#else
+#if ($propertyType.equals("Date") || $propertyType.equals("java.util.Date"))
+        return toUtilDate(${variableName});
+#else
+        return ${variableName};
+#end
+#end
+    }
+#if (!$database.hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter($pmbClassName, $propertyName))
+
+    /**
+     * [set] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
+     */
+    def set${database.initCap($propertyName)}(${argumentName}: ${entryPropertyType}): Unit = {
+        ${variableName} = toBindingType(${argumentName});
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
+
+    /**
+     * [set as likeSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
+     * @param optionCall The callback for option of likeSearch for ${propertyName} which is NOT split mode. (NotNull)
+     */
+    def set${database.initCap($propertyName)}(${argumentName}: ${entryPropertyType})(optionCall: (ScrLikeSearchOption) => Unit): Unit = {
+        val option = callbackLSOP(optionCall);
+        assertLikeSearchOptionValid("option for ${argumentName}", option);
+        ${variableName} = toBindingType(${argumentName});
+        ${variableName}InternalLikeSearchOption = option;
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
+
+    /**
+     * [set as prefixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
+     */
+    def set${database.initCap($propertyName)}_PrefixSearch(${argumentName}: ${entryPropertyType}): Unit = {
+        ${variableName} = toBindingType(${argumentName});
+        ${variableName}InternalLikeSearchOption = createLikeSearchOption().likePrefix();
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
+
+    /**
+     * [set as containSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
+     */
+    def set${database.initCap($propertyName)}_ContainSearch(${argumentName}: ${entryPropertyType}): Unit = {
+        ${variableName} = toBindingType(${argumentName});
+        ${variableName}InternalLikeSearchOption = createLikeSearchOption().likeContain();
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
+
+    /**
+     * [set as suffixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
+     */
+    def set${database.initCap($propertyName)}_SuffixSearch(${argumentName}: ${entryPropertyType}): Unit = {
+        ${variableName} = toBindingType(${argumentName});
+        ${variableName}InternalLikeSearchOption = createLikeSearchOption().likeSuffix();
+    }
+#end
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
+
+    /**
+     * Get the internal option of likeSearch for ${propertyName}. {Internal Method: Don't invoke this}
+     * @return The internal option of likeSearch for ${propertyName}. (NullAllowed)
+     */
+    def get${database.initCap($propertyName)}InternalLikeSearchOption(): LikeSearchOption = {
+        return ${variableName}InternalLikeSearchOption;
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionFromDate($pmbClassName, $propertyName))
+
+    /**
+     * [set as fromDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
+     */
+    def set${database.initCap($propertyName)}_FromDate(${argumentName}: ${propertyType}): Unit = {
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+        ${variableName} = toLocalDate(createFromToOption().compareAsDate().filterFromDate(toUtilDate(${argumentName})), classOf[${propertyType}]);
+#else
+        ${variableName} = createFromToOption().compareAsDate().filterFromDate(${argumentName});
+#end
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionFromDateOption($pmbClassName, $propertyName))
+
+    /**
+     * [set as fromScope] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
+     * @param optionCall The callback for option of from-to scope for ${propertyName}. (NotNull)
+     */
+    def set${database.initCap($propertyName)}_FromDate(${argumentName}: ${propertyType})(optionCall: (ScrFromToOption) => Unit): Unit = {
+        val option = callbackFTOP(optionCall);
+        assertFromToOptionValid("option for ${argumentName}", option);
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+        ${variableName} = toLocalDate(option.filterFromDate(toUtilDate(${argumentName})), classOf[${propertyType}]);
+#else
+        ${variableName} = option.filterFromDate(${argumentName});
+#end
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
+
+    /**
+     * [set as toDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
+     */
+    def set${database.initCap($propertyName)}_ToDate(${argumentName}: ${propertyType}): Unit = {
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+        ${variableName} = toLocalDate(createFromToOption().compareAsDate().filterToDate(toUtilDate(${argumentName})), classOf[${propertyType}]);
+#else
+        ${variableName} = createFromToOption().compareAsDate().filterToDate(${argumentName});
+#end
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionToDateOption($pmbClassName, $propertyName))
+
+    /**
+     * [set as toScope] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
+     * @param optionCall The callback for option of from-to scope for ${propertyName}. (NotNull)
+     */
+    def set${database.initCap($propertyName)}_ToDate(${argumentName}: ${propertyType})(optionCall: (ScrFromToOption) => Unit): Unit = {
+        val option = callbackFTOP(optionCall);
+        assertFromToOptionValid("option for ${argumentName}", option);
+#if ($database.isAvailableJodaTimeLocalDateEntity())
+        ${variableName} = toLocalDate(option.filterToDate(toUtilDate(${argumentName})), classOf[${propertyType}]);
+#else
+        ${variableName} = option.filterToDate(${argumentName});
+#end
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionClassificationSetter($pmbClassName, $propertyName))
+#foreach ($classificationElement in $database.getPmbMetaDataPropertyOptionClassificationTop($pmbClassName, $propertyName).classificationElementList)
+
+    /**
+     * [set as ${classificationElement.name}] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)} <br />
+#end
+#if ($classificationElement.hasComment())
+     * ${classificationElement.comment}
+#end
+     */
+    def set${database.initCap($propertyName)}_${classificationElement.name}(): Unit = {
+        ${variableName} = ${database.getPmbMetaDataPropertyOptionClassificationSettingElementValueExp($pmbClassName, $propertyName, $classificationElement.name)};
+    }
+#end
+#end
+#set ($propertyLoopIndex = $propertyLoopIndex + 1)
+#end
+}

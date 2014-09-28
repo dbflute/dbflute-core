@@ -1,0 +1,14 @@
+#set ($myClassName = "${glConditionKey}NotEqualTradition")
+
+using System;
+
+namespace ${glPackageBaseCommonCKey} {
+
+public class ${myClassName} : ${glConditionKey}NotEqual {
+
+    protected override String defineOperand() {
+        return "!="; // DBFlute has used for a long time
+    }
+}
+	
+}

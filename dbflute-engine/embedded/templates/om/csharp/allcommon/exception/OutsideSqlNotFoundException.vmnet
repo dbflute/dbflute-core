@@ -1,0 +1,20 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the outside-sql is not found.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public class ${glOutsideSqlNotFoundException} : SystemException {
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param="msg">Exception message.</param>
+        public ${glOutsideSqlNotFoundException}(String msg)
+        : base(msg) {}
+    }
+}

@@ -1,0 +1,17 @@
+#set ($myClassName = "${glDateFromToOption}")
+
+using System;
+
+namespace ${glPackageBaseCommonCOption} {
+
+public class ${myClassName} : ${glFromToOption} {
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}() {
+        CompareAsDate();
+    }
+}
+
+}

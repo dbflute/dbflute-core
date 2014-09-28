@@ -1,0 +1,34 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommon} {
+
+    public interface ${glEntityDefinedCommonColumn} : ${glEntity} {
+#foreach ($columnName in ${database.CommonColumnNameList})
+#set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+#set ($commonColumnMap = ${database.CommonColumnMap})
+#set ($columnType = ${commonColumnMap.get(${columnName})})
+#set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+#set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+
+        ${javaNative} ${javaName} { get; set; }
+#if (${database.isAllClassificationColumn($filteredColumnName)})
+#set ($classificationName = $database.getAllClassificationName($filteredColumnName))
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+        void Set${javaName}_${classificationElement.name}();
+#if ($database.isMakeEntityOldStyleClassify())
+        void Classify${javaName}${classificationElement.name}();
+#end
+        bool Is${javaName}${classificationElement.name} { get; }
+#end
+#end
+#end
+
+        void EnableCommonColumnAutoSetup(); // for after disable because the default is enabled
+        void DisableCommonColumnAutoSetup();
+        bool CanCommonColumnAutoSetup();
+    }
+}

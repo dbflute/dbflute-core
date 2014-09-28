@@ -1,0 +1,41 @@
+
+using System;
+using ${glPackageBaseCommonCValue};
+using ${glPackageBaseCommonSqlClause};
+
+namespace ${glPackageBaseCommonCBean} {
+
+// JavaLike
+public interface ${glConditionQuery} {
+
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
+    String getTableDbName();
+    String getTableSqlName();
+	
+    // ===================================================================================
+    //                                                                  Important Accessor
+    //                                                                  ==================
+    ${glConditionQuery} xgetReferrerQuery();
+    ${glSqlClause} xgetSqlClause();
+    String xgetAliasName();
+    String toColumnRealName(String columnName);
+    int xgetNestLevel();
+    int xgetNextNestLevel();
+    bool isBaseQuery();
+	String xgetForeignPropertyName();
+    String xgetRelationPath();
+    String xgetLocationBase();
+	
+    // ===================================================================================
+    //                                                                 Reflection Invoking
+    //                                                                 ===================
+    ${glConditionValue} invokeValue(String columnFlexibleName);
+    void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value);
+    void invokeOrderBy(String columnFlexibleName, bool isAsc);
+    ${glConditionQuery} invokeForeignCQ(String foreignPropertyName);
+    bool invokeHasForeignCQ(String foreignPropertyName);
+}
+
+}

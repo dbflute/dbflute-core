@@ -1,0 +1,126 @@
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsidesql};
+
+namespace ${glPackageBaseCommonS2Dao} {
+
+    public class ${glContextStack} {
+
+        private static LocalDataStoreSlot _slot = Thread.AllocateDataSlot();
+
+        public static Stack<${glContextStack}> GetContextStackOnThread() {
+            return (Stack<${glContextStack}>)Thread.GetData(_slot);
+        }
+
+        public static void ClearContextStackOnThread() {
+            Thread.SetData(_slot, null);
+        }
+
+        public static bool IsExistContextStackOnThread() {
+            return (Thread.GetData(_slot) != null);
+        }
+
+        public static void SaveAllContextOnThread() {
+            if (!IsExistContextStackOnThread()) {
+                Thread.SetData(_slot, new Stack<${glContextStack}>());
+            }
+            ${glContextStack} contextStack = new ${glContextStack}();
+            if (${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
+                contextStack.ConditionBean = ${glConditionBeanContext}.GetConditionBeanOnThread();
+            }
+            if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                contextStack.OutsideSqlContext = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
+            }
+            if (${glFetchNarrowingBeanContext}.IsExistFetchNarrowingBeanOnThread()) {
+                contextStack.FetchNarrowingBean = ${glFetchNarrowingBeanContext}.GetFetchNarrowingBeanOnThread();
+            }
+            if (${glInternalMapContext}.IsExistInternalMapOnThread()) {
+                contextStack.InternalMap = ${glInternalMapContext}.GetInternalMap();
+            }
+            GetContextStackOnThread().Push(contextStack);
+        }
+
+        public static void RestoreAllContextOnThreadIfExists() {
+            if (!IsExistContextStackOnThread()) {
+                return;
+            }
+            Stack<${glContextStack}> stackOnThread = GetContextStackOnThread();
+            if (stackOnThread.Count == 0) {
+                ClearContextStackOnThread();
+                return;
+            }
+            ${glContextStack} contextStack = stackOnThread.Pop();
+            ${glConditionBean} cb = contextStack.ConditionBean;
+            if (cb != null) {
+                ${glConditionBeanContext}.SetConditionBeanOnThread(cb);
+            }
+            ${glOutsideSqlContext} outsideSqlContext = contextStack.OutsideSqlContext;
+            if (outsideSqlContext != null) {
+                ${glOutsideSqlContext}.SetOutsideSqlContextOnThread(outsideSqlContext);
+            }
+            ${glFetchNarrowingBean} fetchNarrowingBean = contextStack.FetchNarrowingBean;
+            if (fetchNarrowingBean != null) {
+                ${glFetchNarrowingBeanContext}.SetFetchNarrowingBeanOnThread(fetchNarrowingBean);
+            }
+            IDictionary<String, Object> internalMap = contextStack.InternalMap;
+            if (internalMap != null) {
+                ${glInternalMapContext}.ClearInternalMapOnThread();
+                foreach (String key in internalMap.Keys) {
+                    Object value = internalMap[key];
+                    ${glInternalMapContext}.SetObject(key, value);
+                }
+            }
+        }
+
+        public static void ClearAllCurrentContext() {
+            if (${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
+                ${glConditionBeanContext}.ClearConditionBeanOnThread();
+            }
+            if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContext}.ClearOutsideSqlContextOnThread();
+            }
+            if (${glFetchNarrowingBeanContext}.IsExistFetchNarrowingBeanOnThread()) {
+                ${glFetchNarrowingBeanContext}.ClearFetchNarrowingBeanOnThread();
+            }
+            if (${glInternalMapContext}.IsExistInternalMapOnThread()) {
+                ${glInternalMapContext}.ClearInternalMapOnThread();
+            }
+        }
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected ${glConditionBean} _conditionBean;
+        protected ${glOutsideSqlContext} _outsideSqlContext;
+        protected ${glFetchNarrowingBean} _fetchNarrowingBean;
+        protected IDictionary<String, Object> _internalMap;
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public ${glConditionBean} ConditionBean {
+            get { return _conditionBean; }
+            set { this._conditionBean = value; }
+        }
+
+        public ${glOutsideSqlContext} OutsideSqlContext {
+            get { return _outsideSqlContext; }
+            set { this._outsideSqlContext = value; }
+        }
+
+        public ${glFetchNarrowingBean} FetchNarrowingBean {
+            get { return _fetchNarrowingBean; }
+            set { this._fetchNarrowingBean = value; }
+        }
+
+        public IDictionary<String, Object> InternalMap {
+            get { return _internalMap; }
+            set { this._internalMap = value; }
+        }
+    }
+}

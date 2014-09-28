@@ -1,0 +1,84 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+/**
+ * The interface of entity defined common columns.
+ * @author ${database.classAuthor}
+ */
+public interface ${glEntityDefinedCommonColumn} extends ${glEntity} {
+#if ($database.isExistCommonColumnSetupElement())
+#foreach ($columnName in ${database.commonColumnNameList})
+#set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+#set ($commonColumnMap = ${database.CommonColumnMap})
+#set ($columnType = ${commonColumnMap.get(${columnName})})
+#set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+#set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+
+    /**
+     * Get the value of ${uncapitalisedJavaName}.
+     * @return The value of ${uncapitalisedJavaName}. (NullAllowed)
+     */
+    public ${javaNative} get${javaName}();
+
+    /**
+     * Set the value of ${uncapitalisedJavaName}.
+     * @param ${uncapitalisedJavaName} The value of ${uncapitalisedJavaName}. (NullAllowed)
+     */
+    public void set${javaName}(${javaNative} ${uncapitalisedJavaName});
+#if (${database.isAllClassificationColumn($filteredColumnName)})
+#set ($classificationName = $database.getAllClassificationName($filteredColumnName))
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+
+    /**
+     * Classify the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br />
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+     */
+    public void classify${javaName}${classificationElement.name}();
+
+    /**
+     * Is the value of ${uncapitalisedJavaName} '${classificationElement.name}'? <br />
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+     * <p>
+     * The difference of capital letters and small letters is NOT distinguished.
+     * If the value is null, this method returns false!
+     * </p>
+     * @return The determination, true or false.
+     */
+    public boolean is${javaName}${classificationElement.name}();
+#end
+#end
+#end
+#end
+
+    /**
+	 * Enable common column auto set up. {for after disable because the default is enabled}
+	 */
+    public void enableCommonColumnAutoSetup();
+
+    /**
+	 * Disable common column auto set up.
+	 */
+    public void disableCommonColumnAutoSetup();
+	
+    /**
+	 * Can the entity set up common column by auto?
+	 * @return The determination, true or false.
+	 */
+	public boolean canCommonColumnAutoSetup();
+}

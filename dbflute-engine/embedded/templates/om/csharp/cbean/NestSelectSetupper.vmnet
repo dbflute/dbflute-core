@@ -1,0 +1,48 @@
+#set ($myClassName = "${myNestSelectSetupperClassName}")
+
+using System;
+using ${glPackageCQ};
+
+namespace ${glPackageNss} {
+
+    public class ${myClassName} {
+
+        protected ${myConditionQueryClassName} _query;
+        public ${myClassName}(${myConditionQueryClassName} query) { _query = query; }
+        public bool HasConditionQuery { get { return _query != null; } }
+
+        // ===============================================================================
+        //                                                       With Nested Foreign Table
+        //                                                       =========================
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyNameInitCap}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($dynamicFixedConditionArgs = "")
+#set ($dynamicFixedConditionVariables = "")
+#if ($fk.hasDynamicFixedCondition())
+#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionArgs}")
+#set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
+#end
+        public ${fk.foreignTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
+            _query.doNss(delegate() { return _query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); });
+            return new ${fk.foreignTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
+        }
+
+#end
+
+        // ===============================================================================
+        //                                                      With Nested Referrer Table
+        //                                                      ==========================
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+        public ${referrer.referrerTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}() {
+            _query.doNss(delegate() { return _query.Query${tmpPropertyNameInitCap}(); });
+            return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}());
+        }
+
+#end
+#end
+    }
+}

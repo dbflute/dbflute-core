@@ -1,0 +1,152 @@
+#set ($myClassName = "${glLikeSearchOption}")
+
+using System;
+
+using ${glPackageBaseCommonJavaLike};
+// using ${glPackageBaseCommonCOptionPartsLocal};
+
+namespace ${glPackageBaseCommonCOption} {
+
+public class ${myClassName} : ${glSimpleStringOption} {
+
+    public static readonly String LIKE_PREFIX = "prefix";
+    public static readonly String LIKE_SUFFIX = "suffix";
+    public static readonly String LIKE_CONTAIN = "contain";
+
+    protected String _like;
+    protected String _escape;
+
+    // ===================================================================================
+    //                                                                         Rear Option
+    //                                                                         ===========
+    public override String getRearOption() {
+        if (_escape == null || _escape.Trim().Length == 0) {
+            return "";
+        }
+        return " escape '" + _escape + "'";
+    }
+
+    // ===================================================================================
+    //                                                                                Like
+    //                                                                                ====
+    public ${myClassName} LikePrefix() {
+        _like = LIKE_PREFIX;
+        DoLikeAutoEscape();
+        return this;
+    }
+
+    public ${myClassName} LikeSuffix() {
+        _like = LIKE_SUFFIX;
+        DoLikeAutoEscape();
+        return this;
+    }
+
+    public ${myClassName} LikeContain() {
+        _like = LIKE_CONTAIN;
+        DoLikeAutoEscape();
+        return this;
+    }
+    
+    protected virtual void DoLikeAutoEscape() {
+        Escape();
+    }
+
+    // ===================================================================================
+    //                                                                              Escape
+    //                                                                              ======
+    public ${myClassName} Escape() {
+        return EscapeByPipeLine();
+    }
+
+    public ${myClassName} EscapeByPipeLine() {
+        _escape = "|";
+        return this;
+    }
+
+    public ${myClassName} EscapeByAtMark() {
+        _escape = "@";
+        return this;
+    }
+
+    public ${myClassName} EscapeBySlash() {
+        _escape = "/";
+        return this;
+    }
+
+    public ${myClassName} EscapeByBackSlash() {
+        _escape = "\\";
+        return this;
+    }
+
+    public ${myClassName} NotEscape() {
+        _escape = null;
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                               Split
+    //                                                                               =====
+
+    // ===================================================================================
+    //                                                                 To Upper/Lower Case
+    //                                                                 ===================
+
+    // ===================================================================================
+    //                                                                      To Single Byte
+    //                                                                      ==============
+
+    // ===================================================================================
+    //                                                                      To Double Byte
+    //                                                                      ==============
+
+    // ===================================================================================
+    //                                                                            Japanese
+    //                                                                            ========
+
+    // ===================================================================================
+    //                                                                          Real Value
+    //                                                                          ==========
+    public override String generateRealValue(String value) {
+        value = base.generateRealValue(value);
+
+        // Escape
+        if (_escape != null && _escape.Trim().Length != 0) {
+            String tmp = replaceString(value, _escape, _escape + _escape);
+            tmp = filterEscape(tmp, "%");
+            tmp = filterEscape(tmp, "_");
+#if ($database.isDatabaseOracle() || $database.isDatabaseDB2())
+            tmp = filterEscape(tmp, "\uff05");
+            tmp = filterEscape(tmp, "\uff3f");
+#end
+#if ($database.isDatabaseSQLServer() || $database.isDatabaseSybase())
+            tmp = filterEscape(tmp, "[");
+            tmp = filterEscape(tmp, "]");
+#end
+            value = tmp;
+        }
+        String wildCard = "${database.wildCard}";
+        if (_like == null || _like.Trim().Length == 0) {
+            return value;
+        } else if (_like.Equals(LIKE_PREFIX)) {
+            return value + wildCard;
+        } else if (_like.Equals(LIKE_SUFFIX)) {
+            return wildCard + value;
+        } else if (_like.Equals(LIKE_CONTAIN)) {
+            return wildCard + value + wildCard;
+        } else {
+            String msg = "The like was wrong string: " + _like;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected String filterEscape(String target, String wildcard) {
+        return replaceString(target, wildcard, _escape + wildcard);
+    }
+
+    // ===================================================================================
+    //                                                                            DeepCopy
+    //                                                                            ========
+
+}
+
+}

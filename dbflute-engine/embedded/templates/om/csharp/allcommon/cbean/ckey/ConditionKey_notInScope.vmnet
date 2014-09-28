@@ -1,0 +1,62 @@
+#set ($myClassName = "${glConditionKey}NotInScope")
+
+using System;
+
+using ${glPackageBaseCommonCValue};
+using ${glPackageBaseCommonCOption};
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommonCKey} {
+
+public class ${myClassName} : ${glConditionKey} {
+
+    private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+    public ${myClassName}() {
+        _conditionKey = "notInScope";
+        _operand = "not in";
+    }
+
+    public override bool isValidRegistration(${glConditionValue} conditionValue, Object value, String callerName) {
+        if (value == null) {
+            return false;
+        }
+        if (value is System.Collections.IList && ((System.Collections.IList)value).Count == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value) {
+        if (value.NotInScope == null) {
+            return;
+        }
+        System.Collections.IList valueList = value.NotInScope;
+        System.Collections.IList checkedValueList = new System.Collections.Generic.List<Object>();
+        foreach (Object checkTargetValue in valueList) {
+            if (checkTargetValue == null) {
+                continue;
+            }
+            checkedValueList.Add(checkTargetValue);
+        }
+        if (checkedValueList.Count == 0) {
+            return;
+        }
+        conditionList.add(buildBindClause(columnName, value.getNotInScopeLocation(), "('a1', 'a2')"));
+    }
+
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option) {
+        throw new UnsupportedOperationException("doAddWhereClause with condition-option is unsupported!!!");
+    }
+
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location) {
+        conditionValue.NotInScope = ((System.Collections.IList)value);
+        conditionValue.setNotInScopeLocation(location);
+    }
+	
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
+        throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
+    }
+}
+	
+}

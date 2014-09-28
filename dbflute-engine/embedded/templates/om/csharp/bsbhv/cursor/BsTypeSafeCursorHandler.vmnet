@@ -1,0 +1,32 @@
+#set ($myClassName = "${myExtendedTypeSafeCursorHandlerClassName}")
+
+using System;
+using System.Data;
+using ${glPackageBaseCommonJdbc};
+
+namespace ${myExtendedCursorPackageName} {
+
+    [System.Serializable]
+    public partial class ${myClassName} : ${glPackageBaseCommonJdbc}.${glCursorHandler} {
+
+        protected ${glCursorFetcher}<${myExtendedTypeSafeCursorClassName}> _cursorFetcher;
+
+        public ${myClassName}(${glCursorFetcher}<${myExtendedTypeSafeCursorClassName}> cursorFetcher) {
+            _cursorFetcher = cursorFetcher;
+        }
+
+        public virtual Object Handle(IDataReader reader) {
+            return FetchCursor(reader);
+        }
+
+        protected virtual Object FetchCursor(IDataReader reader) {
+            return _cursorFetcher.Invoke(CreateTypeSafeCursor(reader));
+        }
+
+        protected virtual ${myExtendedTypeSafeCursorClassName} CreateTypeSafeCursor(IDataReader reader) {
+            ${myExtendedTypeSafeCursorClassName} cursor = new ${myExtendedTypeSafeCursorClassName}();
+            cursor.Accept(reader);
+            return cursor;
+        }
+    }
+}

@@ -1,0 +1,51 @@
+#set ($myClassName = "${glConditionKey}NotLikeSearch")
+
+using System;
+
+using ${glPackageBaseCommonCValue};
+using ${glPackageBaseCommonCOption};
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommonCKey} {
+
+public class ${myClassName} : ${glConditionKey} {
+
+    public ${myClassName}() {
+        _conditionKey = "notLikeSearch";
+        _operand = "not like";
+    }
+
+    public override bool isValidRegistration(${glConditionValue} conditionValue, Object value, String callerName) {
+        if (value == null) {
+            return false;
+        }
+        return true;
+    }
+
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value) {
+        throw new UnsupportedOperationException("doAddWhereClause without condition-option is unsupported!!!");
+    }
+
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option) {
+        if (option == null) {
+            String msg = "The argument[option] should not be null: columnName=" + columnName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (!(option is ${glLikeSearchOption})) {
+            String msg = "The argument[option] should be ${glLikeSearchOption}: columnName=" + columnName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        ${glLikeSearchOption} myOption = (${glLikeSearchOption})option;
+        conditionList.add(buildBindClauseWithRearOption(columnName, value.getNotLikeSearchLocation(), myOption.getRearOption()));
+    }
+
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location) {
+        throw new UnsupportedOperationException("doSetupConditionValue without condition-option is unsupported!!!");
+    }
+
+    protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
+        conditionValue.setNotLikeSearch((String)value, (${glLikeSearchOption})option).setNotLikeSearchLocation(location);
+    }
+}
+	
+}

@@ -1,0 +1,14 @@
+#set ($myClassName = "${glConditionKey}NotEqualStandard")
+
+using System;
+
+namespace ${glPackageBaseCommonCKey} {
+
+public class ${myClassName} : ${glConditionKey}NotEqual {
+
+    protected override String defineOperand() {
+        return "<>"; // is SQL standard operand
+    }
+}
+	
+}

@@ -1,0 +1,211 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
+import org.seasar.dbflute.cbean.sqlclause._
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
+
+/**
+ * The creator of SQL clause.
+ * @author ${database.classAuthor}
+ */
+class ${glImplementedSqlClauseCreator} extends SqlClauseCreator {
+
+    // ===================================================================================
+    //                                                                      Implementation
+    //                                                                      ==============
+	/**
+	 * Create SQL clause. {for condition-bean}
+	 * @param cb Condition-bean. (NotNull) 
+	 * @return SQL clause. (NotNull)
+	 */
+    def createSqlClause(cb: ConditionBean): SqlClause = {
+        val tableDbName: String = cb.getTableDbName();
+		val sqlClause: SqlClause = createSqlClause(tableDbName);
+        return sqlClause;
+    }
+
+	/**
+	 * Create SQL clause.
+	 * @param tableDbName The DB name of table. (NotNull) 
+	 * @return SQL clause. (NotNull)
+	 */
+    def createSqlClause(tableDbName: String): SqlClause = {
+        val sqlClause: SqlClause = doCreateSqlClause(tableDbName);
+        setupSqlClauseOption(sqlClause);
+        return sqlClause;
+    }
+
+    // ===================================================================================
+    //                                                                            Creation
+    //                                                                            ========
+    protected def doCreateSqlClause(tableDbName: String): SqlClause = {
+        // dynamic resolution but no perfect (almost static)
+        val sqlClause: AbstractSqlClause = if (isCurrentDBDef(DBDef.MySQL)) {
+            createSqlClauseMySql(tableDbName);
+        } else if (isCurrentDBDef(DBDef.PostgreSQL)) {
+            createSqlClausePostgreSql(tableDbName);
+        } else if (isCurrentDBDef(DBDef.Oracle)) {
+            createSqlClauseOracle(tableDbName);
+        } else if (isCurrentDBDef(DBDef.DB2)) {
+            createSqlClauseDb2(tableDbName);
+        } else if (isCurrentDBDef(DBDef.SQLServer)) {
+            createSqlClauseSqlServer(tableDbName);
+        } else if (isCurrentDBDef(DBDef.H2)) {
+            createSqlClauseH2(tableDbName);
+        } else if (isCurrentDBDef(DBDef.Derby)) {
+            createSqlClauseDerby(tableDbName);
+        } else if (isCurrentDBDef(DBDef.SQLite)) {
+            createSqlClauseSqlite(tableDbName);
+        } else if (isCurrentDBDef(DBDef.MSAccess)) {
+            createSqlClauseMsAccess(tableDbName);
+        } else if (isCurrentDBDef(DBDef.Firebird)) {
+            createSqlClauseFirebird(tableDbName);
+        } else if (isCurrentDBDef(DBDef.Sybase)) {
+            createSqlClauseSybase(tableDbName);
+        } else {
+            // as the database when generating
+            createSqlClause${database.generateDbName}(tableDbName);
+        }
+        prepareSupporterComponent(sqlClause);
+        return sqlClause;
+    }
+
+    protected def createSqlClauseMySql(tableDbName: String): SqlClauseMySql = {
+        return new SqlClauseMySql(tableDbName);
+    }
+
+    protected def createSqlClausePostgreSql(tableDbName: String): SqlClausePostgreSql = {
+        return new SqlClausePostgreSql(tableDbName);
+    }
+
+    protected def createSqlClauseOracle(tableDbName: String): SqlClauseOracle = {
+        return new SqlClauseOracle(tableDbName);
+    }
+
+    protected def createSqlClauseDb2(tableDbName: String): SqlClauseDb2 = {
+        return new SqlClauseDb2(tableDbName);
+    }
+
+    protected def createSqlClauseSqlServer(tableDbName: String): SqlClauseSqlServer = {
+        return new SqlClauseSqlServer(tableDbName);
+    }
+
+    protected def createSqlClauseH2(tableDbName: String): SqlClauseH2 = {
+        return new SqlClauseH2(tableDbName);
+    }
+
+    protected def createSqlClauseDerby(tableDbName: String): SqlClauseDerby = {
+        return new SqlClauseDerby(tableDbName);
+    }
+
+    protected def createSqlClauseSqlite(tableDbName: String): SqlClauseSqlite = {
+        return new SqlClauseSqlite(tableDbName);
+    }
+
+    protected def createSqlClauseMsAccess(tableDbName: String): SqlClauseMsAccess = {
+        return new SqlClauseMsAccess(tableDbName);
+    }
+
+    protected def createSqlClauseFirebird(tableDbName: String): SqlClauseFirebird = {
+        return new SqlClauseFirebird(tableDbName);
+    }
+
+    protected def createSqlClauseSybase(tableDbName: String): SqlClauseSybase = {
+        return new SqlClauseSybase(tableDbName);
+    }
+
+    protected def createSqlClauseDefault(tableDbName: String): SqlClause = {
+        return new SqlClauseDefault(tableDbName);
+    }
+
+    protected def prepareSupporterComponent(sqlClause: AbstractSqlClause): Unit = {
+        sqlClause.dbmetaProvider(getDBMetaProvider()).cipherManager(getGearedCipherManager());
+    }
+
+    // ===================================================================================
+    //                                                                           Supporter
+    //                                                                           =========
+    protected def getDBMetaProvider(): DBMetaProvider = {
+        return ${glDBMetaInstanceHandler}.getProvider();
+    }
+
+    protected def getGearedCipherManager(): GearedCipherManager = {
+        return ${glDBFluteConfig}.getGearedCipherManager();
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    protected def setupSqlClauseOption(sqlClause: SqlClause): Unit = {
+        if (isInnerJoinAutoDetect()) {
+            sqlClause.enableInnerJoinAutoDetect();
+        }
+        if (isThatsBadTimingDetect()) {
+            sqlClause.enableThatsBadTimingDetect();
+        }
+        if (isNullOrEmptyQueryAllowed()) {
+            sqlClause.ignoreNullOrEmptyQuery();
+        } else { // mainly here on Scala
+            sqlClause.checkNullOrEmptyQuery();
+        }
+        if (isEmptyStringQueryAllowed()) {
+            sqlClause.enableEmptyStringQuery();
+        }
+        if (isOverridingQueryAllowed()) {
+            sqlClause.enableOverridingQuery();
+        } else { // mainly here on Scala
+            sqlClause.disableOverridingQuery();
+        }
+        if (isDisableSelectIndex()) {
+            sqlClause.disableSelectIndex();
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    protected def isCurrentDBDef(currentDBDef: DBDef): Boolean = {
+	    return ${glDBCurrent}.isCurrentDBDef(currentDBDef);
+    }
+
+    protected def isInnerJoinAutoDetect(): Boolean = {
+	    return ${glDBFluteConfig}.isInnerJoinAutoDetect();
+    }
+
+    protected def isThatsBadTimingDetect(): Boolean = {
+	    return ${glDBFluteConfig}.isThatsBadTimingDetect();
+    }
+
+    protected def isNullOrEmptyQueryAllowed(): Boolean = {
+	    return ${glDBFluteConfig}.isNullOrEmptyQueryAllowed();
+    }
+
+    protected def isEmptyStringQueryAllowed(): Boolean = {
+	    return ${glDBFluteConfig}.isEmptyStringQueryAllowed();
+    }
+
+    protected def isOverridingQueryAllowed(): Boolean = {
+	    return ${glDBFluteConfig}.isOverridingQueryAllowed();
+    }
+
+    protected def isDisableSelectIndex(): Boolean = {
+	    return ${glDBFluteConfig}.isDisableSelectIndex();
+    }
+}

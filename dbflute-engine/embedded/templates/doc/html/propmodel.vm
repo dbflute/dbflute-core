@@ -1,0 +1,410 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($manager = $selector.propertiesHtmlManager)
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+#if ($manager.hasTitle())
+	<title>${manager.title}</title>
+#else
+	<title>${manager.projectName} properties</title>
+#end
+#if ($manager.isStyleSheetEmbedded())
+	<style type="text/css">
+${manager.styleSheetEmbedded}
+	</style>
+#elseif ($manager.isStyleSheetLink())
+	${manager.styleSheetLink}
+#else
+	<style type="text/css">
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
+	font-size: 80%;
+	margin: 10px 5px 5px 15px;
+	background-color: #ffffe0;
+}
+
+/* heading */
+h1 {
+	font-size: 1.5em;
+	border-bottom: 2px solid #af0000;
+	border-top: 2px solid #af0000;
+}
+h2 {
+	margin: 30px 0 5px 0;
+	font-size: 1.8em;
+	border-bottom: 2px solid #af0000;
+	border-left: 10px solid #af0000;
+	text-indent: 10px;
+}
+h3 {
+	padding: 0 0 0 10px;
+	margin: 1em 10% 4px 0;
+	border-left: double 3px #af0000;
+	font-size: 1.5em;
+	color: #333333;
+}
+h4 {
+	padding: 0 0 0 10px;
+	margin: 1em 10% 0 1em;
+	border-top: solid 1px #af0000;
+	border-bottom: solid 1px #af0000;
+	font-size: 1.4em;
+	color: #333333;
+}
+.navilinkarea {
+	text-align: right;
+}
+.requestlink {
+	margin-top: 0.1em;
+}
+.sisterlink {
+	margin-top: 0.6em;
+	font-size: 110%;
+}
+.sistersublink {
+	margin-top: 0.6em;
+	font-size: 80%;
+}
+
+/* table */
+table {
+	border-collapse:collapse;
+}
+table, th {
+	border: 1px solid #555;
+}
+th {
+	background-color: #cc9;
+	font-size: 0.8em;
+}
+td {
+	border-bottom: 1px dotted #aaa;
+	border-left: 1px solid #555;
+	padding:2px;
+}
+.rownumhead {
+	text-align: center;
+	font-size: 0.4em;
+}
+.rownumcell {
+	text-align: center;
+	font-size: 0.4em;
+	color: #444;
+}
+.filecell {
+	font-size: 0.9em;
+	white-space: nowrap;
+}
+.extendsfilecell {
+	font-size: 0.6em;
+	white-space: nowrap;
+}
+.markcell {
+	text-align: center;
+	font-size: 0.8em;
+}
+.keycell {
+	font-size: 0.9em;
+	white-space: nowrap;
+}
+.keylistcell {
+	font-size: 0.8em;
+	white-space: nowrap;
+}
+.envtypecell {
+	text-align: center;
+	font-size: 0.6em;
+}
+.envonlytitle {
+	text-align: center;
+	font-size: 1.0em;
+}
+.envonlycomment {
+	color: green;
+	font-size: 0.6em;
+	font-weight: normal;
+}
+.langtypecell {
+	text-align: center;
+	font-size: 0.6em;
+}
+.valuecell {
+	font-size: 0.8em;
+	font-weight: bold;
+}
+.uniquenocell {
+	color: #555555;
+	text-align: center;
+	font-size: 0.7em;
+}
+.floatleftcell {
+	font-size: 0.8em;
+}
+.sizecell {
+	text-align: center;
+	font-size: 0.8em;
+}
+.checkcell {
+	text-align: center;
+	font-size: 0.8em;
+}
+.commentcell {
+	color: green;
+	font-size: 0.7em;
+}
+.freecomment {
+	color: green;
+	font-size: 0.6em;
+	font-weight: normal;
+}
+.diffprop {
+	color: #CC3311;
+	font-size: 1.1em;
+}
+.tablesupplement {
+	color: green;
+	font-size: 0.7em;
+}
+
+/* inner table */
+table.child {
+	margin: 3px;
+}
+table.child th {
+	font-size: 0.7em;
+}
+table.child, table.child td, table.child th {
+	border-top: none;
+	border-left: none;
+	border-bottom: 1px solid #aaa;
+	border-right: 1px solid #aaa;
+}
+	</style>
+#end
+#if ($manager.isJavaScriptEmbedded())
+	<script type="text/javascript">
+${manager.javaScriptEmbedded}
+	</script>
+#elseif ($manager.isJavaScriptLink())
+	${manager.javaScriptLink}
+#end
+</head>
+
+<body>
+#if ($manager.hasTitle())
+<h1>${manager.title}</h1>
+#else
+<h1>Properties for ${manager.projectName}</h1>
+#end
+<div class="navilinkarea">
+#foreach ($request in $manager.requestList)
+	<p class="requestlink"><a href="#${request.requestLowerName}">${request.requestName}</a></p>
+#end
+#if ($selector.isPropertiesHtmlToSchemaHtmlLink())
+<p class="sisterlink"><a href="./${selector.schemaHtmlFileName}">to SchemaHTML</a></p>
+#end
+#if ($selector.isPropertiesHtmlToHistoryHtmlLink())
+<p class="sisterlink"><a href="./${selector.historyHtmlFileName}">to HistoryHTML</a></p>
+#end
+</div>
+
+<h2 id="propertieslist">Properties List</h2>
+
+#foreach ($request in $manager.requestList)
+<h3><a href="#${request.requestLowerName}">${request.requestName}</a>#if ($request.hasExtendsPropRequest()) <span class="freecomment">(extends ${request.extendsPropRequest})</span>#end</h3>
+<table summary="File Attributes">
+	<thead>
+		<tr>
+			<th>File</th>
+			<th>Env</th>
+			<th>Lang</th>
+			<th>Key Count</th>
+#if ($request.hasExtendsPropRequest())
+			<th>Extends</th>
+#end
+			<th>Duplicate Key</th>
+			<th>Over Key</th>
+			<th>Short Key</th>
+		</tr>
+	</thead>
+	<tbody>
+#foreach ($attribute in $request.fileAttributeList)
+		<tr>
+#set ($envType = $attribute.envType)
+#set ($langType = $attribute.langType)
+#if ($attribute.isRootFile())
+			<td class="filecell"><strong>${attribute.propertiesPath}</strong></td>
+#else
+			<td class="filecell">${attribute.propertiesPath}</td>
+#end
+			<td class="envtypecell">${envType}</td>
+			<td class="langtypecell">${langType}</td>
+			<td class="sizecell">${attribute.keyCount}</td>
+#if ($request.hasExtendsPropRequest())
+			<td class="extendsfilecell">#if ($attribute.hasExtendsAttribute())${attribute.extendsAttribute.propertiesPath}#else &nbsp;#end</td>
+#end
+#if ($attribute.hasDuplicateKey())
+			<td class="keylistcell">
+#foreach ($duplicateKey in $attribute.duplicateKeyList)
+				<p class="diffprop">${duplicateKey}</p>
+#end
+			</td>
+#else
+			<td>&nbsp;</td>
+#end
+#if (!$attribute.isRootFile())
+#if ($attribute.hasOverKey())
+			<td class="keylistcell">
+#foreach ($overKey in $attribute.overKeyList)
+#if ($overKey.isOverride())
+				<p>${overKey.propertyKey} <span class="freecomment">(override)</span></p>
+#else
+				<p class="diffprop">${overKey.propertyKey}</p>
+#end
+#end
+			</td>
+#else
+#if ($attribute.isLonely())
+			<td class="markcell">(lonely)</td>
+#else
+			<td>&nbsp;</td>
+#end
+#end
+#else
+			<td class="markcell">-</td>
+#end
+#if (!$attribute.isRootFile())
+#if ($attribute.hasShortKey())
+			<td class="keylistcell">
+#foreach ($shortKey in $attribute.shortKeyList)
+#if ($shortKey.isOverride())
+				<p>${shortKey.propertyKey} <span class="freecomment">(extends)</span></p>
+#else
+				<p class="diffprop">${shortKey.propertyKey}</p>
+#end
+#end
+			</td>
+#else
+#if ($attribute.isLonely())
+			<td class="markcell">(lonely)</td>
+#else
+			<td>&nbsp;</td>
+#end
+#end
+#else
+			<td class="markcell">-</td>
+#end
+		</tr>
+#end
+	</tbody>
+</table>
+#end
+
+#foreach ($request in $manager.requestList)
+<h2 id="${request.requestLowerName}">${request.requestName}#if ($request.hasExtendsPropRequest()) <span class="freecomment">(extends ${request.extendsPropRequest})</span>#end</h2>
+<table summary="Properties">
+	<thead>
+	<tr>
+		<th class="rownumhead">No.</th>
+		<th>Property Key</th>
+		<th>Contents</th>
+	</tr>
+	</thead>
+	<tbody>
+#set ($rownum = 1)
+#foreach ($property in $request.propertyList)
+#set ($propertyKey = $property.propertyKey)
+	<tr>
+		<td class="rownumcell">${rownum}</td>
+		<td class="keycell">${propertyKey}</td>
+		<td>
+#if ($request.isEnvOnlyFloatLeft())
+## = = = = = = = = = =
+## float-left pattern
+## = = = = = = = = = =
+			<table class="child">
+				<tr>
+#foreach ($envElement in $property.envElementList)
+#set ($envType = $envElement.envType)
+#foreach ($langElement in $envElement.langElementList)
+					<th><span class="envonlytitle">${envType}</span> <span class="envonlycomment">uq.${langElement.uniqueNo} #if ($langElement.isOverride())(override)#end</span></th>
+#end
+#end
+				</tr>
+				<tr>
+#foreach ($envElement in $property.envElementList)
+#foreach ($langElement in $envElement.langElementList)
+					<td class="floatleftcell">
+						#if ($langElement.hasComment())<span class="commentcell">${langElement.commentHtmlEncodedFloatLeft}</span><br />#else #end
+						#if ($langElement.hasPropertyValue())<span class="valuecell">${langElement.propertyValueHtmlEncoded}</span>#else &nbsp;#end
+					</td>
+#end
+#end
+				</tr>
+			</table>
+#else
+## = = = = = = = =
+## normal pattern
+## = = = = = = = =
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+#if ($property.hasComment())
+					<th>Comment</th>
+#end
+#if ($property.hasOverride())
+					<th>Override</th>
+#end
+				</tr>
+#foreach ($envElement in $property.envElementList)
+#set ($envType = $envElement.envType)
+#foreach ($langElement in $envElement.langElementList)
+#set ($langType = $langElement.langType)
+				<tr>
+					<td class="envtypecell">${envType}</td>
+					<td class="langtypecell">${langType}</td>
+					<td class="valuecell">#if ($langElement.hasPropertyValue())${langElement.propertyValueHtmlEncoded}#else &nbsp;#end</td>
+					<td class="uniquenocell">${langElement.uniqueNo}</td>
+#if ($property.hasComment())
+					<td class="commentcell">#if ($langElement.hasComment())${langElement.commentHtmlEncoded}#else &nbsp;#end</td>
+#end
+#if ($property.hasOverride())
+					<td class="checkcell">#if ($langElement.isOverride())o#else &nbsp;#end</td>
+#end
+				</tr>
+#end
+#end
+			</table>
+#end
+		</td>
+	</tr>
+#set ($rownum = $rownum + 1)
+#end
+	</tbody>
+</table>
+<p class="tablesupplement">*uq: Unique No (same value, same No)</p>
+#end
+</body>
+</html>

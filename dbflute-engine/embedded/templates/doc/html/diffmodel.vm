@@ -1,0 +1,330 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>${database.projectName} ${selector.diffModelSmallTitle}</title>
+#if ($selector.isHistoryHtmlStyleSheetEmbedded())
+	<style type="text/css">
+${selector.historyHtmlStyleSheetEmbedded}
+	</style>
+#elseif ($selector.isHistoryHtmlStyleSheetLink())
+	${selector.historyHtmlStyleSheetLink}
+#else
+	<style type="text/css">
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
+	font-size: 80%;
+	margin: 1em 1.5em;
+	background-color: #ffffee;
+}
+
+/* heading */
+h1 {
+	font-size: 1.5em;
+	border-bottom: 2px solid #af0000;
+	border-top: 2px solid #af0000;
+}
+h2 {
+	margin-top: 2em;
+	border-bottom: 2px solid #af0000;
+	border-left: 10px solid #af0000;
+	text-indent: 1em;
+	font-size: 1.6em;
+}
+h3 {
+	width: 14em;
+	margin: 0.8em 0;
+	padding-left: 1.8em;
+	border-bottom: solid 1px #333;
+	color: #555;
+	font-size: 1.2em;
+}
+h4 {
+	margin: 1em 0em;
+	font-size: 1em;
+	font-weight: normal;
+	display: list-item;
+}
+h5 {
+	width: 11em;
+	font-size: 80%;
+	border-bottom: solid 1px #333;
+	text-indent: 0.3em;
+	color: #555;
+}
+
+/* total info */
+.updatedate {
+	text-align: right;
+}
+.mainschema {
+	text-align: right;
+}
+.navilinkarea {
+	text-align: right;
+}
+.sisterlink {
+	margin-top: 0.6em;
+	font-size: 110%;
+}
+.sistersublink {
+	margin-top: 0.6em;
+	font-size: 80%;
+}
+
+/* history info */
+.table-content {
+	margin: 0 6em;
+}
+.column-content {
+	margin: 0.5em 1em 0.5em 3em;
+	line-height: 1.4em;
+}
+
+div.change-table-content {
+	margin-left: 3em;
+}
+
+dl.column-content dt {
+	display: list-item;
+}
+dl.column-content dd {
+	margin: 0 4em;
+}
+dl.column-content dd span {
+	display: block;
+	float: left;
+	width: 6em;
+	margin-right: 1.5em;
+	border-right: dotted 2px #333;
+	font-weight: bold;
+	font-size: 80%;
+	color: #555;
+}
+
+span.dt {
+	font-size: 80%;
+}
+p.comment {
+	margin-left: 23em;
+}
+p.tablecount {
+	margin-left: 23em;
+}
+	</style>
+#end
+#if ($selector.isHistoryHtmlJavaScriptEmbedded())
+	<script type="text/javascript">
+${selector.historyHtmlJavaScriptEmbedded}
+	</script>
+#elseif ($selector.isHistoryHtmlJavaScriptLink())
+	${selector.historyHtmlJavaScriptLink}
+#end
+</head>
+
+<body>
+<h1>${selector.diffModelBigTitle} for ${database.projectName} (${database.databaseName})</h1>
+<div class="navilinkarea">
+#if ($selector.isHistoryHtmlToSchemaHtmlLink())
+<p class="sisterlink"><a href="./${selector.schemaHtmlFileName}">to SchemaHTML</a></p>
+#end
+#if ($selector.isHistoryHtmlToPropertiesHtmlLink())
+<p class="sistersublink"><a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a></p>
+#end
+</div>
+
+#foreach ($schemaDiff in $selector.schemaDiffList)
+<div class="section">
+	<h2><span class="dt">Diff Date: </span>${schemaDiff.diffDate}</h2>
+#if ($schemaDiff.hasComment())
+	<p class="comment">${schemaDiff.comment}</p>
+#end
+#if ($schemaDiff.tableCount.hasDiff())
+	<p class="tablecount"><span class="dt">table count: </span>${schemaDiff.tableCount.displayForHtml}</p>
+#end
+
+## ======================================================================================= 
+##                                                                               TableDiff
+##                                                                               =========
+#if (!$schemaDiff.addedTableDiffList.isEmpty())
+	<h3>Add Table</h3>
+	<ul class="table-content">
+#foreach ($tableDiff in $schemaDiff.addedTableDiffList)
+#if ($selector.isCurrentHistoryHtml() && $schemaDiff.isLatest())
+		<li><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></li>
+#else
+		<li>${tableDiff.tableDispName}</li>
+#end
+#end
+	</ul>
+#end
+#if (!$schemaDiff.changedTableDiffList.isEmpty())
+	<h3>Change Table</h3>
+	<div class="table-content">
+#foreach ($tableDiff in $schemaDiff.changedTableDiffList)
+#if ($selector.isCurrentHistoryHtml() && $schemaDiff.isLatest())
+		<h4><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></h4>
+#else
+		<h4>${tableDiff.tableDispName}</h4>
+#end
+		<div class="change-table-content">
+#foreach ($handler in $tableDiff.nextPreviousDiffList)
+			<h5>$handler.titleName()</h5>
+			<div class="column-content">$handler.provide().displayForHtml</div>
+#end
+#foreach ($content in $tableDiff.nestDiffContentOrderedList)
+			<h5>${content.titleName}</h5>
+#if ($content.isChange())
+			<dl class="column-content">
+#foreach ($nestDiff in $content.nestDiffList)
+				<dt>${nestDiff.keyName}</dt>
+#foreach ($handler in $nestDiff.nextPreviousDiffList)
+				<dd><span>$handler.titleName()</span>$handler.provide().displayForHtml</dd>
+#end
+#end
+			</dl>
+#else
+			<ul class="column-content">
+#foreach ($nestDiff in $content.nestDiffList)
+				<li>${nestDiff.keyName}</li>
+#end
+			</ul>
+#end
+#end
+		</div>
+#end
+	</div>
+#end
+#if (!$schemaDiff.deletedTableDiffList.isEmpty())
+	<h3>Delete Table</h3>
+	<ul class="table-content">
+#foreach ($tableDiff in $schemaDiff.deletedTableDiffList)
+		<li>${tableDiff.tableDispName}</li>
+#end
+	</ul>
+#end
+## ======================================================================================= 
+##                                                                            SequenceDiff
+##                                                                            ============
+#if (!$schemaDiff.addedSequenceDiffList.isEmpty())
+	<h3>Add Sequence</h3>
+	<ul class="table-content">
+#foreach ($sequenceDiff in $schemaDiff.addedSequenceDiffList)
+		<li>${sequenceDiff.sequenceDispName}</li>
+#end
+	</ul>
+#end
+#if (!$schemaDiff.changedSequenceDiffList.isEmpty())
+	<h3>Change Sequence</h3>
+	<div class="table-content">
+#foreach ($sequenceDiff in $schemaDiff.changedSequenceDiffList)
+		<h4>${sequenceDiff.sequenceDispName}</h4>
+		<div class="change-table-content">
+#foreach ($handler in $sequenceDiff.nextPreviousDiffList)
+			<h5>$handler.titleName()</h5>
+			<div class="column-content">$handler.provide().displayForHtml</div>
+#end
+		</div>
+#end
+	</div>
+#end
+#if (!$schemaDiff.deletedSequenceDiffList.isEmpty())
+	<h3>Delete Sequence</h3>
+	<ul class="table-content">
+#foreach ($sequenceDiff in $schemaDiff.deletedSequenceDiffList)
+		<li>${sequenceDiff.sequenceDispName}</li>
+#end
+	</ul>
+#end
+## ======================================================================================= 
+##                                                                           ProcedureDiff
+##                                                                           =============
+#if (!$schemaDiff.addedProcedureDiffList.isEmpty())
+	<h3>Add Procedure</h3>
+	<ul class="table-content">
+#foreach ($procedureDiff in $schemaDiff.addedProcedureDiffList)
+		<li>${procedureDiff.procedureDispName}</li>
+#end
+	</ul>
+#end
+#if (!$schemaDiff.changedProcedureDiffList.isEmpty())
+	<h3>Change Procedure</h3>
+	<div class="table-content">
+#foreach ($procedureDiff in $schemaDiff.changedProcedureDiffList)
+		<h4>${procedureDiff.procedureDispName}</h4>
+		<div class="change-table-content">
+#foreach ($handler in $procedureDiff.nextPreviousDiffList)
+			<h5>$handler.titleName()</h5>
+			<div class="column-content">$handler.provide().displayForHtml</div>
+#end
+		</div>
+#end
+	</div>
+#end
+#if (!$schemaDiff.deletedProcedureDiffList.isEmpty())
+	<h3>Delete Procedure</h3>
+	<ul class="table-content">
+#foreach ($procedureDiff in $schemaDiff.deletedProcedureDiffList)
+		<li>${procedureDiff.procedureDispName}</li>
+#end
+	</ul>
+#end
+## ======================================================================================= 
+##                                                                               CraftDiff
+##                                                                               =========
+#foreach ($titleDiff in $schemaDiff.craftTitleDiffList)
+#if (!$titleDiff.addedCraftRowDiffList.isEmpty())
+	<h3>Add ${titleDiff.craftDispTitle}</h3>
+	<ul class="table-content">
+#foreach ($rowDiff in $titleDiff.addedCraftRowDiffList)
+		<li>${rowDiff.craftKeyDispName}</li>
+#end
+	</ul>
+#end
+#if (!$titleDiff.changedCraftRowDiffList.isEmpty())
+	<h3>Change ${titleDiff.craftDispTitle}</h3>
+	<div class="table-content">
+#foreach ($rowDiff in $titleDiff.changedCraftRowDiffList)
+		<h4>${rowDiff.craftKeyDispName}</h4>
+		<div class="change-table-content">
+#foreach ($handler in $rowDiff.nextPreviousDiffList)
+			<h5>$handler.titleName()</h5>
+			<div class="column-content">$handler.provide().displayForHtml</div>
+#end
+		</div>
+#end
+	</div>
+#end
+#if (!$titleDiff.deletedCraftRowDiffList.isEmpty())
+	<h3>Delete ${titleDiff.craftDispTitle}</h3>
+	<ul class="table-content">
+#foreach ($rowDiff in $titleDiff.deletedCraftRowDiffList)
+		<li>${rowDiff.craftKeyDispName}</li>
+#end
+	</ul>
+#end
+#end
+</div>
+#end
+
+</body>
+</html>

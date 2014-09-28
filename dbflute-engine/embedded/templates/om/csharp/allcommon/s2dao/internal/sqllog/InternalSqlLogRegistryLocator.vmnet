@@ -1,0 +1,14 @@
+
+using System;
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlLog} {
+
+    public class ${glInternalSqlLogRegistryLocator} {
+        protected static ${glInternalSqlLogRegistry} instance;
+        public static ${glInternalSqlLogRegistry} Instance { get {
+            return instance;
+        } set {
+            instance = value;
+        }}
+    }
+}

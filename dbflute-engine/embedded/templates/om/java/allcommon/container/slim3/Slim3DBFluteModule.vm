@@ -1,0 +1,106 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import javax.sql.DataSource;
+
+import org.slim3.container.S3Container;
+import org.slim3.container.S3ContainerFactory;
+import org.seasar.dbflute.BehaviorSelector;
+import org.seasar.dbflute.bhv.BehaviorReadable;
+import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
+import org.seasar.dbflute.bhv.core.InvokerAssistant;
+import org.seasar.dbflute.util.DfTypeUtil;
+import ${glPackageExtendedBhv}.*;
+
+/**
+ * @author ${database.classAuthor}
+ */
+public class ${glDBFluteModule} {
+
+    protected DataSource dataSource;
+
+    public DBFluteModule(DataSource dataSource) {
+        if (dataSource == null) {
+            String msg = "The argument 'dataSource' should not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        this.dataSource = dataSource;
+    }
+
+    public void configure() {
+        new ${database.DBFluteInitializerClass}(); // Initialize!
+        
+        // The components of DBFlute Runtime.
+        ${glImplementedBehaviorSelector} behaviorSelector = new ${glImplementedBehaviorSelector}();
+        behaviorSelector.setContainer(S3ContainerFactory.getInstance().getContainer());
+        BehaviorCommandInvoker behaviorCommandInvoker = new BehaviorCommandInvoker();
+        ${glImplementedInvokerAssistant} invokerAssistant = createImplementedInvokerAssistant();
+        behaviorCommandInvoker.setInvokerAssistant(invokerAssistant);
+        ${glImplementedCommonColumnAutoSetupper} commonColumnAutoSetupper = createImplementedCommonColumnAutoSetupper();
+        
+        bind(BehaviorSelector.class).toInstance(behaviorSelector);
+        bind(BehaviorCommandInvoker.class).toInstance(behaviorCommandInvoker);
+        bind(InvokerAssistant.class).toInstance(invokerAssistant);
+        bind(CommonColumnAutoSetupper.class).toInstance(commonColumnAutoSetupper);
+        
+        // The components of Behavior.
+        BehaviorCommandInvoker ker = behaviorCommandInvoker;
+        BehaviorSelector tor = behaviorSelector;
+        CommonColumnAutoSetupper per = commonColumnAutoSetupper;
+#foreach ($table in $database.behaviorTableList)
+        {
+            ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
+#if ($table.isWritable())
+            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor); bhv.setCommonColumnAutoSetupper(per);
+#else
+            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor);
+#end
+            bind(${table.extendedBehaviorClassName}.class).toInstance(bhv);
+        }
+#end
+    }
+
+    protected ${glImplementedInvokerAssistant} createImplementedInvokerAssistant() {
+        ${glImplementedInvokerAssistant} invokerAssistant = new ${database.implementedInvokerAssistantClass}();
+        invokerAssistant.setDataSource(dataSource);
+        return invokerAssistant;
+    }
+
+    protected ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
+        return new ${database.implementedCommonColumnAutoSetupperClass}();
+    }
+
+    protected Setupper bind(Class<?> type) {
+        final S3Container container = S3ContainerFactory.getInstance().getContainer();
+        final String name;
+        if (BehaviorReadable.class.isAssignableFrom(type)) {
+            name = DfTypeUtil.toClassTitle(type);
+        } else {
+            name = type.getName();
+        }
+        return new Setupper() {
+            public void toInstance(Object instance) {
+                container.bind(name, instance);
+            }
+        };
+    }
+
+    protected static interface Setupper {
+        void toInstance(Object instance);
+    }
+}

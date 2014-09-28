@@ -1,0 +1,8 @@
+
+using System;
+using System.Collections.Generic;
+
+namespace ${glPackageBaseCommonCBean} {
+
+    public delegate void ${glSpecifyQuery}<CB>(CB cb) where CB : ${glConditionBean};
+}

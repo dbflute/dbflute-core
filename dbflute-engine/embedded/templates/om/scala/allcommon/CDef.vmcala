@@ -1,0 +1,277 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import scala.collection.immutable;
+import scala.collection.JavaConverters._;
+
+import java.util._;
+
+import org.seasar.dbflute.jdbc.Classification;
+import org.seasar.dbflute.jdbc.ClassificationCodeType;
+import org.seasar.dbflute.jdbc.ClassificationMeta;
+import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
+
+/**
+ * The definition of classification.
+ * @author ${database.classAuthor}
+ */
+object ${glCDef} {
+
+    /** The empty array for no sisters. */
+    val EMPTY_SISTERS: Array[String] = Array[String]();
+
+    /** The empty map for no sub-items. */
+    val EMPTY_SUB_ITEM_MAP: Map[String, Object] = Collections.EMPTY_MAP.asInstanceOf[Map[String, Object]];
+
+#foreach ($classificationName in $database.classificationNameList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+    sealed abstract class ${classificationName}(val code: String, val alias: String, val sisters: Array[String]) extends Classification {
+
+        def name(): String = { return getClass().getSimpleName(); }
+#if ($database.hasClassificationSubItemMap($classificationName))
+        def subItemMap(): Map[String, Object] = { return _subItemMapMap.get(code); }
+#else
+        def subItemMap(): Map[String, Object] = { return EMPTY_SUB_ITEM_MAP; }
+#end
+        def meta(): ClassificationMeta = { return ${glCDef}.DefMeta.${classificationName}; }
+
+#foreach ($regularSubItem in $classificationTop.regularSubItemList)
+#set ($subItemMap = $classificationElement.subItemMap)
+#set ($subItemType = "Object")
+#if ($regularSubItem.isSubItemTypeString())
+#set ($subItemType = "String")
+#end
+        def ${regularSubItem.subItemName}(): ${subItemType} = {
+#if ($regularSubItem.isSubItemTypeObject())
+            return subItemMap().get("${regularSubItem.subItemName}");
+#else
+            return subItemMap().get("${regularSubItem.subItemName}").asInstanceOf[${subItemType}];
+#end
+        }
+
+#end
+#if ($database.hasClassificationSubItemMap($classificationName))
+        private val _subItemMapMap: Map[String, Map[String, Object]] = new HashMap();
+        {
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+#set ($subItemMap = $classificationElement.subItemMap)
+            {
+                val subItemMap: Map[String, Object] = new HashMap();
+#foreach ($entry in $subItemMap.entrySet())
+#if ($entry.value != "null")
+                subItemMap.put("${entry.key}", "${entry.value}");
+#else
+                subItemMap.put("${entry.key}", null);
+#end
+#end
+                _subItemMapMap.put("${classificationElement.code}", Collections.unmodifiableMap(subItemMap));
+            }
+#end
+        }
+#end
+
+#foreach ($group in $classificationTop.groupList)
+        /**
+         * Is the classification in the group? <br />
+#if ($group.hasGroupComment())
+         * ${group.groupCommentForJavaDocNest} <br />
+#end
+         * ${group.buildElementDisp()}
+         * @return The determination, true or false.
+         */
+        def is${group.groupNameInitCap}(): Boolean = {
+            return ${group.buildReturnExpThis()};
+        }
+
+#end
+        def inGroup(groupName: String): Boolean = {
+#foreach ($group in $classificationTop.groupList)
+            if ("${group.groupName}".equals(groupName)) { return is${group.groupNameInitCap}(); }
+#end
+            return false;
+        }
+
+#if ($database.isCDefToStringReturnsName())
+        override def toString(): String = { return name; }
+#else
+        override def toString(): String = { return code; }
+#end
+    }
+
+#if ($classificationTop.hasTopComment())
+    /**
+     * ${classificationTop.topCommentForJavaDoc}
+     */
+#end
+#if ($classificationTop.isDeprecated())
+    @Deprecated
+#end
+    object ${classificationName} {
+
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+        /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
+#if ($classificationElement.isDeprecated())
+        @Deprecated
+#end
+        case object ${classificationElement.name} extends ${classificationName}($database.buildClassificationCodeAliasSisterCodeVariables($classificationElement));
+#end
+
+        private val _codeValueMap: Map[String, ${classificationName}] = new HashMap();
+        {
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+            _codeValueMap.put("${classificationElement.code}".toLowerCase(), ${classificationElement.name});
+#end
+        }
+        private val _nameValueMap: Map[String, ${classificationName}] = new HashMap();
+        {
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+            _nameValueMap.put("${classificationElement.name}", ${classificationElement.name});
+#end
+        }
+
+        /**
+         * Get the classification by the code. (CaseInsensitive)
+         * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
+         * @return The instance of the corresponding classification to the code. (NullAllowed: if not found, returns null)
+         */
+        def codeOf(code: Object): ${classificationName} = {
+            if (code == null) { return null; }
+            if (code.isInstanceOf[${classificationName}]) { return code.asInstanceOf[${classificationName}]; }
+            return _codeValueMap.get(code.toString().toLowerCase());
+        }
+
+        /**
+         * Get the classification by the name (also called 'value' in ENUM world).
+         * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
+         * @return The instance of the corresponding classification to the name. (NullAllowed: if not found, returns null)
+         */
+        def nameOf(name: String): ${classificationName} = {
+            if (name == null) { return null; }
+            return _nameValueMap.get(name);
+        }
+
+        /**
+         * Get the list of all classification elements. (returns new copied list)
+         * @return The list of all classification elements. (NotNull)
+         */
+        def listAll(): scala.collection.immutable.List[${classificationName}] = {
+            return toScalaList(_nameValueMap.values());
+        }
+#foreach ($group in $classificationTop.groupList)
+
+        /**
+         * Get the list of group classification elements. (returns new copied list) <br />
+#if ($group.hasGroupComment())
+         * ${group.groupCommentForJavaDocNest} <br />
+#end
+         * ${group.buildElementDisp()}
+         * @return The list of classification elements in the group. (NotNull)
+         */
+        def listOf${group.groupNameInitCap}(): scala.collection.immutable.List[${classificationName}] = {
+            return toScalaList(Arrays.asList(${group.buildCDefArgExp()}));
+        }
+#end
+
+        /**
+         * Get the list of classification elements in the specified group. (returns new copied list) <br />
+         * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
+         * @return The list of classification elements in the group. (NotNull)
+         */
+        def groupOf(groupName: String): scala.collection.immutable.List[${classificationName}] = {
+#foreach ($group in $classificationTop.groupList)
+            if ("${group.groupName}".equals(groupName)) { return listOf${group.groupNameInitCap}(); }
+#end
+            return scala.collection.immutable.List[${classificationName}]();
+        }
+    }
+
+#end
+    sealed abstract class DefMeta(val name: String) extends ClassificationMeta {
+
+        def classificationName(): String = {
+            return this.name; // same as definition name
+        }
+
+        def codeOf(code: Object): Classification = {
+#foreach ($classificationName in $database.classificationNameList)
+            if ("${classificationName}".equals(this.name)) { return ${glCDef}.${classificationName}.codeOf(code).asInstanceOf[${glCDef}.${classificationName}]; }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+
+        def nameOf(name: String): Classification = {
+#foreach ($classificationName in $database.classificationNameList)
+            if ("${classificationName}".equals(this.name)) { return ${glCDef}.${classificationName}.nameOf(name); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+
+        def listAll(): List[Classification] = {
+#foreach ($classificationName in $database.classificationNameList)
+            if ("${classificationName}".equals(this.name)) { return toClassificationList(${glCDef}.${classificationName}.listAll()); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+
+        def groupOf(groupName: String): List[Classification] = {
+#foreach ($classificationName in $database.classificationNameList)
+            if ("${classificationName}".equals(this.name)) { return toClassificationList(${glCDef}.${classificationName}.groupOf(groupName)); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+
+        private def toClassificationList(clsList: scala.collection.immutable.List[Classification]): List[Classification] = {
+            return clsList.asJava;
+        }
+
+        def codeType(): ClassificationCodeType = {
+#foreach ($classificationName in $database.classificationNameList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+#if ($classificationTop.hasCodeType())
+            if ("${classificationName}".equals(this.name)) { return ClassificationCodeType.${classificationTop.codeType}; }
+#end
+#end
+            return ClassificationCodeType.String; // as default
+        }
+
+        def undefinedHandlingType(): ClassificationUndefinedHandlingType = {
+#foreach ($classificationName in $database.classificationNameList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+            if ("${classificationName}".equals(this.name)) { return ClassificationUndefinedHandlingType.${classificationTop.undefinedHandlingType}; }
+#end
+            return ClassificationUndefinedHandlingType.LOGGING; // as default
+        }
+    }
+
+    object DefMeta {
+
+#foreach ($classificationName in $database.classificationNameList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+#if ($classificationTop.hasTopComment())
+        /** ${classificationTop.topCommentForJavaDocNest} */
+#end
+        case object ${classificationName} extends DefMeta("${classificationName}");
+#end
+    }
+
+    // ===================================================================================
+    //                                                                        Scala Helper
+    //                                                                        ============
+    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): immutable.List[ENTITY] = {
+        return immutable.List.fromArray(javaList.toArray()).asInstanceOf[immutable.List[ENTITY]];
+    }
+}

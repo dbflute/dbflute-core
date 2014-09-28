@@ -1,0 +1,88 @@
+
+using System;
+using Seasar.Extension.ADO;
+using Seasar.Dao;
+
+using ${glPackageBaseCommonS2DaoInternalSqlParser};
+using ${glPackageBaseCommonS2DaoInternalSqlHandler};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonUtil};
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
+
+public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected IDataSource dataSource;
+    protected ICommandFactory commandFactory;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalDeleteQueryAutoDynamicCommand}(IDataSource dataSource, ICommandFactory commandFactory) {
+        this.dataSource = dataSource;
+        this.commandFactory = commandFactory;
+    }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    public Object Execute(Object[] args) {
+        ${glConditionBean} cb = extractConditionBeanWithCheck(args);
+        String[] argNames = new String[]{"pmb"};
+        Type[] argTypes = new Type[]{cb.GetType()};
+        String twoWaySql = buildQueryDeleteTwoWaySql(cb);
+        ICommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
+        ${glInternalCommandContextHandler} handler = createCommandContextHandler(context);
+        handler.LoggingMessageSqlArgs = context.BindVariables;
+        int rows = handler.Execute(args);
+        return rows;
+    }
+    
+    protected ${glConditionBean} extractConditionBeanWithCheck(Object[] args) {
+        if (args == null || args.Length == 0) {
+            String msg = "The arguments should have one argument! But:";
+            msg = msg + " args=" + (args != null ? "" + args.Length : "null");
+            throw new IllegalArgumentException(msg);
+        }
+        Object fisrtArg = args[0];
+        if (!(fisrtArg is ${glConditionBean})) {
+            String msg = "The type of argument should be " + typeof(${glConditionBean}) + "! But:";
+            msg = msg + " type=" + fisrtArg.GetType();
+            throw new IllegalArgumentException(msg);
+        }
+        return (${glConditionBean}) fisrtArg;
+    }
+    
+    protected ${glInternalCommandContextHandler} createCommandContextHandler(ICommandContext context) {
+        return new ${glInternalCommandContextHandler}(dataSource, commandFactory, context);
+    }
+
+    protected String buildQueryDeleteTwoWaySql(${glConditionBean} cb) {
+        return cb.SqlClause.getClauseQueryDelete();
+    }
+    
+    protected ICommandContext createCommandContext(String twoWaySql, String[] argNames, Type[] argTypes, Object[] args) {
+        ICommandContext context;
+        {
+            ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql, true);
+            INode node = parser.Parse();
+            ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
+            context = creator.CreateCommandContext(args);
+            node.Accept(context);
+        }
+        return context;
+    }
+	
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.GetLineSeparator();
+    }
+}
+
+}

@@ -1,0 +1,846 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCB};
+#set ($myClassName = "${myBaseConditionBeanClassName}")
+
+import org.seasar.dbflute.cbean.AbstractConditionBean;
+import org.seasar.dbflute.cbean.AbstractConditionBean._;
+import org.seasar.dbflute.cbean.AndQuery;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ConditionQuery;
+import org.seasar.dbflute.cbean.OrQuery;
+import org.seasar.dbflute.cbean.SpecifyQuery;
+import org.seasar.dbflute.cbean.SubQuery;
+import org.seasar.dbflute.cbean.UnionQuery;
+import org.seasar.dbflute.cbean.chelper._
+import org.seasar.dbflute.cbean.coption._
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+#if ($table.hasPrimaryKeyForcedClassificationSetting())
+import ${glPackageBaseCommon}.${glCDef};
+#end
+import ${glPackageBaseCommon}.${glDBFluteConfig};
+import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
+import ${glPackageBaseCommon}.${glImplementedInvokerAssistant};
+import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
+import ${glPackageBaseCommon}.ScrHpColQyOperand;
+import ${glPackageBaseCommon}.ScrHpSDRFunction;
+import ${glPackageCB}._
+import ${glPackageCQ}._
+#if ($table.hasJoinableRelationNestSelectSetupper())
+import ${glPackageNss}._
+#end
+
+/**
+ * The base condition-bean of ${table.tableDbName}.
+ * @author ${database.classAuthor}
+ */
+class ${myClassName} extends AbstractConditionBean {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected var _conditionQuery: ${myConditionQueryClassName} = null;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    {
+        if (${glDBFluteConfig}.isPagingCountLater()) {
+            enablePagingCountLater();
+        }
+        if (${glDBFluteConfig}.isPagingCountLeastJoin()) {
+            enablePagingCountLeastJoin();
+        }
+        if (${glDBFluteConfig}.isQueryUpdateCountPreCheck()) {
+            enableQueryUpdateCountPreCheck();
+        }
+    }
+
+    // ===================================================================================
+    //                                                                           SqlClause
+    //                                                                           =========
+    @Override
+    protected def createSqlClause(): SqlClause = {
+        val creator: SqlClauseCreator = ${glDBFluteConfig}.getSqlClauseCreator();
+        if (creator != null) {
+            return creator.createSqlClause(this);
+        }
+        return new ${glImplementedSqlClauseCreator}().createSqlClause(this); // as default
+    }
+
+    // ===================================================================================
+    //                                                                     DBMeta Provider
+    //                                                                     ===============
+    @Override
+    protected def getDBMetaProvider(): DBMetaProvider = {
+        return ${glDBMetaInstanceHandler}.getProvider(); // as default
+    }
+
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
+    def getTableDbName(): String = {
+        return "${table.tableDbName}";
+    }
+
+    // ===================================================================================
+    //                                                                 PrimaryKey Handling
+    //                                                                 ===================
+#if ($table.hasPrimaryKey())
+    /**
+     * Accept the query condition of primary key as equal.
+     * ${table.primaryKeyArgsJavaDocString}
+     * @return this. (NotNull)
+     */
+    def acceptPK(${table.primaryKeyArgsString}): ${myConditionBeanClassName} = {
+        ${table.primaryKeyArgsAssertString}
+        val cb: ${myClassName} = this;
+        ${table.primaryKeyArgsConditionSetupString}
+        return this.asInstanceOf[${myConditionBeanClassName}];
+    }
+
+#end
+#foreach ($uq in $table.keyableUniqueList)
+    /**
+     * Accept the query condition of unique key as equal.
+     * ${uq.argsJavaDocString}
+     * @return this. (NotNull)
+     */
+    def acceptUniqueOf${uq.javaNameKeyword}(${uq.argsString}): ${myConditionBeanClassName} = {
+        ${uq.argsAssertString}
+        val cb: ${myClassName} = this;
+        ${uq.argsConditionSetupString}
+        return this.asInstanceOf[${myConditionBeanClassName}];
+    }
+
+#end
+    def addOrderBy_PK_Asc(): ConditionBean = {
+#if ($table.hasPrimaryKey())
+#foreach ($col in $table.primaryKey)
+        query().addOrderBy_${col.JavaName}_Asc();
+#end
+        return this;
+#else
+        val msg: String = "The table has no primary-keys: " + getTableDbName();
+        throw new UnsupportedOperationException(msg);
+#end
+    }
+
+    def addOrderBy_PK_Desc(): ConditionBean = {
+#if ($table.hasPrimaryKey())
+#foreach ($col in $table.primaryKey)
+        query().addOrderBy_${col.JavaName}_Desc();
+#end
+        return this;
+#else
+        val msg: String = "The table has no primary-keys: " + getTableDbName();
+        throw new UnsupportedOperationException(msg);
+#end
+    }
+
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
+    /**
+     * Prepare for various queries. <br />
+     * Examples of main functions are following:
+     * <pre>
+     * <span style="color: #3F7E5E">// Basic Queries</span>
+     * cb.query().setMemberId_Equal(value);        <span style="color: #3F7E5E">// =</span>
+     * cb.query().setMemberId_NotEqual(value);     <span style="color: #3F7E5E">// !=</span>
+     * cb.query().setMemberId_GreaterThan(value);  <span style="color: #3F7E5E">// &gt;</span>
+     * cb.query().setMemberId_LessThan(value);     <span style="color: #3F7E5E">// &lt;</span>
+     * cb.query().setMemberId_GreaterEqual(value); <span style="color: #3F7E5E">// &gt;=</span>
+     * cb.query().setMemberId_LessEqual(value);    <span style="color: #3F7E5E">// &lt;=</span>
+     * cb.query().setMemberName_InScope(valueList);    <span style="color: #3F7E5E">// in ('a', 'b')</span>
+     * cb.query().setMemberName_NotInScope(valueList); <span style="color: #3F7E5E">// not in ('a', 'b')</span>
+     * cb.query().setMemberName_PrefixSearch(value);   <span style="color: #3F7E5E">// like 'a%' escape '|'</span>
+     * <span style="color: #3F7E5E">// LikeSearch with various options: (versatile)</span>
+     * <span style="color: #3F7E5E">// {like ... [options]}</span>
+     * cb.query().setMemberName_LikeSearch(value, option);
+     * cb.query().setMemberName_NotLikeSearch(value, option); <span style="color: #3F7E5E">// not like ...</span>
+     * <span style="color: #3F7E5E">// FromTo with various options: (versatile)</span>
+     * <span style="color: #3F7E5E">// {(default) fromDatetime &lt;= BIRTHDATE &lt;= toDatetime}</span>
+     * cb.query().setBirthdate_FromTo(fromDatetime, toDatetime, option);
+     * <span style="color: #3F7E5E">// DateFromTo: (Date means yyyy/MM/dd)</span>
+     * <span style="color: #3F7E5E">// {fromDate &lt;= BIRTHDATE &lt; toDate + 1 day}</span>
+     * cb.query().setBirthdate_DateFromTo(fromDate, toDate);
+     * cb.query().setBirthdate_IsNull();    <span style="color: #3F7E5E">// is null</span>
+     * cb.query().setBirthdate_IsNotNull(); <span style="color: #3F7E5E">// is not null</span>
+     * 
+     * <span style="color: #3F7E5E">// ExistsReferrer: (correlated sub-query)</span>
+     * <span style="color: #3F7E5E">// {where exists (select PURCHASE_ID from PURCHASE where ...)}</span>
+     * cb.query().existsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         subCB.query().setXxx... <span style="color: #3F7E5E">// referrer sub-query condition</span>
+     *     }
+     * });
+     * cb.query().notExistsPurchaseList...
+     * 
+     * <span style="color: #3F7E5E">// InScopeRelation: (sub-query)</span>
+     * <span style="color: #3F7E5E">// {where MEMBER_STATUS_CODE in (select MEMBER_STATUS_CODE from MEMBER_STATUS where ...)}</span>
+     * cb.query().inScopeMemberStatus(new SubQuery&lt;MemberStatusCB&gt;() {
+     *     public void query(MemberStatusCB subCB) {
+     *         subCB.query().setXxx... <span style="color: #3F7E5E">// relation sub-query condition</span>
+     *     }
+     * });
+     * cb.query().notInScopeMemberStatus...
+     * 
+     * <span style="color: #3F7E5E">// (Query)DerivedReferrer: (correlated sub-query)</span>
+     * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// derived column for function</span>
+     *         subCB.query().setXxx... <span style="color: #3F7E5E">// referrer sub-query condition</span>
+     *     }
+     * }).greaterEqual(value);
+     * 
+     * <span style="color: #3F7E5E">// ScalarCondition: (self-table sub-query)</span>
+     * cb.query().scalar_Equal().max(new SubQuery&lt;MemberCB&gt;() {
+     *     public void query(MemberCB subCB) {
+     *         subCB.specify().columnBirthdate(); <span style="color: #3F7E5E">// derived column for function</span>
+     *         subCB.query().setXxx... <span style="color: #3F7E5E">// scalar sub-query condition</span>
+     *     }
+     * });
+     * 
+     * <span style="color: #3F7E5E">// OrderBy</span>
+     * cb.query().addOrderBy_MemberName_Asc();
+     * cb.query().addOrderBy_MemberName_Desc().withManualOrder(valueList);
+     * cb.query().addOrderBy_MemberName_Desc().withNullsFirst();
+     * cb.query().addOrderBy_MemberName_Desc().withNullsLast();
+     * cb.query().addSpecifiedDerivedOrderBy_Desc(aliasName);
+     * 
+     * <span style="color: #3F7E5E">// Query(Relation)</span>
+     * cb.query().queryMemberStatus()...;
+     * cb.query().queryMemberAddressAsValid(targetDate)...;
+     * </pre>
+     * @return The instance of condition-query for base-point table to set up query. (NotNull)
+     */
+    def query(): ${myConditionQueryClassName} = {
+        assertQueryPurpose(); // assert only when user-public query 
+        return getConditionQuery();
+    }
+
+    def getConditionQuery(): ${myConditionQueryClassName} = { // public for parameter comment and internal
+        if (_conditionQuery == null) {
+            _conditionQuery = createLocalCQ();
+        }
+        return _conditionQuery;
+    }
+
+    protected def createLocalCQ(): ${myConditionQueryClassName} = {
+        return xcreateCQ(null, getSqlClause(), getSqlClause().getBasePointAliasName(), 0);
+    }
+
+    protected def xcreateCQ(childQuery: ConditionQuery, sqlClause: SqlClause, aliasName: String, nestLevel: Integer): ${myConditionQueryClassName} = {
+        val cq: ${myConditionQueryClassName} = xnewCQ(childQuery,  sqlClause,  aliasName,  nestLevel);
+        cq.xsetBaseCB(this);
+        return cq;
+    }
+
+    protected def xnewCQ(childQuery: ConditionQuery, sqlClause: SqlClause, aliasName: String, nestLevel: Integer): ${myConditionQueryClassName} = {
+        return new ${myConditionQueryClassName}(childQuery, sqlClause, aliasName, nestLevel);
+    }
+
+    def localCQ(): ConditionQuery = {
+        return getConditionQuery();
+    }
+
+    // ===================================================================================
+    //                                                                               Union
+    //                                                                               =====
+    /**
+     * Set up 'union' for base-point table. <br />
+     * You don't need to call SetupSelect in union-query,
+     * because it inherits calls before. (Don't call SetupSelect after here)
+     * <pre>
+     * cb.query().<span style="color: #DD4747">union</span>(new UnionQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} unionCB) {
+     *         unionCB.query().setXxx...
+     *     }
+     * });
+     * </pre>
+     * @param unionQuery The query of 'union'. (NotNull)
+     */
+    def union(unionQuery: UnionQuery[${myConditionBeanClassName}]): Unit = {
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForUnion(this); xsyncUQ(cb); 
+        try { lock(); unionQuery.query(cb); } finally { unlock(); }
+        xsaveUCB(cb);
+        val cq: ${myConditionQueryClassName} = cb.query(); query().xsetUnionQuery(cq);
+    }
+
+    /**
+     * Set up 'union all' for base-point table. <br />
+     * You don't need to call SetupSelect in union-query,
+     * because it inherits calls before. (Don't call SetupSelect after here)
+     * <pre>
+     * cb.query().<span style="color: #DD4747">unionAll</span>(new UnionQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} unionCB) {
+     *         unionCB.query().setXxx...
+     *     }
+     * });
+     * </pre>
+     * @param unionQuery The query of 'union all'. (NotNull)
+     */
+    def unionAll(unionQuery: UnionQuery[${myConditionBeanClassName}]): Unit = {
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}(); cb.xsetupForUnion(this); xsyncUQ(cb);
+        try { lock(); unionQuery.query(cb); } finally { unlock(); }
+        xsaveUCB(cb);
+        val cq: ${myConditionQueryClassName} = cb.query(); query().xsetUnionAllQuery(cq);
+    }
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabasePostgreSQL())
+
+    // ===================================================================================
+    //                                                                           Lock Wait
+    //                                                                           =========
+    def lockForUpdateNoWait(): ConditionBean =
+    { if (xhelpIsSqlClausePostgreSql()) { xhelpGettingSqlClausePostgreSql().lockForUpdateNoWait(); } return this; }
+
+    protected def xhelpIsSqlClausePostgreSql(): Boolean = {
+        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql;
+    }
+
+    protected def xhelpGettingSqlClausePostgreSql(): org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql = {
+        return .asInstanceOf[org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql)getSqlClause(];
+    }
+#end
+#if ($database.isDatabaseOracle())
+
+    // ===================================================================================
+    //                                                                           Lock Wait
+    //                                                                           =========
+    def lockForUpdateNoWait(): ConditionBean =
+    { if (xhelpIsSqlClauseOracle()) { xhelpGettingSqlClauseOracle().lockForUpdateNoWait(); } return this; }
+    public ConditionBean lockForUpdateWait(int waitSec)
+    { if (xhelpIsSqlClauseOracle()) { xhelpGettingSqlClauseOracle().lockForUpdateWait(waitSec); } return this; }
+
+    protected def xhelpIsSqlClauseOracle(): Boolean = {
+        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
+    }
+
+    protected def xhelpGettingSqlClauseOracle(): org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle = {
+        return .asInstanceOf[org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause(];
+    }
+#end
+#if ($database.isDatabaseDB2())
+
+    // [DBFlute-0.7.9]
+    // ===================================================================================
+    //                                                                     Isolation Level
+    //                                                                     ===============
+    // *Database Dependency
+    def lockWithRR(): Unit = { if (xhelpIsSqlClauseDb2()): Unit = { xhelpGettingSqlClauseDb2().lockWithRR(); } }
+    def lockWithRS(): Unit = { if (xhelpIsSqlClauseDb2()): Unit = { xhelpGettingSqlClauseDb2().lockWithRS(); } }
+    def lockWithCS(): Unit = { if (xhelpIsSqlClauseDb2()): Unit = { xhelpGettingSqlClauseDb2().lockWithCS(); } }
+    def lockWithUR(): Unit = { if (xhelpIsSqlClauseDb2()): Unit = { xhelpGettingSqlClauseDb2().lockWithUR(); } }
+
+    protected def xhelpIsSqlClauseDb2(): Boolean = {
+        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2;
+    }
+
+    protected def xhelpGettingSqlClauseDb2(): org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2 = {
+        return .asInstanceOf[org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2)getSqlClause(];
+    }
+#end
+#end
+
+    // ===================================================================================
+    //                                                                         SetupSelect
+    //                                                                         ===========
+#foreach ($fk in $table.joinableForeignKeyList)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($nestSelectSetuppperClassName = "${fk.foreignTableNestSelectSetupperClassName}")
+#set ($dynamicFixedConditionArgs = "")
+#set ($dynamicFixedConditionVariables = "")
+#if ($fk.hasDynamicFixedCondition())
+#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionFinalArgs}")
+#set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
+#end
+#set ($hasNestSelectSetupper = ${fk.hasForeignNestSelectSetupper()})
+#if ($hasNestSelectSetupper)
+    protected var _nss${tmpPropertyNameInitCap}: ${nestSelectSetuppperClassName} = null;
+    def getNss${tmpPropertyNameInitCap}(): ${nestSelectSetuppperClassName} = {
+        if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
+        return _nss${tmpPropertyNameInitCap};
+    }
+#end
+    /**
+     * Set up relation columns to select clause. <br />
+     * ${fk.foreignDispForJavaDoc}
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.<span style="color: #DD4747">setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})</span>; <span style="color: #3F7E5E">// ...().with[nested-relation]()</span>
+     * cb.query().setFoo...(value);
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.selectEntityWithDeletedCheck(cb);
+     * ... = ${myEntityVariableName}.<span style="color: #DD4747">get${tmpPropertyNameInitCap}()</span>; <span style="color: #3F7E5E">// you can get by using SetupSelect</span>
+     * </pre>
+#if ($fk.hasDynamicFixedCondition())
+     * ${fk.dynamicFixedConditionArgsJavaDocString}
+#end
+#set ($setupSelectReturnType = "Unit")
+#if ($hasNestSelectSetupper)
+     * @return The set-upper of nested relation. {setupSelect...().with[nested-relation]} (NotNull)
+#set ($setupSelectReturnType = "${nestSelectSetuppperClassName}")
+#end
+     */
+    def setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}): ${setupSelectReturnType} = {
+        assertSetupSelectPurpose("${tmpPropertyName}");
+#if ($fk.hasLocalColumnExceptPrimaryKey())
+        if (hasSpecifiedColumn()) { // if reverse call
+#foreach ($col in $fk.localColumnList)
+#if (!$col.isPrimaryKey())
+            specify().column${col.javaName}();
+#end
+#end
+        }
+#end
+        doSetupSelect(new SsCall() { def qf(): ConditionQuery = { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
+#if ($hasNestSelectSetupper)
+        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery())
+        { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
+        return _nss${tmpPropertyNameInitCap};
+#end
+    }
+
+#end
+#foreach ($referrer in $table.joinableReferrerAsOneList)
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
+#set ($hasNestSelectSetupper = ${referrer.hasReferrerNestSelectSetupper()})
+#if ($hasNestSelectSetupper)
+    protected var _nss${tmpPropertyNameInitCap}: ${nestSelectSetuppperClassName} = null;
+    def getNss${tmpPropertyNameInitCap}(): ${nestSelectSetuppperClassName} = {
+        if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
+        return _nss${tmpPropertyNameInitCap};
+    }
+#end
+    /**
+     * Set up relation columns to select clause. <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.<span style="color: #DD4747">setupSelect_${tmpPropertyNameInitCap}()</span>; <span style="color: #3F7E5E">// ...().with[nested-relation]()</span>
+     * cb.query().setFoo...(value);
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.selectEntityWithDeletedCheck(cb);
+     * ... = ${myEntityVariableName}.<span style="color: #DD4747">get${tmpPropertyNameInitCap}()</span>; <span style="color: #3F7E5E">// you can get by using SetupSelect</span>
+     * </pre>
+#set ($setupSelectReturnType = "Unit")
+#if ($hasNestSelectSetupper)
+     * @return The set-upper of nested relation. {setupSelect...().with[nested-relation]} (NotNull)
+#set ($setupSelectReturnType = "${nestSelectSetuppperClassName}")
+#end
+     */
+    def setupSelect_${tmpPropertyNameInitCap}(): ${setupSelectReturnType} = {
+        assertSetupSelectPurpose("${tmpPropertyName}");
+        doSetupSelect(new SsCall() { def qf(): ConditionQuery = { return query().query${tmpPropertyNameInitCap}(); } });
+#if ($hasNestSelectSetupper)
+        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
+        return _nss${tmpPropertyNameInitCap};
+#end
+    }
+
+#end
+    // [DBFlute-0.7.4]
+    // ===================================================================================
+    //                                                                             Specify
+    //                                                                             =======
+    protected var _specification: Hp${myConditionBeanClassName}.HpSpecification = null;
+
+    /**
+     * Prepare for SpecifyColumn, (Specify)DerivedReferrer. <br />
+     * This method should be called after SetupSelect.
+     * <pre>
+     * cb.setupSelect_MemberStatus(); <span style="color: #3F7E5E">// should be called before specify()</span>
+     * cb.specify().columnMemberName();
+     * cb.specify().specifyMemberStatus().columnMemberStatusName();
+     * cb.specify().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     *     public void query(PurchaseCB subCB) {
+     *         subCB.specify().columnPurchaseDatetime();
+     *         subCB.query().set...
+     *     }
+     * }, aliasName);
+     * </pre>
+     * @return The instance of specification. (NotNull)
+     */
+    def specify(): Hp${myConditionBeanClassName}.HpSpecification = {
+        assertSpecifyPurpose();
+        if (_specification == null) { _specification = new Hp${myConditionBeanClassName}.HpSpecification(this
+            , new HpSpQyCall[${myConditionQueryClassName}]() {
+                def has(): Boolean = { return true; }
+                def qy(): ${myConditionQueryClassName} = { return getConditionQuery(); }
+            }
+            , _purpose, getDBMetaProvider()); }
+        return _specification;
+    }
+
+    def localSp(): HpColumnSpHandler = {
+        return specify();
+    }
+
+    def hasSpecifiedColumn(): Boolean = {
+        return _specification != null && _specification.isAlreadySpecifiedRequiredColumn();
+    }
+
+    // [DBFlute-0.9.5.3]
+    // ===================================================================================
+    //                                                                        Column Query
+    //                                                                        ============
+    /**
+     * Set up column-query. {column1 = column2}
+     * <pre>
+     * <span style="color: #3F7E5E">// where FOO &lt; BAR</span>
+     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} cb) {
+     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *     }
+     * }).lessThan(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} cb) {
+     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *     }
+     * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
+     * </pre>
+     * @param leftSpecifyQuery The specify-query for left column. (NotNull)
+     * @return The object for setting up operand and right column. (NotNull)
+     */
+    def columnQuery(leftSpecifyQuery: (${myConditionBeanClassName}) => Unit): ScrHpColQyOperand[${myConditionBeanClassName}] = {
+        return new ScrHpColQyOperand[${myConditionBeanClassName}](new HpColQyHandler[${myConditionBeanClassName}]() {
+            def handle(rightSp: SpecifyQuery[${myConditionBeanClassName}], operand: String): HpCalculator = {
+                return xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), new SpecifyQuery[${myConditionBeanClassName}]() {
+                    def specify(cb: ${myConditionBeanClassName}): Unit = { leftSpecifyQuery(cb); }
+                }, rightSp, operand);
+            }
+        });
+    }
+
+    protected def xcreateColumnQueryCB(): ${myConditionBeanClassName} = {
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}();
+        cb.xsetupForColumnQuery(this.asInstanceOf[${myConditionBeanClassName}]);
+        return cb;
+    }
+
+    // ===================================================================================
+    //                                                                        Dream Cruise
+    //                                                                        ============
+    /**
+     * Welcome to the Dream Cruise for condition-bean deep world. <br />
+     * This is very specialty so you can get the frontier spirit. Bon voyage!
+     * @return The condition-bean for dream cruise, which is linked to main condition-bean.
+     */
+    def dreamCruiseCB(): ${myConditionBeanClassName} = {
+        val cb: ${myConditionBeanClassName} = new ${myConditionBeanClassName}();
+        cb.xsetupForDreamCruise(this.asInstanceOf[${myConditionBeanClassName}]);
+        return cb;
+    }
+
+    protected def xdoCreateDreamCruiseCB(): ConditionBean = {
+        return dreamCruiseCB();
+    }
+
+    // [DBFlute-0.9.6.3]
+    // ===================================================================================
+    //                                                                       OrScope Query
+    //                                                                       =============
+    /**
+     * Set up the query for or-scope. <br />
+     * (Same-column-and-same-condition-key conditions are allowed in or-scope)
+     * <pre>
+     * <span style="color: #3F7E5E">// where (FOO = '...' or BAR = '...')</span>
+     * cb.<span style="color: #DD4747">orScopeQuery</span>(new OrQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} orCB) {
+     *         orCB.query().setFOO_Equal...
+     *         orCB.query().setBAR_Equal...
+     *     }
+     * });
+     * </pre>
+     * @param orQuery The query for or-condition. (NotNull)
+     */
+    def orScopeQuery(orQuery: (${myConditionBeanClassName}) => Unit): Unit = {
+        xorSQ(this.asInstanceOf[${myConditionBeanClassName}], new OrQuery[${myConditionBeanClassName}]{
+            def query(orCB: ${myConditionBeanClassName}): Unit = { orQuery(orCB); }
+        });
+    }
+
+    /**
+     * Set up the and-part of or-scope. <br />
+     * (However nested or-scope query and as-or-split of like-search in and-part are unsupported)
+     * <pre>
+     * <span style="color: #3F7E5E">// where (FOO = '...' or (BAR = '...' and QUX = '...'))</span>
+     * cb.<span style="color: #DD4747">orScopeQuery</span>(new OrQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void query(${myConditionBeanClassName} orCB) {
+     *         orCB.query().setFOO_Equal...
+     *         orCB.<span style="color: #DD4747">orScopeQueryAndPart</span>(new AndQuery&lt;${myConditionBeanClassName}&gt;() {
+     *             public void query(${myConditionBeanClassName} andCB) {
+     *                 andCB.query().setBar_...
+     *                 andCB.query().setQux_...
+     *             }
+     *         });
+     *     }
+     * });
+     * </pre>
+     * @param andQuery The query for and-condition. (NotNull)
+     */
+    def orScopeQueryAndPart(andQuery: (${myConditionBeanClassName}) => Unit): Unit = {
+        xorSQAP(this.asInstanceOf[${myConditionBeanClassName}], new AndQuery[${myConditionBeanClassName}] {
+            def query(cb: ${myConditionBeanClassName}): Unit = { andQuery(cb); }
+        });
+    }
+#if ($table.isCursorSelectOptionAllowed())
+
+    // ===================================================================================
+    //                                                                       Cursor Select
+    //                                                                       =============
+    def customizeCursorSelect(cursorSelectOption: CursorSelectOption): Unit = {
+        _cursorSelectOption = cursorSelectOption;
+    }
+#end
+
+    // ===================================================================================
+    //                                                                          DisplaySQL
+    //                                                                          ==========
+    @Override
+    protected def getSqlAnalyzerFactory(): SqlAnalyzerFactory =
+    { return new ${glImplementedInvokerAssistant}().assistSqlAnalyzerFactory(); }
+    @Override
+    protected def getLogDateFormat(): String = { return ${glDBFluteConfig}.getLogDateFormat(); }
+    @Override
+    protected def getLogTimestampFormat(): String = { return ${glDBFluteConfig}.getLogTimestampFormat(); }
+
+    // ===================================================================================
+    //                                                                       Meta Handling
+    //                                                                       =============
+    def hasUnionQueryOrUnionAllQuery(): Boolean = {
+        return query().hasUnionQueryOrUnionAllQuery();
+    }
+
+    // ===================================================================================
+    //                                                                        Purpose Type
+    //                                                                        ============
+    @Override
+    protected def xprepareSyncQyCall(mainCB: ConditionBean): Unit = {
+        val cb: ${myConditionBeanClassName} = if (mainCB != null) {
+            mainCB.asInstanceOf[${myConditionBeanClassName}];
+        } else {
+            new ${myConditionBeanClassName}();
+        }
+        specify().xsetSyncQyCall(new HpSpQyCall[${myConditionQueryClassName}]() {
+            def has(): Boolean = { return true; }
+            def qy(): ${myConditionQueryClassName} = { return cb.query(); }
+        });
+    }
+
+    // ===================================================================================
+    //                                                                            Internal
+    //                                                                            ========
+    // very internal (for suppressing warn about 'Not Use Import')
+    protected def getConditionBeanClassNameInternally(): String = { return classOf[${myConditionBeanClassName}].getName(); }
+    protected def getConditionQueryClassNameInternally(): String = { return classOf[${myConditionQueryClassName}].getName(); }
+    protected def getSubQueryClassNameInternally(): String = { return classOf[SubQuery[_]].getName(); }
+    protected def getConditionOptionClassNameInternally(): String = { return classOf[ConditionOption].getName(); }
+}
+
+/**
+ * The singleton object to define condition-bean's specification.
+ * @author ${database.classAuthor}
+ */
+object Hp${myConditionBeanClassName} {
+
+    class HpSpecification(baseCB: ConditionBean, qyCall: HpSpQyCall[${myConditionQueryClassName}], purpose: HpCBPurpose, dbmetaProvider: DBMetaProvider)
+            extends HpAbstractSpecification[${myConditionQueryClassName}](baseCB, qyCall, purpose, dbmetaProvider) {
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+        protected var _${tmpPropertyName}: Hp${tmpCBClassName}.HpSpecification = null;
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+        protected var _${tmpPropertyName}: Hp${tmpCBClassName}.HpSpecification = null;
+#end
+#foreach ($col in $table.columns)
+        /**
+         * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+         * @return The information object of specified column. (NotNull)
+         */
+        def column${col.javaName}(): HpSpecifiedColumn = { return doColumn("${col.name}"); }
+#end
+        def everyColumn(): Unit = { doEveryColumn(); }
+        def exceptRecordMetaColumn(): Unit = { doExceptRecordMetaColumn(); }
+        @Override
+        protected def doSpecifyRequiredColumn(): Unit = {
+#foreach ($col in $table.primaryKey)
+            column${col.javaName}(); // PK
+#end
+#foreach ($referrer in $table.referrerBothNonPKList)
+            if (qyCall().qy().xgetReferrerQuery().isInstanceOf[${referrer.referrerTableExtendedConditionQueryClassName}]) {
+#foreach ($col in $referrer.foreignColumnList)
+                column${col.javaName}(); // non PK but referred column (and referrer also non PK)
+#end
+            }
+#end
+#foreach ($fk in $table.foreignKeyList)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#if ($fk.hasLocalColumnExceptPrimaryKey())
+            if (qyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}()
+                    || qyCall().qy().xgetReferrerQuery().isInstanceOf[${fk.foreignTableExtendedConditionQueryClassName}]) {
+#foreach ($col in $fk.localColumnList)
+#if (!$col.isPrimaryKey())
+                column${col.javaName}(); // FK or one-to-one referrer
+#end
+#end
+            }
+#end
+#end
+        }
+        @Override
+        protected def getTableDbName(): String = { return "$table.tableDbName"; }
+#foreach ($fk in $table.joinableForeignKeyList)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#if ($fk.hasDynamicFixedCondition())
+        /**
+         * Prepare to specify functions about relation table. <br />
+         * ${fk.foreignDispForJavaDocNest}
+         * ${fk.dynamicFixedConditionArgsJavaDocStringNest}
+         * @return The instance for specification for relation table to specify. (NotNull)
+         */
+        def specify${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionFinalArgs}): ${tmpCBClassName}${database.sharp}HpSpecification = {
+            assertRelation("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new Hp${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall[${tmpCQClassName}]() {
+                    def has(): Boolean = { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().query${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionVariables}); } }
+                    , _purpose, _dbmetaProvider);
+                if (xhasSyncQyCall()) { // inherits it
+                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall[${tmpCQClassName}]() {
+                        def has(): Boolean = { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionVariables}); }
+                    });
+                }
+            }
+            return _${tmpPropertyName};
+        }
+#end
+        /**
+         * Prepare to specify functions about relation table. <br />
+         * ${fk.foreignDispForJavaDocNest}
+         * @return The instance for specification for relation table to specify. (NotNull)
+         */
+        def specify${tmpPropertyNameInitCap}(): Hp${tmpCBClassName}.HpSpecification = {
+            assertRelation("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new Hp${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall[${tmpCQClassName}]() {
+                    def has(): Boolean = { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+#if ($fk.hasDynamicFixedCondition())
+                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().getConditionQuery${tmpPropertyNameInitCap}(); } }
+#else
+                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().query${tmpPropertyNameInitCap}(); } }
+#end
+                    , _purpose, _dbmetaProvider);
+                if (xhasSyncQyCall()) { // inherits it
+                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall[${tmpCQClassName}]() {
+                        def has(): Boolean = { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+#if ($fk.hasDynamicFixedCondition())
+                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().getConditionQuery${tmpPropertyNameInitCap}(); }
+#else
+                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(); }
+#end
+                    });
+                }
+            }
+            return _${tmpPropertyName};
+        }
+#end
+#foreach ($referrer in $table.joinableReferrerAsOneList)
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+        /**
+         * Prepare to specify functions about relation table. <br />
+         * ${referrer.referrerDispAsOneForJavaDocNest}
+         * @return The instance for specification for relation table to specify. (NotNull)
+         */
+        def specify${tmpPropertyNameInitCap}(): Hp${tmpCBClassName}.HpSpecification = {
+            assertRelation("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new Hp${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall[${tmpCQClassName}]() {
+                    def has(): Boolean = { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                    def qy(): ${tmpCQClassName} = { return _qyCall.qy().query${tmpPropertyNameInitCap}(); } }
+                    , _purpose, _dbmetaProvider);
+                if (xhasSyncQyCall()) { // inherits it
+                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall[${tmpCQClassName}]() {
+                        def has(): Boolean = { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                        def qy(): ${tmpCQClassName} = { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(); }
+                    });
+                }
+            }
+            return _${tmpPropertyName};
+        }
+#end
+#foreach ($referrer in $table.derivedReferrerReferrers)
+#set ($tmpPropertyName = "${referrer.referrerPropertyName}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($tmpEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
+        /**
+         * Prepare for (Specify)DerivedReferrer (correlated sub-query). <br />
+         * {select max(FOO) from ${referrer.table.tableDbName} where ...) as FOO_MAX} <br />
+         * ${referrer.referrerDispForJavaDocNest}
+         * <pre>
+         * cb.specify().<span style="color: #DD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {
+         *     public void query(${tmpCBClassName} subCB) {
+         *         subCB.specify().<span style="color: #DD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
+         *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
+         *     }
+         * }, ${tmpEntityClassName}.<span style="color: #DD4747">ALIAS_foo...</span>);
+         * </pre>
+         * @return The object to set up a function for referrer table. (NotNull)
+         */
+        def derived${tmpPropertyNameInitCap}(): ScrHpSDRFunction[${tmpCBClassName}, ${tmpLocalCQClassName}] = {
+            assertDerived("${tmpPropertyName}"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
+            return toScalaSDRFunction(new HpSDRFunction[${tmpCBClassName}, ${tmpLocalCQClassName}](_baseCB, _qyCall.qy(), new HpSDRSetupper[${tmpCBClassName}, ${tmpLocalCQClassName}]() {
+                def setup(fn: String, sq: SubQuery[${tmpCBClassName}], cq: ${tmpLocalCQClassName}, al: String, op: DerivedReferrerOption): Unit = {
+                    cq.xsderive${referrer.referrerPropertyNameInitCap}(fn, sq, al, op); } }, _dbmetaProvider));
+        }
+#end
+#if ($table.hasSinglePrimaryKey())
+#if ($table.isAvailableMyselfMyselfDerived())
+        /**
+         * Prepare for (Specify)MyselfDerived (SubQuery).
+         * @return The object to set up a function for myself table. (NotNull)
+         */
+        def myselfDerived(): ScrHpSDRFunction[${myConditionBeanClassName}, ${myConditionQueryClassName}] = {
+            assertDerived("myselfDerived"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
+            return toScalaSDRFunction(new HpSDRFunction[${myConditionBeanClassName}, ${myConditionQueryClassName}](_baseCB, _qyCall.qy(), new HpSDRSetupper[${myConditionBeanClassName}, ${myConditionQueryClassName}]() {
+                def setup(fn: String, sq: SubQuery[${myConditionBeanClassName}], cq: ${myConditionQueryClassName}, al: String, op: DerivedReferrerOption): Unit = {
+                    cq.xsmyselfDerive(fn, sq, al, op); } }, _dbmetaProvider));
+        }
+#end
+#end
+    }
+
+    protected def toScalaSDRFunction[CB <: ConditionBean, CQ <: ConditionQuery](function: HpSDRFunction[CB, CQ]): ScrHpSDRFunction[CB, CQ] =
+    { new ScrHpSDRFunction[CB, CQ](function) } 
+}

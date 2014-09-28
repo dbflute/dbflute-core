@@ -1,0 +1,18 @@
+#set ($myClassName = "${myExtendedBhvApClassName}")
+
+using System;
+using Seasar.Quill.Attrs;
+using ${glPackageExtendedBhvLib};
+
+namespace ${glPackageExtendedBhvAp} {
+
+    [Implementation]
+    public partial class ${myClassName} : ${myExtendedBhvLibClassName} {
+
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        ${database.behaviorQueryPathBeginMark}
+        ${database.behaviorQueryPathEndMark}
+   }
+}

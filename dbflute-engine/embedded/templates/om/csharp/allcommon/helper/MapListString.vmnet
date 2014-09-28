@@ -1,0 +1,54 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ${glPackageBaseCommonHelper} {
+
+    public interface ${glMapListString} {
+
+        string NEW_LINE { get;}
+
+        string DEFAULT_MAP_MARK { get;}
+
+        string DEFAULT_LIST_MARK { get;}
+
+        string DEFAULT_DELIMITER { get;}
+
+        string DEFAULT_START_BRACE { get;}
+
+        string DEFAULT_END_BRACE { get;}
+
+        string DEFAULT_EQUAL { get;}
+
+        String MapMark { get; set; }
+
+        String ListMark { get; set; }
+
+        String StartBrace { get; set; }
+
+        String EndBrace { get; set; }
+
+        String Delimiter { get; set; }
+
+        String Equal { get; set; }
+
+        // ==========================================================================================
+        //                                                                                   Generate
+        //                                                                                   ========
+        /**
+         * Generate map from map-string.
+         * 
+         * @param mapString Map-string (NotNull)
+         * @return Generated map. (NotNull)
+         */
+        Dictionary<String, Object> generateMap(String mapString);
+
+        /**
+         * Generate map from list-string. {Implement}
+         * 
+         * @param listString List-string (NotNull)
+         * @return Generated list. (NotNull)
+         */
+        List<Object> generateList(String listString);
+    }
+}

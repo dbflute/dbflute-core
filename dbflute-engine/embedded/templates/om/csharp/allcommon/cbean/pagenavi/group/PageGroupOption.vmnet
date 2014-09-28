@@ -1,0 +1,29 @@
+#set ($myClassName = "${glPageGroupOption}")
+
+using System;
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommonCBeanPagenaviGroup} {
+
+[System.Serializable]
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    public int _pageGroupSize;
+    public int PageGroupSize { get { return _pageGroupSize; } set { _pageGroupSize = value; } }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public override String ToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append("pageGroupSize=").append(PageGroupSize);
+        sb.append("}");
+        return sb.toString();
+    }
+}
+
+}

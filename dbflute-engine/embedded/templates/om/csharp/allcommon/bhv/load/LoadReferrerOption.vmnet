@@ -1,0 +1,83 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+
+using System;
+using System.Collections.Generic;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonBhvSetup};
+
+namespace ${glPackageBaseCommonBhvLoad} {
+
+    public class ${glLoadReferrerOption}<REFERRER_CB, REFERRER_ENTITY> where REFERRER_CB : ${glConditionBean} where REFERRER_ENTITY : ${glEntity} {
+
+        // ===================================================================================
+        //                                                                           Attribute
+        //                                                                           =========
+        protected ${glConditionBeanSetupper}<REFERRER_CB> _conditionBeanSetupper;
+        protected ${glEntityListSetupper}<REFERRER_ENTITY> _entityListSetupper;
+        protected REFERRER_CB _referrerConditionBean;
+
+        // ===================================================================================
+        //                                                                         Constructor
+        //                                                                         ===========
+        public ${glLoadReferrerOption}() {
+        }
+
+        public ${glLoadReferrerOption}<REFERRER_CB, REFERRER_ENTITY> xinit(
+                ${glConditionBeanSetupper}<REFERRER_CB> conditionBeanSetupper) { // internal
+            this.ConditionBeanSetupper = conditionBeanSetupper;
+            return this;
+        }
+
+        // ===================================================================================
+        //                                                                         Easy-to-Use
+        //                                                                         ===========
+        public void delegateConditionBeanSettingUp(REFERRER_CB cb) { // internal
+            if (_conditionBeanSetupper != null) {
+                _conditionBeanSetupper.Invoke(cb);
+            }
+        }
+
+        public void delegateEntitySettingUp(IList<REFERRER_ENTITY> entityList) { // internal
+            if (_entityListSetupper != null) {
+                _entityListSetupper.Invoke(entityList);
+            }
+        }
+
+        // ===================================================================================
+        //                                                                            Accessor
+        //                                                                            ========
+        public ${glConditionBeanSetupper}<REFERRER_CB> ConditionBeanSetupper { get {
+            return _conditionBeanSetupper;
+        } set {
+            this._conditionBeanSetupper = value;
+        }}
+
+        public ${glEntityListSetupper}<REFERRER_ENTITY> EntityListSetupper { get {
+            return _entityListSetupper;
+        } set {
+            this._entityListSetupper = value;
+        }}
+
+        public REFERRER_CB ReferrerConditionBean { get {
+            return _referrerConditionBean;
+        } set {
+            this._referrerConditionBean = value;
+        }}
+    }
+}

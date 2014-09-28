@@ -1,0 +1,71 @@
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlLog} {
+
+    public class ${glInternalSqlLogRegistry} {
+
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        private static readonly int DEFAULT_LIMIT_SIZE = ${database.sqlLogRegistryLimitSize};
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        [ThreadStatic]
+        private LinkedList<${glInternalSqlLog}> _sqlLogList = new LinkedList<${glInternalSqlLog}>();
+        private int limitSize;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalSqlLogRegistry}() {
+            this.limitSize = DEFAULT_LIMIT_SIZE;
+        }
+
+        public ${glInternalSqlLogRegistry}(int limitSize) {
+            this.limitSize = limitSize;
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public int LimitSize { get {
+            return limitSize;
+        }}
+
+        public int Size { get {
+            return SqlLogList.Count;
+        }}
+
+        public bool IsEmpty { get {
+            return Size == 0;
+        }}
+
+        public ${glInternalSqlLog} Last { get {
+            return IsEmpty ? null : SqlLogList.Last.Value;
+        }}
+
+        public void Add(${glInternalSqlLog} sqlLog) {
+            if (limitSize <= 0) {
+                return;
+            }
+            LinkedList<${glInternalSqlLog}> list = SqlLogList;
+            list.AddLast(sqlLog);
+            if (list.Count > limitSize) {
+                list.RemoveFirst();
+            }
+        }
+
+        public void Clear() {
+            SqlLogList.Clear();
+        }
+
+        public LinkedList<${glInternalSqlLog}> SqlLogList { get {
+            return _sqlLogList;
+        }}
+    }
+}

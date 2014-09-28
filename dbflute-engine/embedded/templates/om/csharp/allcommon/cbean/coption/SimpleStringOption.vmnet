@@ -1,0 +1,66 @@
+#set ($myClassName = "${glSimpleStringOption}")
+
+using System;
+
+// using ${glPackageBaseCommonCOptionParts};
+// using ${glPackageBaseCommonCOptionPartsLocal};
+using ${glPackageBaseCommonUtil};
+
+namespace ${glPackageBaseCommonCOption} {
+
+public class ${myClassName} : ${glConditionOption} {
+
+    // protected ${glSplitOptionParts} _splitOptionParts;
+    // protected ${glToUpperLowerCaseOptionParts} _toUpperLowerCaseOptionParts;
+    // protected ${glToSingleByteOptionParts} _toSingleByteCaseOptionParts;
+    // protected ${glJapaneseOptionPartsAgent} _japaneseOptionPartsAgent;
+
+    // =====================================================================================
+    //                                                                           Rear Option
+    //                                                                           ===========
+    public virtual String getRearOption() {
+        return "";
+    }
+
+    // =====================================================================================
+    //                                                                                 Split
+    //                                                                                 =====
+    public bool isSplit() {
+        return false;
+    }
+
+    // =====================================================================================
+    //                                                                   To Upper/Lower Case
+    //                                                                   ===================
+
+    // =====================================================================================
+    //                                                                        To Single Byte
+    //                                                                        ==============
+
+    // =====================================================================================
+    //                                                                        To Double Byte
+    //                                                                        ==============
+
+    // =====================================================================================
+    //                                                                              Japanese
+    //                                                                              ========
+
+    // =====================================================================================
+    //                                                                            Real Value
+    //                                                                            ==========
+    public virtual String generateRealValue(String value) {
+        // value = getToUpperLowerCaseOptionParts().generateRealValue(value);
+        // value = getToSingleByteOptionParts().generateRealValue(value);
+        // value = getJapaneseOptionPartsAgent().generateRealValue(value);
+        return value;
+    }
+	
+    // =====================================================================================
+    //                                                                        General Helper
+    //                                                                        ==============
+    protected String replaceString(String text, String fromText, String toText) {
+	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
+    }
+}
+
+}

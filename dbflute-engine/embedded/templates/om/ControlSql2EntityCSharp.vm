@@ -1,0 +1,336 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($database = $schemaData.database)
+
+## - - - - - - - - - - - -
+## Initialize properties.
+## - - - - - - - - - - - -
+$database.initializeClassificationDeployment()
+
+## *****************************************************************************************************************
+##                                                                                                   Global Paramter
+##                                                                                                   ***************
+## ===================================================================================
+##                                                                            Language
+##                                                                            ========
+#set ($glTargetLanguage = ${database.TargetLanguage})
+
+## ===================================================================================
+##                                                                  Resource Directory
+##                                                                  ==================
+#set ($glResourceDirectory = ${database.resourceDirectory})
+
+## [Extension]
+#set ($glTemplateFileExtension = ${database.TemplateFileExtension})
+#set ($glClassFileExtension = ${database.ClassFileExtension})
+
+## [Prefix-and-Suffix]
+#set ($glProjectPrefix = ${database.ProjectPrefix})
+#set ($glBasePrefix = ${database.BasePrefix})
+#set ($glBaseSuffixForEntity = ${database.BaseSuffixForEntity})
+
+#set ($glDaoReadable = "${glProjectPrefix}DaoReadable")
+#set ($glDaoWritable = "${glProjectPrefix}DaoWritable")
+
+## [Common-Entity]
+#set ($glEntity = "${glProjectPrefix}Entity")
+#set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
+
+## [ConditionBean]
+#set ($glConditionBean = "${glProjectPrefix}ConditionBean")
+
+## [OutsideSql]
+#set ($glProcedurePmb = "${glProjectPrefix}ProcedurePmb")
+
+## [Allcommon-ConditionBean-Option]
+#set ($glLikeSearchOption = "${glProjectPrefix}LikeSearchOption")
+#set ($glFromToOption = "${glProjectPrefix}FromToOption")
+
+## [DBMeta]
+#set ($glDBMeta = "${glProjectPrefix}DBMeta")
+#set ($glAbstractDBMeta = "${glProjectPrefix}AbstractDBMeta")
+#set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
+
+## [Allcommon-DBMetaInfo]
+#set ($glForeignInfo = "${glProjectPrefix}ForeignInfo")
+#set ($glReferrerInfoName = "${glProjectPrefix}ReferrerInfo")
+#set ($glRelationInfo = "${glProjectPrefix}RelationInfo")
+#set ($glUniqueInfo = "${glProjectPrefix}UniqueInfo")
+#set ($glColumnInfo = "${glProjectPrefix}ColumnInfo")
+
+## [Helper]
+#set ($glMapListString = "${glProjectPrefix}MapListString")
+#set ($glMapListStringImpl = "${glProjectPrefix}MapListStringImpl")
+#set ($glMapStringBuilder = "${glProjectPrefix}MapStringBuilder")
+#set ($glMapStringBuilderImpl = "${glProjectPrefix}MapStringBuilderImpl")
+#set ($glStringKeyMap = "${glProjectPrefix}StringKeyMap")
+#set ($glStringSet = "${glProjectPrefix}StringSet")
+
+## [Allcommon-JDBC]
+#set ($glCursorHandler = "${glProjectPrefix}CursorHandler")
+#set ($glCursorFetcher = "${glProjectPrefix}CursorFetcher")
+#set ($glLatestSqlProvider = "${glProjectPrefix}LatestSqlProvider")
+
+## [ClassificationDefinition]
+#set ($glCDef = "${glProjectPrefix}CDef")
+#set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
+
+## [Allcommon-Util]
+#set ($glSimpleAssertUtil = "${glProjectPrefix}SimpleAssertUtil")
+#set ($glSimpleResourceUtil = "${glProjectPrefix}SimpleResourceUtil")
+#set ($glSimpleStringUtil = "${glProjectPrefix}SimpleStringUtil")
+#set ($glSimpleSystemUtil = "${glProjectPrefix}SimpleSystemUtil")
+#set ($glSimpleTypeUtil = "${glProjectPrefix}SimpleTypeUtil")
+#set ($glValueLabelUtil = "${glProjectPrefix}ValueLabelUtil")
+#set ($glTraceViewUtil = "${glProjectPrefix}TraceViewUtil")
+
+## [Package]
+#set ($glPackageBaseCommon = "${database.baseCommonPackage}")
+#set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.CBean")
+#set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.CBean.COption")
+#set ($glPackageBaseCommonCBeanOutsidesql = "${database.baseCommonPackage}.CBean.OutsideSql")
+#set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.Dbm")
+#set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.Dbm.Info")
+#set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.Helper")
+#set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.JavaLike")
+#set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.Ado")
+#set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.Util")
+#set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
+#set ($glPackageBaseDao = "${database.baseDaoPackage}" )
+#set ($glPackageBaseEntity = "${database.baseEntityPackage}")
+#set ($glPackageExtendedBhv = "${database.extendedBehaviorPackage}")
+#set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
+#set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
+#set ($glPackageBaseCursor = "${database.sql2EntityBaseCursorPackage}" )
+#set ($glPackageExtendedCursor = "${database.sql2EntityExtendedCursorPackage}")
+
+## [Other]
+#set ($glConditionBeanInitialName = "CB")
+#set ($glConditionQueryInitialName = "CQ")
+#set ($glAttachedCBArgsVariableName = "cb")
+
+## -----------------------------------------------------------------------------------------------------
+##                                                                                Parse customize entity
+##                                                                                ----------------------
+##
+## Setup output directory.
+## (but it may be switched per one file)
+##
+$database.enableSql2EntityOutputDirectory()
+
+## for Sql2Entity
+#set ($isSql2Entity = true)
+
+#set ($glPackageBaseCustomizeEntity = "${database.Sql2EntityBaseEntityPackage}" )
+#set ($glPackageCustomizeDBMeta = "${database.Sql2EntityDBMetaPackage}")
+#set ($glPackageExtendedCustomizeEntity = "${database.Sql2EntityExtendedEntityPackage}" )
+
+##
+## Delete old customize classes.
+##
+$database.deleteOldCustomizeClass();
+
+$database.info("public void parseCustomizeEntity() {")
+#foreach ($table in $database.tableList)
+  #set ($myBaseObjectClassName = "${glProjectPrefix}${glBasePrefix}${table.javaName}")
+  #set ($myBaseEntityPackageName = "${glPackageBaseCustomizeEntity}")
+  #set ($myExtendedObjectClassName = "${glProjectPrefix}${table.javaName}")
+  #set ($myExtendedEntityPackageName = "${glPackageExtendedCustomizeEntity}")
+  #set ($myDBMetaClassName = "${glProjectPrefix}${table.javaName}Dbm")
+  #set ($myDBMetaPackageName = "${glPackageCustomizeDBMeta}")
+
+  #set ($myEntityVariableName = "${table.uncapitalisedJavaName}")
+  #set ($myEntityListVariableName = "${table.uncapitalisedJavaName}List")
+  #set ($myCBVariableName = "${table.uncapitalisedJavaName}")
+
+  #set ($myBaseCursorPackageName = "${glPackageBaseCursor}")
+  #set ($myExtendedCursorPackageName = "${glPackageExtendedCursor}")
+  #set ($myBaseTypeSafeCursorClassName = "${glProjectPrefix}${glBasePrefix}${table.javaName}Cursor")
+  #set ($myBaseTypeSafeCursorHandlerClassName = "${glProjectPrefix}${glBasePrefix}${table.javaName}CursorHandler")
+  #set ($myExtendedTypeSafeCursorClassName = "${glProjectPrefix}${table.javaName}Cursor")
+  #set ($myExtendedTypeSafeCursorHandlerClassName = "${glProjectPrefix}${table.javaName}CursorHandler")
+
+  #set ($isExistConditionBean = false)
+  #set ($isExistDao = false)
+
+  $table.switchSql2EntityOutputDirectory()
+  #set ($path = $database.getPackageAsPath(${glPackageBaseCustomizeEntity}))
+  $database.makeDirectory($path)
+  #set ($path = $database.getPackageAsPath(${glPackageCustomizeDBMeta}))
+  $database.makeDirectory($path)
+  #set ($path = $database.getPackageAsPath(${glPackageExtendedCustomizeEntity}))
+  $database.makeDirectory($path)
+
+  #if ($table.isGenerateTypeSafeCursor())
+    #set ($path = $database.getPackageAsPath(${myBaseCursorPackageName}))
+    $database.makeDirectory($path)
+
+    #set ( $path = "${database.getPackageAsPath(${myBaseCursorPackageName})}${myBaseTypeSafeCursorClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/bsbhv/cursor/BsTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
+
+    #set ( $path = "${database.getPackageAsPath(${myBaseCursorPackageName})}${myBaseTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/bsbhv/cursor/BsTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
+
+    #set ($path = $database.getPackageAsPath(${myExtendedCursorPackageName}))
+    $database.makeDirectory($path)
+
+    $database.info("    parse('${myExtendedTypeSafeCursorClassName}')")
+    #set ( $path = "${database.getPackageAsPath(${myExtendedCursorPackageName})}${myExtendedTypeSafeCursorClassName}.${glClassFileExtension}" )
+    #if (!$files.file(${generator.outputPath},$path).exists())
+      $generator.parse("om/${glResourceDirectory}/exbhv/cursor/ExTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
+    #end
+
+    #set ( $path = "${database.getPackageAsPath(${myExtendedCursorPackageName})}${myExtendedTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
+    #if (!$files.file(${generator.outputPath},$path).exists())
+      $generator.parse("om/${glResourceDirectory}/exbhv/cursor/ExTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
+    #end
+  #end
+  #if ($table.isGenerateCustomizeEntity())
+    $database.info("    parse('${myExtendedObjectClassName}')")
+    #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
+
+    #set ( $path = "${database.getPackageAsPath(${myDBMetaPackageName})}${myDBMetaClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
+
+    #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+    #if (!$files.file(${generator.outputPath},$path).exists())
+      $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
+    #end
+  #end
+#end
+$database.info("}")
+
+## -----------------------------------------------------------------------------------------------------
+##                                                                                  Parse parameter bean
+##                                                                                  --------------------
+#if ($database.isExistPmbMetaData())
+$database.info("public void parseParameterBean() {")
+
+#set ($glPackageBaseParameterBean = "${database.sql2EntityBaseParameterBeanPackage}" )
+#set ($glPackageExtendedParameterBean = "${database.sql2EntityExtendedParameterBeanPackage}" )
+
+#foreach ($pmbMetaData in $database.pmbMetaDataList)
+  #set ($pmbClassName = "$pmbMetaData.className")
+  #set ($myBaseParameterBeanClassName = "$pmbMetaData.baseClassName")
+  #set ($myExtendedParameterBeanClassName = "$pmbMetaData.extendedClassName")
+
+  $pmbMetaData.switchSql2EntityOutputDirectory()
+  #set ($path = $database.getPackageAsPath(${glPackageBaseParameterBean}))
+  $database.makeDirectory($path)
+  #set ($path = $database.getPackageAsPath(${glPackageExtendedParameterBean}))
+  $database.makeDirectory($path)
+
+  $database.info("    parse('${myExtendedParameterBeanClassName}');")
+  #set ( $path = "${database.getPackageAsPath(${glPackageBaseParameterBean})}${myBaseParameterBeanClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/bsbhv/pmbean/BsParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
+
+  #set ( $path = "${database.getPackageAsPath(${glPackageExtendedParameterBean})}${myExtendedParameterBeanClassName}.${glClassFileExtension}" )
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("om/${glResourceDirectory}/exbhv/pmbean/ExParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
+  #end
+ #end
+$database.info("}")
+#end
+
+## because it might be switched
+$database.backToSql2EntityOutputDirectory()
+
+## ===================================================================================
+##                                                                          Simple Dto
+##                                                                          ==========
+#if ($database.hasSimpleDtoDefinition())
+  $database.info("parseSimpleDto() {// mapper=$database.isSimpleDtoUseDtoMapper()")
+  #set ($myDomainEntityPackageName = "${glPackageExtendedEntity}.customize")
+  #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}.customize")
+  #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}.customize")
+  #set ($myDtoMapperPackageName = "${database.simpleDtoDtoMapperPackage}.customize")
+
+  #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
+  $database.makeDirectory($path)
+
+  #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
+  $database.makeDirectory($path)
+
+  #if ($database.isSimpleDtoUseDtoMapper())
+    #set ($path = $database.getPackageAsPath(${myDtoMapperPackageName}))
+    $database.makeDirectory($path)
+  #end
+
+  #foreach ($table in $database.tableList)
+    #if (!$table.isSql2EntityTypeSafeCursor())
+    #set ($myBaseObjectClassName = "${database.simpleDtoBaseDtoPrefix}${table.javaName}${database.simpleDtoBaseDtoSuffix}")
+    #set ($myExtendedObjectClassName = "${database.simpleDtoExtendedDtoPrefix}${table.javaName}${database.simpleDtoExtendedDtoSuffix}")
+    #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
+
+    $database.info("    parse('${myExtendedObjectClassName}');")
+
+    #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/other/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+
+    #if (!$database.isStopGenerateExtendedEntity())
+      #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+      #if (!$files.file(${generator.outputPath},$path).exists())
+        $generator.parse("om/${glResourceDirectory}/other/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+      #end
+    #end
+
+    #if ($database.isSimpleDtoUseDtoMapper())
+      #set ( $path = "${database.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/other/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
+    #end
+    #end
+  #end
+  $database.info("}")
+#end
+
+## ===================================================================================
+##                                                                            Flex Dto
+##                                                                            ========
+#if ($database.hasFlexDtoDefinition())
+  $database.enableFlexDtoOutputDirectory()
+  $database.info("parseFlexDto() {")
+  #set ($myBaseEntityPackageName = "${database.flexDtoBaseDtoPackage}.customize")
+  #set ($myExtendedEntityPackageName = "${database.flexDtoExtendedDtoPackage}.customize")
+
+  #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
+  $database.makeDirectory($path)
+
+  #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
+  $database.makeDirectory($path)
+
+  #foreach ($table in $database.tableList)
+    #if (!$table.isSql2EntityTypeSafeCursor())
+    #set ($myBaseObjectClassName = "${database.flexDtoBaseDtoPrefix}${table.javaName}${database.flexDtoBaseDtoSuffix}")
+    #set ($myExtendedObjectClassName = "${database.flexDtoExtendedDtoPrefix}${table.javaName}${database.flexDtoExtendedDtoSuffix}")
+    #set ($myRemoteSimpleDtoClassName = "${database.simpleDtoExtendedDtoPackage}.customize.${myExtendedObjectClassName}")
+
+    $database.info("    parse('${myExtendedObjectClassName}');")
+
+    #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.as" )
+    $generator.parse("om/${glResourceDirectory}/other/flexdto/FlexDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+
+    #if (!$database.isStopGenerateExtendedEntity())
+      #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
+      #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.outputPath},$path).exists())
+        $generator.parse("om/${glResourceDirectory}/other/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+      #end
+    #end
+    #end
+  #end
+  $database.info("}")
+  $database.enableSql2EntityOutputDirectory()
+#end

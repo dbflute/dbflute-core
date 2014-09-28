@@ -1,0 +1,141 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import java.util.*;
+
+/**
+ * The definition of classification.
+ * @author ${database.classAuthor}
+ */
+public interface ${glCDef} {
+
+    /** The empty array for no sisters. */
+    String[] EMPTY_SISTERS = new String[]{};
+
+    /** The empty map for no sub-items. */
+    @SuppressWarnings("unchecked")
+    Map<String, Object> EMPTY_SUB_ITEM_MAP = (Map<String, Object>)Collections.EMPTY_MAP;
+
+    /**
+     * @return The code of the classification. (NotNull)
+     */
+    String code();
+
+    /**
+     * @return The name of the classification. (NotNull)
+     */
+    String name();
+
+    /**
+     * @return The code of the classification. (NullAllowed: when an alias is not specified in its setting)
+     */
+    String alias();
+
+    /**
+     * @return The map of sub-items. (NotNull, EmptyAllowed, ReadOnly)
+     */
+    Map<String, Object> subItemMap();
+#foreach ($classificationName in $database.classificationNameList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+
+#if ($classificationTop.hasTopComment())
+    /**
+     * ${classificationTop.topCommentForJavaDoc}
+     */
+#end
+    public enum ${classificationName} implements ${glCDef} {
+#set ($count = 0)
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+#if ($count != 0)
+        ,
+#end
+        /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
+        ${classificationElement.name}($database.buildClassificationCodeAliasSisterCodeVariables($classificationElement))
+#set ($count = $count + 1)
+#end
+        ;
+        private static final Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
+        static {
+            for (${classificationName} value : values()) {
+                _codeValueMap.put(value.code().toLowerCase(), value);
+                for (String sister : value.sisters()) { _codeValueMap.put(sister.toLowerCase(), value); }
+            }
+        }
+#if ($database.hasClassificationSubItemMap($classificationName))
+        private static final Map<String, Map<String, Object>> _subItemMapMap = new HashMap<String, Map<String, Object>>();
+        static {
+#foreach ($classificationElement in $classificationElement.classificationElementList)
+#set ($subItemList = $classificationElement.subItemList)
+#set ($subItemMap = $classificationElement.subItemMap)
+            {
+                Map<String, Object> subItemMap = new HashMap<String, Object>();
+#foreach ($entry in $subItemMap.entrySet())
+                subItemMap.put("${entry.key}", "${entry.value}");
+#end
+                _subItemMapMap.put(${classificationElement.name}.code(), Collections.unmodifiableMap(subItemMap));
+            }
+#end
+        }
+#end
+        private String _code; private String _alias; private String[] _sisters;
+        private ${classificationName}(String code, String alias, String[] sisters)
+        { _code = code; _alias = alias; _sisters = sisters; }
+        public String code() { return _code; } public String alias() { return _alias; }
+        private String[] sisters() { return _sisters; }
+#if ($database.hasClassificationSubItemMap($classificationName))
+        public Map<String, Object> subItemMap() { return _subItemMapMap.get(code()); }
+#else
+        public Map<String, Object> subItemMap() { return EMPTY_SUB_ITEM_MAP; }
+#end
+
+        /**
+         * Get the classification by the code. (CaseInsensitive)
+         * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
+         * @return The instance of the corresponding classification to the code. (NullAllowed: if not found, returns null)
+         */
+        public static ${classificationName} codeOf(Object code) {
+            if (code == null) { return null; }
+            if (code instanceof ${classificationName}) { return (${classificationName})code; }
+            return _codeValueMap.get(code.toString().toLowerCase());
+        }
+
+        /**
+         * Get the classification by the name (also called 'value' in ENUM world).
+         * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
+         * @return The instance of the corresponding classification to the name. (NullAllowed: if not found, returns null)
+         */
+        public static ${classificationName} nameOf(String name) { // null allowed
+            if (name == null) { return null; }
+            try { return valueOf(name); } catch (RuntimeException ignored) { return null; }
+        }
+
+        /**
+         * Get the list of all classification elements. (returns new copied list)
+         * @return The list of all classification elements. (NotNull)
+         */
+        public static List<${classificationName}> listAll() {
+            return new ArrayList<${classificationName}>(Arrays.asList(values()));
+        }
+
+#if ($database.isCDefToStringReturnsName())
+        @Override public String toString() { return name(); }
+#else
+        @Override public String toString() { return code(); }
+#end
+    }
+#end
+}

@@ -1,0 +1,13 @@
+
+using System;
+
+using Seasar.Quill.Attrs;
+
+namespace ${glPackageBaseCommon} {
+
+    [Implementation(typeof(${glCacheDaoSelectorName}))]
+    public interface ${glDaoSelectorInterfaceName} {
+        DAO Select<DAO>() where DAO : ${glDaoReadable};
+        ${glDaoReadable} ByName(String tableFlexibleName);
+    }
+}

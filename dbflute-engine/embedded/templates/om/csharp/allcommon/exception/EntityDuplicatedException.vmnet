@@ -1,0 +1,23 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception when the entity has been duplicated.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public class ${glEntityDuplicatedException} : SystemException {
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param="msg">Exception message.</param>
+        public ${glEntityDuplicatedException}(String msg)
+        : base(msg) {}
+
+        public ${glEntityDuplicatedException}(String msg, Exception e)
+        : base(msg, e) {}
+    }
+}

@@ -1,0 +1,10 @@
+
+using System;
+using System.Collections.Generic;
+
+namespace ${glPackageBaseCommonCBean} {
+
+    public interface ${glMapParameterBean} {
+        IDictionary<String, Object> ParameterMap { get; }
+    }
+}

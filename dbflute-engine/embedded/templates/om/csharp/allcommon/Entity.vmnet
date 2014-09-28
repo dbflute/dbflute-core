@@ -1,0 +1,98 @@
+
+using System;
+using System.Collections.Generic;
+
+using ${glPackageBaseCommonDBMeta};
+
+namespace ${glPackageBaseCommon} {
+
+    /// <summary>
+    /// The interface of entity.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public interface ${glEntity} {
+
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
+        /// <summary>
+        /// The property of table db-name. (readonly)
+        /// </summary>
+        String TableDbName { get; }
+
+        /// <summary>
+        /// The property of table property-name. (readonly)
+        /// </summary>
+        String TablePropertyName { get; }
+
+        // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
+        /// <summary>
+        /// The property of DBMeta. (readonly)
+        /// </summary>
+        ${glDBMeta} DBMeta { get; }
+
+        // ===============================================================================
+        //                                                                   Determination
+        //                                                                   =============
+        /// <summary>
+        /// Has primary-key value? (readonly)
+        /// </summary>
+        bool HasPrimaryKeyValue { get; }
+
+        // ===============================================================================
+        //                                                             Modified Properties
+        //                                                             ===================
+        IDictionary<String, Object> ModifiedPropertyNames { get; }
+        void ClearModifiedPropertyNames();
+
+        // ===============================================================================
+        //                                                                  Display String
+        //                                                                  ==============
+        String ToStringWithRelation();
+        String BuildDisplayString(String name, bool column, bool relation);
+    }
+
+    /// <summary>
+    /// The modified properties of entity.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    [System.Serializable]
+    public class EntityModifiedProperties {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected IDictionary<String, Object> _propertiesSet = new Dictionary<String, Object>();
+
+        // ===============================================================================
+        //                                                                             Add
+        //                                                                             ===
+        public void AddPropertyName(String propertyName) {
+            if (_propertiesSet.ContainsKey(propertyName)) {
+                return;
+            }
+            _propertiesSet.Add(propertyName, null);
+        }
+
+        // ===============================================================================
+        //                                                                           Other
+        //                                                                           =====
+        public void Clear() {
+            _propertiesSet.Clear();
+        }
+
+        public void Remove(String propertyName) {
+            _propertiesSet.Remove(propertyName);
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public IDictionary<String, Object> PropertyNames {
+            get { return _propertiesSet; }
+        }
+
+    }
+}

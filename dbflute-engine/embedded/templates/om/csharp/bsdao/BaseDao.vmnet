@@ -1,0 +1,49 @@
+#set ($myClassName = "${myExtendedDaoClassName}")
+
+using System;
+using System.Collections.Generic;
+
+using Seasar.Quill.Attrs;
+using Seasar.Dao.Attrs;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonS2Dao};
+using ${myExtendedEntityPackageName};
+using ${glPackageCB};
+#set ($InterfaceName = "")
+#if ($table.hasPrimaryKey())
+  #set ($InterfaceName = "${glDaoWritable}")
+#else
+  #set ($InterfaceName = "${glDaoReadable}")
+#end
+
+namespace ${myExtendedDaoPackageName} {
+
+    [Implementation]
+    [S2Dao(typeof(${database.S2DaoSettingClass}))]
+    [Bean(typeof(${myExtendedObjectClassName}))]
+    public partial interface ${myClassName} : ${InterfaceName} {
+		void InitializeDaoMetaData(String methodName);// Very Internal Method!
+
+        int SelectCount(${myConditionBeanClassName} cb);
+        IList<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb);
+
+#if ($table.hasPrimaryKey())
+        int Insert(${myExtendedObjectClassName} entity);
+        int UpdateModifiedOnly(${myExtendedObjectClassName} entity);
+        int UpdateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
+#if (${table.hasSinglePrimaryKey()})
+        int UpdateByQuery(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} entity);
+#end
+        int Delete(${myExtendedObjectClassName} entity);
+        int DeleteNonstrict(${myExtendedObjectClassName} entity);
+#if (${table.hasSinglePrimaryKey()})
+        int DeleteByQuery(${myConditionBeanClassName} cb);// {DBFlute-0.7.9}
+#end
+#end
+#if ($table.isUseSequence())
+
+        ${table.sequenceReturnType} SelectNextVal();
+#end
+    }
+}

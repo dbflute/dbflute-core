@@ -1,0 +1,17 @@
+
+using System;
+using System.Collections.Generic;
+
+using Seasar.Quill.Attrs;
+
+using ${glPackageBaseCommonS2Dao};
+
+namespace ${glPackageBaseCommonJdbc} {
+
+    [Implementation(typeof(${glSqlLogRegistryLatestSqlProvider}))]
+    public interface ${glLatestSqlProvider} {
+        String GetDisplaySql();
+        IList<String> ExtractDisplaySqlList();
+	    void ClearSqlCache();
+    }
+}

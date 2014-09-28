@@ -1,0 +1,65 @@
+#set ($myClassName = "${glCDef}")
+
+using System;
+
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommon} {
+
+    public static class ${myClassName} {
+
+#foreach ($classificationName in $database.classificationNameList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+#if ($classificationTop.hasTopComment())
+        /**
+         * $classificationTop.topComment
+         */
+#end
+        public class ${classificationName} {
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+            /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
+            public static readonly ${classificationName} ${classificationElement.name} = new ${classificationName}($database.buildClassificationCodeNameAliasVariables($classificationElement));
+#end
+            private static readonly Map<String, ${classificationName}> _codeValueMap = new LinkedHashMap<String, ${classificationName}>();
+            static ${classificationName}() {
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+                _codeValueMap.put(${classificationElement.name}.Code.ToLower(), ${classificationElement.name});
+#end
+            }
+            protected String _code; protected String _name; protected String _alias;
+            public ${classificationName}(String code, String name, String alias) {
+                _code = code; _name = name; _alias = alias;
+            }
+            public String Code { get { return _code; } }
+            public String Name { get { return _name; } }
+            public String Alias { get { return _alias; } }
+            public static ${classificationName} CodeOf(Object code) {
+                if (code == null) { return null; } if (code is ${classificationName}) { return (${classificationName})code; }
+                return _codeValueMap.get(code.ToString().ToLower());
+            }
+            public static ${classificationName}[] Values { get {
+                ${classificationName}[] values = new ${classificationName}[_codeValueMap.size()];
+                int index = 0;
+                foreach (${classificationName} flg in _codeValueMap.values()) {
+                    values[index] = flg;
+                    ++index;
+                }
+                return values;
+            }}
+            public override int GetHashCode() { return 7 + _code.GetHashCode(); }
+            public override bool Equals(Object obj) {
+                if (!(obj is ${classificationName})) { return false; }
+                ${classificationName} cls = (${classificationName})obj;
+                return _code.ToLower().Equals(cls.Code.ToLower());
+            }
+#if ($database.isCDefToStringReturnsName())
+            public override String ToString() { return this.Name; }
+#else
+            public override String ToString() { return this.Code; }
+#end
+        }
+
+#end
+    }
+
+}

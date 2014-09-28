@@ -1,0 +1,537 @@
+
+#set ($myClassName = "${myExtendedObjectClassName}")
+
+using System;
+using System.Reflection;
+using System.Collections.Generic;
+using System.Text;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonHelper};
+using ${myExtendedEntityPackageName};
+using ${myDBMetaPackageName};
+
+#set ($myEntityInterfaceName = "")
+#if (${table.hasAllCommonColumn()})
+#set ($myEntityInterfaceName = ${glEntityDefinedCommonColumn})
+#else
+#set ($myEntityInterfaceName = ${glEntity})
+#end
+
+namespace ${myExtendedEntityPackageName} {
+
+    /// <summary>
+    /// The entity of ${table.basicInfoDispString}. (partial class for auto-generation)
+    /// <![CDATA[
+#if ($table.isCommentForJavaDocValid())
+    /// ${table.commentForJavaDoc}
+    /// 
+#end
+    /// [primary-key]
+    ///     ${table.primaryKeyNameCommaString}
+    /// 
+    /// [column]
+    ///     ${table.columnNameCommaString}
+    /// 
+    /// [sequence]
+    ///     ${table.definedSequenceName}
+    /// 
+    /// [identity]
+    ///     ${table.identityColumnName}
+    /// 
+    /// [version-no]
+    ///     ${table.versionNoColumnName}
+    /// 
+    /// [foreign-table]
+    ///     ${table.foreignTableNameCommaString}
+    /// 
+    /// [referrer-table]
+    ///     ${table.referrerTableNameCommaString}
+    /// 
+    /// [foreign-property]
+    ///     ${table.foreignPropertyNameCommaString}
+    /// 
+    /// [referrer-property]
+    ///     ${table.referrerPropertyNameCommaString}
+    /// ]]>
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    [Seasar.Dao.Attrs.Table("${table.annotationTableName}")]
+#if ($table.isUseUpdateDate())
+    [Seasar.Dao.Attrs.TimestampProperty("${table.updateDatePropertyName}")]
+#end
+#if ($table.isUseVersionNo())
+    [Seasar.Dao.Attrs.VersionNoProperty("${table.versionNoPropertyName}")]
+#end
+    [System.Serializable]
+    public partial class ${myClassName} : ${myEntityInterfaceName} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        #region Attribute
+#foreach ($col in $table.columns)
+        /// <summary>${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}</summary>
+        protected ${col.JavaNative} _${col.uncapitalisedJavaName};
+
+#end
+        protected EntityModifiedProperties __modifiedProperties = new EntityModifiedProperties();
+#if ($table.hasAllCommonColumn())
+
+        protected bool __canCommonColumnAutoSetup = true;
+#end
+        #endregion
+
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
+        public String TableDbName { get { return "${table.tableDbName}"; } }
+        public String TablePropertyName { get { return "${table.javaName}"; } }
+
+#if ($isSql2Entity)
+        // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
+        public ${glDBMeta} DBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
+
+#else
+        // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
+        public ${glDBMeta} DBMeta { get { return ${glDBMetaInstanceHandler}.FindDBMeta(TableDbName); } }
+
+#end
+#if ($table.hasClassification())
+        // ===============================================================================
+        //                                                         Classification Property
+        //                                                         =======================
+        #region Classification Property
+#foreach ($col in $table.columns)
+#if (${col.hasClassification()})
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+        public ${glCDef}.${col.classificationName} ${col.javaName}As${col.classificationName} { get {
+            return ${glCDef}.${col.classificationName}.CodeOf(_${col.uncapitalisedJavaName});
+        } set {
+#if (${col.isJavaNativeStringObject()})
+            ${col.javaName} = value != null ? value.Code : null;
+#else
+            ${col.javaName} = value != null ? ${col.javaNativeRemovedCSharpNullable}.Parse(value.Code) : (${col.javaNative})null;
+#end
+        }}
+
+#end
+#end
+        #endregion
+
+        // ===============================================================================
+        //                                                          Classification Setting
+        //                                                          ======================
+        #region Classification Setting
+#foreach ($col in $table.columns)
+#if (${col.hasClassification()})
+#if ($database.isMakeEntityOldStyleClassify())
+        public void Classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
+            ${col.javaName}As${col.classificationName} = cls;
+        }
+
+#end
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+        /// <summary>
+        /// Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}.
+        /// <![CDATA[
+        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+        /// ]]>
+        /// </summary>
+        public void Set${col.javaName}_${classificationElement.name}() {
+            ${col.javaName}As${col.classificationName} = ${glCDef}.${col.classificationName}.${classificationElement.name};
+        }
+
+#if ($database.isMakeEntityOldStyleClassify())
+        /// <summary>
+        /// Same as Set${col.javaName}_${classificationElement.name}().
+        /// <![CDATA[
+        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+        /// ]]>
+        /// </summary>
+        public void Classify${col.javaName}${classificationElement.name}() {
+            Set${col.javaName}_${classificationElement.name}();
+        }
+
+#end
+#end
+#end
+#end
+        #endregion
+
+        // ===============================================================================
+        //                                                    Classification Determination
+        //                                                    ============================
+        #region Classification Determination
+#foreach ($col in $table.columns)
+#if (${col.hasClassification()})
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+        /// <summary>
+        /// Is the value of ${col.uncapitalisedJavaName} '${classificationElement.name}'?
+        /// <![CDATA[
+        /// The difference of capital letters and small letters is NOT distinguished.
+        /// If the value is null, this method returns false!
+        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
+        /// ]]>
+        /// </summary>
+        public bool Is${col.javaName}${classificationElement.name} {
+            get {
+                ${glCDef}.${col.classificationName} cls = ${col.javaName}As${col.classificationName};
+                return cls != null ? cls.Equals(${glCDef}.${col.classificationName}.${classificationElement.name}) : false;
+            }
+        }
+
+#end
+#end
+#end
+        #endregion
+
+#if ($table.hasImplicitClassification())
+        // ===============================================================================
+        //                                                       Classification Name/Alias
+        //                                                       =========================
+        #region Classification Name/Alias
+#foreach ($col in $table.Columns)
+#if ($col.hasClassification())
+#if (!$col.isTableClassification())
+#if ($col.hasClassificationName())
+        public String ${col.javaName}Name {
+            get {
+                ${glCDef}.${col.classificationName} cls = ${col.javaName}As${col.classificationName};
+                return cls != null ? cls.Name : null;
+            }
+        }
+#end
+#if (${col.hasClassificationAlias()})
+        public String ${col.javaName}Alias {
+            get {
+                ${glCDef}.${col.classificationName} cls = ${col.javaName}As${col.classificationName};
+                return cls != null ? cls.Alias : null;
+            }
+        }
+
+#end
+#end
+#end
+#end
+        #endregion
+
+#end
+#end
+        // ===============================================================================
+        //                                                                Foreign Property
+        //                                                                ================
+        #region Foreign Property
+#set ($foreignKeyIndex = 0)
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignTable = $fk.foreignTable)
+#set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
+#set ($foreignVariableName = "_${fk.foreignPropertyName}")
+        protected ${foreignEntityClassName} ${foreignVariableName};
+
+        /// <summary>${foreignTable.aliasExpression}${foreignTable.tableDbName} as '${fk.foreignPropertyNameInitCap}'.</summary>
+        [Seasar.Dao.Attrs.Relno(${foreignKeyIndex}), Seasar.Dao.Attrs.Relkeys("$fk.relationKeysCommaString")]
+        public ${foreignEntityClassName} ${fk.foreignPropertyNameInitCap} {
+            get { return ${foreignVariableName}; }
+            set { ${foreignVariableName} = value; }
+        }
+#if ($table.isMakeEntityChaseRelation())
+
+        public ${foreignEntityClassName} Chase${fk.foreignPropertyNameInitCap}() {
+            return ${foreignVariableName} != null ? ${foreignVariableName} : new ${foreignEntityClassName}();
+        }
+#end
+
+#set ($foreignKeyIndex = $foreignKeyIndex + 1)
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+        protected ${referrerEntityClassName} ${referrerVariableName};
+
+        /// <summary>${referrerTable.aliasExpression}${referrerTable.tableDbName} as '${referrer.referrerPropertyNameInitCapAsOne}'.</summary>
+        [Seasar.Dao.Attrs.Relno(${foreignKeyIndex}), Seasar.Dao.Attrs.Relkeys("$referrer.relationKeysCommaStringForOneToOneReferrer")]
+        public ${referrerEntityClassName} ${referrer.referrerPropertyNameInitCapAsOne} {
+            get { return ${referrerVariableName}; }
+            set { ${referrerVariableName} = value; }
+        }
+#if ($table.isMakeEntityChaseRelation())
+
+        public ${referrerEntityClassName} Chase${referrer.referrerPropertyNameInitCapAsOne}() {
+            return ${referrerVariableName} != null ? ${referrerVariableName} : new ${referrerEntityClassName}();
+        }
+#end
+
+#set ($foreignKeyIndex = $foreignKeyIndex + 1)
+#end
+        #endregion
+
+        // ===============================================================================
+        //                                                               Referrer Property
+        //                                                               =================
+        #region Referrer Property
+#foreach ($referrer in $table.referrerAsManyList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+        protected IList<${referrerEntityClassName}> $referrerVariableName;
+
+        /// <summary>${referrerTable.aliasExpression}${referrerTable.tableDbName} as '${referrer.referrerPropertyNameInitCap}'.</summary>
+        public IList<${referrerEntityClassName}> ${referrer.referrerPropertyNameInitCap} {
+            get { if (${referrerVariableName} == null) { ${referrerVariableName} = new List<${referrerEntityClassName}>(); } return ${referrerVariableName}; }
+            set { ${referrerVariableName} = value; }
+        }
+
+#end
+#if ($table.isLoadableCustomizeEntity())
+#set ($domain = $table.loadableCustomizeDomain)
+        protected ${domain.extendedEntityClassName} __innerDomain;
+
+        protected ${domain.extendedEntityClassName} innerDomain() {
+            if (__innerDomain == null) {
+                __innerDomain = new ${domain.extendedEntityClassName}();
+            }
+            return __innerDomain;
+        }
+
+        public ${domain.extendedEntityClassName} PrepareDomain() {
+#foreach ($exp in $table.loadableCustomizePrimaryKeySettingExpressionList)
+            innerDomain().${exp};
+#end
+            return innerDomain();
+        }
+
+#foreach ($referrer in $domain.referrerAsManyList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+        public IList<${referrerEntityClassName}> ${referrer.referrerPropertyNameInitCap} {
+            get { return innerDomain().${referrer.referrerPropertyNameInitCap}; }
+        }
+
+#end
+#end
+        #endregion
+
+        // ===============================================================================
+        //                                                                   Determination
+        //                                                                   =============
+        public virtual bool HasPrimaryKeyValue {
+            get {
+#foreach ($col in $table.primaryKey)
+                if (_${col.uncapitalisedJavaName} == null) { return false; }
+#end
+                return ${table.hasPrimaryKey()};
+            }
+        }
+
+        // ===============================================================================
+        //                                                             Modified Properties
+        //                                                             ===================
+        public virtual IDictionary<String, Object> ModifiedPropertyNames {
+            get { return __modifiedProperties.PropertyNames; }
+        }
+
+        public virtual void ClearModifiedPropertyNames() {
+            __modifiedProperties.Clear();
+        }
+#if (${table.hasAllCommonColumn()})
+
+        // ===============================================================================
+        //                                                          Common Column Handling
+        //                                                          ======================
+        public virtual void EnableCommonColumnAutoSetup() {
+            __canCommonColumnAutoSetup = true;
+        }
+
+        public virtual void DisableCommonColumnAutoSetup() {
+            __canCommonColumnAutoSetup = false;
+        }
+
+        public virtual bool CanCommonColumnAutoSetup() {// for Framework
+            return __canCommonColumnAutoSetup;
+        }
+#end
+
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
+        #region Basic Override
+        public override bool Equals(Object other) {
+            if (other == null || !(other is $myClassName)) { return false; }
+            $myClassName otherEntity = ($myClassName)other;
+#foreach ($col in $table.equalsHashcodeColumnList)
+            if (!xSV(this.${col.javaName}, otherEntity.${col.javaName})) { return false; }
+#end
+            return true;
+        }
+        protected bool xSV(Object value1, Object value2) { // isSameValue()
+            if (value1 == null && value2 == null) { return true; }
+            if (value1 == null || value2 == null) { return false; }
+#if ($table.hasByteArrayColumnInEqualsHashcode())
+            if (value1 is byte[] && value2 is byte[]) { return xSVBA((byte[])value1, (byte[])value2); }
+#end
+            return value1.Equals(value2);
+        }
+#if ($table.hasByteArrayColumnInEqualsHashcode())
+        protected bool xSVBA(byte[] byte1, byte[] byte2) { // isSameValueByteArray()
+            if (byte1 == null && byte2 == null) { return true; }
+            if (byte1 == null || byte2 == null) { return false; }
+            if (byte1.Length != byte2.Length) { return false; }
+            for (int i=0; i < byte1.Length; i++) {
+                if (byte1[i] != byte2[i]) { return false; }
+            }
+            return true;
+        }
+#end
+
+        public override int GetHashCode() {
+            int result = 17;
+#foreach ($col in $table.equalsHashcodeColumnList)
+            result = xCH(result, _${col.uncapitalisedJavaName});
+#end
+            return result;
+        }
+        protected int xCH(int result, Object value) { // calculateHashcode()
+            if (value == null) { return result; }
+            return (31*result) + (value is byte[] ? ((byte[])value).Length : value.GetHashCode());
+        }
+
+        public override String ToString() {
+            return "${myClassName}:" + BuildColumnString() + BuildRelationString();
+        }
+
+        public virtual String ToStringWithRelation() {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(ToString());
+#if ($table.hasRelation())
+            String l = "\n  ";
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+            if (${foreignVariableName} != null)
+            { sb.Append(l).Append(xbRDS(${foreignVariableName}, "${foreignKey.foreignPropertyNameInitCap}")); }
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+            if (${referrerVariableName} != null)
+            { sb.Append(l).Append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOneInitCap}")); }
+#end
+#end
+#foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+            if (${referrerVariableName} != null) { foreach (${glEntity} e in ${referrerVariableName})
+            { if (e != null) { sb.Append(l).Append(xbRDS(e, "${referrer.referrerPropertyNameInitCap}")); } } }
+#end
+#end
+#end
+            return sb.ToString();
+        }
+#if ($table.hasRelation())
+        protected String xbRDS(${glEntity} e, String name) { // buildRelationDisplayString()
+            return e.BuildDisplayString(name, true, true);
+        }
+#end
+
+        public virtual String BuildDisplayString(String name, bool column, bool relation) {
+            StringBuilder sb = new StringBuilder();
+            if (name != null) { sb.Append(name).Append(column || relation ? ":" : ""); }
+            if (column) { sb.Append(BuildColumnString()); }
+            if (relation) { sb.Append(BuildRelationString()); }
+            return sb.ToString();
+        }
+        protected virtual String BuildColumnString() {
+            String c = ", ";
+            StringBuilder sb = new StringBuilder();
+#foreach ($col in $table.columns)
+#if ($col.isJavaNativeByteArray())
+            sb.Append(c).Append(xfBA(this.${col.javaName}));
+#else
+            sb.Append(c).Append(this.${col.javaName});
+#end
+#end
+            if (sb.Length > 0) { sb.Remove(0, c.Length); }
+            sb.Insert(0, "{").Append("}");
+            return sb.ToString();
+        }
+#if ($table.hasByteArrayColumn())
+        protected String xfBA(byte[] byteArray) { // formatByteArray()
+            return "byte[" + (byteArray != null ? byteArray.Length.ToString() : "null") + "]";
+        }
+#end
+        protected virtual String BuildRelationString() {
+#if ($table.hasRelation())
+            StringBuilder sb = new StringBuilder();
+            String c = ",";
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+            if (${foreignVariableName} != null) { sb.Append(c).Append("${foreignKey.foreignPropertyNameInitCap}"); }
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+            if (${referrerVariableName} != null) { sb.Append(c).Append("${referrer.referrerPropertyNameAsOneInitCap}"); }
+#end
+#end
+#foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+            if (${referrerVariableName} != null && ${referrerVariableName}.Count > 0)
+            { sb.Append(c).Append("${referrer.referrerPropertyNameInitCap}"); }
+#end
+#end
+            if (sb.Length > 0) { sb.Remove(0, c.Length).Insert(0, "(").Append(")"); }
+            return sb.ToString();
+#else
+            return "";
+#end
+        }
+        #endregion
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        #region Accessor
+#foreach ($col in $table.columns)
+        /// <summary>${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}</summary>
+#if ($col.isCommentForJavaDocValid())
+        /// <remarks>
+        /// ${col.commentForJavaDoc}
+        /// </remarks>
+#end
+#if ($col.isIdentity())
+        [Seasar.Dao.Attrs.ID("identity")]
+#end
+        [Seasar.Dao.Attrs.Column("${col.columnSqlName}")]
+        public ${col.JavaNative} ${col.javaName} {
+#if ($col.isEntityConvertEmptyStringToNull())
+            get { return ConvertEmptyToNull(_${col.uncapitalisedJavaName}); }
+#else
+            get { return _${col.uncapitalisedJavaName}; }
+#end
+            set {
+                __modifiedProperties.AddPropertyName("${col.javaBeansRulePropertyNameInitCap}");
+                _${col.uncapitalisedJavaName} = value;
+            }
+        }
+
+#end
+#if ($table.hasEntityConvertEmptyStringToNull())
+
+        protected virtual String ConvertEmptyToNull(String value) {
+            if (value != null && value.Length == 0) {
+                return null;
+            }
+            return value;
+        }
+#end
+        #endregion
+    }
+}

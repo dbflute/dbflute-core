@@ -1,0 +1,89 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageNss};
+#set ($myClassName = "${myNestSelectSetupperClassName}")
+
+#if ($table.hasJoinableForeignKeyOrReferrerAsOne())
+import org.seasar.dbflute.cbean.ConditionQuery;
+import org.seasar.dbflute.cbean.AbstractConditionQuery._;
+#end
+import ${glPackageCQ}.${myConditionQueryClassName};
+
+/**
+ * The nest select set-upper of ${table.tableDbName}.
+ * @author ${database.classAuthor}
+ */
+class ${myClassName}(query: ${myConditionQueryClassName}) {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected var _query: ${myConditionQueryClassName} = query;
+    def hasConditionQuery(): Boolean = { return _query != null; }
+
+    // ===================================================================================
+    //                                                                     Nested Relation
+    //                                                                     ===============
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($dynamicFixedConditionArgs = "")
+#set ($dynamicFixedConditionVariables = "")
+#if ($fk.hasDynamicFixedCondition())
+#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionFinalArgs}")
+#set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
+#end
+#set ($hasNestSelectSetupper = ${fk.hasForeignNestSelectSetupper()})
+    /**
+     * With nested relation columns to select clause. <br />
+     * ${fk.foreignDispForJavaDoc}
+#if ($fk.hasDynamicFixedCondition())
+     * ${fk.dynamicFixedConditionArgsJavaDocString}
+#end
+#set ($setupSelectReturnType = "Unit")
+#if ($hasNestSelectSetupper)
+     * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
+#set ($setupSelectReturnType = "${fk.foreignTableNestSelectSetupperClassName}")
+#end
+     */
+    def with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}): ${setupSelectReturnType} = {
+        _query.doNss(new NssCall() { def qf(): ConditionQuery = { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
+#if ($hasNestSelectSetupper)
+        return new ${fk.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
+#end
+    }
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($hasNestSelectSetupper = ${referrer.hasReferrerNestSelectSetupper()})
+    /**
+     * With nested relation columns to select clause. <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+#set ($setupSelectReturnType = "Unit")
+#if ($hasNestSelectSetupper)
+     * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
+#set ($setupSelectReturnType = "${referrer.referrerTableNestSelectSetupperClassName}")
+#end
+     */
+    def with${tmpPropertyNameInitCap}(): ${setupSelectReturnType} = {
+        _query.doNss(new NssCall() { def qf(): ConditionQuery = { return _query.query${tmpPropertyNameInitCap}(); }});
+#if ($hasNestSelectSetupper)
+        return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
+#end
+    }
+#end
+}

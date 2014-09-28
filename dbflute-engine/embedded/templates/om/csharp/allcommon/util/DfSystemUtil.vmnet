@@ -1,0 +1,23 @@
+
+using System;
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommonUtil} {
+
+public class ${glDfSystemUtil} {
+
+    // ===================================================================================
+    //                                                                              System
+    //                                                                              ======
+    public static String getLineSeparator() {
+        // /- - - - - - - - - - - - - - - - - - - - - -
+        // Because 'CR + LF' caused many trouble!
+		// And Now 'LF' have little trouble. 
+		// 
+        // return Environment.NewLine;
+        // - - - - - - - - - -/
+		return "\n";
+    }
+}
+
+}

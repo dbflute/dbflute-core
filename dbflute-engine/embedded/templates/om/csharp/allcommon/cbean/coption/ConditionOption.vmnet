@@ -1,0 +1,11 @@
+
+#set ($myClassName = "${glConditionOption}")
+using System;
+
+namespace ${glPackageBaseCommonCOption} {
+
+public interface ${myClassName} {
+    String getRearOption();
+}
+
+}

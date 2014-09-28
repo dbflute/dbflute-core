@@ -1,0 +1,10 @@
+#set ($myClassName = "${myExtendedTypeSafeCursorHandlerClassName}")
+
+using System;
+using System.Data;
+
+namespace ${myExtendedCursorPackageName} {
+
+    partial class ${myClassName} {
+    }
+}

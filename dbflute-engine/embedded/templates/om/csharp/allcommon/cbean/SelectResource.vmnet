@@ -1,0 +1,14 @@
+
+using System;
+using System.Collections;
+using ${glPackageBaseCommonSqlClause};
+
+namespace ${glPackageBaseCommonCBean} {
+
+    /// <summary>
+    /// The select-resource as marker-interface.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public interface ${glSelectResource} {
+    }
+}

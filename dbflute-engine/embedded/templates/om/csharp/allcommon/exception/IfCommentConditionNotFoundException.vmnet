@@ -1,0 +1,14 @@
+
+using System;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the condition of IF comment is not found about outsideSql.
+    /// </summary>
+    public class ${glIfCommentConditionNotFoundException} : SystemException {
+
+        public ${glIfCommentConditionNotFoundException}(String msg)
+        : base(msg) {}
+    }
+}

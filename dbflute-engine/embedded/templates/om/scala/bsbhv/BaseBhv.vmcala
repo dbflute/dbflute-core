@@ -1,0 +1,1191 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${myBaseBhvPackageName};
+#set ($myClassName = "${myBaseBhvClassName}")
+
+import scala.collection.immutable;
+import scala.collection.JavaConverters._;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.seasar.dbflute._;
+import org.seasar.dbflute.bhv._;
+import org.seasar.dbflute.bhv.AbstractBehaviorReadable._;
+import org.seasar.dbflute.bhv.AbstractBehaviorWritable._;
+import org.seasar.dbflute.cbean._;
+import org.seasar.dbflute.cbean.chelper._;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.exception._;
+import org.seasar.dbflute.util._;
+#if ($table.needsBasicOptionalEntityImport())
+import ${database.basicOptionalEntityClassName};
+#end
+#if ($table.needsRelationOptionalEntityNextImport())
+import ${database.relationOptionalEntityClassName};
+#end
+import org.seasar.dbflute.outsidesql.executor._;
+import ${glPackageBaseCommon}._;
+import ${glPackageExtendedBhv}._;
+#if ($table.hasReferrerLoader())
+import ${myReferrerLoaderPackageName}._;
+#end
+import ${glPackageExtendedEntity}._;
+import ${myDBMetaPackageName}._;
+import ${glPackageCB}._;
+
+/**
+ * The behavior of ${table.basicInfoDispString}. <br />
+ * <pre>
+ * [primary key]
+ *     ${table.primaryKeyNameCommaString}
+ *
+ * [column]
+ *     ${table.columnNameCommaString}
+ *
+ * [sequence]
+ *     ${table.definedSequenceName}
+ *
+ * [identity]
+ *     ${table.identityColumnName}
+ *
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ *
+ * [foreign table]
+ *     ${table.foreignTableNameCommaString}
+ *
+ * [referrer table]
+ *     ${table.referrerTableNameCommaString}
+ *
+ * [foreign property]
+ *     ${table.foreignPropertyNameCommaString}
+ *
+ * [referrer property]
+ *     ${table.referrerPropertyNameCommaString}
+ * </pre>
+ * @author ${database.classAuthor}
+ */
+abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${myExtendedObjectClassName}, ${myConditionBeanClassName}] {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    ${database.behaviorQueryPathBeginMark}
+    ${database.behaviorQueryPathEndMark}
+
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    /** {@inheritDoc} */
+    def getDBMeta(): DBMeta = { return ${myDBMetaClassName}; }
+
+    // ===================================================================================
+    //                                                                        New Instance
+    //                                                                        ============
+    /** {@inheritDoc} */
+    def newConditionBean(): ${myConditionBeanClassName} = { return new ${myConditionBeanClassName}(); }
+
+    // ===================================================================================
+    //                                                                        Count Select
+    //                                                                        ============
+    /**
+     * Select the count of uniquely-selected records by the condition-bean. {IgnorePagingCondition, IgnoreSpecifyColumn}<br />
+     * SpecifyColumn is ignored but you can use it only to remove text type column for union's distinct.
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * int count = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectCount</span>(cb);
+     * </pre>
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The count for the condition. (NotMinus)
+     */
+    def selectCount(cbCall: (${myConditionBeanClassName}) => Unit): Int = {
+        return facadeSelectCount(callbackCB(cbCall));
+    }
+
+    // ===================================================================================
+    //                                                                       Entity Select
+    //                                                                       =============
+    /**
+     * Select the entity by the condition-bean. <br />
+     * It returns not-null optional entity, so you should ... <br />
+     * <span style="color: #AD4747; font-size: 120%">If the data always exists as your business rule, get() without check.</span> <br />
+     * <span style="color: #AD4747; font-size: 120%">If it might be no data, get() after check by isPresent() or orElse(), ...</span>
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * OptionalEntity&lt;${myExtendedObjectClassName}&gt; entity = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectEntity</span>(cb);
+     *
+     * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
+     * entity.<span style="color: #DD4747">required</span>(${myEntityVariableName} -&gt; {
+     *     ...
+     * });
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = entity.entity.<span style="color: #DD4747">get()</span>;
+     *
+     * <span style="color: #3F7E5E">// if it might be no data, ifPresent(), isPresent(), ...</span>
+     * entity.<span style="color: #DD4747">ifPresent</span>(${myEntityVariableName} -&gt; {
+     *     ...
+     * });
+     * if (entity.entity.<span style="color: #DD4747">isPresent()</span>) {
+     *     ${myExtendedObjectClassName} ${myEntityVariableName} = entity.entity.<span style="color: #DD4747">get()</span>;
+     * } else {
+     *     ...
+     * }
+     * </pre>
+     * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
+     * @param loaderCall The callback for referrer loader of ${myImmutableExtendedObjectClassName}. (NoArgAllowed: then no loading)
+     * @return The optional entity selected by the condition. (NotNull: if no data, empty entity)
+     * @exception EntityAlreadyDeletedException When get() of return value is called and the value is null, which means entity has already been deleted (point is not found).
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     */
+    def selectEntity(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturnIfNeeds(${myImmutableExtendedObjectClassName})} = {
+        return facadeSelectEntity(callbackCB(cbCall))(loaderCall).map(_.toImmutable);
+    }
+
+    protected def facadeSelectEntity(cb: ${myConditionBeanClassName})(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturnIfNeeds(${myExtendedObjectClassName})} = {
+        return doSelectOptionalEntity(cb, typeOfSelectedEntity())(loaderCall);
+    }
+
+    protected def doSelectEntity[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[_ <: ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ENTITY = {
+        assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
+        val dble = helpSelectEntityInternally(cb, tp);
+        if (dble != null) {
+            callbackLoader(DfCollectionUtil.newArrayList(dble.asInstanceOf[${myExtendedObjectClassName}]), loaderCall);
+        }
+        return dble;
+    }
+
+    protected def doSelectOptionalEntity[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[_ <: ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
+        return ${database.basicOptionalEntitySimpleName}.apply(doSelectEntity(cb, tp)(loaderCall));
+    }
+
+    override protected def doReadEntity(cb: ConditionBean): Entity = { facadeSelectEntity(downcast(cb))().orNull }
+
+    /**
+     * Select the entity by the condition-bean with deleted check. <br />
+     * <span style="color: #AD4747; font-size: 120%">If the data always exists as your business rule, this method is good.</span>
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectEntityWithDeletedCheck</span>(cb);
+     * ... = ${myEntityVariableName}.get...(); <span style="color: #3F7E5E">// the entity always be not null</span>
+     * </pre>
+     * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
+     * @param loaderCall The callback for referrer loader of ${myImmutableExtendedObjectClassName}. (NoArgAllowed: then no loading)
+     * @return The entity selected by the condition. (NotNull: if no data, throws exception)
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (point is not found)
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     */
+    ${table.selectEntityWithDeletedCheckModifierAsPrefix}def selectEntityWithDeletedCheck(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${myImmutableExtendedObjectClassName} = {
+        return facadeSelectEntityWithDeletedCheck(callbackCB(cbCall))(loaderCall).toImmutable;
+    }
+
+    protected def facadeSelectEntityWithDeletedCheck(cb: ${myConditionBeanClassName})(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${myExtendedObjectClassName} = {
+        return doSelectEntityWithDeletedCheck(cb, typeOfSelectedEntity())(loaderCall);
+    }
+
+    protected def doSelectEntityWithDeletedCheck[ENTITY <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[ENTITY])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ENTITY = {
+        assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
+        val dble = helpSelectEntityWithDeletedCheckInternally(cb, tp);
+        callbackLoader(DfCollectionUtil.newArrayList(dble.asInstanceOf[${myExtendedObjectClassName}]), loaderCall);
+        return dble;
+    }
+
+    override protected def doReadEntityWithDeletedCheck(cb: ConditionBean): Entity = { facadeSelectEntityWithDeletedCheck(downcast(cb))() }
+#if ($table.hasPrimaryKey())
+
+    /**
+     * Select the entity by the primary-key value.
+     * ${table.primaryKeyArgsJavaDocString}
+     * @return The optional entity selected by the PK. (NotNull: if no data, empty entity)
+     * @exception EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     */
+    def selectByPK(${table.primaryKeyArgsString}): ${table.filterSelectEntityOptionalReturnIfNeeds(${myImmutableExtendedObjectClassName})} = {
+        return facadeSelectByPK(${table.primaryKeyArgsCallingString}).map(_.toImmutable);
+    }
+
+    protected def facadeSelectByPK(${table.primaryKeyArgsString}): ${table.filterSelectEntityOptionalReturnIfNeeds(${myExtendedObjectClassName})} = {
+        return doSelectByPK(${table.primaryKeyArgsCallingString}, typeOfSelectedEntity());
+    }
+
+    protected def doSelectByPK[ENTITY <: ${myExtendedObjectClassName}](${table.primaryKeyArgsString}, tp: Class[_ <: ENTITY]): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
+        return ${database.basicOptionalEntityClassName}.apply(doSelectEntity(xprepareCBAsPK(${table.primaryKeyArgsCallingString}), tp)());
+    }
+
+    protected def xprepareCBAsPK(${table.primaryKeyArgsString}): ${myConditionBeanClassName} = {
+        ${table.primaryKeyArgsAssertString}
+        return newConditionBean().acceptPK(${table.primaryKeyArgsCallingString});
+    }
+#end
+#foreach ($uq in $table.keyableUniqueList)
+
+    /**
+     * Select the entity by the unique-key value.
+     * ${uq.argsJavaDocString}
+     * @return The optional entity selected by the unique key. (NotNull: if no data, empty entity)
+     * @exception EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     */
+    def selectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}): ${table.filterSelectEntityOptionalReturn(${myImmutableExtendedObjectClassName})} = {
+        return facadeSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}).map(_.toImmutable);
+    }
+
+    protected def facadeSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}): ${table.filterSelectEntityOptionalReturn(${myExtendedObjectClassName})} = {
+        return doSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}, typeOfSelectedEntity());
+    }
+
+    protected def doSelectByUniqueOf${uq.javaNameKeyword}[ENTITY <: ${myExtendedObjectClassName}](${uq.argsString}, tp: Class[_ <: ENTITY]): ${table.filterSelectEntityOptionalReturn("ENTITY")} = {
+        return ${database.basicOptionalEntityClassName}.apply(doSelectEntity(xprepareCBAsUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}), tp)());
+    }
+
+    protected def xprepareCBAsUniqueOf${uq.javaNameKeyword}(${uq.argsString}): ${myConditionBeanClassName} = {
+        ${uq.argsAssertString}
+        return newConditionBean().acceptUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString});
+    }
+#end
+
+    // ===================================================================================
+    //                                                                         List Select
+    //                                                                         ===========
+    /**
+     * Select the list as result bean.
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * cb.query().addOrderBy_Bar...();
+     * List&lt;${${myImmutableExtendedObjectClassName}}&gt; ${myEntityListVariableName} = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectList</span>(cb);
+     * ${myEntityListVariableName}.foreach(${myEntityVariableName} =>
+     *     ... = ${myEntityVariableName}...;
+     * }
+     * </pre>
+     * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
+     * @param loaderCall The callback for referrer loader of ${myImmutableExtendedObjectClassName}. (NoArgAllowed: then no loading)
+     * @return The result bean of selected list. (NotNull: if no data, returns empty list)
+     * @exception DangerousResultSizeException When the result size is over the specified safety size.
+     */
+    def selectList(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): immutable.List[${myImmutableExtendedObjectClassName}] = {
+        return toImmutableEntityList(facadeSelectList(callbackCB(cbCall))(loaderCall));
+    }
+
+    protected def facadeSelectList(cb: ${myConditionBeanClassName})(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ListResultBean[${myExtendedObjectClassName}] = {
+        return doSelectList(cb, typeOfSelectedEntity())(loaderCall);
+    }
+
+    protected def doSelectList[RESULT <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[RESULT])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ListResultBean[RESULT] = {
+        val dbleList = helpSelectListInternally(cb, tp);
+        callbackLoader(dbleList.asInstanceOf[List[${myExtendedObjectClassName}]], loaderCall);
+        return dbleList;
+    }
+
+    override protected def doReadList(cb: ConditionBean): ListResultBean[_ <: Entity] = { facadeSelectList(downcast(cb))() }
+#if ($table.isEntityDerivedMappable())
+
+    override protected def isEntityDerivedMappable(): Boolean = { true }
+#end
+
+    // ===================================================================================
+    //                                                                         Page Select
+    //                                                                         ===========
+    /**
+     * Select the page as result bean. <br />
+     * (both count-select and paging-select are executed)
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * cb.query().addOrderBy_Bar...();
+     * cb.<span style="color: #DD4747">paging</span>(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
+     * PagingResultBean&lt;${myExtendedObjectClassName}&gt; page = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectPage</span>(cb);
+     * int allRecordCount = page.getAllRecordCount();
+     * int allPageCount = page.getAllPageCount();
+     * boolean isExistPrePage = page.isExistPrePage();
+     * boolean isExistNextPage = page.isExistNextPage();
+     * ...
+     * for (${myExtendedObjectClassName} ${myEntityVariableName} : page) {
+     *     ... = ${myEntityVariableName}.get...();
+     * }
+     * </pre>
+     * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
+     * @param loaderCall The callback for referrer loader of ${myImmutableExtendedObjectClassName}. (NoArgAllowed: then no loading)
+     * @return The result bean of selected page. (NotNull: if no data, returns bean as empty list)
+     * @exception DangerousResultSizeException When the result size is over the specified safety size.
+     */
+    def selectPage(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ScrPagingView[${myImmutableExtendedObjectClassName}] = {
+        return newPagingView(facadeSelectPage(callbackCB(cbCall))(loaderCall));
+    }
+
+    protected def facadeSelectPage(cb: ${myConditionBeanClassName})(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingResultBean[${myExtendedObjectClassName}] = {
+        return doSelectPage(cb, typeOfSelectedEntity())(loaderCall);
+    }
+
+    protected def doSelectPage[RESULT <: ${myExtendedObjectClassName}](cb: ${myConditionBeanClassName}, tp: Class[RESULT])(loaderCall: (${myReferrerLoaderClassName}) => Unit = null): PagingResultBean[RESULT] = {
+        val dbleList = helpSelectPageInternally(cb, tp);
+        callbackLoader(dbleList.asInstanceOf[List[${myExtendedObjectClassName}]], loaderCall);
+        return dbleList;
+    }
+
+    override protected def doReadPage(cb: ConditionBean): PagingResultBean[_ <: Entity] = { facadeSelectPage(downcast(cb))() }
+
+    // ===================================================================================
+    //                                                                       Cursor Select
+    //                                                                       =============
+    /**
+     * Select the cursor by the condition-bean.
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectCursor</span>(cb, new EntityRowHandler&lt;${myExtendedObjectClassName}&gt;() {
+     *     public void handle(${myExtendedObjectClassName} entity) {
+     *         ... = entity.getFoo...();
+     *     }
+     * });
+     * </pre>
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @param entityRowHandler The handler of entity row of ${myExtendedObjectClassName}. (NotNull)
+     */
+    def selectCursor(cbCall: (${myConditionBeanClassName}) => Unit)(rowCall: (${myImmutableExtendedObjectClassName}) => Unit): Unit = {
+        facadeSelectCursor(callbackCB(cbCall), new EntityRowHandler[${myExtendedObjectClassName}]() {
+            def handle(entity: ${myExtendedObjectClassName}): Unit = { rowCall(entity.toImmutable) }
+        });
+    }
+
+    // ===================================================================================
+    //                                                                       Scalar Select
+    //                                                                       =============
+    /**
+     * Select the scalar value derived by a function from uniquely-selected records. <br />
+     * You should call a function method after this method called like as follows:
+     * <pre>
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">scalarSelect</span>(Date.class).max(new ScalarQuery() {
+     *     public void query(${myConditionBeanClassName} cb) {
+     *         cb.specify().<span style="color: #DD4747">columnFooDatetime()</span>; <span style="color: #3F7E5E">// required for a function</span>
+     *         cb.query().setBarName_PrefixSearch("S");
+     *     }
+     * });
+     * </pre>
+     * @param <RESULT> The type of result.
+     * @param resultType The type of result. (NotNull)
+     * @return The scalar function object to specify function for scalar value. (NotNull)
+     */
+    def scalarSelect[RESULT](resultType: Class[RESULT]): ScrHpSLSFunction[${myConditionBeanClassName}, RESULT] = {
+        return toScalaSLSFunction[RESULT](facadeScalarSelect(resultType));
+    }
+
+    protected def toScalaSLSFunction[RESULT](function: HpSLSFunction[${myConditionBeanClassName}, RESULT]): ScrHpSLSFunction[${myConditionBeanClassName}, RESULT] =
+    { new ScrHpSLSFunction[${myConditionBeanClassName}, RESULT](function) }
+
+    // ===================================================================================
+    //                                                                            Sequence
+    //                                                                            ========
+#if ($table.isUseSequence())
+    /**
+     * Select the next value as sequence. <br />
+     * This method is called when insert() and set to primary-key automatically.
+     * So you don't need to call this as long as you need to get next value before insert().
+     * @return The next value. (NotNull)
+     */
+    def selectNextVal(): ${table.sequenceReturnType} = {
+        return facadeSelectNextVal();
+    }
+
+    protected def facadeSelectNextVal(): ${table.sequenceReturnType} = {
+        return doSelectNextVal(classOf[${table.sequenceReturnType}]);
+    }
+
+    protected def doSelectNextVal[RESULT](tp: Class[RESULT]): RESULT = {
+        return delegateSelectNextVal(tp);
+    }
+
+#end
+    override protected def doReadNextVal(): Number = {
+#if ($table.isUseSequence())
+        return facadeSelectNextVal();
+#else
+        val msg: String = "This table is NOT related to sequence: " + getTableDbName();
+        throw new UnsupportedOperationException(msg);
+#end
+    }
+#foreach ($col in $table.subColumnSequenceColumnList)
+
+    def selectNextValFor${col.javaName}(): ${col.javaNative} = {
+        return facadeSelectNextValFor${col.javaName}();
+    }
+
+    protected def facadeSelectNextValFor${col.javaName}(): ${col.javaNative} = {
+        return doSelectNextValFor${col.javaName}(null, null); // sequence cache is unsupported by default
+    }
+
+    protected def doSelectNextValFor${col.javaName}(incrementSize: Integer, cacheSize: Integer): ${col.javaNative} = {
+        return delegateSelectNextValSub(classOf[${col.javaNative}], "${col.name}", "${col.subColumnSequenceName}", incrementSize, cacheSize);
+    }
+#end
+
+#if (${table.hasPrimaryKey()} && $table.hasReferrerAsMany())
+    // ===================================================================================
+    //                                                                       Load Referrer
+    //                                                                       =============
+#foreach ($referrer in $table.referrerAsManyList)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
+#set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
+    /**
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br />
+     * ${referrer.referrerDispForJavaDoc}
+     * <pre>
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ${table.loadReferrerConditionSetupperName}&lt;${referrerCBClassName}&gt;() {
+     *     public void setup(${referrerCBClassName} cb) {
+     *         cb.setupSelect...();
+     *         cb.query().setFoo...(value);
+     *         cb.query().addOrderBy_Bar...();
+     *     }
+     * }); <span style="color: #3F7E5E">// you can load nested referrer from here</span>
+     * <span style="color: #3F7E5E">//}).withNestedList(referrerList -&gt {</span>
+     * <span style="color: #3F7E5E">//    ...</span>
+     * <span style="color: #3F7E5E">//});</span>
+     * for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
+     *     ... = ${myEntityVariableName}.<span style="color: #DD4747">get${referrer.referrerJavaBeansRulePropertyNameInitCap}()</span>;
+     * }
+     * </pre>
+     * About internal policy, the value of primary key (and others too) is treated as case-insensitive. <br />
+     * The condition-bean, which the set-upper provides, has settings before callback as follows:
+     * <pre>
+#if ($referrer.isSimpleKeyFK())
+     * cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+     * cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc();
+#else
+     * cb.query().set[ForeignKey]_InScope(pkList);
+     * cb.query().addOrderBy_[ForeignKey]_Asc();
+#end
+     * </pre>
+     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param setupper The callback to set up referrer condition-bean for loading referrer. (NotNull)
+     * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
+     */
+    def load${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], setupCall: (${referrerCBClassName}) => Unit): NestedReferrerListGateway[${referrerEntityClassName}] = {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); assertObjectNotNull("setupCall", setupCall);
+        val setupper = new ReferrerConditionSetupper[${referrerCBClassName}]() { def setup(referrerCB: ${referrerCBClassName}): Unit = { setupCall(referrerCB); } }
+        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]().xinit(setupper));
+    }
+
+    /**
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br />
+     * ${referrer.referrerDispForJavaDoc}
+     * <pre>
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ${table.loadReferrerConditionSetupperName}&lt;${referrerCBClassName}&gt;() {
+     *     public void setup(${referrerCBClassName} cb) {
+     *         cb.setupSelect...();
+     *         cb.query().setFoo...(value);
+     *         cb.query().addOrderBy_Bar...();
+     *     }
+     * }); <span style="color: #3F7E5E">// you can load nested referrer from here</span>
+     * <span style="color: #3F7E5E">//}).withNestedList(referrerList -&gt {</span>
+     * <span style="color: #3F7E5E">//    ...</span>
+     * <span style="color: #3F7E5E">//});</span>
+     * ... = ${myEntityVariableName}.<span style="color: #DD4747">get${referrer.referrerJavaBeansRulePropertyNameInitCap}()</span>;
+     * </pre>
+     * About internal policy, the value of primary key (and others too) is treated as case-insensitive. <br />
+     * The condition-bean, which the set-upper provides, has settings before callback as follows:
+     * <pre>
+#if ($referrer.isSimpleKeyFK())
+     * cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+     * cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc();
+#else
+     * cb.query().set[ForeignKey]_InScope(pkList);
+     * cb.query().addOrderBy_[ForeignKey]_Asc();
+#end
+     * </pre>
+     * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param setupper The callback to set up referrer condition-bean for loading referrer. (NotNull)
+     * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
+     */
+    def load${referrer.referrerPropertyNameInitCap}(${myEntityVariableName}: ${myExtendedObjectClassName}, setupCall: (${referrerCBClassName}) => Unit): NestedReferrerListGateway[${referrerEntityClassName}] = {
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertObjectNotNull("setupCall", setupCall);
+        val setupper = new ReferrerConditionSetupper[${referrerCBClassName}]() { def setup(referrerCB: ${referrerCBClassName}): Unit = { setupCall(referrerCB); } }
+        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), new LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]().xinit(setupper));
+    }
+
+    protected def doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}: List[${myExtendedObjectClassName}], option: LoadReferrerOption[${referrerCBClassName}, ${referrerEntityClassName}]): NestedReferrerListGateway[${referrerEntityClassName}] = {
+        return helpLoadReferrerInternally(${myEntityListVariableName}, option, "${referrer.referrerPropertyName}");
+    }
+
+#end
+#end
+    // ===================================================================================
+    //                                                                   Pull out Relation
+    //                                                                   =================
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
+#set ($foreignImmutableEntityClassName = "${fk.foreignTableImmutableExtendedEntityClassName}")
+    /**
+     * Pull out the list of foreign table '${foreignEntityClassName}'.
+     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
+     * @return The list of foreign table. (NotNull, EmptyAllowed, NotNullElement)
+     */
+    def pullout${fk.foreignPropertyNameInitCap}(${myEntityListVariableName}: immutable.List[${myImmutableExtendedObjectClassName}]): immutable.List[${foreignImmutableEntityClassName}] = {
+        val dbleList = helpPulloutInternally(toDBableEntityList(${myEntityListVariableName}), "${fk.foreignPropertyName}");
+        return toScalaList(dbleList).map(new ${foreignImmutableEntityClassName}(_));
+    }
+
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($referrerEntityClassName = $referrer.referrerTableExtendedEntityClassName)
+#set ($referrerImmutableEntityClassName = $referrer.referrerTableImmutableExtendedEntityClassName)
+    /**
+     * Pull out the list of referrer-as-one table '${referrerEntityClassName}'.
+     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
+     * @return The list of referrer-as-one table. (NotNull, EmptyAllowed, NotNullElement)
+     */
+    def pullout${referrer.referrerPropertyNameInitCapAsOne}(${myEntityListVariableName}: immutable.List[${myImmutableExtendedObjectClassName}]): immutable.List[${referrerImmutableEntityClassName}] = {
+        val dbleList = helpPulloutInternally(toDBableEntityList(${myEntityListVariableName}), "${referrer.referrerPropertyNameAsOne}");
+        return toScalaList(dbleList).map(new ${referrerImmutableEntityClassName}(_));
+    }
+
+#end
+    // ===================================================================================
+    //                                                                      Extract Column
+    //                                                                      ==============
+#if ($table.hasSinglePrimaryKey())
+#set ($pkCol = $table.primaryKeyAsOne)
+    /**
+     * Extract the value list of (single) primary key ${pkCol.uncapitalisedJavaName}.
+     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
+     * @return The list of the column value. (NotNull, EmptyAllowed, NotNullElement)
+     */
+    def extract${pkCol.javaName}List(${myEntityListVariableName}: immutable.List[${myImmutableExtendedObjectClassName}]): immutable.List[${pkCol.immutableJavaNative}] = {
+        val plainList = helpExtractListInternally(toDBableEntityList(${myEntityListVariableName}), "${pkCol.javaBeansRulePropertyName}");
+        return toScalaList(plainList).map(_.asInstanceOf[${pkCol.immutableJavaNative}]);
+    }
+
+#end
+#foreach ($uqCol in $table.singleUniqueUQColumnList)
+    /**
+     * Extract the value list of (single) unique key ${uqCol.uncapitalisedJavaName}.
+     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
+     * @return The list of the column value. (NotNull, EmptyAllowed, NotNullElement)
+     */
+    def extract${uqCol.javaName}List(${myEntityListVariableName}: immutable.List[${myImmutableExtendedObjectClassName}]): immutable.List[${uqCol.immutableJavaNative}] = {
+        val plainList = helpExtractListInternally(toDBableEntityList(${myEntityListVariableName}), "${uqCol.javaBeansRulePropertyName}");
+        return toScalaList(plainList).map(_.asInstanceOf[${uqCol.immutableJavaNative}]);
+    }
+
+#end
+#if ($table.isWritable())
+    // ===================================================================================
+    //                                                                       Entity Update
+    //                                                                       =============
+    /**
+     * Insert the entity modified-only. (DefaultConstraintsEnabled)
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * <span style="color: #3F7E5E">// if auto-increment, you don't need to set the PK value</span>
+     * ${myEntityVariableName}.setFoo...(value);
+     * ${myEntityVariableName}.setBar...(value);
+     * <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setRegisterUser(value);</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.set...;</span>
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">insert</span>(${myEntityVariableName});
+     * ... = ${myEntityVariableName}.getPK...(); <span style="color: #3F7E5E">// if auto-increment, you can get the value after</span>
+     * </pre>
+     * <p>While, when the entity is created by select, all columns are registered.</p>
+     * @param entityCall The callback for entity of insert. (NotNull, PrimaryKeyNullAllowed: when auto-increment)
+     * @param optionCall The callback for option of insert. (NoArgAllowed: then no option)
+     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     */
+    def insert(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+        assertObjectNotNull("entityCall", entityCall);
+        doInsert(callbackMbleEntityToDBable(entityCall), callbackInsertOption(optionCall));
+    }
+
+    /**
+#if ($table.hasOptimisticLock())
+     * Update the entity modified-only. (ZeroUpdateException, ExclusiveControl)
+#else
+     * Update the entity modified-only. (ZeroUpdateException, NonExclusiveControl)
+#end
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setRegisterUser(value);</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.set...;</span>
+     * <span style="color: #3F7E5E">// if exclusive control, the value of concurrency column is required</span>
+     * ${myEntityVariableName}.<span style="color: #DD4747">setVersionNo</span>(value);
+     * try {
+     *     ${myEntityVariableName}Bhv.<span style="color: #DD4747">update</span>(${myEntityVariableName});
+     * } catch (EntityAlreadyUpdatedException e) { <span style="color: #3F7E5E">// if concurrent update</span>
+     *     ...
+     * }
+     * </pre>
+#if ($table.hasOptimisticLock())
+     * @param entityCall The callback for entity of update. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnNotNull)
+#else
+     * @param entityCall The callback for entity of update. (NotNull, PrimaryKeyNotNull)
+#end
+     * @param optionCall The callback for option of update. (NoArgAllowed: then no option)
+#if ($table.hasOptimisticLock())
+     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+#else
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+#end
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     */
+    def update(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+        assertObjectNotNull("entityCall", entityCall);
+        doUpdate(callbackMbleEntityToDBable(entityCall), callbackUpdateOption(optionCall));
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Update the entity non-strictly modified-only. (ZeroUpdateException, NonExclusiveControl)
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setRegisterUser(value);</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.set...;</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of concurrency column</span>
+     * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">updateNonstrict</span>(${myEntityVariableName});
+     * </pre>
+     * @param entityCall The callback for entity of update. (NotNull, PrimaryKeyNotNull)
+     * @param optionCall The callback for option of update. (NoArgAllowed: then no option)
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     */
+    def updateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+        doUpdateNonstrict(callbackMbleEntityToDBable(entityCall), callbackUpdateOption(optionCall));
+    }
+#end
+
+    /**
+#if ($table.hasOptimisticLock())
+     * Insert or update the entity modified-only. (DefaultConstraintsEnabled, ExclusiveControl) <br />
+#else
+     * Insert or update the entity modified-only. (DefaultConstraintsEnabled, NonExclusiveControl) <br />
+#end
+     * if (the entity has no PK) { insert() } else { update(), but no data, insert() } <br />
+     * <p><span style="color: #DD4747; font-size: 120%">Attention, you cannot update by unique keys instead of PK.</span></p>
+     * @param entityCall The callback for entity of insert or update. (NotNull, ...depends on insert or update)
+     * @param insertOptionCall The callback for option of insert. (NoArgAllowed: then no option)
+     * @param updateOptionCall The callback for option of update. (NoArgAllowed: then no option)
+#if ($table.hasOptimisticLock())
+     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+#else
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+#end
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     */
+    def insertOrUpdate(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+        doInsertOrUpdate(callbackMbleEntityToDBable(entityCall), callbackInsertOption(insertOptionCall), callbackUpdateOption(updateOptionCall));
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Insert or update the entity non-strictly modified-only. (DefaultConstraintsEnabled, NonExclusiveControl) <br />
+     * if (the entity has no PK) { insert() } else { update(), but no data, insert() }
+     * <p><span style="color: #DD4747; font-size: 120%">Attention, you cannot update by unique keys instead of PK.</span></p>
+     * @param entityCall The callback for entity of insert or update. (NotNull, ...depends on insert or update)
+     * @param insertOptionCall The callback for option of insert. (NoArgAllowed: then no option)
+     * @param updateOptionCall The callback for option of update. (NoArgAllowed: then no option)
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     */
+    def insertOrUpdateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+        doInsertOrUpdateNonstrict(callbackMbleEntityToDBable(entityCall), callbackInsertOption(insertOptionCall), callbackUpdateOption(updateOptionCall));
+    }
+#end
+
+    /**
+#if ($table.hasOptimisticLock())
+     * Delete the entity. (ZeroUpdateException, ExclusiveControl)
+#else
+     * Delete the entity. (ZeroUpdateException, NonExclusiveControl)
+#end
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * <span style="color: #3F7E5E">// if exclusive control, the value of concurrency column is required</span>
+     * ${myEntityVariableName}.<span style="color: #DD4747">setVersionNo</span>(value);
+     * try {
+     *     ${myEntityVariableName}Bhv.<span style="color: #DD4747">delete</span>(${myEntityVariableName});
+     * } catch (EntityAlreadyUpdatedException e) { <span style="color: #3F7E5E">// if concurrent update</span>
+     *     ...
+     * }
+     * </pre>
+     * @param entityCall The callback for entity of delete. (NotNull, PrimaryKeyNotNull)
+     * @param optionCall The callback for option of delete. (NoArgAllowed: then no option)
+#if ($table.hasOptimisticLock())
+     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+#else
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+#end
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     */
+    def delete(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+        doDelete(callbackMbleEntityToDBable(entityCall), callbackDeleteOption(optionCall));
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Delete the entity non-strictly. {ZeroUpdateException, NonExclusiveControl}
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of concurrency column</span>
+     * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">deleteNonstrict</span>(${myEntityVariableName});
+     * </pre>
+     * @param entityCall The callback for entity of delete. (NotNull, PrimaryKeyNotNull)
+     * @param optionCall The callback for option of delete. (NoArgAllowed: then no option)
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     */
+    def deleteNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
+        doDeleteNonstrict(callbackMbleEntityToDBable(entityCall), callbackDeleteOption(optionCall));
+    }
+#end
+
+    // ===================================================================================
+    //                                                                        Batch Update
+    //                                                                        ============
+    /**
+     * Batch-insert the entity list modified-only of same-set columns. (DefaultConstraintsEnabled) <br />
+     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
+     * <p><span style="color: #DD4747; font-size: 120%">The columns of least common multiple are registered like this:</span></p>
+     * <pre>
+     * for (... : ...) {
+     *     ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     *     ${myEntityVariableName}.setFooName("foo");
+     *     if (...) {
+     *         ${myEntityVariableName}.setFooPrice(123);
+     *     }
+     *     <span style="color: #3F7E5E">// FOO_NAME and FOO_PRICE (and record meta columns) are registered</span>
+     *     <span style="color: #3F7E5E">// FOO_PRICE not-called in any entities are registered as null without default value</span>
+     *     <span style="color: #3F7E5E">// columns not-called in all entities are registered as null or default value</span>
+     *     ${myEntityListVariableName}.add(${myEntityVariableName});
+     * }
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">batchInsert</span>(${myEntityListVariableName});
+     * </pre>
+     * <p>While, when the entities are created by select, all columns are registered.</p>
+     * <p>And if the table has an identity, entities after the process don't have incremented values.
+     * (When you use the (normal) insert(), you can get the incremented value from your entity)</p>
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNullAllowed: when auto-increment)
+     * @return The array of inserted count. (NotNull, EmptyAllowed)
+     */
+    def batchInsert(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+        return doBatchInsert(callbackBatch(batchCall), callbackInsertOption(optionCall));
+    }
+#if ($database.isBatchInsertColumnModifiedPropertiesFragmentedDisallowed())
+
+    override protected def isBatchUpdateColumnModifiedPropertiesFragmentedDisallowed(): Boolean = { true }
+#end
+#if ($database.isCompatibleBatchInsertDefaultEveryColumn())
+
+    override protected def isCompatibleBatchInsertDefaultEveryColumn(): Boolean = { true }
+#end
+
+    /**
+#if ($table.hasOptimisticLock())
+     * Batch-update the entity list modified-only of same-set columns. (ExclusiveControl) <br />
+#else
+     * Batch-update the entity list modified-only of same-set columns. (NonExclusiveControl) <br />
+#end
+     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
+     * <span style="color: #DD4747; font-size: 120%">You should specify same-set columns to all entities like this:</span>
+     * <pre>
+     * for (... : ...) {
+     *     ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     *     ${myEntityVariableName}.setFooName("foo");
+     *     if (...) {
+     *         ${myEntityVariableName}.setFooPrice(123);
+     *     } else {
+     *         ${myEntityVariableName}.setFooPrice(null); <span style="color: #3F7E5E">// updated as null</span>
+     *         <span style="color: #3F7E5E">//${myEntityVariableName}.setFooDate(...); // *not allowed, fragmented</span>
+     *     }
+     *     <span style="color: #3F7E5E">// FOO_NAME and FOO_PRICE (and record meta columns) are updated</span>
+     *     <span style="color: #3F7E5E">// (others are not updated: their values are kept)</span>
+     *     ${myEntityListVariableName}.add(${myEntityVariableName});
+     * }
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">batchUpdate</span>(${myEntityListVariableName});
+     * </pre>
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
+     * @return The array of updated count. (NotNull, EmptyAllowed)
+#if ($table.hasOptimisticLock())
+     * @exception BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
+#else
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+#end
+     */
+    def batchUpdate(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+        return doBatchUpdate(callbackBatch(batchCall), callbackUpdateOption(optionCall));
+    }
+#if ($database.isBatchUpdateColumnModifiedPropertiesFragmentedAllowed())
+
+    override protected def isBatchUpdateColumnModifiedPropertiesFragmentedAllowed(): Boolean = { true }
+#end
+#if ($database.isCompatibleBatchUpdateDefaultEveryColumn())
+
+    override protected def isCompatibleBatchUpdateDefaultEveryColumn(): Boolean = { true }
+#end
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Batch-update the entity list non-strictly modified-only of same-set columns. (NonExclusiveControl) <br />
+     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
+     * <span style="color: #DD4747; font-size: 140%">You should specify same-set columns to all entities like this:</span>
+     * <pre>
+     * for (... : ...) {
+     *     ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     *     ${myEntityVariableName}.setFooName("foo");
+     *     if (...) {
+     *         ${myEntityVariableName}.setFooPrice(123);
+     *     } else {
+     *         ${myEntityVariableName}.setFooPrice(null); <span style="color: #3F7E5E">// updated as null</span>
+     *         <span style="color: #3F7E5E">//${myEntityVariableName}.setFooDate(...); // *not allowed, fragmented</span>
+     *     }
+     *     <span style="color: #3F7E5E">// FOO_NAME and FOO_PRICE (and record meta columns) are updated</span>
+     *     <span style="color: #3F7E5E">// (others are not updated: their values are kept)</span>
+     *     ${myEntityListVariableName}.add(${myEntityVariableName});
+     * }
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">batchUpdate</span>(${myEntityListVariableName});
+     * </pre>
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
+     * @return The array of updated count. (NotNull, EmptyAllowed)
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     */
+    def batchUpdateNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+        return doBatchUpdateNonstrict(callbackBatch(batchCall), callbackUpdateOption(optionCall));
+    }
+#end
+
+    /**
+#if ($table.hasOptimisticLock())
+     * Batch-delete the entity list. (ExclusiveControl) <br />
+#else
+     * Batch-delete the entity list. (NonExclusiveControl) <br />
+#end
+     * This method uses executeBatch() of java.sql.PreparedStatement.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
+     * @return The array of deleted count. (NotNull, EmptyAllowed)
+#if ($table.hasOptimisticLock())
+     * @exception BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
+#else
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+#end
+     */
+    def batchDelete(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+        return doBatchDelete(callbackBatch(batchCall), callbackDeleteOption(optionCall));
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Batch-delete the entity list non-strictly. {NonExclusiveControl} <br />
+     * This method uses executeBatch() of java.sql.PreparedStatement.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
+     * @return The array of deleted count. (NotNull, EmptyAllowed)
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     */
+    def batchDeleteNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
+        return doBatchDeleteNonstrict(callbackBatch(batchCall), callbackDeleteOption(optionCall));
+    }
+#end
+
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    /**
+     * Insert the several entities by query (modified-only for fixed value).
+     * <pre>
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">queryInsert</span>(new QueryInsertSetupper&lt;${myExtendedObjectClassName}, ${myConditionBeanClassName}&gt;() {
+     *     public ConditionBean setup(${myExtendedObjectClassName} entity, ${myConditionBeanClassName} intoCB) {
+     *         FooCB cb = FooCB();
+     *         cb.setupSelect_Bar();
+     *
+     *         <span style="color: #3F7E5E">// mapping</span>
+     *         intoCB.specify().columnMyName().mappedFrom(cb.specify().columnFooName());
+     *         intoCB.specify().columnMyCount().mappedFrom(cb.specify().columnFooCount());
+     *         intoCB.specify().columnMyDate().mappedFrom(cb.specify().specifyBar().columnBarDate());
+     *         entity.setMyFixedValue("foo"); <span style="color: #3F7E5E">// fixed value</span>
+     *         <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     *         <span style="color: #3F7E5E">//entity.setRegisterUser(value);</span>
+     *         <span style="color: #3F7E5E">//entity.set...;</span>
+     *         <span style="color: #3F7E5E">// you don't need to set a value of concurrency column</span>
+     *         <span style="color: #3F7E5E">//entity.setVersionNo(value);</span>
+     *
+     *         return cb;
+     *     }
+     * });
+     * </pre>
+     * @param setupperCall The callback for set-upper of query-insert. (NotNull)
+     * @return The inserted count.
+     */
+    def queryInsert(setupperCall: (${myMutableExtendedObjectClassName}, ${myConditionBeanClassName}) => ConditionBean): Int = {
+        return doQueryInsert(callbackQueryInsertSetupper(setupperCall), null);
+    }
+
+    /**
+     * Update the several entities by query non-strictly modified-only. (NonExclusiveControl)
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * <span style="color: #3F7E5E">// you don't need to set PK value</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setPK...(value);</span>
+     * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setRegisterUser(value);</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.set...;</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of concurrency column</span>
+     * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">queryUpdate</span>(${myEntityVariableName}, cb);
+     * </pre>
+     * @param entityCall The callback for entity that contains update values. (NotNull)
+     * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
+     * @return The updated count.
+     * @exception NonQueryUpdateNotAllowedException When the query has no condition.
+     */
+    def queryUpdate(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(cbCall: (${myConditionBeanClassName}) => Unit): Int = {
+        assertObjectNotNull("entityCall", entityCall); assertObjectNotNull("cbCall", cbCall);
+        return doQueryUpdate(callbackMbleEntityToDBable(entityCall), callbackCB(cbCall), null);
+    }
+
+    /**
+     * Delete the several entities by query. (NonExclusiveControl)
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">queryDelete</span>(${myEntityVariableName}, cb);
+     * </pre>
+     * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
+     * @return The deleted count.
+     * @exception NonQueryDeleteNotAllowedException When the query has no condition.
+     */
+    def queryDelete(cbCall: (${myConditionBeanClassName}) => Unit): Int = {
+        assertObjectNotNull("cbCall", cbCall);
+        return doQueryDelete(callbackCB(cbCall), null);
+    }
+#else
+#if ($table.isAvailableNonPrimaryKeyWritable())
+
+    // ===================================================================================
+    //                                                                       Entity Update
+    //                                                                       =============
+    /**
+     * Insert the entity for a table not defined primary key. <br />
+     * The auto-setup for common columns is unsupported.
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * ${myEntityVariableName}.setFoo...(value);
+     * ${myEntityVariableName}.setBar...(value);
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">insert</span>(${myEntityVariableName});
+     * </pre>
+     * @param ${myEntityVariableName} The entity for insert. (NotNull)
+     */
+    def insert(entityCall: (${myMutableExtendedObjectClassName}) => Unit): Unit = {
+        assertObjectNotNull("entityCall", entityCall);
+        delegateInsert(callbackMbleEntityToDBable(entityCall), null);
+    }
+#end
+#end
+
+    // ===================================================================================
+    //                                                                          OutsideSql
+    //                                                                          ==========
+    /**
+     * Prepare the basic executor of outside-SQL to execute it. <br />
+     * The invoker of behavior command should be not null when you call this method.
+     * <pre>
+     * You can use the methods for outside-SQL are as follows:
+     * {Basic}
+     *   o selectList()
+     *   o execute()
+     *   o call()
+     *
+     * {Entity}
+     *   o entityHandling().selectEntity()
+     *   o entityHandling().selectEntityWithDeletedCheck()
+     *
+     * {Paging}
+     *   o autoPaging().selectList()
+     *   o autoPaging().selectPage()
+     *   o manualPaging().selectList()
+     *   o manualPaging().selectPage()
+     *
+     * {Cursor}
+     *   o cursorHandling().selectCursor()
+     *
+     * {Option}
+     *   o dynamicBinding().selectList()
+     *   o removeBlockComment().selectList()
+     *   o removeLineComment().selectList()
+     *   o formatSql().selectList()
+     * </pre>
+     * @return The basic executor of outside-SQL. (NotNull)
+     */
+    def outsideSql(): ScrOutsideSqlTypedBasicExecutor[${myExtendedBhvClassName}] = {
+        return toImmutableOutsideSqlTypedBasicExecutor(doOutsideSql());
+    }
+
+    protected def toImmutableOutsideSqlTypedBasicExecutor(executor: OutsideSqlBasicExecutor[${myExtendedBhvClassName}]): ScrOutsideSqlTypedBasicExecutor[${myExtendedBhvClassName}] =
+    { new ScrOutsideSqlTypedBasicExecutor(executor) }
+#if ($table.hasBehaviorFilterBeforeColumn())
+
+    // ===================================================================================
+    //                                                                     Filter Override
+    //                                                                     ===============
+#if ($table.hasBehaviorFilterBeforeInsertColumn())
+    @Override
+    protected def filterEntityOfInsert(tgt: Entity, op: InsertOption[_ <: ConditionBean]): Unit = {
+        super.filterEntityOfInsert(tgt, op);
+        val et: ${myExtendedObjectClassName} = downcast(tgt);
+#foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
+        et.set${column.javaName}(${column.behaviorFilterBeforeInsertColumnExpression});
+#end
+    }
+#end
+#if ($table.isWritable())
+#if ($table.hasBehaviorFilterBeforeUpdateColumn())
+    @Override
+    protected def filterEntityOfUpdate(tgt: Entity, op: UpdateOption[_ <: ConditionBean]): Unit = {
+        super.filterEntityOfUpdate(tgt, op);
+        val et: ${myExtendedObjectClassName} = downcast(tgt);
+#foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)
+        et.set${column.javaName}(${column.behaviorFilterBeforeUpdateColumnExpression});
+#end
+    }
+#end
+#end
+#end
+
+#if ($table.hasOptimisticLock())
+    // ===================================================================================
+    //                                                                Optimistic Lock Info
+    //                                                                ====================
+#if ($table.isUseVersionNo())
+    override protected def hasVersionNoValue(et: Entity): Boolean = {
+        return downcast(et).get${table.versionNoJavaName}() != null;
+    }
+
+#end
+#if ($table.isUseUpdateDate())
+    override protected def hasUpdateDateValue(et: Entity): Boolean = {
+        return downcast(et).${database.initUncap(${table.updateDateJavaName})}() != null;
+    }
+
+#end
+#end
+    // ===================================================================================
+    //                                                                     Callback Helper
+    //                                                                     ===============
+    protected def callbackCB(cbCall: (${myConditionBeanClassName}) => Unit): ${myConditionBeanClassName} = {
+        assertObjectNotNull("cbCall", cbCall);
+        val cb = newConditionBean(); cbCall(cb); return cb;
+    }
+
+    protected def callbackBatch(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit): List[${myExtendedObjectClassName}] = {
+        assertObjectNotNull("batchCall", batchCall);
+        val batch = new ScrBatchEntityList[${myMutableExtendedObjectClassName}]();
+        val entityList: List[${myExtendedObjectClassName}] = new ArrayList[${myExtendedObjectClassName}]();
+        batch.entityCallList.asScala.map { entityCall =>
+            val entity = newMbleEntity(); entityCall(entity); entity.toDBable;
+        }
+        return entityList;
+    }
+
+    protected def callbackMbleEntity(entityCall: (${myMutableExtendedObjectClassName}) => Unit): ${myMutableExtendedObjectClassName} = {
+        assertObjectNotNull("entityCall", entityCall);
+        val entity = newMbleEntity(); entityCall(entity); return entity;
+    }
+
+    protected def callbackMbleEntityToDBable(entityCall: (${myMutableExtendedObjectClassName}) => Unit): ${myExtendedObjectClassName} = {
+        return callbackMbleEntity(entityCall).toDBable;
+    }
+
+    protected def callbackInsertOption(optionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit): InsertOption[${myConditionBeanClassName}] = {
+        if (optionCall == null) { return null; }
+        val option = new ScrInsertOption[${myConditionBeanClassName}](new InsertOption[${myConditionBeanClassName}]());
+        optionCall(option); return option.toNative;
+    }
+
+    protected def callbackUpdateOption(optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit): UpdateOption[${myConditionBeanClassName}] = {
+        if (optionCall == null) { return null; }
+        val option = new ScrUpdateOption[${myConditionBeanClassName}](new UpdateOption[${myConditionBeanClassName}]()); optionCall(option); return option.toNative;
+    }
+
+    protected def callbackDeleteOption(optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit): DeleteOption[${myConditionBeanClassName}] = {
+        if (optionCall == null) { return null; }
+        val option = new ScrDeleteOption[${myConditionBeanClassName}](new DeleteOption[${myConditionBeanClassName}]()); optionCall(option); return option.toNative;
+    }
+
+    protected def callbackQueryInsertSetupper(setupperCall: (${myMutableExtendedObjectClassName}, ${myConditionBeanClassName}) => ConditionBean): QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}] = {
+        assertObjectNotNull("setupperCall", setupperCall);
+        return new QueryInsertSetupper[${myExtendedObjectClassName}, ${myConditionBeanClassName}]() {
+            def setup(entity: ${myExtendedObjectClassName}, intoCB: ${myConditionBeanClassName}): ConditionBean = {
+                val mble = newMbleEntity();
+                val resultCB = setupperCall(mble, intoCB);
+                entity.acceptImmutable(mble.toImmutable());
+                return resultCB;
+            }
+        };
+    }
+
+    protected def callbackLoader(dbleList: List[${myExtendedObjectClassName}], loaderCall: (${myReferrerLoaderClassName}) => Unit = null): Unit = {
+        if (loaderCall == null) { return; }
+        val loader = new ${myReferrerLoaderClassName}();
+        loader.ready(dbleList.asInstanceOf[List[${myExtendedObjectClassName}]], _behaviorSelector);
+        loaderCall(loader);
+    }
+
+    // ===================================================================================
+    //                                                                         Type Helper
+    //                                                                         ===========
+    override protected def typeOfSelectedEntity(): Class[${myExtendedObjectClassName}] = { classOf[${myExtendedObjectClassName}] }
+    override protected def typeOfHandlingEntity(): Class[${myExtendedObjectClassName}] = { classOf[${myExtendedObjectClassName}] }
+    override protected def typeOfHandlingConditionBean(): Class[${myConditionBeanClassName}] = { classOf[${myConditionBeanClassName}] }
+    protected def newMbleEntity(): ${myMutableExtendedObjectClassName} = { new ${myMutableExtendedObjectClassName}() }
+    protected def newPagingView(rb: PagingResultBean[${myExtendedObjectClassName}]): ScrPagingView[${myImmutableExtendedObjectClassName}] =
+    { new ScrPagingView(toImmutableEntityList(rb), rb) }
+
+    // ===================================================================================
+    //                                                                        Scala Helper
+    //                                                                        ============
+    protected def toScalaList[ENTITY](javaList: Collection[ENTITY]): immutable.List[ENTITY] = {
+        if (javaList == null) { immutable.List() }
+        return immutable.List.fromArray(javaList.toArray()).asInstanceOf[immutable.List[ENTITY]];
+    }
+
+    def toImmutableEntityList(dbleList: Collection[${myExtendedObjectClassName}]): immutable.List[${myImmutableExtendedObjectClassName}] =
+    { toScalaList(dbleList).map(new ${myImmutableExtendedObjectClassName}(_)) }
+
+    def toDBableEntityList(immuList: immutable.List[${myImmutableExtendedObjectClassName}]): List[${myExtendedObjectClassName}] =
+    { immuList.map(new ${myExtendedObjectClassName}().acceptImmutable(_)).asJava }
+}

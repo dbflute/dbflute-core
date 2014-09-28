@@ -1,0 +1,33 @@
+
+using System;
+using System.Collections;
+using ${glPackageBaseCommonSqlClause};
+
+namespace ${glPackageBaseCommonCBean} {
+
+    /// <summary>
+    /// The bean of fetch narrowing.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public interface ${glFetchNarrowingBean} {
+
+        int FetchNarrowingSkipStartIndex { get; }
+        int FetchNarrowingLoopCount { get; }
+        bool IsFetchNarrowingSkipStartIndexEffective { get; }
+        bool IsFetchNarrowingLoopCountEffective { get; }
+        bool IsFetchNarrowingEffective { get; }
+
+        /// <summary>
+        /// Ignore fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
+        /// </summary>
+        void IgnoreFetchNarrowing();
+
+        /// <summary>
+        /// Restore ignored fetch narrowing. {INTERNAL METHOD}
+        /// </summary>
+        void RestoreIgnoredFetchNarrowing();
+
+        void CheckSafetyResult(int safetyMaxResultSize);
+        int SafetyMaxResultSize { get; }
+    }
+}

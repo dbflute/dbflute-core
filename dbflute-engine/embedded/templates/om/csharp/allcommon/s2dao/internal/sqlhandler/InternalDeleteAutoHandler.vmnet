@@ -1,0 +1,30 @@
+
+using System;
+using System.Collections;
+using System.Data;
+using System.Data.SqlTypes;
+using System.Reflection;
+using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Impl;
+using Seasar.Dao;
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
+
+    public class ${glInternalDeleteAutoHandler} : ${glInternalAbstractAutoHandler} {
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalDeleteAutoHandler}(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
+            : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
+        }
+		
+        // ===============================================================================
+        //                                                                        Override
+        //                                                                        ========
+        protected override void SetupBindVariables(object bean) {
+            SetupDeleteBindVariables(bean);
+            LoggingMessageSqlArgs = _bindVariables;
+        }
+    }
+}

@@ -1,0 +1,18 @@
+#set ($myClassName = "${glRelationInfo}")
+
+using System;
+using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonJavaLike};
+
+namespace ${glPackageBaseCommonDBMetaInfo} {
+    
+    public interface ${myClassName} {
+
+        String RelationPropertyName { get; }
+        ${glDBMeta} LocalDBMeta { get; }
+        ${glDBMeta} TargetDBMeta { get; }
+        Map<${glColumnInfo},${glColumnInfo}> LocalTargetColumnInfoMap { get; }
+        bool IsOneToOne { get; }
+        bool IsReferrer { get; }
+    }
+}

@@ -1,0 +1,15 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the value of bind variable is null about outsideSql.
+    /// </summary>
+    public class ${glBindVariableParameterNullValueException} : SystemException {
+
+        public ${glBindVariableParameterNullValueException}(String msg)
+        : base(msg) {}
+    }
+}

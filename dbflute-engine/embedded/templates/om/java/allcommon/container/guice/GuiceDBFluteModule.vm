@@ -1,0 +1,97 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import javax.sql.DataSource;
+
+import com.google.inject.AbstractModule;
+import org.seasar.dbflute.BehaviorSelector;
+import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
+import org.seasar.dbflute.bhv.core.InvokerAssistant;
+import ${glPackageExtendedBhv}.*;
+
+/**
+ * @author ${database.classAuthor}
+ */
+public class ${glDBFluteModule} extends AbstractModule {
+
+    protected DataSource dataSource;
+
+    public ${glDBFluteModule}(DataSource dataSource) {
+        if (dataSource == null) {
+            String msg = "The argument 'dataSource' should not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        this.dataSource = dataSource;
+    }
+
+    @Override
+    protected void configure() {
+        createDBFluteInitializer(); // initialized by only a creation
+
+        // The components of DBFlute Runtime.
+        ${glImplementedBehaviorSelector} behaviorSelector = createImplementedBehaviorSelector();
+        BehaviorCommandInvoker behaviorCommandInvoker = createBehaviorCommandInvoker();
+        ${glImplementedInvokerAssistant} invokerAssistant = createImplementedInvokerAssistant();
+        behaviorCommandInvoker.setInvokerAssistant(invokerAssistant);
+        ${glImplementedCommonColumnAutoSetupper} commonColumnAutoSetupper = createImplementedCommonColumnAutoSetupper();
+
+        bind(BehaviorSelector.class).toInstance(behaviorSelector);
+        bind(BehaviorCommandInvoker.class).toInstance(behaviorCommandInvoker);
+        bind(InvokerAssistant.class).toInstance(invokerAssistant);
+        bind(CommonColumnAutoSetupper.class).toInstance(commonColumnAutoSetupper);
+
+        // The components of Behavior.
+        setupBehavior(behaviorCommandInvoker, behaviorSelector, commonColumnAutoSetupper);
+    }
+
+    protected ${glDBFluteInitializer} createDBFluteInitializer() {
+        return new ${database.DBFluteInitializerClass}();
+    }
+
+    protected ${glImplementedBehaviorSelector} createImplementedBehaviorSelector() {
+        return new ${glImplementedBehaviorSelector}();
+    }
+
+    protected BehaviorCommandInvoker createBehaviorCommandInvoker() {
+        return new BehaviorCommandInvoker();
+    }
+
+    protected ${glImplementedInvokerAssistant} createImplementedInvokerAssistant() {
+        ${glImplementedInvokerAssistant} invokerAssistant = new ${database.implementedInvokerAssistantClass}();
+        invokerAssistant.setDataSource(dataSource);
+        return invokerAssistant;
+    }
+
+    protected ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
+        return new ${database.implementedCommonColumnAutoSetupperClass}();
+    }
+
+    protected void setupBehavior(BehaviorCommandInvoker ker, BehaviorSelector tor, CommonColumnAutoSetupper per) {
+#foreach ($table in $database.behaviorTableList)
+        {
+            ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
+#if ($table.isWritable())
+            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor); bhv.setCommonColumnAutoSetupper(per);
+#else
+            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor);
+#end
+            bind(${table.extendedBehaviorClassName}.class).toInstance(bhv);
+        }
+#end
+    }
+}

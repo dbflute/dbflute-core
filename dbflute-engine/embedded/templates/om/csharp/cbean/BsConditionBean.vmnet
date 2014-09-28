@@ -1,0 +1,349 @@
+#set ($myClassName = "${myBaseConditionBeanClassName}")
+
+using System;
+using System.Collections;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonSqlClause};
+using ${glPackageBaseCommonHelper};
+
+using ${glPackageCB};
+using ${glPackageCQ};
+using ${glPackageNss};
+
+namespace ${glPackageBaseCB} {
+
+    [System.Serializable]
+    public class ${myClassName} : ${glAbstractConditionBean} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected ${myConditionQueryClassName} _conditionQuery;
+
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
+        public override String TableDbName { get { return "${table.tableDbName}"; } }
+
+        // ===============================================================================
+        //                                                             PrimaryKey Handling
+        //                                                             ===================
+#if ($table.hasPrimaryKey())
+## assert method same as Java
+        public void AcceptPrimaryKey(${table.primaryKeyArgsString}) {
+            ${table.primaryKeyArgsAssertString}
+            ${myClassName} cb = this;
+            ${table.primaryKeyArgsConditionSetupStringCSharp}
+        }
+
+#end
+        public override ${glConditionBean} AddOrderBy_PK_Asc() {
+#if ($table.hasPrimaryKey())
+#foreach ($col in $table.primaryKey)
+            Query().AddOrderBy_${col.JavaName}_Asc();
+#end
+            return this;
+#else
+            String msg = "This method is unsupported in this table that doesn't have primary key: ";
+            throw new NotSupportedException(msg + ToString());
+#end
+        }
+
+        public override ${glConditionBean} AddOrderBy_PK_Desc() {
+#if ($table.hasPrimaryKey())
+#foreach ($col in $table.PrimaryKey)
+            Query().AddOrderBy_${col.JavaName}_Desc();
+#end
+            return this;
+#else
+            String msg = "This method is unsupported in this table that doesn't have primary key: ";
+            throw new NotSupportedException(msg + ToString());
+#end
+        }
+
+        // ===============================================================================
+        //                                                                           Query
+        //                                                                           =====
+        public ${myConditionQueryClassName} Query() {
+            return this.ConditionQuery;
+        }
+
+        public ${myConditionQueryClassName} ConditionQuery {
+            get {
+                if (_conditionQuery == null) {
+                    _conditionQuery = CreateLocalCQ();
+                }
+                return _conditionQuery;
+            }
+        }
+
+        protected virtual ${myConditionQueryClassName} CreateLocalCQ() {
+            return xcreateCQ(null, this.SqlClause, this.SqlClause.getBasePointAliasName(), 0);
+        }
+
+        protected virtual ${myConditionQueryClassName} xcreateCQ(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel) {
+            return new ${myConditionQueryClassName}(childQuery, sqlClause, aliasName, nestLevel);
+        }
+
+        public override ${glConditionQuery} LocalCQ {
+            get { return this.ConditionQuery; }
+        }
+
+        // ===============================================================================
+        //                                                                           Union
+        //                                                                           =====
+	    public virtual void Union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+            cb.xsetupForUnion(this); xsyncUQ(cb); unionQuery.Invoke(cb);
+		    ${myConditionQueryClassName} cq = cb.Query(); Query().xsetUnionQuery(cq);
+        }
+
+	    public virtual void UnionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+            cb.xsetupForUnion(this); xsyncUQ(cb); unionQuery.Invoke(cb);
+		    ${myConditionQueryClassName} cq = cb.Query(); Query().xsetUnionAllQuery(cq);
+	    }
+
+        public override bool HasUnionQueryOrUnionAllQuery() {
+            return Query().hasUnionQueryOrUnionAllQuery();
+        }
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabaseOracle())
+
+        // ===============================================================================
+        //                                                                       Lock Wait
+        //                                                                       =========
+        public virtual ${glConditionBean} LockForUpdateNoWait()
+        { if (xhelpIsSqlClauseOracle()) { xhelpGettingSqlClauseOracle().lockForUpdateNoWait(); } return this; }
+        public virtual ${glConditionBean} LockForUpdateWait(int waitSec)
+        { if (xhelpIsSqlClauseOracle()) { xhelpGettingSqlClauseOracle().lockForUpdateWait(waitSec); } return this; }
+
+        protected virtual bool xhelpIsSqlClauseOracle() {
+            return this.SqlClause is ${glPackageBaseCommonSqlClause}.${glSqlClause}Oracle;
+        }
+
+        protected virtual ${glPackageBaseCommonSqlClause}.${glSqlClause}Oracle xhelpGettingSqlClauseOracle() {
+            return (${glPackageBaseCommonSqlClause}.${glSqlClause}Oracle)this.SqlClause;
+        }
+#end
+#end
+
+        // ===============================================================================
+        //                                                                    Setup Select
+        //                                                                    ============
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyNameInitCap}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($nestSelectSetuppperClassName = "${glProjectPrefix}${fk.foreignTable.javaName}Nss")
+#set ($dynamicFixedConditionArgs = "")
+#set ($dynamicFixedConditionVariables = "")
+#if ($fk.hasDynamicFixedCondition())
+#set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionArgs}")
+#set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
+#end
+        protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
+        public ${nestSelectSetuppperClassName} Nss${tmpPropertyNameInitCap} { get {
+            if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
+            return _nss${tmpPropertyNameInitCap};
+        }}
+        public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
+#if ($fk.hasLocalColumnExceptPrimaryKey())
+            if (HasSpecifiedColumn) { // if reverse call
+#foreach ($col in $fk.localColumnList)
+#if (!$col.isPrimaryKey())
+                Specify().Column${col.javaName}();
+#end
+#end
+            }
+#end
+            doSetupSelect(delegate { return Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); });
+            if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery)
+            { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
+            return _nss${tmpPropertyNameInitCap};
+        }
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+    #set ($tmpPropertyName = "${referrer.referrerPropertyNameInitCapAsOne}")
+    #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+    #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
+
+        protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
+        public ${nestSelectSetuppperClassName} Nss${tmpPropertyNameInitCap} { get {
+            if (_nss${tmpPropertyNameInitCap} == null) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null); }
+            return _nss${tmpPropertyNameInitCap};
+        }}
+        public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
+            doSetupSelect(delegate { return Query().Query${tmpPropertyNameInitCap}(); });
+            if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery)
+            { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}()); }
+            return _nss${tmpPropertyNameInitCap};
+        }
+#end
+
+        // [DBFlute-0.7.4]
+        // ===============================================================================
+        //                                                                         Specify
+        //                                                                         =======
+        protected ${myConditionBeanClassName}Specification _specification;
+        public ${myConditionBeanClassName}Specification Specify() {
+            if (_specification == null) { _specification = new ${myConditionBeanClassName}Specification(this, new MySpQyCall(this), _forDerivedReferrer, _forScalarSelect, _forScalarCondition, _forColumnQuery); }
+            return _specification;
+        }
+        protected bool HasSpecifiedColumn { get {
+            return _specification != null && _specification.IsAlreadySpecifiedRequiredColumn;
+        }}
+        protected class MySpQyCall : HpSpQyCall<${myConditionQueryClassName}> {
+			protected ${myClassName} _myCB;
+			public MySpQyCall(${myClassName} myCB) { _myCB = myCB; }
+    		public bool has() { return true; } public ${myConditionQueryClassName} qy() { return _myCB.Query(); }
+    	}
+
+        // [DBFlute-0.8.9.18]
+        // ===============================================================================
+        //                                                                     ColumnQuery
+        //                                                                     ===========
+        public HpColQyOperand<${myConditionBeanClassName}> ColumnQuery(${glSpecifyQuery}<${myConditionBeanClassName}> leftSpecifyQuery) {
+            return new HpColQyOperand<${myConditionBeanClassName}>(delegate(${glSpecifyQuery}<${myConditionBeanClassName}> rightSp, String operand) {
+                xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), leftSpecifyQuery, rightSp, operand);
+            });
+        }
+
+        protected ${myConditionBeanClassName} xcreateColumnQueryCB() {
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+            cb.xsetupForColumnQuery((${myConditionBeanClassName})this);
+            return cb;
+        }
+
+        // [DBFlute-0.8.9.9]
+        // ===============================================================================
+        //                                                                    OrScopeQuery
+        //                                                                    ============
+        public void OrScopeQuery(${glOrQuery}<${myConditionBeanClassName}> orQuery) {
+            xorQ((${myConditionBeanClassName})this, orQuery);
+        }
+
+        // ===============================================================================
+        //                                                                    Purpose Type
+        //                                                                    ============
+        public void xsetupForColumnQuery(${myConditionBeanClassName} mainCB) {
+            xinheritSubQueryInfo(mainCB.LocalCQ);
+            //xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY);
+            _forColumnQuery = true; // old style
+
+            // inherits a parent query to synchronize real name
+            // (and also for suppressing query check) 
+            Specify().xsetSyncQyCall(new ${myConditionBeanClassName}ColQySpQyCall(mainCB));
+        }
+    }
+
+    public class ${myConditionBeanClassName}ColQySpQyCall : HpSpQyCall<${myConditionQueryClassName}> {
+        protected ${myConditionBeanClassName} _mainCB;
+        public ${myConditionBeanClassName}ColQySpQyCall(${myConditionBeanClassName} mainCB) {
+            _mainCB = mainCB;
+        }
+        public bool has() { return true; } 
+        public ${myConditionQueryClassName} qy() { return _mainCB.Query(); } 
+    }
+
+    public class ${myConditionBeanClassName}Specification : AbstractSpecification<${myConditionQueryClassName}> {
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+        protected ${tmpCBClassName}Specification _${tmpPropertyName};
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+        protected ${tmpCBClassName}Specification _${tmpPropertyName};
+#end
+        public ${myConditionBeanClassName}Specification(${glConditionBean} baseCB, HpSpQyCall<${myConditionQueryClassName}> qyCall
+                                                      , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery, bool forColumnQuery)
+        : base(baseCB, qyCall, forDerivedReferrer, forScalarSelect, forScalarSubQuery, forColumnQuery) { }
+#foreach ($col in $table.columns)
+        public void Column${col.javaName}() { doColumn("${col.name}"); }
+#end
+        protected override void doSpecifyRequiredColumn() {
+#foreach ($col in $table.primaryKey)
+            Column${col.javaName}(); // PK
+#end
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#if ($fk.hasLocalColumnExceptPrimaryKey())
+            if (qyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}()
+                    || qyCall().qy().xgetReferrerQuery() is ${fk.foreignTableExtendedConditionQueryClassName}) {
+#foreach ($col in $fk.localColumnList)
+#if (!$col.isPrimaryKey())
+                Column${col.javaName}(); // FK or one-to-one referrer
+#end
+#end
+            }
+#end
+#end
+        }
+        protected override String getTableDbName() { return "${table.tableDbName}"; }
+#foreach ($fk in $table.foreignKeys)
+#set ($tmpPropertyName = "${fk.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+        public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
+            assertForeign("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarCondition, _forColumnQuery);
+                if (xhasSyncQyCall()) // inherits it
+                { _${tmpPropertyName}.xsetSyncQyCall(new ${tmpPropertyNameInitCap}SpQyCall(xsyncQyCall())); }
+            }
+            return _${tmpPropertyName};
+        }
+		public class ${tmpPropertyNameInitCap}SpQyCall : HpSpQyCall<${tmpCQClassName}> {
+		    protected HpSpQyCall<${myConditionQueryClassName}> _qyCall;
+		    public ${tmpPropertyNameInitCap}SpQyCall(HpSpQyCall<${myConditionQueryClassName}> myQyCall) { _qyCall = myQyCall; }
+		    public bool has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+#if ($fk.hasDynamicFixedCondition())
+			public ${tmpCQClassName} qy() { return _qyCall.qy().ConditionQuery${tmpPropertyNameInitCap}; }
+#else
+			public ${tmpCQClassName} qy() { return _qyCall.qy().Query${tmpPropertyNameInitCap}(); }
+#end
+		}
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+        public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
+            assertForeign("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_qyCall), _forDerivedReferrer, _forScalarSelect, _forScalarCondition, _forColumnQuery);
+                if (xhasSyncQyCall()) // inherits it
+                { _${tmpPropertyName}.xsetSyncQyCall(new ${tmpPropertyNameInitCap}SpQyCall(xsyncQyCall())); }
+            }
+            return _${tmpPropertyName};
+        }
+		public class ${tmpPropertyNameInitCap}SpQyCall : HpSpQyCall<${tmpCQClassName}> {
+		    protected HpSpQyCall<${myConditionQueryClassName}> _qyCall;
+		    public ${tmpPropertyNameInitCap}SpQyCall(HpSpQyCall<${myConditionQueryClassName}> myQyCall) { _qyCall = myQyCall; }
+		    public bool has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+			public ${tmpCQClassName} qy() { return _qyCall.qy().Query${tmpPropertyNameInitCap}(); }
+		}
+#end
+#foreach ($referrer in $table.singleKeyStringOrIntegerReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.referrerPropertyName}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
+        public RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> Derived${tmpPropertyNameInitCap}() {
+            if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
+            return new RAFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _qyCall.qy(), delegate(String function, ${glSubQuery}<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName)
+                { cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName); });
+        }
+#end
+#end
+    }
+}

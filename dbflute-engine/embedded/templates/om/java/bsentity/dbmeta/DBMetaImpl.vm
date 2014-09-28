@@ -1,0 +1,383 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${myDBMetaPackageName};
+#set ($myClassName = "${myDBMetaClassName}")
+
+import java.util.List;
+import java.util.Map;
+
+import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.Entity;
+#if ($table.needsRelationOptionalEntityImport())
+import ${database.relationOptionalEntityClassName};
+#end
+import org.seasar.dbflute.dbmeta.AbstractDBMeta;
+import org.seasar.dbflute.dbmeta.PropertyGateway;
+import org.seasar.dbflute.dbmeta.info.*;
+import org.seasar.dbflute.dbmeta.name.*;
+import ${glPackageBaseCommon}.*;
+import ${myExtendedEntityPackageName}.*;
+
+/**
+ * The DB meta of ${table.tableDbName}. (Singleton)
+ * @author ${database.classAuthor}
+ */
+public class ${myClassName} extends AbstractDBMeta {
+
+    // ===================================================================================
+    //                                                                           Singleton
+    //                                                                           =========
+    private static final ${myClassName} _instance = new ${myClassName}();
+    private ${myClassName}() {}
+    public static ${myClassName} getInstance() { return _instance; }
+
+    // ===================================================================================
+    //                                                                       Current DBDef
+    //                                                                       =============
+    public DBDef getCurrentDBDef() { return ${glDBCurrent}.getInstance().currentDBDef(); }
+
+    // ===================================================================================
+    //                                                                    Property Gateway
+    //                                                                    ================
+## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## These fields and methods should be defined before definitions of column info.
+## And the map should be plain map for performance.
+## - - - - - - - - - -/
+    // -----------------------------------------------------
+    //                                       Column Property
+    //                                       ---------------
+    protected final Map<String, PropertyGateway> _epgMap = newHashMap();
+    {
+#foreach ($col in $table.columns)
+        setupEpg(_epgMap, new Epg${col.javaName}(), "${col.javaBeansRulePropertyName}");
+#end
+    }
+#foreach ($col in $table.columns)
+#set ($setupperClassName = "Epg${col.javaName}")
+#if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
+    public class ${setupperClassName} implements PropertyGateway {
+        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${col.javaName}(); }
+        public void write(Entity et, Object vl) {
+            ColumnInfo col = column${col.javaBeansRulePropertyNameInitCap}();
+#if ($col.isCheckSelectedClassification())
+            ccls(col, vl);
+#end
+#if ($col.isForceClassificationSetting())
+            ${glCDef}.${col.classificationName} cls = (${glCDef}.${col.classificationName})gcls(col, vl);
+            if (cls != null) {
+                ((${myExtendedObjectClassName})et).set${col.javaName}As${col.classificationName}(cls);
+            } else {
+## undefined code or null here, use internal method for native mapping
+#if ($col.isJavaNativeNumberObject())
+                ((${myExtendedObjectClassName})et).mynativeMapping${col.javaName}(ctn(vl, ${col.javaNative}.class));
+#else
+                ((${myExtendedObjectClassName})et).mynativeMapping${col.javaName}((${col.javaNative})vl);
+#end
+            }
+#else
+#if ($col.isJavaNativeNumberObject())
+            ((${myExtendedObjectClassName})et).set${col.javaName}(ctn(vl, ${col.javaNative}.class));
+#else
+            ((${myExtendedObjectClassName})et).set${col.javaName}((${col.javaNative})vl);
+#end
+#end
+        }
+#else
+## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## for different type between relation (Integer, Long and BigDecimal are prior)
+## - - - - - - - - - -/
+    public static class ${setupperClassName} implements PropertyGateway {
+        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${col.javaName}(); }
+## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## number handling might be enough to mapping but use simple name converter for small line
+## (and for compatible, keep just in case)
+## - - - - - - - - - -/
+#if ($col.isJavaNativeNumberObject())
+#if ($col.isJavaNativeInteger())
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(cti(vl)); }
+#elseif ($col.isJavaNativeLong())
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(ctl(vl)); }
+#elseif ($col.isJavaNativeBigDecimal())
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(ctb(vl)); }
+#else
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(ctn(vl, ${col.javaNative}.class)); }
+#end
+#else
+#if ($col.isJavaNativeUtilList())
+        @SuppressWarnings("unchecked")
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}((${col.javaNative})vl); }
+#else
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}((${col.javaNative})vl); }
+#end
+#end
+#end
+    }
+#end
+    public PropertyGateway findPropertyGateway(String prop)
+    { return doFindEpg(_epgMap, prop); }
+#if ($table.hasForeignKey() || $table.hasReferrerAsOne())
+
+    // -----------------------------------------------------
+    //                                      Foreign Property
+    //                                      ----------------
+    protected final Map<String, PropertyGateway> _efpgMap = newHashMap();
+#if ($table.hasForeignKey())
+    {
+#foreach ($fk in $table.foreignKeys)
+        setupEfpg(_efpgMap, new Efpg${fk.foreignJavaBeansRulePropertyNameInitCap}(), "${fk.foreignJavaBeansRulePropertyName}");
+#end
+    }
+#foreach ($fk in $table.foreignKeys)
+#set ($setupperClassName = "Efpg${fk.foreignJavaBeansRulePropertyNameInitCap}")
+    public class ${setupperClassName} implements PropertyGateway {
+        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${fk.foreignJavaBeansRulePropertyNameInitCap}(); }
+#if ($fk.isForeignPropertyOptionalEntity())
+        @SuppressWarnings("unchecked")
+#end
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${fk.foreignJavaBeansRulePropertyNameInitCap}((${fk.foreignPropertyEntityDefinitionType})vl); }
+    }
+#end
+#end
+#if ($table.hasReferrerAsOne())
+    {
+#foreach ($referrer in $table.referrerAsOneList)
+        setupEfpg(_efpgMap, new Efpg${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(), "${referrer.referrerJavaBeansRulePropertyNameAsOne}");
+#end
+    }
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($setupperClassName = "Efpg${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}")
+    public class ${setupperClassName} implements PropertyGateway {
+        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(); }
+#if ($referrer.isReferrerPropertyOptionalEntityAsOne())
+        @SuppressWarnings("unchecked")
+#end
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}((${referrer.referrerPropertyEntityDefinitionTypeAsOne})vl); }
+    }
+#end
+#end
+    public PropertyGateway findForeignPropertyGateway(String prop)
+    { return doFindEfpg(_efpgMap, prop); }
+#end
+
+    // ===================================================================================
+    //                                                                          Table Info
+    //                                                                          ==========
+    protected final String _tableDbName = "${table.tableDbName}";
+    protected final String _tablePropertyName = "${table.javaBeansRulePropertyName}";
+    protected final TableSqlName _tableSqlName = new TableSqlName("${table.tableSqlName}", _tableDbName);
+    { _tableSqlName.xacceptFilter(${glDBFluteConfig}.getInstance().getTableSqlNameFilter()); }
+    public String getTableDbName() { return _tableDbName; }
+    public String getTablePropertyName() { return _tablePropertyName; }
+    public TableSqlName getTableSqlName() { return _tableSqlName; }
+#if ($table.hasAlias())
+    protected final String _tableAlias = "$table.alias";
+    public String getTableAlias() { return _tableAlias; }
+#end
+#if ($table.isCommentForDBMetaValid())
+    protected final String _tableComment = "$table.commentForDBMeta";
+    public String getTableComment() { return _tableComment; }
+#end
+
+    // ===================================================================================
+    //                                                                         Column Info
+    //                                                                         ===========
+#foreach ($col in $table.columns)
+    protected final ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.columnSqlName}", ${col.synonymSettingExpression}, ${col.aliasSettingExpression}, ${col.javaNativeTypeLiteral}, "${col.javaBeansRulePropertyName}", ${col.propertyAccessTypeLiteral}, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, ${col.isNotNull()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.defaultValueSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression}, ${col.classificationMetaSettingExpression});
+#end
+
+#foreach ($col in $table.columns)
+    /**
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @return The information object of specified column. (NotNull)
+     */
+    public ColumnInfo column${col.javaBeansRulePropertyNameInitCap}() { return _column${col.javaBeansRulePropertyNameInitCap}; }
+#end
+
+    protected List<ColumnInfo> ccil() {
+        List<ColumnInfo> ls = newArrayList();
+#foreach ($col in $table.columns)
+        ls.add(column${col.javaBeansRulePropertyNameInitCap}());
+#end
+        return ls;
+    }
+
+    { initializeInformationResource(); }
+
+    // ===================================================================================
+    //                                                                         Unique Info
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                       Primary Element
+    //                                       ---------------
+#if ($table.hasPrimaryKey())
+#if ($table.hasSinglePrimaryKey())
+    protected UniqueInfo cpui() { return hpcpui(column${table.primaryKeyAsOne.javaBeansRulePropertyNameInitCap}()); }
+#else
+    protected UniqueInfo cpui() {
+        List<ColumnInfo> ls = newArrayListSized(4);
+#foreach ($col in $table.primaryKey)
+        ls.add(column${col.javaBeansRulePropertyNameInitCap}());
+#end
+        return hpcpui(ls);
+    }
+#end
+#else
+    protected UniqueInfo cpui() {
+        throw new UnsupportedOperationException("The table does not have primary key: " + getTableDbName());
+    }
+#end
+    public boolean hasPrimaryKey() { return ${table.hasPrimaryKey()}; }
+    public boolean hasCompoundPrimaryKey() { return ${table.hasCompoundPrimaryKey()}; }
+
+    // ===================================================================================
+    //                                                                       Relation Info
+    //                                                                       =============
+    // cannot cache because it uses related DB meta instance while booting
+    // (instead, cached by super's collection)
+    // -----------------------------------------------------
+    //                                      Foreign Property
+    //                                      ----------------
+#foreach ($fk in $table.foreignKeys)
+    /**
+     * ${fk.foreignDispForJavaDoc}
+     * @return The information object of foreign property. (NotNull)
+     */
+    public ForeignInfo foreign${fk.foreignJavaBeansRulePropertyNameInitCap}() {
+#if ($fk.isSimpleKeyFK())
+#set ($col = $fk.localColumnAsOne)
+#set ($yourCol = ${fk.getForeignColumnByLocalColumn(${col})})
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
+#else
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMapSized(4);
+#foreach ($col in $fk.localColumnList)
+#set ($yourCol = ${fk.getForeignColumnByLocalColumn(${col})})
+        mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
+#end
+#end
+        return cfi("${fk.name}", "${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}.getInstance(), mp, ${table.resolveForeignIndex($fk)}, ${fk.foreignPropertyAccessTypeMetaLiteral}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, false, ${fk.isAdditionalForeignKey()}, ${fk.fixedConditionArg}, ${fk.dynamicFixedConditionDBMetaSetupList}, ${fk.isFixedInline()}, ${fk.foreignReverseRelationPropertyNameArg});
+    }
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+    /**
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * @return The information object of foreign property(referrer-as-one). (NotNull)
+     */
+    public ForeignInfo foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
+#if ($referrer.isSimpleKeyFK())
+#set ($col = $referrer.foreignColumnAsOne)
+#set ($yourCol = ${referrer.getLocalColumnByForeignColumn(${col})})
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
+#else
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMapSized(4);
+#foreach ($col in $referrer.foreignColumnList)
+#set ($yourCol = ${referrer.getLocalColumnByForeignColumn(${col})})
+        mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
+#end
+#end
+        return cfi("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), mp, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.referrerPropertyAccessTypeMetaLiteralAsOne}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, true, ${referrer.isAdditionalForeignKey()}, ${referrer.fixedConditionArg}, ${referrer.dynamicFixedConditionDBMetaSetupList}, ${referrer.isFixedInline()}, ${referrer.referrerReverseRelationPropertyNameArg});
+    }
+#end
+
+    // -----------------------------------------------------
+    //                                     Referrer Property
+    //                                     -----------------
+#foreach ($referrer in $table.referrerAsManyList)
+    /**
+     * ${referrer.referrerDispForJavaDoc}
+     * @return The information object of referrer property. (NotNull)
+     */
+    public ReferrerInfo referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
+#if ($referrer.isSimpleKeyFK())
+#set ($col = $referrer.foreignColumnAsOne)
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap}());
+#else
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMapSized(4);
+#foreach ($col in $referrer.foreignColumnList)
+        mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap}());
+#end
+#end
+        return cri("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyName}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), mp, ${referrer.isOneToOne()}, ${referrer.referrerReverseRelationPropertyNameArg});
+    }
+#end
+
+    // ===================================================================================
+    //                                                                        Various Info
+    //                                                                        ============
+#if ($table.isUseIdentity())
+    public boolean hasIdentity() { return true; }
+#end
+#if ($table.isUseSequence())
+    public boolean hasSequence() { return true; }
+    public String getSequenceName() { return "${table.sequenceSqlName}"; }
+    public Integer getSequenceIncrementSize() { return ${table.sequenceIncrementSizeExpression}; }
+    public Integer getSequenceCacheSize() { return ${table.sequenceCacheSizeExpression}; }
+#end
+#if ($table.isUseVersionNo())
+    public boolean hasVersionNo() { return true; }
+    public ColumnInfo getVersionNoColumnInfo() { return _column${table.versionNoJavaName}; }
+#end
+#if ($table.isUseUpdateDate())
+    public boolean hasUpdateDate() { return true; }
+    public ColumnInfo getUpdateDateColumnInfo() { return _column${table.updateDateJavaName}; }
+#end
+#if ($table.hasAllCommonColumn())
+    public boolean hasCommonColumn() { return true; }
+    public List<ColumnInfo> getCommonColumnInfoList()
+    { return newArrayList(${table.commonColumnListSetupExpression}); }
+    public List<ColumnInfo> getCommonColumnInfoBeforeInsertList()
+    { return newArrayList(${table.commonColumnBeforeInsertListSetupExpression}); }
+    public List<ColumnInfo> getCommonColumnInfoBeforeUpdateList()
+    { return newArrayList(${table.commonColumnBeforeUpdateListSetupExpression}); }
+#end
+
+    // ===================================================================================
+    //                                                                           Type Name
+    //                                                                           =========
+    public String getEntityTypeName() { return "${myExtendedEntityPackageName}.${myExtendedObjectClassName}"; }
+#if ($isExistConditionBean)
+    public String getConditionBeanTypeName() { return "${glPackageCB}.${myConditionBeanClassName}"; }
+#else
+    public String getConditionBeanTypeName() { return null; }
+#end
+#if ($isExistBehavior)
+    public String getBehaviorTypeName() { return "${myExtendedBhvPackageName}.${myExtendedBhvClassName}"; }
+#else
+    public String getBehaviorTypeName() { return null; }
+#end
+
+    // ===================================================================================
+    //                                                                         Object Type
+    //                                                                         ===========
+    public Class<${myExtendedObjectClassName}> getEntityType() { return ${myExtendedObjectClassName}.class; }
+
+    // ===================================================================================
+    //                                                                     Object Instance
+    //                                                                     ===============
+    public ${myExtendedObjectClassName} newEntity() { return new ${myExtendedObjectClassName}(); }
+#if ($table.isCompatibleNewMyEntityConditionBean())
+    public ${myExtendedObjectClassName} newMyEntity() { return new ${myExtendedObjectClassName}(); }
+#end
+
+    // ===================================================================================
+    //                                                                   Map Communication
+    //                                                                   =================
+    public void acceptPrimaryKeyMap(Entity et, Map<String, ? extends Object> mp)
+    { doAcceptPrimaryKeyMap((${myExtendedObjectClassName})et, mp); }
+    public void acceptAllColumnMap(Entity et, Map<String, ? extends Object> mp)
+    { doAcceptAllColumnMap((${myExtendedObjectClassName})et, mp); }
+    public Map<String, Object> extractPrimaryKeyMap(Entity et) { return doExtractPrimaryKeyMap(et); }
+    public Map<String, Object> extractAllColumnMap(Entity et) { return doExtractAllColumnMap(et); }
+}

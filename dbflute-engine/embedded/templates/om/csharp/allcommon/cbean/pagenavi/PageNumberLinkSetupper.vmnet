@@ -1,0 +1,9 @@
+#set ($myClassName = "${glPageNumberLinkSetupper}")
+
+using System;
+
+namespace ${glPackageBaseCommonCBeanPagenavi} {
+
+    public delegate LINK ${myClassName}<LINK>(int pageNumberElement, bool current) where LINK : ${glPageNumberLink};
+}
+

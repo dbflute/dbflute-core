@@ -1,0 +1,34 @@
+
+using System.Text;
+using Seasar.Extension.ADO;
+using Seasar.Dao;
+using Seasar.Dao.Impl;
+
+using ${glPackageBaseCommonS2DaoInternalSqlHandler};
+
+namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
+
+    public class ${glInternalUpdateAutoStaticCommand} : ${glInternalAbstractAutoStaticCommand} {
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalUpdateAutoStaticCommand}(IDataSource dataSource, ICommandFactory commandFactory,
+            IBeanMetaData beanMetaData, string[] propertyNames)
+            : base(dataSource, commandFactory, beanMetaData, propertyNames) {
+        }
+
+        // ===============================================================================
+        //                                                                        Override
+        //                                                                        ========
+        protected override ${glInternalAbstractAutoHandler} CreateAutoHandler() {
+            return new ${glInternalUpdateAutoHandler}(DataSource, CommandFactory, BeanMetaData, PropertyTypes);
+        }
+        protected override void SetupSql() {
+            SetupUpdateSql();
+        }
+        protected override void SetupPropertyTypes(string[] propertyNames) {
+            SetupUpdatePropertyTypes(propertyNames);
+        }
+	}
+}

@@ -1,0 +1,14 @@
+
+using System;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the property on embedded value comment is not found  about outsideSql.
+    /// </summary>
+    public class ${glEmbeddedValueCommentNotFoundPropertyException} : SystemException {
+
+        public ${glEmbeddedValueCommentNotFoundPropertyException}(String msg)
+        : base(msg) {}
+    }
+}

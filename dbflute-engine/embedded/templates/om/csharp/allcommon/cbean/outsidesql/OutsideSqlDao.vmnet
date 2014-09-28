@@ -1,0 +1,40 @@
+
+using System;
+using System.Collections.Generic;
+
+using Seasar.Quill.Attrs;
+using Seasar.Dao.Attrs;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonJdbc};
+using ${glPackageBaseCommonS2Dao};
+
+namespace ${glPackageBaseCommonCBeanOutsidesql} {
+
+    [Implementation]
+    [S2Dao(typeof(${database.S2DaoSettingClass}))]
+    [Bean(typeof(OutsideSqlDaoDummyEntity))]
+    public interface ${glOutsideSqlDao} : ${glDaoReadable} {
+
+        // ===================================================================================
+        //                                                                              Select
+        //                                                                              ======
+        System.Collections.IList SelectList(String path, Object pmb, ${glOutsideSqlOption} option, Type entityType);
+
+        Object SelectCursor(String path, Object pmb, ${glOutsideSqlOption} option, ${glCursorHandler} handler);
+
+        int Execute(String path, Object pmb, ${glOutsideSqlOption} option);
+
+		// Not implemented yet!
+        // int[] batchExecute(String path, List<Object> pmb, ${glOutsideSqlOption} option);
+
+        // [DBFlute-0.8.0]
+        // ===================================================================================
+        //                                                                                Call
+        //                                                                                ====
+        void Call(String path, Object pmb, ${glOutsideSqlOption} option);
+    }
+
+    public class OutsideSqlDaoDummyEntity {
+    }
+}

@@ -1,0 +1,106 @@
+
+using System;
+using System.Data;
+
+using Seasar.Dao;
+using Seasar.Dao.Impl;
+using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Impl;
+using Seasar.Quill.Dao.Impl;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonJdbc};
+
+namespace ${glPackageBaseCommonS2Dao} {
+
+    public class ${glS2DaoSetting} : AbstractDaoSetting {
+
+        protected override void SetupDao(IDataSource dataSource) {
+            ICommandFactory commandFactory = CreateCommandFactory();
+            IDataReaderFactory dataReaderFactory = CreateDataReaderFactory(commandFactory);
+            IAnnotationReaderFactory annotationReaderFactory = CreateAnnotationReaderFactory();
+            _daoMetaDataFactory = new ${glS2DaoMetaDataFactoryImpl}(dataSource, commandFactory, annotationReaderFactory, dataReaderFactory);
+            _daoInterceptor = new ${glS2DaoInterceptor}(_daoMetaDataFactory);
+        }
+
+        protected ICommandFactory CreateCommandFactory() {
+            IDbParameterParser dbParamterParser = ${glDBFluteConfig}.GetInstance().DbParameterParser;
+            BasicCommandFactory commandFactory;
+            if (dbParamterParser != null) {
+                commandFactory = new TnBasicCommandFactory(dbParamterParser);
+            } else {
+                commandFactory = new TnBasicCommandFactory();
+            }
+            return commandFactory;
+        }
+
+        protected IDataReaderFactory CreateDataReaderFactory(ICommandFactory commandFactory) {
+            return new BasicDataReaderFactory(commandFactory);
+        }
+
+        protected IAnnotationReaderFactory CreateAnnotationReaderFactory() {
+            return new FieldAnnotationReaderFactory();
+        }
+#if ($database.isQuillDataSourceNameValid())
+
+        public override String DataSourceName {
+            get { return "${database.quillDataSourceName}"; }
+        }
+#end
+    }
+
+    public class TnBasicCommandFactory : BasicCommandFactory {
+
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public TnBasicCommandFactory() : base() {}
+        public TnBasicCommandFactory(IDbParameterParser dbParameterParser) : base(dbParameterParser) {}
+
+        // ===============================================================================
+        //                                                                Command Creation
+        //                                                                ================
+        public override IDbCommand CreateCommand(IDbConnection conn, string sql) {
+            IDbCommand cmd = conn.CreateCommand();
+            cmd.CommandText = ChangeSignSql(cmd, sql);
+            ${glStatementConfig} defaultStatementConfig = ${glDBFluteConfig}.GetInstance().DefaultStatementConfig;
+            bool internalDebug = ${glDBFluteConfig}.GetInstance().IsInternalDebug;
+            ${glStatementConfig} config = FindStatementConfigOnThread();
+            if (config != null && config.HasQueryTimeout()) {
+                if (internalDebug) {
+                    _log.Debug("...Setting statement config as request: " + config);
+                }
+                cmd.CommandTimeout = config.GetQueryTimeout().Value;// DBFlute original logic.
+            } else if (defaultStatementConfig != null && defaultStatementConfig.HasQueryTimeout()) {
+                if (internalDebug) {
+                    _log.Debug("...Setting statement config as default: " + config);
+                }
+                cmd.CommandTimeout = defaultStatementConfig.GetQueryTimeout().Value;// DBFlute original logic.
+            } else {
+                if (CommandTimeout > -1) {
+                    cmd.CommandTimeout = CommandTimeout;// S2Dao original logic.
+                }
+            }
+            return cmd;
+        }
+
+        protected ${glStatementConfig} FindStatementConfigOnThread() {
+            ${glStatementConfig} config = null;
+            if (${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
+                ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
+                config = cb.StatementConfig;
+            } else if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContext} context = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
+                config = context.StatementConfig;
+            }
+            return config;
+        }
+    }
+}

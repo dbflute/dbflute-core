@@ -1,0 +1,13 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommon} {
+
+    public interface ${glDaoWritable} : ${glDaoReadable} {
+
+        int Create(${glEntity} entity);
+        int Modify(${glEntity} entity);
+        int Remove(${glEntity} entity);
+    }
+}

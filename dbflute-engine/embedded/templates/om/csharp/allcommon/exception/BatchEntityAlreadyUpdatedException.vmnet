@@ -1,0 +1,18 @@
+
+using System;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the entity has already been updated by other thread in batch update.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public class ${glBatchEntityAlreadyUpdatedException} : ${glEntityAlreadyUpdatedException} {
+
+        protected int? _batchUpdateCount;
+        public ${glBatchEntityAlreadyUpdatedException}(Object bean, int rows, int? batchUpdateCount)
+        : base(bean, rows) { this._batchUpdateCount = batchUpdateCount; }
+        
+        public int? BatchUpdateCount { get { return _batchUpdateCount; } }
+    }
+}

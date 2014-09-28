@@ -1,0 +1,127 @@
+##
+## Copyright 2004-2014 the Seasar Foundation and the Others.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${database.allClassCopyright}package ${myBaseCursorPackageName};
+#set ($myClassName = "${myBaseTypeSafeCursorClassName}")
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
+
+/**
+ * The cursor of ${table.basicInfoDispString}. <br />
+#if ($table.isCommentForJavaDocValid())
+ * ${table.commentForJavaDoc}
+#end
+ * @author ${database.classAuthor}
+ */
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                        Column DB Name
+    //                                        --------------
+#foreach ($col in $table.columns)
+    /** DB name of ${col.name}. */
+    public static final String DB_NAME_${col.name} = "$col.name";
+
+#end
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Wrapped result set. */
+    protected ResultSet _rs;
+
+#foreach ($col in $table.columns)
+#if ($col.isDbTypeStringClob())
+    protected ValueType _vt${col.javaName} = vt(${col.javaNative}.class, "stringClobType");
+#elseif ($col.isDbTypeBytesOid())
+    protected ValueType _vt${col.javaName} = vt(${col.javaNative}.class, "bytesOidType");
+#else
+    protected ValueType _vt${col.javaName} = vt(${col.javaNative}.class);
+#end
+#end
+
+    protected ValueType vt(Class<?> type) {
+        return TnValueTypes.getValueType(type);
+    }
+
+    protected ValueType vt(Class<?> type, String name) {
+        ValueType valueType = TnValueTypes.getPluginValueType(name);
+        return valueType != null ? valueType : vt(type);
+    }
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}() {
+    }
+
+    // ===================================================================================
+    //                                                                             Prepare
+    //                                                                             =======
+    /**
+     * Accept the result set.
+     * @param rs The cursor (result set) for the query, which has first pointer. (NotNull)
+     */
+    public void accept(ResultSet rs) {
+        this._rs = rs;
+    }
+
+    // ===================================================================================
+    //                                                                              Direct
+    //                                                                              ======
+    /**
+     * Get the wrapped cursor (result set).
+     * @return The instance of result set. (NotNull)
+     */
+    public ResultSet cursor() {
+        return _rs;
+    }
+
+    // ===================================================================================
+    //                                                                            Delegate
+    //                                                                            ========
+    /**
+     * Move to next result.
+     * @return Is exist next result.
+     * @throws SQLException
+     */
+    public boolean next() throws SQLException {
+        return _rs.next();
+    }
+
+    // ===================================================================================
+    //                                                                  Type Safe Accessor
+    //                                                                  ==================
+#foreach ($col in $table.columns)
+    /**
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+     * @return The value of ${col.uncapitalisedJavaName}. (NullAllowed)
+     * @throws java.sql.SQLException
+     */
+    public ${col.javaNative} get${col.javaName}() throws SQLException {
+        return (${col.javaNative})_vt${col.javaName}.getValue(_rs, DB_NAME_${col.name});
+    }
+
+#end
+}

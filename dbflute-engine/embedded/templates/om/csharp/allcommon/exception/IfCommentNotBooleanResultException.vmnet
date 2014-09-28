@@ -1,0 +1,16 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the result of IF comment is not boolean about outsideSql.
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public class ${glIfCommentNotBooleanResultException} : SystemException {
+
+        public ${glIfCommentNotBooleanResultException}(String msg)
+        : base(msg) {}
+    }
+}

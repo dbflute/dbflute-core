@@ -1,0 +1,169 @@
+<!--
+    Torque XML database schema DTD
+-->
+
+<!--
+For: database.defaultIdMethod and table.idMethod
+
+Do not use autoincrement or sequence. They are deprecated in favor of
+using native which will use the Connection pool to determine
+which database it is talking to (yes, it knows that) and then use
+whatever native database methodology for insert increments that it can.
+Otherwise, you should use idbroker or none. none is good if you have a
+table that is just a join table. idbroker is good if you want a
+centralized repository for brokering out clumps of id's in a database
+agnostic way.
+-->
+
+<!--
+
+defaultJavaNamingMethod determines how a table or column name,
+from the name attribute in the xml database file, is converted to a
+Java class or method name.
+
+     nochange   - indicates not change is performed.
+     underscore - Underscores are removed, First letter is
+              capitalized, first letter after an underscore
+              is capitalized, the rest of the letters are
+              converted to lowercase.
+     javaname   - same as underscore, but no letters are converted
+              to lowercase.
+-->
+
+<!ELEMENT database (external-schema*, table+, sequenceGroup?, procedureGroup?)>
+<!ATTLIST database
+  name CDATA #IMPLIED
+  defaultIdMethod (idbroker|native|autoincrement|sequence|none) "none"
+  defaultJavaType (object|primitive) "primitive"
+  package CDATA #IMPLIED
+  baseClass CDATA #IMPLIED
+  basePeer CDATA #IMPLIED
+  defaultJavaNamingMethod (nochange|underscore|javaname) "underscore"
+  heavyIndexing (true|false) "false"
+>
+
+<!ELEMENT external-schema EMPTY>
+<!ATTLIST external-schema
+  filename CDATA #REQUIRED
+>
+
+<!--
+     note: the interface="true", requires that useManagers=true in the
+     properties file.
+-->
+<!ELEMENT table (column+,(foreign-key|index|unique|id-method-parameter)*)>
+<!ATTLIST table
+  name CDATA #REQUIRED
+  type CDATA #IMPLIED
+  schema CDATA #IMPLIED
+  comment CDATA #IMPLIED
+  javaName CDATA #IMPLIED
+  idMethod (idbroker|native|autoincrement|sequence|none|null) "null"
+  skipSql (true|false) "false"
+  abstract (true|false) "false"
+  baseClass CDATA #IMPLIED
+  basePeer CDATA #IMPLIED
+  alias CDATA #IMPLIED
+  interface CDATA #IMPLIED
+  javaNamingMethod (nochange|underscore|javaname) #IMPLIED
+  heavyIndexing (true|false) #IMPLIED
+  description CDATA #IMPLIED
+>
+
+<!ELEMENT id-method-parameter EMPTY>
+<!ATTLIST id-method-parameter
+  name CDATA "default"
+  value CDATA #REQUIRED
+>
+
+<!ELEMENT column (inheritance*)>
+<!ATTLIST column
+  name CDATA #REQUIRED
+  javaName CDATA #IMPLIED
+  type CDATA #IMPLIED
+  dbType CDATA #IMPLIED
+  javaType CDATA #IMPLIED
+  size CDATA #IMPLIED
+  required (true|false) "false"
+  primaryKey (true|false) "false"
+  pkName CDATA #IMPLIED
+  comment CDATA #IMPLIED
+  default CDATA #IMPLIED
+  autoIncrement (true|false) "false"
+  inheritance (single|false) "false"
+  inputValidator CDATA #IMPLIED
+  javaNamingMethod (nochange|underscore|javaname) #IMPLIED
+  description CDATA #IMPLIED
+>
+
+<!ELEMENT inheritance EMPTY>
+<!ATTLIST inheritance
+  key CDATA #REQUIRED
+  class CDATA #REQUIRED
+  extends CDATA #IMPLIED
+>
+
+<!ELEMENT foreign-key (reference+)>
+<!ATTLIST foreign-key
+  foreignTable CDATA #REQUIRED
+  foreignSchema CDATA #IMPLIED
+  name CDATA #IMPLIED
+  onUpdate (cascade|setnull|restrict|none) "none"
+  onDelete (cascade|setnull|restrict|none) "none"
+>
+
+<!ELEMENT reference EMPTY>
+<!ATTLIST reference
+  local CDATA #REQUIRED
+  foreign CDATA #REQUIRED
+>
+
+<!ELEMENT index (index-column+)>
+<!ATTLIST index
+  name CDATA #IMPLIED
+>
+
+<!ELEMENT index-column EMPTY>
+<!ATTLIST index-column
+  name CDATA #REQUIRED
+  position CDATA #REQUIRED
+>
+
+<!ELEMENT unique (unique-column+)>
+<!ATTLIST unique
+  name CDATA #IMPLIED
+>
+
+<!ELEMENT unique-column EMPTY>
+<!ATTLIST unique-column
+  name CDATA #REQUIRED
+  position CDATA #REQUIRED
+>
+
+<!ELEMENT sequenceGroup (sequence*)>
+<!ATTLIST sequenceGroup
+>
+
+<!ELEMENT sequence EMPTY>
+<!ATTLIST sequence
+  name CDATA #REQUIRED
+  schema CDATA #IMPLIED
+  minimumValue CDATA #IMPLIED
+  maximumValue CDATA #IMPLIED
+  incrementSize CDATA #IMPLIED
+  comment CDATA #IMPLIED
+>
+
+<!ELEMENT procedureGroup (procedure*)>
+<!ATTLIST procedureGroup
+>
+
+<!ELEMENT procedure EMPTY>
+<!ATTLIST procedure
+  name CDATA #REQUIRED
+  schema CDATA #IMPLIED
+  sourceLine CDATA #IMPLIED
+  sourceSize CDATA #IMPLIED
+  sourceHash CDATA #IMPLIED
+  comment CDATA #IMPLIED
+>

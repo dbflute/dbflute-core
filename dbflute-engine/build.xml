@@ -1,0 +1,432 @@
+<project name="DBFlute" default="dist" basedir=".">
+
+	<!-- ============================================================================= -->
+	<!--                                          P R O P E R T Y  D E F I N I T I O N -->
+	<!--                                          ==================================== -->
+
+	<!-- Version -->
+	<property name="version" value="1.0.5L" />
+	<property name="build.version" value="${version}" />
+	<property name="runtime.version" value="1.0.5L" />
+	<property name="runtime.build.version" value="${runtime.version}" />
+	<property name="example.latest.version" value="1.x" />
+
+	<!-- Base Directories -->
+	<property name="workspace.base" value="../.." />
+	<property name="dbflute.base" value="${workspace.base}/dbflute" />
+	<property name="dbflute.www.base" value="${workspace.base}/dbflute-www" />
+	<property name="example.container.base" value="${workspace.base}/dbflute-example-container" />
+	<property name="example.database.base" value="${workspace.base}/dbflute-example-database" />
+	<property name="example.multipledb.base" value="${workspace.base}/dbflute-example-multipledb" />
+	<property name="example.subproject.base" value="${workspace.base}/dbflute-example-subproject" />
+	<property name="example.friends.frank.base" value="${workspace.base}/dbflute-example-friends-frank" />
+	<property name="example.friends.guest.base" value="${workspace.base}/dbflute-example-friends-guest" />
+	<property name="tryout.base" value="${workspace.base}/dbflute-tryout" />
+
+	<!-- Point Directories -->
+	<property name="dist" value="dist" />
+	<property name="embedded" value="embedded" />
+	<property name="runtime.dir" value="${dbflute.base}/dbflute-runtime" />
+	<property name="extraction.dir" value="${dist}/extraction" />
+	<property name="stage.dir" value="${dbflute.www.base}/download" />
+
+	<!-- Jar Files -->
+	<property name="engine.jar" value="dbflute.jar" />
+	<property name="runtime.jar" value="dbflute-runtime-${runtime.version}.jar" />
+	<property name="runtime.sources.jar" value="dbflute-runtime-${runtime.version}-sources.jar" />
+	<property name="runtime.build.jar" value="dbflute-runtime-${runtime.build.version}.jar" />
+	<property name="runtime.sources.build.jar" value="dbflute-runtime-${runtime.build.version}-sources.jar" />
+	<property name="runtime.nonversion.jar" value="dbflute-runtime.jar" />
+	<property name="runtime.sources.nonversion.jar" value="dbflute-runtime-sources.jar" />
+	<property name="module.zip" value="dbflute-${version}.zip" />
+	<property name="module.build.zip" value="dbflute-${build.version}.zip" />
+
+	<!-- DI Container Examples -->
+	<property name="seasar.example.dir" value="${example.container.base}/dbflute-seasar-example" />
+	<property name="spring.example.dir" value="${example.container.base}/dbflute-spring-example" />
+	<property name="guice.example.dir" value="${example.container.base}/dbflute-guice-example" />
+	<property name="cdi.example.dir" value="${example.container.base}/dbflute-cdi-example" />
+
+	<!-- Database Examples -->
+	<property name="mysql.example.dir" value="${example.database.base}/dbflute-mysql-example" />
+	<property name="postgresql.example.dir" value="${example.database.base}/dbflute-postgresql-example" />
+	<property name="oracle.example.dir" value="${example.database.base}/dbflute-oracle-example" />
+	<property name="sqlserver.example.dir" value="${example.database.base}/dbflute-sqlserver-example" />
+	<property name="db2.example.dir" value="${example.database.base}/dbflute-db2-example" />
+	<property name="sqlite.example.dir" value="${example.database.base}/dbflute-sqlite-example" />
+	<property name="msaccess.example.dir" value="${example.database.base}/dbflute-msaccess-example" />
+
+	<!-- MultipleDB Examples -->
+	<property name="multipledb.seasar.example.dir" value="${example.multipledb.base}/dbflute-multipledb-seasar-example" />
+	<property name="multipledb.spring.example.dir" value="${example.multipledb.base}/dbflute-multipledb-spring-example" />
+
+	<!-- SubProject Examples -->
+	<property name="bhvap.seasar.example.dir" value="${example.subproject.base}/dbflute-bhvap-seasar-example" />
+	<property name="bhvap.spring.example.dir" value="${example.subproject.base}/dbflute-bhvap-spring-example" />
+	<property name="bhvap.guice.example.dir" value="${example.subproject.base}/dbflute-bhvap-guice-example" />
+	<property name="sqlap.example.dir" value="${example.subproject.base}/dbflute-sqlap-example" />
+
+	<!-- Friends Frank Examples -->
+	<property name="ymir.example.dir" value="${example.friends.frank.base}/dbflute-ymir-example" />
+	<property name="sastruts.example.dir" value="${example.friends.frank.base}/dbflute-sastruts-example" />
+	<property name="flex.example.dir" value="${example.friends.frank.base}/dbflute-flexserver-example" />
+
+	<!-- Friends Guest Examples -->
+	<property name="doma.example.dir" value="${example.friends.guest.base}/dbflute-doma-example" />
+	<property name="hibernate.example.dir" value="${example.friends.guest.base}/dbflute-hibernate-example" />
+	<property name="s2jdbc.example.dir" value="${example.friends.guest.base}/dbflute-s2jdbc-example" />
+
+	<!-- Tryout -->
+	<property name="javatry.dir" value="${tryout.base}/javatry" />
+
+	<!-- ============================================================================= -->
+	<!--                                                        C O M P I L E  T A S K -->
+	<!--                                                        ====================== -->
+
+	<target name="clean">
+		<delete dir="target/classes" />
+		<mkdir dir="target/classes" />
+	</target>
+
+	<target name="copy-resources">
+		<copy todir="target/classes">
+			<fileset dir="src/main/java">
+				<exclude name="**/*.java" />
+			</fileset>
+			<fileset dir="src/main/resources">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="compile" depends="clean, copy-resources" description="==> compiles sources">
+
+		<echo message="+------------------------------------------+" />
+		<echo message="|                                          |" />
+		<echo message="| Compiling sources!                       |" />
+		<echo message="|                                          |" />
+		<echo message="+------------------------------------------+" />
+
+		<javac destdir="target/classes" encoding="UTF-8" debug="true">
+			<src path="src/main/java" />
+			<src path="src/main/resources" />
+			<classpath>
+				<fileset dir="lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+			<include name="**/*" />
+			<compilerarg value="-Xlint:deprecation" />
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
+	</target>
+
+	<!-- ============================================================================= -->
+	<!--                                              D I S T R I B U T I O N  T A S K -->
+	<!--                                              ================================ -->
+
+	<target name="dist" depends="compile" description="==> generates distribution">
+
+		<echo message="+------------------------------------------+" />
+		<echo message="|                                          |" />
+		<echo message="| Generating dist for YOUR datamodel!      |" />
+		<echo message="|                                          |" />
+		<echo message="+------------------------------------------+" />
+
+		<mkdir dir="${dist}" />
+
+		<delete file="${embedded}/lib/${engine.jar}" />
+		<jar jarfile="${embedded}/lib/${engine.jar}" basedir="target/classes">
+		</jar>
+
+		<copy overwrite="true" file="${embedded}/etc/client-template/_project.bat" tofile="${embedded}/etc/client-template/dbflute_dfclient/_project.bat">
+			<filterset>
+				<filter token="dbflute.version" value="${build.version}" />
+			</filterset>
+		</copy>
+		<copy overwrite="true" file="${embedded}/etc/client-template/_project.sh" tofile="${embedded}/etc/client-template/dbflute_dfclient/_project.sh">
+			<filterset>
+				<filter token="dbflute.version" value="${build.version}" />
+			</filterset>
+		</copy>
+		<delete file="${embedded}/etc/client-template/dbflute_dfclient.zip" />
+		<zip zipfile="${embedded}/etc/client-template/dbflute_dfclient.zip">
+			<zipfileset prefix="dbflute_dfclient" dir="${embedded}/etc/client-template/dbflute_dfclient" />
+		</zip>
+
+		<tstamp>
+			<format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
+		</tstamp>
+
+		<delete file="${embedded}/mark/product-is-dbflute-${version}" />
+		<copy overwrite="true" file="${embedded}/mark/product-is-dbflute" tofile="${embedded}/mark/product-is-dbflute-${version}">
+			<filterset>
+				<filter token="version" value="${build.version}" />
+				<filter token="datetime" value="${now.date}" />
+			</filterset>
+		</copy>
+
+		<zip zipfile="${dist}/${module.zip}">
+			<zipfileset prefix="etc/cmd" dir="${embedded}/etc/cmd">
+				<include name="*.cmd" />
+				<include name="*.sh" />
+			</zipfileset>
+			<zipfileset prefix="etc/client-template" dir="${embedded}/etc/client-template">
+				<include name="dbflute_dfclient.zip" />
+			</zipfileset>
+			<zipfileset prefix="etc/license" dir="${embedded}/etc/license">
+				<include name="*.txt" />
+				<include name="*.html" />
+			</zipfileset>
+			<zipfileset prefix="etc/logprop" dir="${embedded}/etc/logprop">
+				<include name="log4j.properties" />
+			</zipfileset>
+			<zipfileset prefix="lib" dir="${embedded}/lib">
+				<include name="*.jar" />
+				<include name="*.zip" />
+			</zipfileset>
+			<zipfileset prefix="templates/doc" dir="${embedded}/templates/doc">
+				<exclude name="**/*---.txt" />
+			</zipfileset>
+			<zipfileset prefix="templates/om" dir="${embedded}/templates/om">
+				<include name="ControlGenerateJava.vm" />
+				<include name="ControlSql2EntityJava.vm" />
+				<include name="ControlGenerateScala.vm" />
+				<include name="ControlSql2EntityScala.vm" />
+			</zipfileset>
+			<zipfileset prefix="templates/om/java" dir="${embedded}/templates/om/java">
+				<exclude name="**/*---.txt" />
+			</zipfileset>
+			<zipfileset prefix="templates/om/scala" dir="${embedded}/templates/om/scala">
+				<exclude name="**/*---.txt" />
+			</zipfileset>
+			<zipfileset prefix="ant" dir="${embedded}/ant" />
+			<zipfileset prefix="" dir="${embedded}">
+				<include name="build-torque.xml" />
+				<include name="LICENSE" />
+				<include name="NOTICE" />
+				<include name="README.txt" />
+			</zipfileset>
+			<zipfileset prefix="" dir="${embedded}/mark">
+				<include name="product-is-dbflute-${version}" />
+			</zipfileset>
+		</zip>
+	</target>
+
+	<target name="runtime-dist">
+		<copy file="${runtime.dir}/target/${runtime.build.jar}" tofile="${dist}/${runtime.jar}" overwrite="true" />
+		<copy file="${runtime.dir}/target/${runtime.sources.build.jar}" tofile="${dist}/${runtime.sources.jar}" overwrite="true" />
+		<copy file="${dist}/${runtime.jar}" tofile="lib/${runtime.nonversion.jar}" overwrite="true" />
+		<copy file="${dist}/${runtime.sources.jar}" tofile="lib/sources/${runtime.sources.nonversion.jar}" overwrite="true" />
+		<copy file="${dist}/${runtime.jar}" tofile="${embedded}/lib/${runtime.nonversion.jar}" overwrite="true" />
+		<delete dir="${runtime.dir}/target/apidocs" />
+		<delete dir="${runtime.dir}/target/java-bundle-options" />
+	</target>
+
+	<target name="adjust">
+		<fixcrlf srcdir="${embedded}/templates" eol="crlf" encoding="UTF-8">
+			<exclude name="**/*.vmnet" />
+		</fixcrlf>
+		<fixcrlf srcdir="${embedded}/templates/om/csharp" eol="crlf" encoding="UTF-8" />
+	</target>
+
+	<!-- ============================================================================= -->
+	<!--                                                            S T A G E  T A S K -->
+	<!--                                                            ================== -->
+
+	<target name="stage">
+		<copy file="${dist}/${module.zip}" tofile="${stage.dir}/dbflute/${module.build.zip}" overwrite="true">
+		</copy>
+	</target>
+
+	<!-- ============================================================================= -->
+	<!--                                                        E X A M P L E  T A S K -->
+	<!--                                                        ====================== -->
+
+	<!-- for example projects -->
+	<target name="prepare-reflection">
+		<delete dir="${extraction.dir}" />
+		<unzip src="${dist}/${module.zip}" dest="${extraction.dir}" />
+		<chmod dir="${extraction.dir}/ant/bin" perm="ugo+rx" includes="**/*" />
+	</target>
+
+	<target name="reflect-to-seasar" depends="prepare-reflection" description="==> reflect to seasar example">
+		<delete dir="${seasar.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${seasar.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-spring" depends="prepare-reflection" description="==> reflect to spring example">
+		<delete dir="${spring.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${spring.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-guice" depends="prepare-reflection" description="==> reflect to guice example">
+		<delete dir="${guice.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${guice.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-cdi" depends="prepare-reflection" description="==> reflect to cdi example">
+		<delete dir="${cdi.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${cdi.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-mysql" depends="prepare-reflection" description="==> reflect to mysql example">
+		<delete dir="${mysql.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${mysql.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-postgresql" depends="prepare-reflection" description="==> reflect to postgresql example">
+		<delete dir="${postgresql.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${postgresql.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-oracle" depends="prepare-reflection" description="==> reflect to oracle example">
+		<delete dir="${oracle.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${oracle.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-db2" depends="prepare-reflection" description="==> reflect to db2 example">
+		<delete dir="${db2.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${db2.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-sqlserver" depends="prepare-reflection" description="==> reflect to sqlserver example">
+		<delete dir="${sqlserver.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${sqlserver.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-sqlite" depends="prepare-reflection" description="==> reflect to sqlite example">
+		<delete dir="${sqlite.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${sqlite.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-msaccess" depends="prepare-reflection" description="==> reflect to msaccess example">
+		<delete dir="${msaccess.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${msaccess.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-flex" depends="prepare-reflection" description="==> reflect to flex example">
+		<delete dir="${flex.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${flex.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-ymir" depends="prepare-reflection" description="==> reflect to ymir example">
+		<delete dir="${ymir.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${ymir.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-sastruts" depends="prepare-reflection" description="==> reflect to sastruts example">
+		<delete dir="${sastruts.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${sastruts.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-hibernate" depends="prepare-reflection" description="==> reflect to hibernate example">
+		<delete dir="${hibernate.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${hibernate.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-s2jdbc" depends="prepare-reflection" description="==> reflect to s2jdbc example">
+		<delete dir="${s2jdbc.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${s2jdbc.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-doma" depends="prepare-reflection" description="==> reflect to flex example">
+		<delete dir="${doma.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${doma.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-multipledb" depends="prepare-reflection" description="==> reflect to multipledb example">
+		<delete dir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<delete dir="${multipledb.spring.example.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<copy todir="${multipledb.spring.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-javatry" depends="prepare-reflection" description="==> reflect to java try">
+		<copy file="${dist}/${runtime.jar}" tofile="${javatry.dir}/lib/${runtime.nonversion.jar}" overwrite="true" />
+		<copy file="${dist}/${runtime.sources.jar}" tofile="${javatry.dir}/lib/sources/${runtime.sources.nonversion.jar}" overwrite="true" />
+	</target>
+
+	<!-- = = = = = = = = = = -->
+	<!-- Reflection for Mac  -->
+	<!-- = = = = = = = = = = -->
+
+	<target name="reflect-to-all-regulars" depends="prepare-reflection" description="==> reflect to all examples">
+		<antcall target="reflect-to-seasar" />
+		<antcall target="reflect-to-spring" />
+		<antcall target="reflect-to-guice" />
+		<antcall target="reflect-to-cdi" />
+		<antcall target="reflect-to-mysql" />
+		<antcall target="reflect-to-postgresql" />
+		<antcall target="reflect-to-db2" />
+
+		<!-- in virtual machine
+		<antcall target="reflect-to-oracle" />
+		<antcall target="reflect-to-sqlserver" />
+		-->
+
+		<antcall target="reflect-to-msaccess" />
+		<antcall target="reflect-to-sqlite" />
+		<antcall target="reflect-to-multipledb" />
+		<antcall target="reflect-to-flex" />
+		<antcall target="reflect-to-sastruts" />
+		<antcall target="reflect-to-ymir" />
+		<antcall target="reflect-to-javatry" />
+	</target>
+</project>

@@ -1,0 +1,207 @@
+<project name="DBFlute.NET" default="dist" basedir=".">
+
+	<!-- ============================================================================= -->
+	<!--                                          P R O P E R T Y  D E F I N I T I O N -->
+	<!--                                          ==================================== -->
+
+	<!-- Version -->
+	<property name="version" value="0.8.9.59"/>
+	<property name="build.version" value="${version}"/>
+	<property name="pre.version" value="0.8.9.58"/>
+
+	<!-- Resource Directories -->
+	<property name="workspace.base" value="../.."/>
+	<property name="dist" value="dist/net"/>
+	<property name="embedded" value="embedded"/>
+	<property name="extraction.dir" value="${dist}/extraction"/>
+	<property name="stage.dir" value="${workspace.base}/dbflute.net-www/download"/>
+
+	<!-- Jar Files -->
+	<property name="engine.jar" value="dbflute.jar"/>
+	<property name="module.zip" value="dbflute-${version}.zip"/>
+	<property name="module.build.zip" value="dbflute-${build.version}.zip"/>
+
+	<!-- Examples -->
+	<property name="basic.example.dir" value="${workspace.base}/dfnet-basic-example"/>
+	<property name="asp.net.example.dir" value="${workspace.base}/dfnet-asp.net-example"/>
+	<property name="multipledb.quill.example.dir" value="${workspace.base}/dfnet-multipledb-quill-example"/>
+
+	<!-- ============================================================================= -->
+	<!--                                                        C O M P I L E  T A S K -->
+	<!--                                                        ====================== -->
+
+	<target name="clean">
+		<delete dir="target/classes"/>
+		<mkdir dir="target/classes"/>
+	</target>
+
+	<target name="copy-resources">
+		<copy todir="target/classes">
+			<fileset dir="src/main/java">
+				<exclude name="**/*.java"/>
+			</fileset>
+			<fileset dir="src/main/resources">
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="compile" depends="clean, copy-resources" description="==> compiles sources">
+
+		<echo message="+------------------------------------------+"/>
+		<echo message="|                                          |"/>
+		<echo message="| Compiling sources!                       |"/>
+		<echo message="|                                          |"/>
+		<echo message="+------------------------------------------+"/>
+
+		<javac destdir="target/classes" encoding="UTF-8" debug="true">
+			<src path="src/main/java" />
+			<src path="src/main/resources" />
+			<classpath>
+			<fileset dir="lib">
+				<include name="**/*.jar" />
+			</fileset>
+			</classpath>
+			<include name="**/*"/>
+			<compilerarg value="-Xlint:deprecation" />
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
+	</target>
+
+	<!-- ============================================================================= -->
+	<!--                                              D I S T R I B U T I O N  T A S K -->
+	<!--                                              ================================ -->
+
+	<target name="dist" depends="compile" description="==> generates distribution">
+
+		<echo message="+------------------------------------------+"/>
+		<echo message="|                                          |"/>
+		<echo message="| Generating dist for YOUR datamodel!      |"/>
+		<echo message="|                                          |"/>
+		<echo message="+------------------------------------------+"/>
+
+		<mkdir dir="${dist}"/>
+
+	  	<delete file="${embedded}/lib/${engine.jar}"/>
+	  	<jar jarfile="${embedded}/lib/${engine.jar}" basedir="target/classes"></jar>
+
+		<copy overwrite="true"
+			  file="${embedded}/etc/client-template/_project.bat"
+			  tofile="${embedded}/etc/client-template/dbflute_dfclient/_project.bat">
+			<filterset><filter token="dbflute.version" value="${build.version}" /></filterset>
+		</copy>
+		<copy overwrite="true"
+		      file="${embedded}/etc/client-template/_project.sh"
+			  tofile="${embedded}/etc/client-template/dbflute_dfclient/_project.sh">
+			<filterset><filter token="dbflute.version" value="${build.version}" /></filterset>
+		</copy>
+		<delete file="${embedded}/etc/client-template/dbflute_dfclient.zip"/>
+		<zip zipfile="${embedded}/etc/client-template/dbflute_dfclient.zip">
+			<zipfileset prefix="dbflute_dfclient" dir="${embedded}/etc/client-template/dbflute_dfclient"/>
+		</zip>
+
+		<tstamp>
+			<format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
+		</tstamp>
+
+		<delete file="${embedded}/mark/product-is-dbflute.net-${version}"/>
+		<copy overwrite="true"
+			  file="${embedded}/mark/product-is-dbflute.net"
+			  tofile="${embedded}/mark/product-is-dbflute.net-${version}">
+			<filterset>
+				<filter token="version" value="${build.version}" />
+				<filter token="datetime" value="${now.date}" />
+			</filterset>
+		</copy>
+
+		<zip zipfile="${dist}/${module.zip}">
+			<zipfileset prefix="etc/cmd" dir="${embedded}/etc/cmd">
+				<include name="*.cmd"/>
+				<include name="*.sh"/>
+			</zipfileset>
+			<zipfileset prefix="etc/client-template" dir="${embedded}/etc/client-template">
+				<include name="dbflute_dfclient.zip"/>
+			</zipfileset>
+	      	<zipfileset prefix="etc/license" dir="${embedded}/etc/license">
+	          	<include name="*.txt"/>
+		        <include name="*.html"/>
+				<exclude name="Derby_License.txt"/>
+				<exclude name="H2_License.html"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="etc/logprop" dir="${embedded}/etc/logprop">
+	          	<include name="log4j.properties"/>
+	      	</zipfileset>
+			<zipfileset prefix="lib" dir="${dist}">
+				<include name="${engine.jar}"/>
+			</zipfileset>
+			<zipfileset prefix="lib" dir="${embedded}/lib">
+				<include name="*.jar"/>
+				<include name="*.zip"/>
+				<exclude name="derby-*.jar"/>
+				<exclude name="h2-*.jar"/>
+			</zipfileset>
+			<zipfileset prefix="templates/doc" dir="${embedded}/templates/doc">
+				<exclude name="**/*---.txt"/>
+			</zipfileset>
+			<zipfileset prefix="templates/om" dir="${embedded}/templates/om">
+				<include name="ControlGenerateCSharp.vm"/>
+				<include name="ControlSql2EntityCSharp.vm"/>
+			</zipfileset>
+			<zipfileset prefix="templates/om/csharp" dir="${embedded}/templates/om/csharp">
+				<exclude name="**/*---.txt"/>
+			</zipfileset>
+			<zipfileset prefix="ant" dir="${embedded}/ant"/>
+			<zipfileset prefix="" dir="${embedded}">
+				<include name="build-torque.xml"/>
+	          	<include name="LICENSE"/>
+	          	<include name="NOTICE"/>
+	          	<include name="README.txt"/>
+			</zipfileset>
+			<zipfileset prefix="" dir="${embedded}/mark">
+				<include name="product-is-dbflute.net-${version}"/>
+			</zipfileset>
+		</zip>
+	</target>
+
+	<!-- ============================================================================= -->
+	<!--                                                            S T A G E  T A S K -->
+	<!--                                                            ================== -->
+
+	<target name="stage">
+		<copy file="${dist}/${module.zip}" tofile="${stage.dir}/dbflute/${module.build.zip}" overwrite="true"></copy>
+	</target>
+
+	<!-- ============================================================================= -->
+	<!--                                                        E X A M P L E  T A S K -->
+	<!--                                                        ====================== -->
+
+    <!-- for example projects -->
+	<target name="deploy-dist">
+		<delete dir="${extraction.dir}"/>
+		<unzip src="${dist}/${module.zip}" dest="${extraction.dir}"/>
+		<chmod dir="${extraction.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	</target>
+
+	<target name="reflect-to-basic" depends="deploy-dist" description="==> reflect to basic example">
+		<copy todir="${basic.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${basic.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${basic.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
+	</target>
+
+	<target name="reflect-to-asp.net" depends="deploy-dist" description="==> reflect to asp.net example">
+		<copy todir="${asp.net.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${asp.net.example.dir}/dbflute_dfnetexdb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${asp.net.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
+	</target>
+
+	<target name="reflect-to-multipledb-quill" depends="deploy-dist" description="==> reflect to multipledb quill example">
+		<copy todir="${multipledb.quill.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${multipledb.quill.example.dir}/dbflute_librarydb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.quill.example.dir}/dbflute_memberdb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${multipledb.quill.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
+	</target>
+
+</project>

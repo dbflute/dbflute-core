@@ -1,0 +1,9 @@
+#set ($myClassName = "${myExtendedParameterBeanClassName}")
+
+using System;
+
+namespace ${glPackageExtendedParameterBean} {
+
+    partial class ${myClassName} {
+    }
+}

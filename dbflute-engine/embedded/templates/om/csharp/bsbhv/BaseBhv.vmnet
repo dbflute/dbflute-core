@@ -1,0 +1,484 @@
+#set ($myClassName = "${myExtendedBhvClassName}")
+
+using System;
+using System.Collections.Generic;
+
+using Seasar.Quill;
+using Seasar.Quill.Attrs;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonBhv};
+using ${glPackageBaseCommonBhvLoad};
+using ${glPackageBaseCommonBhvSetup};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonException};
+using ${myDBMetaPackageName};
+using ${glPackageExtendedDao};
+using ${glPackageExtendedEntity};
+using ${glPackageCB};
+
+#set ($myExtendClassName = "")
+#if ($table.isWritable())
+  #set ($myExtendClassName = "${glAbstractBehaviorWritable}")
+#else
+  #set ($myExtendClassName = "${glAbstractBehaviorReadable}")
+#end
+
+namespace ${glPackageExtendedBhv} {
+
+    [Implementation]
+    public partial class ${myClassName} : ${glPackageBaseCommonBhv}.${myExtendClassName} {
+
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        ${database.behaviorQueryPathBeginMark}
+        ${database.behaviorQueryPathEndMark}
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected ${myExtendedDaoClassName} _dao;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${myClassName}() {
+        }
+        
+        // ===============================================================================
+        //                                                                Initialized Mark
+        //                                                                ================
+        public override bool IsInitialized { get { return _dao != null; } }
+
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
+        public override String TableDbName { get { return "${table.tableDbName}"; } }
+
+        // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
+        public override ${glDBMeta} DBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
+        public ${myDBMetaClassName} MyDBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
+
+        // ===============================================================================
+        //                                                                    New Instance
+        //                                                                    ============
+        #region New Instance
+        public override ${glEntity} NewEntity() { return NewMyEntity(); }
+        public override ${glConditionBean} NewConditionBean() { return NewMyConditionBean(); }
+        public virtual ${myExtendedObjectClassName} NewMyEntity() { return new ${myExtendedObjectClassName}(); }
+        public virtual ${myConditionBeanClassName} NewMyConditionBean() { return new ${myConditionBeanClassName}(); }
+        #endregion
+
+        // ===============================================================================
+        //                                                                    Count Select
+        //                                                                    ============
+        #region Count Select
+        public virtual int SelectCount(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.DelegateSelectCount(cb);
+        }
+
+        protected override int DoReadCount(${glConditionBean} cb) {
+            return SelectCount(Downcast(cb));
+        }
+        #endregion
+
+        // ===============================================================================
+        //                                                                   Entity Select
+        //                                                                   =============
+        #region Entity Select
+        public virtual ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            if (!cb.HasWhereClause() && cb.FetchSize != 1) { // if no condition for one
+                throwSelectEntityConditionNotFoundException(cb);
+            }
+            int preSafetyMaxResultSize = xcheckSafetyResultAsOne(cb);
+            IList<${myExtendedObjectClassName}> ls = null;
+            try {
+                ls = this.DelegateSelectList(cb);
+            } catch (${glDangerousResultSizeException} e) {
+                ThrowEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
+                return null; // unreachable
+            } finally {
+                xrestoreSafetyResult(cb, preSafetyMaxResultSize);
+            }
+            if (ls.Count == 0) { return null; }
+            AssertEntitySelectedAsOne(ls, cb);
+            return (${myExtendedObjectClassName})ls[0];
+        }
+
+        protected override ${glEntity} DoReadEntity(${glConditionBean} cb) {
+            return SelectEntity(Downcast(cb));
+        }
+
+        public virtual ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            ${myExtendedObjectClassName} entity = SelectEntity(cb);
+            AssertEntityNotDeleted(entity, cb);
+            return entity;
+        }
+
+        protected override ${glEntity} DoReadEntityWithDeletedCheck(${glConditionBean} cb) {
+            return SelectEntityWithDeletedCheck(Downcast(cb));
+        }
+#if ($table.hasPrimaryKey())
+
+        public virtual ${myExtendedObjectClassName} SelectByPKValue(${table.primaryKeyArgsString}) {
+            return SelectEntity(BuildPKCB(${table.primaryKeyArgsCallingString}));
+        }
+
+        public virtual ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.primaryKeyArgsString}) {
+            return SelectEntityWithDeletedCheck(BuildPKCB(${table.primaryKeyArgsCallingString}));
+        }
+
+        private ${myConditionBeanClassName} BuildPKCB(${table.primaryKeyArgsString}) {
+            ${table.primaryKeyArgsAssertStringCSharp}
+            ${myConditionBeanClassName} cb = NewMyConditionBean();
+            ${table.primaryKeyArgsConditionSetupStringCSharp}
+            return cb;            
+        }
+#end
+        #endregion
+
+        // ===============================================================================
+        //                                                                     List Select
+        //                                                                     ===========
+        #region List Select
+        public virtual ${glListResultBean}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return new ${glResultBeanBuilder}<${myExtendedObjectClassName}>(TableDbName).BuildListResultBean(cb, this.DelegateSelectList(cb));
+        }
+        #endregion
+
+        // ===============================================================================
+        //                                                                     Page Select
+        //                                                                     ===========
+        #region Page Select
+        public virtual ${glPagingResultBean}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            ${glPagingInvoker}<${myExtendedObjectClassName}> invoker = new ${glPagingInvoker}<${myExtendedObjectClassName}>(TableDbName);
+            return invoker.InvokePaging(new InternalSelectPagingHandler(this, cb));
+        }
+
+        private class InternalSelectPagingHandler : ${glPagingHandler}<${myExtendedObjectClassName}> {
+            protected ${myClassName} _bhv; protected ${myConditionBeanClassName} _cb;
+            public InternalSelectPagingHandler(${myClassName} bhv, ${myConditionBeanClassName} cb) { _bhv = bhv; _cb = cb; }
+            public ${glPagingBean} PagingBean { get { return _cb; } }
+            public int Count() { return _bhv.SelectCount(_cb); }
+            public IList<${myExtendedObjectClassName}> Paging() { return _bhv.SelectList(_cb); }
+        }
+        #endregion
+#if ($table.isUseSequence())
+
+        // ===============================================================================
+        //                                                                        Sequence
+        //                                                                        ========
+        public ${table.sequenceReturnType} SelectNextVal() {
+            return DelegateSelectNextVal();
+        }
+#if ($table.hasSinglePrimaryKey())
+        protected override void SetupNextValueToPrimaryKey(${glEntity} entity) {// Very Internal
+            ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
+            myEntity.${table.primaryKeyJavaNameAsOne} = SelectNextVal();
+        }
+#end
+#end
+
+#if (${table.hasSinglePrimaryKey()})
+        // ===============================================================================
+        //                                                                   Load Referrer
+        //                                                                   =============
+        #region Load Referrer
+#foreach ($referrer in $table.referrerList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
+#set ($referrerDaoClassName = "${referrerEntityClassName}Dao")
+#set ($referrerBhvClassName = "")
+#set ($referrerBhvClassName = "${referrerEntityClassName}Bhv")
+#set ($referrerCBClassName = "${referrerEntityClassName}${glConditionBeanInitialName}")
+#set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
+#set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
+#set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, IList<${referrerEntityClassName}>")
+#if (!${referrer.isOneToOne()})
+        public virtual void Load${referrer.referrerPropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glConditionBeanSetupper}<${referrerCBClassName}> conditionBeanSetupper) {
+            AssertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
+            Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs<${myExtendedObjectClassName}>(${myEntityVariableName}), conditionBeanSetupper);
+        }
+        public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupper}<${referrerCBClassName}> conditionBeanSetupper) {
+            AssertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
+            Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(conditionBeanSetupper));
+        }
+        public virtual void Load${referrer.referrerPropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+            AssertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); AssertObjectNotNull("loadReferrerOption", loadReferrerOption);
+            Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs<${myExtendedObjectClassName}>(${myEntityVariableName}), loadReferrerOption);
+        }
+        public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+            AssertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); AssertObjectNotNull("loadReferrerOption", loadReferrerOption);
+            if (${myEntityListVariableName}.Count == 0) { return; }
+            ${referrerBhvClassName} referrerBhv = xgetBSFLR().Select<${referrerBhvClassName}>();
+            HelpLoadReferrerInternally<${myExtendedObjectClassName}, ${referrer.localColumnAsOne.javaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>
+                    (${myEntityListVariableName}, loadReferrerOption, new MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback(referrerBhv));
+        }
+#if ($referrer.isSimpleKeyFK())
+#set ($referrerColumn = ${referrer.localColumnAsOne})
+#set ($localColumn = ${referrer.foreignColumnAsOne})
+#set ($keyJavaNative = "${referrerColumn.javaNative}")
+        protected class MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback : InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}> {
+            protected ${referrerBhvClassName} referrerBhv;
+            public MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback(${referrerBhvClassName} referrerBhv) { this.referrerBhv = referrerBhv; }
+            public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} e) { return e.${localColumn.javaName}; }
+            public void setRfLs(${myExtendedObjectClassName} e, IList<${referrerEntityClassName}> ls) { e.${referrer.referrerPropertyNameInitCap} = ls; }
+            public ${referrerCBClassName} newMyCB() { return referrerBhv.NewMyConditionBean(); }
+            public void qyFKIn(${referrerCBClassName} cb, IList<${keyJavaNative}> ls) { cb.Query().Set${referrerColumn.javaName}_InScope(ls); }
+            public void qyOdFKAsc(${referrerCBClassName} cb) { cb.Query().AddOrderBy_${referrerColumn.javaName}_Asc(); }
+            public void spFKCol(${referrerCBClassName} cb) { cb.Specify().Column${referrerColumn.javaName}(); }
+            public IList<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.SelectList(cb); }
+            public ${keyJavaNative} getFKVal(${referrerEntityClassName} e) { return e.${referrerColumn.javaName}; }
+            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} be) { re.${referrer.foreignPropertyNameInitCap} = be; }
+        }
+#end
+#end
+#end
+        #endregion
+#end
+
+        // ===============================================================================
+        //                                                                Pull out Foreign
+        //                                                                ================
+        #region Pullout Foreign
+#foreach ($foreignKeys in $table.foreignKeys)
+#set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
+        public IList<${foreignEntityClassName}> Pullout${foreignKeys.foreignPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+            return HelpPulloutInternally<${myExtendedObjectClassName}, ${foreignEntityClassName}>(${myEntityListVariableName}, new MyInternalPullout${foreignKeys.foreignPropertyNameInitCap}Callback());
+        }
+        protected class MyInternalPullout${foreignKeys.foreignPropertyNameInitCap}Callback : InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}> {
+            public ${foreignEntityClassName} getFr(${myExtendedObjectClassName} entity) { return entity.${foreignKeys.foreignPropertyNameInitCap}; }
+        }
+#end
+#foreach ($referrer in $table.referrerAsOneList)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
+        public IList<${referrerEntityClassName}> Pullout${referrer.referrerPropertyNameInitCapAsOne}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+            return HelpPulloutInternally<${myExtendedObjectClassName}, ${referrerEntityClassName}>(${myEntityListVariableName}, new MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback());
+        }
+        protected class MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback : InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}> {
+            public ${referrerEntityClassName} getFr(${myExtendedObjectClassName} entity) { return entity.${referrer.referrerPropertyNameInitCapAsOne}; }
+        }
+#end
+        #endregion
+
+#if ($table.isWritable())
+
+        // ===============================================================================
+        //                                                                   Entity Update
+        //                                                                   =============
+        #region Basic Entity Update
+        public virtual void Insert(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNull(entity);
+            this.DelegateInsert(entity);
+        }
+
+        protected override void DoCreate(${glEntity} entity) {
+            Insert(Downcast(entity));
+        }
+
+        public virtual void Update(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNull(entity);
+            AssertEntityHasVersionNoValue(entity);
+            AssertEntityHasUpdateDateValue(entity);
+            int updatedCount = this.DelegateUpdate(entity);
+            AssertUpdatedEntity(entity, updatedCount);
+        }
+
+        protected override void DoModify(${glEntity} entity) {
+            Update(Downcast(entity));
+        }
+#if ($table.hasOptimisticLock())
+
+        public virtual void UpdateNonstrict(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNull(entity);
+            int updatedCount = this.DelegateUpdateNonstrict(entity);
+            AssertUpdatedEntity(entity, updatedCount);
+        }
+#end
+
+        public void InsertOrUpdate(${myExtendedObjectClassName} entity) {
+            HelpInsertOrUpdateInternally<${myExtendedObjectClassName}, ${myConditionBeanClassName}>(entity, new MyInternalInsertOrUpdateCallback(this));
+        }
+        protected class MyInternalInsertOrUpdateCallback : InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}> {
+            protected ${myClassName} _bhv;
+            public MyInternalInsertOrUpdateCallback(${myClassName} bhv) { _bhv = bhv; }
+            public void CallbackInsert(${myExtendedObjectClassName} entity) { _bhv.Insert(entity); }
+            public void CallbackUpdate(${myExtendedObjectClassName} entity) { _bhv.Update(entity); }
+            public ${myConditionBeanClassName} CallbackNewMyConditionBean() { return _bhv.NewMyConditionBean(); }
+            public void CallbackSetupPrimaryKeyCondition(${myConditionBeanClassName} cb, ${myExtendedObjectClassName} entity) {
+#foreach ($col in $table.primaryKey)
+                cb.Query().Set${col.javaName}_Equal(entity.${col.javaName});
+#end
+            }
+            public int CallbackSelectCount(${myConditionBeanClassName} cb) { return _bhv.SelectCount(cb); }
+        }
+#if ($table.hasOptimisticLock())
+
+        public void InsertOrUpdateNonstrict(${myExtendedObjectClassName} entity) {
+            HelpInsertOrUpdateInternally<${myExtendedObjectClassName}>(entity, new MyInternalInsertOrUpdateNonstrictCallback(this));
+        }
+        protected class MyInternalInsertOrUpdateNonstrictCallback : InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}> {
+            protected ${myClassName} _bhv;
+            public MyInternalInsertOrUpdateNonstrictCallback(${myClassName} bhv) { _bhv = bhv; }
+            public void CallbackInsert(${myExtendedObjectClassName} entity) { _bhv.Insert(entity); }
+            public void CallbackUpdateNonstrict(${myExtendedObjectClassName} entity) { _bhv.UpdateNonstrict(entity); }
+        }
+#end
+
+        public virtual void Delete(${myExtendedObjectClassName} entity) {
+            HelpDeleteInternally<${myExtendedObjectClassName}>(entity, new MyInternalDeleteCallback(this));
+        }
+
+        protected override void DoRemove(${glEntity} entity) {
+            Remove(Downcast(entity));
+        }
+
+        protected class MyInternalDeleteCallback : InternalDeleteCallback<${myExtendedObjectClassName}> {
+            protected ${myClassName} _bhv;
+            public MyInternalDeleteCallback(${myClassName} bhv) { _bhv = bhv; }
+            public int CallbackDelegateDelete(${myExtendedObjectClassName} entity) { return _bhv.DelegateDelete(entity); }
+        }
+#if ($table.hasOptimisticLock())
+
+        public virtual void DeleteNonstrict(${myExtendedObjectClassName} entity) {
+            HelpDeleteNonstrictInternally<${myExtendedObjectClassName}>(entity, new MyInternalDeleteNonstrictCallback(this));
+        }
+        protected class MyInternalDeleteNonstrictCallback : InternalDeleteNonstrictCallback<${myExtendedObjectClassName}> {
+            protected ${myClassName} _bhv;
+            public MyInternalDeleteNonstrictCallback(${myClassName} bhv) { _bhv = bhv; }
+            public int CallbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return _bhv.DelegateDeleteNonstrict(entity); }
+        }
+
+        public virtual void DeleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} entity) {
+            HelpDeleteNonstrictIgnoreDeletedInternally<${myExtendedObjectClassName}>(entity, new MyInternalDeleteNonstrictIgnoreDeletedCallback(this));
+        }
+        protected class MyInternalDeleteNonstrictIgnoreDeletedCallback : InternalDeleteNonstrictIgnoreDeletedCallback<${myExtendedObjectClassName}> {
+            protected ${myClassName} _bhv;
+            public MyInternalDeleteNonstrictIgnoreDeletedCallback(${myClassName} bhv) { _bhv = bhv; }
+            public int CallbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return _bhv.DelegateDeleteNonstrict(entity); }
+        }
+#end
+        #endregion
+#end
+
+        // ===============================================================================
+        //                                                                    Query Update
+        //                                                                    ============
+#if (${table.hasSinglePrimaryKey()})
+        public int QueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
+            AssertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); AssertConditionBeanNotNull(cb);
+            SetupCommonColumnOfUpdateIfNeeds(${myEntityVariableName});
+            FilterEntityOfUpdate(${myEntityVariableName}); AssertEntityOfUpdate(${myEntityVariableName});
+            return this.Dao.UpdateByQuery(cb, ${myEntityVariableName});
+        }
+
+        public int QueryDelete(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.Dao.DeleteByQuery(cb);
+        }
+#end
+
+        // ===============================================================================
+        //                                                            Optimistic Lock Info
+        //                                                            ====================
+        protected override bool HasVersionNoValue(${glEntity} entity) {
+#if ($table.isUseVersionNo())
+            return Downcast(entity).${table.versionNoJavaName} != null;
+#else
+            return false;
+#end
+        }
+
+        protected override bool HasUpdateDateValue(${glEntity} entity) {
+#if ($table.isUseUpdateDate())
+            return Downcast(entity).${table.updateDateJavaName} != null;
+#else
+            return false;
+#end
+        }
+
+        // ===============================================================================
+        //                                                                 Delegate Method
+        //                                                                 ===============
+        #region Delegate Method
+        protected int DelegateSelectCount(${myConditionBeanClassName} cb) { AssertConditionBeanNotNull(cb); return this.Dao.SelectCount(cb); }
+        protected IList<${myExtendedObjectClassName}> DelegateSelectList(${myConditionBeanClassName} cb) { AssertConditionBeanNotNull(cb); return this.Dao.SelectList(cb); }
+#if ($table.isUseSequence())
+        protected ${table.sequenceReturnType} DelegateSelectNextVal() { return this.Dao.SelectNextVal(); }
+#end
+
+#if ($table.isWritable())
+        protected int DelegateInsert(${myExtendedObjectClassName} e) { if (!ProcessBeforeInsert(e)) { return 1; } return this.Dao.Insert(e); }
+        protected int DelegateUpdate(${myExtendedObjectClassName} e)
+#if ($table.hasOptimisticLock())
+        { if (!ProcessBeforeUpdate(e)) { return 1; } return this.Dao.UpdateModifiedOnly(e); }
+#else
+        { if (!ProcessBeforeUpdate(e)) { return 1; } return this.Dao.UpdateNonstrictModifiedOnly(e); }
+#end
+#if ($table.hasOptimisticLock())
+        protected int DelegateUpdateNonstrict(${myExtendedObjectClassName} e)
+        { if (!ProcessBeforeUpdate(e)) { return 1; } return this.Dao.UpdateNonstrictModifiedOnly(e); }
+#end
+        protected int DelegateDelete(${myExtendedObjectClassName} e)
+#if ($table.hasOptimisticLock())
+        { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.Delete(e); }
+#else
+        { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.DeleteNonstrict(e); }
+#end
+#if ($table.hasOptimisticLock())
+        protected int DelegateDeleteNonstrict(${myExtendedObjectClassName} e)
+        { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.DeleteNonstrict(e); }
+#end
+#end
+        #endregion
+#if ($table.hasBehaviorFilterBeforeColumn())
+
+#if ($table.hasBehaviorFilterBeforeInsertColumn())
+        protected override void FilterEntityOfInsert(${glEntity} targetEntity) {
+            base.FilterEntityOfInsert(targetEntity);
+            ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})targetEntity;
+#foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
+            entity.${column.javaName} = ${column.behaviorFilterBeforeInsertColumnExpression};
+#end
+        }
+#end
+#if ($table.isWritable())
+#if ($table.hasBehaviorFilterBeforeUpdateColumn())
+        protected override void FilterEntityOfUpdate(${glEntity} targetEntity) {
+            base.FilterEntityOfUpdate(targetEntity);
+            ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})targetEntity;
+#foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)
+            entity.${column.javaName} = ${column.behaviorFilterBeforeUpdateColumnExpression};
+#end
+        }
+#end
+#end
+#end
+
+        // ===============================================================================
+        //                                                                 Downcast Helper
+        //                                                                 ===============
+        protected ${myExtendedObjectClassName} Downcast(${glEntity} entity) {
+            return (${myExtendedObjectClassName})entity;
+        }
+
+        protected ${myConditionBeanClassName} Downcast(${glConditionBean} cb) {
+            return (${myConditionBeanClassName})cb;
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public virtual ${myExtendedDaoClassName} Dao { get { return _dao; } set { _dao = value; } }
+    }
+}
