@@ -17,7 +17,7 @@ package org.dbflute.exception.handler;
 
 import java.sql.SQLException;
 
-import org.dbflute.DBDef;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.util.Srl;
 
 /**

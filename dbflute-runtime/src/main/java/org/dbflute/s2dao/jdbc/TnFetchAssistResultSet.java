@@ -18,8 +18,8 @@ package org.dbflute.s2dao.jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.dbflute.DBDef;
-import org.dbflute.cbean.FetchNarrowingBean;
+import org.dbflute.cbean.paging.FetchNarrowingBean;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.FetchingOverSafetySizeException;
 import org.dbflute.exception.handler.SQLExceptionHandler;
 import org.dbflute.exception.handler.SQLExceptionResource;

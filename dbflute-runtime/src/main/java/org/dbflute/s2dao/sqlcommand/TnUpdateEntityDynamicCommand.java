@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 
 import org.dbflute.Entity;
 import org.dbflute.XLog;
-import org.dbflute.bhv.UpdateOption;
+import org.dbflute.bhv.writable.UpdateOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.exception.VaryingUpdateInvalidColumnSpecificationException;

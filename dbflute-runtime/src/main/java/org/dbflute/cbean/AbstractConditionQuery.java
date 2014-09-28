@@ -49,6 +49,7 @@ import org.dbflute.cbean.coption.ParameterOption;
 import org.dbflute.cbean.coption.RangeOfOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
+import org.dbflute.cbean.ordering.ManualOrderBean;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.dbflute.cbean.sqlclause.SqlClauseOracle;
@@ -67,6 +68,7 @@ import org.dbflute.cbean.sqlclause.subquery.ScalarCondition.PartitionByProvider;
 import org.dbflute.cbean.sqlclause.subquery.SpecifyDerivedReferrer;
 import org.dbflute.cbean.sqlclause.subquery.SubQueryPath;
 import org.dbflute.cbean.sqlclause.union.UnionClauseProvider;
+import org.dbflute.cbean.subcall.SubQuery;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.dbmeta.info.ColumnInfo;
@@ -91,6 +93,7 @@ import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ParameterUtil;
 import org.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.twowaysql.pmbean.SimpleMapPmb;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfReflectionUtil.ReflectionFailureException;
@@ -1651,6 +1654,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                            Order By
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     protected void registerOrderBy(String columnDbName, boolean ascOrDesc) {
         final DBMeta dbmeta = xgetLocalDBMeta();
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
@@ -1679,6 +1685,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 getTableDbName(), columnDbName);
     }
 
+    // -----------------------------------------------------
+    //                                      Nulls First/Last
+    //                                      ----------------
     /**
      * Order with the keyword 'nulls first'.
      * <pre>
@@ -1701,6 +1710,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      */
     public void withNullsLast() { // is user public!
         xgetSqlClause().addNullsLastToPreviousOrderBy();
+    }
+
+    // -----------------------------------------------------
+    //                                          Manual Order
+    //                                          ------------
+    protected ManualOrderBean cMOB() {
+        return newManualOrderBean();
+    }
+
+    /**
+     * New-create the option of like-search as plain.
+     * @return The new-created option of like-search. (NotNull)
+     */
+    protected ManualOrderBean newManualOrderBean() {
+        return new ManualOrderBean();
     }
 
     protected void xdoWithManualOrder(ManualOrderBean mob) {
@@ -1748,6 +1772,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return new HpSpecifiedColumn(aliasName, columnInfo, dreamCruiseCB, columnName, derived);
     }
 
+    // -----------------------------------------------------
+    //                             Specified Derived OrderBy
+    //                             -------------------------
     protected void registerSpecifiedDerivedOrderBy_Asc(String aliasName) {
         if (!xgetSqlClause().hasSpecifiedDerivingSubQuery(aliasName)) {
             throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
@@ -2313,12 +2340,49 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                       Create Option
     //                                                                       =============
+    // -----------------------------------------------------
+    //                                            LikeSearch
+    //                                            ----------
+    protected LikeSearchOption cLSOP() { // called by template: createLikeSearchOption()
+        return newLikeSearchOption();
+    }
+
     /**
-     * create the option of like search as prefix search.
-     * @return The option of like search as prefix search. (NotNull)
+     * New-create the option of like-search as plain.
+     * @return The new-created option of like-search. (NotNull)
      */
-    protected LikeSearchOption cLSOP() { // createLikeSearchOption
-        return new LikeSearchOption().likePrefix();
+    protected LikeSearchOption newLikeSearchOption() {
+        return new LikeSearchOption();
+    }
+
+    // -----------------------------------------------------
+    //                                               RangeOf
+    //                                               -------
+    protected RangeOfOption cROOP() { // called by template: createRangeOfOption()
+        return newRangeOfOption();
+    }
+
+    /**
+     * New-create the option of range-of as plain.
+     * @return The new-created option of range-of. (NotNull)
+     */
+    protected RangeOfOption newRangeOfOption() {
+        return new RangeOfOption();
+    }
+
+    // -----------------------------------------------------
+    //                                                FromTo
+    //                                                ------
+    protected FromToOption cFTOP() { // called by template: createFromToOption()
+        return newFromToOption();
+    }
+
+    /**
+     * New-create the option of from-to as plain.
+     * @return The new-created option of from-to. (NotNull)
+     */
+    protected FromToOption newFromToOption() {
+        return new FromToOption();
     }
 
     // ===================================================================================

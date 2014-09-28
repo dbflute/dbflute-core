@@ -25,11 +25,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.dbflute.CallbackContext;
 import org.dbflute.Entity;
-import org.dbflute.cbean.ConditionBeanContext;
-import org.dbflute.cbean.EntityRowHandler;
-import org.dbflute.cbean.FetchAssistContext;
+import org.dbflute.bhv.CallbackContext;
+import org.dbflute.bhv.readable.EntityRowHandler;
 import org.dbflute.jdbc.SqlLogInfo;
 import org.dbflute.jdbc.SqlLogInfo.SqlLogDisplaySqlBuilder;
 import org.dbflute.jdbc.SqlResultHandler;

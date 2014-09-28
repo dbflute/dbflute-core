@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.DBDef;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;

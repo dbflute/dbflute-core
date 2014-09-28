@@ -17,7 +17,7 @@ package org.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
-import org.dbflute.bhv.DeleteOption;
+import org.dbflute.bhv.writable.DeleteOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.StatementFactory;

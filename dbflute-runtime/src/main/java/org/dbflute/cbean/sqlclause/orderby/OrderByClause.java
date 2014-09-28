@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.dbflute.cbean.ManualOrderBean;
+import org.dbflute.cbean.ordering.ManualOrderBean;
 
 /**
  * @author jflute

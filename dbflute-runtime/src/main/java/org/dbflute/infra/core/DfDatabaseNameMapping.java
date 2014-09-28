@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.dbflute.DBDef;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.helper.mapstring.MapListString;
 
 /**

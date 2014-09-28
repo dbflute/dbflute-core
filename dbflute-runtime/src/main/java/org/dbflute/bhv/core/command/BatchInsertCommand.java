@@ -15,9 +15,9 @@
  */
 package org.dbflute.bhv.core.command;
 
-import org.dbflute.bhv.InsertOption;
 import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.SqlExecutionCreator;
+import org.dbflute.bhv.writable.InsertOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.sqlcommand.TnBatchInsertDynamicCommand;

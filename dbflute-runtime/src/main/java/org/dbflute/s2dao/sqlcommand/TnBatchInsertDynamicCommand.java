@@ -21,7 +21,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.dbflute.bhv.InsertOption;
+import org.dbflute.bhv.writable.InsertOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnPropertyType;

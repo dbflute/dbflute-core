@@ -15,7 +15,8 @@
  */
 package org.dbflute;
 
-import org.dbflute.CallbackContext.CallbackContextHolder;
+import org.dbflute.bhv.CallbackContext;
+import org.dbflute.bhv.CallbackContext.CallbackContextHolder;
 import org.dbflute.jdbc.SqlLogHandler;
 import org.dbflute.jdbc.SqlLogInfo;
 import org.dbflute.unit.PlainTestCase;

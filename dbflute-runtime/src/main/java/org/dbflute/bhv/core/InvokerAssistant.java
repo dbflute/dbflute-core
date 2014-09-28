@@ -17,11 +17,11 @@ package org.dbflute.bhv.core;
 
 import javax.sql.DataSource;
 
-import org.dbflute.DBDef;
 import org.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.factory.SQLExceptionHandlerFactory;
 import org.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.dbflute.jdbc.SQLExceptionDigger;

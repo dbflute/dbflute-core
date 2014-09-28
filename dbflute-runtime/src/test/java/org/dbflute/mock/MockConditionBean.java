@@ -17,21 +17,21 @@ package org.dbflute.mock;
 
 import java.util.Map;
 
-import org.dbflute.cbean.AndQuery;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
-import org.dbflute.cbean.OrQuery;
-import org.dbflute.cbean.OrderByBean;
-import org.dbflute.cbean.PagingBean;
-import org.dbflute.cbean.PagingInvoker;
-import org.dbflute.cbean.UnionQuery;
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpColumnSpHandler;
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.ordering.OrderByBean;
+import org.dbflute.cbean.paging.PagingBean;
+import org.dbflute.cbean.paging.PagingInvoker;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.dbflute.cbean.subcall.AndQuery;
+import org.dbflute.cbean.subcall.OrQuery;
+import org.dbflute.cbean.subcall.UnionQuery;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DerivedTypeHandler;
 import org.dbflute.jdbc.StatementConfig;

@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.dbflute.bhv.BehaviorReadable;
 import org.dbflute.bhv.BehaviorWritable;
-import org.dbflute.cbean.PagingInvoker;
+import org.dbflute.cbean.paging.PagingInvoker;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.dbflute.helper.stacktrace.InvokeNameResult;

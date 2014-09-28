@@ -24,8 +24,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.cbean.FetchAssistContext;
-import org.dbflute.cbean.FetchNarrowingBean;
+import org.dbflute.bhv.core.FetchAssistContext;
+import org.dbflute.cbean.paging.FetchNarrowingBean;
 import org.dbflute.exception.FetchingOverSafetySizeException;
 import org.dbflute.exception.handler.SQLExceptionResource;
 import org.dbflute.jdbc.FetchBean;

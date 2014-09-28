@@ -17,9 +17,9 @@ package org.dbflute.bhv;
 
 import org.dbflute.Entity;
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.PagingResultBean;
 import org.dbflute.cbean.chelper.HpSLSFunction;
+import org.dbflute.cbean.result.ListResultBean;
+import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 

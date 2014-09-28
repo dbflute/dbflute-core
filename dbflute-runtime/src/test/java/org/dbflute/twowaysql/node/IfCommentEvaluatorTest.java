@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.cbean.SimpleMapPmb;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.twowaysql.exception.IfCommentDifferentTypeComparisonException;
@@ -37,6 +36,7 @@ import org.dbflute.twowaysql.exception.IfCommentPropertyReadFailureException;
 import org.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;
 import org.dbflute.twowaysql.exception.IfCommentUnsupportedTypeComparisonException;
 import org.dbflute.twowaysql.pmbean.ParameterBean;
+import org.dbflute.twowaysql.pmbean.SimpleMapPmb;
 import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfReflectionUtil.ReflectionFailureException;

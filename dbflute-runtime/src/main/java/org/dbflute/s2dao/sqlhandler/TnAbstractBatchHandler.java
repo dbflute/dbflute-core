@@ -25,8 +25,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.DBDef;
 import org.dbflute.XLog;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.BatchEntityAlreadyUpdatedException;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;

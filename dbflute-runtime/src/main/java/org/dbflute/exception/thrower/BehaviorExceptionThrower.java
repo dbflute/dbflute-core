@@ -18,12 +18,12 @@ package org.dbflute.exception.thrower;
 import java.util.List;
 
 import org.dbflute.Entity;
-import org.dbflute.bhv.DeleteOption;
-import org.dbflute.bhv.UpdateOption;
-import org.dbflute.bhv.WritableOption;
+import org.dbflute.bhv.writable.DeleteOption;
+import org.dbflute.bhv.writable.UpdateOption;
+import org.dbflute.bhv.writable.WritableOption;
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.PagingBean;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
+import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.exception.DangerousResultSizeException;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;

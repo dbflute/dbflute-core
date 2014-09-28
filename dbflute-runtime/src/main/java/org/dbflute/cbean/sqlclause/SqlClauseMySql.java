@@ -17,12 +17,12 @@ package org.dbflute.cbean.sqlclause;
 
 import java.util.List;
 
-import org.dbflute.DBDef;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.dbway.DBWay;
 import org.dbflute.dbway.WayOfMySQL.FullTextSearchModifier;
 import org.dbflute.util.Srl;

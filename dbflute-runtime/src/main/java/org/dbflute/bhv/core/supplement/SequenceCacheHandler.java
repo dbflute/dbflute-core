@@ -21,8 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.dbflute.DBDef;
 import org.dbflute.XLog;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.SequenceCacheIllegalStateException;
 import org.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
 import org.dbflute.resource.DBFluteSystem;

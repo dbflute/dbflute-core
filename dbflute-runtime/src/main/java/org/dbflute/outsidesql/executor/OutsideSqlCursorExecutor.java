@@ -15,10 +15,10 @@
  */
 package org.dbflute.outsidesql.executor;
 
-import org.dbflute.DBDef;
 import org.dbflute.bhv.core.BehaviorCommand;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.bhv.core.command.OutsideSqlSelectCursorCommand;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.jdbc.CursorHandler;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.outsidesql.OutsideSqlFilter;

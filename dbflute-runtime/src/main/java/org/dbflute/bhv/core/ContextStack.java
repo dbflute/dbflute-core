@@ -21,10 +21,8 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.dbflute.Entity;
+import org.dbflute.bhv.readable.EntityRowHandler;
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ConditionBeanContext;
-import org.dbflute.cbean.EntityRowHandler;
-import org.dbflute.cbean.FetchAssistContext;
 import org.dbflute.jdbc.FetchBean;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.resource.InternalMapContext;

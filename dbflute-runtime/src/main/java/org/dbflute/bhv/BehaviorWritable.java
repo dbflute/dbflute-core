@@ -18,6 +18,10 @@ package org.dbflute.bhv;
 import java.util.List;
 
 import org.dbflute.Entity;
+import org.dbflute.bhv.writable.DeleteOption;
+import org.dbflute.bhv.writable.InsertOption;
+import org.dbflute.bhv.writable.QueryInsertSetupper;
+import org.dbflute.bhv.writable.UpdateOption;
 import org.dbflute.cbean.ConditionBean;
 
 /**

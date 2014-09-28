@@ -20,7 +20,10 @@ import java.util.List;
 
 import org.dbflute.*;
 import org.dbflute.bhv.*;
+import org.dbflute.bhv.option.*;
+import org.dbflute.bhv.referrer.*;
 import org.dbflute.cbean.*;
+import org.dbflute.cbean.callback.*;
 import org.dbflute.cbean.chelper.HpSLSFunction;
 import org.dbflute.exception.*;
 #if ($table.needsBasicOptionalEntityImport())
@@ -127,6 +130,66 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     // ===================================================================================
     //                                                                       Entity Select
     //                                                                       =============
+#if ($table.isMakeCallbackConditionBeanSetup())
+    /**
+#if ($table.isAvailableSelectEntityPlainReturn())
+     * Select the entity by the condition-bean. #beforejava8 <br />
+     * <span style="color: #AD4747; font-size: 120%">The return might be null if no data, so you should have null check.</span> <br />
+     * <span style="color: #AD4747; font-size: 120%">If the data always exists as your business rule, use selectEntityWithDeletedCheck().</span>
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectEntity</span>(cb);
+     * if (${myEntityVariableName} != null) { <span style="color: #3F7E5E">// null check</span>
+     *     ... = ${myEntityVariableName}.get...();
+     * } else {
+     *     ...
+     * }
+     * </pre>
+#else
+     * Select the entity by the condition-bean. <br />
+     * It returns not-null optional entity, so you should ... <br />
+     * <span style="color: #AD4747; font-size: 120%">If the data always exists as your business rule, get() without check.</span> <br />
+     * <span style="color: #AD4747; font-size: 120%">If it might be no data, get() after check by isPresent() or orElse(), ...</span>
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * OptionalEntity&lt;${myExtendedObjectClassName}&gt; entity = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectEntity</span>(cb);
+     *
+     * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
+     * entity.<span style="color: #DD4747">required</span>(${myEntityVariableName} -&gt; {
+     *     ...
+     * });
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = entity.entity.<span style="color: #DD4747">get()</span>;
+     *
+     * <span style="color: #3F7E5E">// if it might be no data, ifPresent(), isPresent(), ...</span>
+     * entity.<span style="color: #DD4747">ifPresent</span>(${myEntityVariableName} -&gt; {
+     *     ...
+     * });
+     * if (entity.entity.<span style="color: #DD4747">isPresent()</span>) {
+     *     ${myExtendedObjectClassName} ${myEntityVariableName} = entity.entity.<span style="color: #DD4747">get()</span>;
+     * } else {
+     *     ...
+     * }
+     * </pre>
+#end
+     * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
+#if ($table.isAvailableSelectEntityPlainReturn())
+     * @return The entity selected by the condition. (NullAllowed: if no data, it returns null)
+#else
+     * @return The optional entity selected by the condition. (NotNull: if no data, empty entity)
+     * @exception EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
+#end
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     */
+    public ${table.filterSelectEntityOptionalReturnIfNeeds($myExtendedObjectClassName)} selectEntity(CBCall<${myConditionBeanClassName}> cbLambda) {
+        ${myConditionBeanClassName} cb = newConditionBean(); cbLambda.callback(cb);
+        return facadeSelectEntity(cb);
+    }
+
+#end
+#if ($table.isMakeDirectConditionBeanSetup())
     /**
 #if ($table.isAvailableSelectEntityPlainReturn())
      * Select the entity by the condition-bean. #beforejava8 <br />
@@ -183,6 +246,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return facadeSelectEntity(cb);
     }
 
+#end
     protected ${table.filterSelectEntityOptionalReturnIfNeeds($myExtendedObjectClassName)} facadeSelectEntity(${myConditionBeanClassName} cb) {
 #if ($table.isAvailableSelectEntityPlainReturn())
         return doSelectEntity(cb, typeOfSelectedEntity());
@@ -200,6 +264,29 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #else
     protected Entity doReadEntity(ConditionBean cb) { return facadeSelectEntity(downcast(cb)).orElseNull(); }
 #end
+#if ($table.isMakeCallbackConditionBeanSetup())
+
+    /**
+     * Select the entity by the condition-bean with deleted check. <br />
+     * <span style="color: #AD4747; font-size: 120%">If the data always exists as your business rule, this method is good.</span>
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectEntityWithDeletedCheck</span>(cb);
+     * ... = ${myEntityVariableName}.get...(); <span style="color: #3F7E5E">// the entity always be not null</span>
+     * </pre>
+     * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The entity selected by the condition. (NotNull: if no data, throws exception)
+     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     */
+    ${table.selectEntityWithDeletedCheckModifier} ${myExtendedObjectClassName} selectEntityWithDeletedCheck(CBCall<${myConditionBeanClassName}> cbLambda) {
+        ${myConditionBeanClassName} cb = newConditionBean(); cbLambda.callback(cb);
+        return facadeSelectEntityWithDeletedCheck(cb);
+    }
+#end
+#if ($table.isMakeDirectConditionBeanSetup())
 
     /**
      * Select the entity by the condition-bean with deleted check. <br />
@@ -219,6 +306,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     ${table.selectEntityWithDeletedCheckModifier} ${myExtendedObjectClassName} selectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
         return facadeSelectEntityWithDeletedCheck(cb);
     }
+#end
 #if ($table.hasPrimaryKey())
 
     /**
@@ -307,6 +395,29 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     // ===================================================================================
     //                                                                         List Select
     //                                                                         ===========
+#if ($table.isMakeCallbackConditionBeanSetup())
+    /**
+     * Select the list as result bean.
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * cb.query().addOrderBy_Bar...();
+     * ListResultBean&lt;${myExtendedObjectClassName}&gt; ${myEntityListVariableName} = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectList</span>(cb);
+     * for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
+     *     ... = ${myEntityVariableName}.get...();
+     * }
+     * </pre>
+     * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The result bean of selected list. (NotNull: if no data, returns empty list)
+     * @exception DangerousResultSizeException When the result size is over the specified safety size.
+     */
+    public ListResultBean<${myExtendedObjectClassName}> selectList(CBCall<${myConditionBeanClassName}> cbLambda) {
+        ${myConditionBeanClassName} cb = newConditionBean(); cbLambda.callback(cb);
+        return facadeSelectList(cb);
+    }
+
+#end
+#if ($table.isMakeDirectConditionBeanSetup())
     /**
      * Select the list as result bean.
      * <pre>
@@ -325,15 +436,46 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     public ListResultBean<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
         return facadeSelectList(cb);
     }
-#if ($table.isEntityDerivedMappable())
 
+#end
+#if ($table.isEntityDerivedMappable())
     @Override
     protected boolean isEntityDerivedMappable() { return true; }
-#end
 
+#end
     // ===================================================================================
     //                                                                         Page Select
     //                                                                         ===========
+#if ($table.isMakeCallbackConditionBeanSetup())
+    /**
+     * Select the page as result bean. <br />
+     * (both count-select and paging-select are executed)
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * cb.query().addOrderBy_Bar...();
+     * cb.<span style="color: #DD4747">paging</span>(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
+     * PagingResultBean&lt;${myExtendedObjectClassName}&gt; page = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectPage</span>(cb);
+     * int allRecordCount = page.getAllRecordCount();
+     * int allPageCount = page.getAllPageCount();
+     * boolean isExistPrePage = page.isExistPrePage();
+     * boolean isExistNextPage = page.isExistNextPage();
+     * ...
+     * for (${myExtendedObjectClassName} ${myEntityVariableName} : page) {
+     *     ... = ${myEntityVariableName}.get...();
+     * }
+     * </pre>
+     * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The result bean of selected page. (NotNull: if no data, returns bean as empty list)
+     * @exception DangerousResultSizeException When the result size is over the specified safety size.
+     */
+    public PagingResultBean<${myExtendedObjectClassName}> selectPage(CBCall<${myConditionBeanClassName}> cbLambda) {
+        ${myConditionBeanClassName} cb = newConditionBean(); cbLambda.callback(cb);
+        return facadeSelectPage(cb);
+    }
+
+#end
+#if ($table.isMakeDirectConditionBeanSetup())
     /**
      * Select the page as result bean. <br />
      * (both count-select and paging-select are executed)
@@ -360,9 +502,32 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return facadeSelectPage(cb);
     }
 
+#end
     // ===================================================================================
     //                                                                       Cursor Select
     //                                                                       =============
+#if ($table.isMakeCallbackConditionBeanSetup())
+    /**
+     * Select the cursor by the condition-bean.
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectCursor</span>(cb, new EntityRowHandler&lt;${myExtendedObjectClassName}&gt;() {
+     *     public void handle(${myExtendedObjectClassName} entity) {
+     *         ... = entity.getFoo...();
+     *     }
+     * });
+     * </pre>
+     * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @param entityLambda The handler of entity row of ${myExtendedObjectClassName}. (NotNull)
+     */
+    public void selectCursor(CBCall<${myConditionBeanClassName}> cbLambda, EntityRowHandler<${myExtendedObjectClassName}> entityLambda) {
+        ${myConditionBeanClassName} cb = newConditionBean(); cbLambda.callback(cb);
+        facadeSelectCursor(cb, entityLambda);
+    }
+
+#end
+#if ($table.isMakeDirectConditionBeanSetup())
     /**
      * Select the cursor by the condition-bean.
      * <pre>
@@ -381,6 +546,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         facadeSelectCursor(cb, entityRowHandler);
     }
 
+#end
     // ===================================================================================
     //                                                                       Scalar Select
     //                                                                       =============
@@ -980,6 +1146,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     @Override
     protected boolean isCompatibleBatchUpdateDefaultEveryColumn() { return true; }
 #end
+#if ($table.isMakeBatchUpdateSpecifyColumn())
 
     /**
 #if ($table.hasOptimisticLock())
@@ -1024,6 +1191,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> updateColumnSpec) {
         return doBatchUpdate(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec));
     }
+#end
 #if ($table.hasOptimisticLock())
 
     /**
@@ -1053,6 +1221,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return doBatchUpdateNonstrict(${myEntityListVariableName}, null);
     }
+#if ($table.isMakeBatchUpdateSpecifyColumn())
 
     /**
      * Batch-update the entity list non-strictly specified-only. (NonExclusiveControl) <br />
@@ -1084,6 +1253,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> updateColumnSpec) {
         return doBatchUpdateNonstrict(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec));
     }
+#end
 #end
 
     /**
@@ -1150,6 +1320,36 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     public int queryInsert(QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> setupper) {
         return doQueryInsert(setupper, null);
     }
+#if ($table.isMakeCallbackConditionBeanSetup())
+
+    /**
+     * Update the several entities by query non-strictly modified-only. (NonExclusiveControl)
+     * <pre>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * <span style="color: #3F7E5E">// you don't need to set PK value</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setPK...(value);</span>
+     * ${myEntityVariableName}.setFoo...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// you don't need to set values of common columns</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setRegisterUser(value);</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.set...;</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of concurrency column</span>
+     * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">queryUpdate</span>(${myEntityVariableName}, cb);
+     * </pre>
+     * @param ${myEntityVariableName} The entity that contains update values. (NotNull, PrimaryKeyNullAllowed)
+     * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The updated count.
+     * @exception NonQueryUpdateNotAllowedException When the query has no condition.
+     */
+    public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, CBCall<${myConditionBeanClassName}> cbLambda) {
+        ${myConditionBeanClassName} cb = newConditionBean(); cbLambda.callback(cb);
+        return doQueryUpdate(${myEntityVariableName}, cb, null);
+    }
+#end
+#if ($table.isMakeDirectConditionBeanSetup())
 
     /**
      * Update the several entities by query non-strictly modified-only. (NonExclusiveControl)
@@ -1176,6 +1376,26 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
         return doQueryUpdate(${myEntityVariableName}, cb, null);
     }
+#end
+#if ($table.isMakeCallbackConditionBeanSetup())
+
+    /**
+     * Delete the several entities by query. (NonExclusiveControl)
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">queryDelete</span>(${myEntityVariableName}, cb);
+     * </pre>
+     * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The deleted count.
+     * @exception NonQueryDeleteNotAllowedException When the query has no condition.
+     */
+    public int queryDelete(CBCall<${myConditionBeanClassName}> cbLambda) {
+        ${myConditionBeanClassName} cb = newConditionBean(); cbLambda.callback(cb);
+        return doQueryDelete(cb, null);
+    }
+#end
+#if ($table.isMakeDirectConditionBeanSetup())
 
     /**
      * Delete the several entities by query. (NonExclusiveControl)
@@ -1191,6 +1411,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     public int queryDelete(${myConditionBeanClassName} cb) {
         return doQueryDelete(cb, null);
     }
+#end
 
     // ===================================================================================
     //                                                                      Varying Update
@@ -1465,6 +1686,45 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         assertInsertOptionNotNull(option);
         return doQueryInsert(setupper, option);
     }
+#if ($table.isMakeCallbackConditionBeanSetup())
+
+    /**
+     * Update the several entities by query with varying requests non-strictly modified-only. {NonExclusiveControl} <br />
+     * For example, self(selfCalculationSpecification), specify(updateColumnSpecification)
+     * , disableCommonColumnAutoSetup(), allowNonQueryUpdate(). <br />
+     * Other specifications are same as queryUpdate(entity, cb).
+     * <pre>
+     * <span style="color: #3F7E5E">// ex) you can update by self calculation values</span>
+     * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
+     * <span style="color: #3F7E5E">// you don't need to set PK value</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setPK...(value);</span>
+     * ${myEntityVariableName}.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
+     * <span style="color: #3F7E5E">// you don't need to set a value of concurrency column</span>
+     * <span style="color: #3F7E5E">// (auto-increment for version number is valid though non-exclusive control)</span>
+     * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * UpdateOption&lt;${myConditionBeanClassName}&gt; option = new UpdateOption&lt;${myConditionBeanClassName}&gt;();
+     * option.self(new SpecifyQuery&lt;${myConditionBeanClassName}&gt;() {
+     *     public void specify(${myConditionBeanClassName} cb) {
+     *         cb.specify().<span style="color: #DD4747">columnFooCount()</span>;
+     *     }
+     * }).plus(1); <span style="color: #3F7E5E">// FOO_COUNT = FOO_COUNT + 1</span>
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">varyingQueryUpdate</span>(${myEntityVariableName}, cb, option);
+     * </pre>
+     * @param ${myEntityVariableName} The entity that contains update values. (NotNull) {PrimaryKeyNotRequired}
+     * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @param option The option of update for varying requests. (NotNull)
+     * @return The updated count.
+     * @exception NonQueryUpdateNotAllowedException When the query has no condition (if not allowed).
+     */
+    public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, CBCall<${myConditionBeanClassName}> cbLambda, UpdateOption<${myConditionBeanClassName}> option) {
+        assertUpdateOptionNotNull(option);
+        ${myConditionBeanClassName} cb = newConditionBean(); cbLambda.callback(cb);
+        return doQueryUpdate(${myEntityVariableName}, cb, option);
+    }
+#end
+#if ($table.isMakeDirectConditionBeanSetup())
 
     /**
      * Update the several entities by query with varying requests non-strictly modified-only. {NonExclusiveControl} <br />
@@ -1500,6 +1760,25 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         assertUpdateOptionNotNull(option);
         return doQueryUpdate(${myEntityVariableName}, cb, option);
     }
+#end
+#if ($table.isMakeCallbackConditionBeanSetup())
+
+    /**
+     * Delete the several entities by query with varying requests non-strictly. <br />
+     * For example, allowNonQueryDelete(). <br />
+     * Other specifications are same as batchUpdateNonstrict(entityList).
+     * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @param option The option of delete for varying requests. (NotNull)
+     * @return The deleted count.
+     * @exception NonQueryDeleteNotAllowedException When the query has no condition (if not allowed).
+     */
+    public int varyingQueryDelete(CBCall<${myConditionBeanClassName}> cbLambda, DeleteOption<${myConditionBeanClassName}> option) {
+        assertDeleteOptionNotNull(option);
+        ${myConditionBeanClassName} cb = newConditionBean(); cbLambda.callback(cb);
+        return doQueryDelete(cb, option);
+    }
+#end
+#if ($table.isMakeDirectConditionBeanSetup())
 
     /**
      * Delete the several entities by query with varying requests non-strictly. <br />
@@ -1514,6 +1793,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         assertDeleteOptionNotNull(option);
         return doQueryDelete(cb, option);
     }
+#end
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
 

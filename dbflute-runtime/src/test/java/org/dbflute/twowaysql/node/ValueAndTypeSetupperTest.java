@@ -18,7 +18,6 @@ package org.dbflute.twowaysql.node;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.cbean.SimpleMapPmb;
 import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.twowaysql.exception.BindVariableCommentListIndexNotNumberException;
 import org.dbflute.twowaysql.exception.BindVariableCommentListIndexOutOfBoundsException;
@@ -26,6 +25,7 @@ import org.dbflute.twowaysql.exception.BindVariableCommentNotFoundPropertyExcept
 import org.dbflute.twowaysql.exception.ForCommentNotFoundPropertyException;
 import org.dbflute.twowaysql.exception.ForCommentPropertyReadFailureException;
 import org.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
+import org.dbflute.twowaysql.pmbean.SimpleMapPmb;
 import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;

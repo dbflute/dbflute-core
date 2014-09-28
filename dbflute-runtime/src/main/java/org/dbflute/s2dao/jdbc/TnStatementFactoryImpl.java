@@ -23,8 +23,8 @@ import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbflute.bhv.core.ConditionBeanContext;
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.exception.handler.SQLExceptionHandler;
 import org.dbflute.exception.handler.SQLExceptionResource;
 import org.dbflute.jdbc.StatementConfig;

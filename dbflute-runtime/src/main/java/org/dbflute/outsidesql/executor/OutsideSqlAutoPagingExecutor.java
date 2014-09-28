@@ -15,10 +15,10 @@
  */
 package org.dbflute.outsidesql.executor;
 
-import org.dbflute.DBDef;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.PagingResultBean;
+import org.dbflute.cbean.result.ListResultBean;
+import org.dbflute.cbean.result.PagingResultBean;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;

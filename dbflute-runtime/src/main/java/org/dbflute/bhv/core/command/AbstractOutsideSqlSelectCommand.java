@@ -17,11 +17,11 @@ package org.dbflute.bhv.core.command;
 
 import java.util.Map;
 
+import org.dbflute.bhv.core.FetchAssistContext;
 import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.bhv.core.execution.OutsideSqlSelectExecution;
-import org.dbflute.cbean.FetchAssistContext;
-import org.dbflute.cbean.FetchNarrowingBean;
+import org.dbflute.cbean.paging.FetchNarrowingBean;
 import org.dbflute.jdbc.FetchBean;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.outsidesql.OutsideSqlOption;

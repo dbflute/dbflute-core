@@ -18,7 +18,7 @@ package org.dbflute.s2dao.sqlhandler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dbflute.CallbackContext;
+import org.dbflute.bhv.CallbackContext;
 import org.dbflute.jdbc.SqlLogHandler;
 import org.dbflute.jdbc.SqlLogInfo;
 import org.dbflute.jdbc.SqlResultHandler;

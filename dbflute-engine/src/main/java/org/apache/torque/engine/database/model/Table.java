@@ -141,7 +141,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
+import org.dbflute.DBDef;
 import org.dbflute.DfBuildProperties;
+import org.dbflute.bhv.ConditionBeanSetupper;
+import org.dbflute.bhv.ReferrerConditionSetupper;
+import org.dbflute.dbmeta.DerivedMappable;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringSet;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
@@ -158,17 +164,11 @@ import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfIncludeQueryProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
-import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
-import org.dbflute.DBDef;
-import org.dbflute.bhv.ConditionBeanSetupper;
-import org.dbflute.bhv.ReferrerConditionSetupper;
-import org.dbflute.dbmeta.DerivedMappable;
-import org.dbflute.helper.StringKeyMap;
-import org.dbflute.helper.StringSet;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
@@ -3532,6 +3532,18 @@ public class Table {
         return prop.isCompatibleSelectByPKOldStyle() ? "Value" : "";
     }
 
+    public boolean isMakeCallbackConditionBeanSetup() {
+        return getLittleAdjustmentProperties().isMakeCallbackConditionBeanSetup();
+    }
+
+    public boolean isMakeDirectConditionBeanSetup() {
+        return getLittleAdjustmentProperties().isMakeDirectConditionBeanSetup();
+    }
+
+    public boolean isMakeBatchUpdateSpecifyColumn() {
+        return getLittleAdjustmentProperties().isMakeBatchUpdateSpecifyColumn();
+    }
+
     public boolean isCompatibleSelectByPKWithDeletedCheck() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.isCompatibleSelectByPKWithDeletedCheck();
@@ -3614,6 +3626,30 @@ public class Table {
 
     public boolean isMakeConditionQueryPlainListManualOrder() {
         return getLittleAdjustmentProperties().isMakeConditionQueryPlainListManualOrder();
+    }
+
+    public boolean isMakeConditionQueryPrefixSearch() {
+        return getLittleAdjustmentProperties().isMakeConditionQueryPrefixSearch();
+    }
+
+    public boolean isMakeConditionQueryDateFromTo() {
+        return getLittleAdjustmentProperties().isMakeConditionQueryDateFromTo();
+    }
+
+    public boolean isMakeCallbackConditionOptionSetup() {
+        return getLittleAdjustmentProperties().isMakeCallbackConditionOptionSetup();
+    }
+
+    public boolean isMakeDirectConditionOptionSetup() {
+        return getLittleAdjustmentProperties().isMakeDirectConditionOptionSetup();
+    }
+
+    public boolean isMakeCallbackConditionManualOrder() {
+        return getLittleAdjustmentProperties().isMakeCallbackConditionManualOrder();
+    }
+
+    public boolean isMakeDirectConditionManualOrder() {
+        return getLittleAdjustmentProperties().isMakeDirectConditionManualOrder();
     }
 
     // ===================================================================================

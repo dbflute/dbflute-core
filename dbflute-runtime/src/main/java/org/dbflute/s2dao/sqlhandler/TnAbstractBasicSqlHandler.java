@@ -27,8 +27,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.CallbackContext;
 import org.dbflute.QLog;
+import org.dbflute.bhv.CallbackContext;
 import org.dbflute.bhv.core.SqlFireHook;
 import org.dbflute.bhv.core.SqlFireReadyInfo;
 import org.dbflute.bhv.core.SqlFireResultInfo;

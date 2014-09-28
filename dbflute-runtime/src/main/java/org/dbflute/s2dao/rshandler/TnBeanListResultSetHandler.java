@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.dbflute.bhv.core.ConditionBeanContext;
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.extension.TnRelationRowCreatorExtension;

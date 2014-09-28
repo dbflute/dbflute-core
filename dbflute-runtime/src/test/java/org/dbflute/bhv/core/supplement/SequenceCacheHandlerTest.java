@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.dbflute.DBDef;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.unit.PlainTestCase;

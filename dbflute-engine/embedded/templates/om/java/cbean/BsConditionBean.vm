@@ -17,13 +17,9 @@ ${database.allClassCopyright}package ${glPackageBaseCB};
 #set ($myClassName = "${myBaseConditionBeanClassName}")
 
 import org.dbflute.cbean.AbstractConditionBean;
-import org.dbflute.cbean.AndQuery;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
-import org.dbflute.cbean.OrQuery;
-import org.dbflute.cbean.SpecifyQuery;
-import org.dbflute.cbean.SubQuery;
-import org.dbflute.cbean.UnionQuery;
+import org.dbflute.cbean.callback.*;
 import org.dbflute.cbean.chelper.*;
 import org.dbflute.cbean.coption.*;
 import org.dbflute.cbean.sqlclause.SqlClause;

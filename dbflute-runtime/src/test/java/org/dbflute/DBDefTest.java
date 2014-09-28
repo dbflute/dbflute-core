@@ -15,6 +15,7 @@
  */
 package org.dbflute;
 
+import org.dbflute.dbway.DBDef;
 import org.dbflute.dbway.DBWay;
 import org.dbflute.dbway.WayOfMySQL;
 import org.dbflute.unit.PlainTestCase;

@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ManualOrderBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
 import org.dbflute.cbean.chelper.HpMobCaseWhenElement;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
+import org.dbflute.cbean.ordering.ManualOrderBean;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.resource.DBFluteSystem;

@@ -20,10 +20,10 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.dbflute.CallbackContext;
 import org.dbflute.Entity;
-import org.dbflute.bhv.SqlStringFilter;
+import org.dbflute.bhv.CallbackContext;
 import org.dbflute.bhv.core.BehaviorCommandMeta;
+import org.dbflute.bhv.core.SqlStringFilter;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.name.ColumnSqlName;

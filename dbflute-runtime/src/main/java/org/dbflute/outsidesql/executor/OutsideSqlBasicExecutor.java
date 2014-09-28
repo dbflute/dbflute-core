@@ -17,15 +17,15 @@ package org.dbflute.outsidesql.executor;
 
 import java.util.List;
 
-import org.dbflute.DBDef;
 import org.dbflute.bhv.core.BehaviorCommand;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.bhv.core.command.AbstractOutsideSqlCommand;
 import org.dbflute.bhv.core.command.OutsideSqlCallCommand;
 import org.dbflute.bhv.core.command.OutsideSqlExecuteCommand;
 import org.dbflute.bhv.core.command.OutsideSqlSelectListCommand;
-import org.dbflute.cbean.ListResultBean;
-import org.dbflute.cbean.ResultBeanBuilder;
+import org.dbflute.cbean.result.ListResultBean;
+import org.dbflute.cbean.result.ResultBeanBuilder;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.FetchingOverSafetySizeException;
 import org.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.dbflute.jdbc.FetchBean;

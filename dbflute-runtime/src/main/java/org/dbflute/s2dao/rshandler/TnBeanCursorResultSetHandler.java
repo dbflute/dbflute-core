@@ -19,8 +19,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.dbflute.Entity;
-import org.dbflute.cbean.ConditionBeanContext;
-import org.dbflute.cbean.EntityRowHandler;
+import org.dbflute.bhv.core.ConditionBeanContext;
+import org.dbflute.bhv.readable.EntityRowHandler;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCache;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;

@@ -25,9 +25,9 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.dbflute.Entity;
-import org.dbflute.bhv.DeleteOption;
-import org.dbflute.bhv.InsertOption;
-import org.dbflute.bhv.UpdateOption;
+import org.dbflute.bhv.writable.DeleteOption;
+import org.dbflute.bhv.writable.InsertOption;
+import org.dbflute.bhv.writable.UpdateOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.exception.EntityAlreadyUpdatedException;
 import org.dbflute.helper.beans.DfPropertyDesc;

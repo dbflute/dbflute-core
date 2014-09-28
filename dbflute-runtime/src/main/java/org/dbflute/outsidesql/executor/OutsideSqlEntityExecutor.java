@@ -17,8 +17,8 @@ package org.dbflute.outsidesql.executor;
 
 import java.util.List;
 
-import org.dbflute.DBDef;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.DangerousResultSizeException;
 import org.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.dbflute.jdbc.FetchBean;

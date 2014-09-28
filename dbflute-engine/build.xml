@@ -15,7 +15,7 @@
 	<property name="workspace.base" value="../.." />
 	<property name="dbflute.base" value="${workspace.base}/dbflute-core" />
 	<property name="dbflute.www.base" value="${workspace.base}/dbflute-www" />
-	<property name="test.entry.base" value="${workspace.base}" />
+	<property name="test.active.stage.base" value="${workspace.base}" />
 	<property name="example.container.base" value="${workspace.base}/dbflute-example-container" />
 	<property name="example.database.base" value="${workspace.base}/dbflute-example-database" />
 	<property name="example.multipledb.base" value="${workspace.base}/dbflute-example-multipledb" />
@@ -42,10 +42,9 @@
 	<property name="module.zip" value="dbflute-${version}.zip" />
 	<property name="module.build.zip" value="dbflute-${build.version}.zip" />
 
-	<!-- DI Container Examples -->
-	<property name="test.basic.dir" value="${test.entry.base}/dbflute-test-basic" />
-	<property name="test.onparade.dir" value="${test.entry.base}/dbflute-test-onparade" />
-	<property name="cdi.example.dir" value="${example.container.base}/dbflute-cdi-example" />
+	<!-- Test: Active Stage -->
+	<property name="test.active.dockside.dir" value="${test.active.stage.base}/dbflute-test-active-dockside" />
+	<property name="test.active.hanger.dir" value="${test.active.stage.base}/dbflute-test-active-hanger" />
 
 	<!-- Database Examples -->
 	<property name="mysql.example.dir" value="${example.database.base}/dbflute-mysql-example" />
@@ -250,25 +249,17 @@
 		<chmod dir="${extraction.dir}/ant/bin" perm="ugo+rx" includes="**/*" />
 	</target>
 
-	<target name="reflect-to-test-basic" depends="prepare-reflection" description="==> reflect to test basic">
-		<delete dir="${test.basic.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${test.basic.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+	<target name="reflect-to-test-active-dockside" depends="prepare-reflection" description="==> reflect to test active dockside">
+		<delete dir="${test.active.dockside.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.active.dockside.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />
 	</target>
 
-	<target name="reflect-to-test-onparade" depends="prepare-reflection" description="==> reflect to test onparade">
-		<delete dir="${test.onparade.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${test.onparade.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-cdi" depends="prepare-reflection" description="==> reflect to cdi example">
-		<delete dir="${cdi.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${cdi.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+	<target name="reflect-to-test-active-hanger" depends="prepare-reflection" description="==> reflect to test active hanger">
+		<delete dir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />

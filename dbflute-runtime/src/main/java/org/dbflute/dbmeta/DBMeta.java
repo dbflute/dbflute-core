@@ -18,7 +18,6 @@ package org.dbflute.dbmeta;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.DBDef;
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
@@ -26,6 +25,7 @@ import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
 import org.dbflute.dbmeta.info.UniqueInfo;
 import org.dbflute.dbmeta.name.TableSqlName;
+import org.dbflute.dbway.DBDef;
 
 /**
  * The interface of DB meta for one table.

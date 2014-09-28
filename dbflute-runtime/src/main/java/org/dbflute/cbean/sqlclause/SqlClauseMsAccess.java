@@ -17,11 +17,11 @@ package org.dbflute.cbean.sqlclause;
 
 import java.util.Map;
 
-import org.dbflute.DBDef;
 import org.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.dbway.DBWay;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 

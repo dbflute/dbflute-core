@@ -18,7 +18,6 @@ package org.dbflute.cbean.sqlclause;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.cbean.ManualOrderBean;
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
@@ -30,6 +29,7 @@ import org.dbflute.cbean.coption.ConditionOption;
 import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.ordering.ManualOrderBean;
 import org.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.dbflute.cbean.sqlclause.join.FixedConditionLazyChecker;

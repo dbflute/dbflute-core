@@ -16,8 +16,8 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.SpecifyQuery;
 import org.dbflute.cbean.ckey.ConditionKey;
+import org.dbflute.cbean.subcall.SpecifyQuery;
 
 /**
  * @param <CB> The type of condition-bean.

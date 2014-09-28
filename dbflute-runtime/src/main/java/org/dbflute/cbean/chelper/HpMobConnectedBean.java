@@ -15,8 +15,8 @@
  */
 package org.dbflute.cbean.chelper;
 
-import org.dbflute.cbean.ManualOrderBean;
 import org.dbflute.cbean.ckey.ConditionKey;
+import org.dbflute.cbean.ordering.ManualOrderBean;
 
 /**
  * @author jflute

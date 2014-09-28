@@ -21,10 +21,10 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.dbflute.CallbackContext;
 import org.dbflute.Entity;
-import org.dbflute.bhv.SqlStringFilter;
+import org.dbflute.bhv.CallbackContext;
 import org.dbflute.bhv.core.BehaviorCommandMeta;
+import org.dbflute.bhv.core.SqlStringFilter;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.sqlclause.SqlClause;

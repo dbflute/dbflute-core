@@ -15,8 +15,8 @@
  */
 package org.dbflute.outsidesql.factory;
 
-import org.dbflute.DBDef;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.outsidesql.OutsideSqlFilter;
 import org.dbflute.outsidesql.OutsideSqlOption;

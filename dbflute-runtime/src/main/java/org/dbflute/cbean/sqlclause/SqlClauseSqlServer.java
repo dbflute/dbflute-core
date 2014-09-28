@@ -15,8 +15,8 @@
  */
 package org.dbflute.cbean.sqlclause;
 
-import org.dbflute.DBDef;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.dbway.DBWay;
 
 /**

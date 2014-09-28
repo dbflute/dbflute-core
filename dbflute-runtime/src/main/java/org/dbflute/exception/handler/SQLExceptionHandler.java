@@ -22,9 +22,9 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.DBDef;
+import org.dbflute.bhv.core.ConditionBeanContext;
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.ConditionBeanContext;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.EntityAlreadyExistsException;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.exception.factory.ExceptionMessageBuilder;

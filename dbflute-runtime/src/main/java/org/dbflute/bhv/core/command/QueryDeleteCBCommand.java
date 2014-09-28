@@ -15,8 +15,8 @@
  */
 package org.dbflute.bhv.core.command;
 
-import org.dbflute.bhv.DeleteOption;
 import org.dbflute.bhv.core.SqlExecution;
+import org.dbflute.bhv.writable.DeleteOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.s2dao.sqlcommand.TnQueryDeleteDynamicCommand;
 

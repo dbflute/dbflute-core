@@ -17,8 +17,8 @@ package org.dbflute.s2dao.identity;
 
 import javax.sql.DataSource;
 
-import org.dbflute.DBDef;
 import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.dbway.WayOfSQLServer;
 import org.dbflute.dbway.WayOfSybase;
 import org.dbflute.jdbc.StatementFactory;

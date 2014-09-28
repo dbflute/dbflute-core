@@ -20,12 +20,12 @@ import java.util.Map;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
-import org.dbflute.cbean.ManualOrderBean;
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.ordering.ManualOrderBean;
 import org.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;

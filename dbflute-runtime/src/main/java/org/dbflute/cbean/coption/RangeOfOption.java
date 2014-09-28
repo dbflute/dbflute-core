@@ -18,13 +18,13 @@ package org.dbflute.cbean.coption;
 import java.util.List;
 
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.SpecifyQuery;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
 import org.dbflute.cbean.chelper.HpCalculator;
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
+import org.dbflute.cbean.subcall.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbway.ExtensionOperand;
 import org.dbflute.dbway.StringConnector;

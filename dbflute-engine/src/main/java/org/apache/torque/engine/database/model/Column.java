@@ -136,6 +136,7 @@ import java.util.Set;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
@@ -147,11 +148,10 @@ import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfIncludeQueryProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfTypeMappingProperties;
-import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
@@ -2103,6 +2103,9 @@ public class Column {
         if (hasQueryRestrictionByClassification()) {
             return false;
         }
+        if (!getTable().isMakeConditionQueryPrefixSearch()) {
+            return false; // basically here since 1.1
+        }
         return getIncludeQueryProperties().isAvailableStringPrefixSearch(this);
     }
 
@@ -2245,6 +2248,9 @@ public class Column {
     public boolean isAvailableDateDateFromTo() { // means DateFromTo of Date type
         if (isJdbcTypeTime()) {
             return false;
+        }
+        if (!getTable().isMakeConditionQueryDateFromTo()) {
+            return false; // basically here since 1.1
         }
         return getIncludeQueryProperties().isAvailableDateDateFromTo(this);
     }

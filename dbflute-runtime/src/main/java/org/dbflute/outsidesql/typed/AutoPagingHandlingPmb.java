@@ -15,7 +15,7 @@
  */
 package org.dbflute.outsidesql.typed;
 
-import org.dbflute.cbean.PagingBean;
+import org.dbflute.cbean.paging.PagingBean;
 
 /**
  * The parameter-bean for auto-paging handling.

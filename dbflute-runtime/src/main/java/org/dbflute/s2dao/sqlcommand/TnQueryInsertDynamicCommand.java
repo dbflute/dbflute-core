@@ -22,8 +22,8 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.dbflute.Entity;
-import org.dbflute.bhv.InsertOption;
-import org.dbflute.bhv.UpdateOption;
+import org.dbflute.bhv.writable.InsertOption;
+import org.dbflute.bhv.writable.UpdateOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;

@@ -19,6 +19,7 @@ ${database.allClassCopyright}package ${glPackageBaseCQ};
 import java.util.*;
 
 import org.dbflute.cbean.*;
+import org.dbflute.cbean.callback.*;
 import org.dbflute.cbean.chelper.*;
 import org.dbflute.cbean.ckey.*;
 import org.dbflute.cbean.coption.*;
@@ -322,18 +323,22 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
-#if (${col.isAvailableStringPrefixSearch()})
+#if (${col.isAvailableStringLikeSearch()})
+#if ($table.isMakeCallbackConditionOptionSetup())
 
     /**
-     * PrefixSearch {like 'xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch. (NullAllowed: if null (or empty), no condition)
+     * LikeSearch with various options. (versatile) {like '%xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * <pre>e.g. set${tmpJavaName}_LikeSearch("xxx", new <span style="color: #DD4747">LikeSearchOption</span>().likeContain());</pre>
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch. (NullAllowed: if null (or empty), no condition)
+     * @param opLambda The callback for option of like-search. (NotNull)
      */
-    public void set${tmpJavaName}_PrefixSearch(${col.javaNative} ${tmpUncapitalisedJavaName}) {
-        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, cLSOP());
+    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, COptionCall<LikeSearchOption> opLambda) {
+        LikeSearchOption op = cLSOP(); opLambda.callback(op);
+        regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", op);
     }
 #end
-#if (${col.isAvailableStringLikeSearch()})
+#if ($table.isMakeDirectConditionOptionSetup())
 
     /**
      * LikeSearch with various options. (versatile) {like '%xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
@@ -346,7 +351,23 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
     }
 #end
+#end
 #if (${col.isAvailableStringNotLikeSearch()})
+#if ($table.isMakeCallbackConditionOptionSetup())
+
+    /**
+     * NotLikeSearch with various options. (versatile) {not like 'xxx%' escape ...} <br />
+     * And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch. (NullAllowed: if null (or empty), no condition)
+     * @param opLambda The callback for option of like-search. (NotNull)
+     */
+    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, COptionCall<LikeSearchOption> opLambda) {
+        LikeSearchOption op = cLSOP(); opLambda.callback(op);
+        regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", op);
+    }
+#end
+#if ($table.isMakeDirectConditionOptionSetup())
 
     /**
      * NotLikeSearch with various options. (versatile) {not like 'xxx%' escape ...} <br />
@@ -357,6 +378,22 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      */
     public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
+    }
+#end
+#end
+#if (${col.isAvailableStringPrefixSearch()})
+
+    /**
+     * PrefixSearch {like 'xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch. (NullAllowed: if null (or empty), no condition)
+     */
+    public void set${tmpJavaName}_PrefixSearch(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+#if ($table.isMakeCallbackConditionOptionSetup())
+        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, op -> op.likePrefix());
+#elseif ($table.isMakeDirectConditionOptionSetup())
+        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, cLSOP().likePrefix());
+#end
     }
 #end
 #foreach ($referrer in $col.existsReferrerReferrers)
@@ -734,6 +771,23 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #end
 #if (${col.isAvailableNumberRangeOf()})
+#if ($table.isMakeCallbackConditionOptionSetup())
+
+    /**
+     * RangeOf with various options. (versatile) <br />
+     * {(default) minNumber &lt;= column &lt;= maxNumber} <br />
+     * And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param minNumber The min number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
+     * @param maxNumber The max number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
+     * @param opLambda The callback for option of range-of. (NotNull)
+     */
+    public void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, COptionCall<RangeOfOption> opLambda) {
+        RangeOfOption op = cROOP(); opLambda.callback(op);
+        regROO(minNumber, maxNumber, getCValue${tmpJavaName}(), "${col.name}", op);
+    }
+#end
+#if ($table.isMakeDirectConditionBeanSetup())
 
     /**
      * RangeOf with various options. (versatile) <br />
@@ -747,6 +801,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, RangeOfOption rangeOfOption) {
         regROO(minNumber, maxNumber, getCValue${tmpJavaName}(), "${col.name}", rangeOfOption);
     }
+#end
 #end
 #if (${col.isAvailableNumberInScope()})
 
@@ -1121,6 +1176,31 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #end
 #if (${col.isAvailableDateFromTo()})
+#if ($table.isMakeCallbackConditionOptionSetup())
+
+    /**
+     * FromTo with various options. (versatile) {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
+     * And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, new <span style="color: #DD4747">FromToOption</span>().compareAsDate());</pre>
+     * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
+     * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
+     * @param opLambda The callback for option of from-to. (NotNull)
+     */
+    public void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, COptionCall<FromToOption> opLambda) {
+        FromToOption op = cFTOP(); opLambda.callback(op); 
+#if ($col.isJavaNativeUtilDate())
+        regFTQ(fCTPD(fromDatetime), fCTPD(toDatetime), getCValue${tmpJavaName}(), "${col.name}", op);
+#elseif ($col.isJavaNativeNextLocalDate())
+        regFTQ(toUtilDate(fromDatetime), toUtilDate(toDatetime), getCValue${tmpJavaName}(), "${col.name}", op);
+#elseif ($col.isJavaNativeNextLocalDateTime())
+        regFTQ(toTimestamp(fromDatetime), toTimestamp(toDatetime), getCValue${tmpJavaName}(), "${col.name}", op);
+#else
+        regFTQ((fromDatetime != null ? new ${col.javaNative}(fromDatetime.getTime()) : null), (toDatetime != null ? new ${col.javaNative}(toDatetime.getTime()) : null), getCValue${tmpJavaName}(), "${col.name}", op);
+#end
+    }
+#end
+#if ($table.isMakeDirectConditionOptionSetup())
 
     /**
      * FromTo with various options. (versatile) {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
@@ -1143,6 +1223,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
     }
 #end
+#end
 #if (${col.isAvailableDateDateFromTo()})
 
     /**
@@ -1157,7 +1238,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      */
     public void set${tmpJavaName}_DateFromTo(${col.fromToJavaNativeDate} fromDate, ${col.fromToJavaNativeDate} toDate) {
-        set${tmpJavaName}_FromTo(fromDate, toDate, new FromToOption().compareAsDate());
+#if ($table.isMakeCallbackConditionOptionSetup())
+        set${tmpJavaName}_FromTo(fromDate, toDate, op -> op.compareAsDate());
+#elseif ($table.isMakeDirectConditionOptionSetup())
+        set${tmpJavaName}_FromTo(fromDate, toDate, cFTOP().compareAsDate());
+#end
     }
 #end
 #if (${col.isAvailableDateInScope()})
@@ -1579,6 +1664,45 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     // ===================================================================================
     //                                                                        Manual Order
     //                                                                        ============
+#if ($table.isMakeCallbackConditionManualOrder())
+    /**
+     * Order along manual ordering information.
+     * <pre>
+     * MemberCB cb = new MemberCB();
+     * ManualOrderBean mob = new ManualOrderBean();
+     * mob.<span style="color: #DD4747">when_GreaterEqual</span>(priorityDate); <span style="color: #3F7E5E">// e.g. 2000/01/01</span>
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+     * <span style="color: #3F7E5E">// order by </span>
+     * <span style="color: #3F7E5E">//   case</span>
+     * <span style="color: #3F7E5E">//     when BIRTHDATE &gt;= '2000/01/01' then 0</span>
+     * <span style="color: #3F7E5E">//     else 1</span>
+     * <span style="color: #3F7E5E">//   end asc, ...</span>
+     *
+     * MemberCB cb = new MemberCB();
+     * ManualOrderBean mob = new ManualOrderBean();
+     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Withdrawal);
+     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Formalized);
+     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Provisional);
+     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+     * <span style="color: #3F7E5E">// order by </span>
+     * <span style="color: #3F7E5E">//   case</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'FML' then 1</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'PRV' then 2</span>
+     * <span style="color: #3F7E5E">//     else 3</span>
+     * <span style="color: #3F7E5E">//   end asc, ...</span>
+     * </pre>
+     * <p>This function with Union is unsupported!</p>
+     * <p>The order values are bound (treated as bind parameter).</p>
+     * @param mob The bean of manual order containing order values. (NotNull)
+     */
+    public void withManualOrder(MOrderCall mobLambda) { // is user public!
+        ManualOrderBean mob = cMOB(); mobLambda.callback(mob);
+        xdoWithManualOrder(mob);
+    }
+
+#end
+#if ($table.isMakeDirectConditionManualOrder())
     /**
      * Order along manual ordering information.
      * <pre>
@@ -1614,6 +1738,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         xdoWithManualOrder(mob);
     }
 
+#end
     // ===================================================================================
     //                                                                    Small Adjustment
     //                                                                    ================

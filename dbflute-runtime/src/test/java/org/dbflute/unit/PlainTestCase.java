@@ -30,8 +30,8 @@ import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.AccessContext;
-import org.dbflute.cbean.PagingResultBean;
+import org.dbflute.bhv.AccessContext;
+import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.unit.markhere.MarkHereManager;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;

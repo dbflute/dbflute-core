@@ -17,7 +17,7 @@ package org.dbflute.s2dao.metadata;
 
 import java.util.List;
 
-import org.dbflute.DBDef;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.PluginValueTypeNotFoundException;
 import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ValueType;
