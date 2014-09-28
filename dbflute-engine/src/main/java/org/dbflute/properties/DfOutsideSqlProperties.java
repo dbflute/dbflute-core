@@ -28,9 +28,9 @@ import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.friends.velocity.DfGenerator;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlLocation;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

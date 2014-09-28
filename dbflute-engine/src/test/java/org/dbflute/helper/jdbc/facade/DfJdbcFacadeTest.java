@@ -20,8 +20,8 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
-import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

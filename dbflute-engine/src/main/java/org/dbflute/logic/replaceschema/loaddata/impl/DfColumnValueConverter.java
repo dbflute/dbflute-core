@@ -28,9 +28,9 @@ import java.util.Set;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.dbflute.util.DfNameHintUtil;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

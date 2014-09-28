@@ -18,7 +18,7 @@ package org.dbflute.logic.sql2entity.analyzer;
 import java.util.Map;
 
 import org.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

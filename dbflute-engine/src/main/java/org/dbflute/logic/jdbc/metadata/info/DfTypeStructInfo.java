@@ -16,8 +16,8 @@
 package org.dbflute.logic.jdbc.metadata.info;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

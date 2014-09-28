@@ -23,7 +23,7 @@ import org.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractorOracle;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

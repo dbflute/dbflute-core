@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dbflute.exception.DfTakeFinallyAssertionFailureException;
-import org.seasar.dbflute.exception.SQLFailureException;
+import org.dbflute.exception.SQLFailureException;
 
 /**
  * @author jflute

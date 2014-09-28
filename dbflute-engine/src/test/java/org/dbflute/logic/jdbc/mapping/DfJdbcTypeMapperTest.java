@@ -26,7 +26,7 @@ import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.DfLanguageDependencyJava;
 import org.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper;
 import org.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.DfMapperResource;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

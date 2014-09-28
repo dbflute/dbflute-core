@@ -21,8 +21,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

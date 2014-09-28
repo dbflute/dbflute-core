@@ -23,8 +23,8 @@ import java.util.Map.Entry;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
 import org.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.util.Srl;
 
 /**
  * Temporary DTO when classification initializing.

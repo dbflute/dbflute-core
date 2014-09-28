@@ -15,7 +15,7 @@
  */
 package org.dbflute.logic.replaceschema.finalinfo;
 
-import org.seasar.dbflute.exception.SQLFailureException;
+import org.dbflute.exception.SQLFailureException;
 
 /**
  * @author jflute

@@ -16,7 +16,7 @@
 package org.dbflute.logic.generate.language.typemapping;
 
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingCSharp;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

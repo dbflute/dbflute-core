@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.dbflute.logic.jdbc.metadata.basic.DfForeignKeyExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

@@ -20,7 +20,7 @@ import java.util.Map;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

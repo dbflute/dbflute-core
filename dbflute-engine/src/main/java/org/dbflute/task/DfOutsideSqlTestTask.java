@@ -37,12 +37,12 @@ import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTask;
 import org.dbflute.task.bs.assistant.DfSpecifiedSqlFile;
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
-import org.seasar.dbflute.util.Srl.ScopeInfo;
+import org.dbflute.DBDef;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
+import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute

@@ -29,9 +29,9 @@ import org.dbflute.helper.dataset.DfDataRow;
 import org.dbflute.helper.dataset.DfDataSet;
 import org.dbflute.helper.dataset.DfDataTable;
 import org.dbflute.helper.io.xls.DfTableXlsReader;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.unit.core.PlainTestCase;
-import org.seasar.dbflute.util.DfResourceUtil;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.unit.PlainTestCase;
+import org.dbflute.util.DfResourceUtil;
 
 /**
  * @author jflute

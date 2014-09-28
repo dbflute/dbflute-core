@@ -23,7 +23,7 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.util.DfNameHintUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

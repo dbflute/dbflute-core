@@ -21,7 +21,7 @@ import org.apache.velocity.texen.util.FileUtil;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.friends.velocity.DfGenerator;
 import org.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

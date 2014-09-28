@@ -17,7 +17,7 @@ package org.dbflute.helper.dataset.types;
 
 import java.sql.Timestamp;
 
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * The time-stamp type for data set.

@@ -36,9 +36,9 @@ import org.dbflute.properties.assistant.freegen.json.DfJsonSchemaTableLoader;
 import org.dbflute.properties.assistant.freegen.prop.DfPropTableLoader;
 import org.dbflute.properties.assistant.freegen.solr.DfSolrXmlTableLoader;
 import org.dbflute.properties.assistant.freegen.xls.DfXlsTableLoader;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -82,7 +82,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     // ; outputMap = map:{
     //     ; templateFile = MessageDef.vm
     //     ; outputDirectory = ../src/main/java
-    //     ; package = org.seasar.dbflute...
+    //     ; package = org.dbflute...
     //     ; className = MessageDef
     // }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - XLS
@@ -93,7 +93,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     // ; outputMap = map:{
     //     ; templateFile = CsvDto.vm
     //     ; outputDirectory = ../src/main/java
-    //     ; package = org.seasar.dbflute...
+    //     ; package = org.dbflute...
     //     ; className = FooDto
     // }
     // ; tableMap = map:{

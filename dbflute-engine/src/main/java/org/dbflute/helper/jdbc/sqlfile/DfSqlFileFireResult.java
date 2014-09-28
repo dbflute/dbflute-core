@@ -18,7 +18,7 @@ package org.dbflute.helper.jdbc.sqlfile;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.seasar.dbflute.exception.SQLFailureException;
+import org.dbflute.exception.SQLFailureException;
 
 /**
  * @author jflute

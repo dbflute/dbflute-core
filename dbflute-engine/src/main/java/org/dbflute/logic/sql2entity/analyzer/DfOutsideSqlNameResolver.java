@@ -21,7 +21,7 @@ import java.util.List;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfIllegalAutoNamingClassNameException;
 import org.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute

@@ -49,14 +49,14 @@ import org.dbflute.util.DfPropertyUtil;
 import org.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
 import org.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
 import org.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.infra.core.DfEnvironmentType;
-import org.seasar.dbflute.infra.core.logic.DfSchemaResourceFinder;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.infra.core.DfEnvironmentType;
+import org.dbflute.infra.core.logic.DfSchemaResourceFinder;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

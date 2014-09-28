@@ -25,9 +25,9 @@ import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.dbflute.properties.assistant.freegen.reflector.DfFreeGenLazyReflector;
 import org.dbflute.properties.assistant.freegen.reflector.DfFreeGenMethodConverter;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -66,7 +66,7 @@ public class DfJsonSchemaTableLoader {
     // ; outputMap = map:{
     //     ; templateFile = unused
     //     ; outputDirectory = ../src/main/java
-    //     ; package = org.seasar.dbflute...
+    //     ; package = org.dbflute...
     //     ; className = unused
     // }
     // ; tableMap = map:{

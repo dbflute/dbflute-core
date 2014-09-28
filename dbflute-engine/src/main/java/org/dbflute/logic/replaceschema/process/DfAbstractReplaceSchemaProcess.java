@@ -26,8 +26,8 @@ import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.helper.token.line.LineToken;
-import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
+import org.dbflute.helper.token.line.LineToken;
+import org.dbflute.helper.token.line.LineTokenizingOption;
 
 /**
  * @author jflute

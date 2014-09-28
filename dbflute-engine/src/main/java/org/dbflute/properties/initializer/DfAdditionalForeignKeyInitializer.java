@@ -32,10 +32,10 @@ import org.dbflute.exception.DfPropertySettingColumnNotFoundException;
 import org.dbflute.exception.DfPropertySettingTableNotFoundException;
 import org.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringSet;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * The initializer of additional foreign key.

@@ -32,13 +32,13 @@ import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfPropertyUtil;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.jprop.JavaPropertiesProperty;
-import org.seasar.dbflute.helper.jprop.JavaPropertiesReader;
-import org.seasar.dbflute.helper.jprop.JavaPropertiesResult;
-import org.seasar.dbflute.helper.jprop.JavaPropertiesStreamProvider;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.jprop.JavaPropertiesProperty;
+import org.dbflute.helper.jprop.JavaPropertiesReader;
+import org.dbflute.helper.jprop.JavaPropertiesResult;
+import org.dbflute.helper.jprop.JavaPropertiesStreamProvider;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -55,7 +55,7 @@ public class DfPropTableLoader {
     // ; outputMap = map:{
     //     ; templateFile = MessageDef.vm
     //     ; outputDirectory = ../src/main/java
-    //     ; package = org.seasar.dbflute...
+    //     ; package = org.dbflute...
     //     ; className = MessageDef
     // }
     // ; tableMap = map:{

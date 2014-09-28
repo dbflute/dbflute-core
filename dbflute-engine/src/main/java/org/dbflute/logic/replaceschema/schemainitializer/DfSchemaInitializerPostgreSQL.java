@@ -29,9 +29,9 @@ import org.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.StringSet;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

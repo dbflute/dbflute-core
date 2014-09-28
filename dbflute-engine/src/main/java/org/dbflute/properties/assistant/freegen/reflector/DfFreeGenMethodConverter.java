@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.seasar.dbflute.util.Srl;
-import org.seasar.dbflute.util.Srl.ScopeInfo;
+import org.dbflute.util.Srl;
+import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute

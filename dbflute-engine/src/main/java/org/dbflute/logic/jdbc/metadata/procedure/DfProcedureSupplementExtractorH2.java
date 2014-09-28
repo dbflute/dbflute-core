@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
-import org.seasar.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringKeyMap;
 
 /**
  * @author jflute

@@ -17,7 +17,7 @@ package org.dbflute.logic.generate.language.implstyle;
 
 import org.apache.torque.engine.database.model.Column;
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingScala;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

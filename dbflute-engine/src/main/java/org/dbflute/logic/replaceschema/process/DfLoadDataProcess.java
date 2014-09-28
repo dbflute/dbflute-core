@@ -46,8 +46,8 @@ import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterce
 import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSQLServer;
 import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSybase;
 import org.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

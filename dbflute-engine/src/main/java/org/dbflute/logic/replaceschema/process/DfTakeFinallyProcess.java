@@ -47,10 +47,10 @@ import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

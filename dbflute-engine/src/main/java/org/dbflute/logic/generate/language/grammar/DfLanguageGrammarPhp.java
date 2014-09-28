@@ -18,7 +18,7 @@ package org.dbflute.logic.generate.language.grammar;
 import java.util.List;
 
 import org.apache.torque.engine.database.model.Column;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

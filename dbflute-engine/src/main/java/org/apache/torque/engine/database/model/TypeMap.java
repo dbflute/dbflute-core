@@ -137,8 +137,8 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * A class that maps JDBC types to their corresponding

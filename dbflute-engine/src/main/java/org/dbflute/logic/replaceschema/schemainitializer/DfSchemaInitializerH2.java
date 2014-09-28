@@ -24,7 +24,7 @@ import java.util.Map;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

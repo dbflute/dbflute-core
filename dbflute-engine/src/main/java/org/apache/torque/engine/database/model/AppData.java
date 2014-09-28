@@ -78,7 +78,7 @@ import org.apache.torque.engine.database.transform.DTDResolver;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**

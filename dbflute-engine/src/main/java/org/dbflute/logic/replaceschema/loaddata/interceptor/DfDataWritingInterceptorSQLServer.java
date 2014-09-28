@@ -29,8 +29,8 @@ import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.dbway.WayOfSQLServer;
-import org.seasar.dbflute.helper.StringSet;
+import org.dbflute.dbway.WayOfSQLServer;
+import org.dbflute.helper.StringSet;
 
 /**
  * @author jflute

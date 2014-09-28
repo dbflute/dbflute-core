@@ -18,7 +18,7 @@ package org.dbflute.logic.sql2entity.pmbean;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute

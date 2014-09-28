@@ -31,10 +31,10 @@ import org.dbflute.logic.generate.language.DfLanguageDependencyScala;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.properties.facade.DfSchemaXmlFacadeProp;
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.infra.core.DfDatabaseNameMapping;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.DBDef;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.infra.core.DfDatabaseNameMapping;
+import org.dbflute.util.Srl;
 
 /**
  * The basic properties for DBFlute property. <br />

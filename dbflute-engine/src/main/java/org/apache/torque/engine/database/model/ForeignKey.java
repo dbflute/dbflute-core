@@ -152,11 +152,11 @@ import org.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationGroup;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**

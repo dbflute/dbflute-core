@@ -25,7 +25,7 @@ import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

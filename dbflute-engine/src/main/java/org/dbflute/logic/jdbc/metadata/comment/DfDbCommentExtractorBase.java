@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfCommentExtractingFailureException;
 import org.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
-import org.seasar.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringKeyMap;
 
 /**
  * @author jflute

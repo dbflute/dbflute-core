@@ -52,8 +52,8 @@ import org.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.logic.jdbc.metadata.synonym.DfDBLinkNativeExtractorOracle.DBLinkNativeInfo;
 import org.dbflute.logic.jdbc.metadata.synonym.DfSynonymNativeExtractorOracle.SynonymNativeInfo;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

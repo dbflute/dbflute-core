@@ -16,7 +16,7 @@
 package org.dbflute.properties.facade;
 
 import org.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.DBDef;
+import org.dbflute.DBDef;
 
 /**
  * @author jflute

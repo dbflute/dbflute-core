@@ -49,8 +49,8 @@ import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTexenTask;
 import org.dbflute.task.bs.assistant.DfDocumentSelector;
-import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

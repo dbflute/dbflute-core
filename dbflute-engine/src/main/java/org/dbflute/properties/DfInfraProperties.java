@@ -18,7 +18,7 @@ package org.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

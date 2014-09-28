@@ -33,7 +33,7 @@ import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
 
 /**
  * @author jflute

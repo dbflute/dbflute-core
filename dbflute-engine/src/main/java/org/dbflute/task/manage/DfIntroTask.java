@@ -23,7 +23,7 @@ import org.dbflute.properties.DfInfraProperties;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTask;
-import org.seasar.dbflute.infra.dfprop.DfPropPublicMap;
+import org.dbflute.infra.dfprop.DfPropPublicMap;
 
 /**
  * @author jflute

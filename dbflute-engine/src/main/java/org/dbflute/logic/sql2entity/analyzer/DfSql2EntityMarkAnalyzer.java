@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
-import org.seasar.dbflute.util.Srl.ScopeInfo;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.Srl;
+import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute

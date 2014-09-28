@@ -36,8 +36,8 @@ import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeTranslatorOracle;
-import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.helper.StringKeyMap;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.helper.StringKeyMap;
 
 /**
  * @author jflute

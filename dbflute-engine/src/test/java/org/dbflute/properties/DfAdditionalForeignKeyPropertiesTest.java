@@ -18,8 +18,8 @@ package org.dbflute.properties;
 import java.util.Properties;
 
 import org.dbflute.properties.DfAdditionalForeignKeyProperties;
-import org.seasar.dbflute.unit.core.PlainTestCase;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.unit.PlainTestCase;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

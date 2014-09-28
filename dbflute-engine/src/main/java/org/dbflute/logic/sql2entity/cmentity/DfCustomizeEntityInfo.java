@@ -25,7 +25,7 @@ import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

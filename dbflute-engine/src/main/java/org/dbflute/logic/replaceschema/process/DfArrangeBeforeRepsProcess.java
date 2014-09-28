@@ -26,13 +26,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.util.FileUtils;
 import org.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.process.ProcessResult;
-import org.seasar.dbflute.helper.process.SystemScript;
-import org.seasar.dbflute.helper.process.exception.SystemScriptUnsupportedScriptException;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.process.ProcessResult;
+import org.dbflute.helper.process.SystemScript;
+import org.dbflute.helper.process.exception.SystemScriptUnsupportedScriptException;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

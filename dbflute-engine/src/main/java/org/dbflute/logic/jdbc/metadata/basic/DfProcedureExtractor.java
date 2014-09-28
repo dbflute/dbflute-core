@@ -61,10 +61,10 @@ import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfOutsideSqlProperties.ProcedureSynonymHandlingType;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

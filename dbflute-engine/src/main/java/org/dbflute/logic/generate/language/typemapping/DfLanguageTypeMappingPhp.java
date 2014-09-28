@@ -18,7 +18,7 @@ package org.dbflute.logic.generate.language.typemapping;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

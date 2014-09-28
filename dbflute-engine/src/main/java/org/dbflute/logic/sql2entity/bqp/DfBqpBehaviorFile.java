@@ -36,7 +36,7 @@ import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

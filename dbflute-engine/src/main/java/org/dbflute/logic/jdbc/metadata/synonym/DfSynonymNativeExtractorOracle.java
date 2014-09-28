@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

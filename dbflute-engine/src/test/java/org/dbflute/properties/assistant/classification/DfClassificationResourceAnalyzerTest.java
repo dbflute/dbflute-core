@@ -23,7 +23,7 @@ import java.util.List;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

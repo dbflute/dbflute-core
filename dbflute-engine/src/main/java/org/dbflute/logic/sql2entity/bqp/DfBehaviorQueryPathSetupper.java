@@ -43,8 +43,8 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

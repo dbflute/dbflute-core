@@ -177,12 +177,12 @@ import org.dbflute.properties.initializer.DfAdditionalForeignKeyInitializer;
 import org.dbflute.properties.initializer.DfAdditionalPrimaryKeyInitializer;
 import org.dbflute.properties.initializer.DfAdditionalUniqueKeyInitializer;
 import org.dbflute.properties.initializer.DfIncludeQueryInitializer;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.infra.core.DfDatabaseNameMapping;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringSet;
+import org.dbflute.infra.core.DfDatabaseNameMapping;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**

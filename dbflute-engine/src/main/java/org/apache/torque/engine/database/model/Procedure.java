@@ -22,7 +22,7 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**

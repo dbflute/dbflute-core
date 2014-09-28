@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.torque.engine.database.model.Table;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfCollectionUtil.AccordingToOrderIdExtractor;
-import org.seasar.dbflute.util.DfCollectionUtil.AccordingToOrderResource;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil.AccordingToOrderIdExtractor;
+import org.dbflute.util.DfCollectionUtil.AccordingToOrderResource;
 
 /**
  * @author jflute

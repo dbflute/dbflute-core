@@ -163,14 +163,14 @@ import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.bhv.ConditionBeanSetupper;
-import org.seasar.dbflute.bhv.ReferrerConditionSetupper;
-import org.seasar.dbflute.dbmeta.DerivedMappable;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.DBDef;
+import org.dbflute.bhv.ConditionBeanSetupper;
+import org.dbflute.bhv.ReferrerConditionSetupper;
+import org.dbflute.dbmeta.DerivedMappable;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringSet;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**

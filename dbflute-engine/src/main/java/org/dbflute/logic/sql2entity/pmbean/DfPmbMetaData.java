@@ -40,9 +40,9 @@ import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfTypeMappingProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

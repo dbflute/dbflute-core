@@ -16,7 +16,7 @@
 package org.dbflute.logic.replaceschema.loaddata.impl;
 
 import org.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataHandlerImpl;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

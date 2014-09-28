@@ -18,10 +18,10 @@ package org.dbflute.logic.outsidesqltest.check;
 import org.dbflute.exception.DfCustomizeEntityMarkInvalidException;
 import org.dbflute.exception.DfParameterBeanMarkInvalidException;
 import org.dbflute.logic.outsidesqltest.DfOutsideSqlChecker;
-import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
-import org.seasar.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
-import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.twowaysql.exception.EndCommentNotFoundException;
+import org.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
+import org.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

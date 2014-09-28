@@ -26,7 +26,7 @@ import org.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractorOracle;
 import org.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractorPostgreSQL;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

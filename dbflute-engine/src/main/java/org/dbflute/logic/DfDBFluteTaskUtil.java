@@ -38,9 +38,9 @@ import org.dbflute.friends.log4j.DfFlutistEmergencyLog4JLogger;
 import org.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.DfStringUtil;
 
 /**
  * Utilities for DBFlute task.

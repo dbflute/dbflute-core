@@ -43,10 +43,10 @@ import org.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.DBDef;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

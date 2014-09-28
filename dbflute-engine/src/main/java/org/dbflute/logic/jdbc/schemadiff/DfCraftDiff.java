@@ -29,14 +29,14 @@ import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfCraftDiffIllegalCraftKeyNameException;
 import org.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.token.file.FileToken;
-import org.seasar.dbflute.helper.token.file.FileTokenizingCallback;
-import org.seasar.dbflute.helper.token.file.FileTokenizingHeaderInfo;
-import org.seasar.dbflute.helper.token.file.FileTokenizingOption;
-import org.seasar.dbflute.helper.token.file.FileTokenizingRowResource;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.token.file.FileToken;
+import org.dbflute.helper.token.file.FileTokenizingCallback;
+import org.dbflute.helper.token.file.FileTokenizingHeaderInfo;
+import org.dbflute.helper.token.file.FileTokenizingOption;
+import org.dbflute.helper.token.file.FileTokenizingRowResource;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

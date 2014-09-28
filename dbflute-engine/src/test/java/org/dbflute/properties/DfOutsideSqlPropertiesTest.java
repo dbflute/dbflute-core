@@ -18,7 +18,7 @@ package org.dbflute.properties;
 import java.util.Properties;
 
 import org.dbflute.properties.DfOutsideSqlProperties;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

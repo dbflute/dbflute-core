@@ -15,7 +15,7 @@
  */
 package org.dbflute.logic.jdbc.urlanalyzer;
 
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

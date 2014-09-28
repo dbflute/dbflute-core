@@ -19,8 +19,8 @@ import java.util.Map;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

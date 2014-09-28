@@ -29,9 +29,9 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.facade.DfSchemaXmlFacadeProp;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.infra.diffmap.DfDiffMapFile;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.infra.diffmap.DfDiffMapFile;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

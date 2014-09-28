@@ -15,7 +15,7 @@
  */
 package org.dbflute.task.bs.assistant;
 
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

@@ -34,7 +34,7 @@ import org.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringKeyMap;
 
 /**
  * @author modified by jflute (originated in Seasar2)

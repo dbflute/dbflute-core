@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

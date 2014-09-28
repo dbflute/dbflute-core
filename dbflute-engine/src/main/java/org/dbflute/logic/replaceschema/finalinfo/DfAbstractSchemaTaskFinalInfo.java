@@ -18,7 +18,7 @@ package org.dbflute.logic.replaceschema.finalinfo;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

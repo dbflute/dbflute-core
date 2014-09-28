@@ -19,9 +19,9 @@ import java.util.List;
 
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

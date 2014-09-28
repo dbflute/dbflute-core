@@ -32,9 +32,9 @@ import org.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTask;
-import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

@@ -42,21 +42,21 @@ import org.dbflute.logic.sql2entity.pmbean.DfPmbPropertyOptionComment;
 import org.dbflute.logic.sql2entity.pmbean.DfPmbMetaData.DfPagingType;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.cbean.SimplePagingBean;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.outsidesql.ProcedurePmb;
-import org.seasar.dbflute.twowaysql.SqlAnalyzer;
-import org.seasar.dbflute.twowaysql.node.BindVariableNode;
-import org.seasar.dbflute.twowaysql.node.ForNode;
-import org.seasar.dbflute.twowaysql.node.IfCommentEvaluator;
-import org.seasar.dbflute.twowaysql.node.IfNode;
-import org.seasar.dbflute.twowaysql.node.Node;
-import org.seasar.dbflute.twowaysql.node.ScopeNode;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.DfTypeUtil.ParseTimeException;
-import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.DBDef;
+import org.dbflute.cbean.SimplePagingBean;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.outsidesql.ProcedurePmb;
+import org.dbflute.twowaysql.SqlAnalyzer;
+import org.dbflute.twowaysql.node.BindVariableNode;
+import org.dbflute.twowaysql.node.ForNode;
+import org.dbflute.twowaysql.node.IfCommentEvaluator;
+import org.dbflute.twowaysql.node.IfNode;
+import org.dbflute.twowaysql.node.Node;
+import org.dbflute.twowaysql.node.ScopeNode;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil.ParseTimeException;
+import org.dbflute.util.DfTypeUtil.ParseTimestampException;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

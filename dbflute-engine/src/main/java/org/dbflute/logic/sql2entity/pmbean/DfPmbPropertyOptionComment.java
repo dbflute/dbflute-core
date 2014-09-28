@@ -17,7 +17,7 @@ package org.dbflute.logic.sql2entity.pmbean;
 
 import java.util.List;
 
-import org.seasar.dbflute.resource.DBFluteSystem;
+import org.dbflute.resource.DBFluteSystem;
 
 /**
  * @author jflute

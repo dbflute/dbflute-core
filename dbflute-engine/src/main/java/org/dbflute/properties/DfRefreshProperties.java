@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

@@ -25,8 +25,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

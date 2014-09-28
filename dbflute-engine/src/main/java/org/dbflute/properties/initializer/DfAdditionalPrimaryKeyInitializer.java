@@ -28,7 +28,7 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfPropertySettingColumnNotFoundException;
 import org.dbflute.exception.DfPropertySettingTableNotFoundException;
 import org.dbflute.properties.DfAdditionalPrimaryKeyProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
 
 /**
  * The initializer of additional primary key.

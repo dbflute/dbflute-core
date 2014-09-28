@@ -20,9 +20,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 

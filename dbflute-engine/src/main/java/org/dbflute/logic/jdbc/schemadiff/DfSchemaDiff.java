@@ -35,11 +35,11 @@ import org.dbflute.logic.jdbc.schemadiff.differ.DfIndexDiffer;
 import org.dbflute.logic.jdbc.schemadiff.differ.DfUniqueKeyDiffer;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

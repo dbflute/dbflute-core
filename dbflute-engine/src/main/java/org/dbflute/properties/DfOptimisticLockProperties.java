@@ -21,9 +21,9 @@ import java.util.Properties;
 
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.properties.assistant.DfTableListProvider;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute

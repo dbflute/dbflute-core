@@ -15,7 +15,7 @@
  */
 package org.dbflute.logic.generate.language.pkgstyle;
 
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -85,6 +85,6 @@ public class DfLanguageClassPackageJava implements DfLanguageClassPackage {
     }
 
     public String buildAccessContextFqcn(String baseCommonPackage, String projectPrefix) {
-        return "org.seasar.dbflute.AccessContext";
+        return "org.dbflute.AccessContext";
     }
 }

@@ -35,10 +35,10 @@ import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.dbflute.properties.assistant.DfConnectionProperties;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

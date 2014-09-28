@@ -22,8 +22,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

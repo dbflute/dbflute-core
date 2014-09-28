@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -51,7 +51,7 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     //}
     protected static final List<String> _binaryList = newArrayList("Array[Byte]");
 
-    protected static <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
+    protected static <ELEMENT> ArrayList<ELEMENT> newArrayList(@SuppressWarnings("unchecked") ELEMENT... elements) {
         return DfCollectionUtil.newArrayList(elements);
     }
 

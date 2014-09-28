@@ -18,7 +18,7 @@ package org.dbflute.helper.jdbc.connection;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute

@@ -33,8 +33,8 @@ import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

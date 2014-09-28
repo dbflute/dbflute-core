@@ -27,7 +27,7 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.task.bs.DfAbstractTask;
-import org.seasar.dbflute.resource.DBFluteSystem;
+import org.dbflute.resource.DBFluteSystem;
 
 /**
  * @author jflute

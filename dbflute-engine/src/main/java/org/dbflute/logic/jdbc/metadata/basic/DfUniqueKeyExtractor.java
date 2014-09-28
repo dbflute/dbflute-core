@@ -33,7 +33,7 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

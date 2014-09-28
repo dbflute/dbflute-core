@@ -22,8 +22,8 @@ import org.apache.torque.engine.database.model.Table;
 import org.dbflute.logic.jdbc.schemadiff.DfForeignKeyDiff;
 import org.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
 import org.dbflute.logic.jdbc.schemadiff.DfTableDiff;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

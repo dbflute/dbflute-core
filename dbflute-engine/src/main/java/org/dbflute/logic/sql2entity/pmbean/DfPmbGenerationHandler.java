@@ -33,9 +33,9 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.cbean.SimplePagingBean;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.cbean.SimplePagingBean;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

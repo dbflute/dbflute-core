@@ -27,7 +27,7 @@ import java.util.TreeSet;
 
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

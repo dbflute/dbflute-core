@@ -29,7 +29,7 @@ import org.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageRes
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolverJava;
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingJava;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

@@ -29,9 +29,9 @@ import org.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.task.DfDBFluteTaskStatus;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
+import org.dbflute.util.Srl;
 
 /**
  * Temporary DTO when classification initializing.

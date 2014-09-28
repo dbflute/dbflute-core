@@ -24,8 +24,8 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.dbflute.util.DfNameHintUtil;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

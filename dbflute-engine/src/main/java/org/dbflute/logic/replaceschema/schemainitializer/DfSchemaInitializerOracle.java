@@ -25,8 +25,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
-import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.util.Srl;
 
 /**
  * The schema initializer for Oracle.

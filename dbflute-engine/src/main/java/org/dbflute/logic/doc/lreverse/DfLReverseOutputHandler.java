@@ -42,10 +42,10 @@ import org.dbflute.helper.jdbc.facade.DfJFadCursorHandler;
 import org.dbflute.helper.jdbc.facade.DfJFadResultSetWrapper;
 import org.dbflute.properties.DfAdditionalTableProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.helper.token.file.FileMakingCallback;
-import org.seasar.dbflute.helper.token.file.FileMakingOption;
-import org.seasar.dbflute.helper.token.file.FileMakingRowWriter;
-import org.seasar.dbflute.helper.token.file.FileToken;
+import org.dbflute.helper.token.file.FileMakingCallback;
+import org.dbflute.helper.token.file.FileMakingOption;
+import org.dbflute.helper.token.file.FileMakingRowWriter;
+import org.dbflute.helper.token.file.FileToken;
 
 /**
  * @author jflute

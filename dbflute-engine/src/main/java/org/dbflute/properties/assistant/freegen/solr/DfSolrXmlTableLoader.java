@@ -27,7 +27,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -55,7 +55,7 @@ public class DfSolrXmlTableLoader {
     // ; outputMap = map:{
     //     ; templateFile = unused
     //     ; outputDirectory = ../src/main/java
-    //     ; package = org.seasar.dbflute...
+    //     ; package = org.dbflute...
     //     ; className = unused
     // }
     // ; tableMap = map:{

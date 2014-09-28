@@ -24,7 +24,7 @@ import org.dbflute.exception.DfAlterCheckDifferenceFoundException;
 import org.dbflute.exception.DfAlterCheckReplaceSchemaFailureException;
 import org.dbflute.exception.DfAlterCheckSavePreviousFailureException;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureException;
-import org.seasar.dbflute.exception.SQLFailureException;
+import org.dbflute.exception.SQLFailureException;
 
 /**
  * @author jflute

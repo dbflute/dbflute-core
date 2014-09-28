@@ -36,11 +36,11 @@ import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
 import org.dbflute.properties.assistant.DfConnectionProperties;
-import org.seasar.dbflute.helper.process.SystemScript;
-import org.seasar.dbflute.infra.reps.DfRepsSchemaSqlDir;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.process.SystemScript;
+import org.dbflute.infra.reps.DfRepsSchemaSqlDir;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

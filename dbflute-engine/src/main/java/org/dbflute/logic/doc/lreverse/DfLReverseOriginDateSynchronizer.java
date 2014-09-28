@@ -26,10 +26,10 @@ import java.io.OutputStreamWriter;
 import java.util.Date;
 
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.HandyDate;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.HandyDate;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

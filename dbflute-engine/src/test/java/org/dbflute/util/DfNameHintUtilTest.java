@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.dbflute.util.DfNameHintUtil;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

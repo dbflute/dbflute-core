@@ -26,9 +26,9 @@ import java.util.Map.Entry;
 
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.mapstring.MapListString;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.mapstring.MapListString;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

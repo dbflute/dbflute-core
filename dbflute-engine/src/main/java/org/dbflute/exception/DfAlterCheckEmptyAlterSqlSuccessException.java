@@ -15,7 +15,7 @@
  */
 package org.dbflute.exception;
 
-import org.seasar.dbflute.exception.SQLFailureException;
+import org.dbflute.exception.SQLFailureException;
 
 /**
  * @author jflute

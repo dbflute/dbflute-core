@@ -39,9 +39,9 @@ import org.dbflute.task.bs.assistant.DfTaskBasicController;
 import org.dbflute.task.bs.assistant.DfTaskControlCallback;
 import org.dbflute.task.bs.assistant.DfTaskControlLogic;
 import org.dbflute.task.bs.assistant.DfTaskDatabaseResource;
-import org.seasar.dbflute.helper.filesystem.FileURL;
-import org.seasar.dbflute.infra.dfprop.DfPropPublicMap;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.filesystem.FileURL;
+import org.dbflute.infra.dfprop.DfPropPublicMap;
+import org.dbflute.util.Srl;
 
 /**
  * The abstract task.

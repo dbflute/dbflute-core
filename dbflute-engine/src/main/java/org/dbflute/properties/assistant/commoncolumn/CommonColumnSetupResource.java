@@ -15,7 +15,7 @@
  */
 package org.dbflute.properties.assistant.commoncolumn;
 
-import org.seasar.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute

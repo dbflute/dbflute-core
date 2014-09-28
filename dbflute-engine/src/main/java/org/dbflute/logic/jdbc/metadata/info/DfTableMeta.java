@@ -22,7 +22,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.resource.DBFluteSystem;
+import org.dbflute.resource.DBFluteSystem;
 
 /**
  * @author jflute

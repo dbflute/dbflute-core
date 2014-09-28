@@ -38,9 +38,9 @@ import org.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.util.DfNameHintUtil;
-import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.helper.StringSet;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * The schema initializer with JDBC.

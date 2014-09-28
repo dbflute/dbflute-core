@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.TypeMap;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -42,7 +42,7 @@ public class DfLanguageTypeMappingJava implements DfLanguageTypeMapping {
     protected static final List<String> _booleanList = newArrayList("Boolean");
     protected static final List<String> _binaryList = newArrayList("byte[]");
 
-    protected static <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
+    protected static <ELEMENT> ArrayList<ELEMENT> newArrayList(@SuppressWarnings("unchecked") ELEMENT... elements) {
         return DfCollectionUtil.newArrayList(elements);
     }
 

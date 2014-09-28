@@ -17,7 +17,7 @@ package org.dbflute.logic.doc.prophtml;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

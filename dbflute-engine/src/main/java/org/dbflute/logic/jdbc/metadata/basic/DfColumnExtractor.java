@@ -31,8 +31,8 @@ import org.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.DfMapperResource;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.DfTypeMappingProperties;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.helper.StringSet;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

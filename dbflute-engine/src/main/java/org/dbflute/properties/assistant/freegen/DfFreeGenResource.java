@@ -16,7 +16,7 @@
 package org.dbflute.properties.assistant.freegen;
 
 import org.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

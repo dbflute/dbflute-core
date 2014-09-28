@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.junit.Assert;
-import org.seasar.dbflute.unit.core.PlainTestCase;
-import org.seasar.dbflute.util.DfResourceUtil;
+import org.dbflute.unit.PlainTestCase;
+import org.dbflute.util.DfResourceUtil;
 
 /**
  * @author jflute

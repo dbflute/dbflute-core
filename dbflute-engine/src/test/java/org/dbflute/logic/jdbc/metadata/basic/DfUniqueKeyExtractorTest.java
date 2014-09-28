@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

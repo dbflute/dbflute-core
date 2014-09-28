@@ -131,7 +131,7 @@ import java.util.StringTokenizer;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * A <code>NameGenerator</code> implementation for Java-esque names.

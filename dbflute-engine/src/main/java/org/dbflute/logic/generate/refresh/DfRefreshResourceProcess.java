@@ -20,9 +20,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.infra.manage.refresh.DfRefreshResourceRequest;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.infra.manage.refresh.DfRefreshResourceRequest;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

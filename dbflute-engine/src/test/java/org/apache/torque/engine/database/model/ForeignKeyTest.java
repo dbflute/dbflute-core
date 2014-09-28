@@ -15,7 +15,7 @@
  */
 package org.apache.torque.engine.database.model;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

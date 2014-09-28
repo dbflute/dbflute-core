@@ -79,8 +79,8 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

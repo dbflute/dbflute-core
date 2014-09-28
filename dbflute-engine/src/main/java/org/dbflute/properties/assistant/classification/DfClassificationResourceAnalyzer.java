@@ -30,11 +30,11 @@ import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.DfNameHintUtil;
-import org.seasar.dbflute.helper.token.line.LineToken;
-import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
-import org.seasar.dbflute.util.Srl.ScopeInfo;
+import org.dbflute.helper.token.line.LineToken;
+import org.dbflute.helper.token.line.LineTokenizingOption;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.Srl;
+import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute

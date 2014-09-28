@@ -43,13 +43,13 @@ import org.dbflute.properties.assistant.classification.DfClassificationLiteralAr
 import org.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer;
 import org.dbflute.properties.assistant.classification.DfClassificationSqlResourceCloser;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringSet;
+import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * The properties for classification.

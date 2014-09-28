@@ -37,15 +37,15 @@ import org.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
 import org.dbflute.helper.jdbc.facade.DfJFadStringConverter;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
-import org.seasar.dbflute.s2dao.valuetype.basic.TimeType;
-import org.seasar.dbflute.s2dao.valuetype.basic.TimestampType;
-import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
-import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.BytesType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.StringClobType;
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.jdbc.ValueType;
+import org.dbflute.s2dao.valuetype.basic.StringType;
+import org.dbflute.s2dao.valuetype.basic.TimeType;
+import org.dbflute.s2dao.valuetype.basic.TimestampType;
+import org.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
+import org.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
+import org.dbflute.s2dao.valuetype.plugin.BytesType;
+import org.dbflute.s2dao.valuetype.plugin.StringClobType;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute

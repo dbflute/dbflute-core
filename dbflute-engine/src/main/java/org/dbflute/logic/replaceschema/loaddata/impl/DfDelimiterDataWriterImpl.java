@@ -43,11 +43,11 @@ import org.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataWriter;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringSet;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

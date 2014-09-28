@@ -30,10 +30,10 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.jdbc.ValueType;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * Super simple facade for JDBC.

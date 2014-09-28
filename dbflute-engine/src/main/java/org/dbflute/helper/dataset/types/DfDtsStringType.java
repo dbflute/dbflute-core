@@ -15,7 +15,7 @@
  */
 package org.dbflute.helper.dataset.types;
 
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * The string type for data set.

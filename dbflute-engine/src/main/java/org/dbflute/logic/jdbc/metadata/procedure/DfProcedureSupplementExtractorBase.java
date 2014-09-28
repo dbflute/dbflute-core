@@ -28,8 +28,8 @@ import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
 import org.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

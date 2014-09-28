@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -44,7 +44,7 @@ public class DfJsonKeyTableLoader {
     // ; outputMap = map:{
     //     ; templateFile = MessageDef.vm
     //     ; outputDirectory = ../src/main/java
-    //     ; package = org.seasar.dbflute...
+    //     ; package = org.dbflute...
     //     ; className = MessageDef
     // }
     // ; tableMap = map:{

@@ -64,16 +64,16 @@ import org.dbflute.logic.replaceschema.dataassert.DfDataAssertHandler;
 import org.dbflute.logic.replaceschema.dataassert.DfDataAssertProvider;
 import org.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
-import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.process.ProcessResult;
-import org.seasar.dbflute.helper.process.SystemScript;
-import org.seasar.dbflute.helper.process.exception.SystemScriptUnsupportedScriptException;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.process.ProcessResult;
+import org.dbflute.helper.process.SystemScript;
+import org.dbflute.helper.process.exception.SystemScriptUnsupportedScriptException;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

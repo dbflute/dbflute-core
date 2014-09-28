@@ -23,7 +23,7 @@ import org.dbflute.logic.jdbc.schemadiff.DfDiffAssist;
 import org.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
 import org.dbflute.logic.jdbc.schemadiff.DfTableDiff;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

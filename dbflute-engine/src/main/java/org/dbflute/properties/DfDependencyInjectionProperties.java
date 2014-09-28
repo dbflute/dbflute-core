@@ -22,7 +22,7 @@ import java.util.Properties;
 
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.framework.DfLanguageFramework;
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute

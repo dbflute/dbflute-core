@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute

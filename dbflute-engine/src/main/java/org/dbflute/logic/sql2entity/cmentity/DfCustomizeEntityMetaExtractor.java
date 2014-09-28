@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
-import org.seasar.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringKeyMap;
 
 public class DfCustomizeEntityMetaExtractor {
 

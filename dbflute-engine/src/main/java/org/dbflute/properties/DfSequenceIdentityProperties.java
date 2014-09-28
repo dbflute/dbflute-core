@@ -33,10 +33,10 @@ import org.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
 import org.dbflute.logic.jdbc.metadata.sequence.factory.DfSequenceExtractorFactory;
 import org.dbflute.properties.assistant.DfTableDeterminer;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

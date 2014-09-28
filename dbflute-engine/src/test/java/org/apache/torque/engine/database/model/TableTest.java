@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

@@ -29,8 +29,8 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfLoadDataIllegalImplicitClassificationValueException;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 
 /**
  * @author jflute

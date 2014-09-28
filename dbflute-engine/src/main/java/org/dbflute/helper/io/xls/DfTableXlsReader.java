@@ -43,13 +43,13 @@ import org.dbflute.helper.dataset.DfDataSetConstants;
 import org.dbflute.helper.dataset.DfDataTable;
 import org.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.dbflute.helper.dataset.types.DfDtsColumnTypes;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
-import org.seasar.dbflute.util.Srl.ScopeInfo;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
+import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author modified by jflute (originated in Seasar2)

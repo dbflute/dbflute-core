@@ -28,13 +28,13 @@ import org.dbflute.exception.DfTableColumnNameNonCompilableConnectorException;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.framework.DfLanguageFramework;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.jdbc.ClassificationUndefinedHandlingType;
-import org.seasar.dbflute.optional.OptionalEntity;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringSet;
+import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
+import org.dbflute.optional.OptionalEntity;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

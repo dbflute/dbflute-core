@@ -43,13 +43,13 @@ import org.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory;
 import org.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory.InitializeType;
 import org.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.infra.reps.DfRepsExecuteLimitter;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringSet;
+import org.dbflute.infra.reps.DfRepsExecuteLimitter;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

@@ -28,9 +28,9 @@ import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.properties.assistant.DfTableListProvider;
 import org.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.dbflute.util.DfPropertyUtil;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -386,7 +386,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     //                                              --------
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
     // ex) Get date from dateProvider
-    // R_TIMESTAMP = @org.seasar.dbflute.DateProvider@dateProvider.getDate()
+    // R_TIMESTAMP = @org.dbflute.DateProvider@dateProvider.getDate()
     // - - - - - - - - - -/
     protected static final String COMMON_COLUMN_SETUP_RESOURCE_PREFIX_MARK = "@";
     protected static final String COMMON_COLUMN_SETUP_RESOURCE_SECOND_MARK = "@";

@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.jprop.JavaPropertiesProperty;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.jprop.JavaPropertiesProperty;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

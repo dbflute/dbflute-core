@@ -40,9 +40,9 @@ import org.dbflute.logic.jdbc.metadata.supplement.DfUniqueKeyFkExtractor;
 import org.dbflute.logic.jdbc.metadata.supplement.DfUniqueKeyFkExtractor.UserUniqueFkColumn;
 import org.dbflute.logic.jdbc.metadata.supplement.factory.DfUniqueKeyFkExtractorFactory;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

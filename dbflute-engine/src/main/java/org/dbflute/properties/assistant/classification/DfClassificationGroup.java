@@ -21,8 +21,8 @@ import java.util.List;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

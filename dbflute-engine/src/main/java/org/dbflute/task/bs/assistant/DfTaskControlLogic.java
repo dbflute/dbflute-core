@@ -41,11 +41,11 @@ import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfRefreshProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.infra.core.DfEnvironmentType;
-import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
-import org.seasar.dbflute.util.DfTraceViewUtil;
+import org.dbflute.DBDef;
+import org.dbflute.infra.core.DfEnvironmentType;
+import org.dbflute.resource.ResourceContext;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
+import org.dbflute.util.DfTraceViewUtil;
 
 /**
  * @author jflute

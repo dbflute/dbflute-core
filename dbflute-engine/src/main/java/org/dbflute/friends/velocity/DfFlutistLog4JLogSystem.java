@@ -23,7 +23,7 @@ import org.apache.log4j.PatternLayout;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.Log4JLogChute;
 import org.dbflute.friends.log4j.DfFlutistRollingFileAppender;
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * The log system using Log4j for DBFlute.

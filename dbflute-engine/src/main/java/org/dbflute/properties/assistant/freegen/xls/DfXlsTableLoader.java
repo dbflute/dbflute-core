@@ -34,7 +34,7 @@ import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.dbflute.properties.assistant.freegen.reflector.DfFreeGenLazyReflector;
 import org.dbflute.properties.assistant.freegen.reflector.DfFreeGenMethodConverter;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -56,7 +56,7 @@ public class DfXlsTableLoader {
     // ; outputMap = map:{
     //     ; templateFile = CsvDto.vm
     //     ; outputDirectory = ../src/main/java
-    //     ; package = org.seasar.dbflute...
+    //     ; package = org.dbflute...
     //     ; className = FooDto
     // }
     // ; tableMap = map:{

@@ -37,13 +37,13 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfCommonColumnProperties;
 import org.dbflute.properties.DfOptimisticLockProperties;
 import org.dbflute.util.DfNameHintUtil;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
-import org.seasar.dbflute.util.Srl.ScopeInfo;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringSet;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.Srl;
+import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute

@@ -32,9 +32,9 @@ import org.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.util.DfNameHintUtil;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

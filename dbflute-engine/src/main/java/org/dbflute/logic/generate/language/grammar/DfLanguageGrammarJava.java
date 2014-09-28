@@ -20,9 +20,9 @@ import java.util.Set;
 
 import org.apache.torque.engine.database.model.Column;
 import org.dbflute.logic.generate.language.DfLanguageSmallHelper;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.StringSet;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

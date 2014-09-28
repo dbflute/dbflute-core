@@ -13,7 +13,7 @@
 
 	<!-- Base Directories -->
 	<property name="workspace.base" value="../.." />
-	<property name="dbflute.base" value="${workspace.base}/dbflute" />
+	<property name="dbflute.base" value="${workspace.base}/dbflute-core" />
 	<property name="dbflute.www.base" value="${workspace.base}/dbflute-www" />
 	<property name="example.container.base" value="${workspace.base}/dbflute-example-container" />
 	<property name="example.database.base" value="${workspace.base}/dbflute-example-database" />

@@ -23,9 +23,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.DfAlterCheckAlterScriptSQLException;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
-import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.helper.token.line.LineToken;
-import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.helper.token.line.LineToken;
+import org.dbflute.helper.token.line.LineTokenizingOption;
 
 /**
  * @author jflute

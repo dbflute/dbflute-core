@@ -16,7 +16,7 @@
 package org.dbflute.logic.sql2entity.outsidesql;
 
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlNameResolver;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

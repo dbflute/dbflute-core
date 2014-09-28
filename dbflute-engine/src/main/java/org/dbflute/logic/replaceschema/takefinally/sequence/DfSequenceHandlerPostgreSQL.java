@@ -35,7 +35,7 @@ import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
-import org.seasar.dbflute.helper.StringSet;
+import org.dbflute.helper.StringSet;
 
 /**
  * @author jflute

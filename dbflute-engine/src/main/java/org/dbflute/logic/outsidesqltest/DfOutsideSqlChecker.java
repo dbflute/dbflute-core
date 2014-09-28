@@ -22,12 +22,12 @@ import org.dbflute.exception.DfParameterBeanMarkInvalidException;
 import org.dbflute.exception.DfRequiredOutsideSqlDescriptionNotFoundException;
 import org.dbflute.exception.DfRequiredOutsideSqlTitleNotFoundException;
 import org.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.twowaysql.SqlAnalyzer;
-import org.seasar.dbflute.twowaysql.node.IfCommentEvaluator;
-import org.seasar.dbflute.twowaysql.node.ParameterFinder;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.twowaysql.SqlAnalyzer;
+import org.dbflute.twowaysql.node.IfCommentEvaluator;
+import org.dbflute.twowaysql.node.ParameterFinder;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

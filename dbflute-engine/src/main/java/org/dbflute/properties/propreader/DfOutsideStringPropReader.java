@@ -15,7 +15,7 @@
  */
 package org.dbflute.properties.propreader;
 
-import org.seasar.dbflute.infra.dfprop.DfPropFile;
+import org.dbflute.infra.dfprop.DfPropFile;
 
 /**
  * @author jflute

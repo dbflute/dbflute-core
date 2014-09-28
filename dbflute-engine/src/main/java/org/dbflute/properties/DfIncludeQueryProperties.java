@@ -28,10 +28,10 @@ import java.util.Set;
 import org.apache.torque.engine.database.model.Column;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.Srl;
-import org.seasar.dbflute.util.Srl.ScopeInfo;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.Srl;
+import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute

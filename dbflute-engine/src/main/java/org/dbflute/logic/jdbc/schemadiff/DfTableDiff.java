@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute

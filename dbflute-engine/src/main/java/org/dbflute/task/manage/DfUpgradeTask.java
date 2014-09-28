@@ -24,10 +24,10 @@ import org.dbflute.helper.io.compress.DfZipArchiver;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTask;
-import org.seasar.dbflute.helper.filesystem.FileTextIO;
-import org.seasar.dbflute.helper.filesystem.FileTextLineFilter;
-import org.seasar.dbflute.infra.dfprop.DfPropPublicMap;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.filesystem.FileTextIO;
+import org.dbflute.helper.filesystem.FileTextLineFilter;
+import org.dbflute.infra.dfprop.DfPropPublicMap;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

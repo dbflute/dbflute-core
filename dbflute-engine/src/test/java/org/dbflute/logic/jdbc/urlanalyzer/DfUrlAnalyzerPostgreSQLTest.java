@@ -17,7 +17,7 @@ package org.dbflute.logic.jdbc.urlanalyzer;
 
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerPostgreSQL;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

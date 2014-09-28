@@ -18,7 +18,7 @@ package org.dbflute.properties;
 import static org.dbflute.properties.DfSimpleDtoProperties.doBuildFieldName;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

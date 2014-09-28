@@ -63,13 +63,13 @@ import org.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfTableNameProp;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.exception.handler.SQLExceptionAdviser;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.DBDef;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.exception.handler.SQLExceptionAdviser;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * The implementation of xls data handler. And also of writer.

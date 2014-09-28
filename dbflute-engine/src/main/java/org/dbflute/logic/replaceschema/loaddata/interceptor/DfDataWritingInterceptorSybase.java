@@ -20,7 +20,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
-import org.seasar.dbflute.dbway.WayOfSybase;
+import org.dbflute.dbway.WayOfSybase;
 
 /**
  * @author jflute

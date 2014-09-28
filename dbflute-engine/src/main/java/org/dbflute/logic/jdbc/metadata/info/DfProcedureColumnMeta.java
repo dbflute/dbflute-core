@@ -21,7 +21,7 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

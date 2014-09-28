@@ -41,11 +41,11 @@ import org.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureCol
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfTypeMappingProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.jdbc.ValueType;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute

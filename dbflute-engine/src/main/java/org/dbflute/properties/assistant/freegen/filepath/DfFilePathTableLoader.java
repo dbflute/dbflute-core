@@ -22,10 +22,10 @@ import java.util.Map;
 import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.dbflute.util.DfNameHintUtil;
-import org.seasar.dbflute.helper.filesystem.FileHierarchyTracer;
-import org.seasar.dbflute.helper.filesystem.FileHierarchyTracingHandler;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.filesystem.FileHierarchyTracer;
+import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -42,7 +42,7 @@ public class DfFilePathTableLoader {
     // ; outputMap = map:{
     //     ; templateFile = JspPath.vm
     //     ; outputDirectory = $$baseDir$$/java
-    //     ; package = org.seasar.dbflute...
+    //     ; package = org.dbflute...
     //     ; className = JspPath
     // }
     // ; tableMap = map:{

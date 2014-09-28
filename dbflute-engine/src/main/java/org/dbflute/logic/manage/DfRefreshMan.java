@@ -20,9 +20,9 @@ import java.util.List;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.generate.refresh.DfRefreshResourceProcess;
 import org.dbflute.properties.DfRefreshProperties;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

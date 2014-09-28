@@ -31,7 +31,7 @@ import org.dbflute.properties.assistant.freegen.DfFreeGenRequest;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTexenTask;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

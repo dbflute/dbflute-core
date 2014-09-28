@@ -37,10 +37,10 @@ import org.dbflute.helper.dataset.DfDataRow;
 import org.dbflute.helper.dataset.DfDataSet;
 import org.dbflute.helper.dataset.DfDataSetConstants;
 import org.dbflute.helper.dataset.DfDataTable;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author modified by jflute (originated in Seasar2)

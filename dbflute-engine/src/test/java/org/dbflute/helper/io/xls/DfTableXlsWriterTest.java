@@ -26,10 +26,10 @@ import java.util.Map;
 import org.dbflute.helper.dataset.DfDataSet;
 import org.dbflute.helper.io.xls.DfTableXlsReader;
 import org.dbflute.helper.io.xls.DfTableXlsWriter;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.infra.manage.refresh.DfRefreshResourceRequest;
-import org.seasar.dbflute.unit.core.PlainTestCase;
-import org.seasar.dbflute.util.DfResourceUtil;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.infra.manage.refresh.DfRefreshResourceRequest;
+import org.dbflute.unit.PlainTestCase;
+import org.dbflute.util.DfResourceUtil;
 
 /**
  * @author jflute

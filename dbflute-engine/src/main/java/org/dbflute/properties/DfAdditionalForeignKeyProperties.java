@@ -23,8 +23,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute

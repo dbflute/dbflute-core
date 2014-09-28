@@ -18,9 +18,9 @@ package org.dbflute.logic.generate.language.pkgstyle;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
-import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
-import org.seasar.dbflute.util.Srl.ScopeInfo;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.Srl;
+import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute

@@ -60,11 +60,11 @@ import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTexenTask;
 import org.dbflute.task.bs.assistant.DfSpecifiedSqlFile;
-import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.util.Srl;
-import org.seasar.dbflute.util.Srl.IndexOfInfo;
+import org.dbflute.exception.IllegalOutsideSqlOperationException;
+import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.Srl;
+import org.dbflute.util.Srl.IndexOfInfo;
 
 /**
  * @author jflute

@@ -25,8 +25,8 @@ import java.io.StringWriter;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
-import org.seasar.dbflute.resource.DBFluteSystem;
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * The Log4j logger for emergency. (e.g. when an accident occurs in Log4j)
