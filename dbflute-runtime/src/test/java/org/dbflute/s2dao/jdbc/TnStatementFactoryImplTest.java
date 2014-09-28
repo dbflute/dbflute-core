@@ -18,7 +18,7 @@ package org.dbflute.s2dao.jdbc;
 import java.sql.ResultSet;
 
 import org.dbflute.jdbc.StatementConfig;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

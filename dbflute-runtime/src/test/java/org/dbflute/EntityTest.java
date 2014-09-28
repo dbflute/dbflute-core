@@ -16,7 +16,7 @@
 package org.dbflute;
 
 import org.dbflute.Entity.FunCustodial;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

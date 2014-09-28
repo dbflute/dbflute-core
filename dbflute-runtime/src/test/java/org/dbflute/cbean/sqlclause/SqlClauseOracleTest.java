@@ -18,7 +18,7 @@ package org.dbflute.cbean.sqlclause;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

@@ -18,7 +18,7 @@ package org.dbflute.cbean.coption;
 import java.util.Arrays;
 import java.util.List;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
 /**

@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.dbflute.helper.secretary.BusinessDayDeterminer;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

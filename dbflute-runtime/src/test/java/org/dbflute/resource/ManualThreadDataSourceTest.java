@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

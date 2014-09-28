@@ -18,7 +18,7 @@ package org.dbflute.infra.core;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

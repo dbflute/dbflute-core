@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dbflute.mock.MockColumnInfo;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

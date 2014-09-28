@@ -16,7 +16,7 @@
 package org.dbflute.twowaysql;
 
 import org.dbflute.twowaysql.node.SqlPartsNode;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.dbflute.cbean.pagenavi.group.PageGroupBean;
 import org.dbflute.cbean.pagenavi.range.PageRangeBean;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfReflectionUtil;
 
 /**

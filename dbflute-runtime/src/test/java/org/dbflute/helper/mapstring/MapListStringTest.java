@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.dbflute.exception.MapListStringDuplicateEntryException;
 import org.dbflute.exception.MapListStringParseFailureException;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

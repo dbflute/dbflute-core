@@ -45,7 +45,7 @@ import org.dbflute.s2dao.valuetype.basic.LongType;
 import org.dbflute.s2dao.valuetype.basic.ObjectType;
 import org.dbflute.s2dao.valuetype.basic.SqlDateType;
 import org.dbflute.s2dao.valuetype.basic.StringType;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
 /**

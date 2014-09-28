@@ -16,7 +16,7 @@
 package org.dbflute.cbean.coption;
 
 import org.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.Srl;
 
 /**

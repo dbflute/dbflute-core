@@ -36,7 +36,7 @@ import javax.sql.DataSource;
 import org.dbflute.DBDef;
 import org.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
 import org.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfStringUtil;
 
 /**

@@ -26,7 +26,7 @@ import org.dbflute.AccessContext.AccessTimestampProvider;
 import org.dbflute.AccessContext.AccessUserProvider;
 import org.dbflute.exception.AccessContextNoValueException;
 import org.dbflute.exception.AccessContextNotFoundException;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

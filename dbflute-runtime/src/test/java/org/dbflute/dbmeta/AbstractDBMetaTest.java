@@ -21,7 +21,7 @@ import java.util.Map;
 import org.dbflute.dbmeta.AbstractDBMeta.MapStringValueAnalyzer;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationMeta;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
 /**

@@ -18,7 +18,7 @@ package org.dbflute.helper.filesystem;
 import java.io.File;
 import java.util.List;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfResourceUtil;
 import org.dbflute.util.Srl;
 

@@ -15,7 +15,7 @@
  */
 package org.dbflute.jdbc;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

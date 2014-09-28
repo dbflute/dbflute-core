@@ -22,7 +22,7 @@ import org.dbflute.cbean.chelper.HpManualOrderThemeListHandler;
 import org.dbflute.cbean.chelper.HpMobCaseWhenElement;
 import org.dbflute.cbean.chelper.HpMobConnectionMode;
 import org.dbflute.cbean.ckey.ConditionKey;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfTypeUtil;
 
 /**

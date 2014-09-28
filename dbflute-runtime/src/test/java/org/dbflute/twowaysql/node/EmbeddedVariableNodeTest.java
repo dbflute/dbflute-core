@@ -21,7 +21,7 @@ import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.exception.EmbeddedVariableCommentContainsBindSymbolException;
 import org.dbflute.twowaysql.exception.EmbeddedVariableCommentInScopeNotListException;
 import org.dbflute.twowaysql.exception.EmbeddedVariableCommentParameterNullValueException;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
 /**

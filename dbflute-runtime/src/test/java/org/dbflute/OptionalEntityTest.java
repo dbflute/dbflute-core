@@ -19,7 +19,7 @@ import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.mock.MockEntity;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.optional.OptionalObjectExceptionThrower;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

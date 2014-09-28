@@ -37,7 +37,7 @@ import org.dbflute.twowaysql.exception.IfCommentPropertyReadFailureException;
 import org.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;
 import org.dbflute.twowaysql.exception.IfCommentUnsupportedTypeComparisonException;
 import org.dbflute.twowaysql.pmbean.ParameterBean;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.dbflute.util.DfTypeUtil;

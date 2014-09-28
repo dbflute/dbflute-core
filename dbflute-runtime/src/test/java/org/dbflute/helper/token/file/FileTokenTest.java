@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dbflute.helper.token.file.exception.FileMakingInvalidValueCountException;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

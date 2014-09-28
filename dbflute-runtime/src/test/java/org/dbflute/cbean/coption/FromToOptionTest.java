@@ -18,7 +18,7 @@ package org.dbflute.cbean.coption;
 import java.util.Date;
 
 import org.dbflute.cbean.ckey.ConditionKey;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfTypeUtil;
 
 /**

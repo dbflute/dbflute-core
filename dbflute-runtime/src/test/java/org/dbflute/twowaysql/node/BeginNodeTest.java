@@ -19,7 +19,7 @@ import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.exception.IfCommentNotFoundPropertyException;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

@@ -40,7 +40,7 @@ import org.dbflute.mock.MockOutsideSqlContext;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.resource.InternalMapContext;
 import org.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

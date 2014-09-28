@@ -21,7 +21,7 @@ import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.exception.EndCommentNotFoundException;
 import org.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

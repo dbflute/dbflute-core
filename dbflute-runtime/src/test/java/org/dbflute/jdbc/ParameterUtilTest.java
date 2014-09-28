@@ -17,7 +17,7 @@ package org.dbflute.jdbc;
 
 import org.dbflute.exception.CharParameterShortSizeException;
 import org.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

@@ -17,7 +17,7 @@ package org.dbflute.exception.thrower;
 
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 import org.dbflute.twowaysql.DisplaySqlBuilder.DateFormatResource;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 

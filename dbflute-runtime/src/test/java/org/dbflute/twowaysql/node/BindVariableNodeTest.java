@@ -21,7 +21,7 @@ import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.exception.BindVariableCommentInScopeNotListException;
 import org.dbflute.twowaysql.exception.BindVariableCommentParameterNullValueException;
 import org.dbflute.twowaysql.exception.InLoopOptionOutOfLoopException;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
 /**

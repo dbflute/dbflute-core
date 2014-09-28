@@ -15,7 +15,7 @@
  */
 package org.dbflute.cbean.sqlclause.subquery;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

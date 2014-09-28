@@ -17,7 +17,7 @@ package org.dbflute.helper.mapstring;
 
 import java.io.ByteArrayInputStream;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

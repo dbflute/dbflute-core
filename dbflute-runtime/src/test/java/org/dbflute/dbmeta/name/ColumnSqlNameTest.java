@@ -15,7 +15,7 @@
  */
 package org.dbflute.dbmeta.name;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

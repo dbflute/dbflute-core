@@ -18,7 +18,7 @@ package org.dbflute;
 import org.dbflute.CallbackContext.CallbackContextHolder;
 import org.dbflute.jdbc.SqlLogHandler;
 import org.dbflute.jdbc.SqlLogInfo;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

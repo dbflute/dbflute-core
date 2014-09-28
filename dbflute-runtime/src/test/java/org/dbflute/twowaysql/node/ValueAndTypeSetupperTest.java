@@ -26,7 +26,7 @@ import org.dbflute.twowaysql.exception.BindVariableCommentNotFoundPropertyExcept
 import org.dbflute.twowaysql.exception.ForCommentNotFoundPropertyException;
 import org.dbflute.twowaysql.exception.ForCommentPropertyReadFailureException;
 import org.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 

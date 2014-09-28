@@ -17,7 +17,7 @@ package org.dbflute.exception.handler;
 
 import org.dbflute.resource.InternalMapContext;
 import org.dbflute.resource.InternalMapContext.InvokePathProvider;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute

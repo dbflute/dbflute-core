@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.Srl.DelimiterInfo;
 import org.dbflute.util.Srl.IndexOfInfo;
 import org.dbflute.util.Srl.ScopeInfo;

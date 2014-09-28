@@ -19,7 +19,7 @@ import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute
