@@ -44,20 +44,12 @@ public class DfSerialVersionUIDResolver {
         final String serialDefinition = "private static final long serialVersionUID = 1L;";
         final File exfile = new File(path);
         final String encoding = _sourceEncoding;
-        final BufferedReader br;
+        final StringBuilder sb = new StringBuilder();
+        String line = null;
+        BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(exfile), encoding));
-        } catch (UnsupportedEncodingException e) {
-            String msg = "The encoding is unsupported: encoding=" + encoding;
-            throw new IllegalStateException(msg, e);
-        } catch (FileNotFoundException e) {
-            String msg = "The file of extended class was NOT found: exfile=" + exfile;
-            throw new IllegalStateException(msg, e);
-        }
-        final StringBuilder sb = new StringBuilder();
-        final String sourceCodeLn = _sourceLn;
-        String line = null;
-        try {
+            final String sourceCodeLn = _sourceLn;
             while (true) {
                 line = br.readLine();
                 if (line == null) {

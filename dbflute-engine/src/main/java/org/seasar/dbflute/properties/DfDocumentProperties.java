@@ -352,6 +352,13 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         } catch (IOException e) {
             String msg = "Failed to read the CSS file: " + cssFile;
             throw new IllegalStateException(msg, e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 
@@ -408,6 +415,13 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         } catch (IOException e) {
             String msg = "Failed to read the CSS file: " + cssFile;
             throw new IllegalStateException(msg, e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 

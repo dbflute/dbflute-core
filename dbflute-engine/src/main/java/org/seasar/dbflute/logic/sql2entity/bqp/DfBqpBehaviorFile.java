@@ -117,19 +117,11 @@ public class DfBqpBehaviorFile {
         final String behaviorQueryPathBeginMark = getBasicProperties().getBehaviorQueryPathBeginMark();
         final String behaviorQueryPathEndMark = getBasicProperties().getBehaviorQueryPathEndMark();
         final DfDocumentProperties docprop = getDocumentProperties();
-        final BufferedReader br;
+        final StringBuilder sb = new StringBuilder();
+        String lineString = null;
+        BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(_bsbhvFile), encoding));
-        } catch (UnsupportedEncodingException e) {
-            String msg = "The encoding is unsupported: encoding=" + encoding;
-            throw new IllegalStateException(msg, e);
-        } catch (FileNotFoundException e) {
-            String msg = "The file of base behavior was not found: bsbhvFile=" + _bsbhvFile;
-            throw new IllegalStateException(msg, e);
-        }
-        String lineString = null;
-        final StringBuilder sb = new StringBuilder();
-        try {
             boolean targetArea = false;
             boolean done = false;
             while (true) {

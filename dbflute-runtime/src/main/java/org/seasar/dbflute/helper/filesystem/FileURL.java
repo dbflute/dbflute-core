@@ -80,18 +80,23 @@ public class FileURL {
             }
         }
         final File outputFile = new File(toFilePath);
-        final FileOutputStream ous;
+        FileOutputStream ous = null;
         try {
             ous = new FileOutputStream(outputFile, false);
+            ous.write(bytes);
         } catch (FileNotFoundException e) {
             String msg = "Not found the file: toFilePath=" + toFilePath;
             throw new IllegalStateException(msg, e);
-        }
-        try {
-            ous.write(bytes);
         } catch (IOException e) {
             String msg = "Failed to write the byte data: toFilePath=" + toFilePath;
             throw new IllegalStateException(msg, e);
+        } finally {
+            if (ous != null) {
+                try {
+                    ous.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 
