@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -443,15 +444,15 @@ public interface Entity {
             return DfTypeUtil.toClassTitle(entity);
         }
 
-        public static String toString(Date date, String pattern) {
+        public static String toStringDate(Date date, String pattern, TimeZone timeZone) {
             if (date == null) {
                 return null;
             }
-            final String str = DfTypeUtil.toString(date, pattern);
+            final String str = DfTypeUtil.toStringDate(date, pattern, timeZone);
             return (DfTypeUtil.isDateBC(date) ? "BC" : "") + str;
         }
 
-        public static String toString(byte[] bytes) {
+        public static String toStringBytes(byte[] bytes) {
             return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
         }
 

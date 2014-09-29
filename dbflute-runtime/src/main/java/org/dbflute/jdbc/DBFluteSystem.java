@@ -35,7 +35,7 @@ public class DBFluteSystem {
     // ===================================================================================
     //                                                                    Option Attribute
     //                                                                    ================
-    protected static DBFluteStateProvider _currentProvider;
+    protected static DBFluteStateProvider _stateProvider;
 
     protected static boolean _locked = true;
 
@@ -68,8 +68,8 @@ public class DBFluteSystem {
 
     public static long currentTimeMillis() {
         final long millis;
-        if (_currentProvider != null) {
-            millis = _currentProvider.currentTimeMillis();
+        if (_stateProvider != null) {
+            millis = _stateProvider.currentTimeMillis();
         } else {
             millis = System.currentTimeMillis();
         }
@@ -99,7 +99,7 @@ public class DBFluteSystem {
         if (_log.isInfoEnabled()) {
             _log.info("...Setting DBFluteCurrentProvider: " + currentProvider);
         }
-        _currentProvider = currentProvider;
+        _stateProvider = currentProvider;
         xlock();
     }
 }

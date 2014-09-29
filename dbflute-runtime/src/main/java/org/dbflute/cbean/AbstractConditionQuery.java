@@ -1921,7 +1921,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 throwConditionInvokingValueConvertFailureException(colName, ckey, value, option, e);
             }
         }
-        final String methodName = "set" + columnCapPropName + "_" + initCap(ckey);
+        final String methodName = xbuildQuerySetMethodName(ckey, columnCapPropName);
         final List<Class<?>> typeList = newArrayListSized(4);
         if (fromTo) {
             typeList.add(Date.class);
@@ -1972,6 +1972,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throwConditionInvokingSetReflectionFailureException(colName, ckey, value, option, methodName,
                     parameterTypes, e);
         }
+    }
+
+    protected String xbuildQuerySetMethodName(String ckey, String columnCapPropName) {
+        return "set" + columnCapPropName + "_" + initCap(ckey);
     }
 
     protected Class<?> xfilterInvokeQueryParameterType(String colName, String ckey, Class<?> parameterType) {
@@ -2268,7 +2272,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (found != null) {
             return found;
         }
-        return DfReflectionUtil.getWholeMethod(cqType, methodName, argTypes); // e.g. native method of classification
+        // non-cache here e.g. native method of classification or protected option method
+        return DfReflectionUtil.getWholeMethod(cqType, methodName, argTypes);
     }
 
     protected Object xhelpInvokingCQMethod(ConditionQuery cq, Method method, Object[] args) {

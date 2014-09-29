@@ -38,6 +38,7 @@ import org.dbflute.hook.AccessContext;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 
 /**
  * The context of resource.
@@ -250,14 +251,24 @@ public class ResourceContext {
         return resourceParameter != null ? resourceParameter.getOutsideSqlPackage() : null;
     }
 
-    public static String getLogDateFormat() {
+    public static String getLogDatePattern() {
         final ResourceParameter resourceParameter = resourceParameter();
-        return resourceParameter != null ? resourceParameter.getLogDateFormat() : null;
+        return resourceParameter != null ? resourceParameter.getLogDatePattern() : null;
     }
 
-    public static String getLogTimestampFormat() {
+    public static String getLogTimestampPattern() {
         final ResourceParameter resourceParameter = resourceParameter();
-        return resourceParameter != null ? resourceParameter.getLogTimestampFormat() : null;
+        return resourceParameter != null ? resourceParameter.getLogTimestampPattern() : null;
+    }
+
+    public static String getLogTimePattern() {
+        final ResourceParameter resourceParameter = resourceParameter();
+        return resourceParameter != null ? resourceParameter.getLogTimePattern() : null;
+    }
+
+    public static BoundDateDisplayTimeZoneProvider getLogTimeZoneProvider() {
+        final ResourceParameter resourceParameter = resourceParameter();
+        return resourceParameter != null ? resourceParameter.getLogTimeZoneProvider() : null;
     }
 
     public static boolean isInternalDebug() {

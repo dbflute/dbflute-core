@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Set;
 #if ($table.hasUtilDateColumn())
 import java.util.Date;
+import java.util.TimeZone;
 #end
 
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
@@ -818,7 +819,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
     }
 #if ($table.hasUtilDateColumn())
     protected def xfUD(date: Date): String = { // formatUtilDate()
-        return FunCustodial.toString(date, xgDP());
+        return FunCustodial.toStringDate(date, xgDP(), mytimeZone());
     }
     protected def xgDP(): String = { // getDatePattern
 #if ($database.isDatabaseOracle())
@@ -827,10 +828,13 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
         return "yyyy-MM-dd";
 #end
     }
+    protected def mytimeZone(): TimeZone = {
+        return null; // as default
+    }
 #end
 #if ($table.hasByteArrayColumn())
     protected def xfBA(bytes: byte[]): String = { // formatByteArray()
-        return FunCustodial.toString(bytes);
+        return FunCustodial.toStringBytes(bytes);
     }
 #end
     protected def buildRelationString(): String = {

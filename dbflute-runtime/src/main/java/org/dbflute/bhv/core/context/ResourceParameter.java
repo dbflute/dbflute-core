@@ -15,6 +15,8 @@
  */
 package org.dbflute.bhv.core.context;
 
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
+
 /**
  * The parameters as internal resource.
  * @author jflute
@@ -24,14 +26,31 @@ public class ResourceParameter {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _outsideSqlPackage;
-    protected String _logDateFormat;
-    protected String _logTimestampFormat;
+    // -----------------------------------------------------
+    //                                           Outside SQL
+    //                                           -----------
+    protected String _outsideSqlPackage; // null allowed
+
+    // -----------------------------------------------------
+    //                                     Log Display Style
+    //                                     -----------------
+    // every one null allowed
+    protected String _logDatePattern;
+    protected String _logTimestampPattern;
+    protected String _logTimePattern;
+    protected BoundDateDisplayTimeZoneProvider _logTimeZoneProvider;
+
+    // -----------------------------------------------------
+    //                                        Internal Debug
+    //                                        --------------
     protected boolean _internalDebug;
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                           Outside SQL
+    //                                           -----------
     public String getOutsideSqlPackage() {
         return _outsideSqlPackage;
     }
@@ -40,22 +59,44 @@ public class ResourceParameter {
         _outsideSqlPackage = outsideSqlPackage;
     }
 
-    public String getLogDateFormat() {
-        return _logDateFormat;
+    // -----------------------------------------------------
+    //                                     Log Display Style
+    //                                     -----------------
+    public String getLogDatePattern() {
+        return _logDatePattern;
     }
 
-    public void setLogDateFormat(String logDateFormat) {
-        _logDateFormat = logDateFormat;
+    public void setLogDatePattern(String logDatePattern) {
+        _logDatePattern = logDatePattern;
     }
 
-    public String getLogTimestampFormat() {
-        return _logTimestampFormat;
+    public String getLogTimestampPattern() {
+        return _logTimestampPattern;
     }
 
-    public void setLogTimestampFormat(String logTimestampFormat) {
-        _logTimestampFormat = logTimestampFormat;
+    public void setLogTimestampPattern(String logTimestampPattern) {
+        _logTimestampPattern = logTimestampPattern;
     }
 
+    public String getLogTimePattern() {
+        return _logTimePattern;
+    }
+
+    public void setLogTimePattern(String logTimePattern) {
+        _logTimePattern = logTimePattern;
+    }
+
+    public BoundDateDisplayTimeZoneProvider getLogTimeZoneProvider() {
+        return _logTimeZoneProvider;
+    }
+
+    public void setLogTimeZoneProvider(BoundDateDisplayTimeZoneProvider logTimeZoneProvider) {
+        _logTimeZoneProvider = logTimeZoneProvider;
+    }
+
+    // -----------------------------------------------------
+    //                                        Internal Debug
+    //                                        --------------
     public boolean isInternalDebug() {
         return _internalDebug;
     }

@@ -3644,6 +3644,11 @@ public class Table {
         return getLittleAdjustmentProperties().isMakeDirectConditionOptionSetup();
     }
 
+    public String getDirectConditionOptionMethodModifier() {
+        final DfLanguageGrammar grammar = getLanguageGrammar();
+        return isMakeDirectConditionOptionSetup() ? grammar.getPublicModifier() : grammar.getProtectedModifier();
+    }
+
     public boolean isMakeCallbackConditionManualOrder() {
         return getLittleAdjustmentProperties().isMakeCallbackConditionManualOrder();
     }

@@ -68,6 +68,8 @@ import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.dbflute.util.DfTypeUtil;
@@ -159,6 +161,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /** The handler of derived type. {Internal} (NullAllowed: lazy-loaded) */
     protected DerivedTypeHandler _derivedTypeHandler;
+
+    /** The display style of date for logging, overriding default style. (NullAllowed: configured default style) */
+    protected BoundDateDisplayStyle _logDateDisplayStyle;
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -1323,22 +1328,55 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public String toDisplaySql() {
         final SqlAnalyzerFactory factory = getSqlAnalyzerFactory();
-        final String dateFormat = getLogDateFormat();
-        final String timestampFormat = getLogTimestampFormat();
-        return convertConditionBean2DisplaySql(factory, this, dateFormat, timestampFormat);
+        final BoundDateDisplayStyle realStyle;
+        final BoundDateDisplayStyle specifiedStyle = getLogDateDisplayStyle();
+        if (specifiedStyle != null) {
+            realStyle = specifiedStyle;
+        } else {
+            realStyle = createConfiguredBoundDateDisplayStyle();
+        }
+        return convertConditionBean2DisplaySql(factory, this, realStyle);
     }
 
-    protected static String convertConditionBean2DisplaySql(SqlAnalyzerFactory factory, ConditionBean cb,
-            String logDateFormat, String logTimestampFormat) {
-        final String twoWaySql = cb.getSqlClause().getClause();
-        return SqlAnalyzer.convertTwoWaySql2DisplaySql(factory, twoWaySql, cb, logDateFormat, logTimestampFormat);
-    }
-
+    // to get from assistant
     protected abstract SqlAnalyzerFactory getSqlAnalyzerFactory();
 
-    protected abstract String getLogDateFormat();
+    protected BoundDateDisplayStyle createConfiguredBoundDateDisplayStyle() {
+        final String datePattern = getConfiguredLogDatePattern();
+        final String timestampPattern = getConfiguredLogTimestampPattern();
+        final String timePattern = getConfiguredLogTimePattern();
+        final BoundDateDisplayTimeZoneProvider timeZoneProvider = getConfiguredLogTimeZoneProvider();
+        return new BoundDateDisplayStyle(datePattern, timestampPattern, timePattern, timeZoneProvider);
+    }
 
-    protected abstract String getLogTimestampFormat();
+    // to get from DBFluteConfig
+    protected abstract String getConfiguredLogDatePattern();
+
+    protected abstract String getConfiguredLogTimestampPattern();
+
+    protected abstract String getConfiguredLogTimePattern();
+
+    protected abstract BoundDateDisplayTimeZoneProvider getConfiguredLogTimeZoneProvider();
+
+    protected static String convertConditionBean2DisplaySql(SqlAnalyzerFactory factory, ConditionBean cb,
+            BoundDateDisplayStyle dateDisplayStyle) {
+        final String twoWaySql = cb.getSqlClause().getClause();
+        return SqlAnalyzer.convertTwoWaySql2DisplaySql(factory, twoWaySql, cb, dateDisplayStyle);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void styleLogDateDisplay(BoundDateDisplayStyle logDateDisplayStyle) {
+        _logDateDisplayStyle = logDateDisplayStyle;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public BoundDateDisplayStyle getLogDateDisplayStyle() {
+        return _logDateDisplayStyle;
+    }
 
     // [DBFlute-0.9.5.2]
     // ===================================================================================

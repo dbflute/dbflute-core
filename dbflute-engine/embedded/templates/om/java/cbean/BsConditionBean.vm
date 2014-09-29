@@ -26,6 +26,7 @@ import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.dbflute.cbean.scoping.*;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 #if ($table.hasPrimaryKeyForcedClassificationSetting())
 import ${glPackageBaseCommon}.${glCDef};
 #end
@@ -923,9 +924,13 @@ public class ${myClassName} extends AbstractConditionBean {
     protected SqlAnalyzerFactory getSqlAnalyzerFactory()
     { return new ${glImplementedInvokerAssistant}().assistSqlAnalyzerFactory(); }
     @Override
-    protected String getLogDateFormat() { return ${glDBFluteConfig}.getInstance().getLogDateFormat(); }
+    protected String getConfiguredLogDatePattern() { return ${glDBFluteConfig}.getInstance().getLogDatePattern(); }
     @Override
-    protected String getLogTimestampFormat() { return ${glDBFluteConfig}.getInstance().getLogTimestampFormat(); }
+    protected String getConfiguredLogTimestampPattern() { return ${glDBFluteConfig}.getInstance().getLogTimestampPattern(); }
+    @Override
+    protected String getConfiguredLogTimePattern() { return ${glDBFluteConfig}.getInstance().getLogTimePattern(); }
+    @Override
+    protected BoundDateDisplayTimeZoneProvider getConfiguredLogTimeZoneProvider() { return ${glDBFluteConfig}.getInstance().getLogTimeZoneProvider(); }
 
     // ===================================================================================
     //                                                                       Meta Handling

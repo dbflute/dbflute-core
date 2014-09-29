@@ -28,10 +28,12 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.QLog;
+import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.exception.SQLExceptionHandler;
 import org.dbflute.bhv.exception.SQLExceptionResource;
+import org.dbflute.cbean.ConditionBean;
 import org.dbflute.hook.CallbackContext;
 import org.dbflute.hook.SqlFireHook;
 import org.dbflute.hook.SqlFireReadyInfo;
@@ -51,6 +53,8 @@ import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.twowaysql.DisplaySqlBuilder;
+import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 
 /**
  * The basic handler to execute SQL. <br />
@@ -269,13 +273,37 @@ public abstract class TnAbstractBasicSqlHandler {
     }
 
     protected DisplaySqlBuilder createDisplaySqlBuilder() {
-        final String logDateFormat = ResourceContext.getLogDateFormat();
-        final String logTimestampFormat = ResourceContext.getLogTimestampFormat();
-        return newDisplaySqlBuilder(logDateFormat, logTimestampFormat);
+        final BoundDateDisplayStyle realStyle;
+        final BoundDateDisplayStyle specifiedStyle = getSpecifiedLogDateDisplayStyle();
+        if (specifiedStyle != null) {
+            realStyle = specifiedStyle;
+        } else {
+            realStyle = createResourcedLogDateDisplayStyle();
+        }
+        return newDisplaySqlBuilder(realStyle);
     }
 
-    protected DisplaySqlBuilder newDisplaySqlBuilder(String logDateFormat, String logTimestampFormat) {
-        return new DisplaySqlBuilder(logDateFormat, logTimestampFormat);
+    protected BoundDateDisplayStyle getSpecifiedLogDateDisplayStyle() {
+        if (ConditionBeanContext.isExistConditionBeanOnThread()) {
+            final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+            final BoundDateDisplayStyle specifiedStyle = cb.getLogDateDisplayStyle();
+            if (specifiedStyle != null) {
+                return specifiedStyle;
+            }
+        }
+        return null;
+    }
+
+    protected BoundDateDisplayStyle createResourcedLogDateDisplayStyle() {
+        final String datePattern = ResourceContext.getLogDatePattern();
+        final String iimestampPattern = ResourceContext.getLogTimestampPattern();
+        final String timePattern = ResourceContext.getLogTimePattern();
+        final BoundDateDisplayTimeZoneProvider timeZoneProvider = ResourceContext.getLogTimeZoneProvider();
+        return new BoundDateDisplayStyle(datePattern, iimestampPattern, timePattern, timeZoneProvider);
+    }
+
+    protected DisplaySqlBuilder newDisplaySqlBuilder(BoundDateDisplayStyle dateDisplayStyle) {
+        return new DisplaySqlBuilder(dateDisplayStyle);
     }
 
     // -----------------------------------------------------

@@ -112,11 +112,11 @@ public final class DfTypeUtil {
         } else if (obj instanceof String) {
             return (String) obj;
         } else if (obj instanceof Date) {
-            return toStringFromDate((Date) obj, pattern);
+            return toStringDate((Date) obj, pattern, null);
         } else if (obj instanceof Number) {
-            return toStringFromNumber((Number) obj, pattern);
+            return toStringNumber((Number) obj, pattern);
         } else if (obj instanceof Calendar) {
-            return toStringFromDate(((Calendar) obj).getTime(), pattern);
+            return toStringDate(((Calendar) obj).getTime(), pattern, null);
         } else if (obj instanceof byte[]) {
             return encodeAsBase64((byte[]) obj);
         } else if (obj instanceof Throwable) {
@@ -126,7 +126,7 @@ public final class DfTypeUtil {
         }
     }
 
-    protected static String toStringFromNumber(Number value, String pattern) {
+    public static String toStringNumber(Number value, String pattern) {
         if (value != null) {
             if (pattern != null) {
                 return createDecimalFormat(pattern).format(value);
@@ -136,17 +136,17 @@ public final class DfTypeUtil {
         return null;
     }
 
-    protected static String toStringFromDate(Date value, String pattern) {
+    public static String toStringDate(Date value, String pattern, TimeZone timeZone) {
         if (value != null) {
             if (pattern != null) {
-                return createDateFormat(pattern, (TimeZone) null).format(value);
+                return createDateFormat(pattern, timeZone).format(value);
             }
             return value.toString();
         }
         return null;
     }
 
-    protected static String toStringStackTrace(Throwable t) {
+    public static String toStringStackTrace(Throwable t) {
         StringWriter sw = null;
         try {
             sw = new StringWriter();

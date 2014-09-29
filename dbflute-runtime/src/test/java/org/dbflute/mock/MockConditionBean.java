@@ -35,6 +35,7 @@ import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.derived.DerivedTypeHandler;
 import org.dbflute.jdbc.StatementConfig;
+import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 
 /**
  * @author jflute
@@ -100,6 +101,13 @@ public class MockConditionBean implements ConditionBean {
     }
 
     public String toDisplaySql() {
+        return null;
+    }
+
+    public void styleLogDateDisplay(BoundDateDisplayStyle logDateDisplayStyle) {
+    }
+
+    public BoundDateDisplayStyle getLogDateDisplayStyle() {
         return null;
     }
 

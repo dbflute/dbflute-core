@@ -44,6 +44,7 @@ import org.dbflute.twowaysql.node.RootNode;
 import org.dbflute.twowaysql.node.SqlConnectorAdjustable;
 import org.dbflute.twowaysql.node.SqlConnectorNode;
 import org.dbflute.twowaysql.node.SqlPartsNode;
+import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 import org.dbflute.util.Srl;
 
 /**
@@ -608,16 +609,15 @@ public class SqlAnalyzer {
     //                                                                          DisplaySql
     //                                                                          ==========
     public static String convertTwoWaySql2DisplaySql(SqlAnalyzerFactory factory, String twoWaySql, Object arg,
-            String logDateFormat, String logTimestampFormat) {
+            BoundDateDisplayStyle dateDisplayStyle) {
         final String[] argNames = new String[] { "pmb" };
         final Class<?>[] argTypes = new Class<?>[] { arg.getClass() };
         final Object[] args = new Object[] { arg };
-        return convertTwoWaySql2DisplaySql(factory, twoWaySql, argNames, argTypes, args, logDateFormat,
-                logTimestampFormat);
+        return convertTwoWaySql2DisplaySql(factory, twoWaySql, argNames, argTypes, args, dateDisplayStyle);
     }
 
     public static String convertTwoWaySql2DisplaySql(SqlAnalyzerFactory factory, String twoWaySql, String[] argNames,
-            Class<?>[] argTypes, Object[] args, String logDateFormat, String logTimestampFormat) {
+            Class<?>[] argTypes, Object[] args, BoundDateDisplayStyle dateDisplayStyle) {
         final CommandContext context;
         {
             final SqlAnalyzer parser = createSqlAnalyzer4DisplaySql(factory, twoWaySql);
@@ -627,7 +627,7 @@ public class SqlAnalyzer {
             node.accept(context);
         }
         final String preparedSql = context.getSql();
-        final DisplaySqlBuilder builder = new DisplaySqlBuilder(logDateFormat, logTimestampFormat);
+        final DisplaySqlBuilder builder = new DisplaySqlBuilder(dateDisplayStyle);
         return builder.buildDisplaySql(preparedSql, context.getBindVariables());
     }
 

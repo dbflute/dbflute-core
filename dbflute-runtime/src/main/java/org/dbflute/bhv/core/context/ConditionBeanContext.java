@@ -21,8 +21,6 @@ import org.dbflute.Entity;
 import org.dbflute.bhv.readable.EntityRowHandler;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.jdbc.DBFluteSystem;
-import org.dbflute.twowaysql.SqlAnalyzer;
-import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 
 /**
  * The context of condition-bean.
@@ -30,6 +28,9 @@ import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
  */
 public class ConditionBeanContext {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(ConditionBeanContext.class);
 
@@ -116,27 +117,6 @@ public class ConditionBeanContext {
     }
 
     // ===================================================================================
-    //                                                                  Type Determination
-    //                                                                  ==================
-    /**
-     * Is the argument condition-bean?
-     * @param dtoInstance DTO instance.
-     * @return The determination, true or false.
-     */
-    public static boolean isTheArgumentConditionBean(final Object dtoInstance) {
-        return dtoInstance instanceof ConditionBean;
-    }
-
-    /**
-     * Is the type condition-bean?
-     * @param dtoClass DtoClass.
-     * @return The determination, true or false.
-     */
-    public static boolean isTheTypeConditionBean(final Class<?> dtoClass) {
-        return ConditionBean.class.isAssignableFrom(dtoClass);
-    }
-
-    // ===================================================================================
     //                                                                        Cool Classes
     //                                                                        ============
     public static void loadCoolClasses() {
@@ -176,15 +156,6 @@ public class ConditionBeanContext {
 
     protected static void loadClass(Class<?> clazz) { // for avoiding Find-Bugs warnings
         // do nothing
-    }
-
-    // ===================================================================================
-    //                                                                          DisplaySql
-    //                                                                          ==========
-    public static String convertConditionBean2DisplaySql(SqlAnalyzerFactory factory, ConditionBean cb,
-            String logDateFormat, String logTimestampFormat) {
-        final String twoWaySql = cb.getSqlClause().getClause();
-        return SqlAnalyzer.convertTwoWaySql2DisplaySql(factory, twoWaySql, cb, logDateFormat, logTimestampFormat);
     }
 
     // ===================================================================================

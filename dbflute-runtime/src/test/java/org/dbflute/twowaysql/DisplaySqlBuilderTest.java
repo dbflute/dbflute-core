@@ -15,10 +15,14 @@
  */
 package org.dbflute.twowaysql;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.dbflute.twowaysql.DisplaySqlBuilder.DateFormatResource;
+import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -31,8 +35,8 @@ import org.dbflute.util.Srl;
 public class DisplaySqlBuilderTest extends PlainTestCase {
 
     // ===================================================================================
-    //                                                                         Display SQL
-    //                                                                         ===========
+    //                                                                               Basic
+    //                                                                               =====
     public void test_buildDisplaySql_basic() {
         // ## Arrange ##
         String sql = "select * from where FOO_CODE = ?";
@@ -46,6 +50,9 @@ public class DisplaySqlBuilderTest extends PlainTestCase {
         assertTrue(actual.contains("FOO_CODE = 'qux'"));
     }
 
+    // ===================================================================================
+    //                                                                          Date Style
+    //                                                                          ==========
     public void test_buildDisplaySql_date_default() {
         // ## Arrange ##
         String sql = "select * from where FOO_DATE = ?";
@@ -92,13 +99,86 @@ public class DisplaySqlBuilderTest extends PlainTestCase {
         Date fooDate = DfTypeUtil.toDate("2010/12/12 12:34:56");
 
         // ## Act ##
-        String actual = createTargetWithDateFormat("yyyy@MM@dd").buildDisplaySql(sql, new Object[] { fooDate });
+        String actual = createTargetWithDatePattern("yyyy@MM@dd").buildDisplaySql(sql, new Object[] { fooDate });
 
         // ## Assert ##
         log(actual);
         assertTrue(actual.contains("FOO_DATE = '2010@12@12'"));
     }
 
+    public void test_buildDisplaySql_timestamp_basic() {
+        // ## Arrange ##
+        String sql = "select * from where FOO_DATE = ?";
+        Timestamp fooDate = DfTypeUtil.toTimestamp("2010/12/12 12:34:56");
+        DisplaySqlBuilder builder = createTarget();
+
+        // ## Act ##
+        String actual = builder.buildDisplaySql(sql, new Object[] { fooDate });
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("FOO_DATE = '2010-12-12 12:34:56.000'"));
+    }
+
+    public void test_buildDisplaySql_timestamp_specified() {
+        // ## Arrange ##
+        String sql = "select * from where FOO_DATE = ?";
+        Timestamp fooDate = DfTypeUtil.toTimestamp("2010/12/12 12:34:56");
+        DisplaySqlBuilder builder = createTargetWithTimestampPattern("yyyy@MM+dd HH_mm_ss.SSS");
+
+        // ## Act ##
+        String actual = builder.buildDisplaySql(sql, new Object[] { fooDate });
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("FOO_DATE = '2010@12+12 12_34_56.000'"));
+    }
+
+    public void test_buildDisplaySql_timestamp_timeZone() {
+        // ## Arrange ##
+        String sql = "select * from where FOO_DATE = ?";
+        Timestamp fooDate = DfTypeUtil.toTimestamp("2010/12/12 12:34:56");
+        DisplaySqlBuilder builder = createTargetWithTimeZone(() -> TimeZone.getTimeZone("GMT+3"));
+
+        // ## Act ##
+        String actual = builder.buildDisplaySql(sql, new Object[] { fooDate });
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("FOO_DATE = '2010-12-12 06:34:56.000'"));
+    }
+
+    public void test_buildDisplaySql_time_basic() {
+        // ## Arrange ##
+        String sql = "select * from where FOO_DATE = ?";
+        Time fooDate = DfTypeUtil.toTime("2010/12/12 12:34:56");
+        DisplaySqlBuilder builder = createTarget();
+
+        // ## Act ##
+        String actual = builder.buildDisplaySql(sql, new Object[] { fooDate });
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("FOO_DATE = '12:34:56'"));
+    }
+
+    public void test_buildDisplaySql_time_specified() {
+        // ## Arrange ##
+        String sql = "select * from where FOO_DATE = ?";
+        Time fooDate = DfTypeUtil.toTime("2010/12/12 12:34:56");
+        DisplaySqlBuilder builder = createTargetWithTimePattern("HH@mm@ss");
+
+        // ## Act ##
+        String actual = builder.buildDisplaySql(sql, new Object[] { fooDate });
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains("FOO_DATE = '12@34@56'"));
+    }
+
+    // ===================================================================================
+    //                                                                             Symbols
+    //                                                                             =======
     public void test_buildDisplaySql_questionInComment_quotationInComment() {
         // ## Arrange ##
         String sql = "/*foo's bar*/select * from where FOO_NAME/*qux?*/ like ? escape '|' and ? /*quux'?*/and ?";
@@ -149,7 +229,7 @@ public class DisplaySqlBuilderTest extends PlainTestCase {
         Date date = DfTypeUtil.toDate("2009-10-27");
 
         // ## Act ##
-        String actual = createTargetWithDateFormat(format).getBindVariableText(date);
+        String actual = createTargetWithDatePattern(format).getBindVariableText(date);
 
         // ## Assert ##
         assertEquals("date '2009-10-27'", actual);
@@ -161,7 +241,7 @@ public class DisplaySqlBuilderTest extends PlainTestCase {
         Timestamp timestamp = DfTypeUtil.toTimestamp("2009-10-27 16:22:23.123");
 
         // ## Act ##
-        String actual = createTargetWithTimestampFormat(format).getBindVariableText(timestamp);
+        String actual = createTargetWithTimestampPattern(format).getBindVariableText(timestamp);
 
         // ## Assert ##
         assertEquals("'2009-10-27 16:22:23.123'", actual);
@@ -173,15 +253,15 @@ public class DisplaySqlBuilderTest extends PlainTestCase {
         Timestamp timestamp = DfTypeUtil.toTimestamp("2009-10-27 16:22:23.123");
 
         // ## Act ##
-        String actual = createTargetWithTimestampFormat(format).getBindVariableText(timestamp);
+        String actual = createTargetWithTimestampPattern(format).getBindVariableText(timestamp);
 
         // ## Assert ##
         assertEquals("timestamp '2009-10-27 16:22:23.123'", actual);
     }
 
     // ===================================================================================
-    //                                                                          DateFormat
-    //                                                                          ==========
+    //                                                                  Analyze DateFormat
+    //                                                                  ==================
     public void test_analyzeDateFormat_basic() {
         // ## Arrange ##
         String format = "yyyy-MM-dd";
@@ -268,18 +348,29 @@ public class DisplaySqlBuilderTest extends PlainTestCase {
     //                                                                         Test Helper
     //                                                                         ===========
     protected DisplaySqlBuilder createTarget() {
-        return doCreateTarget(null, null);
+        return doCreateTarget(null, null, null, null);
     }
 
-    protected DisplaySqlBuilder createTargetWithDateFormat(String logDateFormat) {
-        return doCreateTarget(logDateFormat, null);
+    protected DisplaySqlBuilder createTargetWithDatePattern(String datePattern) {
+        return doCreateTarget(datePattern, null, null, null);
     }
 
-    protected DisplaySqlBuilder createTargetWithTimestampFormat(String logTimestampFormat) {
-        return doCreateTarget(null, logTimestampFormat);
+    protected DisplaySqlBuilder createTargetWithTimestampPattern(String timestampPattern) {
+        return doCreateTarget(null, timestampPattern, null, null);
     }
 
-    protected DisplaySqlBuilder doCreateTarget(String logDateFormat, String logTimestampFormat) {
-        return new DisplaySqlBuilder(logDateFormat, logTimestampFormat);
+    protected DisplaySqlBuilder createTargetWithTimePattern(String timePattern) {
+        return doCreateTarget(null, null, timePattern, null);
+    }
+
+    protected DisplaySqlBuilder createTargetWithTimeZone(BoundDateDisplayTimeZoneProvider timeZoneProvider) {
+        return doCreateTarget(null, null, null, timeZoneProvider);
+    }
+
+    protected DisplaySqlBuilder doCreateTarget(String datePattern, String timestampPattern, String timePattern,
+            BoundDateDisplayTimeZoneProvider timeZoneProvider) {
+        BoundDateDisplayStyle dateDisplayStyle = new BoundDateDisplayStyle(datePattern, timestampPattern, timePattern,
+                timeZoneProvider);
+        return new DisplaySqlBuilder(dateDisplayStyle);
     }
 }

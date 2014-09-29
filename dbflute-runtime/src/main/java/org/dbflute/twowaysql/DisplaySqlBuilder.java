@@ -18,8 +18,11 @@ package org.dbflute.twowaysql;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.TimeZone;
 
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
@@ -32,22 +35,23 @@ public class DisplaySqlBuilder {
     //                                                                          Definition
     //                                                                          ==========
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
-    public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
     public static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
     public static final String NULL = "null";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _logDateFormat;
-    protected final String _logTimestampFormat;
+    protected final BoundDateDisplayStyle _dateDisplayStyle; // not null
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DisplaySqlBuilder(String logDateFormat, String logTimestampFormat) {
-        _logDateFormat = logDateFormat;
-        _logTimestampFormat = logTimestampFormat;
+    public DisplaySqlBuilder(BoundDateDisplayStyle dateDisplayStyle) {
+        if (dateDisplayStyle == null) {
+            throw new IllegalArgumentException("The argument 'dateDisplayStyle' should not be null.");
+        }
+        _dateDisplayStyle = dateDisplayStyle;
     }
 
     // ===================================================================================
@@ -239,26 +243,26 @@ public class DisplaySqlBuilder {
     //                                                                       Date Handling
     //                                                                       =============
     protected String buildTimestampText(Object bindVariable) {
-        final String format = _logTimestampFormat != null ? _logTimestampFormat : DEFAULT_TIMESTAMP_FORMAT;
+        final String realPattern = getTimestampPattern();
         final java.util.Date date = (java.util.Date) bindVariable;
-        return processDateDisplay(date, format);
+        return processDateDisplay(date, realPattern);
     }
 
-    protected String buildTimeText(Object bindVariable) { // Time type has no option
-        final String format = DEFAULT_TIME_FORMAT;
+    protected String buildTimeText(Object bindVariable) {
+        final String realPattern = getTimePattern();
         final java.util.Date date = (java.util.Date) bindVariable;
-        return quote(DfTypeUtil.toString(date, format));
+        return quote(DfTypeUtil.toString(date, realPattern));
     }
 
     protected String buildDateText(Object bindVariable) {
-        final String format = _logDateFormat != null ? _logDateFormat : DEFAULT_DATE_FORMAT;
+        final String realPattern = getDatePattern();
         final java.util.Date date = (java.util.Date) bindVariable;
-        return processDateDisplay(date, format);
+        return processDateDisplay(date, realPattern);
     }
 
     protected String processDateDisplay(java.util.Date date, String format) {
         final DateFormatResource resource = analyzeDateFormat(format);
-        String disp = DfTypeUtil.toString(date, resource.getFormat());
+        String disp = DfTypeUtil.toStringDate(date, resource.getFormat(), getTimeZone());
         if (isBCPrefixTarget(date, resource)) {
             // fixed specification, basically not use 'G'
             // in pattern at least default pattern
@@ -268,11 +272,40 @@ public class DisplaySqlBuilder {
         return quote(disp, resource);
     }
 
+    // -----------------------------------------------------
+    //                                         Style Pattern
+    //                                         -------------
+    protected String getDatePattern() {
+        final String datePattern = _dateDisplayStyle.getDatePattern();
+        return datePattern != null ? datePattern : DEFAULT_DATE_FORMAT;
+    }
+
+    protected String getTimestampPattern() {
+        final String timestampPattern = _dateDisplayStyle.getTimestampPattern();
+        return timestampPattern != null ? timestampPattern : DEFAULT_TIMESTAMP_FORMAT;
+    }
+
+    protected String getTimePattern() {
+        final String timePattern = _dateDisplayStyle.getTimePattern();
+        return timePattern != null ? timePattern : DEFAULT_TIME_FORMAT;
+    }
+
+    protected TimeZone getTimeZone() {
+        final BoundDateDisplayTimeZoneProvider provider = _dateDisplayStyle.getTimeZoneProvider();
+        return provider != null ? provider.provide() : null;
+    }
+
+    // -----------------------------------------------------
+    //                                              AD or BC
+    //                                              --------
     protected boolean isBCPrefixTarget(java.util.Date date, DateFormatResource resource) {
         final String format = resource.getFormat();
         return DfTypeUtil.isDateBC(date) && format.startsWith("yyyy") && !format.contains("G");
     }
 
+    // -----------------------------------------------------
+    //                                    Analyze DateFormat
+    //                                    ------------------
     /**
      * Analyze date format.
      * <pre>

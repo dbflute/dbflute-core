@@ -31,6 +31,7 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.derived.DerivedTypeHandler;
 import org.dbflute.exception.ConditionInvokingFailureException;
 import org.dbflute.jdbc.StatementConfig;
+import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 
 /**
  * The bean for condition.
@@ -445,6 +446,18 @@ public interface ConditionBean extends PagingBean {
      * @return SQL for display. (NotNull and NotEmpty)
      */
     String toDisplaySql();
+
+    /**
+     * Style bound dates on logging display SQL, overriding default style.
+     * @param logDateDisplayStyle The display style of date for logging. (NullAllowed: if null, configured default style) 
+     */
+    void styleLogDateDisplay(BoundDateDisplayStyle logDateDisplayStyle);
+
+    /**
+     * Get the display style of date for logging.
+     * @return The specified style object. (NullAllowed: if null, configured default style)
+     */
+    BoundDateDisplayStyle getLogDateDisplayStyle();
 
     // ===================================================================================
     //                                                                       Meta Handling

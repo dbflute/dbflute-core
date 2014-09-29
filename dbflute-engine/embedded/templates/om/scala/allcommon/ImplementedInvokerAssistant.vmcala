@@ -421,8 +421,10 @@ class ${glImplementedInvokerAssistant} extends InvokerAssistant {
     def assistResourceParameter(): ResourceParameter = {
         val parameter: ResourceParameter = newResourceParameter();
         parameter.setOutsideSqlPackage(${glDBFluteConfig}.getOutsideSqlPackage());
-        parameter.setLogDateFormat(${glDBFluteConfig}.getLogDateFormat());
-        parameter.setLogTimestampFormat(${glDBFluteConfig}.getLogTimestampFormat());
+        parameter.setLogDatePattern(${glDBFluteConfig}.getLogDatePattern());
+        parameter.setLogTimestampPattern(${glDBFluteConfig}.getLogTimestampPattern());
+        parameter.setLogTimePattern(${glDBFluteConfig}.getLogTimePattern());
+        parameter.setLogTimeZoneProvider(${glDBFluteConfig}.getLogTimeZoneProvider());
         parameter.setInternalDebug(${glDBFluteConfig}.isInternalDebug());
         return parameter;
     }

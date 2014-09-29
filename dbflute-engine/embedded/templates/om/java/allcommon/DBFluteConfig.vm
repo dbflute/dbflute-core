@@ -44,6 +44,7 @@ import org.dbflute.s2dao.valuetype.plugin.OracleDateType;
 import org.dbflute.s2dao.valuetype.plugin.OracleArrayType;
 import org.dbflute.s2dao.valuetype.plugin.OracleStructType;
 import org.dbflute.twowaysql.DisplaySqlBuilder;
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 import org.dbflute.util.DfReflectionUtil;
 #if ($database.isTargetContainerSeasar())
 import org.seasar.extension.dbcp.ConnectionWrapper;
@@ -103,8 +104,10 @@ public class ${glDBFluteConfig} {
     // logging
     protected boolean _queryLogLevelInfo;
     protected boolean _executeStatusLogLevelInfo;
-    protected String _logDateFormat;
-    protected String _logTimestampFormat;
+    protected String _logDatePattern;
+    protected String _logTimestampPattern;
+    protected String _logTimePattern;
+    protected BoundDateDisplayTimeZoneProvider _logTimeZoneProvider;
 
     // environment
     protected StatementConfig _defaultStatementConfig;
@@ -162,8 +165,8 @@ public class ${glDBFluteConfig} {
             // date formatting has two points:
             //   o the DATE type of Oracle has seconds  
             //   o it uses a date literal of Oracle
-            _logDateFormat = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
-            _logTimestampFormat = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";
+            _logDatePattern = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
+            _logTimestampPattern = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";
         }
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
 
@@ -390,28 +393,52 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                          Log Format
     //                                                                          ==========
-    public String getLogDateFormat() {
-        return _logDateFormat;
+    public String getLogDatePattern() {
+        return _logDatePattern;
     }
 
-    public void setLogDateFormat(String logDateFormat) {
+    public void setLogDatePattern(String logDatePattern) {
         assertNotLocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting logDateFormat: " + logDateFormat);
+            _log.info("...Setting logDatePattern: " + logDatePattern);
         }
-        _logDateFormat = logDateFormat;
+        _logDatePattern = logDatePattern;
     }
 
-    public String getLogTimestampFormat() {
-        return _logTimestampFormat;
+    public String getLogTimestampPattern() {
+        return _logTimestampPattern;
     }
 
-    public void setLogTimestampFormat(String logTimestampFormat) {
+    public void setLogTimestampPattern(String logTimestampPattern) {
         assertNotLocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting logTimestampFormat: " + logTimestampFormat);
+            _log.info("...Setting logTimestampPattern: " + logTimestampPattern);
         }
-        _logTimestampFormat = logTimestampFormat;
+        _logTimestampPattern = logTimestampPattern;
+    }
+
+    public String getLogTimePattern() {
+        return _logTimePattern;
+    }
+
+    public void setLogTimePattern(String logTimePattern) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting logTimePattern: " + logTimePattern);
+        }
+        _logTimePattern = logTimePattern;
+    }
+
+    public BoundDateDisplayTimeZoneProvider getLogTimeZoneProvider() {
+        return _logTimeZoneProvider;
+    }
+
+    public void setLogTimeZoneProvider(BoundDateDisplayTimeZoneProvider logTimeZoneProvider) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting logTimeZoneProvider: " + logTimeZoneProvider);
+        }
+        _logTimeZoneProvider = logTimeZoneProvider;
     }
 
     // ===================================================================================
