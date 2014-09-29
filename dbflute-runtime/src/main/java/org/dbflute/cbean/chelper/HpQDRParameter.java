@@ -23,7 +23,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
 import org.dbflute.cbean.coption.FromToOption;
-import org.dbflute.cbean.subcall.SubQuery;
+import org.dbflute.cbean.scoping.SubQuery;
 
 /**
  * The parameter of (Query)DerivedReferrer.

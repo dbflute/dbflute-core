@@ -25,9 +25,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 

@@ -19,8 +19,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.dbway.WayOfSybase;
+import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 
 /**
  * @author jflute

@@ -22,8 +22,8 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
 
 /**
  * @author jflute

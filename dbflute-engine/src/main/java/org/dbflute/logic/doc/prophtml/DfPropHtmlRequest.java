@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.jprop.JavaPropertiesProperty;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.DfCollectionUtil;
 
 /**

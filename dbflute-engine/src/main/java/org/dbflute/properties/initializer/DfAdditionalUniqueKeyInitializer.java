@@ -27,8 +27,8 @@ import org.apache.torque.engine.database.model.Unique;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfPropertySettingColumnNotFoundException;
 import org.dbflute.exception.DfPropertySettingTableNotFoundException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfAdditionalUniqueKeyProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 
 /**
  * The initializer of additional unique key.

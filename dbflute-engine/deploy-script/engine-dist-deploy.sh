@@ -1,6 +1,6 @@
 cd ..
 ant -f build.xml dist
-ant -f build.xml reflect-to-test-active-dockside
+#ant -f build.xml reflect-to-test-active-dockside
 ant -f build.xml reflect-to-test-active-hanger
 
 cd ../../dbflute-test-active-dockside/dbflute_exampledb

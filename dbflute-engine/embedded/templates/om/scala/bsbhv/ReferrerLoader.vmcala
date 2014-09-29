@@ -22,9 +22,9 @@ import scala.collection.JavaConverters._;
 import java.util.Collection;
 import java.util.List;
 
-import org.dbflute._;
-#if ($table.hasLoadReferrer())
 import org.dbflute.bhv._;
+#if ($table.hasLoadReferrer())
+import org.dbflute.bhv.referrer._;
 #end
 import ${glPackageBaseCommon}._;
 import ${glPackageExtendedBhv}._;

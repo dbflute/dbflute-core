@@ -19,11 +19,11 @@ ${database.allClassCopyright}package ${glPackageBaseCB};
 import org.dbflute.cbean.AbstractConditionBean;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
-import org.dbflute.cbean.callback.*;
 import org.dbflute.cbean.chelper.*;
 import org.dbflute.cbean.coption.*;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.cbean.scoping.*;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 #if ($table.hasPrimaryKeyForcedClassificationSetting())

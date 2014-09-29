@@ -27,10 +27,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfLoadDataIllegalImplicitClassificationValueException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 
 /**
  * @author jflute

@@ -33,6 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfIllegalPropertySettingException;
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
@@ -40,7 +41,6 @@ import org.dbflute.logic.jdbc.metadata.supplement.DfUniqueKeyFkExtractor;
 import org.dbflute.logic.jdbc.metadata.supplement.DfUniqueKeyFkExtractor.UserUniqueFkColumn;
 import org.dbflute.logic.jdbc.metadata.supplement.factory.DfUniqueKeyFkExtractorFactory;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.dbflute.helper.StringKeyMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 

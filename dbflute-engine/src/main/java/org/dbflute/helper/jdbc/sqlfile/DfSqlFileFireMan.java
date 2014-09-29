@@ -22,8 +22,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.DfAlterCheckAlterScriptSQLException;
-import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
 import org.dbflute.exception.SQLFailureException;
+import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
 import org.dbflute.helper.token.line.LineToken;
 import org.dbflute.helper.token.line.LineTokenizingOption;
 

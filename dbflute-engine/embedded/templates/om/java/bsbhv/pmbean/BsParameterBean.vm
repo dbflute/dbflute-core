@@ -18,12 +18,12 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 
 import java.util.*;
 
-#if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
-import org.dbflute.cbean.SimplePagingBean;
-#end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 import org.dbflute.outsidesql.ProcedurePmb;
 #else
+#if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
+import org.dbflute.outsidesql.paging.SimplePagingBean;
+#end
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
 import org.dbflute.outsidesql.typed.*;
 #else

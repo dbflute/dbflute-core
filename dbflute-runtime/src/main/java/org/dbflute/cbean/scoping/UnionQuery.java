@@ -13,34 +13,30 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.subcall;
+package org.dbflute.cbean.scoping;
 
 import org.dbflute.cbean.ConditionBean;
 
 /**
- * The interface of specify-query.
+ * The interface of union-query.
  * <pre>
- * cb.columnQuery(new SpecifyQuery&lt;LandCB&gt;() {
- *     public void query(LandCB spCB) {
- *         spCB.specify().columnLand...();
+ * cb.union(new UnionQuery&lt;FooCB&gt;() {
+ *     public void query(FooCB unionCB) {
+ *         unionCB.query().setFoo...
  *     }
- * }).lessThan(new SpecifyQuery&lt;SeaCB&gt;() {
- *     public void query(SeaCB spCB) {
- *         spCB.specify().columnSea...();
- *     }
- * });
+ * }
  * </pre>
  * @author jflute
- * @param <CB> The type of condition-bean for specification.
+ * @param <UNION_CB> The type of condition-bean for union.
  */
 @FunctionalInterface
-public interface SpecifyQuery<CB extends ConditionBean> {
+public interface UnionQuery<UNION_CB extends ConditionBean> {
 
     /**
-     * Specify your column for query. <br />
-     * Don't call the method 'setupSelect_Xxx()' and 'query()' and 'addOrderBy_Xxx...()'
+     * Set up your query condition for union. <br />
+     * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
-     * @param spCB The condition-bean for specification. (NotNull)
+     * @param unionCB The condition-bean for union. (NotNull)
      */
-    void specify(CB spCB);
+    void query(UNION_CB unionCB);
 }

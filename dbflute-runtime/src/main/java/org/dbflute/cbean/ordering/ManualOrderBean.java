@@ -31,7 +31,7 @@ import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.coption.ColumnConversionOption;
 import org.dbflute.cbean.coption.DateFromToOption;
 import org.dbflute.cbean.coption.FromToOption;
-import org.dbflute.cbean.subcall.SpecifyQuery;
+import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;

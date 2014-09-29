@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.torque.engine.database.model.Column;
-import org.dbflute.logic.generate.language.DfLanguageSmallHelper;
 import org.dbflute.helper.StringSet;
+import org.dbflute.logic.generate.language.DfLanguageSmallHelper;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 

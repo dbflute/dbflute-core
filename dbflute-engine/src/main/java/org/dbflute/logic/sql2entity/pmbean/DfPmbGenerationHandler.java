@@ -29,11 +29,11 @@ import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
+import org.dbflute.outsidesql.paging.SimplePagingBean;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.dbflute.cbean.SimplePagingBean;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 

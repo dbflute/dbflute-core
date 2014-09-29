@@ -31,6 +31,7 @@ import org.apache.velocity.context.Context;
 import org.dbflute.exception.DfCreateSchemaFailureException;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.dbflute.exception.DfTakeFinallyFailureException;
+import org.dbflute.exception.SQLFailureException;
 import org.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.dbflute.logic.replaceschema.finalinfo.DfAbstractSchemaTaskFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
@@ -39,17 +40,16 @@ import org.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.dbflute.logic.replaceschema.process.DfAlterCheckProcess;
+import org.dbflute.logic.replaceschema.process.DfAlterCheckProcess.CoreProcessPlayer;
 import org.dbflute.logic.replaceschema.process.DfArrangeBeforeRepsProcess;
 import org.dbflute.logic.replaceschema.process.DfCreateSchemaProcess;
+import org.dbflute.logic.replaceschema.process.DfCreateSchemaProcess.CreatingDataSourcePlayer;
 import org.dbflute.logic.replaceschema.process.DfLoadDataProcess;
 import org.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
-import org.dbflute.logic.replaceschema.process.DfAlterCheckProcess.CoreProcessPlayer;
-import org.dbflute.logic.replaceschema.process.DfCreateSchemaProcess.CreatingDataSourcePlayer;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTexenTask;
 import org.dbflute.task.bs.assistant.DfDocumentSelector;
-import org.dbflute.exception.SQLFailureException;
 import org.dbflute.util.Srl;
 
 /**

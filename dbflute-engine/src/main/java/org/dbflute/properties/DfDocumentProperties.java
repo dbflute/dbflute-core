@@ -30,10 +30,10 @@ import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
-import org.dbflute.util.DfNameHintUtil;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
 
 /**

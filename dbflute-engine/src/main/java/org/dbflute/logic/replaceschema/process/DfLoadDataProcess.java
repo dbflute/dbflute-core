@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
 import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResource;
@@ -46,7 +47,6 @@ import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterce
 import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSQLServer;
 import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSybase;
 import org.dbflute.properties.DfBasicProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
 
 /**

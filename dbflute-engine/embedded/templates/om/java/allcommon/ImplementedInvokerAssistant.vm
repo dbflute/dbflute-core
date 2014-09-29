@@ -17,17 +17,18 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import javax.sql.DataSource;
 
-import org.dbflute.DBDef;
 import org.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.bhv.core.context.ResourceParameter;
 import org.dbflute.bhv.core.melodicsql.MelodicSqlAnalyzerFactory;
 import org.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
+import org.dbflute.bhv.exception.BehaviorExceptionThrower;
 import org.dbflute.bhv.exception.DefaultSQLExceptionHandlerFactory;
 import org.dbflute.bhv.exception.SQLExceptionHandlerFactory;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.dbflute.dbmeta.DBMetaProvider;
-import org.dbflute.exception.thrower.BehaviorExceptionThrower;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.jdbc.DataSourceHandler;
 import org.dbflute.jdbc.HandlingDataSourceWrapper;
 import org.dbflute.jdbc.SQLExceptionDigger;
@@ -36,7 +37,6 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.optional.RelationOptionalFactory;
 import org.dbflute.outsidesql.factory.DefaultOutsideSqlExecutorFactory;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
-import org.dbflute.resource.ResourceParameter;
 #if ($database.isTargetContainerSeasar())
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 #end

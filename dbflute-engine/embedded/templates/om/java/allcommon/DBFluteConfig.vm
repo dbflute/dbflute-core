@@ -23,13 +23,13 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.DBDef;
 import org.dbflute.QLog;
 import org.dbflute.XLog;
 import org.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.dbflute.dbmeta.name.SqlNameFilter;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.IllegalDBFluteConfigAccessException;
 import org.dbflute.jdbc.DataSourceHandler;
 import org.dbflute.jdbc.NotClosingConnectionWrapper;

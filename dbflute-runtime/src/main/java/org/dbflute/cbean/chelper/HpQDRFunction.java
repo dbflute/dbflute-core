@@ -17,7 +17,7 @@ package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
-import org.dbflute.cbean.subcall.SubQuery;
+import org.dbflute.cbean.scoping.SubQuery;
 
 /**
  * The function of (Query)DerivedReferrer.

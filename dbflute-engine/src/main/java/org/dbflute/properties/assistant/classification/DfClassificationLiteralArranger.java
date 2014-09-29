@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.mapstring.MapListString;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
 
 /**

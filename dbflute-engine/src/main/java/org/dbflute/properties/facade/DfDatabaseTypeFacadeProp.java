@@ -15,8 +15,8 @@
  */
 package org.dbflute.properties.facade;
 
+import org.dbflute.dbway.DBDef;
 import org.dbflute.properties.DfBasicProperties;
-import org.dbflute.DBDef;
 
 /**
  * @author jflute

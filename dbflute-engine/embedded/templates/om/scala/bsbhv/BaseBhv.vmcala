@@ -25,10 +25,15 @@ import java.util.ArrayList;
 
 import org.dbflute._;
 import org.dbflute.bhv._;
+import org.dbflute.bhv.readable._;
+#if ($table.isWritable())
+import org.dbflute.bhv.writable._;
+#end
 import org.dbflute.bhv.AbstractBehaviorReadable._;
 import org.dbflute.bhv.AbstractBehaviorWritable._;
 import org.dbflute.cbean._;
 import org.dbflute.cbean.chelper._;
+import org.dbflute.cbean.result._;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.exception._;
 import org.dbflute.util._;

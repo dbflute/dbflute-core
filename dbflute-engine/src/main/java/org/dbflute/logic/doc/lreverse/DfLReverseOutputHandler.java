@@ -40,12 +40,12 @@ import org.dbflute.helper.io.xls.DfTableXlsWriter;
 import org.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
 import org.dbflute.helper.jdbc.facade.DfJFadCursorHandler;
 import org.dbflute.helper.jdbc.facade.DfJFadResultSetWrapper;
-import org.dbflute.properties.DfAdditionalTableProperties;
-import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.helper.token.file.FileMakingCallback;
 import org.dbflute.helper.token.file.FileMakingOption;
 import org.dbflute.helper.token.file.FileMakingRowWriter;
 import org.dbflute.helper.token.file.FileToken;
+import org.dbflute.properties.DfAdditionalTableProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
  * @author jflute

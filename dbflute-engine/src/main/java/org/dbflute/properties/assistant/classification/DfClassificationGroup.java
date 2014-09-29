@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfIllegalPropertySettingException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfDocumentProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
 
 /**

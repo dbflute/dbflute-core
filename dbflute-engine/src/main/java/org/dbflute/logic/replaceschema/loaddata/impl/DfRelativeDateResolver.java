@@ -21,9 +21,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.dbflute.exception.DfLoadDataRegistrationFailureException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.HandyDate;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfReflectionUtil.ReflectionFailureException;

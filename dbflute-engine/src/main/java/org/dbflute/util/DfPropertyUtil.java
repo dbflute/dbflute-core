@@ -25,7 +25,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.dbflute.helper.mapstring.MapListString;
-import org.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute

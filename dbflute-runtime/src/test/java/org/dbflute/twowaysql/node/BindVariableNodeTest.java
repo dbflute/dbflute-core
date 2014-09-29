@@ -15,12 +15,14 @@
  */
 package org.dbflute.twowaysql.node;
 
+import org.dbflute.bhv.core.melodicsql.MelodicNodeAdviceFactory;
 import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.exception.BindVariableCommentInScopeNotListException;
 import org.dbflute.twowaysql.exception.BindVariableCommentParameterNullValueException;
 import org.dbflute.twowaysql.exception.InLoopOptionOutOfLoopException;
+import org.dbflute.twowaysql.factory.NodeAdviceFactory;
 import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
@@ -240,10 +242,34 @@ public class BindVariableNodeTest extends PlainTestCase {
     // ===================================================================================
     //                                                                      In-Loop Option
     //                                                                      ==============
-    public void test_accept_inLoopOption_basic() {
+    public void test_accept_inLoopOption_default() {
         // ## Arrange ##
         String sql = "= /*FOR pmb.memberNameList*//*#current:likePrefix*/'foo'/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        Node rootNode = analyzer.analyze();
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));
+        CommandContext ctx = createCtx(pmb);
+
+        // ## Act ##
+        try {
+            rootNode.accept(ctx);
+            // ## Assert ##
+            fail();
+        } catch (IllegalStateException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_accept_inLoopOption_melodic() {
+        // ## Arrange ##
+        String sql = "= /*FOR pmb.memberNameList*//*#current:likePrefix*/'foo'/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false) {
+            @Override
+            protected NodeAdviceFactory getNodeAdviceFactory() {
+                return new MelodicNodeAdviceFactory();
+            }
+        };
         Node rootNode = analyzer.analyze();
         MockMemberPmb pmb = new MockMemberPmb();
         pmb.setMemberNameList(DfCollectionUtil.newArrayList("foo", "bar", "baz"));

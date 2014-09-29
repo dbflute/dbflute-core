@@ -21,8 +21,8 @@ import java.util.Set;
 
 import org.dbflute.Entity;
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
-import org.dbflute.cbean.subcall.SpecifyQuery;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.UniqueInfo;

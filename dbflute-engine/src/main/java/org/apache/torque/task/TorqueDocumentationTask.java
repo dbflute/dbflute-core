@@ -134,6 +134,7 @@ import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
@@ -141,7 +142,6 @@ import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractDbMetaTexenTask;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
 
 /**

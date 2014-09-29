@@ -22,9 +22,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.dbflute.exception.DfJDBCException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 
 /**
  * The handler of auto increment. 

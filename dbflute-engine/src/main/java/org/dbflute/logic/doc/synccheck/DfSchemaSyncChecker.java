@@ -28,12 +28,12 @@ import org.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
 import org.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.dbflute.helper.jdbc.connection.DfFittingDataSource;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.craftdiff.DfCraftDiffAssertDirection;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDocumentProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
 
 /**

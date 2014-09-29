@@ -16,8 +16,8 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
-import org.dbflute.cbean.subcall.SpecifyQuery;
 
 /**
  * The option for ScalarCondition (the old name: ScalarSubQuery).

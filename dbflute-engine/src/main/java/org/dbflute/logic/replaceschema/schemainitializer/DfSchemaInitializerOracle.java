@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.exception.SQLFailureException;
+import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.util.Srl;
 
 /**

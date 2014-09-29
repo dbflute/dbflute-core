@@ -37,6 +37,7 @@ public class DefaultNodeAdviceFactory implements NodeAdviceFactory {
 
     @Override
     public FilteringBindOption createInLoopLikeSearchOption(String likeDirection) {
-        return null; // means unsupported as default
+        String msg = "Unsupported in-loop like-search option: likeDirection=" + likeDirection;
+        throw new IllegalStateException(msg); // as default, you can override it
     }
 }

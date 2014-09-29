@@ -35,6 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfBehaviorNotFoundException;
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
@@ -43,7 +44,6 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
-import org.dbflute.helper.StringKeyMap;
 import org.dbflute.util.Srl;
 
 /**

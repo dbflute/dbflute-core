@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.util.Srl;
 
 /**

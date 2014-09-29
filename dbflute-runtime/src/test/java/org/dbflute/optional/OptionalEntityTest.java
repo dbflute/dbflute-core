@@ -13,8 +13,9 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute;
+package org.dbflute.optional;
 
+import org.dbflute.Entity;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.mock.MockEntity;
 import org.dbflute.optional.OptionalEntity;

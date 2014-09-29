@@ -28,13 +28,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfCraftDiffIllegalCraftKeyNameException;
-import org.dbflute.properties.DfDocumentProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.token.file.FileToken;
 import org.dbflute.helper.token.file.FileTokenizingCallback;
 import org.dbflute.helper.token.file.FileTokenizingHeaderInfo;
 import org.dbflute.helper.token.file.FileTokenizingOption;
 import org.dbflute.helper.token.file.FileTokenizingRowResource;
+import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 

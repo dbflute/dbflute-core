@@ -13,29 +13,22 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.derived;
-
-import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
+package org.dbflute.dbmeta.derived;
 
 /**
- * The handler of derived type for (Specify)DerivedReferrer.
+ * The interface of derived mappable object (basically entity), for (Specify)DerivedReferrer.
  * @author jflute
  * @since 1.0.5J (2014/06/18 Wednesday)
  */
-public interface DerivedTypeHandler {
+public interface DerivedMappable {
+
+    /** The prefix mark for derived mapping alias. */
+    String MAPPING_ALIAS_PREFIX = "$";
 
     /**
-     * Find the mapping type of the derived column.
-     * @param derivingInfo The information of deriving sub-query. (NotNull)
-     * @return The mapping type to find value type. (NotNull)
-     */
-    Class<?> findMappingType(HpDerivingSubQueryInfo derivingInfo);
-
-    /**
-     * Convert the selected value to derived map value. e.g. to Option
-     * @param derivingInfo The information of deriving sub-query. (NotNull)
+     * Register value derived by (Specify)DerivedReferrer.
+     * @param aliasName The alias name of derived-referrer. (NotNull)
      * @param selectedValue The selected value from database. (NullAllowed)
-     * @return The converted value. (NullAllowed)
      */
-    Object convertToMapValue(HpDerivingSubQueryInfo derivingInfo, Object selectedValue);
+    void registerDerivedValue(String aliasName, Object selectedValue);
 }

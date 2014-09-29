@@ -27,10 +27,10 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
-import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
-import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.dbway.WayOfSQLServer;
 import org.dbflute.helper.StringSet;
+import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
  * @author jflute

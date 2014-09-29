@@ -25,7 +25,7 @@ import java.io.StringWriter;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 
 /**

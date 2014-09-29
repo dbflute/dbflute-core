@@ -30,12 +30,12 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.dbflute.helper.StringSet;
 import org.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
-import org.dbflute.helper.StringSet;
 
 /**
  * @author jflute

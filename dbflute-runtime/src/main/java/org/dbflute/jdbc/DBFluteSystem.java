@@ -35,7 +35,7 @@ public class DBFluteSystem {
     // ===================================================================================
     //                                                                    Option Attribute
     //                                                                    ================
-    protected static DBFluteCurrentProvider _currentProvider;
+    protected static DBFluteStateProvider _currentProvider;
 
     protected static boolean _locked = true;
 
@@ -76,10 +76,6 @@ public class DBFluteSystem {
         return millis;
     }
 
-    public static interface DBFluteCurrentProvider {
-        long currentTimeMillis();
-    }
-
     // ===================================================================================
     //                                                                     Option Accessor
     //                                                                     ===============
@@ -98,7 +94,7 @@ public class DBFluteSystem {
         }
     }
 
-    public static void xsetDBFluteCurrentProvider(DBFluteCurrentProvider currentProvider) {
+    public static void xsetDBFluteCurrentProvider(DBFluteStateProvider currentProvider) {
         assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting DBFluteCurrentProvider: " + currentProvider);

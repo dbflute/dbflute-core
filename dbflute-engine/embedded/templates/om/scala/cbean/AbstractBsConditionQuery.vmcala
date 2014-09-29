@@ -28,6 +28,8 @@ import org.dbflute.cbean.chelper._;
 import org.dbflute.cbean.ckey._;
 import org.dbflute.cbean.coption._;
 import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.ordering._;
+import org.dbflute.cbean.scoping._;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMetaProvider;
 #if ($database.isAvailableJodaTimeEntity())

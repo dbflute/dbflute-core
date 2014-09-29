@@ -22,8 +22,8 @@ import java.util.Map.Entry;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfDocumentProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
 
 /**

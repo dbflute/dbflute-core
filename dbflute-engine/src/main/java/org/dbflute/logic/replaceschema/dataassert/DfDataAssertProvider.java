@@ -34,7 +34,7 @@ import org.dbflute.exception.DfTakeFinallyAssertionFailureCountNotZeroException;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureListNotExistsException;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureListNotZeroException;
 import org.dbflute.exception.DfTakeFinallyAssertionInvalidMarkException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
 

@@ -13,30 +13,31 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.subcall;
+package org.dbflute.cbean.scoping;
 
 import org.dbflute.cbean.ConditionBean;
 
 /**
- * The interface of union-query.
+ * The interface of or-query.
  * <pre>
- * cb.union(new UnionQuery&lt;FooCB&gt;() {
- *     public void query(FooCB unionCB) {
- *         unionCB.query().setFoo...
+ * cb.<span style="color: #DD4747">orScopeQuery</span>(new OrQuery&lt;FooCB&gt;() {
+ *     public void query(FooCB orCB) {
+ *         orCB.query().setFoo...
+ *         orCB.query().setBar...
  *     }
  * }
  * </pre>
  * @author jflute
- * @param <UNION_CB> The type of condition-bean for union.
+ * @param <OR_CB> The type of condition-bean for or-query.
  */
 @FunctionalInterface
-public interface UnionQuery<UNION_CB extends ConditionBean> {
+public interface OrQuery<OR_CB extends ConditionBean> {
 
     /**
-     * Set up your query condition for union. <br />
+     * Set up your query condition for or-query. <br />
      * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
-     * @param unionCB The condition-bean for union. (NotNull)
+     * @param orCB The condition-bean for or-query. (NotNull)
      */
-    void query(UNION_CB unionCB);
+    void query(OR_CB orCB);
 }

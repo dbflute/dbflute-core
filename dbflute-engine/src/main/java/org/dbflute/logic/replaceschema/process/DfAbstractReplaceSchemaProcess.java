@@ -21,13 +21,13 @@ import java.util.List;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.jdbc.DfRunnerInformation;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
+import org.dbflute.helper.token.line.LineToken;
+import org.dbflute.helper.token.line.LineTokenizingOption;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.dbflute.helper.token.line.LineToken;
-import org.dbflute.helper.token.line.LineTokenizingOption;
 
 /**
  * @author jflute

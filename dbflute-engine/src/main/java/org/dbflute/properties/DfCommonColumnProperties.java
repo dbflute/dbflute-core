@@ -24,12 +24,12 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.torque.engine.database.model.Table;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.properties.assistant.DfTableListProvider;
 import org.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.dbflute.util.DfPropertyUtil;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.dbflute.helper.StringKeyMap;
 import org.dbflute.util.DfStringUtil;
 
 /**

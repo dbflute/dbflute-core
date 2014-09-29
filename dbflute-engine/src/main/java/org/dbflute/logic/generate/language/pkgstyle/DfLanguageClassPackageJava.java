@@ -15,6 +15,7 @@
  */
 package org.dbflute.logic.generate.language.pkgstyle;
 
+import org.dbflute.hook.AccessContext;
 import org.dbflute.util.Srl;
 
 /**
@@ -85,6 +86,6 @@ public class DfLanguageClassPackageJava implements DfLanguageClassPackage {
     }
 
     public String buildAccessContextFqcn(String baseCommonPackage, String projectPrefix) {
-        return "org.dbflute.AccessContext";
+        return AccessContext.class.getName();
     }
 }

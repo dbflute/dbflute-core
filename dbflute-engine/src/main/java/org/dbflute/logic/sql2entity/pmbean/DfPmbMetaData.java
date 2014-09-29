@@ -24,6 +24,7 @@ import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.friends.velocity.DfGenerator;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
@@ -40,7 +41,6 @@ import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfTypeMappingProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 

@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.dataset.states.DfDtsRowStates;
 import org.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.dbflute.helper.dataset.types.DfDtsColumnTypes;
@@ -34,7 +35,6 @@ import org.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
-import org.dbflute.helper.StringKeyMap;
 
 /**
  * @author modified by jflute (originated in Seasar2)

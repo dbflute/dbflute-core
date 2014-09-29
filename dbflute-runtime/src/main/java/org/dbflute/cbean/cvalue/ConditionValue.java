@@ -796,7 +796,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the map of fixed values for query. {basically for internal tests} <br />
-     * @return A map instance. map:{[condition-key] = [value]} (NullAllowed)
+     * @return The map of query. map:{[condition-key] = [value]} (NullAllowed)
      */
     public Map<String, Object> getFixedQuery() {
         return _fixedValueMap != null ? _fixedValueMap.get(FIXED_KEY_QUERY) : null;
@@ -804,7 +804,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the map of fixed values for in-line. {basically for internal tests} <br />
-     * @return A map instance. map:{[condition-key] = [value]} (NullAllowed)
+     * @return The map of in-line query. map:{[condition-key] = [value]} (NullAllowed)
      */
     public Map<String, Object> getFixedInline() {
         return _fixedValueMap != null ? _fixedValueMap.get(FIXED_KEY_INLINE) : null;
@@ -812,7 +812,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Get the map of fixed values for on-clause. {basically for internal tests} <br />
-     * @return A map instance. map:{[condition-key] = [value]} (NullAllowed)
+     * @return The map of on-clause query. map:{[condition-key] = [value]} (NullAllowed)
      */
     public Map<String, Object> getFixedOnClause() {
         return _fixedValueMap != null ? _fixedValueMap.get(FIXED_KEY_ONCLAUSE) : null;

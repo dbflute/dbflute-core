@@ -27,8 +27,8 @@ import org.apache.torque.engine.database.model.Table;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfPropertySettingColumnNotFoundException;
 import org.dbflute.exception.DfPropertySettingTableNotFoundException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfAdditionalPrimaryKeyProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 
 /**
  * The initializer of additional primary key.

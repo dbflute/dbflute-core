@@ -23,8 +23,8 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.exception.DfParameterBeanReferenceColumnNotFoundException;
 import org.dbflute.exception.DfParameterBeanReferenceTableNotFoundException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
 

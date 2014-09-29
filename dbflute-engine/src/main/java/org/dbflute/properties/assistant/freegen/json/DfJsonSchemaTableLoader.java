@@ -21,11 +21,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.dbflute.properties.assistant.freegen.reflector.DfFreeGenLazyReflector;
 import org.dbflute.properties.assistant.freegen.reflector.DfFreeGenMethodConverter;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 

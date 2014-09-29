@@ -29,13 +29,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.dbflute.properties.DfBasicProperties;
-import org.dbflute.properties.DfDocumentProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.jprop.JavaPropertiesProperty;
 import org.dbflute.helper.jprop.JavaPropertiesReader;
 import org.dbflute.helper.jprop.JavaPropertiesResult;
 import org.dbflute.helper.jprop.JavaPropertiesStreamProvider;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 

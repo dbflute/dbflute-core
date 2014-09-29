@@ -15,7 +15,6 @@
  */
 package org.dbflute.exception;
 
-import org.dbflute.exception.SQLFailureException;
 
 /**
  * @author jflute

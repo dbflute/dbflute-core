@@ -35,6 +35,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
@@ -42,9 +43,9 @@ import org.dbflute.logic.jdbc.metadata.basic.DfForeignKeyExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfIndexExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
-import org.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 import org.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
+import org.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
@@ -52,7 +53,6 @@ import org.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.logic.jdbc.metadata.synonym.DfDBLinkNativeExtractorOracle.DBLinkNativeInfo;
 import org.dbflute.logic.jdbc.metadata.synonym.DfSynonymNativeExtractorOracle.SynonymNativeInfo;
-import org.dbflute.helper.StringKeyMap;
 import org.dbflute.util.DfCollectionUtil;
 
 /**

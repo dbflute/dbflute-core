@@ -30,8 +30,8 @@ import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.properties.facade.DfSchemaXmlFacadeProp;
-import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfNameHintUtil;
 
 /**
  * @author jflute

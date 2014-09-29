@@ -13,31 +13,30 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.subcall;
+package org.dbflute.cbean.scoping;
 
 import org.dbflute.cbean.ConditionBean;
 
 /**
- * The interface of scalar-query.
+ * The interface of sub-query.
  * <pre>
- * fooBhv.scalarSelect(Date.class).max(new ScalarQuery&lt;FooCB&gt;() {
- *     public void query(FooCB cb) {
- *         cb.specify().columnFooDatetime(); <span style="color: #3F7E5E">// required for a function</span>
- *         cb.query().setFoo...
+ * cb.query.existsSeaList(new SubQuery&lt;SeaCB&gt;() {
+ *     public void query(SeaCB subCB) {
+ *         subCB.query().setSea...
  *     }
  * }
  * </pre>
  * @author jflute
- * @param <CB> The type of condition-bean.
+ * @param <SUB_CB> The type of condition-bean for sub-query.
  */
 @FunctionalInterface
-public interface ScalarQuery<CB extends ConditionBean> {
+public interface SubQuery<SUB_CB extends ConditionBean> {
 
     /**
-     * Set up your query condition for scalar-query. <br />
+     * Set up your query condition for sub-query. <br />
      * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
-     * @param cb The condition-bean for scalar-query. (NotNull)
+     * @param subCB The condition-bean for sub-query. (NotNull)
      */
-    void query(CB cb);
+    void query(SUB_CB subCB);
 }

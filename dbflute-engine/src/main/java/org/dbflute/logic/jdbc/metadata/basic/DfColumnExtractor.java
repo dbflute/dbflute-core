@@ -25,13 +25,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.dbflute.helper.StringSet;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper;
 import org.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.DfMapperResource;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.DfTypeMappingProperties;
-import org.dbflute.helper.StringSet;
 import org.dbflute.util.DfCollectionUtil;
 
 /**

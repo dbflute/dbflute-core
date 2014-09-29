@@ -42,7 +42,8 @@ public class DfLanguageTypeMappingJava implements DfLanguageTypeMapping {
     protected static final List<String> _booleanList = newArrayList("Boolean");
     protected static final List<String> _binaryList = newArrayList("byte[]");
 
-    protected static <ELEMENT> ArrayList<ELEMENT> newArrayList(@SuppressWarnings("unchecked") ELEMENT... elements) {
+    @SafeVarargs
+    protected static <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
         return DfCollectionUtil.newArrayList(elements);
     }
 

@@ -29,11 +29,11 @@ import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDispatchResult;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 
 /**
  * @author jflute

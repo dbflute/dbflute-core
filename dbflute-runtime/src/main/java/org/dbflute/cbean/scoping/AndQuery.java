@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.subcall;
+package org.dbflute.cbean.scoping;
 
 import org.dbflute.cbean.ConditionBean;
 

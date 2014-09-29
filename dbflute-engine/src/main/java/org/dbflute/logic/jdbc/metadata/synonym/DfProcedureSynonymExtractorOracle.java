@@ -29,6 +29,8 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.dbflute.exception.SQLFailureException;
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
@@ -36,8 +38,6 @@ import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeTranslatorOracle;
-import org.dbflute.exception.SQLFailureException;
-import org.dbflute.helper.StringKeyMap;
 
 /**
  * @author jflute

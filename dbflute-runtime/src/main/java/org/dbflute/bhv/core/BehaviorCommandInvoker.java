@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.dbflute.Entity;
 import org.dbflute.XLog;
 import org.dbflute.bhv.core.InvokerAssistant.DisposableProcess;
+import org.dbflute.bhv.core.context.ContextStack;
 import org.dbflute.bhv.core.context.FetchAssistContext;
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.ResourceContext;

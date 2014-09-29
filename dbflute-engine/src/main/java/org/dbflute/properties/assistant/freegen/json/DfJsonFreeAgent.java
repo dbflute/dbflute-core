@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.Srl;
 

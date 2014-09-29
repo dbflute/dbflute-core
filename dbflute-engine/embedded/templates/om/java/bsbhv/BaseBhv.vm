@@ -20,11 +20,14 @@ import java.util.List;
 
 import org.dbflute.*;
 import org.dbflute.bhv.*;
-import org.dbflute.bhv.option.*;
+import org.dbflute.bhv.readable.*;
+#if ($table.isWritable())
+import org.dbflute.bhv.writable.*;
+#end
 import org.dbflute.bhv.referrer.*;
 import org.dbflute.cbean.*;
-import org.dbflute.cbean.callback.*;
 import org.dbflute.cbean.chelper.HpSLSFunction;
+import org.dbflute.cbean.result.*;
 import org.dbflute.exception.*;
 #if ($table.needsBasicOptionalEntityImport())
 import ${database.basicOptionalEntityClassName};

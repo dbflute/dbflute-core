@@ -31,11 +31,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfPropertySettingTableNotFoundException;
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
-import org.dbflute.helper.StringKeyMap;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 

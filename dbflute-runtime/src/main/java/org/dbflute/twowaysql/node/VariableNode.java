@@ -17,7 +17,6 @@ package org.dbflute.twowaysql.node;
 
 import java.util.List;
 
-import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.factory.NodeAdviceFactory;
 import org.dbflute.util.Srl;
@@ -164,17 +163,14 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_optionDef)) {
             final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
             for (String option : optionList) {
-                // #hope remove dependency to like search option by factory
-                if (option.equals(INLOOP_OPTION_LIKE_PREFIX)) {
-                    return new LikeSearchOption().likePrefix();
-                } else if (option.equals(INLOOP_OPTION_LIKE_SUFFIX)) {
-                    return new LikeSearchOption().likeSuffix();
-                } else if (option.equals(INLOOP_OPTION_LIKE_CONTAIN)) {
-                    return new LikeSearchOption().likeContain();
-                }
+                return createLikeSearchOption(option);
             }
         }
         return null;
+    }
+
+    protected FilteringBindOption createLikeSearchOption(String likeDirection) {
+        return _nodeAdviceFactory.createInLoopLikeSearchOption(likeDirection);
     }
 
     protected void assertInLoopOnlyOptionInLoop(LoopInfo loopInfo) {

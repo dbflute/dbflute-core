@@ -22,7 +22,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcElement.CalculationType;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.ColumnConversionOption;
-import org.dbflute.cbean.subcall.SpecifyQuery;
+import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;

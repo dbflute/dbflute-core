@@ -136,7 +136,7 @@ import java.util.Set;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;

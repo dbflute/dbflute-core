@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.bhv.core;
+package org.dbflute.bhv.core.context;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,10 +21,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.dbflute.Entity;
-import org.dbflute.bhv.core.context.ConditionBeanContext;
-import org.dbflute.bhv.core.context.FetchAssistContext;
-import org.dbflute.bhv.core.context.InternalMapContext;
-import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.readable.EntityRowHandler;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.jdbc.FetchBean;

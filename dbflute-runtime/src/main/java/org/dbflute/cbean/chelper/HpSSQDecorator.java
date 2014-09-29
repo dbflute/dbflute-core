@@ -16,7 +16,7 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.subcall.SpecifyQuery;
+import org.dbflute.cbean.scoping.SpecifyQuery;
 
 /**
  * The decorator for ScalarCondition (the old name: ScalarSubQuery).

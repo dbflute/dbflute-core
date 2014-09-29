@@ -17,10 +17,10 @@ package org.dbflute.logic.sql2entity.pmbean;
 
 import java.util.List;
 
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.dbflute.resource.DBFluteSystem;
 import org.dbflute.util.Srl;
 
 /**

@@ -19,11 +19,12 @@ ${database.allClassCopyright}package ${glPackageBaseCQ};
 import java.util.*;
 
 import org.dbflute.cbean.*;
-import org.dbflute.cbean.callback.*;
 import org.dbflute.cbean.chelper.*;
 import org.dbflute.cbean.ckey.*;
 import org.dbflute.cbean.coption.*;
 import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.ordering.*;
+import org.dbflute.cbean.scoping.*;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMetaProvider;
 #if ($database.isAvailableJodaTimeEntity())
@@ -1694,7 +1695,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * <p>This function with Union is unsupported!</p>
      * <p>The order values are bound (treated as bind parameter).</p>
-     * @param mob The bean of manual order containing order values. (NotNull)
+     * @param mobLambda The callback for bean of manual order containing order values. (NotNull)
      */
     public void withManualOrder(MOrderCall mobLambda) { // is user public!
         ManualOrderBean mob = cMOB(); mobLambda.callback(mob);

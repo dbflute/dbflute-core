@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.torque.engine.database.model.Table;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.assistant.DfTableListProvider;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 

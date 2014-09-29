@@ -40,8 +40,8 @@ import org.apache.velocity.context.Context;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfTemplateParsingException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfBasicProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 
 /**
  * The Velocity generator for DBFlute.

@@ -75,11 +75,11 @@
 package org.apache.torque.engine.database.model;
 
 import org.dbflute.DfBuildProperties;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
-import org.dbflute.resource.DBFluteSystem;
 import org.dbflute.util.Srl;
 
 /**

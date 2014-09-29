@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
-import org.dbflute.resource.DBFluteSystem;
 
 /**
  * @author jflute

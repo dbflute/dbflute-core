@@ -51,7 +51,8 @@ public class DfLanguageTypeMappingScala implements DfLanguageTypeMapping {
     //}
     protected static final List<String> _binaryList = newArrayList("Array[Byte]");
 
-    protected static <ELEMENT> ArrayList<ELEMENT> newArrayList(@SuppressWarnings("unchecked") ELEMENT... elements) {
+    @SafeVarargs
+    protected static <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
         return DfCollectionUtil.newArrayList(elements);
     }
 

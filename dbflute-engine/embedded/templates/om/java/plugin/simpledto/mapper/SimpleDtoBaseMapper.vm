@@ -27,10 +27,10 @@ import org.dbflute.Entity;
 #if ($table.hasOptionalRelation() || $table.hasReverseOptionalRelation())
 import ${database.relationOptionalEntityClassName};
 #end
-import org.dbflute.bhv.DtoMapper;
-import org.dbflute.bhv.InstanceKeyDto;
-import org.dbflute.bhv.InstanceKeyEntity;
 import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.InstanceKeyEntity;
+import org.dbflute.dbmeta.dtomap.DtoMapper;
+import org.dbflute.dbmeta.dtomap.InstanceKeyDto;
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;

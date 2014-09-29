@@ -32,7 +32,7 @@ import org.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class ValueAndTypeSetupperTest extends PlainTestCase {
+public class BoundValueTracerTest extends PlainTestCase {
 
     // ===================================================================================
     //                                                                                Bean

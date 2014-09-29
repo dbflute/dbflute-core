@@ -22,10 +22,10 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.dataset.DfDataRow;
 import org.dbflute.helper.dataset.DfDataTable;
 import org.dbflute.helper.dataset.states.DfDtsRowState;
-import org.dbflute.exception.SQLFailureException;
 
 /**
  * @author modified by jflute (originated in Seasar2)

@@ -147,7 +147,7 @@ import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.apache.torque.engine.database.model.Unique;
 import org.dbflute.DfBuildProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

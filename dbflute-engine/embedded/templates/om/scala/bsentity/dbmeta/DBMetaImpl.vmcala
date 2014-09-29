@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap
 
-import org.dbflute.DBDef;
 import org.dbflute.Entity;
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
@@ -37,6 +36,7 @@ import org.dbflute.dbmeta.DBMeta.OptimisticLockType
 import org.dbflute.dbmeta.PropertyGateway;
 import org.dbflute.dbmeta.info._;
 import org.dbflute.dbmeta.name._;
+import org.dbflute.dbway.DBDef;
 import org.dbflute.jdbc.Classification;
 import ${glPackageBaseCommon}._;
 import ${myExtendedEntityPackageName}._;

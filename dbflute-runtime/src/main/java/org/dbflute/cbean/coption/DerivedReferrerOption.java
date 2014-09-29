@@ -18,7 +18,7 @@ package org.dbflute.cbean.coption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
-import org.dbflute.cbean.subcall.SpecifyQuery;
+import org.dbflute.cbean.scoping.SpecifyQuery;
 
 /**
  * The option for DerivedReferrer. <br />

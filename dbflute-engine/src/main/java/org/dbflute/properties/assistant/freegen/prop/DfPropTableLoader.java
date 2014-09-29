@@ -26,18 +26,18 @@ import java.util.Map.Entry;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.dbflute.properties.DfDocumentProperties;
-import org.dbflute.properties.assistant.freegen.DfFreeGenRequest;
-import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
-import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
-import org.dbflute.util.DfNameHintUtil;
-import org.dbflute.util.DfPropertyUtil;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.jprop.JavaPropertiesProperty;
 import org.dbflute.helper.jprop.JavaPropertiesReader;
 import org.dbflute.helper.jprop.JavaPropertiesResult;
 import org.dbflute.helper.jprop.JavaPropertiesStreamProvider;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.assistant.freegen.DfFreeGenRequest;
+import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
+import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfNameHintUtil;
+import org.dbflute.util.DfPropertyUtil;
 import org.dbflute.util.Srl;
 
 /**

@@ -17,6 +17,7 @@ package org.dbflute.twowaysql.node;
 
 import java.util.List;
 
+import org.dbflute.bhv.core.melodicsql.MelodicNodeAdviceFactory;
 import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.context.CommandContext;
@@ -25,6 +26,7 @@ import org.dbflute.twowaysql.exception.BindVariableCommentIllegalParameterBeanSp
 import org.dbflute.twowaysql.exception.EndCommentNotFoundException;
 import org.dbflute.twowaysql.exception.ForCommentParameterNullElementException;
 import org.dbflute.twowaysql.exception.LoopCurrentVariableOutOfForCommentException;
+import org.dbflute.twowaysql.factory.NodeAdviceFactory;
 import org.dbflute.twowaysql.pmbean.ParameterBean;
 import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfCollectionUtil;
@@ -1105,7 +1107,14 @@ public class ForNodeTest extends PlainTestCase {
         sb.append("     /*LAST*/)/*END*//*END*/").append(ln());
         sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
         sb.append(" /*END*/");
-        SqlAnalyzer analyzer = new SqlAnalyzer(sb.toString(), false);
+        String sql = sb.toString();
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false) {
+            @Override
+            protected NodeAdviceFactory getNodeAdviceFactory() {
+                return new MelodicNodeAdviceFactory();
+            }
+        };
+
         Node rootNode = analyzer.analyze();
         CommandContext ctx = createCtx(pmb);
 

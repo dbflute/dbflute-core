@@ -19,11 +19,11 @@ import java.io.File;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dbflute.infra.dfprop.DfPropPublicMap;
 import org.dbflute.properties.DfInfraProperties;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTask;
-import org.dbflute.infra.dfprop.DfPropPublicMap;
 
 /**
  * @author jflute

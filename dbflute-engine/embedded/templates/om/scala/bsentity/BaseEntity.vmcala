@@ -40,7 +40,7 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.MappingValueType;
 #end
 #if ($table.isEntityDerivedMappable())
-import org.dbflute.dbmeta.DerivedMappable;
+import org.dbflute.dbmeta.derived.DerivedMappable;
 #end
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};

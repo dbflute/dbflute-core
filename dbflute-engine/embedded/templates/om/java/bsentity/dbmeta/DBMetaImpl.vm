@@ -19,7 +19,6 @@ ${database.allClassCopyright}package ${myDBMetaPackageName};
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.DBDef;
 import org.dbflute.Entity;
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
@@ -28,6 +27,7 @@ import org.dbflute.dbmeta.AbstractDBMeta;
 import org.dbflute.dbmeta.PropertyGateway;
 import org.dbflute.dbmeta.info.*;
 import org.dbflute.dbmeta.name.*;
+import org.dbflute.dbway.DBDef;
 import ${glPackageBaseCommon}.*;
 import ${myExtendedEntityPackageName}.*;
 

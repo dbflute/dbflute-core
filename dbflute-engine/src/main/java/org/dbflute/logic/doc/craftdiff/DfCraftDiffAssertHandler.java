@@ -28,14 +28,14 @@ import java.util.Set;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfCraftDiffIllegalCraftKeyNameException;
-import org.dbflute.properties.DfDocumentProperties;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.token.file.FileMakingCallback;
 import org.dbflute.helper.token.file.FileMakingOption;
 import org.dbflute.helper.token.file.FileMakingRowWriter;
 import org.dbflute.helper.token.file.FileToken;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.DfCollectionUtil;
 
 /**

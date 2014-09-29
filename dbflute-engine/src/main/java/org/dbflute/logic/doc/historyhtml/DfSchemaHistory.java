@@ -26,11 +26,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.dbflute.DfBuildProperties;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.infra.diffmap.DfDiffMapFile;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.facade.DfSchemaXmlFacadeProp;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.dbflute.infra.diffmap.DfDiffMapFile;
 import org.dbflute.util.DfCollectionUtil;
 
 /**

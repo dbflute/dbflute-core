@@ -13,31 +13,34 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.subcall;
+package org.dbflute.cbean.scoping;
 
 import org.dbflute.cbean.ConditionBean;
 
 /**
- * The interface of or-query.
+ * The interface of specify-query.
  * <pre>
- * cb.<span style="color: #DD4747">orScopeQuery</span>(new OrQuery&lt;FooCB&gt;() {
- *     public void query(FooCB orCB) {
- *         orCB.query().setFoo...
- *         orCB.query().setBar...
+ * cb.columnQuery(new SpecifyQuery&lt;LandCB&gt;() {
+ *     public void query(LandCB spCB) {
+ *         spCB.specify().columnLand...();
  *     }
- * }
+ * }).lessThan(new SpecifyQuery&lt;SeaCB&gt;() {
+ *     public void query(SeaCB spCB) {
+ *         spCB.specify().columnSea...();
+ *     }
+ * });
  * </pre>
  * @author jflute
- * @param <OR_CB> The type of condition-bean for or-query.
+ * @param <CB> The type of condition-bean for specification.
  */
 @FunctionalInterface
-public interface OrQuery<OR_CB extends ConditionBean> {
+public interface SpecifyQuery<CB extends ConditionBean> {
 
     /**
-     * Set up your query condition for or-query. <br />
-     * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
+     * Specify your column for query. <br />
+     * Don't call the method 'setupSelect_Xxx()' and 'query()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
-     * @param orCB The condition-bean for or-query. (NotNull)
+     * @param spCB The condition-bean for specification. (NotNull)
      */
-    void query(OR_CB orCB);
+    void specify(CB spCB);
 }

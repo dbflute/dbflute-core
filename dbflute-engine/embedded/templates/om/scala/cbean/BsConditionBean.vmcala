@@ -27,6 +27,7 @@ import org.dbflute.cbean.SubQuery;
 import org.dbflute.cbean.UnionQuery;
 import org.dbflute.cbean.chelper._
 import org.dbflute.cbean.coption._
+import org.dbflute.cbean.scoping._;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.dbflute.dbmeta.DBMetaProvider;

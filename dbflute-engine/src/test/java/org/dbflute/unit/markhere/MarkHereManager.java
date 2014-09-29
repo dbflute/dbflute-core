@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 
 import junit.framework.AssertionFailedError;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 
 /**
  * @author jflute
