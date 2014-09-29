@@ -19,7 +19,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 

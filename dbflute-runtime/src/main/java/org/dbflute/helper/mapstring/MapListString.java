@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.dbflute.exception.MapListStringDuplicateEntryException;
 import org.dbflute.exception.MapListStringParseFailureException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 
 /**
  * The string for map and list.

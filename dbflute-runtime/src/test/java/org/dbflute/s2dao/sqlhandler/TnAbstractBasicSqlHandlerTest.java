@@ -18,14 +18,14 @@ package org.dbflute.s2dao.sqlhandler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dbflute.bhv.CallbackContext;
-import org.dbflute.jdbc.SqlLogHandler;
-import org.dbflute.jdbc.SqlLogInfo;
-import org.dbflute.jdbc.SqlResultHandler;
-import org.dbflute.jdbc.SqlResultInfo;
+import org.dbflute.bhv.core.context.InternalMapContext;
+import org.dbflute.bhv.core.context.ResourceContext;
+import org.dbflute.hook.CallbackContext;
+import org.dbflute.hook.SqlLogHandler;
+import org.dbflute.hook.SqlLogInfo;
+import org.dbflute.hook.SqlResultHandler;
+import org.dbflute.hook.SqlResultInfo;
 import org.dbflute.mock.MockBehaviorCommand;
-import org.dbflute.resource.InternalMapContext;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.unit.PlainTestCase;
 
 /**

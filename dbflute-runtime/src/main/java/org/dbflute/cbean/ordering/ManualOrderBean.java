@@ -34,7 +34,7 @@ import org.dbflute.cbean.coption.FromToOption;
 import org.dbflute.cbean.subcall.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationCodeType;
 import org.dbflute.util.DfTypeUtil;

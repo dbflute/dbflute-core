@@ -23,7 +23,8 @@ import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbway.ExtensionOperand;
-import org.dbflute.dbway.StringConnector;
+import org.dbflute.dbway.OnQueryStringConnector;
+import org.dbflute.twowaysql.node.FilteringBindOption;
 import org.dbflute.util.DfTypeUtil;
 
 /**
@@ -36,7 +37,7 @@ import org.dbflute.util.DfTypeUtil;
  * </pre>
  * @author jflute
  */
-public class LikeSearchOption extends SimpleStringOption {
+public class LikeSearchOption extends SimpleStringOption implements FilteringBindOption {
 
     // ===================================================================================
     //                                                                          Definition
@@ -54,7 +55,7 @@ public class LikeSearchOption extends SimpleStringOption {
     protected List<String> _originalWildCardList;
     protected List<HpSpecifiedColumn> _compoundColumnList;
     protected List<Integer> _compoundColumnSizeList;
-    protected StringConnector _stringConnector;
+    protected OnQueryStringConnector _stringConnector;
     protected GearedCipherManager _cipherManager;;
 
     // ===================================================================================
@@ -415,7 +416,7 @@ public class LikeSearchOption extends SimpleStringOption {
     // for DBMS that has original string connection way
     //  e.g. MySQL, SQLServer
 
-    public LikeSearchOption acceptStringConnector(StringConnector stringConnector) {
+    public LikeSearchOption acceptStringConnector(OnQueryStringConnector stringConnector) {
         _stringConnector = stringConnector;
         return this;
     }
@@ -424,7 +425,7 @@ public class LikeSearchOption extends SimpleStringOption {
         return _stringConnector != null;
     }
 
-    public StringConnector getStringConnector() {
+    public OnQueryStringConnector getStringConnector() {
         return _stringConnector;
     }
 

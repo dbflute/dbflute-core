@@ -17,11 +17,11 @@ package org.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
-import org.dbflute.bhv.CallbackContext;
 import org.dbflute.bhv.core.BehaviorCommandMeta;
-import org.dbflute.bhv.core.SqlStringFilter;
+import org.dbflute.bhv.core.context.ResourceContext;
+import org.dbflute.hook.CallbackContext;
+import org.dbflute.hook.SqlStringFilter;
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
 import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.context.CommandContext;

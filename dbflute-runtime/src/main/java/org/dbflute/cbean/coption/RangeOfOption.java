@@ -27,7 +27,7 @@ import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.cbean.subcall.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbway.ExtensionOperand;
-import org.dbflute.dbway.StringConnector;
+import org.dbflute.dbway.OnQueryStringConnector;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
@@ -282,7 +282,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
         return false;
     }
 
-    public StringConnector getStringConnector() {
+    public OnQueryStringConnector getStringConnector() {
         return null;
     }
 

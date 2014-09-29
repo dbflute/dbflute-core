@@ -33,9 +33,9 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfStringUtil;
 

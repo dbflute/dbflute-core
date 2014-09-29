@@ -27,7 +27,7 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;

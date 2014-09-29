@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.token.file.exception.FileMakingInvalidValueCountException;
 import org.dbflute.helper.token.file.exception.FileMakingRequiredOptionNotFoundException;
 import org.dbflute.helper.token.file.exception.FileMakingSQLHandlingFailureException;

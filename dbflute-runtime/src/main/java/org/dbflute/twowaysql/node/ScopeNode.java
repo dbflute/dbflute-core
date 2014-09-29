@@ -15,7 +15,7 @@
  */
 package org.dbflute.twowaysql.node;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.exception.ForCommentParameterNullElementException;
 

@@ -17,7 +17,7 @@ package org.dbflute.s2dao.identity;
 
 import javax.sql.DataSource;
 
-import org.dbflute.resource.ResourceContext;
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**

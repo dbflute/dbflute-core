@@ -22,13 +22,13 @@ import org.dbflute.cbean.chelper.HpColumnSpHandler;
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.derived.DerivedTypeHandler;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.subcall.AndQuery;
 import org.dbflute.cbean.subcall.OrQuery;
 import org.dbflute.cbean.subcall.UnionQuery;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.DerivedTypeHandler;
 import org.dbflute.exception.ConditionInvokingFailureException;
 import org.dbflute.jdbc.StatementConfig;
 

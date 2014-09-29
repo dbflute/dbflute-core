@@ -24,10 +24,10 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dbflute.bhv.core.FetchAssistContext;
+import org.dbflute.bhv.core.context.FetchAssistContext;
+import org.dbflute.bhv.exception.SQLExceptionResource;
 import org.dbflute.cbean.paging.FetchNarrowingBean;
 import org.dbflute.exception.FetchingOverSafetySizeException;
-import org.dbflute.exception.handler.SQLExceptionResource;
 import org.dbflute.jdbc.FetchBean;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;

@@ -22,11 +22,11 @@ import javax.sql.DataSource;
 
 import org.dbflute.bhv.core.BehaviorCommand;
 import org.dbflute.bhv.core.BehaviorCommandComponentSetup;
+import org.dbflute.bhv.core.context.InternalMapContext;
+import org.dbflute.bhv.core.context.InternalMapContext.InvokePathProvider;
 import org.dbflute.bhv.core.execution.OutsideSqlExecuteExecution;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.jdbc.ValueType;
-import org.dbflute.resource.InternalMapContext;
-import org.dbflute.resource.InternalMapContext.InvokePathProvider;
 import org.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.dbflute.s2dao.extension.TnRelationRowOptionalHandler;
 import org.dbflute.s2dao.extension.TnRowCreatorExtension;

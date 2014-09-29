@@ -23,9 +23,9 @@ import org.dbflute.cbean.result.ResultBeanBuilder;
 import org.dbflute.exception.DangerousResultSizeException;
 import org.dbflute.exception.PagingOverSafetySizeException;
 import org.dbflute.exception.PagingStatusInvalidException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.dbflute.resource.DBFluteSystem;
-import org.dbflute.resource.ManualThreadDataSourceHandler;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.jdbc.ManualThreadDataSourceHandler;
 
 /**
  * The invoker of paging.

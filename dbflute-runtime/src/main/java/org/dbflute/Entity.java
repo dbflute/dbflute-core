@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.exception.SpecifyDerivedReferrerUnknownAliasNameException;
 import org.dbflute.exception.UndefinedClassificationCodeException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;

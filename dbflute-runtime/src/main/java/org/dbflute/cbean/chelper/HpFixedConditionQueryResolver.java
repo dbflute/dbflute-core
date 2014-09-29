@@ -35,8 +35,8 @@ import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.name.TableSqlName;
 import org.dbflute.exception.DBMetaNotFoundException;
 import org.dbflute.exception.FixedConditionIllegalOverRelationException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.IndexOfInfo;
 

@@ -26,7 +26,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.dbflute.exception.ParseDateExpressionFailureException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.secretary.BusinessDayDeterminer;
 import org.dbflute.helper.secretary.DateCompareCallback;
 import org.dbflute.util.DfTypeUtil;

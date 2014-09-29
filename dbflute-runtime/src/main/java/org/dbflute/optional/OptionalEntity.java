@@ -17,7 +17,7 @@ package org.dbflute.optional;
 
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.NonSetupSelectRelationAccessException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 
 /**
  * The entity as optional object, which has entity instance in it. <br />
@@ -212,6 +212,8 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
         callbackIfPresent(consumer);
     }
 
+    // TODO jflute fix optional javadoc
+    // TODO jflute make orElseThrow()
     /**
      * Is the entity instance present? (existing?)
      * <pre>

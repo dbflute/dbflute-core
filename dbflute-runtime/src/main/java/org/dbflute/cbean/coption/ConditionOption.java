@@ -21,7 +21,7 @@ import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbway.ExtensionOperand;
-import org.dbflute.dbway.StringConnector;
+import org.dbflute.dbway.OnQueryStringConnector;
 
 /**
  * The interface of condition-option.
@@ -57,7 +57,7 @@ public interface ConditionOption {
      * Get the string connector basically for compound columns?
      * @return The object of string connector. (NullAllowed)
      */
-    StringConnector getStringConnector();
+    OnQueryStringConnector getStringConnector();
 
     /**
      * Get the extension operand.

@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.PluginValueTypeNotFoundException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 

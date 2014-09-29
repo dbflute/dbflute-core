@@ -29,7 +29,7 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 
 /**

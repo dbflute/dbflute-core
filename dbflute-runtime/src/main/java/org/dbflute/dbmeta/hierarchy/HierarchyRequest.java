@@ -24,7 +24,7 @@ import org.dbflute.dbmeta.hierarchy.basic.HierarchySourceEntityColumn;
 import org.dbflute.dbmeta.hierarchy.basic.HierarchySourceEntityListIterator;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.jdbc.DBFluteSystem;
 
 /**
  * The request of hierarchy.

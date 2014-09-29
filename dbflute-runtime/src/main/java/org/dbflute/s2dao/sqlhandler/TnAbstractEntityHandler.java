@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.dbflute.Entity;
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.writable.DeleteOption;
 import org.dbflute.bhv.writable.InsertOption;
 import org.dbflute.bhv.writable.UpdateOption;
@@ -33,7 +34,6 @@ import org.dbflute.exception.EntityAlreadyUpdatedException;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.jdbc.ValueType;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.identity.TnIdentityGenerationHandler;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;

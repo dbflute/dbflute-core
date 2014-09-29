@@ -24,7 +24,7 @@ import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbway.ExtensionOperand;
-import org.dbflute.dbway.StringConnector;
+import org.dbflute.dbway.OnQueryStringConnector;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 
@@ -1296,7 +1296,7 @@ public class FromToOption implements ConditionOption {
         return false;
     }
 
-    public StringConnector getStringConnector() {
+    public OnQueryStringConnector getStringConnector() {
         return null;
     }
 

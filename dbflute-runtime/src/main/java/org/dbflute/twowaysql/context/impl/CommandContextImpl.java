@@ -30,19 +30,19 @@ public class CommandContextImpl implements CommandContext {
     //                                                                           Attribute
     //                                                                           =========
     /** The arguments. it should be allowed null value. */
-    private final StringKeyMap<Object> _args = StringKeyMap.createAsCaseInsensitive();
+    protected final StringKeyMap<Object> _args = StringKeyMap.createAsCaseInsensitive();
 
     /** The types of argument. it should be allowed null value. */
-    private final StringKeyMap<Class<?>> _argTypes = StringKeyMap.createAsCaseInsensitive();
+    protected final StringKeyMap<Class<?>> _argTypes = StringKeyMap.createAsCaseInsensitive();
 
-    private final StringBuilder _sqlSb = new StringBuilder(100);
-    private final List<Object> _bindVariables = DfCollectionUtil.newArrayList();
-    private final List<Class<?>> _bindVariableTypes = DfCollectionUtil.newArrayList();
-    private final CommandContext _parent;
+    protected final StringBuilder _sqlSb = new StringBuilder(100);
+    protected final List<Object> _bindVariables = DfCollectionUtil.newArrayList();
+    protected final List<Class<?>> _bindVariableTypes = DfCollectionUtil.newArrayList();
+    protected final CommandContext _parent;
 
-    private boolean _enabled;
-    private boolean _beginChild;
-    private boolean _alreadySkippedConnector;
+    protected boolean _enabled;
+    protected boolean _beginChild;
+    protected boolean _alreadySkippedConnector;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -50,7 +50,7 @@ public class CommandContextImpl implements CommandContext {
     /**
      * Constructor for root context.
      */
-    private CommandContextImpl() {
+    protected CommandContextImpl() {
         _parent = null;
         _enabled = true; // immutable since here
     }
@@ -59,7 +59,7 @@ public class CommandContextImpl implements CommandContext {
      * Constructor for child context.
      * @param parent The parent context. (NotNull)
      */
-    private CommandContextImpl(CommandContext parent) {
+    protected CommandContextImpl(CommandContext parent) {
         _parent = parent;
         _enabled = false; // changing depends on child elements
     }
@@ -84,7 +84,7 @@ public class CommandContextImpl implements CommandContext {
         return new CommandContextImpl(parent).asBeginChild();
     }
 
-    private CommandContextImpl asBeginChild() {
+    protected CommandContextImpl asBeginChild() {
         _beginChild = true;
         return this;
     }
@@ -152,8 +152,8 @@ public class CommandContextImpl implements CommandContext {
     public CommandContext addSql(String sql, Object[] bindVariables, Class<?>[] bindVariableTypes) {
         _sqlSb.append(sql);
         for (int i = 0; i < bindVariables.length; ++i) {
-            this._bindVariables.add(bindVariables[i]);
-            this._bindVariableTypes.add(bindVariableTypes[i]);
+            _bindVariables.add(bindVariables[i]);
+            _bindVariableTypes.add(bindVariableTypes[i]);
         }
         return this;
     }
@@ -182,7 +182,7 @@ public class CommandContextImpl implements CommandContext {
     }
 
     public void setEnabled(boolean enabled) {
-        this._enabled = enabled;
+        _enabled = enabled;
     }
 
     public boolean isBeginChild() {
@@ -194,6 +194,6 @@ public class CommandContextImpl implements CommandContext {
     }
 
     public void setAlreadySkippedConnector(boolean alreadySkippedConnector) {
-        this._alreadySkippedConnector = alreadySkippedConnector;
+        _alreadySkippedConnector = alreadySkippedConnector;
     }
 }

@@ -19,13 +19,14 @@ import javax.sql.DataSource;
 
 import org.dbflute.DBDef;
 import org.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.bhv.core.melodicsql.MelodicSqlAnalyzerFactory;
 import org.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
+import org.dbflute.bhv.exception.DefaultSQLExceptionHandlerFactory;
+import org.dbflute.bhv.exception.SQLExceptionHandlerFactory;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.dbflute.dbmeta.DBMetaProvider;
-import org.dbflute.exception.factory.SQLExceptionHandlerFactory;
-import org.dbflute.exception.factory.DefaultSQLExceptionHandlerFactory;
 import org.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.dbflute.jdbc.DataSourceHandler;
 import org.dbflute.jdbc.HandlingDataSourceWrapper;
@@ -42,7 +43,6 @@ import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
 import org.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
-import org.dbflute.twowaysql.factory.DefaultSqlAnalyzerFactory;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 #if ($database.isTargetContainerSeasar())
 
@@ -265,11 +265,11 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     }
 
     protected SqlAnalyzerFactory createSqlAnalyzerFactory() {
-        return newDefaultSqlAnalyzerFactory();
+        return newMelodicSqlAnalyzerFactory();
     }
 
-    protected DefaultSqlAnalyzerFactory newDefaultSqlAnalyzerFactory() {
-        return new DefaultSqlAnalyzerFactory();
+    protected MelodicSqlAnalyzerFactory newMelodicSqlAnalyzerFactory() {
+        return new MelodicSqlAnalyzerFactory();
     }
 
     // -----------------------------------------------------

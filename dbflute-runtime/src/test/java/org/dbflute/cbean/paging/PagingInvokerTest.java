@@ -23,7 +23,7 @@ import org.dbflute.cbean.paging.PagingHandler;
 import org.dbflute.cbean.paging.PagingInvoker;
 import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.mock.MockColumnInfo;
-import org.dbflute.twowaysql.pmbean.SimplePagingBean;
+import org.dbflute.outsidesql.paging.SimplePagingBean;
 import org.dbflute.unit.PlainTestCase;
 
 /**

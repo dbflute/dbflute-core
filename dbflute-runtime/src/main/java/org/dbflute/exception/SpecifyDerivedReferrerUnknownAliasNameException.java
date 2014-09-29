@@ -18,7 +18,7 @@ package org.dbflute.exception;
 /**
  * The exception of when the unknown alias name of specify-derived-referrer is specified.
  * @author jflute
- * @since 1.0.6A (2014/06/20 Friday)
+ * @since 1.0.5J (2014/06/20 Friday)
  */
 public class SpecifyDerivedReferrerUnknownAliasNameException extends RuntimeException {
 

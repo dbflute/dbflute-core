@@ -19,8 +19,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.helper.StringKeyMap;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.dbflute.s2dao.metadata.TnPropertyType;

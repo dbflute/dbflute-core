@@ -33,7 +33,7 @@ public class SqlPartsNode extends AbstractNode {
     //                                                                         Constructor
     //                                                                         ===========
     private SqlPartsNode(String sqlParts) {
-        this._sqlParts = sqlParts;
+        _sqlParts = sqlParts;
     }
 
     // -----------------------------------------------------

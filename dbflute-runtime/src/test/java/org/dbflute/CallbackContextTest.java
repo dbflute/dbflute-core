@@ -15,10 +15,10 @@
  */
 package org.dbflute;
 
-import org.dbflute.bhv.CallbackContext;
-import org.dbflute.bhv.CallbackContext.CallbackContextHolder;
-import org.dbflute.jdbc.SqlLogHandler;
-import org.dbflute.jdbc.SqlLogInfo;
+import org.dbflute.hook.CallbackContext;
+import org.dbflute.hook.SqlLogHandler;
+import org.dbflute.hook.SqlLogInfo;
+import org.dbflute.hook.CallbackContext.CallbackContextHolder;
 import org.dbflute.unit.PlainTestCase;
 
 /**

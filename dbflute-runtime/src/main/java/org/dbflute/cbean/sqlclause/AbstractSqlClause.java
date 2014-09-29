@@ -74,9 +74,9 @@ import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.dbmeta.name.TableSqlName;
 import org.dbflute.dbway.DBWay;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.StringKeyMap;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.util.DfAssertUtil;
 import org.dbflute.util.Srl;
 

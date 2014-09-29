@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.dbflute.resource.DBFluteSystem;
-
 /**
  * @author jflute
  * @since 0.9.7.1 (2010/06/06 Sunday)
@@ -350,7 +348,7 @@ public class MapListFile {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return "\n";
     }
 
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {

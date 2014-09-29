@@ -18,15 +18,15 @@ package org.dbflute;
 import java.sql.Timestamp;
 import java.util.Date;
 
-import org.dbflute.bhv.AccessContext;
-import org.dbflute.bhv.AccessContext.AccessContextHolder;
-import org.dbflute.bhv.AccessContext.AccessDateProvider;
-import org.dbflute.bhv.AccessContext.AccessModuleProvider;
-import org.dbflute.bhv.AccessContext.AccessProcessProvider;
-import org.dbflute.bhv.AccessContext.AccessTimestampProvider;
-import org.dbflute.bhv.AccessContext.AccessUserProvider;
 import org.dbflute.exception.AccessContextNoValueException;
 import org.dbflute.exception.AccessContextNotFoundException;
+import org.dbflute.hook.AccessContext;
+import org.dbflute.hook.AccessContext.AccessContextHolder;
+import org.dbflute.hook.AccessContext.AccessDateProvider;
+import org.dbflute.hook.AccessContext.AccessModuleProvider;
+import org.dbflute.hook.AccessContext.AccessProcessProvider;
+import org.dbflute.hook.AccessContext.AccessTimestampProvider;
+import org.dbflute.hook.AccessContext.AccessUserProvider;
 import org.dbflute.unit.PlainTestCase;
 
 /**

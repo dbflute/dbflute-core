@@ -23,7 +23,7 @@ import java.sql.Types;
 import java.util.Collection;
 import java.util.List;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.DfTypeUtil;
 
 /**

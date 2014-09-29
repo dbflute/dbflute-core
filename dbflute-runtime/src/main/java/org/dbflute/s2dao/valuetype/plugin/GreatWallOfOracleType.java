@@ -25,7 +25,7 @@ import java.util.List;
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.PhysicalConnectionDigger;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.util.DfCollectionUtil;

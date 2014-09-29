@@ -28,7 +28,7 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.UniqueInfo;
 import org.dbflute.exception.BatchInsertColumnModifiedPropertiesFragmentedException;
 import org.dbflute.exception.SpecifyUpdateColumnInvalidException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;

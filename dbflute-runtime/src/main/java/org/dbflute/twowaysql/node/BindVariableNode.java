@@ -19,7 +19,7 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 
 import org.dbflute.twowaysql.context.CommandContext;
-import org.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
+import org.dbflute.twowaysql.factory.NodeAdviceFactory;
 
 /**
  * @author modified by jflute (originated in S2Dao)
@@ -29,32 +29,33 @@ public class BindVariableNode extends VariableNode {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public BindVariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
-        super(expression, testValue, specifiedSql, blockNullParameter);
+    public BindVariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter,
+            NodeAdviceFactory nodeAdviceFactory) {
+        super(expression, testValue, specifiedSql, blockNullParameter, nodeAdviceFactory);
     }
 
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
     @Override
-    protected void doProcess(CommandContext ctx, ValueAndType valueAndType, LoopInfo loopInfo) {
-        final Object finalValue = valueAndType.getTargetValue();
-        final Class<?> finalType = valueAndType.getTargetType();
+    protected void doProcess(CommandContext ctx, BoundValue boundValue, LoopInfo loopInfo) {
+        final Object finalValue = boundValue.getTargetValue();
+        final Class<?> finalType = boundValue.getTargetType();
         if (isInScope()) {
             if (finalValue == null) { // in-scope does not allow null value
-                throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
+                throwBindOrEmbeddedCommentParameterNullValueException(boundValue);
             }
             if (Collection.class.isAssignableFrom(finalType)) {
                 bindArray(ctx, ((Collection<?>) finalValue).toArray());
             } else if (finalType.isArray()) {
                 bindArray(ctx, finalValue);
             } else {
-                throwBindOrEmbeddedCommentInScopeNotListException(valueAndType);
+                throwBindOrEmbeddedCommentInScopeNotListException(boundValue);
             }
         } else {
             ctx.addSql("?", finalValue, finalType); // if null, bind as null
             if (isAcceptableLikeSearch(loopInfo)) {
-                setupRearOption(ctx, valueAndType);
+                setupRearOption(ctx, boundValue);
             }
         }
     }
@@ -97,7 +98,7 @@ public class BindVariableNode extends VariableNode {
     //                                                                      Implementation
     //                                                                      ==============
     @Override
-    protected CommentType getCommentType() {
-        return CommentType.BIND;
+    protected ParameterCommentType getCommentType() {
+        return ParameterCommentType.BIND;
     }
 }

@@ -17,8 +17,8 @@ package org.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.sqlhandler.TnBasicParameterHandler;
 import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.context.CommandContext;

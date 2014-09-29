@@ -20,14 +20,14 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.dbflute.bhv.CallbackContext;
 import org.dbflute.bhv.core.BehaviorCommandMeta;
-import org.dbflute.bhv.core.SqlStringFilter;
+import org.dbflute.bhv.core.context.ResourceContext;
+import org.dbflute.hook.CallbackContext;
+import org.dbflute.hook.SqlStringFilter;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.outsidesql.OutsideSqlFilter;
 import org.dbflute.outsidesql.ProcedurePmb;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.dbflute.s2dao.metadata.TnProcedureMetaData;
 import org.dbflute.s2dao.metadata.TnProcedureParameterType;

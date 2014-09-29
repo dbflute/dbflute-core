@@ -22,13 +22,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
 import org.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.twowaysql.exception.IfCommentDifferentTypeComparisonException;
 import org.dbflute.twowaysql.exception.IfCommentEmptyExpressionException;
 import org.dbflute.twowaysql.exception.IfCommentIllegalParameterBeanSpecificationException;
@@ -407,17 +407,17 @@ public class IfCommentEvaluator {
         if (isLoopCurrentVariable(firstName)) {
             return;
         }
-        if (NodeUtil.isCurrentVariableOutOfScope(firstName, isInLoop())) {
+        if (NodeChecker.isCurrentVariableOutOfScope(firstName, isInLoop())) {
             throwLoopCurrentVariableOutOfForCommentException();
         }
         final Object firstArg = _finder.find(firstName); // get from plain context
-        if (NodeUtil.isWrongParameterBeanName(firstName, firstArg)) {
+        if (NodeChecker.isWrongParameterBeanName(firstName, firstArg)) {
             throwIfCommentIllegalParameterBeanSpecificationException();
         }
     }
 
     protected void throwLoopCurrentVariableOutOfForCommentException() {
-        NodeUtil.throwLoopCurrentVariableOutOfForCommentException(_expression, _specifiedSql);
+        NodeChecker.throwLoopCurrentVariableOutOfForCommentException(_expression, _specifiedSql);
     }
 
     protected Object processOneProperty(Object baseObject, String firstProperty, String property) {

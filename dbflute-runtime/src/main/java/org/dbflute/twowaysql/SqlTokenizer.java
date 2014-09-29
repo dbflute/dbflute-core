@@ -16,8 +16,7 @@
 package org.dbflute.twowaysql;
 
 import org.dbflute.exception.CommentTerminatorNotFoundException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 
 /**
  * @author modified by jflute (originated in S2Dao)
@@ -340,13 +339,6 @@ public class SqlTokenizer {
             }
         }
         return index;
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String ln() {
-        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

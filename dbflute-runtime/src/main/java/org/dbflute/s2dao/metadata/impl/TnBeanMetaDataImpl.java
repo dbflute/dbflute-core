@@ -23,12 +23,12 @@ import java.util.Set;
 
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.name.ColumnSqlName;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.exception.DfBeanPropertyNotFoundException;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;

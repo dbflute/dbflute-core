@@ -22,16 +22,16 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.dbflute.Entity;
+import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.writable.InsertOption;
 import org.dbflute.bhv.writable.UpdateOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.resource.DBFluteSystem;
-import org.dbflute.resource.InternalMapContext;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
 import org.dbflute.s2dao.sqlhandler.TnCommandContextHandler;

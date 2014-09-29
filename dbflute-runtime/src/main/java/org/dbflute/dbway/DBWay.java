@@ -62,9 +62,9 @@ public interface DBWay {
     // ===================================================================================
     //                                                                    String Connector
     //                                                                    ================
-    StringConnector getStringConnector();
+    OnQueryStringConnector getStringConnector();
 
-    static final StringConnector STANDARD_STRING_CONNECTOR = new StringConnector() {
+    static final OnQueryStringConnector STANDARD_STRING_CONNECTOR = new OnQueryStringConnector() {
         public String connect(Object... elements) {
             final StringBuilder sb = new StringBuilder();
             int index = 0;
@@ -79,7 +79,7 @@ public interface DBWay {
         }
     };
 
-    static final StringConnector PLUS_STRING_CONNECTOR = new StringConnector() {
+    static final OnQueryStringConnector PLUS_STRING_CONNECTOR = new OnQueryStringConnector() {
         public String connect(Object... elements) {
             final StringBuilder sb = new StringBuilder();
             int index = 0;

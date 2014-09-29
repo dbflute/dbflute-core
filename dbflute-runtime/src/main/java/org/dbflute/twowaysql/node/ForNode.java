@@ -19,11 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.exception.ForCommentIllegalParameterBeanSpecificationException;
 import org.dbflute.twowaysql.exception.ForCommentParameterNotListException;
-import org.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
+import org.dbflute.twowaysql.factory.NodeAdviceFactory;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
@@ -47,14 +47,16 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
     protected final String _expression;
     protected final List<String> _nameList;
     protected final String _specifiedSql;
+    protected final NodeAdviceFactory _nodeAdviceFactory;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ForNode(String expression, String specifiedSql) {
-        this._expression = expression;
-        this._nameList = Srl.splitList(expression, ".");
-        this._specifiedSql = specifiedSql;
+    public ForNode(String expression, String specifiedSql, NodeAdviceFactory nodeAdviceFactory) {
+        _expression = expression;
+        _nameList = Srl.splitList(expression, ".");
+        _specifiedSql = specifiedSql;
+        _nodeAdviceFactory = nodeAdviceFactory;
     }
 
     // ===================================================================================
@@ -88,14 +90,14 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
         if (firstValue == null) {
             return; // if base object is null, do nothing at FOR comment
         }
-        final ValueAndType valueAndType = new ValueAndType();
-        valueAndType.setFirstValue(firstValue);
-        valueAndType.setFirstType(firstType);
-        setupValueAndType(valueAndType);
+        final BoundValue boundValue = new BoundValue();
+        boundValue.setFirstValue(firstValue);
+        boundValue.setFirstType(firstType);
+        setupBoundValue(boundValue);
         if (inheritLoop) {
-            valueAndType.inheritLikeSearchOptionIfNeeds(parentLoop);
+            boundValue.inheritLikeSearchOptionIfNeeds(parentLoop);
         }
-        final Object targetValue = valueAndType.getTargetValue();
+        final Object targetValue = boundValue.getTargetValue();
         if (targetValue == null) {
             return; // if target value is null, do nothing at FOR comment
         }
@@ -108,7 +110,7 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
         loopInfo.setSpecifiedSql(_specifiedSql);
         loopInfo.setParameterList(parameterList);
         loopInfo.setLoopSize(loopSize);
-        loopInfo.setLikeSearchOption(valueAndType.getLikeSearchOption());
+        loopInfo.setFilteringBindOption(boundValue.getFilteringBindOption());
         for (int loopIndex = 0; loopIndex < loopSize; loopIndex++) {
             loopInfo.setLoopIndex(loopIndex);
             processAcceptingChildren(ctx, loopInfo);
@@ -119,16 +121,16 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
     }
 
     protected void assertFirstNameAsNormal(CommandContext ctx, String firstName) {
-        if (NodeUtil.isCurrentVariableOutOfScope(firstName, false)) {
+        if (NodeChecker.isCurrentVariableOutOfScope(firstName, false)) {
             throwLoopCurrentVariableOutOfForCommentException();
         }
-        if (NodeUtil.isWrongParameterBeanName(firstName, ctx)) {
+        if (NodeChecker.isWrongParameterBeanName(firstName, ctx)) {
             throwForCommentIllegalParameterBeanSpecificationException();
         }
     }
 
     protected void throwLoopCurrentVariableOutOfForCommentException() {
-        NodeUtil.throwLoopCurrentVariableOutOfForCommentException(_expression, _specifiedSql);
+        NodeChecker.throwLoopCurrentVariableOutOfForCommentException(_expression, _specifiedSql);
     }
 
     protected void throwForCommentIllegalParameterBeanSpecificationException() {
@@ -156,10 +158,14 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
         throw new ForCommentIllegalParameterBeanSpecificationException(msg);
     }
 
-    protected void setupValueAndType(ValueAndType valueAndType) {
-        final CommentType type = CommentType.FORCOMMENT;
-        final ValueAndTypeSetupper setuper = new ValueAndTypeSetupper(_nameList, _expression, _specifiedSql, type);
-        setuper.setupValueAndType(valueAndType);
+    protected void setupBoundValue(BoundValue boundValue) {
+        final ParameterCommentType type = ParameterCommentType.FORCOMMENT;
+        final BoundValueTracer tracer = createBoundValueTracer(type);
+        tracer.trace(boundValue);
+    }
+
+    protected BoundValueTracer createBoundValueTracer(final ParameterCommentType type) {
+        return _nodeAdviceFactory.createBoundValueTracer(_nameList, _expression, _specifiedSql, type);
     }
 
     protected void assertParameterList(Object targetValue) {

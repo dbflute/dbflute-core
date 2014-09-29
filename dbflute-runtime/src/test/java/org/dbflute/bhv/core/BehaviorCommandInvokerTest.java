@@ -26,18 +26,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.dbflute.Entity;
-import org.dbflute.bhv.CallbackContext;
+import org.dbflute.bhv.core.context.ConditionBeanContext;
+import org.dbflute.bhv.core.context.FetchAssistContext;
+import org.dbflute.bhv.core.context.InternalMapContext;
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.readable.EntityRowHandler;
-import org.dbflute.jdbc.SqlLogInfo;
-import org.dbflute.jdbc.SqlLogInfo.SqlLogDisplaySqlBuilder;
-import org.dbflute.jdbc.SqlResultHandler;
-import org.dbflute.jdbc.SqlResultInfo;
+import org.dbflute.hook.CallbackContext;
+import org.dbflute.hook.SqlLogInfo;
+import org.dbflute.hook.SqlResultHandler;
+import org.dbflute.hook.SqlResultInfo;
+import org.dbflute.hook.SqlLogInfo.SqlLogDisplaySqlBuilder;
 import org.dbflute.mock.MockBehaviorCommand;
 import org.dbflute.mock.MockConditionBean;
 import org.dbflute.mock.MockOutsideSqlContext;
 import org.dbflute.outsidesql.OutsideSqlContext;
-import org.dbflute.resource.InternalMapContext;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.unit.PlainTestCase;
 
 /**

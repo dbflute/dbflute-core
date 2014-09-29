@@ -33,7 +33,7 @@ public class WayOfMySQL implements DBWay, Serializable {
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
-    protected static final StringConnector ORIGINAL_STRING_CONNECTOR = new StringConnector() {
+    protected static final OnQueryStringConnector ORIGINAL_STRING_CONNECTOR = new OnQueryStringConnector() {
         public String connect(Object... elements) {
             final StringBuilder sb = new StringBuilder();
             sb.append("concat(");
@@ -93,7 +93,7 @@ public class WayOfMySQL implements DBWay, Serializable {
     // ===================================================================================
     //                                                                    String Connector
     //                                                                    ================
-    public StringConnector getStringConnector() {
+    public OnQueryStringConnector getStringConnector() {
         return ORIGINAL_STRING_CONNECTOR;
     }
 

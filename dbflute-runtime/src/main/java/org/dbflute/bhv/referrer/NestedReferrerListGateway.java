@@ -41,7 +41,7 @@ import org.dbflute.Entity;
  * </pre>
  * @param <REFERRER> The type of referrer entity.
  * @author jflute
- * @since 1.0.6A (2014/06/14 Saturday)
+ * @since 1.0.5J (2014/06/14 Saturday)
  */
 @FunctionalInterface
 public interface NestedReferrerListGateway<REFERRER extends Entity> {

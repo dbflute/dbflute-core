@@ -16,9 +16,9 @@
 package org.dbflute.cbean.sqlclause.subquery;
 
 import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.derived.DerivedMappable;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.DerivedMappable;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.dbflute.dbmeta.name.ColumnSqlName;

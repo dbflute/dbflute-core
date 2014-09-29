@@ -18,6 +18,7 @@ package org.dbflute.outsidesql.executor;
 import java.util.List;
 
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.dbflute.bhv.exception.BehaviorExceptionThrower;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.paging.PagingHandler;
 import org.dbflute.cbean.paging.PagingInvoker;
@@ -27,7 +28,6 @@ import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.EntityDuplicatedException;
 import org.dbflute.exception.FetchingOverSafetySizeException;
 import org.dbflute.exception.PagingOverSafetySizeException;
-import org.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;

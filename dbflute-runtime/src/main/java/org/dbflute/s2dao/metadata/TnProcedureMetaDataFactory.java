@@ -24,13 +24,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbway.DBDef;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ValueType;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.metadata.TnProcedureParameterType.TnProcedureParameterAccessor;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfTypeUtil;

@@ -30,11 +30,11 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.jprop.exception.JavaPropertiesImplicitOverrideException;
 import org.dbflute.helper.jprop.exception.JavaPropertiesLonelyOverrideException;
 import org.dbflute.helper.jprop.exception.JavaPropertiesReadFailureException;
 import org.dbflute.helper.jprop.exception.JavaPropertiesStreamNotFoundException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfCollectionUtil.AccordingToOrderIdExtractor;
 import org.dbflute.util.DfCollectionUtil.AccordingToOrderResource;

@@ -15,9 +15,9 @@
  */
 package org.dbflute.bhv.core.command;
 
-import org.dbflute.bhv.core.ConditionBeanContext;
 import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.SqlExecutionCreator;
+import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;

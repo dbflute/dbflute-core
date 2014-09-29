@@ -32,12 +32,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.mock.MockValueType;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.valuetype.basic.BigDecimalType;
 import org.dbflute.s2dao.valuetype.basic.BinaryType;
 import org.dbflute.s2dao.valuetype.basic.IntegerType;

@@ -75,7 +75,7 @@ public class WayOfOracle implements DBWay, Serializable {
     // ===================================================================================
     //                                                                    String Connector
     //                                                                    ================
-    public StringConnector getStringConnector() {
+    public OnQueryStringConnector getStringConnector() {
         return STANDARD_STRING_CONNECTOR;
     }
 

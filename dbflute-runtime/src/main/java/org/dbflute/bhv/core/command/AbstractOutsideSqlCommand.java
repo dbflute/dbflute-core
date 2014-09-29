@@ -15,6 +15,7 @@
  */
 package org.dbflute.bhv.core.command;
 
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.dbway.DBDef;
@@ -22,7 +23,6 @@ import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.outsidesql.OutsideSqlFilter;
 import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.outsidesql.factory.OutsideSqlContextFactory;
-import org.dbflute.resource.ResourceContext;
 
 /**
  * @author jflute

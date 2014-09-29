@@ -15,7 +15,7 @@
  */
 package org.dbflute.twowaysql.node;
 
-import org.dbflute.twowaysql.pmbean.SimplePagingBean;
+import org.dbflute.outsidesql.paging.SimplePagingBean;
 
 /**
  * @author jflute

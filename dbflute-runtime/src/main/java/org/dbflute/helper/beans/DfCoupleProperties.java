@@ -20,7 +20,7 @@ package org.dbflute.helper.beans;
  * Basically for Scala entity, e.g. String memberName(), memberName(String). <br />
  * (Cannot get annotation on Scala entity from Java so this way)
  * @author jflute
- * @since 1.0.6A (2014/06/02 Monday)
+ * @since 1.0.5J (2014/06/02 Monday)
  */
 public interface DfCoupleProperties {
 }

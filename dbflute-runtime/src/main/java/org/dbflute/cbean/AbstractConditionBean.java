@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.dbflute.Entity;
-import org.dbflute.bhv.core.ConditionBeanContext;
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
 import org.dbflute.cbean.chelper.HpCalculator;
@@ -35,6 +34,8 @@ import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.derived.DerivedTypeHandler;
+import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.ordering.OrderByBean;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.paging.PagingInvoker;
@@ -53,7 +54,6 @@ import org.dbflute.cbean.subcall.SpecifyQuery;
 import org.dbflute.cbean.subcall.UnionQuery;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
-import org.dbflute.dbmeta.DerivedTypeHandler;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
@@ -62,11 +62,11 @@ import org.dbflute.exception.ColumnQueryCalculationUnsupportedColumnTypeExceptio
 import org.dbflute.exception.ConditionInvokingFailureException;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
-import org.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.StatementConfig;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfReflectionUtil.ReflectionFailureException;
@@ -1325,7 +1325,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
         final SqlAnalyzerFactory factory = getSqlAnalyzerFactory();
         final String dateFormat = getLogDateFormat();
         final String timestampFormat = getLogTimestampFormat();
-        return ConditionBeanContext.convertConditionBean2DisplaySql(factory, this, dateFormat, timestampFormat);
+        return convertConditionBean2DisplaySql(factory, this, dateFormat, timestampFormat);
+    }
+
+    protected static String convertConditionBean2DisplaySql(SqlAnalyzerFactory factory, ConditionBean cb,
+            String logDateFormat, String logTimestampFormat) {
+        final String twoWaySql = cb.getSqlClause().getClause();
+        return SqlAnalyzer.convertTwoWaySql2DisplaySql(factory, twoWaySql, cb, logDateFormat, logTimestampFormat);
     }
 
     protected abstract SqlAnalyzerFactory getSqlAnalyzerFactory();

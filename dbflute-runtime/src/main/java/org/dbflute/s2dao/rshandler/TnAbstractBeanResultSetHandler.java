@@ -19,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.dbflute.resource.ResourceContext;
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;

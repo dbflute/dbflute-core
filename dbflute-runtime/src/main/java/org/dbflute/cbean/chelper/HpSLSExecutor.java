@@ -22,7 +22,7 @@ import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
  * @param <CB> The type of condition-bean.
  * @param <RESULT> The type of result of function.
  * @author jflute
- * @since 1.0.6A (2014/06/12 Thursday)
+ * @since 1.0.5J (2014/06/12 Thursday)
  */
 public interface HpSLSExecutor<CB extends ConditionBean, RESULT> {
 

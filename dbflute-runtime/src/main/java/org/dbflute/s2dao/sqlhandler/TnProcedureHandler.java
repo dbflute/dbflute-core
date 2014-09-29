@@ -23,7 +23,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.dbflute.exception.handler.SQLExceptionResource;
+import org.dbflute.bhv.exception.SQLExceptionResource;
 import org.dbflute.jdbc.FetchBean;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.jdbc.ValueType;

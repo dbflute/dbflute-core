@@ -17,7 +17,7 @@ package org.dbflute.cbean.sqlclause.query;
 
 import java.util.List;
 
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.util.Srl;
 
 /**

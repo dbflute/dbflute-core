@@ -18,12 +18,12 @@ package org.dbflute.twowaysql.node;
 import java.lang.reflect.Array;
 import java.util.Collection;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.exception.EmbeddedVariableCommentContainsBindSymbolException;
-import org.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
+import org.dbflute.twowaysql.factory.NodeAdviceFactory;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
 
@@ -49,8 +49,8 @@ public class EmbeddedVariableNode extends VariableNode {
     //                                                                         Constructor
     //                                                                         ===========
     public EmbeddedVariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter,
-            boolean replaceOnly, boolean terminalDot) {
-        super(expression, testValue, specifiedSql, blockNullParameter);
+            NodeAdviceFactory nodeAdviceFactory, boolean replaceOnly, boolean terminalDot) {
+        super(expression, testValue, specifiedSql, blockNullParameter, nodeAdviceFactory);
         _replaceOnly = replaceOnly;
         _terminalDot = terminalDot;
     }
@@ -59,19 +59,19 @@ public class EmbeddedVariableNode extends VariableNode {
     //                                                                              Accept
     //                                                                              ======
     @Override
-    protected void doProcess(CommandContext ctx, ValueAndType valueAndType, LoopInfo loopInfo) {
-        final Object finalValue = valueAndType.getTargetValue();
-        final Class<?> finalType = valueAndType.getTargetType();
+    protected void doProcess(CommandContext ctx, BoundValue boundValue, LoopInfo loopInfo) {
+        final Object finalValue = boundValue.getTargetValue();
+        final Class<?> finalType = boundValue.getTargetType();
         if (isInScope()) {
             if (finalValue == null) { // in-scope does not allow null value
-                throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
+                throwBindOrEmbeddedCommentParameterNullValueException(boundValue);
             }
             if (Collection.class.isAssignableFrom(finalType)) {
                 embedArray(ctx, ((Collection<?>) finalValue).toArray());
             } else if (finalType.isArray()) {
                 embedArray(ctx, finalValue);
             } else {
-                throwBindOrEmbeddedCommentInScopeNotListException(valueAndType);
+                throwBindOrEmbeddedCommentInScopeNotListException(boundValue);
             }
         } else {
             if (finalValue == null) {
@@ -90,11 +90,11 @@ public class EmbeddedVariableNode extends VariableNode {
                 if (isQuotedScalar()) { // basically for condition value
                     ctx.addSql(quote(embeddedStr));
                     if (isAcceptableLikeSearch(loopInfo)) {
-                        setupRearOption(ctx, valueAndType);
+                        setupRearOption(ctx, boundValue);
                     }
                 } else {
-                    final Object firstValue = valueAndType.getFirstValue();
-                    final Class<?> firstType = valueAndType.getFirstType();
+                    final Object firstValue = boundValue.getFirstValue();
+                    final Class<?> firstType = boundValue.getFirstType();
                     final boolean bound = processDynamicBinding(ctx, firstValue, firstType, embeddedStr);
                     if (!bound) {
                         ctx.addSql(embeddedStr);
@@ -206,7 +206,7 @@ public class EmbeddedVariableNode extends VariableNode {
     //                                                                      Implementation
     //                                                                      ==============
     @Override
-    protected CommentType getCommentType() {
-        return CommentType.EMBEDDED;
+    protected ParameterCommentType getCommentType() {
+        return ParameterCommentType.EMBEDDED;
     }
 }

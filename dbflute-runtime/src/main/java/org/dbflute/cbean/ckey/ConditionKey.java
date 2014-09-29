@@ -38,7 +38,7 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.dbway.ExtensionOperand;
-import org.dbflute.dbway.StringConnector;
+import org.dbflute.dbway.OnQueryStringConnector;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
@@ -432,7 +432,7 @@ public abstract class ConditionKey implements Serializable {
         for (HpSpecifiedColumn specifiedColumn : compoundColumnList) {
             realNameList.add(doResolveCompoundColumn(option, specifiedColumn));
         }
-        final StringConnector stringConnector = option.getStringConnector();
+        final OnQueryStringConnector stringConnector = option.getStringConnector();
         final String connected = stringConnector.connect(realNameList.toArray());
         return ColumnRealName.create(null, new ColumnSqlName(connected));
     }

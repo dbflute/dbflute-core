@@ -17,11 +17,11 @@ package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.dbflute.cbean.subcall.ScalarQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
-import org.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 
 /**
  * The function for scalar select. 

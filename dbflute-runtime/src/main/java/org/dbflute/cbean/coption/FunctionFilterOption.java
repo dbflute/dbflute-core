@@ -42,7 +42,7 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.dbflute.dbmeta.name.ColumnSqlNameProvider;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 

@@ -21,10 +21,10 @@ import java.lang.reflect.Method;
 import java.sql.Time;
 import java.sql.Timestamp;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfTypeUtil;
 

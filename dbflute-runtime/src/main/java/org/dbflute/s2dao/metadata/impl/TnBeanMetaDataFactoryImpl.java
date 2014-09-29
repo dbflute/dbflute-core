@@ -20,10 +20,10 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.dbflute.exception.handler.SQLExceptionHandler;
-import org.dbflute.exception.handler.SQLExceptionResource;
+import org.dbflute.bhv.core.context.ResourceContext;
+import org.dbflute.bhv.exception.SQLExceptionHandler;
+import org.dbflute.bhv.exception.SQLExceptionResource;
 import org.dbflute.jdbc.LazyDatabaseMetaDataWrapper;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;

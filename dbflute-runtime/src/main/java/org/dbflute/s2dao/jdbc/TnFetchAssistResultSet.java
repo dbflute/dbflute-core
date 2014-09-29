@@ -18,14 +18,14 @@ package org.dbflute.s2dao.jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.dbflute.bhv.core.context.ResourceContext;
+import org.dbflute.bhv.exception.SQLExceptionHandler;
+import org.dbflute.bhv.exception.SQLExceptionResource;
 import org.dbflute.cbean.paging.FetchNarrowingBean;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.FetchingOverSafetySizeException;
-import org.dbflute.exception.handler.SQLExceptionHandler;
-import org.dbflute.exception.handler.SQLExceptionResource;
 import org.dbflute.jdbc.FetchBean;
 import org.dbflute.jdbc.PlainResultSetWrapper;
-import org.dbflute.resource.ResourceContext;
 
 /**
  * @author modified by jflute (originated in S2Dao)

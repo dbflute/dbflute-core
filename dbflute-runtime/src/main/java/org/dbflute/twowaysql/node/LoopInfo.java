@@ -17,7 +17,6 @@ package org.dbflute.twowaysql.node;
 
 import java.util.List;
 
-import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.util.DfTypeUtil;
 
 /**
@@ -33,7 +32,7 @@ public class LoopInfo {
     protected String _specifiedSql; // as loop meta information
     protected List<?> _parameterList;
     protected int _loopSize;
-    protected LikeSearchOption _likeSearchOption;
+    protected FilteringBindOption _filteringBindOption;
     protected int _loopIndex;
     protected LoopInfo _parentLoop;
 
@@ -53,7 +52,7 @@ public class LoopInfo {
     }
 
     public void setExpression(String expression) {
-        this._expression = expression;
+        _expression = expression;
     }
 
     public String getSpecifiedSql() {
@@ -61,7 +60,7 @@ public class LoopInfo {
     }
 
     public void setSpecifiedSql(String specifiedSql) {
-        this._specifiedSql = specifiedSql;
+        _specifiedSql = specifiedSql;
     }
 
     public List<?> getParameterList() {
@@ -69,7 +68,7 @@ public class LoopInfo {
     }
 
     public void setParameterList(List<?> parameterList) {
-        this._parameterList = parameterList;
+        _parameterList = parameterList;
     }
 
     public int getLoopSize() {
@@ -77,15 +76,15 @@ public class LoopInfo {
     }
 
     public void setLoopSize(int loopSize) {
-        this._loopSize = loopSize;
+        _loopSize = loopSize;
     }
 
-    public LikeSearchOption getLikeSearchOption() {
-        return _likeSearchOption;
+    public FilteringBindOption getFilteringBindOption() {
+        return _filteringBindOption;
     }
 
-    public void setLikeSearchOption(LikeSearchOption likeSearchOption) {
-        this._likeSearchOption = likeSearchOption;
+    public void setFilteringBindOption(FilteringBindOption filteringBindOption) {
+        _filteringBindOption = filteringBindOption;
     }
 
     public int getLoopIndex() {
@@ -93,7 +92,7 @@ public class LoopInfo {
     }
 
     public void setLoopIndex(int loopIndex) {
-        this._loopIndex = loopIndex;
+        _loopIndex = loopIndex;
     }
 
     public LoopInfo getParentLoop() {
@@ -101,7 +100,7 @@ public class LoopInfo {
     }
 
     public void setParentLoop(LoopInfo parentLoop) {
-        this._parentLoop = parentLoop;
+        _parentLoop = parentLoop;
     }
 
     public Object getCurrentParameter() {

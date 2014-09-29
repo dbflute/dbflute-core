@@ -87,7 +87,7 @@ public class WayOfSQLServer implements DBWay, Serializable {
     // ===================================================================================
     //                                                                    String Connector
     //                                                                    ================
-    public StringConnector getStringConnector() {
+    public OnQueryStringConnector getStringConnector() {
         return PLUS_STRING_CONNECTOR;
     }
 

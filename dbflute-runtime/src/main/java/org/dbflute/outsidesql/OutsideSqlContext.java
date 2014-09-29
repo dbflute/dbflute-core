@@ -27,10 +27,10 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.exception.OutsideSqlNotFoundException;
 import org.dbflute.exception.OutsideSqlReadFailureException;
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.CursorHandler;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.StatementConfig;
-import org.dbflute.resource.DBFluteSystem;
 import org.dbflute.util.DfResourceUtil;
 import org.dbflute.util.Srl;
 

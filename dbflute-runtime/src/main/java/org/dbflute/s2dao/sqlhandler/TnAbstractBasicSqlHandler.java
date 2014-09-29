@@ -28,26 +28,26 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.QLog;
-import org.dbflute.bhv.CallbackContext;
-import org.dbflute.bhv.core.SqlFireHook;
-import org.dbflute.bhv.core.SqlFireReadyInfo;
-import org.dbflute.bhv.core.SqlFireResultInfo;
-import org.dbflute.exception.handler.SQLExceptionHandler;
-import org.dbflute.exception.handler.SQLExceptionResource;
+import org.dbflute.bhv.core.context.InternalMapContext;
+import org.dbflute.bhv.core.context.ResourceContext;
+import org.dbflute.bhv.exception.SQLExceptionHandler;
+import org.dbflute.bhv.exception.SQLExceptionResource;
+import org.dbflute.hook.CallbackContext;
+import org.dbflute.hook.SqlFireHook;
+import org.dbflute.hook.SqlFireReadyInfo;
+import org.dbflute.hook.SqlFireResultInfo;
+import org.dbflute.hook.SqlLogHandler;
+import org.dbflute.hook.SqlLogInfo;
+import org.dbflute.hook.SqlLogInfo.SqlLogDisplaySqlBuilder;
+import org.dbflute.hook.SqlResultHandler;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.DataSourceHandler;
 import org.dbflute.jdbc.ExecutionTimeInfo;
 import org.dbflute.jdbc.HandlingDataSourceWrapper;
+import org.dbflute.jdbc.ManualThreadDataSourceHandler;
 import org.dbflute.jdbc.NotClosingConnectionWrapper;
-import org.dbflute.jdbc.SqlLogHandler;
-import org.dbflute.jdbc.SqlLogInfo;
-import org.dbflute.jdbc.SqlLogInfo.SqlLogDisplaySqlBuilder;
-import org.dbflute.jdbc.SqlResultHandler;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.jdbc.ValueType;
-import org.dbflute.resource.DBFluteSystem;
-import org.dbflute.resource.InternalMapContext;
-import org.dbflute.resource.ManualThreadDataSourceHandler;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.twowaysql.DisplaySqlBuilder;
@@ -271,6 +271,10 @@ public abstract class TnAbstractBasicSqlHandler {
     protected DisplaySqlBuilder createDisplaySqlBuilder() {
         final String logDateFormat = ResourceContext.getLogDateFormat();
         final String logTimestampFormat = ResourceContext.getLogTimestampFormat();
+        return newDisplaySqlBuilder(logDateFormat, logTimestampFormat);
+    }
+
+    protected DisplaySqlBuilder newDisplaySqlBuilder(String logDateFormat, String logTimestampFormat) {
         return new DisplaySqlBuilder(logDateFormat, logTimestampFormat);
     }
 

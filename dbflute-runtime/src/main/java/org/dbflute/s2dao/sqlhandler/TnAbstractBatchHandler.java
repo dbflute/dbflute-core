@@ -26,14 +26,14 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.XLog;
+import org.dbflute.bhv.core.context.ResourceContext;
+import org.dbflute.bhv.exception.SQLExceptionResource;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.BatchEntityAlreadyUpdatedException;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;
-import org.dbflute.exception.handler.SQLExceptionResource;
-import org.dbflute.jdbc.SqlLogInfo;
+import org.dbflute.hook.SqlLogInfo;
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 

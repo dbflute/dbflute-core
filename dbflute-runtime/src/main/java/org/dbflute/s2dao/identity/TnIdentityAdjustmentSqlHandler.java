@@ -21,7 +21,7 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.dbflute.exception.handler.SQLExceptionResource;
+import org.dbflute.bhv.exception.SQLExceptionResource;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.sqlhandler.TnBasicUpdateHandler;
 

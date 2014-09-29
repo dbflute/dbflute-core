@@ -18,7 +18,7 @@ package org.dbflute.bhv.proposal.callback;
 import java.lang.reflect.Method;
 
 import org.dbflute.bhv.core.BehaviorCommandMeta;
-import org.dbflute.bhv.core.SqlStringFilter;
+import org.dbflute.hook.SqlStringFilter;
 import org.dbflute.util.Srl;
 
 /**

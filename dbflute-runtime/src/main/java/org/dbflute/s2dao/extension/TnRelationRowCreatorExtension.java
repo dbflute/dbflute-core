@@ -22,10 +22,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.dbflute.Entity;
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.jdbc.ValueType;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.dbflute.s2dao.metadata.TnPropertyType;

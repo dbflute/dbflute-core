@@ -15,10 +15,10 @@
  */
 package org.dbflute.bhv.core.command;
 
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.core.supplement.SequenceCache;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
-import org.dbflute.resource.ResourceContext;
 
 /**
  * The command to select next values of sequence for sub column.

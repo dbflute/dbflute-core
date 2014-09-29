@@ -17,8 +17,8 @@ package org.dbflute.cbean.sqlclause.subquery;
 
 import java.io.Serializable;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
 

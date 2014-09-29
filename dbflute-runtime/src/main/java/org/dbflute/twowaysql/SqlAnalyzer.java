@@ -19,13 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import org.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.dbflute.resource.DBFluteSystem;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.exception.EndCommentNotFoundException;
 import org.dbflute.twowaysql.exception.ForCommentExpressionEmptyException;
 import org.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
+import org.dbflute.twowaysql.factory.DefaultNodeAdviceFactory;
+import org.dbflute.twowaysql.factory.NodeAdviceFactory;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.dbflute.twowaysql.node.BeginNode;
 import org.dbflute.twowaysql.node.BindVariableNode;
@@ -49,6 +50,11 @@ import org.dbflute.util.Srl;
  * @author modified by jflute (originated in S2Dao)
  */
 public class SqlAnalyzer {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final NodeAdviceFactory _defaultNodeAdviceFactory = new DefaultNodeAdviceFactory();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -108,9 +114,9 @@ public class SqlAnalyzer {
         }
     }
 
-    // -----------------------------------------------------
-    //                                             SQL Parts
-    //                                             ---------
+    // ===================================================================================
+    //                                                                           SQL Parts
+    //                                                                           =========
     protected void parseSql() {
         final String sql;
         {
@@ -176,9 +182,9 @@ public class SqlAnalyzer {
         return (node instanceof SqlConnectorAdjustable) && !isTopBegin(node);
     }
 
-    // -----------------------------------------------------
-    //                                               Comment
-    //                                               -------
+    // ===================================================================================
+    //                                                                         SQL Comment
+    //                                                                         ===========
     protected void parseComment() {
         final String comment = _tokenizer.getToken();
         if (isTargetComment(comment)) { // parameter comment
@@ -214,9 +220,9 @@ public class SqlAnalyzer {
         return true;
     }
 
-    // -----------------------------------------------------
-    //                                                 BEGIN
-    //                                                 -----
+    // ===================================================================================
+    //                                                                       BEGIN Comment
+    //                                                                       =============
     protected boolean isBeginComment(String comment) {
         return BeginNode.MARK.equals(comment);
     }
@@ -234,6 +240,10 @@ public class SqlAnalyzer {
     }
 
     protected BeginNode createBeginNode() {
+        return newBeginNode();
+    }
+
+    protected BeginNode newBeginNode() {
         return new BeginNode(_inBeginScope);
     }
 
@@ -251,9 +261,9 @@ public class SqlAnalyzer {
         return ((BeginNode) node).isNested();
     }
 
-    // -----------------------------------------------------
-    //                                                    IF
-    //                                                    --
+    // ===================================================================================
+    //                                                                          IF Comment
+    //                                                                          ==========
     protected boolean isIfComment(String comment) {
         return comment.startsWith(IfNode.PREFIX);
     }
@@ -272,6 +282,10 @@ public class SqlAnalyzer {
 
     protected IfNode createIfNode(String expr) {
         researchIfNeeds(_researchIfCommentList, expr); // for research
+        return newIfNode(expr);
+    }
+
+    protected IfNode newIfNode(String expr) {
         return new IfNode(expr, _specifiedSql);
     }
 
@@ -292,24 +306,32 @@ public class SqlAnalyzer {
         throw new IfCommentConditionEmptyException(msg);
     }
 
-    // -----------------------------------------------------
-    //                                                  ELSE
-    //                                                  ----
+    // ===================================================================================
+    //                                                                        ELSE Comment
+    //                                                                        ============
     protected void parseElse() {
         final Node parent = peek();
         if (!(parent instanceof IfNode)) {
             return;
         }
         final IfNode ifNode = (IfNode) pop();
-        final ElseNode elseNode = new ElseNode();
+        final ElseNode elseNode = createElseNode();
         ifNode.setElseNode(elseNode);
         push(elseNode);
         _tokenizer.skipWhitespace();
     }
 
-    // -----------------------------------------------------
-    //                                                   FOR
-    //                                                   ---
+    protected ElseNode createElseNode() {
+        return newElseNode();
+    }
+
+    protected ElseNode newElseNode() {
+        return new ElseNode();
+    }
+
+    // ===================================================================================
+    //                                                                         FOR Comment
+    //                                                                         ===========
     protected boolean isForComment(String comment) {
         return comment.startsWith(ForNode.PREFIX);
     }
@@ -328,7 +350,11 @@ public class SqlAnalyzer {
 
     protected ForNode createForNode(String expr) {
         researchIfNeeds(_researchForCommentList, expr); // for research
-        return new ForNode(expr, _specifiedSql);
+        return newForNode(expr);
+    }
+
+    protected ForNode newForNode(String expr) {
+        return new ForNode(expr, _specifiedSql, getNodeAdviceFactory());
     }
 
     protected boolean isLoopVariableComment(String comment) {
@@ -378,9 +404,9 @@ public class SqlAnalyzer {
         throw new ForCommentExpressionEmptyException(msg);
     }
 
-    // -----------------------------------------------------
-    //                                                   END
-    //                                                   ---
+    // ===================================================================================
+    //                                                                         END Comment
+    //                                                                         ===========
     protected boolean isEndComment(String content) {
         return content != null && "END".equals(content);
     }
@@ -412,9 +438,9 @@ public class SqlAnalyzer {
         throw new EndCommentNotFoundException(msg);
     }
 
-    // -----------------------------------------------------
-    //                                      Bind or Embedded
-    //                                      ----------------
+    // ===================================================================================
+    //                                                                    Bind or Embedded
+    //                                                                    ================
     protected void parseCommentBindVariable() {
         final String expr = _tokenizer.getToken();
         final String testValue = _tokenizer.skipToken(true);
@@ -441,18 +467,30 @@ public class SqlAnalyzer {
 
     protected BindVariableNode createBindVariableNode(String expr, String testValue) {
         researchIfNeeds(_researchBindVariableCommentList, expr); // for research
-        return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
+        return newBindVariableNode(expr, testValue);
+    }
+
+    protected BindVariableNode newBindVariableNode(String expr, String testValue) {
+        final NodeAdviceFactory tracerFactory = getNodeAdviceFactory();
+        return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, tracerFactory);
     }
 
     protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly,
             boolean terminalDot) {
         researchIfNeeds(_researchEmbeddedVariableCommentList, expr); // for research
-        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, replaceOnly, terminalDot);
+        return newEmbeddedVariableNode(expr, testValue, replaceOnly, terminalDot);
     }
 
-    // -----------------------------------------------------
-    //                                          Various Node
-    //                                          ------------
+    protected EmbeddedVariableNode newEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly,
+            boolean terminalDot) {
+        final NodeAdviceFactory tracerFactory = getNodeAdviceFactory();
+        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, tracerFactory,
+                replaceOnly, terminalDot);
+    }
+
+    // ===================================================================================
+    //                                                                        Various Node
+    //                                                                        ============
     protected SqlConnectorNode createSqlConnectorNode(Node node, String connector, String sqlParts) {
         if (isNestedBegin(node)) { // basically nested if BEGIN node because checked before
             // connector adjustment of BEGIN is independent 
@@ -483,9 +521,9 @@ public class SqlAnalyzer {
         return SqlPartsNode.createSqlPartsNode(sqlParts);
     }
 
-    // -----------------------------------------------------
-    //                                            Node Stack
-    //                                            ----------
+    // ===================================================================================
+    //                                                                          Node Stack
+    //                                                                          ==========
     protected Node pop() {
         return (Node) _nodeStack.pop();
     }
@@ -505,6 +543,13 @@ public class SqlAnalyzer {
             }
         }
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                   Bind Value Tracer
+    //                                                                   =================
+    protected NodeAdviceFactory getNodeAdviceFactory() {
+        return _defaultNodeAdviceFactory; // you can switch it
     }
 
     // ===================================================================================
@@ -555,11 +600,7 @@ public class SqlAnalyzer {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String ln() {
-        return DBFluteSystem.getBasicLn();
-    }
-
-    protected final String replaceString(String text, String fromText, String toText) {
+    protected String replaceString(String text, String fromText, String toText) {
         return Srl.replace(text, fromText, toText);
     }
 

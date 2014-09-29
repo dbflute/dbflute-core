@@ -17,7 +17,7 @@ package org.dbflute.optional;
 
 /**
  * @author jflute
- * @since 1.0.6A (2014/06/22 Sunday)
+ * @since 1.0.5J (2014/06/22 Sunday)
  */
 public class RelationOptionalFactory {
 

@@ -17,12 +17,12 @@ package org.dbflute.s2dao.identity;
 
 import javax.sql.DataSource;
 
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.dbway.WayOfSQLServer;
 import org.dbflute.dbway.WayOfSybase;
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.resource.ResourceContext;
 
 /**
  * @author modified by jflute (originated in S2Dao)

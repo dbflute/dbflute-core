@@ -17,11 +17,11 @@ package org.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.writable.DeleteOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.resource.InternalMapContext;
 import org.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
 import org.dbflute.twowaysql.context.CommandContext;
 

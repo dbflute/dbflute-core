@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.jdbc.ValueType;
-import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.valuetype.basic.BigDecimalType;
 import org.dbflute.s2dao.valuetype.basic.BigIntegerType;
 import org.dbflute.s2dao.valuetype.basic.BinaryStreamType;
