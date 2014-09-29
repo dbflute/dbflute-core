@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import java.util.Collection;
 import java.util.Date;
 #end
 
-import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.Entity.FunCustodial;
+import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.Entity.FunCustodial;
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
 #end

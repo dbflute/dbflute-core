@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -17,33 +17,33 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.bhv.core.InvokerAssistant;
-import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
-import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
-import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
-import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
-import org.seasar.dbflute.exception.factory.DefaultSQLExceptionHandlerFactory;
-import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
-import org.seasar.dbflute.jdbc.DataSourceHandler;
-import org.seasar.dbflute.jdbc.HandlingDataSourceWrapper;
-import org.seasar.dbflute.jdbc.SQLExceptionDigger;
-import org.seasar.dbflute.jdbc.StatementConfig;
-import org.seasar.dbflute.jdbc.StatementFactory;
-import org.seasar.dbflute.optional.RelationOptionalFactory;
-import org.seasar.dbflute.outsidesql.factory.DefaultOutsideSqlExecutorFactory;
-import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
-import org.seasar.dbflute.resource.ResourceParameter;
+import org.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.bhv.core.context.ResourceParameter;
+import org.dbflute.bhv.core.melodicsql.MelodicSqlAnalyzerFactory;
+import org.dbflute.bhv.core.supplement.SequenceCacheHandler;
+import org.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
+import org.dbflute.bhv.exception.BehaviorExceptionThrower;
+import org.dbflute.bhv.exception.DefaultSQLExceptionHandlerFactory;
+import org.dbflute.bhv.exception.SQLExceptionHandlerFactory;
+import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.dbway.DBDef;
+import org.dbflute.jdbc.DataSourceHandler;
+import org.dbflute.jdbc.HandlingDataSourceWrapper;
+import org.dbflute.jdbc.SQLExceptionDigger;
+import org.dbflute.jdbc.StatementConfig;
+import org.dbflute.jdbc.StatementFactory;
+import org.dbflute.optional.RelationOptionalFactory;
+import org.dbflute.outsidesql.factory.DefaultOutsideSqlExecutorFactory;
+import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 #if ($database.isTargetContainerSeasar())
-import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 #end
-import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
-import org.seasar.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
-import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
-import org.seasar.dbflute.twowaysql.factory.DefaultSqlAnalyzerFactory;
-import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
+import org.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
+import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
+import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 #if ($database.isTargetContainerSeasar())
 
 import org.seasar.framework.container.annotation.tiger.Binding;
@@ -421,8 +421,10 @@ class ${glImplementedInvokerAssistant} extends InvokerAssistant {
     def assistResourceParameter(): ResourceParameter = {
         val parameter: ResourceParameter = newResourceParameter();
         parameter.setOutsideSqlPackage(${glDBFluteConfig}.getOutsideSqlPackage());
-        parameter.setLogDateFormat(${glDBFluteConfig}.getLogDateFormat());
-        parameter.setLogTimestampFormat(${glDBFluteConfig}.getLogTimestampFormat());
+        parameter.setLogDatePattern(${glDBFluteConfig}.getLogDatePattern());
+        parameter.setLogTimestampPattern(${glDBFluteConfig}.getLogTimestampPattern());
+        parameter.setLogTimePattern(${glDBFluteConfig}.getLogTimePattern());
+        parameter.setLogTimeZoneProvider(${glDBFluteConfig}.getLogTimeZoneProvider());
         parameter.setInternalDebug(${glDBFluteConfig}.isInternalDebug());
         return parameter;
     }

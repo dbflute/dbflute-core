@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2014 the Seasar Foundation and the Others.
+ * Copyright 2014-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,28 +135,28 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
-import org.seasar.dbflute.exception.DfFixedConditionInvalidClassificationEmbeddedCommentException;
-import org.seasar.dbflute.exception.DfFixedConditionOptionConstraintFailureException;
-import org.seasar.dbflute.exception.DfTableNotFoundException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.generate.column.DfColumnListToStringBuilder;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
-import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
-import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfClassificationProperties;
-import org.seasar.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.properties.DfIncludeQueryProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
-import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
-import org.seasar.dbflute.properties.assistant.classification.DfClassificationGroup;
-import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.DfBuildProperties;
+import org.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
+import org.dbflute.exception.DfFixedConditionInvalidClassificationEmbeddedCommentException;
+import org.dbflute.exception.DfFixedConditionOptionConstraintFailureException;
+import org.dbflute.exception.DfTableNotFoundException;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
+import org.dbflute.logic.generate.language.DfLanguageDependency;
+import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfClassificationProperties;
+import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfIncludeQueryProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.properties.DfMultipleFKPropertyProperties;
+import org.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.dbflute.properties.assistant.classification.DfClassificationGroup;
+import org.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**

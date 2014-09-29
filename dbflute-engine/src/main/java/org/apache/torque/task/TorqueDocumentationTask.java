@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2014 the Seasar Foundation and the Others.
+ * Copyright 2014-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,17 +132,17 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
-import org.seasar.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.logic.doc.lreverse.DfLReverseProcess;
-import org.seasar.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
-import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
-import org.seasar.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.task.DfDBFluteTaskStatus;
-import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
-import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.exception.DfRequiredPropertyNotFoundException;
+import org.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.doc.lreverse.DfLReverseProcess;
+import org.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
+import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
+import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.task.DfDBFluteTaskStatus;
+import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
+import org.dbflute.task.bs.DfAbstractDbMetaTexenTask;
+import org.dbflute.util.Srl;
 
 /**
  * The DBFlute task generating documentations, SchemaHTML, HistoryHTML and so on.

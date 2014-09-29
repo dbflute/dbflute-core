@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import java.util.Date;
 
-import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.SpecifyQuery;
-import org.seasar.dbflute.cbean.ckey.ConditionKey;
-import org.seasar.dbflute.cbean._;
-import org.seasar.dbflute.cbean.chelper._;
-import org.seasar.dbflute.cbean.coption._;
+import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.SpecifyQuery;
+import org.dbflute.cbean.ckey.ConditionKey;
+import org.dbflute.cbean._;
+import org.dbflute.cbean.chelper._;
+import org.dbflute.cbean.coption._;
 
 /* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
 /* _/_/_/_/_/_/_/_/_/_/_/                                                                      _/_/_/_/_/_/_/_/_/_/_/ */

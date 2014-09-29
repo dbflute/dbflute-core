@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -22,17 +22,18 @@ import java.util.ArrayList;
 import java.util.Set;
 #if ($table.hasUtilDateColumn())
 import java.util.Date;
+import java.util.TimeZone;
 #end
 
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
-import org.seasar.dbflute.Entity;
+import org.dbflute.Entity;
 #end
-import org.seasar.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.DBMeta;
 #if ($table.needsMappingValueType())
-import org.seasar.dbflute.dbmeta.MappingValueType;
+import org.dbflute.dbmeta.MappingValueType;
 #end
 #if ($table.isEntityDerivedMappable())
-import org.seasar.dbflute.dbmeta.DerivedMappable;
+import org.dbflute.dbmeta.derived.DerivedMappable;
 #end
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
@@ -772,19 +773,22 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 #if ($table.hasUtilDateColumn())
     protected String xfUD(Date date) { // formatUtilDate()
-        return FunCustodial.toString(date, xgDP());
+        return FunCustodial.toStringDate(date, xgDP(), mytimeZone());
     }
-    protected String xgDP() { // getDatePattern
+    protected String xgDP() { // getDatePattern()
 #if ($database.isDatabaseOracle())
         return "yyyy-MM-dd HH:mm:ss"; // time parts for Oracle only
 #else
         return "yyyy-MM-dd";
 #end
     }
+    protected TimeZone mytimeZone() {
+        return null; // as default
+    }
 #end
 #if ($table.hasByteArrayColumn())
     protected String xfBA(byte[] bytes) { // formatByteArray()
-        return FunCustodial.toString(bytes);
+        return FunCustodial.toStringBytes(bytes);
     }
 #end
     protected String buildRelationString() {

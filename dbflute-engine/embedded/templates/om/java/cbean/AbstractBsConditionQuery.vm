@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -18,15 +18,17 @@ ${database.allClassCopyright}package ${glPackageBaseCQ};
 #set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
 import java.util.*;
 
-import org.seasar.dbflute.cbean.*;
-import org.seasar.dbflute.cbean.chelper.*;
-import org.seasar.dbflute.cbean.ckey.*;
-import org.seasar.dbflute.cbean.coption.*;
-import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.cbean.*;
+import org.dbflute.cbean.chelper.*;
+import org.dbflute.cbean.ckey.*;
+import org.dbflute.cbean.coption.*;
+import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.ordering.*;
+import org.dbflute.cbean.scoping.*;
+import org.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.dbmeta.DBMetaProvider;
 #if ($database.isAvailableJodaTimeEntity())
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.ReadableInstant;
@@ -322,18 +324,21 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
-#if (${col.isAvailableStringPrefixSearch()})
+#if (${col.isAvailableStringLikeSearch()})
+#if ($table.isMakeCallbackConditionOptionSetup())
 
     /**
-     * PrefixSearch {like 'xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch. (NullAllowed: if null (or empty), no condition)
+     * LikeSearch with various options. (versatile) {like '%xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * <pre>e.g. set${tmpJavaName}_LikeSearch("xxx", new <span style="color: #DD4747">LikeSearchOption</span>().likeContain());</pre>
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch. (NullAllowed: if null (or empty), no condition)
+     * @param opLambda The callback for option of like-search. (NotNull)
      */
-    public void set${tmpJavaName}_PrefixSearch(${col.javaNative} ${tmpUncapitalisedJavaName}) {
-        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, cLSOP());
+    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, COptionCall<LikeSearchOption> opLambda) {
+        LikeSearchOption op = cLSOP(); opLambda.callback(op);
+        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, op);
     }
 #end
-#if (${col.isAvailableStringLikeSearch()})
 
     /**
      * LikeSearch with various options. (versatile) {like '%xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
@@ -342,11 +347,25 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch. (NullAllowed: if null (or empty), no condition)
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
+    ${table.directConditionOptionMethodModifier} void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
     }
 #end
 #if (${col.isAvailableStringNotLikeSearch()})
+#if ($table.isMakeCallbackConditionOptionSetup())
+
+    /**
+     * NotLikeSearch with various options. (versatile) {not like 'xxx%' escape ...} <br />
+     * And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch. (NullAllowed: if null (or empty), no condition)
+     * @param opLambda The callback for option of like-search. (NotNull)
+     */
+    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, COptionCall<LikeSearchOption> opLambda) {
+        LikeSearchOption op = cLSOP(); opLambda.callback(op);
+        set${tmpJavaName}_NotLikeSearch(${tmpUncapitalisedJavaName}, op);
+    }
+#end
 
     /**
      * NotLikeSearch with various options. (versatile) {not like 'xxx%' escape ...} <br />
@@ -355,8 +374,19 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch. (NullAllowed: if null (or empty), no condition)
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
+    ${table.directConditionOptionMethodModifier} void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
+    }
+#end
+#if (${col.isAvailableStringPrefixSearch()})
+
+    /**
+     * PrefixSearch {like 'xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch. (NullAllowed: if null (or empty), no condition)
+     */
+    public void set${tmpJavaName}_PrefixSearch(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, cLSOP().likePrefix());
     }
 #end
 #foreach ($referrer in $col.existsReferrerReferrers)
@@ -734,6 +764,22 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #end
 #if (${col.isAvailableNumberRangeOf()})
+#if ($table.isMakeCallbackConditionOptionSetup())
+
+    /**
+     * RangeOf with various options. (versatile) <br />
+     * {(default) minNumber &lt;= column &lt;= maxNumber} <br />
+     * And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * @param minNumber The min number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
+     * @param maxNumber The max number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
+     * @param opLambda The callback for option of range-of. (NotNull)
+     */
+    public void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, COptionCall<RangeOfOption> opLambda) {
+        RangeOfOption op = cROOP(); opLambda.callback(op);
+        set${tmpJavaName}_RangeOf(minNumber, maxNumber, op);
+    }
+#end
 
     /**
      * RangeOf with various options. (versatile) <br />
@@ -744,7 +790,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param maxNumber The max number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param rangeOfOption The option of range-of. (NotNull)
      */
-    public void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, RangeOfOption rangeOfOption) {
+    ${table.directConditionOptionMethodModifier} void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, RangeOfOption rangeOfOption) {
         regROO(minNumber, maxNumber, getCValue${tmpJavaName}(), "${col.name}", rangeOfOption);
     }
 #end
@@ -1121,6 +1167,22 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #end
 #if (${col.isAvailableDateFromTo()})
+#if ($table.isMakeCallbackConditionOptionSetup())
+
+    /**
+     * FromTo with various options. (versatile) {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
+     * And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, new <span style="color: #DD4747">FromToOption</span>().compareAsDate());</pre>
+     * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
+     * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
+     * @param opLambda The callback for option of from-to. (NotNull)
+     */
+    public void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, COptionCall<FromToOption> opLambda) {
+        FromToOption op = cFTOP(); opLambda.callback(op);
+        set${tmpJavaName}_FromTo(fromDatetime, toDatetime, op);
+    }
+#end
 
     /**
      * FromTo with various options. (versatile) {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
@@ -1131,7 +1193,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    public void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, FromToOption fromToOption) {
+    ${table.directConditionOptionMethodModifier} void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, FromToOption fromToOption) {
 #if ($col.isJavaNativeUtilDate())
         regFTQ(fCTPD(fromDatetime), fCTPD(toDatetime), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #elseif ($col.isJavaNativeNextLocalDate())
@@ -1157,7 +1219,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      */
     public void set${tmpJavaName}_DateFromTo(${col.fromToJavaNativeDate} fromDate, ${col.fromToJavaNativeDate} toDate) {
-        set${tmpJavaName}_FromTo(fromDate, toDate, new FromToOption().compareAsDate());
+        set${tmpJavaName}_FromTo(fromDate, toDate, cFTOP().compareAsDate());
     }
 #end
 #if (${col.isAvailableDateInScope()})
@@ -1480,9 +1542,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param conditionValue The condition value embedded without binding (by MySQL restriction) but escaped. (NullAllowed: if null or empty, no condition)
      * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, No modifier specified)
      */
-    public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn
+    public void match(org.dbflute.dbmeta.info.ColumnInfo textColumn
                     , String conditionValue
-                    , org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
+                    , org.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue, modifier);
     }
@@ -1494,9 +1556,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param conditionValue The condition value embedded without binding (by MySQL restriction) but escaped. (NullAllowed: if null or empty, no condition)
      * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, no modifier specified)
      */
-    public void match(List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList
+    public void match(List<org.dbflute.dbmeta.info.ColumnInfo> textColumnList
                     , String conditionValue
-                    , org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
+                    , org.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
         xdoMatchForMySQL(textColumnList, conditionValue, modifier);
     }
 #end
@@ -1510,7 +1572,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
+    public void match(org.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue);
     }
@@ -1520,7 +1582,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
+    public void match(List<org.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
         xdoMatchByLikeSearch(textColumnList, conditionValue);
     }
 
@@ -1535,7 +1597,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 
     @Override
-    protected org.seasar.dbflute.dbway.ExtensionOperand xgetPostgreSQLMatchOperand() {
+    protected org.dbflute.dbway.ExtensionOperand xgetPostgreSQLMatchOperand() {
         return ${glDBFluteConfig}.getInstance().getFullTextSearchOperand();
     }
 #end
@@ -1549,7 +1611,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
+    public void match(org.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue);
     }
@@ -1560,7 +1622,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    public void match(List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
+    public void match(List<org.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
         xdoMatchByLikeSearch(textColumnList, conditionValue);
     }
 
@@ -1579,6 +1641,45 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     // ===================================================================================
     //                                                                        Manual Order
     //                                                                        ============
+#if ($table.isMakeCallbackConditionManualOrder())
+    /**
+     * Order along manual ordering information.
+     * <pre>
+     * MemberCB cb = new MemberCB();
+     * ManualOrderBean mob = new ManualOrderBean();
+     * mob.<span style="color: #DD4747">when_GreaterEqual</span>(priorityDate); <span style="color: #3F7E5E">// e.g. 2000/01/01</span>
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+     * <span style="color: #3F7E5E">// order by </span>
+     * <span style="color: #3F7E5E">//   case</span>
+     * <span style="color: #3F7E5E">//     when BIRTHDATE &gt;= '2000/01/01' then 0</span>
+     * <span style="color: #3F7E5E">//     else 1</span>
+     * <span style="color: #3F7E5E">//   end asc, ...</span>
+     *
+     * MemberCB cb = new MemberCB();
+     * ManualOrderBean mob = new ManualOrderBean();
+     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Withdrawal);
+     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Formalized);
+     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Provisional);
+     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+     * <span style="color: #3F7E5E">// order by </span>
+     * <span style="color: #3F7E5E">//   case</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'FML' then 1</span>
+     * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'PRV' then 2</span>
+     * <span style="color: #3F7E5E">//     else 3</span>
+     * <span style="color: #3F7E5E">//   end asc, ...</span>
+     * </pre>
+     * <p>This function with Union is unsupported!</p>
+     * <p>The order values are bound (treated as bind parameter).</p>
+     * @param mobLambda The callback for bean of manual order containing order values. (NotNull)
+     */
+    public void withManualOrder(MOrderCall mobLambda) { // is user public!
+        ManualOrderBean mob = cMOB(); mobLambda.callback(mob);
+        xdoWithManualOrder(mob);
+    }
+
+#end
+#if ($table.isMakeDirectConditionManualOrder())
     /**
      * Order along manual ordering information.
      * <pre>
@@ -1614,6 +1715,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         xdoWithManualOrder(mob);
     }
 
+#end
     // ===================================================================================
     //                                                                    Small Adjustment
     //                                                                    ================

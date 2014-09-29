@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ ${database.allClassCopyright}package ${glPackageBaseCQ};
 
 import java.util.Map;
 
-import org.seasar.dbflute.cbean._
-import org.seasar.dbflute.cbean.chelper._
-import org.seasar.dbflute.cbean.coption._
-import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.dbflute.cbean._
+import org.dbflute.cbean.chelper._
+import org.dbflute.cbean.coption._
+import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.exception.IllegalConditionBeanOperationException;
 import ${glPackageCIQ}._
 import ${glPackageCB}._
 import ${glPackageCQ}._

@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -50,13 +50,13 @@ import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.BehaviorSelector;
-import org.seasar.dbflute.bhv.AbstractBehaviorReadable;
-import org.seasar.dbflute.bhv.AbstractBehaviorWritable;
-import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
-import org.seasar.dbflute.bhv.core.InvokerAssistant;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.BehaviorSelector;
+import org.dbflute.bhv.AbstractBehaviorReadable;
+import org.dbflute.bhv.AbstractBehaviorWritable;
+import org.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.dbflute.bhv.core.CommonColumnAutoSetupper;
+import org.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 
 import ${glPackageExtendedBhv}.*;
 

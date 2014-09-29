@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -26,18 +26,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap
 
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.Entity;
+import org.dbflute.Entity;
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
 #end
-import org.seasar.dbflute.dbmeta.AbstractDBMeta;
-import org.seasar.dbflute.dbmeta.AbstractDBMeta._;
-import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType
-import org.seasar.dbflute.dbmeta.PropertyGateway;
-import org.seasar.dbflute.dbmeta.info._;
-import org.seasar.dbflute.dbmeta.name._;
-import org.seasar.dbflute.jdbc.Classification;
+import org.dbflute.dbmeta.AbstractDBMeta;
+import org.dbflute.dbmeta.AbstractDBMeta._;
+import org.dbflute.dbmeta.DBMeta.OptimisticLockType
+import org.dbflute.dbmeta.PropertyGateway;
+import org.dbflute.dbmeta.info._;
+import org.dbflute.dbmeta.name._;
+import org.dbflute.dbway.DBDef;
+import org.dbflute.jdbc.Classification;
 import ${glPackageBaseCommon}._;
 import ${myExtendedEntityPackageName}._;
 

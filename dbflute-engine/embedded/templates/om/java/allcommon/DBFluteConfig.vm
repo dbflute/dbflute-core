@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -23,28 +23,29 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.QLog;
-import org.seasar.dbflute.XLog;
-import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
-import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
-import org.seasar.dbflute.dbmeta.name.SqlNameFilter;
-import org.seasar.dbflute.exception.IllegalDBFluteConfigAccessException;
-import org.seasar.dbflute.jdbc.DataSourceHandler;
-import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
-import org.seasar.dbflute.jdbc.PhysicalConnectionDigger;
-import org.seasar.dbflute.jdbc.SQLExceptionDigger;
-import org.seasar.dbflute.jdbc.StatementConfig;
-import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
-import org.seasar.dbflute.s2dao.valuetype.plugin.OracleAgent;
-import org.seasar.dbflute.s2dao.valuetype.plugin.OracleDateType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.OracleArrayType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.OracleStructType;
-import org.seasar.dbflute.twowaysql.DisplaySqlBuilder;
-import org.seasar.dbflute.util.DfReflectionUtil;
+import org.dbflute.QLog;
+import org.dbflute.XLog;
+import org.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
+import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.dbmeta.name.SqlNameFilter;
+import org.dbflute.dbway.DBDef;
+import org.dbflute.exception.IllegalDBFluteConfigAccessException;
+import org.dbflute.jdbc.DataSourceHandler;
+import org.dbflute.jdbc.NotClosingConnectionWrapper;
+import org.dbflute.jdbc.PhysicalConnectionDigger;
+import org.dbflute.jdbc.SQLExceptionDigger;
+import org.dbflute.jdbc.StatementConfig;
+import org.dbflute.jdbc.ValueType;
+import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
+import org.dbflute.s2dao.valuetype.plugin.OracleAgent;
+import org.dbflute.s2dao.valuetype.plugin.OracleDateType;
+import org.dbflute.s2dao.valuetype.plugin.OracleArrayType;
+import org.dbflute.s2dao.valuetype.plugin.OracleStructType;
+import org.dbflute.twowaysql.DisplaySqlBuilder;
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
+import org.dbflute.util.DfReflectionUtil;
 #if ($database.isTargetContainerSeasar())
 import org.seasar.extension.dbcp.ConnectionWrapper;
 import org.seasar.framework.exception.SQLRuntimeException;
@@ -64,8 +65,8 @@ import org.joda.time.LocalTime;
 #end
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
-import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.s2dao.valuetype.TnAbstractValueType;
+import org.dbflute.util.DfTypeUtil;
 #end
 
 /**
@@ -103,8 +104,10 @@ public class ${glDBFluteConfig} {
     // logging
     protected boolean _queryLogLevelInfo;
     protected boolean _executeStatusLogLevelInfo;
-    protected String _logDateFormat;
-    protected String _logTimestampFormat;
+    protected String _logDatePattern;
+    protected String _logTimestampPattern;
+    protected String _logTimePattern;
+    protected BoundDateDisplayTimeZoneProvider _logTimeZoneProvider;
 
     // environment
     protected StatementConfig _defaultStatementConfig;
@@ -138,8 +141,8 @@ public class ${glDBFluteConfig} {
     //                                   -------------------
 #if ($database.isAvailableDatabaseDependency())
 #if ($database.isDatabasePostgreSQL())
-    protected org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch _fullTextSearchOperand
-            = org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.FULL_TEXT_SEARCH;
+    protected org.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch _fullTextSearchOperand
+            = org.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.FULL_TEXT_SEARCH;
 #end
 #end
 
@@ -162,8 +165,8 @@ public class ${glDBFluteConfig} {
             // date formatting has two points:
             //   o the DATE type of Oracle has seconds  
             //   o it uses a date literal of Oracle
-            _logDateFormat = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
-            _logTimestampFormat = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";
+            _logDatePattern = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
+            _logTimestampPattern = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";
         }
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
 
@@ -390,28 +393,52 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                          Log Format
     //                                                                          ==========
-    public String getLogDateFormat() {
-        return _logDateFormat;
+    public String getLogDatePattern() {
+        return _logDatePattern;
     }
 
-    public void setLogDateFormat(String logDateFormat) {
+    public void setLogDatePattern(String logDatePattern) {
         assertNotLocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting logDateFormat: " + logDateFormat);
+            _log.info("...Setting logDatePattern: " + logDatePattern);
         }
-        _logDateFormat = logDateFormat;
+        _logDatePattern = logDatePattern;
     }
 
-    public String getLogTimestampFormat() {
-        return _logTimestampFormat;
+    public String getLogTimestampPattern() {
+        return _logTimestampPattern;
     }
 
-    public void setLogTimestampFormat(String logTimestampFormat) {
+    public void setLogTimestampPattern(String logTimestampPattern) {
         assertNotLocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting logTimestampFormat: " + logTimestampFormat);
+            _log.info("...Setting logTimestampPattern: " + logTimestampPattern);
         }
-        _logTimestampFormat = logTimestampFormat;
+        _logTimestampPattern = logTimestampPattern;
+    }
+
+    public String getLogTimePattern() {
+        return _logTimePattern;
+    }
+
+    public void setLogTimePattern(String logTimePattern) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting logTimePattern: " + logTimePattern);
+        }
+        _logTimePattern = logTimePattern;
+    }
+
+    public BoundDateDisplayTimeZoneProvider getLogTimeZoneProvider() {
+        return _logTimeZoneProvider;
+    }
+
+    public void setLogTimeZoneProvider(BoundDateDisplayTimeZoneProvider logTimeZoneProvider) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting logTimeZoneProvider: " + logTimeZoneProvider);
+        }
+        _logTimeZoneProvider = logTimeZoneProvider;
     }
 
     // ===================================================================================
@@ -662,7 +689,7 @@ public class ${glDBFluteConfig} {
     // -----------------------------------------------------
     //                              Full-Text Search Operand
     //                              ------------------------
-    public org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch getFullTextSearchOperand() {
+    public org.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch getFullTextSearchOperand() {
         return _fullTextSearchOperand;
     }
 
@@ -671,7 +698,7 @@ public class ${glDBFluteConfig} {
         if (_log.isInfoEnabled()) {
             _log.info("...Using fullTextSearchOperand: Default");
         }
-        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.FULL_TEXT_SEARCH; 
+        _fullTextSearchOperand = org.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.FULL_TEXT_SEARCH; 
     }
 
     public void useOldFullTextSearchOperand() {
@@ -679,7 +706,7 @@ public class ${glDBFluteConfig} {
         if (_log.isInfoEnabled()) {
             _log.info("...Using fullTextSearchOperand: Old");
         }
-        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.OLD_FULL_TEXT_SEARCH; 
+        _fullTextSearchOperand = org.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.OLD_FULL_TEXT_SEARCH; 
     }
 #end
 #end

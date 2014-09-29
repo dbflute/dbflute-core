@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -23,22 +23,27 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.seasar.dbflute._;
-import org.seasar.dbflute.bhv._;
-import org.seasar.dbflute.bhv.AbstractBehaviorReadable._;
-import org.seasar.dbflute.bhv.AbstractBehaviorWritable._;
-import org.seasar.dbflute.cbean._;
-import org.seasar.dbflute.cbean.chelper._;
-import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.exception._;
-import org.seasar.dbflute.util._;
+import org.dbflute._;
+import org.dbflute.bhv._;
+import org.dbflute.bhv.readable._;
+#if ($table.isWritable())
+import org.dbflute.bhv.writable._;
+#end
+import org.dbflute.bhv.AbstractBehaviorReadable._;
+import org.dbflute.bhv.AbstractBehaviorWritable._;
+import org.dbflute.cbean._;
+import org.dbflute.cbean.chelper._;
+import org.dbflute.cbean.result._;
+import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.exception._;
+import org.dbflute.util._;
 #if ($table.needsBasicOptionalEntityImport())
 import ${database.basicOptionalEntityClassName};
 #end
 #if ($table.needsRelationOptionalEntityNextImport())
 import ${database.relationOptionalEntityClassName};
 #end
-import org.seasar.dbflute.outsidesql.executor._;
+import org.dbflute.outsidesql.executor._;
 import ${glPackageBaseCommon}._;
 import ${glPackageExtendedBhv}._;
 #if ($table.hasReferrerLoader())

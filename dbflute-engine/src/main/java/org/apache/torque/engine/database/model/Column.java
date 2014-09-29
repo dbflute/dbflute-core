@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2014 the Seasar Foundation and the Others.
+ * Copyright 2014-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,26 +134,26 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
-import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
-import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
-import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfClassificationProperties;
-import org.seasar.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.properties.DfIncludeQueryProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
-import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
-import org.seasar.dbflute.properties.DfTypeMappingProperties;
-import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.DfBuildProperties;
+import org.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
+import org.dbflute.logic.generate.language.DfLanguageDependency;
+import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
+import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
+import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfClassificationProperties;
+import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfIncludeQueryProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
+import org.dbflute.properties.DfSequenceIdentityProperties;
+import org.dbflute.properties.DfTypeMappingProperties;
+import org.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**
@@ -2103,6 +2103,9 @@ public class Column {
         if (hasQueryRestrictionByClassification()) {
             return false;
         }
+        if (!getTable().isMakeConditionQueryPrefixSearch()) {
+            return false; // basically here since 1.1
+        }
         return getIncludeQueryProperties().isAvailableStringPrefixSearch(this);
     }
 
@@ -2245,6 +2248,9 @@ public class Column {
     public boolean isAvailableDateDateFromTo() { // means DateFromTo of Date type
         if (isJdbcTypeTime()) {
             return false;
+        }
+        if (!getTable().isMakeConditionQueryDateFromTo()) {
+            return false; // basically here since 1.1
         }
         return getIncludeQueryProperties().isAvailableDateDateFromTo(this);
     }

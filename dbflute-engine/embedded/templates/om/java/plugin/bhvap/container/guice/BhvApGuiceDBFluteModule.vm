@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonAp};
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.BehaviorSelector;
-import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
+import org.dbflute.BehaviorSelector;
+import org.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.dbflute.bhv.core.CommonColumnAutoSetupper;
 import ${glPackageBaseCommonLib}.${glDBFluteModuleLib};
 import ${glPackageExtendedBhvAp}.*;
 

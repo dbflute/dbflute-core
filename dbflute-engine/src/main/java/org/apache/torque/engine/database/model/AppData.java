@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2014 the Seasar Foundation and the Others.
+ * Copyright 2014-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,10 +75,10 @@
 package org.apache.torque.engine.database.model;
 
 import org.apache.torque.engine.database.transform.DTDResolver;
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.DfBuildProperties;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
+import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**

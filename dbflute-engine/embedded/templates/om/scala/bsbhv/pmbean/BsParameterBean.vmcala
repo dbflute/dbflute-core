@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -21,31 +21,31 @@ import scala.collection.JavaConverters._;
 
 import java.util._;
 
-#if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
-import org.seasar.dbflute.cbean.SimplePagingBean;
-#end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-import org.seasar.dbflute.outsidesql.ProcedurePmb;
+import org.dbflute.outsidesql.ProcedurePmb;
 #else
+#if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
+import org.dbflute.outsidesql.paging.SimplePagingBean;
+#end
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
-import org.seasar.dbflute.immutable.outsidesql._;
+import org.dbflute.immutable.outsidesql._;
 #else
-import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
+import org.dbflute.twowaysql.pmbean.ParameterBean;
 #end
 #end
-import org.seasar.dbflute.jdbc._;
-import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
+import org.dbflute.jdbc._;
+import org.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
-import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.dbflute.cbean.coption.LikeSearchOption;
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
-import org.seasar.dbflute.cbean.coption.FromToOption;
+import org.dbflute.cbean.coption.FromToOption;
 #end
-import org.seasar.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 #if ($database.hasPmbMetaDataPropertyUseOriginalException($pmbClassName))
-import org.seasar.dbflute.exception._;
+import org.dbflute.exception._;
 #end
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 #if ($database.isAvailableJodaTimeEntity())
 #if ($database.isAvailableJodaTimeLocalDateEntity())
 import org.joda.time.LocalDate;

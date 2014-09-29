@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@ ${database.allClassCopyright}package ${myDBMetaPackageName};
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.Entity;
+import org.dbflute.Entity;
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
 #end
-import org.seasar.dbflute.dbmeta.AbstractDBMeta;
-import org.seasar.dbflute.dbmeta.PropertyGateway;
-import org.seasar.dbflute.dbmeta.info.*;
-import org.seasar.dbflute.dbmeta.name.*;
+import org.dbflute.dbmeta.AbstractDBMeta;
+import org.dbflute.dbmeta.PropertyGateway;
+import org.dbflute.dbmeta.info.*;
+import org.dbflute.dbmeta.name.*;
+import org.dbflute.dbway.DBDef;
 import ${glPackageBaseCommon}.*;
 import ${myExtendedEntityPackageName}.*;
 

@@ -5,16 +5,17 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="1.0.5L" />
-	<property name="build.version" value="${version}" />
-	<property name="runtime.version" value="1.0.5L" />
-	<property name="runtime.build.version" value="${runtime.version}" />
+	<property name="version" value="1.1" />
+	<property name="build.version" value="${version}-pilot1-SNAPSHOT" />
+	<property name="runtime.version" value="1.1" />
+	<property name="runtime.build.version" value="${runtime.version}-pilot1-SNAPSHOT" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
 	<property name="workspace.base" value="../.." />
-	<property name="dbflute.base" value="${workspace.base}/dbflute" />
+	<property name="dbflute.base" value="${workspace.base}/dbflute-core" />
 	<property name="dbflute.www.base" value="${workspace.base}/dbflute-www" />
+	<property name="test.active.stage.base" value="${workspace.base}" />
 	<property name="example.container.base" value="${workspace.base}/dbflute-example-container" />
 	<property name="example.database.base" value="${workspace.base}/dbflute-example-database" />
 	<property name="example.multipledb.base" value="${workspace.base}/dbflute-example-multipledb" />
@@ -41,11 +42,9 @@
 	<property name="module.zip" value="dbflute-${version}.zip" />
 	<property name="module.build.zip" value="dbflute-${build.version}.zip" />
 
-	<!-- DI Container Examples -->
-	<property name="seasar.example.dir" value="${example.container.base}/dbflute-seasar-example" />
-	<property name="spring.example.dir" value="${example.container.base}/dbflute-spring-example" />
-	<property name="guice.example.dir" value="${example.container.base}/dbflute-guice-example" />
-	<property name="cdi.example.dir" value="${example.container.base}/dbflute-cdi-example" />
+	<!-- Test: Active Stage -->
+	<property name="test.active.dockside.dir" value="${test.active.stage.base}/dbflute-test-active-dockside" />
+	<property name="test.active.hanger.dir" value="${test.active.stage.base}/dbflute-test-active-hanger" />
 
 	<!-- Database Examples -->
 	<property name="mysql.example.dir" value="${example.database.base}/dbflute-mysql-example" />
@@ -250,33 +249,17 @@
 		<chmod dir="${extraction.dir}/ant/bin" perm="ugo+rx" includes="**/*" />
 	</target>
 
-	<target name="reflect-to-seasar" depends="prepare-reflection" description="==> reflect to seasar example">
-		<delete dir="${seasar.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${seasar.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+	<target name="reflect-to-test-active-dockside" depends="prepare-reflection" description="==> reflect to test active dockside">
+		<delete dir="${test.active.dockside.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.active.dockside.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />
 	</target>
 
-	<target name="reflect-to-spring" depends="prepare-reflection" description="==> reflect to spring example">
-		<delete dir="${spring.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${spring.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-guice" depends="prepare-reflection" description="==> reflect to guice example">
-		<delete dir="${guice.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${guice.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-cdi" depends="prepare-reflection" description="==> reflect to cdi example">
-		<delete dir="${cdi.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${cdi.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+	<target name="reflect-to-test-active-hanger" depends="prepare-reflection" description="==> reflect to test active hanger">
+		<delete dir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />

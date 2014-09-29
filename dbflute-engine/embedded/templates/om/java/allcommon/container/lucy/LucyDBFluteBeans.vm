@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}">
         <inject method="setContainer">lucy</inject>
     </component>
-    <component name="${database.behaviorCommandInvokerComponentName}" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker">
+    <component name="${database.behaviorCommandInvokerComponentName}" class="org.dbflute.bhv.core.BehaviorCommandInvoker">
         <inject method="setInvokerAssistant">${database.invokerAssistantComponentName}</inject>
     </component>
     

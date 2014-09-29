@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2014 the Seasar Foundation and the Others.
+ * Copyright 2014-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,10 +76,10 @@ package org.apache.torque.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
-import org.seasar.dbflute.task.DfDBFluteTaskStatus;
-import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
-import org.seasar.dbflute.task.bs.DfAbstractTask;
+import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
+import org.dbflute.task.DfDBFluteTaskStatus;
+import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
+import org.dbflute.task.bs.DfAbstractTask;
 
 /**
  * @author modified by jflute (originated in Apache Torque)

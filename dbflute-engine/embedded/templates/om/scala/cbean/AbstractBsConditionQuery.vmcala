@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -22,16 +22,18 @@ import scala.collection.JavaConverters._;
 import java.util.Collection;
 import java.util.Date;
 
-import org.seasar.dbflute.cbean._;
-import org.seasar.dbflute.cbean.AbstractConditionQuery._;
-import org.seasar.dbflute.cbean.chelper._;
-import org.seasar.dbflute.cbean.ckey._;
-import org.seasar.dbflute.cbean.coption._;
-import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.cbean._;
+import org.dbflute.cbean.AbstractConditionQuery._;
+import org.dbflute.cbean.chelper._;
+import org.dbflute.cbean.ckey._;
+import org.dbflute.cbean.coption._;
+import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.ordering._;
+import org.dbflute.cbean.scoping._;
+import org.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.dbmeta.DBMetaProvider;
 #if ($database.isAvailableJodaTimeEntity())
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.dbflute.util.DfTypeUtil;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.ReadableInstant;
@@ -1476,9 +1478,9 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param conditionValue The condition value embedded without binding (by MySQL restriction) but escaped. (NullAllowed: if null or empty, no condition)
      * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, No modifier specified)
      */
-    public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn
+    public void match(org.dbflute.dbmeta.info.ColumnInfo textColumn
                     , String conditionValue
-                    , org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
+                    , org.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue, modifier);
     }
@@ -1490,9 +1492,9 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param conditionValue The condition value embedded without binding (by MySQL restriction) but escaped. (NullAllowed: if null or empty, no condition)
      * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, no modifier specified)
      */
-    public void match(List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList
+    public void match(List<org.dbflute.dbmeta.info.ColumnInfo> textColumnList
                     , String conditionValue
-                    , org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
+                    , org.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
         xdoMatchForMySQL(textColumnList, conditionValue, modifier);
     }
 #end
@@ -1506,7 +1508,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    def match(textColumn: org.seasar.dbflute.dbmeta.info.ColumnInfo, conditionValue: String): Unit = {
+    def match(textColumn: org.dbflute.dbmeta.info.ColumnInfo, conditionValue: String): Unit = {
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue);
     }
@@ -1516,7 +1518,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    def match(textColumnList: List[org.seasar.dbflute.dbmeta.info.ColumnInfo], conditionValue: String): Unit = {
+    def match(textColumnList: List[org.dbflute.dbmeta.info.ColumnInfo], conditionValue: String): Unit = {
         xdoMatchByLikeSearch(textColumnList, conditionValue);
     }
 
@@ -1531,7 +1533,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
     }
 
     @Override
-    protected def xgetPostgreSQLMatchOperand(): org.seasar.dbflute.dbway.ExtensionOperand = {
+    protected def xgetPostgreSQLMatchOperand(): org.dbflute.dbway.ExtensionOperand = {
         return ${glDBFluteConfig}.getFullTextSearchOperand();
     }
 #end
@@ -1545,7 +1547,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    def match(textColumn: org.seasar.dbflute.dbmeta.info.ColumnInfo, conditionValue: String): Unit = {
+    def match(textColumn: org.dbflute.dbmeta.info.ColumnInfo, conditionValue: String): Unit = {
         assertObjectNotNull("textColumn", textColumn);
         match(newArrayList(textColumn), conditionValue);
     }
@@ -1556,7 +1558,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
-    def match(textColumnList: List[org.seasar.dbflute.dbmeta.info.ColumnInfo], conditionValue: String): Unit = {
+    def match(textColumnList: List[org.dbflute.dbmeta.info.ColumnInfo], conditionValue: String): Unit = {
         xdoMatchByLikeSearch(textColumnList, conditionValue);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2014 the Seasar Foundation and the Others.
+ * Copyright 2014-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,36 +141,36 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
-import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.bhv.ConditionBeanSetupper;
-import org.seasar.dbflute.bhv.ReferrerConditionSetupper;
-import org.seasar.dbflute.dbmeta.DerivedMappable;
-import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
-import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
-import org.seasar.dbflute.logic.generate.column.DfColumnListToStringBuilder;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
-import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
-import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
-import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
-import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
-import org.seasar.dbflute.properties.DfClassificationProperties;
-import org.seasar.dbflute.properties.DfCommonColumnProperties;
-import org.seasar.dbflute.properties.DfDatabaseProperties;
-import org.seasar.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.properties.DfIncludeQueryProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
-import org.seasar.dbflute.properties.DfOutsideSqlProperties;
-import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
-import org.seasar.dbflute.properties.DfSimpleDtoProperties;
-import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
+import org.dbflute.DfBuildProperties;
+import org.dbflute.bhv.referrer.ConditionBeanSetupper;
+import org.dbflute.bhv.referrer.ReferrerConditionSetupper;
+import org.dbflute.dbmeta.derived.DerivedMappable;
+import org.dbflute.dbway.DBDef;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.StringSet;
+import org.dbflute.helper.jdbc.context.DfSchemaSource;
+import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
+import org.dbflute.logic.generate.column.DfColumnListToStringBuilder;
+import org.dbflute.logic.generate.language.DfLanguageDependency;
+import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
+import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
+import org.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfBehaviorFilterProperties;
+import org.dbflute.properties.DfClassificationProperties;
+import org.dbflute.properties.DfCommonColumnProperties;
+import org.dbflute.properties.DfDatabaseProperties;
+import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfIncludeQueryProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
+import org.dbflute.properties.DfOutsideSqlProperties;
+import org.dbflute.properties.DfSequenceIdentityProperties;
+import org.dbflute.properties.DfSimpleDtoProperties;
+import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**
@@ -3532,6 +3532,18 @@ public class Table {
         return prop.isCompatibleSelectByPKOldStyle() ? "Value" : "";
     }
 
+    public boolean isMakeCallbackConditionBeanSetup() {
+        return getLittleAdjustmentProperties().isMakeCallbackConditionBeanSetup();
+    }
+
+    public boolean isMakeDirectConditionBeanSetup() {
+        return getLittleAdjustmentProperties().isMakeDirectConditionBeanSetup();
+    }
+
+    public boolean isMakeBatchUpdateSpecifyColumn() {
+        return getLittleAdjustmentProperties().isMakeBatchUpdateSpecifyColumn();
+    }
+
     public boolean isCompatibleSelectByPKWithDeletedCheck() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.isCompatibleSelectByPKWithDeletedCheck();
@@ -3614,6 +3626,35 @@ public class Table {
 
     public boolean isMakeConditionQueryPlainListManualOrder() {
         return getLittleAdjustmentProperties().isMakeConditionQueryPlainListManualOrder();
+    }
+
+    public boolean isMakeConditionQueryPrefixSearch() {
+        return getLittleAdjustmentProperties().isMakeConditionQueryPrefixSearch();
+    }
+
+    public boolean isMakeConditionQueryDateFromTo() {
+        return getLittleAdjustmentProperties().isMakeConditionQueryDateFromTo();
+    }
+
+    public boolean isMakeCallbackConditionOptionSetup() {
+        return getLittleAdjustmentProperties().isMakeCallbackConditionOptionSetup();
+    }
+
+    public boolean isMakeDirectConditionOptionSetup() {
+        return getLittleAdjustmentProperties().isMakeDirectConditionOptionSetup();
+    }
+
+    public String getDirectConditionOptionMethodModifier() {
+        final DfLanguageGrammar grammar = getLanguageGrammar();
+        return isMakeDirectConditionOptionSetup() ? grammar.getPublicModifier() : grammar.getProtectedModifier();
+    }
+
+    public boolean isMakeCallbackConditionManualOrder() {
+        return getLittleAdjustmentProperties().isMakeCallbackConditionManualOrder();
+    }
+
+    public boolean isMakeDirectConditionManualOrder() {
+        return getLittleAdjustmentProperties().isMakeDirectConditionManualOrder();
     }
 
     // ===================================================================================

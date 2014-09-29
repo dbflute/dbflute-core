@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -21,16 +21,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.seasar.dbflute.cbean.ListResultBean;
-import org.seasar.dbflute.cbean.PagingBean;
-import org.seasar.dbflute.cbean.PagingResultBean;
-import org.seasar.dbflute.immutable.DBableEntity;
-import org.seasar.dbflute.immutable.outsidesql._;
-import org.seasar.dbflute.outsidesql._;
-import org.seasar.dbflute.outsidesql.executor._;
-import org.seasar.dbflute.outsidesql.typed._;
-import org.seasar.dbflute.jdbc.CursorHandler;
-import org.seasar.dbflute.jdbc.StatementConfig;
+import org.dbflute.cbean.ListResultBean;
+import org.dbflute.cbean.PagingBean;
+import org.dbflute.cbean.PagingResultBean;
+import org.dbflute.immutable.DBableEntity;
+import org.dbflute.immutable.outsidesql._;
+import org.dbflute.outsidesql._;
+import org.dbflute.outsidesql.executor._;
+import org.dbflute.outsidesql.typed._;
+import org.dbflute.jdbc.CursorHandler;
+import org.dbflute.jdbc.StatementConfig;
 
 /**
  * The gateway of loader handling for nested referrer as Scala runtime.

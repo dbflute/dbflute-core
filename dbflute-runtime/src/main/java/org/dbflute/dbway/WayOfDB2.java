@@ -1,0 +1,88 @@
+/*
+ * Copyright 2014-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+package org.dbflute.dbway;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * The DB-way of DB2.
+ * @author jflute
+ */
+public class WayOfDB2 implements DBWay, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    protected static final List<String> ORIGNAL_WILD_CARD_LIST = Arrays.asList("\uff05", "\uff3f");
+
+    // ===================================================================================
+    //                                                                        Sequence Way
+    //                                                                        ============
+    public String buildSequenceNextValSql(String sequenceName) {
+        return "values nextval for " + sequenceName;
+    }
+
+    // ===================================================================================
+    //                                                                        Identity Way
+    //                                                                        ============
+    public String getIdentitySelectSql() {
+        return "values IDENTITY_VAL_LOCAL()";
+    }
+
+    // ===================================================================================
+    //                                                                         SQL Support
+    //                                                                         ===========
+    public boolean isBlockCommentSupported() {
+        return true;
+    }
+
+    public boolean isLineCommentSupported() {
+        return true;
+    }
+
+    // ===================================================================================
+    //                                                                        JDBC Support
+    //                                                                        ============
+    public boolean isScrollableCursorSupported() {
+        return true;
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    public List<String> getOriginalWildCardList() {
+        return ORIGNAL_WILD_CARD_LIST;
+    }
+
+    // ===================================================================================
+    //                                                                    String Connector
+    //                                                                    ================
+    public OnQueryStringConnector getStringConnector() {
+        return STANDARD_STRING_CONNECTOR;
+    }
+
+    // ===================================================================================
+    //                                                                   SQLException Info
+    //                                                                   =================
+    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
+        return "23505".equals(sqlState);
+    }
+}

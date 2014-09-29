@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -16,20 +16,17 @@
 ${database.allClassCopyright}package ${glPackageBaseCB};
 #set ($myClassName = "${myBaseConditionBeanClassName}")
 
-import org.seasar.dbflute.cbean.AbstractConditionBean;
-import org.seasar.dbflute.cbean.AndQuery;
-import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.ConditionQuery;
-import org.seasar.dbflute.cbean.OrQuery;
-import org.seasar.dbflute.cbean.SpecifyQuery;
-import org.seasar.dbflute.cbean.SubQuery;
-import org.seasar.dbflute.cbean.UnionQuery;
-import org.seasar.dbflute.cbean.chelper.*;
-import org.seasar.dbflute.cbean.coption.*;
-import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
-import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.dbflute.cbean.AbstractConditionBean;
+import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.ConditionQuery;
+import org.dbflute.cbean.chelper.*;
+import org.dbflute.cbean.coption.*;
+import org.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.cbean.scoping.*;
+import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 #if ($table.hasPrimaryKeyForcedClassificationSetting())
 import ${glPackageBaseCommon}.${glCDef};
 #end
@@ -320,11 +317,11 @@ public class ${myClassName} extends AbstractConditionBean {
     { if (xhelpIsSqlClausePostgreSql()) { xhelpGettingSqlClausePostgreSql().lockForUpdateNoWait(); } return this; }
 
     protected boolean xhelpIsSqlClausePostgreSql() {
-        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql;
+        return getSqlClause() instanceof org.dbflute.cbean.sqlclause.SqlClausePostgreSql;
     }
 
-    protected org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql xhelpGettingSqlClausePostgreSql() {
-        return (org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql)getSqlClause();
+    protected org.dbflute.cbean.sqlclause.SqlClausePostgreSql xhelpGettingSqlClausePostgreSql() {
+        return (org.dbflute.cbean.sqlclause.SqlClausePostgreSql)getSqlClause();
     }
 #end
 #if ($database.isDatabaseOracle())
@@ -338,11 +335,11 @@ public class ${myClassName} extends AbstractConditionBean {
     { if (xhelpIsSqlClauseOracle()) { xhelpGettingSqlClauseOracle().lockForUpdateWait(waitSec); } return this; }
 
     protected boolean xhelpIsSqlClauseOracle() {
-        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
+        return getSqlClause() instanceof org.dbflute.cbean.sqlclause.SqlClauseOracle;
     }
 
-    protected org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle xhelpGettingSqlClauseOracle() {
-        return (org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause();
+    protected org.dbflute.cbean.sqlclause.SqlClauseOracle xhelpGettingSqlClauseOracle() {
+        return (org.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause();
     }
 #end
 #if ($database.isDatabaseDB2())
@@ -358,11 +355,11 @@ public class ${myClassName} extends AbstractConditionBean {
     public void lockWithUR() { if (xhelpIsSqlClauseDb2()) { xhelpGettingSqlClauseDb2().lockWithUR(); } }
 
     protected boolean xhelpIsSqlClauseDb2() {
-        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2;
+        return getSqlClause() instanceof org.dbflute.cbean.sqlclause.SqlClauseDb2;
     }
 
-    protected org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2 xhelpGettingSqlClauseDb2() {
-        return (org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2)getSqlClause();
+    protected org.dbflute.cbean.sqlclause.SqlClauseDb2 xhelpGettingSqlClauseDb2() {
+        return (org.dbflute.cbean.sqlclause.SqlClauseDb2)getSqlClause();
     }
 #end
 #end
@@ -927,9 +924,13 @@ public class ${myClassName} extends AbstractConditionBean {
     protected SqlAnalyzerFactory getSqlAnalyzerFactory()
     { return new ${glImplementedInvokerAssistant}().assistSqlAnalyzerFactory(); }
     @Override
-    protected String getLogDateFormat() { return ${glDBFluteConfig}.getInstance().getLogDateFormat(); }
+    protected String getConfiguredLogDatePattern() { return ${glDBFluteConfig}.getInstance().getLogDatePattern(); }
     @Override
-    protected String getLogTimestampFormat() { return ${glDBFluteConfig}.getInstance().getLogTimestampFormat(); }
+    protected String getConfiguredLogTimestampPattern() { return ${glDBFluteConfig}.getInstance().getLogTimestampPattern(); }
+    @Override
+    protected String getConfiguredLogTimePattern() { return ${glDBFluteConfig}.getInstance().getLogTimePattern(); }
+    @Override
+    protected BoundDateDisplayTimeZoneProvider getConfiguredLogTimeZoneProvider() { return ${glDBFluteConfig}.getInstance().getLogTimeZoneProvider(); }
 
     // ===================================================================================
     //                                                                       Meta Handling

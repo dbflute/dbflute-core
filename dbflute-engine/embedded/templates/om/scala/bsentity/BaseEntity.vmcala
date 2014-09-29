@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2014 the Seasar Foundation and the Others.
+## Copyright 2014-2014 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -30,29 +30,30 @@ import java.util.ArrayList;
 import java.util.Set;
 #if ($table.hasUtilDateColumn())
 import java.util.Date;
+import java.util.TimeZone;
 #end
 
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
-import org.seasar.dbflute.Entity;
+import org.dbflute.Entity;
 #end
-import org.seasar.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.DBMeta;
 #if ($table.needsMappingValueType())
-import org.seasar.dbflute.dbmeta.MappingValueType;
+import org.dbflute.dbmeta.MappingValueType;
 #end
 #if ($table.isEntityDerivedMappable())
-import org.seasar.dbflute.dbmeta.DerivedMappable;
+import org.dbflute.dbmeta.derived.DerivedMappable;
 #end
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
 #end
-import org.seasar.dbflute.Entity.EntityUniqueDrivenProperties;
-import org.seasar.dbflute.Entity.EntityModifiedProperties;
+import org.dbflute.Entity.EntityUniqueDrivenProperties;
+import org.dbflute.Entity.EntityModifiedProperties;
 #if ($table.isEntityDerivedMappable())
-import org.seasar.dbflute.Entity.EntityDerivedMap;
+import org.dbflute.Entity.EntityDerivedMap;
 #end
-import org.seasar.dbflute.Entity.FunCustodial;
-import org.seasar.dbflute.helper.beans.DfCoupleProperties;
-import org.seasar.dbflute.immutable.DBableEntity;
+import org.dbflute.Entity.FunCustodial;
+import org.dbflute.helper.beans.DfCoupleProperties;
+import org.dbflute.immutable.DBableEntity;
 #if ($table.hasAllCommonColumn())
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
 #end
@@ -818,7 +819,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
     }
 #if ($table.hasUtilDateColumn())
     protected def xfUD(date: Date): String = { // formatUtilDate()
-        return FunCustodial.toString(date, xgDP());
+        return FunCustodial.toStringDate(date, xgDP(), mytimeZone());
     }
     protected def xgDP(): String = { // getDatePattern
 #if ($database.isDatabaseOracle())
@@ -827,10 +828,13 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
         return "yyyy-MM-dd";
 #end
     }
+    protected def mytimeZone(): TimeZone = {
+        return null; // as default
+    }
 #end
 #if ($table.hasByteArrayColumn())
     protected def xfBA(bytes: byte[]): String = { // formatByteArray()
-        return FunCustodial.toString(bytes);
+        return FunCustodial.toStringBytes(bytes);
     }
 #end
     protected def buildRelationString(): String = {
