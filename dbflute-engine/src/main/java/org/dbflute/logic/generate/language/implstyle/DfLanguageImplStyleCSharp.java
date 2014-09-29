@@ -102,4 +102,8 @@ public class DfLanguageImplStyleCSharp implements DfLanguageImplStyle {
     public boolean isOutsideSqlCursorGenericVoidable() {
         return true;
     }
+
+    public boolean canUseJava8TimeLocalDate() {
+        return false;
+    }
 }

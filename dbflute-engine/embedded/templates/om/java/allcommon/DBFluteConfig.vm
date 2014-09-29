@@ -173,13 +173,6 @@ public class ${glDBFluteConfig} {
         // treats as uses Oracle date of database native JDBC to get best performances
         TnValueTypes.registerBasicValueType(DBDef.Oracle, java.util.Date.class, new ImplementedOracleDateType());
 #end
-#if ($database.isAvailableJava8TimeLocalDateEntity())
-
-        // uses Java8-Time
-        TnValueTypes.registerBasicValueType(currentDBDef(), LocalDate.class, new LocalDateType());
-        TnValueTypes.registerBasicValueType(currentDBDef(), LocalDateTime.class, new LocalDateTimeType());
-        TnValueTypes.registerBasicValueType(currentDBDef(), LocalTime.class, new LocalDateTimeType());
-#end
 #if ($database.isAvailableJodaTimeLocalDateEntity())
 
         // uses JodaTime

@@ -33,6 +33,11 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -111,6 +116,8 @@ public final class DfTypeUtil {
             return null;
         } else if (obj instanceof String) {
             return (String) obj;
+        } else if (isAnyLocalDate(obj)) {
+            return toStringDate(toDate(obj), pattern, null);
         } else if (obj instanceof Date) {
             return toStringDate((Date) obj, pattern, null);
         } else if (obj instanceof Number) {
@@ -745,6 +752,51 @@ public final class DfTypeUtil {
     }
 
     // ===================================================================================
+    //                                                                            Time API
+    //                                                                            ========
+    // TODO jflute toLocalDate() javadoc
+    public static LocalDate toLocalDate(Object obj) {
+        return obj != null ? toZonedDateTime(toZonedResourceDate(obj)).toLocalDate() : null;
+    }
+
+    public static LocalDateTime toLocalDateTime(Object obj) {
+        return obj != null ? toZonedDateTime(toZonedResourceDate(obj)).toLocalDateTime() : null;
+    }
+
+    public static LocalTime toLocalTime(Object obj) {
+        return obj != null ? toZonedDateTime(toZonedResourceDate(obj)).toLocalTime() : null;
+    }
+
+    public static ZonedDateTime toZonedDateTime(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        final ZoneId systemDefault = ZoneId.systemDefault();
+        return ZonedDateTime.ofInstant(toZonedResourceDate(obj).toInstant(), systemDefault);
+    }
+
+    public static ZonedDateTime toZonedDateTime(Object obj, TimeZone timeZone) {
+        if (obj == null) {
+            return null;
+        }
+        final ZoneId zoneId = timeZone != null ? ZoneId.of(timeZone.getID()) : ZoneId.systemDefault();
+        return ZonedDateTime.ofInstant(toZonedResourceDate(obj, timeZone).toInstant(), zoneId);
+    }
+
+    protected static Date toZonedResourceDate(Object obj) {
+        return toZonedResourceDate(obj, null);
+    }
+
+    protected static Date toZonedResourceDate(Object obj, TimeZone timeZone) {
+        // toDate() might return new-created pure date if sql.Date
+        return obj instanceof Date ? (Date) obj : toDate(obj, timeZone);
+    }
+
+    public static boolean isAnyLocalDate(Object obj) {
+        return obj instanceof LocalDate || obj instanceof LocalDateTime || obj instanceof LocalTime;
+    }
+
+    // ===================================================================================
     //                                                                          Point Date
     //                                                                          ==========
     /**
@@ -839,15 +891,18 @@ public final class DfTypeUtil {
             return null;
         } else if (obj instanceof String) {
             return toDateFromString((String) obj, pattern, timeZone);
+        } else if (obj instanceof LocalDate) {
+            final LocalDate localDate = (LocalDate) obj;
+            return toDateFromLocalDate(localDate, timeZone);
+        } else if (obj instanceof LocalDateTime) {
+            final LocalDateTime localDateTime = (LocalDateTime) obj;
+            return toDateFromLocalDateTime(localDateTime, timeZone);
         } else if (obj instanceof Date) {
             final Date paramDate = (Date) obj;
             if (Date.class.equals(paramDate.getClass())) { // pure date
                 return paramDate;
-            } else { // sub class
-                // because the Date is not final class.
-                final Date date = new Date();
-                date.setTime(paramDate.getTime());
-                return date;
+            } else { // sub class (Date is not final class)
+                return new Date(paramDate.getTime()); // returns copied pure date
             }
         } else if (obj instanceof Calendar) {
             return ((Calendar) obj).getTime();
@@ -1093,6 +1148,25 @@ public final class DfTypeUtil {
         public ParseDateOutOfCalendarException(String msg, Exception e) {
             super(msg, e);
         }
+    }
+
+    // -----------------------------------------------------
+    //                                         from Time API
+    //                                         -------------
+    protected static Date toDateFromLocalDate(LocalDate localDate, TimeZone timeZone) {
+        if (localDate == null) {
+            return null;
+        }
+        final LocalDateTime localDateTime = localDate.atTime(0, 0, 0, 0);
+        return toDateFromLocalDateTime(localDateTime, timeZone);
+    }
+
+    protected static Date toDateFromLocalDateTime(LocalDateTime localDateTime, TimeZone timeZone) {
+        if (localDateTime == null) {
+            return null;
+        }
+        final ZoneId zoneId = timeZone != null ? ZoneId.of(timeZone.getID()) : ZoneId.systemDefault();
+        return Date.from(localDateTime.toInstant(zoneId.getRules().getOffset(localDateTime)));
     }
 
     // -----------------------------------------------------

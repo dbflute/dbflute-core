@@ -1953,6 +1953,14 @@ public class Database {
         return isDatabaseOracle() && isAvailableDatabaseNativeJDBC();
     }
 
+    public boolean isAvailableNextTimeEntity() {
+        return getLittleAdjustmentProperties().isAvailableNextTimeEntity();
+    }
+
+    public boolean isAvailableNextTimeLocalDateEntity() {
+        return getLittleAdjustmentProperties().isAvailableNextTimeLocalDateEntity();
+    }
+
     public boolean isAvailableJava8TimeEntity() {
         return getLittleAdjustmentProperties().isAvailableJava8TimeEntity();
     }

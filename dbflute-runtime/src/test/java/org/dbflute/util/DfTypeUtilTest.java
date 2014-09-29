@@ -28,6 +28,8 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -150,9 +152,25 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals(new BigInteger(String.valueOf(Long.MAX_VALUE)), DfTypeUtil.toBigInteger(Long.MAX_VALUE));
     }
 
-    // -----------------------------------------------------
-    //                                                  Date
-    //                                                  ----
+    // ===================================================================================
+    //                                                                            Time API
+    //                                                                            ========
+    public void test_toLocalDate_basic() {
+        // ## Arrange ##
+        Date pureDate = toDate("2009-12-13 12:34:56.123");
+
+        // ## Act ##
+        LocalDate localDate = DfTypeUtil.toLocalDate(pureDate);
+
+        // ## Assert ##
+        assertEquals("2009-12-13", localDate.format(DateTimeFormatter.ISO_DATE));
+    }
+
+    // TODO jflute convert test
+
+    // ===================================================================================
+    //                                                                          (util)Date
+    //                                                                          ==========
     public void test_toDate_sameClass() {
         // ## Arrange ##
         DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");

@@ -31,6 +31,7 @@ import org.dbflute.properties.assistant.DfTableListProvider;
 import org.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.dbflute.util.DfPropertyUtil;
 import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -334,14 +335,8 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
             if (value != null && value.contains(allcommonExp)) {
                 value = DfStringUtil.replace(value, allcommonExp, baseCommonPackage);
             }
-            if (getLittleAdjustmentProperties().isAvailableJodaTimeLocalDateEntity()) {
-                if (value != null && value.equals(accessDateExp)) {
-                    value = "org.joda.time.LocalDate.fromDateFields(" + value + ")";
-                }
-                if (value != null && value.equals(accessTimestampExp)) {
-                    value = "org.joda.time.LocalDateTime.fromDateFields(" + value + ")";
-                }
-            }
+            value = doFilterJava8TimeLocalDate(accessDateExp, accessTimestampExp, value);
+            value = doFilterJodaTimeLocalDate(accessDateExp, accessTimestampExp, value);
             if (value != null && value.contains(accessContextExp)) {
                 final String accessContext = getAccessContextFqcn();
                 value = DfStringUtil.replace(value, accessContextExp, accessContext);
@@ -358,6 +353,30 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
             }
             map.put(key, value);
         }
+    }
+
+    protected String doFilterJava8TimeLocalDate(String accessDateExp, String accessTimestampExp, String value) {
+        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
+        if (value != null && littleProp.isAvailableJava8TimeLocalDateEntity()) {
+            if (value.equals(accessDateExp)) {
+                value = DfTypeUtil.class.getName() + ".toLocalDate(" + value + ")";
+            } else if (value.equals(accessTimestampExp)) {
+                value = DfTypeUtil.class.getName() + ".toLocalDateTime(" + value + ")";
+            }
+        }
+        return value;
+    }
+
+    protected String doFilterJodaTimeLocalDate(String accessDateExp, String accessTimestampExp, String value) {
+        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
+        if (value != null && littleProp.isAvailableJodaTimeLocalDateEntity()) {
+            if (value.equals(accessDateExp)) {
+                value = "org.joda.time.LocalDate.fromDateFields(" + value + ")";
+            } else if (value.equals(accessTimestampExp)) {
+                value = "org.joda.time.LocalDateTime.fromDateFields(" + value + ")";
+            }
+        }
+        return value;
     }
 
     protected String _accessContextFqcn;

@@ -162,8 +162,18 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // Java8-Time and JodaTime support
     // DfTypeMappingProperties.java, Column.java
     // DBFluteConfig.vm, AbstractBsConditionQuery.vm, BsParameterBean.vm
-    public boolean isAvailableJava8OrJodaTimeEntity() {
-        return isAvailableJava8TimeEntity() || isAvailableJodaTimeEntity();
+    public boolean isAvailableNextTimeEntity() {
+        final boolean java8Time = isAvailableJava8TimeEntity();
+        final boolean jodaTime = isAvailableJodaTimeEntity();
+        if (java8Time && jodaTime) {
+            String msg = "Both Java8Time and JodaTime are available, choose either!";
+            throw new DfIllegalPropertySettingException(msg);
+        }
+        return java8Time || jodaTime;
+    }
+
+    public boolean isAvailableNextTimeLocalDateEntity() {
+        return isAvailableJava8TimeLocalDateEntity() || isAvailableJodaTimeLocalDateEntity();
     }
 
     public boolean isAvailableJava8TimeEntity() { // closet
@@ -171,13 +181,27 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isAvailableJava8TimeLocalDateEntity() { // closet
-        return isProperty("isAvailableJava8TimeLocalDateEntity", false);
+        if (isAvailableJava8TimeZonedDateEntity() || isAvailableJodaTimeEntity()) {
+            return false;
+        }
+        final DfLanguageImplStyle implStyle = getLanguageDependency().getLanguageImplStyle();
+        if (implStyle.canUseJava8TimeLocalDate()) {
+            final boolean defaultValue = !isCompatibleBeforeJava8(); // as default since 1.1
+            return isProperty("isAvailableJava8TimeLocalDateEntity", defaultValue);
+        }
+        return false;
     }
 
     public boolean isAvailableJava8TimeZonedDateEntity() { // closet
-        return isProperty("isAvailableJava8TimeZonedDateEntity", false); // unsupported for now
+        final String key = "isAvailableJava8TimeZonedDateEntity";
+        final boolean property = isProperty(key, false);
+        if (property) {
+            throw new IllegalStateException("Unsupported for now: " + key);
+        }
+        return property;
     }
 
+    // basically use Java8-Time instead of JodaTime since 1.1
     public boolean isAvailableJodaTimeEntity() {
         return isAvailableJodaTimeLocalDateEntity() || isAvailableJodaTimeZonedDateEntity();
     }
@@ -187,7 +211,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isAvailableJodaTimeZonedDateEntity() { // closet
-        return isProperty("isAvailableJodaTimeZonedDateEntity", false); // unsupported for now
+        final String key = "isAvailableJodaTimeZonedDateEntity";
+        final boolean property = isProperty(key, false);
+        if (property) {
+            throw new IllegalStateException("Unsupported for now: " + key);
+        }
+        return property;
     }
 
     // -----------------------------------------------------

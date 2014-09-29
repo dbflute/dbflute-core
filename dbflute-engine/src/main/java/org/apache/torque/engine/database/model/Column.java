@@ -1586,7 +1586,7 @@ public class Column {
 
     public String getFromToJavaNativeDate() { // in condition-bean
         final String definedDate;
-        if (getLittleAdjustmentProperties().isAvailableJava8OrJodaTimeEntity()) {
+        if (getLittleAdjustmentProperties().isAvailableNextTimeEntity()) {
             definedDate = getJavaNative();
         } else { // normally here
             definedDate = "Date"; // java.util.Date, package already imported

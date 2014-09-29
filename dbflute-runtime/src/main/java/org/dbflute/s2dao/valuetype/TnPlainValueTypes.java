@@ -30,6 +30,9 @@ import static org.dbflute.s2dao.valuetype.TnValueTypes.DOUBLE;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.FIXED_LENGTH_STRING;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.FLOAT;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.INTEGER;
+import static org.dbflute.s2dao.valuetype.TnValueTypes.LOCALDATETIME_AS_TIMESTAMP;
+import static org.dbflute.s2dao.valuetype.TnValueTypes.LOCALDATE_AS_SQLDATE;
+import static org.dbflute.s2dao.valuetype.TnValueTypes.LOCALTIME_AS_TIME;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.LONG;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.OBJECT_BINDING_BIGDECIMAL;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.SHORT;
@@ -48,6 +51,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -82,10 +88,15 @@ public class TnPlainValueTypes {
     }
 
     protected void initialize() {
+        // _/_/_/_/_/_/_/_/_/_/
         // basic (object)
+        // _/_/_/_/_/_/_/_/_/_/
+        // << String >>
         registerBasicValueType(String.class, STRING);
         registerBasicValueType(char.class, CHARACTER);
         registerBasicValueType(Character.class, CHARACTER);
+
+        // << Number >>
         registerBasicValueType(byte.class, BYTE);
         registerBasicValueType(Byte.class, BYTE);
         registerBasicValueType(short.class, SHORT);
@@ -100,6 +111,11 @@ public class TnPlainValueTypes {
         registerBasicValueType(Double.class, DOUBLE);
         registerBasicValueType(BigInteger.class, BIGINTEGER);
         registerBasicValueType(BigDecimal.class, BIGDECIMAL);
+
+        // << Date >>
+        registerBasicValueType(LocalDate.class, LOCALDATE_AS_SQLDATE);
+        registerBasicValueType(LocalDateTime.class, LOCALDATETIME_AS_TIMESTAMP);
+        registerBasicValueType(LocalTime.class, LOCALTIME_AS_TIME);
         registerBasicValueType(java.sql.Date.class, SQLDATE);
         registerBasicValueType(java.sql.Time.class, TIME);
 
@@ -107,26 +123,32 @@ public class TnPlainValueTypes {
         // If Oracle, this switches to As-Timestamp when initialization
         // because the date type of Oracle has time parts.
         registerBasicValueType(java.util.Date.class, UTILDATE_AS_SQLDATE);
-
         registerBasicValueType(Timestamp.class, TIMESTAMP);
         registerBasicValueType(Calendar.class, TIMESTAMP);
+
+        // << Binary >>
         registerBasicValueType(BYTE_ARRAY_CLASS, BINARY);
         registerBasicValueType(InputStream.class, BINARY_STREAM);
+
+        // << Boolean >>
         registerBasicValueType(boolean.class, BOOLEAN);
         registerBasicValueType(Boolean.class, BOOLEAN);
 
+        // << UUID >>
         // The (java.util.)UUID type is treated as As-Direct by default.
         // If SQLServer, this switches to As-String when initialization
         // because the UUID type of SQLServer cannot handle the type.
         registerBasicValueType(UUID.class, UUID_AS_DIRECT);
 
-        // basic (interface)
+        // << Classification >>
         registerBasicValueType(Classification.class, CLASSIFICATION); // DBFlute original class
 
         // Because object type is to be handle as special type.
         //registerBasicValueType(Object.class, OBJECT);
 
+        // _/_/_/_/_/_/_/_/_/_/
         // plug-in (default)
+        // _/_/_/_/_/_/_/_/_/_/
         registerPluginValueType("stringClobType", STRING_CLOB);
         registerPluginValueType("bytesOidType", BYTES_OID);
         registerPluginValueType("fixedLengthStringType", FIXED_LENGTH_STRING);

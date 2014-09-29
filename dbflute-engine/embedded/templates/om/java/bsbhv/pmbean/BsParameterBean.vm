@@ -16,6 +16,9 @@
 ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 #set ($myClassName = "${myBaseParameterBeanClassName}")
 
+#if ($database.isAvailableJava8TimeEntity())
+import java.time.*;
+#end
 import java.util.*;
 
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
@@ -326,10 +329,22 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
             return new Date(((ReadableInstant) date).getMillis());
         }
 #else
-    protected Date toUtilDate(Date date) {
+    protected Date toUtilDate(Object date) {
 #end
         return DfTypeUtil.toDate(date); // if sub class, re-create as pure date
     }
+#if ($database.isAvailableJava8TimeLocalDateEntity())
+
+    @SuppressWarnings("unchecked")
+    protected <DATE> DATE toLocalDate(Date date, Class<DATE> localType) {
+        if (LocalDate.class.isAssignableFrom(localType)) {
+            return (DATE)DfTypeUtil.toLocalDate(date);
+        } else if (LocalDateTime.class.isAssignableFrom(localType)) {
+            return (DATE)DfTypeUtil.toLocalDateTime(date);
+        }
+        return null; // unreachable
+    }
+#end
 #if ($database.isAvailableJodaTimeLocalDateEntity())
 
     @SuppressWarnings("unchecked")
@@ -538,7 +553,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}) {
-#if ($database.isAvailableJodaTimeLocalDateEntity())
+#if ($database.isAvailableNextTimeLocalDateEntity())
         ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = new FromToOption().compareAsDate().filterFromDate(${argumentName});
@@ -557,7 +572,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
-#if ($database.isAvailableJodaTimeLocalDateEntity())
+#if ($database.isAvailableNextTimeLocalDateEntity())
         ${variableName} = toLocalDate(${argumentName}Option.filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = ${argumentName}Option.filterFromDate(${argumentName});
@@ -574,7 +589,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}) {
-#if ($database.isAvailableJodaTimeLocalDateEntity())
+#if ($database.isAvailableNextTimeLocalDateEntity())
         ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = new FromToOption().compareAsDate().filterToDate(${argumentName});
@@ -593,7 +608,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
-#if ($database.isAvailableJodaTimeLocalDateEntity())
+#if ($database.isAvailableNextTimeLocalDateEntity())
         ${variableName} = toLocalDate(${argumentName}Option.filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = ${argumentName}Option.filterToDate(${argumentName});
