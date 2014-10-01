@@ -81,11 +81,11 @@ import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.optional.OptionalObjectExceptionThrower;
 import org.dbflute.optional.RelationOptionalFactory;
 import org.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfTypeUtil;
@@ -1935,7 +1935,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      * @return The value of line separator. (NotNull)
      */
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

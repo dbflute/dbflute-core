@@ -1670,12 +1670,20 @@ public class Column {
         return isJavaNativeTime() || isJavaNativeJava8LocalTime() || isJavaNativeJodaLocalTime();
     }
 
+    public boolean isJavaNativeNextTimeLocal() { // as pinpoint
+        return isJavaNativeNextLocalDate() || isJavaNativeNextLocalDateTime() || isJavaNativeNextLocalTime();
+    }
+
     public boolean isJavaNativeNextLocalDate() { // as pinpoint
         return isJavaNativeJava8LocalDate() || isJavaNativeJodaLocalDate();
     }
 
     public boolean isJavaNativeNextLocalDateTime() { // as pinpoint
         return isJavaNativeJava8LocalDateTime() || isJavaNativeJodaLocalDateTime();
+    }
+
+    public boolean isJavaNativeNextLocalTime() { // as pinpoint
+        return isJavaNativeJava8LocalTime() || isJavaNativeJodaLocalTime();
     }
 
     public boolean isJavaNativeJava8LocalDate() { // as pinpoint

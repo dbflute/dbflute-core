@@ -29,10 +29,12 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -155,18 +157,57 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     // ===================================================================================
     //                                                                            Time API
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                            Local Date
+    //                                            ----------
     public void test_toLocalDate_basic() {
-        // ## Arrange ##
-        Date pureDate = toDate("2009-12-13 12:34:56.123");
-
-        // ## Act ##
-        LocalDate localDate = DfTypeUtil.toLocalDate(pureDate);
-
-        // ## Assert ##
+        TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        Date pureDate = toDate("2009-12-13 01:23:45.123", gmt2hour);
+        LocalDate localDate = DfTypeUtil.toLocalDate(pureDate, gmt2hour);
         assertEquals("2009-12-13", localDate.format(DateTimeFormatter.ISO_DATE));
     }
 
-    // TODO jflute convert test
+    public void test_toLocalDate_gmt9hour() {
+        TimeZone gmt9hour = TimeZone.getTimeZone("GMT+9");
+        Date pureDate = toDate("2009-12-13 01:23:45.123", gmt9hour);
+        LocalDate localDate = DfTypeUtil.toLocalDate(pureDate, gmt9hour);
+        assertEquals("2009-12-13", localDate.format(DateTimeFormatter.ISO_DATE));
+    }
+
+    // -----------------------------------------------------
+    //                                        Local DateTime
+    //                                        --------------
+    public void test_toLocalDateTime_fromUtilDate_timeZone() {
+        TimeZone gmt3Hour = TimeZone.getTimeZone("GMT+3");
+        Date pureDate = toDate("2009-12-13 12:34:56.123", gmt3Hour);
+        LocalDateTime localDate = DfTypeUtil.toLocalDateTime(pureDate, gmt3Hour);
+        assertEquals("2009-12-13T12:34:56.123", localDate.format(DateTimeFormatter.ISO_DATE_TIME));
+    }
+
+    public void test_toLocalDateTime_fromStringDate_timeZone() {
+        // ## Arrange ##
+        String strDate = "1970-01-01 09:00:06.789";
+
+        // ## Act ##
+        TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        LocalDateTime ldt = DfTypeUtil.toLocalDateTime(strDate, gmt2hour);
+
+        // ## Assert ##
+        String converted = ldt.format(DateTimeFormatter.ISO_DATE_TIME);
+        log("converted : " + converted);
+        assertEquals("1970-01-01T09:00:06.789", converted);
+
+        // e.g. 1 hour is 3600000L, 7 hours is 25200000L, 9 hours is 32400000L
+        Date reversedDate = DfTypeUtil.toDate(ldt, gmt2hour);
+        String reversedStrDate = DfTypeUtil.toStringDate(reversedDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
+        log("reversed  : " + reversedStrDate + ", " + reversedDate.getTime());
+        assertEquals("1970/01/01 09:00:06.789", reversedStrDate);
+
+        TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+        Date gmt7hour = DfTypeUtil.toDate("1970/01/01 07:00:06.789", gmtZone);
+        log("emg7hour  : " + DfTypeUtil.toStringDate(gmt7hour, "yyyy/MM/dd HH:mm:ss.SSS", gmtZone));
+        assertEquals(gmt7hour.getTime(), reversedDate.getTime());
+    }
 
     // ===================================================================================
     //                                                                          (util)Date
@@ -310,6 +351,22 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals(dfmil.format(date), dfmil.format(actual));
     }
 
+    public void test_toDate_LocalDateTime_basic() {
+        // ## Arrange ##
+        TimeZone gmt9hour = TimeZone.getTimeZone("GMT+9");
+        DateFormat dfmil = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS", gmt9hour);
+
+        // ## Act ##
+        TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+        Date actual = DfTypeUtil.toDate(LocalDateTime.of(1970, 1, 1, 0, 0, 0), gmtZone);
+
+        // ## Assert ##
+        String formatted = dfmil.format(actual);
+        log(formatted + ", " + actual.getTime());
+        assertEquals("1970/01/01 09:00:00.000", formatted);
+        assertEquals(0L, actual.getTime());
+    }
+
     public void test_toDate_illegal() {
         // short expression
         try {
@@ -445,6 +502,21 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertFalse(DfTypeUtil.isDateBC(after));
         assertEquals(GregorianCalendar.BC, DfTypeUtil.toCalendar(before).get(Calendar.ERA));
         assertEquals(GregorianCalendar.AD, DfTypeUtil.toCalendar(after).get(Calendar.ERA));
+    }
+
+    public void test_toDate_fromString_timeZone() {
+        // ## Arrange ##
+        String strDate = "1970-01-01 09:00:06.789";
+        TimeZone timeZone = TimeZone.getTimeZone("GMT+2");
+
+        // ## Act ##
+        Date actual = toDate(strDate, timeZone); // expects 7 hour for GMT
+
+        // ## Assert ##
+        String reversed = DfTypeUtil.toStringDate(actual, "yyyy/MM/dd HH:mm:ss.SSS", timeZone);
+        Date gmt7hour = toDate("1970-01-01 07:00:06.789", TimeZone.getTimeZone("GMT"));
+        log(reversed + ", " + actual.getTime() + ", " + gmt7hour.getTime());
+        assertEquals(gmt7hour.getTime(), actual.getTime());
     }
 
     // -----------------------------------------------------

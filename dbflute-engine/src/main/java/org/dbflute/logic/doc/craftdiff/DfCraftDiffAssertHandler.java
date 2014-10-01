@@ -34,8 +34,8 @@ import org.dbflute.helper.token.file.FileMakingCallback;
 import org.dbflute.helper.token.file.FileMakingOption;
 import org.dbflute.helper.token.file.FileMakingRowWriter;
 import org.dbflute.helper.token.file.FileToken;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 
 /**
@@ -247,6 +247,6 @@ public class DfCraftDiffAssertHandler {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

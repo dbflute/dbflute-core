@@ -16,6 +16,7 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.coption.ColumnConversionOption;
+import org.dbflute.cbean.coption.FFOptionCall;
 
 /**
  * @author jflute
@@ -159,10 +160,10 @@ public interface HpCalculator {
 
     /**
      * Convert the value of right column by function.
-     * @param option The conversion option of column. (NotNull)
+     * @param opLambda The callback for conversion option of column. (NotNull)
      * @return this. (NotNull)
      */
-    HpCalculator convert(ColumnConversionOption option);
+    HpCalculator convert(FFOptionCall<ColumnConversionOption> opLambda);
 
     // ===================================================================================
     //                                                                     Left/Right Mode

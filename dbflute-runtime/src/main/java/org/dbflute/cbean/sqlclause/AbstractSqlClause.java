@@ -76,7 +76,7 @@ import org.dbflute.dbway.DBWay;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfAssertUtil;
 import org.dbflute.util.Srl;
 
@@ -3670,7 +3670,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // -----------------------------------------------------

@@ -28,10 +28,10 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.hook.CallbackContext;
 import org.dbflute.hook.SqlStringFilter;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
+import org.dbflute.system.DBFluteSystem;
 
 /**
  * @author modified by jflute (originated in S2Dao)
@@ -172,7 +172,7 @@ public abstract class TnAbstractEntityDynamicCommand extends TnAbstractBasicSqlC
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

@@ -37,12 +37,12 @@ import org.dbflute.dbmeta.derived.DerivedTypeHandler;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.MappingClassCastException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
@@ -371,7 +371,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

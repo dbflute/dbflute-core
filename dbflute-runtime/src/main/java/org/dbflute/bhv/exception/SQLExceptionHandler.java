@@ -31,8 +31,8 @@ import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.EntityAlreadyExistsException;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.outsidesql.OutsideSqlContext;
+import org.dbflute.system.DBFluteSystem;
 
 /**
  * @author jflute
@@ -356,6 +356,6 @@ public class SQLExceptionHandler {
     }
 
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

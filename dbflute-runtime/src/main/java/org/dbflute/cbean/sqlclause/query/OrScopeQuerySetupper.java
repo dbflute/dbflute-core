@@ -17,7 +17,7 @@ package org.dbflute.cbean.sqlclause.query;
 
 import java.util.List;
 
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.Srl;
 
 /**
@@ -134,6 +134,6 @@ public class OrScopeQuerySetupper {
     }
 
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

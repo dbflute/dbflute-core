@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.dbflute.Entity;
 import org.dbflute.bhv.readable.EntityRowHandler;
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 
 /**
  * The context of condition-bean.
@@ -162,6 +162,6 @@ public class ConditionBeanContext {
     //                                                                      General Helper
     //                                                                      ==============
     protected static String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

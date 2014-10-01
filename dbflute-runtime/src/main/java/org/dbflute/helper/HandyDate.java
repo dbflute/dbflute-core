@@ -19,6 +19,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -29,6 +31,7 @@ import org.dbflute.exception.ParseDateExpressionFailureException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.secretary.BusinessDayDeterminer;
 import org.dbflute.helper.secretary.DateCompareCallback;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.DfTypeUtil.ParseDateException;
 
@@ -80,6 +83,40 @@ public class HandyDate implements Serializable {
     //                                                                         Constructor
     //                                                                         ===========
     /**
+     * Construct the handy date by the specified local date.
+     * <pre>
+     * e.g.
+     *  Date adjusted = new HandyDate(localDate, timeZone).addDay(3).getDate();
+     * </pre>
+     * @param localDate The instance of the local date. (NotNull)
+     * @param timeZone The time-zone to parse as date and for internal calendar. (NotNull)
+     */
+    public HandyDate(LocalDate localDate, TimeZone timeZone) {
+        assertConstructorArgumentNotNull("localDate", localDate);
+        assertConstructorArgumentNotNull("timeZone", timeZone);
+        _cal = createCalendar(timeZone);
+        prepareDefaultBeginAttribute();
+        _cal.setTime(DfTypeUtil.toDate(localDate, timeZone));
+    }
+
+    /**
+     * Construct the handy date by the specified local date-time.
+     * <pre>
+     * e.g.
+     *  Date adjusted = new HandyDate(localDateTime, timeZone).addDay(3).getDate();
+     * </pre>
+     * @param localDateTime The instance of the local date-time. (NotNull)
+     * @param timeZone The time-zone to parse as date and for internal calendar. (NotNull)
+     */
+    public HandyDate(LocalDateTime localDateTime, TimeZone timeZone) {
+        assertConstructorArgumentNotNull("localDateTime", localDateTime);
+        assertConstructorArgumentNotNull("timeZone", timeZone);
+        _cal = createCalendar(timeZone);
+        prepareDefaultBeginAttribute();
+        _cal.setTime(DfTypeUtil.toDate(localDateTime, timeZone));
+    }
+
+    /**
      * Construct the handy date by the specified date. <br />
      * The specified date is not changed by this handy date. <br />
      * <pre>
@@ -96,7 +133,7 @@ public class HandyDate implements Serializable {
      */
     public HandyDate(Date date) {
         assertConstructorArgumentNotNull("date", date);
-        _cal = createCalendar(null);
+        _cal = createCalendar(null); // means default zone
         prepareDefaultBeginAttribute();
         _cal.setTime(date);
     }
@@ -116,7 +153,7 @@ public class HandyDate implements Serializable {
      */
     public HandyDate(String exp) {
         assertConstructorArgumentNotNull("exp", exp);
-        final TimeZone timeZone = null;
+        final TimeZone timeZone = null; // means default zone
         _cal = createCalendar(timeZone);
         prepareDefaultBeginAttribute();
         try {
@@ -209,13 +246,12 @@ public class HandyDate implements Serializable {
     }
 
     protected Calendar createCalendar(TimeZone timeZone) {
-        final Calendar cal;
-        if (timeZone != null) {
-            cal = Calendar.getInstance(timeZone);
-        } else {
-            cal = Calendar.getInstance(); // default time-zone, locale
-        }
-        return cal;
+        final TimeZone realZone = chooseRealZone(timeZone);
+        return Calendar.getInstance(realZone);
+    }
+
+    protected TimeZone chooseRealZone(TimeZone timeZone) {
+        return timeZone != null ? timeZone : DBFluteSystem.getFinalTimeZone();
     }
 
     protected void prepareDefaultBeginAttribute() {
@@ -2809,6 +2845,24 @@ public class HandyDate implements Serializable {
     //                                                                            Get Date
     //                                                                            ========
     /**
+     * Get created new local date that has the same time of this handy date. <br />
+     * The conversion logic uses the TimeZone saved in calendar, might be null.
+     * @return The instance of local date. (NotNull)
+     */
+    public LocalDate getLocalDate() {
+        return DfTypeUtil.toLocalDate(getDate(), _cal.getTimeZone());
+    }
+
+    /**
+     * Get created new local date-time that has the same time of this handy date. <br />
+     * The conversion logic uses the TimeZone saved in calendar, might be null.
+     * @return The instance of local date-time. (NotNull)
+     */
+    public LocalDateTime getLocalDateTime() {
+        return DfTypeUtil.toLocalDateTime(getDate(), _cal.getTimeZone());
+    }
+
+    /**
      * Get created new date that has the same time of this handy date. 
      * @return The instance of date. (NotNull)
      */
@@ -2954,7 +3008,7 @@ public class HandyDate implements Serializable {
         } else {
             dateFormat = new SimpleDateFormat(pattern);
         }
-        if (timeZone != null) {
+        if (timeZone != null) { // basically true, calendar has default zone
             dateFormat.setTimeZone(timeZone);
         }
         return dateFormat;

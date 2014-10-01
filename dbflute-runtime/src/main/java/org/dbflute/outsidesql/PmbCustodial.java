@@ -13,19 +13,32 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.jdbc;
+package org.dbflute.outsidesql;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
+import org.dbflute.cbean.coption.FromToOption;
 import org.dbflute.exception.CharParameterShortSizeException;
+import org.dbflute.exception.RequiredOptionNotFoundException;
+import org.dbflute.system.DBFluteSystem;
+import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class ParameterUtil {
+public class PmbCustodial {
 
+    // ===================================================================================
+    //                                                                              String
+    //                                                                              ======
     /**
      * @param value Query value. (NullAllowed)
      * @return Converted value. (NullAllowed)
@@ -101,5 +114,64 @@ public class ParameterUtil {
         public String code() {
             return _code;
         }
+    }
+
+    // ===================================================================================
+    //                                                                                Date
+    //                                                                                ====
+    public static Date toUtilDate(Object date, TimeZone specifiedZone) {
+        // local date and sub class of date to pure date
+        return DfTypeUtil.toDate(date, chooseRealTimeZone(specifiedZone));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <DATE> DATE toLocalDate(Date date, Class<DATE> localType, TimeZone timeZone) {
+        if (LocalDate.class.isAssignableFrom(localType)) {
+            return (DATE) DfTypeUtil.toLocalDate(date, timeZone);
+        } else if (LocalDateTime.class.isAssignableFrom(localType)) {
+            return (DATE) DfTypeUtil.toLocalDateTime(date, timeZone);
+        }
+        return null; // unreachable
+    }
+
+    public static String formatUtilDate(Date date, String pattern, TimeZone specifiedZone) {
+        return DfTypeUtil.toStringDate(date, pattern, chooseRealTimeZone(specifiedZone));
+    }
+
+    public static void assertFromToOptionValid(String name, FromToOption option) {
+        if (option == null) {
+            String msg = "The from-to option is required!";
+            throw new RequiredOptionNotFoundException(msg);
+        }
+    }
+
+    public static FromToOption createFromToOption(TimeZone specifiedZone) {
+        return new FromToOption().zone(chooseRealTimeZone(specifiedZone));
+    }
+
+    public static TimeZone chooseRealTimeZone(TimeZone specifiedZone) {
+        return specifiedZone != null ? specifiedZone : DBFluteSystem.getFinalTimeZone();
+    }
+
+    // ===================================================================================
+    //                                                                             Various
+    //                                                                             =======
+    @SuppressWarnings("unchecked")
+    public static <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) { // might be called by option handling
+        return (NUMBER) DfTypeUtil.toNumber(obj, type);
+    }
+
+    public static Boolean toBoolean(Object obj) {
+        return DfTypeUtil.toBoolean(obj);
+    }
+
+    public static String formatByteArray(byte[] bytes) {
+        return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) { // might be called by option handling
+        Object obj = DfCollectionUtil.newArrayList(elements);
+        return (ArrayList<ELEMENT>) obj; // to avoid the warning between JDK6 and JDK7
     }
 }

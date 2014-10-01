@@ -27,14 +27,9 @@ import org.dbflute.cbean.ordering.*;
 import org.dbflute.cbean.scoping.*;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMetaProvider;
-#if ($database.isAvailableNextTimeEntity())
-import org.dbflute.util.DfTypeUtil;
-#end
-#if ($database.isAvailableJodaTimeEntity())
 #if ($database.isAvailableJodaTimeLocalDateEntity())
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
-#end
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
 #end
@@ -1200,10 +1195,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     ${table.directConditionOptionMethodModifier} void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, FromToOption fromToOption) {
 #if ($col.isJavaNativeUtilDate())
         regFTQ(fCTPD(fromDatetime), fCTPD(toDatetime), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
-#elseif ($col.isJavaNativeNextLocalDate())
-        regFTQ(toUtilDate(fromDatetime), toUtilDate(toDatetime), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
-#elseif ($col.isJavaNativeNextLocalDateTime())
-        regFTQ(toTimestamp(fromDatetime), toTimestamp(toDatetime), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
+#elseif ($col.isJavaNativeNextTimeLocal())
+        String nm = "${col.name}"; FromToOption op = fromToOption;
+        regFTQ(xfFTHD(fromDatetime, nm, op), xfFTHD(toDatetime, nm, op), getCValue${tmpJavaName}(), nm, op);
 #else
         regFTQ((fromDatetime != null ? new ${col.javaNative}(fromDatetime.getTime()) : null), (toDatetime != null ? new ${col.javaNative}(toDatetime.getTime()) : null), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #end
@@ -1755,43 +1749,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #if ($table.isCompatibleConditionBeanFromToOneSideAllowed())
     @Override
-    protected void filterFromToOption(FromToOption option) {
+    protected void filterFromToOption(String columnDbName, FromToOption option) {
         option.allowOneSide();
     }
 
 #end
-#if ($database.isAvailableJava8TimeEntity())
-    protected Date toUtilDate(Object date) {
-        return DfTypeUtil.toDate(date);
-    }
-
-    protected java.sql.Timestamp toTimestamp(Object date) {
-        return DfTypeUtil.toTimestamp(date);
-    }
-
-#if ($database.isAvailableJava8TimeLocalDateEntity())
+#if ($database.isAvailableJodaTimeLocalDateEntity())
     @Override
-    protected Object filterFromToRegisteredDate(Date date, String columnDbName) {
-        if (date instanceof java.sql.Timestamp) {
-            return DfTypeUtil.toLocalDateTime(date);
-        } else { // basically pure Date
-            return DfTypeUtil.toLocalDate(date);
-        }
-    }
-
-#end
-#end
-#if ($database.isAvailableJodaTimeEntity())
-    protected Date toUtilDate(Object date) {
-        if (date != null && date instanceof ReadablePartial) {
-            return new Date(((ReadablePartial) date).toDateTime(null).getMillis());
-        } else if (date != null && date instanceof ReadableInstant) {
-            return new Date(((ReadableInstant) date).getMillis());
-        }
-        return DfTypeUtil.toDate(date);
-    }
-
-    protected java.sql.Timestamp toTimestamp(Object date) {
+    protected Date xtoFromToUtilDate(Object date, String columnDbName, FromToOption option) {
         if (date != null && date instanceof ReadablePartial) {
             return new java.sql.Timestamp(((ReadablePartial) date).toDateTime(null).getMillis());
         } else if (date != null && date instanceof ReadableInstant) {
@@ -1800,17 +1765,36 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         return DfTypeUtil.toTimestamp(date);
     }
 
-#if ($database.isAvailableJodaTimeLocalDateEntity())
     @Override
-    protected Object filterFromToRegisteredDate(Date date, String columnDbName) {
-        if (date instanceof java.sql.Timestamp) {
-            return LocalDateTime.fromDateFields(date);
-        } else { // basically pure Date
-            return LocalDate.fromDateFields(date);
+    protected Timestamp xtoFromToTimestamp(Object date, String columnDbName, FromToOption option) {
+        if (date != null && date instanceof ReadablePartial) {
+            return new java.sql.Timestamp(((ReadablePartial) date).toDateTime(null).getMillis());
+        } else if (date != null && date instanceof ReadableInstant) {
+            return new java.sql.Timestamp(((ReadableInstant) date).getMillis());
         }
+        return DfTypeUtil.toTimestamp(date);
     }
 
-#end
+    @Override
+    protected Object xtoFromToLocalDate(Object date, String columnDbName, FromToOption option) {
+        return LocalDate.fromDateFields(date);
+    }
+
+    @Override
+    protected Object xtoFromToLocalDateTime(Object date, String columnDbName, FromToOption option) {
+        return LocalDateTime.fromDateFields(date);
+    }
+
+    @Override
+    protected boolean xisNextTimeLocalDate(Class<?> nativeType) {
+        return LocalDate.class.isAssignableFrom(nativeType);
+    }
+
+    @Override
+    protected boolean xisNextTimeLocalDateTime(Class<?> nativeType) {
+        return LocalDateTime.class.isAssignableFrom(nativeType);
+    }
+
 #end
     // ===================================================================================
     //                                                                       Very Internal

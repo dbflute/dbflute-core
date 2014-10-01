@@ -28,7 +28,7 @@ import org.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.dbmeta.info.ColumnInfo;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 
 /**
  * @author jflute
@@ -391,6 +391,6 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

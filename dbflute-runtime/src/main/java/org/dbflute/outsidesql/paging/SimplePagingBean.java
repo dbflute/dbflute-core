@@ -26,7 +26,7 @@ import org.dbflute.cbean.sqlclause.SqlClauseDefault;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.dbflute.exception.PagingPageSizeNotPlusException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.pmbean.MapParameterBean;
 
 /**
@@ -374,7 +374,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object> {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

@@ -757,6 +757,17 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                      Final TimeZone
+    //                                                                      ==============
+    public boolean hasDBFluteSystemFinalTimeZone() {
+        return getDBFluteSystemFinalTimeZone() != null;
+    }
+
+    public String getDBFluteSystemFinalTimeZone() {
+        return getProperty("dbfluteSystemFinalTimeZone", null);
+    }
+
+    // ===================================================================================
     //                                                                         Super Debug
     //                                                                         ===========
     public boolean isSuperDebug() { // closet (very internal)

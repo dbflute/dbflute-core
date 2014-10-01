@@ -208,6 +208,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * </pre>
      * @param consumer The callback interface to consume the optional value. (NotNull)
      */
+    // TODO jflute orElse
     public void ifPresent(OptionalObjectConsumer<ENTITY> consumer) {
         callbackIfPresent(consumer);
     }
@@ -313,6 +314,9 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     //    return directlyGetOrElse(other);
     //}
 
+    // ===================================================================================
+    //                                                                           Extension
+    //                                                                           =========
     /**
      * Get the entity instance or null if not present.
      * <pre>
@@ -330,6 +334,24 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     /**
      * Handle the entity in the optional object or exception if not present.
      * <pre>
+     * memberBhv.selectEntity(cb -&gt; {
+     *     cb.setupSelect_MemberStatus();
+     *     cb.query().setMemberId_Equal(1);
+     * }).<span style="color: #DD4747">alwaysPresent</span>(member -&gt; {
+     *     <span style="color: #3F7E5E">// called if value exists, or exception if not present</span>
+     *     ... = member.getMemberName();
+     * });
+     * </pre>
+     * @param consumer The callback interface to consume the optional value. (NotNull)
+     * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     */
+    public void alwaysPresent(OptionalObjectConsumer<ENTITY> consumer) {
+        callbackRequired(consumer);
+    }
+
+    /**
+     * Handle the entity in the optional object or exception if not present.
+     * <pre>
      * MemberCB cb = new MemberCB();
      * cb.query().set...
      * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
@@ -340,6 +362,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * </pre>
      * @param consumer The callback interface to consume the optional value. (NotNull)
      * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     * @deprecated use alwaysPresent()
      */
     public void required(OptionalObjectConsumer<ENTITY> consumer) {
         callbackRequired(consumer);

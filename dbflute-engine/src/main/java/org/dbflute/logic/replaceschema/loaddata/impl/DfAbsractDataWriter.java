@@ -44,7 +44,6 @@ import org.dbflute.exception.DfJDBCException;
 import org.dbflute.exception.DfLoadDataRegistrationFailureException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
@@ -58,6 +57,7 @@ import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterce
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.DfTypeUtil.ParseBooleanException;
@@ -1146,7 +1146,7 @@ public abstract class DfAbsractDataWriter {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

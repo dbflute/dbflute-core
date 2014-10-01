@@ -49,6 +49,8 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.dbflute.system.DBFluteSystem;
+
 /**
  * @author modified by jflute (originated in Seasar2)
  */
@@ -755,41 +757,40 @@ public final class DfTypeUtil {
     //                                                                            Time API
     //                                                                            ========
     // TODO jflute toLocalDate() javadoc
-    public static LocalDate toLocalDate(Object obj) {
-        return obj != null ? toZonedDateTime(toZonedResourceDate(obj)).toLocalDate() : null;
+    public static LocalDate toLocalDate(Object obj, TimeZone timeZone) {
+        assertTimeZoneNotNull("toLocalDate()", timeZone);
+        return obj != null ? toZonedDateTime(toZonedResourceDate(obj, timeZone), timeZone).toLocalDate() : null;
     }
 
-    public static LocalDateTime toLocalDateTime(Object obj) {
-        return obj != null ? toZonedDateTime(toZonedResourceDate(obj)).toLocalDateTime() : null;
+    public static LocalDateTime toLocalDateTime(Object obj, TimeZone timeZone) {
+        assertTimeZoneNotNull("toLocalDateTime()", timeZone);
+        return obj != null ? toZonedDateTime(toZonedResourceDate(obj, timeZone), timeZone).toLocalDateTime() : null;
     }
 
-    public static LocalTime toLocalTime(Object obj) {
-        return obj != null ? toZonedDateTime(toZonedResourceDate(obj)).toLocalTime() : null;
-    }
-
-    public static ZonedDateTime toZonedDateTime(Object obj) {
-        if (obj == null) {
-            return null;
-        }
-        final ZoneId systemDefault = ZoneId.systemDefault();
-        return ZonedDateTime.ofInstant(toZonedResourceDate(obj).toInstant(), systemDefault);
+    public static LocalTime toLocalTime(Object obj, TimeZone timeZone) {
+        assertTimeZoneNotNull("toLocalTime()", timeZone);
+        return obj != null ? toZonedDateTime(toZonedResourceDate(obj, timeZone), timeZone).toLocalTime() : null;
     }
 
     public static ZonedDateTime toZonedDateTime(Object obj, TimeZone timeZone) {
+        assertTimeZoneNotNull("toZonedDateTime()", timeZone);
         if (obj == null) {
             return null;
         }
-        final ZoneId zoneId = timeZone != null ? ZoneId.of(timeZone.getID()) : ZoneId.systemDefault();
+        final ZoneId zoneId = ZoneId.of(timeZone.getID());
         return ZonedDateTime.ofInstant(toZonedResourceDate(obj, timeZone).toInstant(), zoneId);
     }
 
-    protected static Date toZonedResourceDate(Object obj) {
-        return toZonedResourceDate(obj, null);
+    protected static Date toZonedResourceDate(Object obj, TimeZone timeZone) {
+        assertTimeZoneNotNull("toZonedResourceDate()", timeZone);
+        return toDate(obj, timeZone); // java.sql.Date does not support toInstant() so to pure date
     }
 
-    protected static Date toZonedResourceDate(Object obj, TimeZone timeZone) {
-        // toDate() might return new-created pure date if sql.Date
-        return obj instanceof Date ? (Date) obj : toDate(obj, timeZone);
+    protected static void assertTimeZoneNotNull(String methodName, TimeZone timeZone) {
+        if (timeZone == null) {
+            String msg = "The argument 'timeZone' should not be null: method=" + methodName;
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     public static boolean isAnyLocalDate(Object obj) {
@@ -1167,6 +1168,22 @@ public final class DfTypeUtil {
         }
         final ZoneId zoneId = timeZone != null ? ZoneId.of(timeZone.getID()) : ZoneId.systemDefault();
         return Date.from(localDateTime.toInstant(zoneId.getRules().getOffset(localDateTime)));
+    }
+
+    protected static Timestamp toTimestampFromLocalDate(LocalDate localDate, TimeZone timeZone) {
+        if (localDate == null) {
+            return null;
+        }
+        final LocalDateTime localDateTime = localDate.atTime(0, 0, 0, 0);
+        return toTimestampFromLocalDateTime(localDateTime, timeZone);
+    }
+
+    protected static Timestamp toTimestampFromLocalDateTime(LocalDateTime localDateTime, TimeZone timeZone) {
+        if (localDateTime == null) {
+            return null;
+        }
+        final ZoneId zoneId = timeZone != null ? ZoneId.of(timeZone.getID()) : ZoneId.systemDefault();
+        return Timestamp.from(localDateTime.toInstant(zoneId.getRules().getOffset(localDateTime)));
     }
 
     // -----------------------------------------------------
@@ -1642,11 +1659,14 @@ public final class DfTypeUtil {
             throw new IllegalArgumentException(msg);
         }
         final SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-        if (timeZone != null) {
-            sdf.setTimeZone(timeZone);
-        }
+        final TimeZone realZone = chooseRealZone(timeZone);
+        sdf.setTimeZone(realZone);
         sdf.setLenient(!strict);
         return sdf;
+    }
+
+    protected static TimeZone chooseRealZone(TimeZone timeZone) {
+        return timeZone != null ? timeZone : DBFluteSystem.getFinalTimeZone();
     }
 
     // ===================================================================================
@@ -1725,6 +1745,12 @@ public final class DfTypeUtil {
                 // because the time-stamp type is not final class.
                 return new Timestamp(paramTimestamp.getTime());
             }
+        } else if (obj instanceof LocalDate) {
+            final LocalDate localDate = (LocalDate) obj;
+            return toTimestampFromLocalDate(localDate, timeZone);
+        } else if (obj instanceof LocalDateTime) {
+            final LocalDateTime localDateTime = (LocalDateTime) obj;
+            return toTimestampFromLocalDateTime(localDateTime, timeZone);
         } else if (obj instanceof Date) {
             return new Timestamp(((Date) obj).getTime());
         } else if (obj instanceof String) {
@@ -2128,9 +2154,10 @@ public final class DfTypeUtil {
             cal.setTimeZone(original.getTimeZone());
             return cal; // new instance
         }
+        final TimeZone realZone = chooseRealZone(timeZone);
         final Date date;
         try {
-            date = toDate(obj, pattern, timeZone);
+            date = toDate(obj, pattern, realZone);
         } catch (ParseDateNumberFormatException e) {
             String msg = "Failed to format the calendar as number:";
             msg = msg + " obj=" + obj + " pattern=" + pattern;
@@ -2145,11 +2172,8 @@ public final class DfTypeUtil {
             throw new ParseCalendarException(msg, e);
         }
         if (date != null) {
-            final Calendar cal = Calendar.getInstance();
+            final Calendar cal = Calendar.getInstance(realZone);
             cal.setTime(date);
-            if (timeZone != null) {
-                cal.setTimeZone(timeZone);
-            }
             return cal;
         }
         return null;

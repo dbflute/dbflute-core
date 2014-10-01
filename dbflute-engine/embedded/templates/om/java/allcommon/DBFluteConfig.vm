@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.QLog;
 import org.dbflute.XLog;
+import org.dbflute.bhv.core.context.mapping.MappingDateTimeZoneProvider;
 import org.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.sqlclause.SqlClauseCreator;
@@ -125,6 +126,7 @@ public class ${glDBFluteConfig} {
     protected String _outsideSqlPackage;
 #end
     protected boolean _useSqlLogRegistry = ${database.isSqlLogRegistryValid()};
+    protected MappingDateTimeZoneProvider _mappingDateTimeZoneProvider;
 
     // extension
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
@@ -571,6 +573,22 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting useSqlLogRegistry: " + useSqlLogRegistry);
         }
         _useSqlLogRegistry = useSqlLogRegistry;
+    }
+
+    // [DBFlute-1.1.0]
+    // ===================================================================================
+    //                                                               Mapping Date TimeZone
+    //                                                               =====================
+    public MappingDateTimeZoneProvider getMappingDateTimeZoneProvider() {
+        return _mappingDateTimeZoneProvider;
+    }
+
+    public void setMappingDateTimeZoneProvider(MappingDateTimeZoneProvider mappingDateTimeZoneProvider) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting mappingDateTimeZoneProvider: " + mappingDateTimeZoneProvider);
+        }
+        _mappingDateTimeZoneProvider = mappingDateTimeZoneProvider;
     }
 
     // [DBFlute-0.9.6.4]

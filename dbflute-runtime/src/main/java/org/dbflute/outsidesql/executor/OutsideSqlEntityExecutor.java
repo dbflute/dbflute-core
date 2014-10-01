@@ -21,12 +21,12 @@ import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.bhv.exception.BehaviorExceptionThrower;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.DangerousResultSizeException;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.FetchBean;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.dbflute.outsidesql.typed.EntityHandlingPmb;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 
 /**
@@ -321,6 +321,6 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * @return The value of line separator. (NotNull)
      */
     protected static String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

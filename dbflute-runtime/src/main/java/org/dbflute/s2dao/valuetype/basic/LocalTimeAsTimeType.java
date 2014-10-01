@@ -22,8 +22,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalTime;
+import java.util.TimeZone;
 
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.s2dao.valuetype.TnAbstractValueType;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 
 /**
@@ -79,10 +82,20 @@ public class LocalTimeAsTimeType extends TnAbstractValueType {
     //                                                                       Assist Helper
     //                                                                       =============
     protected LocalTime toLocalTime(Object date) {
-        return DfTypeUtil.toLocalTime(date);
+        return DfTypeUtil.toLocalTime(date, getTimeZone());
     }
 
     protected java.sql.Time toSqlDate(Object date) {
-        return DfTypeUtil.toTime(date);
+        return DfTypeUtil.toTime(date, getTimeZone());
+    }
+
+    protected TimeZone getTimeZone() {
+        if (ResourceContext.isExistResourceContextOnThread()) {
+            final TimeZone provided = ResourceContext.provideMappingDateTimeZone();
+            if (provided != null) {
+                return provided;
+            }
+        }
+        return DBFluteSystem.getFinalTimeZone();
     }
 }

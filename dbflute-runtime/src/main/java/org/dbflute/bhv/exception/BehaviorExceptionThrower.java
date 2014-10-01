@@ -36,8 +36,8 @@ import org.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.dbflute.exception.PagingCountSelectNotCountException;
 import org.dbflute.exception.SelectEntityConditionNotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.FetchBean;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
@@ -435,7 +435,7 @@ public class BehaviorExceptionThrower {
      * @return The value of line separator. (NotNull)
      */
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     protected String initCap(String str) {

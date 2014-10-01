@@ -17,7 +17,7 @@ package org.dbflute.logic.sql2entity.pmbean;
 
 import java.util.List;
 
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 
 /**
  * @author jflute
@@ -109,6 +109,6 @@ public class DfPmbPropertyOptionComment {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

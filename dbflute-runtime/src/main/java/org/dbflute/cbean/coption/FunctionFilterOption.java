@@ -42,7 +42,7 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.dbflute.dbmeta.name.ColumnSqlNameProvider;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
@@ -777,6 +777,7 @@ public class FunctionFilterOption implements ParameterOption {
         if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeDate()) {
             return true;
         }
+        // TODO jflute for LocalDate
         if (_mysticBindingSnapshot != null && _mysticBindingSnapshot instanceof Date) {
             return true;
         }
@@ -889,7 +890,7 @@ public class FunctionFilterOption implements ParameterOption {
     //                                                                      General Helper
     //                                                                      ==============
     protected final String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

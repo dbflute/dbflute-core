@@ -79,28 +79,28 @@ public class AccessContextTest extends PlainTestCase {
         AccessContext accessContext = new AccessContext();
         final String dateExp = "2013-02-02 12:34:56";
         accessContext.setAccessDateProvider(new AccessDateProvider() {
-            public Date getAccessDate() {
+            public Date provideDate() {
                 return toDate(dateExp);
             }
         });
         final String timestampExp = "2013-02-02 12:34:56";
         accessContext.setAccessTimestampProvider(new AccessTimestampProvider() {
-            public Timestamp getAccessTimestamp() {
+            public Timestamp provideTimestamp() {
                 return toTimestamp(timestampExp);
             }
         });
         accessContext.setAccessUserProvider(new AccessUserProvider() {
-            public String getAccessUser() {
+            public String provideUser() {
                 return "foo";
             }
         });
         accessContext.setAccessProcessProvider(new AccessProcessProvider() {
-            public String getAccessProcess() {
+            public String provideProcess() {
                 return "bar";
             }
         });
         accessContext.setAccessModuleProvider(new AccessModuleProvider() {
-            public String getAccessModule() {
+            public String provideModule() {
                 return "qux";
             }
         });

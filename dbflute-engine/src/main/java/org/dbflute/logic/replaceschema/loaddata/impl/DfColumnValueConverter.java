@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;

@@ -27,8 +27,8 @@ import java.util.Date;
 
 import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.Srl;
 
 /**

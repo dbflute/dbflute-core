@@ -15,9 +15,11 @@
  */
 package org.dbflute.cbean.coption;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
@@ -25,6 +27,7 @@ import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbway.ExtensionOperand;
 import org.dbflute.dbway.OnQueryStringConnector;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 
@@ -113,7 +116,12 @@ public class FromToOption implements ConditionOption {
     protected Integer _moveToScope;
     protected boolean _usePattern;
     protected boolean _orIsNull;
+    
+    /** Does it allow one-side only from-to? */
     protected boolean _oneSideAllowed;
+
+    /** The time-zone for filtering. (NullAllowed: if null, default zone) */
+    protected TimeZone _timeZone;
 
     // ===================================================================================
     //                                                                  Comparison Pattern
@@ -973,6 +981,11 @@ public class FromToOption implements ConditionOption {
     // ===================================================================================
     //                                                                       Internal Main
     //                                                                       =============
+    public LocalDate filterFromDate(LocalDate fromDate) {
+        final TimeZone timeZone = DBFluteSystem.getFinalTimeZone();
+        return DfTypeUtil.toLocalDate(filterFromDate(DfTypeUtil.toDate(fromDate, timeZone)), timeZone);
+    }
+
     /**
      * Filter the date as From. It requires this method is called before getFromDateConditionKey().
      * @param fromDate The date as From. (NullAllowed: If the value is null, it returns null)
@@ -1275,6 +1288,25 @@ public class FromToOption implements ConditionOption {
         if (_moveToScope != null) {
             DfTypeUtil.addCalendarQuarterOfYear(cal, _moveToScope);
         }
+    }
+
+    // ===================================================================================
+    //                                                                            TimeZone
+    //                                                                            ========
+    /**
+     * Set time-zone, basically for LocalDate conversion. <br />
+     * Normally you don't need to set this, you can adjust other ways. <br />
+     * (DBFlute system's time-zone is used as default)
+     * @param timeZone The time-zone for filtering. (NullAllowed: if null, default zone)
+     * @return this. (NotNull)
+     */
+    public FromToOption zone(TimeZone timeZone) {
+        _timeZone = timeZone;
+        return this;
+    }
+
+    public TimeZone getTimeZone() {
+        return _timeZone;
     }
 
     // ===================================================================================

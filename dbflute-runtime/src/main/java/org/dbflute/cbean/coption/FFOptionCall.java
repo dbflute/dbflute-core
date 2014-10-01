@@ -16,22 +16,16 @@
 package org.dbflute.cbean.coption;
 
 /**
- * The option of date-from-to.
- * <pre>
- * e.g. fromDate:{2007/04/10 08:24:53} toDate:{2007/04/16 14:36:29}
- *
- *   new DateFromToOption(); 
- *     --&gt; column &gt;= '2007/04/10 00:00:00'
- *     and column &lt; '2007/04/17 00:00:00'
- * </pre>
+ * The callback interface of function filter option.
+ * @param <OP> The type of function filter option to be set up.
  * @author jflute
+ * @since 1.1.0 (2014/09/30 Tuesday)
  */
-public class DateFromToOption extends FromToOption {
+@FunctionalInterface
+public interface FFOptionCall<OP extends FunctionFilterOption> {
 
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public DateFromToOption() {
-        compareAsDate();
-    }
+    /**
+     * @param op The option of function filter to be set up. (NotNull)
+     */
+    void callback(OP op);
 }

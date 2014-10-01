@@ -36,7 +36,7 @@ import org.dbflute.dbmeta.name.TableSqlName;
 import org.dbflute.exception.DBMetaNotFoundException;
 import org.dbflute.exception.FixedConditionIllegalOverRelationException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.IndexOfInfo;
 
@@ -848,6 +848,6 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     }
 
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

@@ -21,6 +21,7 @@
 # o sourceCodeLineSeparator: (NotRequired - Default no setting)
 # o applicationBehaviorMap: (NotRequired - Default map:{})
 # o outputPackageAdjustmentMap: (NotRequired - Default map:{})
+# o dbfluteSystemFinalTimeZone: (NotRequired - Default null)
 #
 # *The line that starts with '#' means comment-out.
 #
@@ -215,6 +216,14 @@ map:{
     #    ; flatDirectoryPackage = Aaa.Bbb.DBFlute
     #    ; omitDirectoryPackage = Aaa
     #}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o dbfluteSystemFinalTimeZone: (NotRequired - Default null)
+    #  The ID of time-zone for DBFlute system.
+    #  basically for e.g. DisplaySql, Date conversion, LocalDate mapping and so on...
+    #
+    #; dbfluteSystemFinalTimeZone = GMT
     # - - - - - - - - - -/
 }
 # ----------------/

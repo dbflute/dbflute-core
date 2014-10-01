@@ -31,7 +31,6 @@ import org.dbflute.properties.assistant.DfTableListProvider;
 import org.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.dbflute.util.DfPropertyUtil;
 import org.dbflute.util.DfStringUtil;
-import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -356,14 +355,15 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     protected String doFilterJava8TimeLocalDate(String accessDateExp, String accessTimestampExp, String value) {
-        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
-        if (value != null && littleProp.isAvailableJava8TimeLocalDateEntity()) {
-            if (value.equals(accessDateExp)) {
-                value = DfTypeUtil.class.getName() + ".toLocalDate(" + value + ")";
-            } else if (value.equals(accessTimestampExp)) {
-                value = DfTypeUtil.class.getName() + ".toLocalDateTime(" + value + ")";
-            }
-        }
+        // you can already use getAccessLocalDate()
+        //final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
+        //if (value != null && littleProp.isAvailableJava8TimeLocalDateEntity()) {
+        //    if (value.equals(accessDateExp)) {
+        //        value = DfTypeUtil.class.getName() + ".toLocalDate(" + value + ")";
+        //    } else if (value.equals(accessTimestampExp)) {
+        //        value = DfTypeUtil.class.getName() + ".toLocalDateTime(" + value + ")";
+        //    }
+        //}
         return value;
     }
 

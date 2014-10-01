@@ -24,7 +24,7 @@ import org.dbflute.dbmeta.hierarchy.basic.HierarchySourceEntityColumn;
 import org.dbflute.dbmeta.hierarchy.basic.HierarchySourceEntityListIterator;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 
 /**
  * The request of hierarchy.
@@ -316,6 +316,6 @@ public class HierarchyRequest<LOCAL_ENTITY extends Entity> {
      * @return The value of line separator. (NotNull)
      */
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

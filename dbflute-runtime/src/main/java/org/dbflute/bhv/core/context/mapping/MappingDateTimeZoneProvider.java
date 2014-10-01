@@ -13,22 +13,20 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.bhv.writable;
+package org.dbflute.bhv.core.context.mapping;
 
-import org.dbflute.cbean.ConditionBean;
+import java.util.TimeZone;
 
 /**
- * The callback interface of writable option.
- * @param <CB> The type of condition-bean for specification.
- * @param <OP> The type of writable option to be set up.
  * @author jflute
- * @since 1.1.0 (2014/09/28 Sunday)
+ * @since 1.1.0 (2014/09/30 Tuesday)
  */
-@FunctionalInterface
-public interface WOptionCall<CB extends ConditionBean, OP extends WritableOption<CB>> {
+public interface MappingDateTimeZoneProvider {
 
     /**
-     * @param op The option of writable to be set up. (NotNull)
+     * Provide the time-zone for conversion in value type mapping. <br />
+     * This might be called many times, so take care of performance.
+     * @return The time-zone for conversion in value type mapping. (NullAllowed: if null, default zone)
      */
-    void callback(OP op);
+    TimeZone provide();
 }

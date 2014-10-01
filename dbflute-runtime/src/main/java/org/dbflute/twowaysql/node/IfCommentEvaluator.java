@@ -28,7 +28,7 @@ import org.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
 import org.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.exception.IfCommentDifferentTypeComparisonException;
 import org.dbflute.twowaysql.exception.IfCommentEmptyExpressionException;
 import org.dbflute.twowaysql.exception.IfCommentIllegalParameterBeanSpecificationException;
@@ -841,7 +841,7 @@ public class IfCommentEvaluator {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     protected List<String> splitList(String str, String delimiter) {

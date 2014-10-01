@@ -29,7 +29,7 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 
 /**
@@ -666,7 +666,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         try {
             return method.invoke(target, args);
         } catch (RuntimeException e) {
-            final String ln = DBFluteSystem.getBasicLn();
+            final String ln = DBFluteSystem.ln();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             String msg = "Invoking method threw the exception:" + ln;
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln;

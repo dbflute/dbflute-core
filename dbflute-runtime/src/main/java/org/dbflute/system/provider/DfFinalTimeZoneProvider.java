@@ -9,26 +9,24 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.bhv.writable;
+package org.dbflute.system.provider;
 
-import org.dbflute.cbean.ConditionBean;
+import java.util.TimeZone;
 
 /**
- * The callback interface of writable option.
- * @param <CB> The type of condition-bean for specification.
- * @param <OP> The type of writable option to be set up.
  * @author jflute
- * @since 1.1.0 (2014/09/28 Sunday)
+ * @since 1.1.0 (2014/09/29 Monday)
  */
-@FunctionalInterface
-public interface WOptionCall<CB extends ConditionBean, OP extends WritableOption<CB>> {
+public interface DfFinalTimeZoneProvider {
 
     /**
-     * @param op The option of writable to be set up. (NotNull)
+     * Provide the time-zone as final default. <br />
+     * This might be called many times, so take care of performance.
+     * @return The time-zone instance. (NullAllowed: if null, server zone might be used)
      */
-    void callback(OP op);
+    TimeZone provide();
 }

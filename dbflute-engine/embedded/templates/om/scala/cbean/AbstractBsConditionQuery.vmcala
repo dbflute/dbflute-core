@@ -32,8 +32,7 @@ import org.dbflute.cbean.ordering._;
 import org.dbflute.cbean.scoping._;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMetaProvider;
-#if ($database.isAvailableJodaTimeEntity())
-import org.dbflute.util.DfTypeUtil;
+#if ($database.isAvailableJodaTimeLocalDateEntity())
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.ReadableInstant;
@@ -1613,7 +1612,7 @@ abstract class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClaus
         xdoWithManualOrder(callbackMOB(mobCall));
     }
 
-#if ($database.isAvailableJodaTimeEntity())
+#if ($database.isAvailableJodaTimeLocalDateEntity())
     protected def toUtilDate(date: Object): Date = {
         if (date != null && date.isInstanceOf[ReadablePartial]) {
             return new Date(date.asInstanceOf[ReadablePartial].toDateTime(null).getMillis());

@@ -33,7 +33,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
-import org.dbflute.jdbc.ParameterUtil;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 
 /**
@@ -437,7 +437,7 @@ public interface Entity {
         }
 
         public static String convertEmptyToNull(String value) {
-            return ParameterUtil.convertEmptyToNull(value);
+            return (value != null && value.length() == 0) ? null : value;
         }
 
         public static String toClassTitle(Object entity) {
@@ -448,7 +448,8 @@ public interface Entity {
             if (date == null) {
                 return null;
             }
-            final String str = DfTypeUtil.toStringDate(date, pattern, timeZone);
+            final TimeZone realZone = timeZone != null ? timeZone : DBFluteSystem.getFinalTimeZone();
+            final String str = DfTypeUtil.toStringDate(date, pattern, realZone);
             return (DfTypeUtil.isDateBC(date) ? "BC" : "") + str;
         }
 
