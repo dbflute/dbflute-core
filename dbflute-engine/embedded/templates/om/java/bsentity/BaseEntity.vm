@@ -416,12 +416,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     public void set${fk.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${fk.foreignPropertyName}) {
         ${foreignVariableName} = ${fk.foreignPropertyName};
     }
-#if ($table.isMakeEntityChaseRelation())
-
-    public ${foreignEntityClassName} chase${fk.foreignJavaBeansRulePropertyNameInitCap}() {
-        return ${foreignVariableName} != null ? ${foreignVariableName} : new ${foreignEntityClassName}();
-    }
-#end
 
 #end
 #foreach ($referrer in $table.referrerAsOneList)
@@ -455,12 +449,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
         ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
     }
-#if ($table.isMakeEntityChaseRelation())
-
-    public ${referrerEntityClassName} chase${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
-        return ${referrerVariableName} != null ? ${referrerVariableName} : new ${referrerEntityClassName}();
-    }
-#end
 
 #end
     // ===================================================================================

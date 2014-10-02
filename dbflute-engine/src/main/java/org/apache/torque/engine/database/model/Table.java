@@ -3580,10 +3580,6 @@ public class Table {
     // ===================================================================================
     //                                                                   Entity Adjustment
     //                                                                   =================
-    public boolean isMakeEntityChaseRelation() {
-        return getLittleAdjustmentProperties().isMakeEntityChaseRelation();
-    }
-
     public String getDerivedMappableDefinition() {
         if (isEntityDerivedMappable()) {
             final String delimiter = getLanguageGrammar().getImplementsDelimiter();

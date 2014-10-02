@@ -241,12 +241,6 @@ namespace ${myExtendedEntityPackageName} {
             get { return ${foreignVariableName}; }
             set { ${foreignVariableName} = value; }
         }
-#if ($table.isMakeEntityChaseRelation())
-
-        public ${foreignEntityClassName} Chase${fk.foreignPropertyNameInitCap}() {
-            return ${foreignVariableName} != null ? ${foreignVariableName} : new ${foreignEntityClassName}();
-        }
-#end
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
@@ -262,12 +256,6 @@ namespace ${myExtendedEntityPackageName} {
             get { return ${referrerVariableName}; }
             set { ${referrerVariableName} = value; }
         }
-#if ($table.isMakeEntityChaseRelation())
-
-        public ${referrerEntityClassName} Chase${referrer.referrerPropertyNameInitCapAsOne}() {
-            return ${referrerVariableName} != null ? ${referrerVariableName} : new ${referrerEntityClassName}();
-        }
-#end
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end

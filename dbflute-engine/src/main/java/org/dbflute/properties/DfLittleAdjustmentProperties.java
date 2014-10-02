@@ -140,10 +140,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                              Entity
     //                                                                              ======
-    public boolean isMakeEntityChaseRelation() {
-        return isProperty("isMakeEntityChaseRelation", false);
-    }
-
     public boolean isEntityConvertEmptyStringToNull() {
         return isProperty("isEntityConvertEmptyStringToNull", false);
     }
@@ -495,7 +491,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getProperty(KEY_isCheckSelectedClassification, null) != null;
     }
 
-    public boolean isCheckSelectedClassification() {
+    public boolean isCheckSelectedClassification() { // closet
         return isProperty(KEY_isCheckSelectedClassification, false);
     }
 
@@ -509,7 +505,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getProperty(PROP_isMakeClassificationNativeTypeSetter, null) != null;
     }
 
-    public boolean isMakeClassificationNativeTypeSetter() {
+    public boolean isMakeClassificationNativeTypeSetter() { // closet
         return isProperty(PROP_isMakeClassificationNativeTypeSetter, false);
     }
 
