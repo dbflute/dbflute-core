@@ -115,6 +115,25 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     // ===================================================================================
     //                                                                        Count Select
     //                                                                        ============
+#if ($table.isMakeCallbackConditionBeanSetup())
+    /**
+     * Select the count of uniquely-selected records by the condition-bean. {IgnorePagingCondition, IgnoreSpecifyColumn}<br />
+     * SpecifyColumn is ignored but you can use it only to remove text type column for union's distinct.
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * int count = ${myEntityVariableName}Bhv.<span style="color: #DD4747">selectCount</span>(cb);
+     * </pre>
+     * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The count for the condition. (NotMinus)
+     */
+    public int selectCount(CBCall<${myConditionBeanClassName}> cbLambda) {
+        ${myConditionBeanClassName} cb = newConditionBean(); cbLambda.callback(cb);
+        return facadeSelectCount(cb);
+    }
+
+#end
+#if ($table.isMakeDirectConditionBeanSetup())
     /**
      * Select the count of uniquely-selected records by the condition-bean. {IgnorePagingCondition, IgnoreSpecifyColumn}<br />
      * SpecifyColumn is ignored but you can use it only to remove text type column for union's distinct.
@@ -130,6 +149,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
         return facadeSelectCount(cb);
     }
 
+#end
     // ===================================================================================
     //                                                                       Entity Select
     //                                                                       =============
