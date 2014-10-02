@@ -15,11 +15,11 @@
 # o dbfluteBeansPackageName (NotRequired - Default '../resources')
 # o dbfluteBeansFileName: (NotRequired - Default 'dbfluteBeans.xml')
 # o dbfluteBeansDataSourceName: (NotRequired - Default 'dataSource')
-# o dbfluteBeansDefaultAttribute: (NotRequired - Default '')
+# o dbfluteBeansDefaultAttribute: (NotRequired - Default null)
 # o isDBFluteBeansGeneratedAsJavaConfig (NotRequired - Default true since 1.1)
 #
 # {CSharp} Quill(CSharp Seasar) Only:
-# o quillDataSourceName: (NotRequired - Default '')
+# o quillDataSourceName: (NotRequired - Default null)
 #
 # *The line that starts with '#' means comment-out.
 #
@@ -99,7 +99,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dbfluteBeansPackageName (NotRequired - Default '')
+    # o dbfluteBeansPackageName (NotRequired - Default null)
     #  The default attribute expression of DBFlute DI configuration for Spring and Lucy.
     #
     # @SpringOnly
@@ -115,7 +115,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o quillDataSourceName: (NotRequired - Default '')
+    # o quillDataSourceName: (NotRequired - Default null)
     #  The data source name of Quill(CSharp Seasar).
     #
     # @QuillOnly
