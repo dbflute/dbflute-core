@@ -203,10 +203,10 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator convert(ColumnConversionOption option) {
-        assertObjectNotNull("option", option);
+    public HpCalculator convert(FFOptionCall<ColumnConversionOption> opLambda) {
+        assertObjectNotNull("opLambda", opLambda);
         initializeCalcSpecificationIfNeeds();
-        return _calcSpecification.convert(option);
+        return _calcSpecification.convert(opLambda);
     }
 
     /**

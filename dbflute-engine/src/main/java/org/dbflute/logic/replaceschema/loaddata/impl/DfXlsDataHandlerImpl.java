@@ -59,7 +59,6 @@ import org.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.dbflute.helper.io.xls.DfTableXlsReader;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
@@ -68,6 +67,7 @@ import org.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfTableNameProp;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
@@ -900,7 +900,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

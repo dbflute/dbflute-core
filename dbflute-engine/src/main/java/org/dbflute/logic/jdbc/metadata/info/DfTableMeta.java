@@ -20,9 +20,9 @@ import java.util.Map;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.dbflute.system.DBFluteSystem;
 
 /**
  * @author jflute
@@ -144,7 +144,7 @@ public class DfTableMeta {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

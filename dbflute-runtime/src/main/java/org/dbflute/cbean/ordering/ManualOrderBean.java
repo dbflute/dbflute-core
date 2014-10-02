@@ -28,8 +28,9 @@ import org.dbflute.cbean.chelper.HpMobConnectedBean;
 import org.dbflute.cbean.chelper.HpMobConnectionMode;
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.ckey.ConditionKey;
+import org.dbflute.cbean.coption.COptionCall;
 import org.dbflute.cbean.coption.ColumnConversionOption;
-import org.dbflute.cbean.coption.DateFromToOption;
+import org.dbflute.cbean.coption.FFOptionCall;
 import org.dbflute.cbean.coption.FromToOption;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
@@ -177,28 +178,21 @@ public class ManualOrderBean implements HpCalculator {
      * See the {@link FromToOption} class for the details.
      * @param fromDate The from-date for ordering. (NullAllowed: if null, means invalid from-condition)
      * @param toDate The to-date for ordering. (NullAllowed: if null, means invalid to-condition)
-     * @param option The option of from-to. (NotNull)
+     * @param opLambda The callback for option of from-to. (NotNull)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public HpMobConnectedBean when_FromTo(Date fromDate, Date toDate, FromToOption option) {
-        return doWhen_FromTo(fromDate, toDate, option);
+    public HpMobConnectedBean when_FromTo(Date fromDate, Date toDate, COptionCall<FromToOption> opLambda) {
+        if (opLambda == null) {
+            String msg = "The argument 'opLambda' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        final FromToOption op = createFromToOption();
+        opLambda.callback(op);
+        return doWhen_FromTo(fromDate, toDate, op);
     }
 
-    /**
-     * Add 'when' element for 'case' statement as DateFromTo.
-     * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007/04/10</span> 08:24:53} to:{<span style="color: #DD4747">2007/04/16</span> 14:36:29}
-     * 
-     *   mob.when_DateFromTo(fromDate, toDate);
-     *     --&gt; column &gt;= '2007/04/10 00:00:00'
-     *     and column &lt; '2007/04/17 00:00:00'
-     * </pre>
-     * @param fromDate The from-date for ordering. (NullAllowed: if null, means invalid from-condition)
-     * @param toDate The to-date for ordering. (NullAllowed: if null, means invalid to-condition)
-     * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
-     */
-    public HpMobConnectedBean when_DateFromTo(Date fromDate, Date toDate) {
-        return doWhen_FromTo(fromDate, toDate, new DateFromToOption());
+    protected FromToOption createFromToOption() {
+        return new FromToOption();
     }
 
     protected HpMobConnectedBean doWhen_FromTo(Date fromDate, Date toDate, FromToOption option) {
@@ -206,6 +200,7 @@ public class ManualOrderBean implements HpCalculator {
             String msg = "The argument 'option' should not be null.";
             throw new IllegalArgumentException(msg);
         }
+        // TODO jflute check one-side allowed
         final ConditionKey fromDateConditionKey = option.getFromDateConditionKey();
         final ConditionKey toDateConditionKey = option.getToDateConditionKey();
         final Date filteredFromDate = option.filterFromDate(fromDate);
@@ -473,10 +468,10 @@ public class ManualOrderBean implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator convert(ColumnConversionOption option) {
-        assertObjectNotNull("option", option);
+    public HpCalculator convert(FFOptionCall<ColumnConversionOption> opLambda) {
+        assertObjectNotNull("opLambda", opLambda);
         initializeCalcSpecificationIfNeeds();
-        return _calcSpecification.convert(option);
+        return _calcSpecification.convert(opLambda);
     }
 
     /**

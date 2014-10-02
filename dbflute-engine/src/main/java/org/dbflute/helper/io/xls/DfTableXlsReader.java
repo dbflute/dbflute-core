@@ -45,7 +45,7 @@ import org.dbflute.helper.dataset.DfDataTable;
 import org.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -650,6 +650,6 @@ public class DfTableXlsReader {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

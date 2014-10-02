@@ -34,12 +34,12 @@ import org.dbflute.exception.DfJDBCException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfCommonColumnProperties;
 import org.dbflute.properties.DfOptimisticLockProperties;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
@@ -311,6 +311,6 @@ public class DfCraftDiffAssertProvider {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

@@ -22,11 +22,11 @@ import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfDBFluteTaskCancelledException;
 import org.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.logic.DfDBFluteTaskUtil;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.task.bs.DfAbstractTask;
 
 /**

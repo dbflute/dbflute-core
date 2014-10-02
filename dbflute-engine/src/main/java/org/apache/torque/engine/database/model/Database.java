@@ -1503,19 +1503,30 @@ public class Database {
     //                                             ---------
     // CSharp Only
     public boolean isFlatDirectoryPackageValid() {
-        return getProperties().getBasicProperties().isFlatDirectoryPackageValid();
+        return getBasicProperties().isFlatDirectoryPackageValid();
     }
 
     public String getFlatDirectoryPackage() {
-        return getProperties().getBasicProperties().getFlatDirectoryPackage();
+        return getBasicProperties().getFlatDirectoryPackage();
     }
 
     public boolean isOmitDirectoryPackageValid() {
-        return getProperties().getBasicProperties().isOmitDirectoryPackageValid();
+        return getBasicProperties().isOmitDirectoryPackageValid();
     }
 
     public String getOmitDirectoryPackage() {
-        return getProperties().getBasicProperties().getOmitDirectoryPackage();
+        return getBasicProperties().getOmitDirectoryPackage();
+    }
+
+    // -----------------------------------------------------
+    //                                        Final TimeZone
+    //                                        --------------
+    public boolean hasDBFluteSystemFinalTimeZone() {
+        return getBasicProperties().hasDBFluteSystemFinalTimeZone();
+    }
+
+    public String getDBFluteSystemFinalTimeZone() {
+        return getBasicProperties().getDBFluteSystemFinalTimeZone();
     }
 
     // -----------------------------------------------------
@@ -1951,6 +1962,14 @@ public class Database {
 
     public boolean isAvailableOracleNativeJDBC() { // Oracle facade
         return isDatabaseOracle() && isAvailableDatabaseNativeJDBC();
+    }
+
+    public boolean isAvailableNextTimeEntity() {
+        return getLittleAdjustmentProperties().isAvailableNextTimeEntity();
+    }
+
+    public boolean isAvailableNextTimeLocalDateEntity() {
+        return getLittleAdjustmentProperties().isAvailableNextTimeLocalDateEntity();
     }
 
     public boolean isAvailableJava8TimeEntity() {

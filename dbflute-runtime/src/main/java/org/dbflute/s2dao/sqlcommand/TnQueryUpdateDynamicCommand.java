@@ -32,12 +32,12 @@ import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnSqlName;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.Srl;
 
@@ -244,7 +244,7 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
     }
 
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

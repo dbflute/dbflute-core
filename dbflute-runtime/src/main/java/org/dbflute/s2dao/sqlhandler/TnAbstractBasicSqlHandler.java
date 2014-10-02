@@ -42,7 +42,6 @@ import org.dbflute.hook.SqlLogHandler;
 import org.dbflute.hook.SqlLogInfo;
 import org.dbflute.hook.SqlLogInfo.SqlLogDisplaySqlBuilder;
 import org.dbflute.hook.SqlResultHandler;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.DataSourceHandler;
 import org.dbflute.jdbc.ExecutionTimeInfo;
 import org.dbflute.jdbc.HandlingDataSourceWrapper;
@@ -52,6 +51,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.DisplaySqlBuilder;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
@@ -774,7 +774,7 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     protected long systemTime() {

@@ -21,8 +21,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.dbflute.bhv.core.BehaviorCommand;
+import org.dbflute.bhv.core.context.mapping.MappingDateTimeZoneProvider;
 import org.dbflute.bhv.exception.SQLExceptionHandler;
 import org.dbflute.bhv.exception.SQLExceptionHandlerFactory;
 import org.dbflute.cbean.ConditionBean;
@@ -73,7 +75,7 @@ public class ResourceContext {
      * @return The determination, true or false.
      */
     public static boolean isExistResourceContextOnThread() {
-        return (threadLocal.get() != null);
+        return threadLocal.get() != null;
     }
 
     /**
@@ -247,33 +249,43 @@ public class ResourceContext {
     }
 
     public static String getOutsideSqlPackage() {
-        final ResourceParameter resourceParameter = resourceParameter();
-        return resourceParameter != null ? resourceParameter.getOutsideSqlPackage() : null;
+        final ResourceParameter parameter = resourceParameter();
+        return parameter != null ? parameter.getOutsideSqlPackage() : null;
+    }
+
+    public static MappingDateTimeZoneProvider getMappingDateTimeZoneProvider() {
+        final ResourceParameter parameter = resourceParameter();
+        return parameter != null ? parameter.getMappingDateTimeZoneProvider() : null;
+    }
+
+    public static TimeZone provideMappingDateTimeZone() {
+        MappingDateTimeZoneProvider provider = getMappingDateTimeZoneProvider();
+        return provider != null ? provider.provide() : null;
     }
 
     public static String getLogDatePattern() {
-        final ResourceParameter resourceParameter = resourceParameter();
-        return resourceParameter != null ? resourceParameter.getLogDatePattern() : null;
+        final ResourceParameter parameter = resourceParameter();
+        return parameter != null ? parameter.getLogDatePattern() : null;
     }
 
     public static String getLogTimestampPattern() {
-        final ResourceParameter resourceParameter = resourceParameter();
-        return resourceParameter != null ? resourceParameter.getLogTimestampPattern() : null;
+        final ResourceParameter parameter = resourceParameter();
+        return parameter != null ? parameter.getLogTimestampPattern() : null;
     }
 
     public static String getLogTimePattern() {
-        final ResourceParameter resourceParameter = resourceParameter();
-        return resourceParameter != null ? resourceParameter.getLogTimePattern() : null;
+        final ResourceParameter parameter = resourceParameter();
+        return parameter != null ? parameter.getLogTimePattern() : null;
     }
 
     public static BoundDateDisplayTimeZoneProvider getLogTimeZoneProvider() {
-        final ResourceParameter resourceParameter = resourceParameter();
-        return resourceParameter != null ? resourceParameter.getLogTimeZoneProvider() : null;
+        final ResourceParameter parameter = resourceParameter();
+        return parameter != null ? parameter.getLogTimeZoneProvider() : null;
     }
 
     public static boolean isInternalDebug() {
-        final ResourceParameter resourceParameter = resourceParameter();
-        return resourceParameter != null ? resourceParameter.isInternalDebug() : false;
+        final ResourceParameter parameter = resourceParameter();
+        return parameter != null ? parameter.isInternalDebug() : false;
     }
 
     protected static ResourceParameter resourceParameter() {

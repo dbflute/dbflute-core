@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.TimeZone;
 
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 import org.dbflute.util.DfTypeUtil;
@@ -49,7 +50,8 @@ public class DisplaySqlBuilder {
     //                                                                         ===========
     public DisplaySqlBuilder(BoundDateDisplayStyle dateDisplayStyle) {
         if (dateDisplayStyle == null) {
-            throw new IllegalArgumentException("The argument 'dateDisplayStyle' should not be null.");
+            String msg = "The argument 'dateDisplayStyle' should not be null.";
+            throw new IllegalArgumentException(msg);
         }
         _dateDisplayStyle = dateDisplayStyle;
     }
@@ -292,7 +294,7 @@ public class DisplaySqlBuilder {
 
     protected TimeZone getTimeZone() {
         final BoundDateDisplayTimeZoneProvider provider = _dateDisplayStyle.getTimeZoneProvider();
-        return provider != null ? provider.provide() : null;
+        return provider != null ? provider.provide() : DBFluteSystem.getFinalTimeZone();
     }
 
     // -----------------------------------------------------

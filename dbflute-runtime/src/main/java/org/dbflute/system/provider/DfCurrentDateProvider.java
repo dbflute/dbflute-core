@@ -13,13 +13,18 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.jdbc;
+package org.dbflute.system.provider;
 
 /**
  * @author jflute
  * @since 1.1.0 (2014/09/29 Monday)
  */
-public interface DBFluteStateProvider {
+public interface DfCurrentDateProvider {
 
+    /**
+     * Get current date as milliseconds. <br />
+     * This might be called many times, so take care of performance.
+     * @return The long value as milliseconds.
+     */
     long currentTimeMillis();
 }

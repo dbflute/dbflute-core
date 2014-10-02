@@ -25,7 +25,7 @@ import java.io.StringWriter;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 
 /**
@@ -184,6 +184,6 @@ public class DfFlutistEmergencyLog4JLogger implements Log {
     //                                                                      General Helper
     //                                                                      ==============
     protected static String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

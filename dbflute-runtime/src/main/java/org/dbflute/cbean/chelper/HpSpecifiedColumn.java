@@ -17,6 +17,7 @@ package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.coption.ColumnConversionOption;
+import org.dbflute.cbean.coption.FFOptionCall;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
@@ -232,11 +233,13 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn convert(ColumnConversionOption option) {
-        assertObjectNotNull("option", option);
+    public HpSpecifiedColumn convert(FFOptionCall<ColumnConversionOption> opLambda) {
+        assertObjectNotNull("opLambda", opLambda);
         initializeCalcSpecificationIfNeeds();
-        initializeConvOptionColumn(option);
-        _calcSpecification.convert(option);
+        _calcSpecification.convert(op -> {
+            initializeConvOptionColumn(op);
+            opLambda.callback(op);
+        });
         return this;
     }
 

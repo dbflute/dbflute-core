@@ -44,7 +44,6 @@ import org.dbflute.hook.CallbackContext;
 import org.dbflute.hook.SqlLogInfo;
 import org.dbflute.hook.SqlResultHandler;
 import org.dbflute.hook.SqlResultInfo;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.ExecutionTimeInfo;
 import org.dbflute.jdbc.SQLExceptionDigger;
 import org.dbflute.jdbc.StatementConfig;
@@ -52,6 +51,7 @@ import org.dbflute.optional.RelationOptionalFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTraceViewUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
@@ -784,7 +784,7 @@ public class BehaviorCommandInvoker {
     }
 
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

@@ -37,9 +37,9 @@ import org.dbflute.exception.DfJDBCException;
 import org.dbflute.friends.log4j.DfFlutistEmergencyLog4JLogger;
 import org.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfStringUtil;
 
 /**
@@ -293,6 +293,6 @@ public final class DfDBFluteTaskUtil {
     //                                                                      General Helper
     //                                                                      ==============
     protected static String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

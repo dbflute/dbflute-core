@@ -494,8 +494,8 @@ public class ColumnInfo {
      */
     public boolean isObjectNativeTypeDate() {
         return assignableObjectNativeTypeUtilDate() // traditional date
-                || assignableObjectNativeTypeJodaDate() // JodaDate
-                || assignableObjectNativeTypeJodaDate(); // Java8Date
+                || assignableObjectNativeTypeJava8Date() // Java8Date
+                || assignableObjectNativeTypeJodaDate(); // JodaDate
     }
 
     protected boolean assignableObjectNativeTypeUtilDate() {

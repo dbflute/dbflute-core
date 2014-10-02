@@ -18,7 +18,7 @@ package org.dbflute.cbean.sqlclause.subquery;
 import java.io.Serializable;
 
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
 
@@ -247,6 +247,6 @@ public class SubQueryIndentProcessor implements Serializable {
     }
 
     protected static String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

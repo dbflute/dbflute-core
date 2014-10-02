@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
+import org.dbflute.system.DBFluteSystem;
 
 /**
  * @author jflute
@@ -84,7 +84,7 @@ public class DfSynonymMeta {
     public String toString() {
         String comment = "";
         if (_tableComment != null) {
-            final String ln = DBFluteSystem.getBasicLn();
+            final String ln = DBFluteSystem.ln();
             final int indexOf = _tableComment.indexOf(ln);
             if (indexOf > 0) { // not contain 0 because ignore first line separator
                 comment = _tableComment.substring(0, indexOf) + "...";

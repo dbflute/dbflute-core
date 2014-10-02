@@ -40,13 +40,13 @@ import org.dbflute.exception.DfJDBCException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.core.DfEnvironmentType;
 import org.dbflute.infra.core.logic.DfSchemaResourceFinder;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.properties.handler.DfPropertiesHandler;
 import org.dbflute.properties.propreader.DfOutsideListPropReader;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
 import org.dbflute.properties.propreader.DfOutsideStringPropReader;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
@@ -873,7 +873,7 @@ public abstract class DfAbstractHelperProperties {
     //                                                                  General Helper
     //                                                                  ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {

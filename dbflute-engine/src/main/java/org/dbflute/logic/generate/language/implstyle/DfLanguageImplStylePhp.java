@@ -98,4 +98,8 @@ public class DfLanguageImplStylePhp implements DfLanguageImplStyle {
     public boolean isOutsideSqlCursorGenericVoidable() {
         return false;
     }
+
+    public boolean canUseJava8TimeLocalDate() {
+        return false;
+    }
 }

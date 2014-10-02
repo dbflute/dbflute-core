@@ -16,6 +16,8 @@
 package org.dbflute.hook;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.AccessContextNoValueException;
 import org.dbflute.exception.AccessContextNotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 
 /**
  * The context of DB access. (basically for CommonColumnAutoSetup)
@@ -196,6 +198,58 @@ public class AccessContext {
     //                                                                  Access Information
     //                                                                  ==================
     // -----------------------------------------------------
+    //                                  Access LocalDateTime
+    //                                  --------------------
+    /**
+     * Get access local date on thread. <br />
+     * If it couldn't get access local date from access-context, it returns null.
+     * @return The local date that specifies access time. (NotNull)
+     */
+    public static LocalDate getAccessLocalDateOnThread() {
+        if (isExistAccessContextOnThread()) {
+            final AccessContext context = getAccessContextOnThread();
+            final LocalDate accessLocalDate = context.getAccessLocalDate();
+            if (accessLocalDate != null) {
+                return accessLocalDate;
+            }
+            final AccessLocalDateProvider provider = context.getAccessLocalDateProvider();
+            if (provider != null) {
+                final LocalDate provided = provider.provideLocalDate();
+                if (provided != null) {
+                    return provided;
+                }
+            }
+        }
+        return null; // not inherit current time return, access-context should be set up
+    }
+
+    // -----------------------------------------------------
+    //                                  Access LocalDateTime
+    //                                  --------------------
+    /**
+     * Get access local date-time on thread. <br />
+     * If it couldn't get access local date-time from access-context, it returns null.
+     * @return The local date-time that specifies access time. (NotNull)
+     */
+    public static LocalDateTime getAccessLocalDateTimeOnThread() {
+        if (isExistAccessContextOnThread()) {
+            final AccessContext context = getAccessContextOnThread();
+            final LocalDateTime accessLocalDateTime = context.getAccessLocalDateTime();
+            if (accessLocalDateTime != null) {
+                return accessLocalDateTime;
+            }
+            final AccessLocalDateTimeProvider provider = context.getAccessLocalDateTimeProvider();
+            if (provider != null) {
+                final LocalDateTime provided = provider.provideLocalDateTime();
+                if (provided != null) {
+                    return provided;
+                }
+            }
+        }
+        return null; // not inherit current time return, access-context should be set up
+    }
+
+    // -----------------------------------------------------
     //                                           Access Date
     //                                           -----------
     /**
@@ -212,7 +266,7 @@ public class AccessContext {
             }
             final AccessDateProvider provider = context.getAccessDateProvider();
             if (provider != null) {
-                final Date provided = provider.getAccessDate();
+                final Date provided = provider.provideDate();
                 if (provided != null) {
                     return provided;
                 }
@@ -238,7 +292,7 @@ public class AccessContext {
             }
             final AccessTimestampProvider provider = context.getAccessTimestampProvider();
             if (provider != null) {
-                final Timestamp provided = provider.getAccessTimestamp();
+                final Timestamp provided = provider.provideTimestamp();
                 if (provided != null) {
                     return provided;
                 }
@@ -263,7 +317,7 @@ public class AccessContext {
             }
             final AccessUserProvider provider = context.getAccessUserProvider();
             if (provider != null) {
-                final String user = provider.getAccessUser();
+                final String user = provider.provideUser();
                 if (user != null) {
                     return user;
                 }
@@ -294,7 +348,7 @@ public class AccessContext {
             }
             final AccessProcessProvider provider = context.getAccessProcessProvider();
             if (provider != null) {
-                final String provided = provider.getAccessProcess();
+                final String provided = provider.provideProcess();
                 if (provided != null) {
                     return provided;
                 }
@@ -325,7 +379,7 @@ public class AccessContext {
             }
             final AccessModuleProvider provider = context.getAccessModuleProvider();
             if (provider != null) {
-                final String provided = provider.getAccessModule();
+                final String provided = provider.provideModule();
                 if (provided != null) {
                     return provided;
                 }
@@ -417,12 +471,18 @@ public class AccessContext {
     //                                                                      General Helper
     //                                                                      ==============
     protected static String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected LocalDate _accessLocalDate;
+    protected AccessLocalDateProvider _accessLocalDateProvider;
+
+    protected LocalDateTime _accessLocalDateTime;
+    protected AccessLocalDateTimeProvider _accessLocalDateTimeProvider;
+
     protected Date _accessDate;
     protected AccessDateProvider _accessDateProvider;
 
@@ -454,6 +514,44 @@ public class AccessContext {
     //                                                                            Accessor
     //                                                                            ========
     // -----------------------------------------------------
+    //                                      Access LocalDate
+    //                                      ----------------
+    public LocalDate getAccessLocalDate() {
+        return _accessLocalDate;
+    }
+
+    public void setAccessLocalDate(LocalDate accessLocalDate) {
+        _accessLocalDate = accessLocalDate;
+    }
+
+    public AccessLocalDateProvider getAccessLocalDateProvider() {
+        return _accessLocalDateProvider;
+    }
+
+    public void setAccessLocalDateProvider(AccessLocalDateProvider accessLocalDateProvider) {
+        _accessLocalDateProvider = accessLocalDateProvider;
+    }
+
+    // -----------------------------------------------------
+    //                                  Access LocalDateTime
+    //                                  --------------------
+    public LocalDateTime getAccessLocalDateTime() {
+        return _accessLocalDateTime;
+    }
+
+    public void setAccessLocalDateTime(LocalDateTime accessLocalDateTime) {
+        _accessLocalDateTime = accessLocalDateTime;
+    }
+
+    public AccessLocalDateTimeProvider getAccessLocalDateTimeProvider() {
+        return _accessLocalDateTimeProvider;
+    }
+
+    public void setAccessLocalDateTimeProvider(AccessLocalDateTimeProvider accessLocalDateTimeProvider) {
+        _accessLocalDateTimeProvider = accessLocalDateTimeProvider;
+    }
+
+    // -----------------------------------------------------
     //                                           Access Date
     //                                           -----------
     public Date getAccessDate() {
@@ -461,7 +559,7 @@ public class AccessContext {
     }
 
     public void setAccessDate(Date accessDate) {
-        this._accessDate = accessDate;
+        _accessDate = accessDate;
     }
 
     public AccessDateProvider getAccessDateProvider() {
@@ -469,7 +567,7 @@ public class AccessContext {
     }
 
     public void setAccessDateProvider(AccessDateProvider accessDateProvider) {
-        this._accessDateProvider = accessDateProvider;
+        _accessDateProvider = accessDateProvider;
     }
 
     // -----------------------------------------------------
@@ -480,7 +578,7 @@ public class AccessContext {
     }
 
     public void setAccessTimestamp(Timestamp accessTimestamp) {
-        this._accessTimestamp = accessTimestamp;
+        _accessTimestamp = accessTimestamp;
     }
 
     public AccessTimestampProvider getAccessTimestampProvider() {
@@ -488,7 +586,7 @@ public class AccessContext {
     }
 
     public void setAccessTimestampProvider(AccessTimestampProvider accessTimestampProvider) {
-        this._accessTimestampProvider = accessTimestampProvider;
+        _accessTimestampProvider = accessTimestampProvider;
     }
 
     // -----------------------------------------------------
@@ -499,7 +597,7 @@ public class AccessContext {
     }
 
     public void setAccessUser(String accessUser) {
-        this._accessUser = accessUser;
+        _accessUser = accessUser;
     }
 
     public AccessUserProvider getAccessUserProvider() {
@@ -507,7 +605,7 @@ public class AccessContext {
     }
 
     public void setAccessUserProvider(AccessUserProvider accessUserProvider) {
-        this._accessUserProvider = accessUserProvider;
+        _accessUserProvider = accessUserProvider;
     }
 
     // -----------------------------------------------------
@@ -518,7 +616,7 @@ public class AccessContext {
     }
 
     public void setAccessProcess(String accessProcess) {
-        this._accessProcess = accessProcess;
+        _accessProcess = accessProcess;
     }
 
     public AccessProcessProvider getAccessProcessProvider() {
@@ -526,7 +624,7 @@ public class AccessContext {
     }
 
     public void setAccessProcessProvider(AccessProcessProvider accessProcessProvider) {
-        this._accessProcessProvider = accessProcessProvider;
+        _accessProcessProvider = accessProcessProvider;
     }
 
     // -----------------------------------------------------
@@ -537,7 +635,7 @@ public class AccessContext {
     }
 
     public void setAccessModule(String accessModule) {
-        this._accessModule = accessModule;
+        _accessModule = accessModule;
     }
 
     public AccessModuleProvider getAccessModuleProvider() {
@@ -545,7 +643,7 @@ public class AccessContext {
     }
 
     public void setAccessModuleProvider(AccessModuleProvider accessModuleProvider) {
-        this._accessModuleProvider = accessModuleProvider;
+        _accessModuleProvider = accessModuleProvider;
     }
 
     // -----------------------------------------------------
@@ -571,6 +669,30 @@ public class AccessContext {
     //                                                                  Provider Interface
     //                                                                  ==================
     /**
+     * The provider interface of access local date.
+     */
+    public static interface AccessLocalDateProvider {
+
+        /**
+         * Get access local date.
+         * @return The date that specifies access local date. (NotNull)
+         */
+        LocalDate provideLocalDate();
+    }
+
+    /**
+     * The provider interface of access local date-time.
+     */
+    public static interface AccessLocalDateTimeProvider {
+
+        /**
+         * Get access local date-time.
+         * @return The time-stamp that specifies access time. (NotNull)
+         */
+        LocalDateTime provideLocalDateTime();
+    }
+
+    /**
      * The provider interface of access date.
      */
     public static interface AccessDateProvider {
@@ -579,7 +701,7 @@ public class AccessContext {
          * Get access date.
          * @return The date that specifies access time. (NotNull)
          */
-        Date getAccessDate();
+        Date provideDate();
     }
 
     /**
@@ -591,7 +713,7 @@ public class AccessContext {
          * Get access time-stamp.
          * @return The time-stamp that specifies access time. (NotNull)
          */
-        Timestamp getAccessTimestamp();
+        Timestamp provideTimestamp();
     }
 
     /**
@@ -603,7 +725,7 @@ public class AccessContext {
          * Get access user.
          * @return The expression for access user. (NotNull)
          */
-        String getAccessUser();
+        String provideUser();
     }
 
     /**
@@ -615,7 +737,7 @@ public class AccessContext {
          * Get access process.
          * @return The expression for access process. (NotNull)
          */
-        String getAccessProcess();
+        String provideProcess();
     }
 
     /**
@@ -627,6 +749,6 @@ public class AccessContext {
          * Get access module.
          * @return The expression for access module. (NotNull)
          */
-        String getAccessModule();
+        String provideModule();
     }
 }

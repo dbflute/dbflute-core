@@ -75,11 +75,11 @@
 package org.apache.torque.engine.database.model;
 
 import org.dbflute.DfBuildProperties;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.Srl;
 
 /**
@@ -408,6 +408,6 @@ public class UnifiedSchema {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

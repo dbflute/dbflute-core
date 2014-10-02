@@ -67,7 +67,7 @@ import org.dbflute.exception.SpecifyIllegalPurposeException;
 import org.dbflute.exception.SpecifyRelationIllegalPurposeException;
 import org.dbflute.exception.SpecifyThatsBadTimingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
@@ -1409,7 +1409,7 @@ public class ConditionBeanExceptionThrower {
      * @return The value of line separator. (NotNull)
      */
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     protected String initCap(String str) {

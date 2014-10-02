@@ -26,7 +26,7 @@ import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.SequenceCacheIllegalStateException;
 import org.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.Srl;
 
 /**
@@ -272,7 +272,7 @@ public class SequenceCacheHandler {
     }
 
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

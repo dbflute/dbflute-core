@@ -29,12 +29,12 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.helper.StringKeyMap;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
 import org.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.Srl;
 
@@ -232,6 +232,6 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
     }
 
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

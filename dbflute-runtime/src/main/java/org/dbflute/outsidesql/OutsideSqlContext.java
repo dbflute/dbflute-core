@@ -29,8 +29,8 @@ import org.dbflute.exception.OutsideSqlNotFoundException;
 import org.dbflute.exception.OutsideSqlReadFailureException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.CursorHandler;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.StatementConfig;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfResourceUtil;
 import org.dbflute.util.Srl;
 
@@ -448,7 +448,7 @@ public class OutsideSqlContext {
     }
 
     protected static String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

@@ -18,7 +18,7 @@ package org.dbflute.cbean.sqlclause.subquery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;
-import org.dbflute.jdbc.DBFluteSystem;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.Srl;
 
 /**
@@ -195,6 +195,6 @@ public class SubQueryClause {
     }
 
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 }

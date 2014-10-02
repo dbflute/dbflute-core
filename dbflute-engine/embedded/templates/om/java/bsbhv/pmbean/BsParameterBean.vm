@@ -31,17 +31,17 @@ import org.dbflute.twowaysql.pmbean.ParameterBean;
 #end
 #end
 import org.dbflute.jdbc.*;
-import org.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
 import org.dbflute.cbean.coption.LikeSearchOption;
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
 import org.dbflute.cbean.coption.FromToOption;
 #end
-import org.dbflute.util.DfCollectionUtil;
 #if ($database.hasPmbMetaDataPropertyUseOriginalException($pmbClassName))
 import org.dbflute.exception.*;
 #end
+import org.dbflute.outsidesql.PmbCustodial;
+import org.dbflute.outsidesql.PmbCustodial.ShortCharHandlingMode;
 import org.dbflute.util.DfTypeUtil;
 #if ($database.isAvailableJodaTimeEntity())
 #if ($database.isAvailableJodaTimeLocalDateEntity())
@@ -172,6 +172,9 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     protected int _safetyMaxResultSize;
 
 #end
+    /** The time-zone for filtering e.g. from-to. (NullAllowed: if null, default zone) */
+    protected TimeZone _timeZone;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -279,11 +282,11 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    // -----------------------------------------------------
+    //                                                String
+    //                                                ------
     protected String filterStringParameter(String value) {
-        if (isEmptyStringParameterAllowed()) {
-            return value;
-        }
-        return convertEmptyToNull(value);
+        return isEmptyStringParameterAllowed() ? value : convertEmptyToNull(value);
     }
 
     protected boolean isEmptyStringParameterAllowed() {
@@ -291,33 +294,35 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     }
 
     protected String convertEmptyToNull(String value) {
-	    return ParameterUtil.convertEmptyToNull(value);
+	    return PmbCustodial.convertEmptyToNull(value);
     }
 
     protected String handleShortChar(String propertyName, String value, Integer size) {
-        ShortCharHandlingMode mode = getShortCharHandlingMode(propertyName, value, size);
-        return ParameterUtil.handleShortChar(propertyName, value, size, mode);
+        ShortCharHandlingMode mode = chooseShortCharHandlingMode(propertyName, value, size);
+        return PmbCustodial.handleShortChar(propertyName, value, size, mode);
     }
 
-    protected ShortCharHandlingMode getShortCharHandlingMode(String propertyName, String value, Integer size) {
+    protected ShortCharHandlingMode chooseShortCharHandlingMode(String propertyName, String value, Integer size) {
         return ShortCharHandlingMode.${database.shortCharHandlingMode};
     }
 
-    @SuppressWarnings("unchecked")
-    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) { // might be called by option handling
-        Object obj = DfCollectionUtil.newArrayList(elements);
-        return (ArrayList<ELEMENT>)obj; // to avoid the warning between JDK6 and JDK7
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
+    protected void assertLikeSearchOptionValid(String name, LikeSearchOption option) {
+        if (option == null) {
+            String msg = "The like-search option is required!";
+            throw new RequiredOptionNotFoundException(msg);
+        }
+        if (option.isSplit()) {
+            String msg = "The split of like-search is NOT available on parameter-bean.";
+            msg = msg + " Don't use splitByXxx(): " + option;
+            throw new IllegalOutsideSqlOperationException(msg);
+        }
     }
 
-    @SuppressWarnings("unchecked")
-    protected <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) { // might be called by option handling
-        return (NUMBER)DfTypeUtil.toNumber(obj, type);
-    }
-
-    protected Boolean toBoolean(Object obj) {
-        return DfTypeUtil.toBoolean(obj);
-    }
-
+#end
+    // -----------------------------------------------------
+    //                                                  Date
+    //                                                  ----
 #if ($database.isAvailableJodaTimeEntity())
     protected Date toUtilDate(Object date) {
         if (date != null && date instanceof ReadablePartial) {
@@ -326,10 +331,16 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
             return new Date(((ReadableInstant) date).getMillis());
         }
 #else
-    protected Date toUtilDate(Date date) {
+    protected Date toUtilDate(Object date) {
 #end
-        return DfTypeUtil.toDate(date); // if sub class, re-create as pure date
+        return PmbCustodial.toUtilDate(date, _timeZone);
     }
+#if ($database.isAvailableJava8TimeLocalDateEntity())
+
+    protected <DATE> DATE toLocalDate(Date date, Class<DATE> localType) {
+        return PmbCustodial.toLocalDate(date, localType, chooseRealTimeZone());
+    }
+#end
 #if ($database.isAvailableJodaTimeLocalDateEntity())
 
     @SuppressWarnings("unchecked")
@@ -349,36 +360,53 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #else
         String pattern = "yyyy-MM-dd";
 #end
-        return DfTypeUtil.toString(date, pattern);
+        return PmbCustodial.formatUtilDate(date, pattern, _timeZone);
+    }
+
+#if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
+    protected void assertFromToOptionValid(String name, FromToOption option) {
+        PmbCustodial.assertFromToOptionValid(name, option);
+    }
+
+    protected FromToOption createFromToOption() {
+        return PmbCustodial.createFromToOption(_timeZone);
+    }
+
+#end
+    protected TimeZone chooseRealTimeZone() {
+        return PmbCustodial.chooseRealTimeZone(_timeZone);
+    }
+
+    /**
+     * Set time-zone, basically for LocalDate conversion. <br />
+     * Normally you don't need to set this, you can adjust other ways. <br />
+     * (DBFlute system's time-zone is used as default)
+     * @param timeZone The time-zone for filtering. (NullAllowed: if null, default zone)
+     */
+    public void zone(TimeZone timeZone) {
+        _timeZone = timeZone;
+    }
+
+    // -----------------------------------------------------
+    //                                               Various
+    //                                               -------
+    protected <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) { // might be called by option handling
+        return PmbCustodial.toNumber(obj, type);
+    }
+
+    protected Boolean toBoolean(Object obj) {
+        return PmbCustodial.toBoolean(obj);
     }
 
     protected String formatByteArray(byte[] bytes) {
-        return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
+        return PmbCustodial.formatByteArray(bytes);
     }
 
-#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
-    protected void assertLikeSearchOptionValid(String name, LikeSearchOption option) {
-        if (option == null) {
-            String msg = "The like-search option is required!";
-            throw new RequiredOptionNotFoundException(msg);
-        }
-        if (option.isSplit()) {
-            String msg = "The split of like-search is NOT available on parameter-bean.";
-            msg = msg + " Don't use splitByXxx(): " + option;
-            throw new IllegalOutsideSqlOperationException(msg);
-        }
+    @SuppressWarnings("unchecked")
+    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) { // might be called by option handling
+        return PmbCustodial.newArrayList(elements);
     }
 
-#end
-#if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
-    protected void assertFromToOptionValid(String name, FromToOption option) {
-        if (option == null) {
-            String msg = "The from-to option is required!";
-            throw new RequiredOptionNotFoundException(msg);
-        }
-    }
-
-#end
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
@@ -538,10 +566,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}) {
-#if ($database.isAvailableJodaTimeLocalDateEntity())
-        ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
+#if ($database.isAvailableNextTimeLocalDateEntity())
+        ${variableName} = toLocalDate(createFromToOption().compareAsDate().filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
-        ${variableName} = new FromToOption().compareAsDate().filterFromDate(${argumentName});
+        ${variableName} = createFromToOption().compareAsDate().filterFromDate(${argumentName});
 #end
     }
 #end
@@ -557,7 +585,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
-#if ($database.isAvailableJodaTimeLocalDateEntity())
+#if ($database.isAvailableNextTimeLocalDateEntity())
         ${variableName} = toLocalDate(${argumentName}Option.filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = ${argumentName}Option.filterFromDate(${argumentName});
@@ -574,10 +602,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}) {
-#if ($database.isAvailableJodaTimeLocalDateEntity())
-        ${variableName} = toLocalDate(new FromToOption().compareAsDate().filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
+#if ($database.isAvailableNextTimeLocalDateEntity())
+        ${variableName} = toLocalDate(createFromToOption().compareAsDate().filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
-        ${variableName} = new FromToOption().compareAsDate().filterToDate(${argumentName});
+        ${variableName} = createFromToOption().compareAsDate().filterToDate(${argumentName});
 #end
     }
 #end
@@ -593,7 +621,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
-#if ($database.isAvailableJodaTimeLocalDateEntity())
+#if ($database.isAvailableNextTimeLocalDateEntity())
         ${variableName} = toLocalDate(${argumentName}Option.filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = ${argumentName}Option.filterToDate(${argumentName});

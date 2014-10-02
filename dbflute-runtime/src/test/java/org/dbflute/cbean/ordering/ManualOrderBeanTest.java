@@ -22,7 +22,6 @@ import org.dbflute.cbean.chelper.HpManualOrderThemeListHandler;
 import org.dbflute.cbean.chelper.HpMobCaseWhenElement;
 import org.dbflute.cbean.chelper.HpMobConnectionMode;
 import org.dbflute.cbean.ckey.ConditionKey;
-import org.dbflute.cbean.ordering.ManualOrderBean;
 import org.dbflute.unit.PlainTestCase;
 import org.dbflute.util.DfTypeUtil;
 
@@ -39,7 +38,7 @@ public class ManualOrderBeanTest extends PlainTestCase {
         ManualOrderBean mob = new ManualOrderBean();
 
         // ## Act ##
-        mob.when_DateFromTo(fromDate, toDate);
+        mob.when_FromTo(fromDate, toDate, op -> op.compareAsDate());
 
         // ## Assert ##
         List<HpMobCaseWhenElement> caseWhenAcceptedList = mob.getCaseWhenAcceptedList();

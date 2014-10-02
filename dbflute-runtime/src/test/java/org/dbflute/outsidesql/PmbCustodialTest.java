@@ -13,25 +13,26 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.jdbc;
+package org.dbflute.outsidesql;
 
 import org.dbflute.exception.CharParameterShortSizeException;
-import org.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
+import org.dbflute.outsidesql.PmbCustodial;
+import org.dbflute.outsidesql.PmbCustodial.ShortCharHandlingMode;
 import org.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute
  * @since 0.9.6.1 (2009/11/17 Tuesday)
  */
-public class ParameterUtilTest extends PlainTestCase {
+public class PmbCustodialTest extends PlainTestCase {
 
     // ===================================================================================
     //                                                                       Empty to Null
     //                                                                       =============
     public void test_convertEmptyToNull() {
-        assertNull(ParameterUtil.convertEmptyToNull(""));
-        assertNull(ParameterUtil.convertEmptyToNull(null));
-        assertEquals(" ", ParameterUtil.convertEmptyToNull(" "));
+        assertNull(PmbCustodial.convertEmptyToNull(""));
+        assertNull(PmbCustodial.convertEmptyToNull(null));
+        assertEquals(" ", PmbCustodial.convertEmptyToNull(" "));
     }
 
     // ===================================================================================
@@ -49,7 +50,7 @@ public class ParameterUtilTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            ParameterUtil.handleShortChar(parameterName, value, size, mode);
+            PmbCustodial.handleShortChar(parameterName, value, size, mode);
 
             // ## Assert ##
             fail();
@@ -67,7 +68,7 @@ public class ParameterUtilTest extends PlainTestCase {
         ShortCharHandlingMode mode = ShortCharHandlingMode.EXCEPTION;
 
         // ## Act ##
-        String actual = ParameterUtil.handleShortChar(parameterName, value, size, mode);
+        String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
 
         // ## Assert ##
         assertNull(actual);
@@ -81,7 +82,7 @@ public class ParameterUtilTest extends PlainTestCase {
         ShortCharHandlingMode mode = ShortCharHandlingMode.EXCEPTION;
 
         // ## Act ##
-        String actual = ParameterUtil.handleShortChar(parameterName, value, size, mode);
+        String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
 
         // ## Assert ##
         assertEquals(value, actual);
@@ -96,7 +97,7 @@ public class ParameterUtilTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            ParameterUtil.handleShortChar(parameterName, value, size, mode);
+            PmbCustodial.handleShortChar(parameterName, value, size, mode);
 
             // ## Assert ##
             fail();
@@ -118,7 +119,7 @@ public class ParameterUtilTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            ParameterUtil.handleShortChar(parameterName, value, size, mode);
+            PmbCustodial.handleShortChar(parameterName, value, size, mode);
 
             // ## Assert ##
             fail();
@@ -136,7 +137,7 @@ public class ParameterUtilTest extends PlainTestCase {
         ShortCharHandlingMode mode = ShortCharHandlingMode.EXCEPTION;
 
         // ## Act ##
-        String actual = ParameterUtil.handleShortChar(parameterName, value, size, mode);
+        String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
 
         // ## Assert ##
         assertEquals(value, actual);
@@ -150,7 +151,7 @@ public class ParameterUtilTest extends PlainTestCase {
         ShortCharHandlingMode mode = ShortCharHandlingMode.EXCEPTION;
 
         // ## Act ##
-        String actual = ParameterUtil.handleShortChar(parameterName, value, size, mode);
+        String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
 
         // ## Assert ##
         assertEquals(value, actual);
@@ -169,7 +170,7 @@ public class ParameterUtilTest extends PlainTestCase {
         ShortCharHandlingMode mode = ShortCharHandlingMode.RFILL;
 
         // ## Act ##
-        String actual = ParameterUtil.handleShortChar(parameterName, value, size, mode);
+        String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
 
         // ## Assert ##
         assertEquals(value + " ", actual);
@@ -183,7 +184,7 @@ public class ParameterUtilTest extends PlainTestCase {
         ShortCharHandlingMode mode = ShortCharHandlingMode.RFILL;
 
         // ## Act ##
-        String actual = ParameterUtil.handleShortChar(parameterName, value, size, mode);
+        String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
 
         // ## Assert ##
         assertEquals(value + " ", actual);
@@ -200,7 +201,7 @@ public class ParameterUtilTest extends PlainTestCase {
         ShortCharHandlingMode mode = ShortCharHandlingMode.LFILL;
 
         // ## Act ##
-        String actual = ParameterUtil.handleShortChar(parameterName, value, size, mode);
+        String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
 
         // ## Assert ##
         assertEquals(" " + value, actual);
@@ -214,7 +215,7 @@ public class ParameterUtilTest extends PlainTestCase {
         ShortCharHandlingMode mode = ShortCharHandlingMode.LFILL;
 
         // ## Act ##
-        String actual = ParameterUtil.handleShortChar(parameterName, value, size, mode);
+        String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
 
         // ## Assert ##
         assertEquals(" " + value, actual);

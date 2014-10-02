@@ -24,6 +24,7 @@ import org.dbflute.cbean.ConditionBean;
  * @author jflute
  * @since 1.1.0 (2014/09/28 Sunday)
  */
+@FunctionalInterface
 public interface WOptionCall<CB extends ConditionBean, OP extends WritableOption<CB>> {
 
     /**

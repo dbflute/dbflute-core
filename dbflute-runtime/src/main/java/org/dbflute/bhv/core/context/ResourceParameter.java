@@ -15,6 +15,7 @@
  */
 package org.dbflute.bhv.core.context;
 
+import org.dbflute.bhv.core.context.mapping.MappingDateTimeZoneProvider;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
 
 /**
@@ -30,6 +31,11 @@ public class ResourceParameter {
     //                                           Outside SQL
     //                                           -----------
     protected String _outsideSqlPackage; // null allowed
+
+    // -----------------------------------------------------
+    //                                          Mapping Date
+    //                                          ------------
+    protected MappingDateTimeZoneProvider _mappingDateTimeZoneProvider;
 
     // -----------------------------------------------------
     //                                     Log Display Style
@@ -57,6 +63,17 @@ public class ResourceParameter {
 
     public void setOutsideSqlPackage(String outsideSqlPackage) {
         _outsideSqlPackage = outsideSqlPackage;
+    }
+
+    // -----------------------------------------------------
+    //                                          Mapping Date
+    //                                          ------------
+    public MappingDateTimeZoneProvider getMappingDateTimeZoneProvider() {
+        return _mappingDateTimeZoneProvider;
+    }
+
+    public void setMappingDateTimeZoneProvider(MappingDateTimeZoneProvider mappingDateTimeZoneProvider) {
+        _mappingDateTimeZoneProvider = mappingDateTimeZoneProvider;
     }
 
     // -----------------------------------------------------

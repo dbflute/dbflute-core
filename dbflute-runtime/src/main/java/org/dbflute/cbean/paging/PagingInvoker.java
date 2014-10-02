@@ -24,8 +24,8 @@ import org.dbflute.exception.DangerousResultSizeException;
 import org.dbflute.exception.PagingOverSafetySizeException;
 import org.dbflute.exception.PagingStatusInvalidException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.jdbc.ManualThreadDataSourceHandler;
+import org.dbflute.system.DBFluteSystem;
 
 /**
  * The invoker of paging.
@@ -270,7 +270,7 @@ public class PagingInvoker<ENTITY> {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

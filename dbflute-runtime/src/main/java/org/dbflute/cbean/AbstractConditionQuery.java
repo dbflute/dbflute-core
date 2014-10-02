@@ -16,6 +16,9 @@
 package org.dbflute.cbean;
 
 import java.lang.reflect.Method;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -25,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
@@ -90,9 +94,9 @@ import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
-import org.dbflute.jdbc.DBFluteSystem;
-import org.dbflute.jdbc.ParameterUtil;
-import org.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
+import org.dbflute.outsidesql.PmbCustodial;
+import org.dbflute.outsidesql.PmbCustodial.ShortCharHandlingMode;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.pmbean.SimpleMapPmb;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfReflectionUtil;
@@ -621,11 +625,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // ===================================================================================
-    //                                                                      Register Query
-    //                                                                      ==============
-    // -----------------------------------------------------
-    //                                          Normal Query
-    //                                          ------------
+    //                                                                        Normal Query
+    //                                                                        ============
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
             return;
@@ -666,9 +667,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    // -----------------------------------------------------
-    //                                      Overriding Query
-    //                                      ----------------
+    // ===================================================================================
+    //                                                                    Overriding Query
+    //                                                                    ================
     protected void handleOverridingQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         if (isOverrideQueryAllowed(key, value, cvalue, columnDbName)) {
             return;
@@ -680,9 +681,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return xgetSqlClause().isOverridingQueryEnabled();
     }
 
-    // -----------------------------------------------------
-    //                                         Invalid Query
-    //                                         -------------
+    // ===================================================================================
+    //                                                                       Invalid Query
+    //                                                                       =============
     protected void handleInvalidQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         final HpInvalidQueryInfo invalidQueryInfo = xcreateInvalidQueryInfo(key, value, columnDbName);
         xdoHandleInvalidQuery(columnDbName, invalidQueryInfo);
@@ -752,9 +753,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         createCBExThrower().throwInvalidQueryRegisteredException(invalidQueryInfoAry);
     }
 
-    // -----------------------------------------------------
-    //                                      LikeSearch Query
-    //                                      ----------------
+    // ===================================================================================
+    //                                                                    LikeSearch Query
+    //                                                                    ================
     protected void regLSQ(ConditionKey key, String value, ConditionValue cvalue, String columnDbName,
             LikeSearchOption option) {
         registerLikeSearchQuery(key, value, cvalue, columnDbName, option);
@@ -932,12 +933,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return xgetSqlClause().isOrScopeQueryAndPartEffective();
     }
 
-    // -----------------------------------------------------
-    //                                          FromTo Query
-    //                                          ------------
+    // ===================================================================================
+    //                                                                        FromTo Query
+    //                                                                        ============
     protected void regFTQ(Date fromDate, Date toDate, ConditionValue cvalue, String columnDbName, FromToOption option) {
         assertObjectNotNull("option(FromToOption)", option);
-        filterFromToOption(option); // for fixed option
+        filterFromToOption(columnDbName, option); // for fixed option
         final Date filteredFromDate = option.filterFromDate(fromDate);
         final ConditionKey fromKey = option.getFromDateConditionKey();
         final boolean fromValidQuery = prepareQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName);
@@ -952,11 +953,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         try {
             if (fromValidQuery) {
-                final Object registered = filterFromToRegisteredDate(filteredFromDate, columnDbName);
+                final Object registered = filterFromToRegisteredDate(option, filteredFromDate, columnDbName);
                 setupConditionValueAndRegisterWhereClause(fromKey, registered, cvalue, columnDbName);
             }
             if (toValidQuery) {
-                final Object registered = filterFromToRegisteredDate(filteredToDate, columnDbName);
+                final Object registered = filterFromToRegisteredDate(option, filteredToDate, columnDbName);
                 setupConditionValueAndRegisterWhereClause(toKey, registered, cvalue, columnDbName);
             }
             if (!fromValidQuery && !toValidQuery) { // both no condition
@@ -977,17 +978,80 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    protected void filterFromToOption(FromToOption option) {
+    protected void filterFromToOption(String columnDbName, FromToOption option) {
         // do nothing as default, basically for option default
     }
 
-    protected Object filterFromToRegisteredDate(Date date, String columnDbName) {
-        return date; // do nothing as default, basically for converting to next date
+    // -----------------------------------------------------
+    //                                        from LocalDate
+    //                                        --------------
+    // for conversion
+    protected Date xfFTHD(Object date, String columnDbName, FromToOption option) { // filterFromToHandlingDate()
+        final ColumnInfo columnInfo = xgetLocalDBMeta().findColumnInfo(columnDbName);
+        if (xisNextTimeLocalDate(columnInfo.getObjectNativeType())) {
+            return xtoFromToUtilDate(date, columnDbName, option);
+        } else if (xisNextTimeLocalDateTime(columnInfo.getObjectNativeType())) {
+            return xtoFromToTimestamp(date, columnDbName, option);
+        }
+        return xtoFromToUtilDate(date, columnDbName, option); // basically no way (generator controls it)
+    }
+
+    protected Date xtoFromToUtilDate(Object date, String columnDbName, FromToOption option) {
+        final TimeZone realZone = xchooseFromToRealTimeZone(columnDbName, option);
+        return DfTypeUtil.toDate(date, realZone);
+    }
+
+    protected Timestamp xtoFromToTimestamp(Object date, String columnDbName, FromToOption option) {
+        final TimeZone realZone = xchooseFromToRealTimeZone(columnDbName, option);
+        return DfTypeUtil.toTimestamp(date, realZone);
     }
 
     // -----------------------------------------------------
-    //                                         RangeOf Query
-    //                                         -------------
+    //                                          to LocalDate
+    //                                          ------------
+    protected Object filterFromToRegisteredDate(FromToOption option, Date date, String columnDbName) {
+        final ColumnInfo columnInfo = xgetLocalDBMeta().findColumnInfo(columnDbName);
+        if (xisNextTimeLocalDate(columnInfo.getObjectNativeType())) {
+            return xtoFromToLocalDate(date, columnDbName, option);
+        } else if (xisNextTimeLocalDateTime(columnInfo.getObjectNativeType())) {
+            return xtoFromToLocalDateTime(date, columnDbName, option);
+        }
+        return date;
+    }
+
+    protected Object xtoFromToLocalDate(Object date, String columnDbName, FromToOption option) {
+        final TimeZone realZone = xchooseFromToRealTimeZone(columnDbName, option);
+        return DfTypeUtil.toLocalDate(date, realZone);
+    }
+
+    protected Object xtoFromToLocalDateTime(Object date, String columnDbName, FromToOption option) {
+        final TimeZone realZone = xchooseFromToRealTimeZone(columnDbName, option);
+        return DfTypeUtil.toLocalDateTime(date, realZone);
+    }
+
+    // -----------------------------------------------------
+    //                                      LocalDate Assist
+    //                                      ----------------
+    protected boolean xisNextTimeLocalDate(Class<?> nativeType) {
+        return LocalDate.class.isAssignableFrom(nativeType);
+    }
+
+    protected boolean xisNextTimeLocalDateTime(Class<?> nativeType) {
+        return LocalDateTime.class.isAssignableFrom(nativeType);
+    }
+
+    protected TimeZone xchooseFromToRealTimeZone(String columnDbName, FromToOption option) {
+        final TimeZone opZone = option.getTimeZone();
+        return opZone != null ? opZone : xgetFromToConversionTimeZone(columnDbName);
+    }
+
+    protected TimeZone xgetFromToConversionTimeZone(String columnDbName) {
+        return getDBFluteSystemFinalTimeZone();
+    }
+
+    // ===================================================================================
+    //                                                                       RangeOf Query
+    //                                                                       =============
     protected void regROO(Number minNumber, Number maxNumber, ConditionValue cvalue, String columnDbName,
             RangeOfOption option) {
         assertObjectNotNull("option(RangeOfOption)", option);
@@ -1027,9 +1091,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    // -----------------------------------------------------
-    //                                         InScope Query
-    //                                         -------------
+    // ===================================================================================
+    //                                                                       InScope Query
+    //                                                                       =============
     protected void regINS(ConditionKey key, List<?> value, ConditionValue cvalue, String columnDbName) {
         if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
             return;
@@ -1081,9 +1145,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return ConditionKeyInScope.class.isAssignableFrom(key.getClass());
     }
 
-    // -----------------------------------------------------
-    //                                          Inline Query
-    //                                          ------------
+    // ===================================================================================
+    //                                                                       In-line Query
+    //                                                                       =============
     protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         doRegIQ(key, value, cvalue, columnDbName, null);
     }
@@ -1116,9 +1180,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    // -----------------------------------------------------
-    //                                        ExistsReferrer
-    //                                        --------------
+    // ===================================================================================
+    //                                                                      ExistsReferrer
+    //                                                                      ==============
     protected void registerExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName, String referrerPropertyName) {
         registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, false);
@@ -1208,9 +1272,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     // *unsupported ExistsReferrer as in-line because it's (or was) so dangerous
 
-    // -----------------------------------------------------
-    //                                       InScopeRelation
-    //                                       ---------------
+    // ===================================================================================
+    //                                                                     InScopeRelation
+    //                                                                     ===============
     // {Modified at DBFlute-0.7.5}
     protected void registerInScopeRelation(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName, String relationPropertyName) {
@@ -1269,9 +1333,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // [DBFlute-0.7.4]
-    // -----------------------------------------------------
-    //                              (Specify)DerivedReferrer
-    //                              ------------------------
+    // ===================================================================================
+    //                                                            (Specify)DerivedReferrer
+    //                                                            ========================
     protected void registerSpecifyDerivedReferrer(String function, ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String referrerPropertyName, String aliasName,
             DerivedReferrerOption option) {
@@ -1336,9 +1400,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // [DBFlute-0.8.8.1]
-    // -----------------------------------------------------
-    //                                (Query)DerivedReferrer
-    //                                ----------------------
+    // ===================================================================================
+    //                                                              (Query)DerivedReferrer
+    //                                                              ======================
     protected void registerQueryDerivedReferrer(String function, ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String referrerPropertyName, String operand, Object value,
             String parameterPropertyName, DerivedReferrerOption option) {
@@ -1423,9 +1487,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // [DBFlute-0.8.8]
-    // -----------------------------------------------------
-    //                                       ScalarCondition
-    //                                       ---------------
+    // ===================================================================================
+    //                                                                     ScalarCondition
+    //                                                                     ===============
     protected <CB extends ConditionBean> void registerScalarCondition(final String function,
             final ConditionQuery subQuery, String propertyName, String operand, final HpSSQOption<CB> option) {
         assertSubQueryNotNull("ScalarCondition", propertyName, subQuery);
@@ -1476,9 +1540,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // overridden by sub-class (not abstract for suppressing option)
     }
 
-    // -----------------------------------------------------
-    //                                          MyselfExists
-    //                                          ------------
+    // ===================================================================================
+    //                                                                        MyselfExists
+    //                                                                        ============
     protected void registerMyselfExists(ConditionQuery subQuery, String subQueryPropertyName) {
         final String relatedColumnDbName;
         {
@@ -1496,9 +1560,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         registerExistsReferrer(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName, null);
     }
 
-    // -----------------------------------------------------
-    //                                         MyselfInScope
-    //                                         -------------
+    // ===================================================================================
+    //                                                                       MyselfInScope
+    //                                                                       =============
     protected void registerMyselfInScope(ConditionQuery subQuery, String subQueryPropertyName) {
         final String relatedColumnDbName;
         {
@@ -1515,9 +1579,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         registerInScopeRelation(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName, null);
     }
 
-    // -----------------------------------------------------
-    //                                       SubQuery Common
-    //                                       ---------------
+    // ===================================================================================
+    //                                                                     SubQuery Common
+    //                                                                     ===============
     protected class GeneralColumnRealNameProvider implements ColumnRealNameProvider {
         public ColumnRealName provide(String columnDbName) {
             return toColumnRealName(columnDbName);
@@ -1541,9 +1605,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    // -----------------------------------------------------
-    //                                          Where Clause
-    //                                          ------------
+    // ===================================================================================
+    //                                                                        Where Clause
+    //                                                                        ============
     protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
             String columnDbName) {
         final ConditionOption embeddedOption = createEmbeddedOption(key, value, cvalue, columnDbName);
@@ -1591,9 +1655,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    // -----------------------------------------------------
-    //                                           Union Query
-    //                                           -----------
+    // ===================================================================================
+    //                                                                         Union Query
+    //                                                                         ===========
     protected void registerUnionQuery(final ConditionQuery unionQuery, boolean unionAll,
             final String unionQueryPropertyName) {
         xgetSqlClause().registerUnionQuery(new UnionClauseProvider() {
@@ -1627,9 +1691,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return replaceString(unionQueryClause, oldStr, newStr);
     }
 
-    // -----------------------------------------------------
-    //                                            Inner Join
-    //                                            ----------
+    // ===================================================================================
+    //                                                                          Inner Join
+    //                                                                          ==========
     /**
      * Change the join type for this relation to inner join. <br />
      * This method is for PERFORMANCE TUNING basically.
@@ -2490,7 +2554,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             msg = msg + " columnName=" + columnName + " modeCode=" + modeCode;
             throw new IllegalStateException(msg);
         }
-        return ParameterUtil.handleShortChar(columnName, value, size, mode);
+        return PmbCustodial.handleShortChar(columnName, value, size, mode);
     }
 
     // ===================================================================================
@@ -2770,7 +2834,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected String ln() {
-        return DBFluteSystem.getBasicLn();
+        return DBFluteSystem.ln();
     }
 
     // -----------------------------------------------------
@@ -2879,6 +2943,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    // -----------------------------------------------------
+    //                                        Final TimeZone
+    //                                        --------------
+    protected TimeZone getDBFluteSystemFinalTimeZone() {
+        return DBFluteSystem.getFinalTimeZone();
     }
 
     // ===================================================================================

@@ -88,14 +88,18 @@ public class DfLanguageImplStyleJava implements DfLanguageImplStyle {
     }
 
     public boolean isCompatibleBeforeJava8() {
-        return false; // #later false since 1.1
+        return false; // non compatible since 1.1
     }
 
     public boolean isEntityDerivedMappable() {
-        return true; // #later true since 1.1
+        return true; // be mappable since 1.1
     }
 
     public boolean isOutsideSqlCursorGenericVoidable() {
+        return true;
+    }
+
+    public boolean canUseJava8TimeLocalDate() {
         return true;
     }
 }
