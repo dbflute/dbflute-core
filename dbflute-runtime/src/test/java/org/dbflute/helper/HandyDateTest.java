@@ -900,6 +900,16 @@ public class HandyDateTest extends PlainTestCase {
     }
 
     // ===================================================================================
+    //                                                                           Get Parts
+    //                                                                           =========
+    public void test_getMonth() throws Exception {
+        assertEquals(Month.OCTOBER, new HandyDate("2014/10/01").getMonth());
+        HandyDate octDate = new HandyDate("2014/01/01");
+        assertEquals(Month.JANUARY, octDate.getMonth());
+        assertEquals(octDate.getMonthAsOneOrigin(), octDate.getMonth().getValue());
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     public void test_deepCopy_basic() throws Exception {

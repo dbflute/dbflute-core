@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -1472,6 +1473,17 @@ public class HandyDate implements Serializable {
     }
 
     /**
+     * Is the month of this date same as specified month? <br />
+     * e.g. if 2011/11/27, isMonth(11) is true
+     * @param month The enumeration of month. (NotNull, 1 origin)
+     * @return The determination, true or false.
+     */
+    public boolean isMonth(Month month) {
+        assertArgumentNotNull("month", month);
+        return getMonth() == month; // zero origin headache
+    }
+
+    /**
      * Is the month of this date same as the month of the specified date? <br />
      * e.g. if 2011/11/27, isMonthSameAs(toDate("2013/11/01")) is true
      * @param date The date to compare. (NotNull)
@@ -2885,6 +2897,10 @@ public class HandyDate implements Serializable {
         final int year = _cal.get(Calendar.YEAR);
         final int era = _cal.get(Calendar.ERA);
         return era == GregorianCalendar.AD ? year : -year;
+    }
+
+    public Month getMonth() { // resolved zero origin headache
+        return Month.of(getMonthAsOneOrigin());
     }
 
     public int getMonthAsOneOrigin() { // resolved zero origin headache
