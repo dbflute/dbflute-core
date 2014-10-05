@@ -19,7 +19,7 @@ import org.dbflute.Entity;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.mock.MockEntity;
 import org.dbflute.optional.OptionalEntity;
-import org.dbflute.optional.OptionalObjectExceptionThrower;
+import org.dbflute.optional.OptionalThingExceptionThrower;
 import org.dbflute.unit.PlainTestCase;
 
 /**
@@ -109,7 +109,7 @@ public class OptionalEntityTest extends PlainTestCase {
     //                                                                         Test Helper
     //                                                                         ===========
     protected OptionalEntity<MockEntity> prepareOpt(MockEntity entity) {
-        return new OptionalEntity<MockEntity>(entity, new OptionalObjectExceptionThrower() {
+        return new OptionalEntity<MockEntity>(entity, new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
                 throw new IllegalStateException("foo");
             }

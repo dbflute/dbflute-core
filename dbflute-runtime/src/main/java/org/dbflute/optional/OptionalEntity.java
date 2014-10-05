@@ -49,19 +49,20 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
  */
 public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
 
+    // TODO jflute fix optional javadoc
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     protected static final OptionalEntity<Object> EMPTY_INSTANCE;
     static {
-        EMPTY_INSTANCE = new OptionalEntity<Object>(null, new OptionalObjectExceptionThrower() {
+        EMPTY_INSTANCE = new OptionalEntity<Object>(null, new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
                 String msg = "The empty optional so the value is null.";
                 throw new EntityAlreadyDeletedException(msg);
             }
         });
     }
-    protected static final OptionalObjectExceptionThrower NOWAY_THROWER = new OptionalObjectExceptionThrower() {
+    protected static final OptionalThingExceptionThrower NOWAY_THROWER = new OptionalThingExceptionThrower() {
         public void throwNotFoundException() {
             throw new EntityAlreadyDeletedException("no way");
         }
@@ -74,7 +75,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @param entity The wrapped instance of entity. (NullAllowed)
      * @param thrower The exception thrower when illegal access. (NotNull)
      */
-    public OptionalEntity(ENTITY entity, OptionalObjectExceptionThrower thrower) { // basically called by DBFlute
+    public OptionalEntity(ENTITY entity, OptionalThingExceptionThrower thrower) { // basically called by DBFlute
         super(entity, thrower);
     }
 
@@ -103,7 +104,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @param thrower The exception thrower when illegal access. (NotNull)
      * @return The new-created instance as existing or empty optional object. (NotNull)
      */
-    public static <ENTITY> OptionalEntity<ENTITY> ofNullable(ENTITY entity, OptionalObjectExceptionThrower thrower) {
+    public static <ENTITY> OptionalEntity<ENTITY> ofNullable(ENTITY entity, OptionalThingExceptionThrower thrower) {
         if (entity != null) {
             return of(entity);
         } else {
@@ -125,7 +126,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
             String msg = "The argument 'relation' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        return new OptionalEntity<EMPTY>(null, new OptionalObjectExceptionThrower() {
+        return new OptionalEntity<EMPTY>(null, new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
                 throwNonSetupSelectRelationAccessException(entity, relation);
             }
@@ -194,27 +195,28 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     /**
-     * Handle the entity in the optional object if the entity is present. <br />
+     * Handle the wrapped entity if it is present. <br />
      * You should call this if null entity handling is unnecessary (do nothing if null). <br />
      * If exception is preferred when null entity, use required().
      * <pre>
      * MemberCB cb = new MemberCB();
      * cb.query().set...
      * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-     * entity.<span style="color: #DD4747">ifPresent</span>(member -&gt; {
+     * entity.<span style="color: #CC4747">ifPresent</span>(member -&gt; {
      *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
      *     ... = member.getMemberName();
+     * }).<span style="color: #994747">orElse</span>(() -&gt; {
+     *     <span style="color: #3F7E5E">// called if value does not exist</span>
      * });
      * </pre>
-     * @param consumer The callback interface to consume the optional value. (NotNull)
+     * @param entityLambda The callback interface to consume the optional entity. (NotNull)
+     * @return The handler of after process when if not present. (NotNull)
      */
-    // TODO jflute orElse
-    public void ifPresent(OptionalObjectConsumer<ENTITY> consumer) {
-        callbackIfPresent(consumer);
+    public OptionalThingIfPresentAfter ifPresent(OptionalThingConsumer<ENTITY> entityLambda) {
+        assertEntityLambdaNotNull(entityLambda);
+        return callbackIfPresent(entityLambda);
     }
 
-    // TODO jflute fix optional javadoc
-    // TODO jflute make orElseThrow()
     /**
      * Is the entity instance present? (existing?)
      * <pre>
@@ -244,19 +246,20 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      *     return member.getMemberId() % 2 == 0;
      * });
      * </pre>
-     * @param predicate The callback to predicate whether the entity is remained. (NotNull)
+     * @param entityLambda The callback to predicate whether the entity is remained. (NotNull)
      * @return The filtered optional entity, might be empty. (NotNull)
      */
-    public OptionalEntity<ENTITY> filter(OptionalObjectPredicate<ENTITY> predicate) {
-        return (OptionalEntity<ENTITY>) callbackFilter(predicate);
+    public OptionalEntity<ENTITY> filter(OptionalThingPredicate<ENTITY> entityLambda) {
+        assertEntityLambdaNotNull(entityLambda);
+        return (OptionalEntity<ENTITY>) callbackFilter(entityLambda);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected <ARG> OptionalObject<ARG> createOptionalFilteredObject(ARG obj) {
-        return new OptionalObject<ARG>(obj, _thrower);
+    protected <ARG> OptionalThing<ARG> createOptionalFilteredObject(ARG obj) {
+        return new OptionalThing<ARG>(obj, _thrower);
     }
 
     /**
@@ -270,22 +273,24 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      *     return new MemberWebBean(member);
      * });
      * </pre>
-     * @param mapper The callback interface to apply. (NotNull)
+     * @param entityLambda The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     @SuppressWarnings("unchecked")
-    public <RESULT> OptionalObject<RESULT> map(OptionalObjectFunction<? super ENTITY, ? extends RESULT> mapper) {
-        return (OptionalObject<RESULT>) callbackMapping(mapper); // downcast allowed because factory is overridden
+    public <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super ENTITY, ? extends RESULT> entityLambda) {
+        assertEntityLambdaNotNull(entityLambda);
+        return (OptionalThing<RESULT>) callbackMapping(entityLambda); // downcast allowed because factory is overridden
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected <ARG> OptionalObject<ARG> createOptionalMappedObject(ARG obj) {
-        return new OptionalObject<ARG>(obj, _thrower);
+    protected <ARG> OptionalThing<ARG> createOptionalMappedObject(ARG obj) {
+        return new OptionalThing<ARG>(obj, _thrower);
     }
 
+    // TODO jflute make Optional.flatMap()
     // almost no needed
     ///**
     // * Apply the flat-mapping of entity to result object.
@@ -309,14 +314,37 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     //    return callbackFlatMapping(mapper);
     //}
 
-    // absolutely no needed
-    //public ENTITY orElse(ENTITY other) {
-    //    return directlyGetOrElse(other);
+    // unsupported because of absolutely no needed, and making orElseNull() stand out
+    //public ENTITY orElse(...) {
+    //    return ...;
     //}
+    //public ENTITY orElseGet(...) {
+    //    return ...;
+    //}
+    // TODO jflute make Optional.orElseThrow(Supplier)
 
     // ===================================================================================
     //                                                                           Extension
     //                                                                           =========
+    /**
+     * Handle the entity in the optional object or exception if not present.
+     * <pre>
+     * memberBhv.selectEntity(cb -&gt; {
+     *     cb.setupSelect_MemberStatus();
+     *     cb.query().setMemberId_Equal(1);
+     * }).<span style="color: #DD4747">alwaysPresent</span>(member -&gt; {
+     *     <span style="color: #3F7E5E">// called if value exists, or exception if not present</span>
+     *     ... = member.getMemberName();
+     * });
+     * </pre>
+     * @param entityLambda The callback interface to consume the optional value. (NotNull)
+     * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     */
+    public void alwaysPresent(OptionalThingConsumer<ENTITY> entityLambda) {
+        assertEntityLambdaNotNull(entityLambda);
+        callbackAlwaysPresent(entityLambda);
+    }
+
     /**
      * Get the entity instance or null if not present.
      * <pre>
@@ -334,24 +362,6 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     /**
      * Handle the entity in the optional object or exception if not present.
      * <pre>
-     * memberBhv.selectEntity(cb -&gt; {
-     *     cb.setupSelect_MemberStatus();
-     *     cb.query().setMemberId_Equal(1);
-     * }).<span style="color: #DD4747">alwaysPresent</span>(member -&gt; {
-     *     <span style="color: #3F7E5E">// called if value exists, or exception if not present</span>
-     *     ... = member.getMemberName();
-     * });
-     * </pre>
-     * @param consumer The callback interface to consume the optional value. (NotNull)
-     * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
-     */
-    public void alwaysPresent(OptionalObjectConsumer<ENTITY> consumer) {
-        callbackRequired(consumer);
-    }
-
-    /**
-     * Handle the entity in the optional object or exception if not present.
-     * <pre>
      * MemberCB cb = new MemberCB();
      * cb.query().set...
      * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
@@ -360,11 +370,20 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      *     ... = member.getMemberName();
      * });
      * </pre>
-     * @param consumer The callback interface to consume the optional value. (NotNull)
+     * @param entityLambda The callback interface to consume the optional value. (NotNull)
      * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
      * @deprecated use alwaysPresent()
      */
-    public void required(OptionalObjectConsumer<ENTITY> consumer) {
-        callbackRequired(consumer);
+    public void required(OptionalThingConsumer<ENTITY> entityLambda) {
+        callbackAlwaysPresent(entityLambda);
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertEntityLambdaNotNull(Object entityLambda) {
+        if (entityLambda == null) {
+            throw new IllegalArgumentException("The argument 'entityLambda' should not be null.");
+        }
     }
 }

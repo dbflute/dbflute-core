@@ -29,7 +29,7 @@ public class RelationOptionalFactory {
      * @param thrower The exception thrower for optional object. (NotNull: if needs)
      * @return The optional object for the relation. (NotNull)
      */
-    public Object createOptionalNullEntity(OptionalObjectExceptionThrower thrower) { // #extensionPoint, object for override
+    public Object createOptionalNullEntity(OptionalThingExceptionThrower thrower) { // #extensionPoint, object for override
         return OptionalEntity.ofNullable(null, thrower);
     }
 

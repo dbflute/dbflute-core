@@ -24,18 +24,30 @@ package org.dbflute.optional;
 public abstract class BaseOptional<OBJ> {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final OptionalThingIfPresentAfter IF_PRESENT_AFTER_EMPTY = noArgLambda -> {};
+    protected static final OptionalThingIfPresentAfter IF_PRESENT_AFTER_NONE_FIRE = noArgLambda -> {
+        if (noArgLambda == null) {
+            String msg = "The argument 'noArgLambda' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        noArgLambda.process();
+    };
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** The wrapped object for this optional object. (NullAllowed) */
     protected final OBJ _obj;
 
     /** The exception thrower e.g. when wrapped object is not found. (NotNull) */
-    protected final OptionalObjectExceptionThrower _thrower;
+    protected final OptionalThingExceptionThrower _thrower;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public BaseOptional(OBJ obj, OptionalObjectExceptionThrower thrower) { // basically called by DBFlute
+    public BaseOptional(OBJ obj, OptionalThingExceptionThrower thrower) { // basically called by DBFlute
         _obj = obj; // may be null
         if (thrower == null) {
             String msg = "The argument 'thrower' should not be null: obj=" + obj;
@@ -59,14 +71,18 @@ public abstract class BaseOptional<OBJ> {
 
     /**
      * @param consumer The callback interface to consume the wrapped object. (NotNull)
+     * @return The handler of after process when if not present. (NotNull)
      */
-    protected void callbackIfPresent(OptionalObjectConsumer<OBJ> consumer) {
+    protected OptionalThingIfPresentAfter callbackIfPresent(OptionalThingConsumer<OBJ> consumer) {
         if (consumer == null) {
             String msg = "The argument 'consumer' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         if (exists()) {
             consumer.accept(_obj);
+            return IF_PRESENT_AFTER_EMPTY;
+        } else {
+            return IF_PRESENT_AFTER_NONE_FIRE;
         }
     }
 
@@ -82,7 +98,7 @@ public abstract class BaseOptional<OBJ> {
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    protected BaseOptional<OBJ> callbackFilter(OptionalObjectPredicate<OBJ> mapper) {
+    protected BaseOptional<OBJ> callbackFilter(OptionalThingPredicate<OBJ> mapper) {
         if (mapper == null) {
             String msg = "The argument 'mapper' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -109,7 +125,7 @@ public abstract class BaseOptional<OBJ> {
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    protected <RESULT> BaseOptional<RESULT> callbackMapping(OptionalObjectFunction<? super OBJ, ? extends RESULT> mapper) {
+    protected <RESULT> BaseOptional<RESULT> callbackMapping(OptionalThingFunction<? super OBJ, ? extends RESULT> mapper) {
         if (mapper == null) {
             String msg = "The argument 'mapper' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -129,8 +145,8 @@ public abstract class BaseOptional<OBJ> {
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as flat-mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    protected <RESULT> OptionalObject<RESULT> callbackFlatMapping(
-            OptionalObjectFunction<? super OBJ, OptionalObject<RESULT>> mapper) {
+    protected <RESULT> OptionalThing<RESULT> callbackFlatMapping(
+            OptionalThingFunction<? super OBJ, OptionalThing<RESULT>> mapper) {
         if (mapper == null) {
             String msg = "The argument 'mapper' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -147,17 +163,17 @@ public abstract class BaseOptional<OBJ> {
     }
 
     /**
-     * @param consumer The callback interface to consume the wrapped value. (NotNull)
+     * @param objLambda The callback interface to consume the wrapped value. (NotNull)
      */
-    protected void callbackRequired(OptionalObjectConsumer<OBJ> consumer) {
-        if (consumer == null) {
-            String msg = "The argument 'consumer' should not be null.";
+    protected void callbackAlwaysPresent(OptionalThingConsumer<OBJ> objLambda) {
+        if (objLambda == null) {
+            String msg = "The argument 'objLambda' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         if (_obj == null) {
             _thrower.throwNotFoundException();
         }
-        consumer.accept(_obj);
+        objLambda.accept(_obj);
     }
 
     // ===================================================================================

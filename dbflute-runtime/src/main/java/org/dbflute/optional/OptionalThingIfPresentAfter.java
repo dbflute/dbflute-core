@@ -16,23 +16,23 @@
 package org.dbflute.optional;
 
 /**
- * The predicate of optional value.
+ * The consumer of optional value.
  * <pre>
- * OptionalObject&lt;MemberWebBean&gt; beanOpt = entityOpt.<span style="color: #DD4747">filter</span>(member -&gt; {
+ * opt.<span style="color: #DD4747">ifPresent</span>(member -&gt; {
  *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
- *     return member.getMemberId() % 2 == 0;
+ *     ... = member.getMemberName();
+ * }).<span style="color: #DD4747">orElse</span>(() =&gt; {
+ *     <span style="color: #3F7E5E">// *here: called if value does not exist</span>
  * });
  * </pre>
- * @param <OBJ> The type of wrapped object in optional object.
  * @author jflute
- * @since 1.0.5G (2014/05/26 Monday)
+ * @since 1.1.0 (2014/10/05 Monday)
  */
-public interface OptionalObjectPredicate<OBJ> {
+public interface OptionalThingIfPresentAfter {
 
     /**
-     * Test the object in the optional object.
-     * @param obj The wrapped object in the optional object. (NotNull)
-     * @return The determination, true or false.
+     * Execute the process when the thing is none.
+     * @param noArgLambda The callback to run the process when the thing is none. (NotNull)
      */
-    boolean test(OBJ obj);
+    void orElse(OptionalThingNoneProcessor noArgLambda);
 }

@@ -82,7 +82,7 @@ import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.optional.OptionalEntity;
-import org.dbflute.optional.OptionalObjectExceptionThrower;
+import org.dbflute.optional.OptionalThingExceptionThrower;
 import org.dbflute.optional.RelationOptionalFactory;
 import org.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.dbflute.system.DBFluteSystem;
@@ -307,7 +307,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     protected abstract Entity doReadEntity(ConditionBean cb);
 
     protected <RESULT> OptionalEntity<RESULT> createOptionalEntity(RESULT entity, final Object... searchKey) {
-        return new OptionalEntity<RESULT>(entity, new OptionalObjectExceptionThrower() {
+        return new OptionalEntity<RESULT>(entity, new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
                 throwSelectEntityAlreadyDeletedException(searchKey);
             }
@@ -1636,7 +1636,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         if (relationRow != null) {
             result = factory.createOptionalPresentEntity(relationRow);
         } else {
-            result = factory.createOptionalNullEntity(new OptionalObjectExceptionThrower() {
+            result = factory.createOptionalNullEntity(new OptionalThingExceptionThrower() {
                 public void throwNotFoundException() {
                     String msg = "Not found the relation row for: " + relationTitle;
                     throw new EntityAlreadyDeletedException(msg);

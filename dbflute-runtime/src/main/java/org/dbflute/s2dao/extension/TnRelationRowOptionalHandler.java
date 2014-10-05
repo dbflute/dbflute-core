@@ -26,7 +26,7 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.exception.RelationEntityNotFoundException;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.optional.OptionalObjectExceptionThrower;
+import org.dbflute.optional.OptionalThingExceptionThrower;
 import org.dbflute.optional.RelationOptionalFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
@@ -91,7 +91,7 @@ public class TnRelationRowOptionalHandler {
         return _relationOptionalFactory.createOptionalNullEntity(createOptionalNullableThrower(row, rpt));
     }
 
-    protected OptionalObjectExceptionThrower createOptionalNullableThrower(final Object row, TnRelationPropertyType rpt) {
+    protected OptionalThingExceptionThrower createOptionalNullableThrower(final Object row, TnRelationPropertyType rpt) {
         final String propertyName = rpt.getPropertyDesc().getPropertyName();
         final DBMeta localDBMeta = rpt.getMyBeanMetaData().getDBMeta();
         final ConditionBean cb;
@@ -110,7 +110,7 @@ public class TnRelationRowOptionalHandler {
             outsideSqlPath = null;
             parameterBean = null;
         }
-        return new OptionalObjectExceptionThrower() {
+        return new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
                 throwRelationEntityNotFoundException(row, propertyName, localDBMeta, cb, outsideSqlPath, parameterBean);
             }
