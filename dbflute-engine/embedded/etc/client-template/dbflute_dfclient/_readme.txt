@@ -1,5 +1,8 @@
 Directory for DBFlute client
 
+TODO jflute
+
+
 jdbc.bat, jdbc.sh:
 A execution command of JDBC task
 which gets your schema info and saves it to SchemaXML
