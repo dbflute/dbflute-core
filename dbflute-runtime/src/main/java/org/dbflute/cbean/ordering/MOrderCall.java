@@ -24,7 +24,7 @@ package org.dbflute.cbean.ordering;
 public interface MOrderCall {
 
     /**
-     * @param option The option of manual-order to be set up. (NotNull)
+     * @param op The option of manual-order to be set up. (NotNull)
      */
-    void callback(ManualOrderOption option);
+    void callback(ManualOrderOption op);
 }

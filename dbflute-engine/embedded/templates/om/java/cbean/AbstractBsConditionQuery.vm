@@ -1684,7 +1684,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param opLambda The callback for option of manual order containing order values. (NotNull)
      */
     public void withManualOrder(MOrderCall opLambda) { // is user public!
-        ManualOrderOption op = cMOO(); mobLambda.callback(mob);
+        ManualOrderOption op = cMOO(); opLambda.callback(op);
         xdoWithManualOrder(op);
     }
 

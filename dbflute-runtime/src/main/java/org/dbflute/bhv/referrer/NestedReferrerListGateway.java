@@ -68,7 +68,7 @@ public interface NestedReferrerListGateway<REFERRER extends Entity> {
      *     }
      * }
      * </pre>
-     * @param handler The handler of referrer list to load nested referrer. (NotNull)
+     * @param entityListLambda The callback for handler of referrer list to load nested referrer. (NotNull)
      */
-    void withNestedReferrer(ReferrerListHandler<REFERRER> handler);
+    void withNestedReferrer(ReferrerListHandler<REFERRER> entityListLambda);
 }
