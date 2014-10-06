@@ -29,13 +29,13 @@ import org.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.9.8.2 (2011/04/08 Friday)
  */
-public class ManualOrderBeanTest extends PlainTestCase {
+public class ManualOrderOptionTest extends PlainTestCase {
 
     public void test_DateFromTo() throws Exception {
         // ## Arrange ##
         Date fromDate = DfTypeUtil.toDate("1969/01/01");
         Date toDate = DfTypeUtil.toDate("1970/12/31");
-        ManualOrderBean mob = new ManualOrderBean();
+        ManualOrderOption mob = new ManualOrderOption();
 
         // ## Act ##
         mob.when_FromTo(fromDate, toDate, op -> op.compareAsDate());
