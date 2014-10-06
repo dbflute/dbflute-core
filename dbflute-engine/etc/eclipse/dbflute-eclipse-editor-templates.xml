@@ -56,22 +56,32 @@
     andCB.query().set${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ConditionBean" enabled="true" name="cbLambda">cb -&gt; {
     cb.${newName}
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ColumnQuery" enabled="true" name="colCBLambda">colCB -&gt; {
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for SpecifyColumn" enabled="true" name="colCBLambda">colCB -&gt; {
     colCB.specify().column${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for DerivedReferrer" enabled="true" name="derivedCBLambda">${var}CB -&gt; {
     ${var}CB.specify().column${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Entity" enabled="true" name="entityLambda">${var} -&gt; {
     ${var}.${newName}
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ReferrerLoader" enabled="true" name="loaderLambda">loader -&gt; {
-    loader.load${newName}
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for many-arguments" enabled="true" name="manyArgLambda">(${var}, ${newNew}) -&gt; {
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Entity List" enabled="true" name="entityListLambda">${var}List -&gt; {
+    ${cursor}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ReferrerLoader" enabled="true" name="loaderLambda">${var}Loader -&gt; {
+    ${var}Loader.load${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for many arguments" enabled="true" name="manyArgLambda">(${var}, ${newNew}) -&gt; {
     ${cursor}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for no-argument" enabled="true" name="noArgLambda">() -&gt; {
     ${cursor}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for one argument" enabled="true" name="oneArgLambda">${var} -&gt; {
+    ${var}.${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ConditionOption" enabled="true" name="opLambda">op -&gt; op.${newName}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQuery" enabled="true" name="orCBLambda">orCB -&gt; {
     orCB.query().set${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Referrer" enabled="true" name="refCBLambda">${var}CB -&gt; {
+    ${var}CB.query().addOrderBy_${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ScalarCondition" enabled="true" name="scalarCBLambda">${var}CB -&gt; {
+    ${var}CB.specify().column{newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for SubQuery" enabled="true" name="subCBLambda">${var}CB -&gt; {
     ${var}CB.query().set${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for one ConditionBean" enabled="true" name="xxxCBLambda">${var}CB -&gt; {
+    ${var}CB.${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Something" enabled="true" name="xxxLambda">${var} -&gt; {
     ${var}.${newName}
 }</template></templates>
