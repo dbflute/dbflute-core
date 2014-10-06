@@ -64,11 +64,11 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_purchaseCount</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void count(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doCount(subQuery, aliasName, null);
+    public void count(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doCount(derivedCBLambda, aliasName, null);
     }
 
     /**
@@ -81,13 +81,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_purchaseCount</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void count(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+    public void count(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, DerivedReferrerOption option) {
         assertDerivedReferrerOption(option);
-        doCount(subQuery, aliasName, option);
+        doCount(derivedCBLambda, aliasName, option);
     }
 
     protected void doCount(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -106,11 +106,11 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_productKindCount</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doCountDistinct(subQuery, aliasName, null);
+    public void countDistinct(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doCountDistinct(derivedCBLambda, aliasName, null);
     }
 
     /**
@@ -123,13 +123,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_productKindCount</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+    public void countDistinct(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, DerivedReferrerOption option) {
         assertDerivedReferrerOption(option);
-        doCountDistinct(subQuery, aliasName, option);
+        doCountDistinct(derivedCBLambda, aliasName, option);
     }
 
     protected void doCountDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -148,11 +148,11 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_latestPurchaseDatetime</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void max(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doMax(subQuery, aliasName, null);
+    public void max(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doMax(derivedCBLambda, aliasName, null);
     }
 
     /**
@@ -165,13 +165,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_latestPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>("2011-06-07"));
      * </pre>
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void max(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+    public void max(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, DerivedReferrerOption option) {
         assertDerivedReferrerOption(option);
-        doMax(subQuery, aliasName, option);
+        doMax(derivedCBLambda, aliasName, option);
     }
 
     protected void doMax(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -190,11 +190,11 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_firstPurchaseDatetime</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void min(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doMin(subQuery, aliasName, null);
+    public void min(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doMin(derivedCBLambda, aliasName, null);
     }
 
     /**
@@ -207,13 +207,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_firstPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>("2011-06-07"));
      * </pre>
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void min(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+    public void min(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, DerivedReferrerOption option) {
         assertDerivedReferrerOption(option);
-        doMin(subQuery, aliasName, option);
+        doMin(derivedCBLambda, aliasName, option);
     }
 
     protected void doMin(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -232,11 +232,11 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceSummary</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doSum(subQuery, aliasName, null);
+    public void sum(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doSum(derivedCBLambda, aliasName, null);
     }
 
     /**
@@ -249,13 +249,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceSummary</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+    public void sum(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, DerivedReferrerOption option) {
         assertDerivedReferrerOption(option);
-        doSum(subQuery, aliasName, option);
+        doSum(derivedCBLambda, aliasName, option);
     }
 
     protected void doSum(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -274,11 +274,11 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceAverage</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doAvg(subQuery, aliasName, null);
+    public void avg(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doAvg(derivedCBLambda, aliasName, null);
     }
 
     /**
@@ -291,13 +291,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     }
      * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceAverage</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+    public void avg(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, DerivedReferrerOption option) {
         assertDerivedReferrerOption(option);
-        doAvg(subQuery, aliasName, option);
+        doAvg(derivedCBLambda, aliasName, option);
     }
 
     protected void doAvg(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {

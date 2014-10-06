@@ -29,10 +29,6 @@ import java.util.Set;
 import org.dbflute.cbean.result.grouping.GroupingListDeterminer;
 import org.dbflute.cbean.result.grouping.GroupingListRowResource;
 import org.dbflute.cbean.result.grouping.GroupingMapDeterminer;
-import org.dbflute.cbean.result.grouping.GroupingOption;
-import org.dbflute.cbean.result.grouping.GroupingRowEndDeterminer;
-import org.dbflute.cbean.result.grouping.GroupingRowResource;
-import org.dbflute.cbean.result.grouping.GroupingRowSetupper;
 import org.dbflute.cbean.result.mapping.EntityColumnExtractor;
 import org.dbflute.cbean.result.mapping.EntityDtoMapper;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
@@ -144,13 +140,13 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      *     }
      * });
      * </pre>
-     * @param determiner The determiner of grouping map. (NotNull)
+     * @param entityLambda The callback for determiner of grouping map. (NotNull)
      * @return The grouping map that has grouped rows, the key is provided. (NotNull)
      */
-    public Map<String, ListResultBean<ENTITY>> groupingMap(GroupingMapDeterminer<ENTITY> determiner) {
+    public Map<String, ListResultBean<ENTITY>> groupingMap(GroupingMapDeterminer<ENTITY> entityLambda) {
         final Map<String, ListResultBean<ENTITY>> groupingListMap = new LinkedHashMap<String, ListResultBean<ENTITY>>();
         for (ENTITY entity : _selectedList) {
-            final String groupingKey = determiner.provideKey(entity);
+            final String groupingKey = entityLambda.provideKey(entity);
             ListResultBean<ENTITY> rowList = groupingListMap.get(groupingKey);
             if (rowList == null) {
                 rowList = createInheritedResultBean(null); // no set selectedList
@@ -159,89 +155,6 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
             rowList.add(entity);
         }
         return groupingListMap;
-    }
-
-    /**
-     * Split the list per group. (old style method) <br />
-     * This method needs the property 'selectedList' only.
-     * <pre>
-     * e.g. grouping per three records
-     * GroupingOption&lt;Member&gt; groupingOption = new GroupingOption&lt;Member&gt;(<span style="color: #DD4747">3</span>);
-     * List&lt;List&lt;Member&gt;&gt; groupingList = memberList.<span style="color: #DD4747">groupingList</span>(new GroupingRowSetupper&lt;List&lt;Member&gt;, Member&gt;() {
-     *     public List&lt;Member&gt; setup(GroupingRowResource&lt;Member&gt; groupingRowResource) {
-     *         return new ArrayList&lt;Member&gt;(groupingRowResource.getGroupingRowList());
-     *     }
-     * }, groupingOption);
-     * 
-     * e.g. grouping per initial character of MEMBER_NAME
-     * <span style="color: #3F7E5E">// the breakCount is unnecessary in this case</span>
-     * GroupingOption&lt;Member&gt; groupingOption = new GroupingOption&lt;Member&gt;();
-     * groupingOption.setGroupingRowEndDeterminer(new GroupingRowEndDeterminer&lt;Member&gt;() {
-     *     public boolean <span style="color: #DD4747">determine</span>(GroupingRowResource&lt;Member&gt; rowResource, Member nextEntity) {
-     *         Member currentEntity = rowResource.getCurrentEntity();
-     *         String currentInitChar = currentEntity.getMemberName().substring(0, 1);
-     *         String nextInitChar = nextEntity.getMemberName().substring(0, 1);
-     *         return !currentInitChar.equalsIgnoreCase(nextInitChar);
-     *     }
-     * });
-     * List&lt;List&lt;Member&gt;&gt; groupingList = memberList.<span style="color: #DD4747">groupingList</span>(new GroupingRowSetupper&lt;List&lt;Member&gt;, Member&gt;() {
-     *     public List&lt;Member&gt; setup(GroupingRowResource&lt;Member&gt; groupingRowResource) {
-     *         return new ArrayList&lt;Member&gt;(groupingRowResource.getGroupingRowList());
-     *     }
-     * }, groupingOption);
-     * </pre>
-     * @param <ROW> The type of row.
-     * @param groupingRowSetupper The set-upper of grouping row. (NotNull)
-     * @param groupingOption The option of grouping. (NotNull and it requires the breakCount or the determiner)
-     * @return The grouped list. (NotNull)
-     * @deprecated Use {@link #groupingList(GroupingListDeterminer)}
-     */
-    public <ROW> List<ROW> groupingList(GroupingRowSetupper<ROW, ENTITY> groupingRowSetupper,
-            GroupingOption<ENTITY> groupingOption) {
-        final List<ROW> groupingList = new ArrayList<ROW>();
-        final int breakCount = groupingOption.getElementCount();
-        GroupingRowEndDeterminer<ENTITY> endDeterminer = groupingOption.getGroupingRowEndDeterminer();
-        if (endDeterminer == null) {
-            endDeterminer = new GroupingRowEndDeterminer<ENTITY>() {
-                public boolean determine(GroupingRowResource<ENTITY> rowResource, ENTITY nextEntity) {
-                    return rowResource.isSizeUpBreakCount();
-                }
-            }; // by count
-        }
-        GroupingRowResource<ENTITY> rowResource = new GroupingRowResource<ENTITY>();
-        int rowElementIndex = 0;
-        int allElementIndex = 0;
-        for (ENTITY entity : _selectedList) {
-            // set up row resource
-            rowResource.addGroupingRowList(entity);
-            rowResource.setElementCurrentIndex(rowElementIndex);
-            rowResource.setBreakCount(breakCount);
-
-            if (_selectedList.size() == (allElementIndex + 1)) { // last loop
-                // set up the object of grouping row
-                final ROW groupingRowObject = groupingRowSetupper.setup(rowResource);
-                groupingList.add(groupingRowObject);
-                break;
-            }
-
-            // not last loop so the nextElement must exist
-            final ENTITY nextElement = _selectedList.get(allElementIndex + 1);
-
-            // do at row end.
-            if (endDeterminer.determine(rowResource, nextElement)) { // determine the row end
-                // set up the object of grouping row!
-                final ROW groupingRowObject = groupingRowSetupper.setup(rowResource);
-
-                groupingList.add(groupingRowObject);
-                rowResource = new GroupingRowResource<ENTITY>();
-                rowElementIndex = 0;
-                ++allElementIndex;
-                continue;
-            }
-            ++rowElementIndex;
-            ++allElementIndex;
-        }
-        return groupingList;
     }
 
     // ===================================================================================
@@ -263,13 +176,13 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * });
      * </pre>
      * @param <DTO> The type of DTO.
-     * @param entityDtoMapper The map-per for entity and DTO. (NotNull)
+     * @param entityLambda The callback for mapping of entity and DTO. (NotNull)
      * @return The new mapped list as result bean. (NotNull)
      */
-    public <DTO> ListResultBean<DTO> mappingList(EntityDtoMapper<ENTITY, DTO> entityDtoMapper) {
+    public <DTO> ListResultBean<DTO> mappingList(EntityDtoMapper<ENTITY, DTO> entityLambda) {
         final ListResultBean<DTO> mappingList = new ListResultBean<DTO>();
         for (ENTITY entity : _selectedList) {
-            mappingList.add(entityDtoMapper.map(entity));
+            mappingList.add(entityLambda.map(entity));
         }
         mappingList.setTableDbName(getTableDbName());
         mappingList.setAllRecordCount(getAllRecordCount());
@@ -292,13 +205,13 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * });
      * </pre>
      * @param <COLUMN> The type of COLUMN.
-     * @param entityColumnExtractor The value extractor of entity column. (NotNull)
+     * @param entityLambda The callback for value extractor of entity column. (NotNull)
      * @return The value list of the entity column. (NotNull, NotNullElement)
      */
-    public <COLUMN> List<COLUMN> extractColumnList(EntityColumnExtractor<ENTITY, COLUMN> entityColumnExtractor) {
+    public <COLUMN> List<COLUMN> extractColumnList(EntityColumnExtractor<ENTITY, COLUMN> entityLambda) {
         final List<COLUMN> columnList = new ArrayList<COLUMN>();
         for (ENTITY entity : _selectedList) {
-            final COLUMN column = entityColumnExtractor.extract(entity);
+            final COLUMN column = entityLambda.extract(entity);
             if (column != null) {
                 columnList.add(column);
             }
@@ -318,13 +231,13 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * });
      * </pre>
      * @param <COLUMN> The type of COLUMN.
-     * @param entityColumnExtractor The value extractor of entity column. (NotNull)
+     * @param entityLambda The callback for value extractor of entity column. (NotNull)
      * @return The value set of the entity column. (NotNull, NotNullElement)
      */
-    public <COLUMN> Set<COLUMN> extractColumnSet(EntityColumnExtractor<ENTITY, COLUMN> entityColumnExtractor) {
+    public <COLUMN> Set<COLUMN> extractColumnSet(EntityColumnExtractor<ENTITY, COLUMN> entityLambda) {
         final Set<COLUMN> columnSet = new LinkedHashSet<COLUMN>();
         for (ENTITY entity : _selectedList) {
-            COLUMN column = entityColumnExtractor.extract(entity);
+            COLUMN column = entityLambda.extract(entity);
             if (column != null) {
                 columnSet.add(column);
             }

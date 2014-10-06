@@ -54,11 +54,11 @@ public class HpColQyOperand<CB extends ConditionBean> {
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
-     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator equal(SpecifyQuery<CB> rightSpecifyQuery) {
-        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_EQUAL.getOperand());
+    public HpCalculator equal(SpecifyQuery<CB> colCBLambda) {
+        return _handler.handle(colCBLambda, ConditionKey.CK_EQUAL.getOperand());
     }
 
     /**
@@ -75,11 +75,11 @@ public class HpColQyOperand<CB extends ConditionBean> {
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
-     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator notEqual(SpecifyQuery<CB> rightSpecifyQuery) {
-        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_NOT_EQUAL_STANDARD.getOperand());
+    public HpCalculator notEqual(SpecifyQuery<CB> colCBLambda) {
+        return _handler.handle(colCBLambda, ConditionKey.CK_NOT_EQUAL_STANDARD.getOperand());
     }
 
     /**
@@ -96,11 +96,11 @@ public class HpColQyOperand<CB extends ConditionBean> {
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
-     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator greaterThan(SpecifyQuery<CB> rightSpecifyQuery) {
-        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_GREATER_THAN.getOperand());
+    public HpCalculator greaterThan(SpecifyQuery<CB> colCBLambda) {
+        return _handler.handle(colCBLambda, ConditionKey.CK_GREATER_THAN.getOperand());
     }
 
     /**
@@ -117,11 +117,11 @@ public class HpColQyOperand<CB extends ConditionBean> {
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
-     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator lessThan(SpecifyQuery<CB> rightSpecifyQuery) {
-        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_LESS_THAN.getOperand());
+    public HpCalculator lessThan(SpecifyQuery<CB> colCBLambda) {
+        return _handler.handle(colCBLambda, ConditionKey.CK_LESS_THAN.getOperand());
     }
 
     /**
@@ -138,11 +138,11 @@ public class HpColQyOperand<CB extends ConditionBean> {
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
-     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator greaterEqual(SpecifyQuery<CB> rightSpecifyQuery) {
-        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_GREATER_EQUAL.getOperand());
+    public HpCalculator greaterEqual(SpecifyQuery<CB> colCBLambda) {
+        return _handler.handle(colCBLambda, ConditionKey.CK_GREATER_EQUAL.getOperand());
     }
 
     /**
@@ -159,11 +159,11 @@ public class HpColQyOperand<CB extends ConditionBean> {
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
-     * @param rightSpecifyQuery The specify-query for right column. (NotNull)
+     * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator lessEqual(SpecifyQuery<CB> rightSpecifyQuery) {
-        return _handler.handle(rightSpecifyQuery, ConditionKey.CK_LESS_EQUAL.getOperand());
+    public HpCalculator lessEqual(SpecifyQuery<CB> colCBLambda) {
+        return _handler.handle(colCBLambda, ConditionKey.CK_LESS_EQUAL.getOperand());
     }
 
     // ===================================================================================
