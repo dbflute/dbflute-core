@@ -1299,8 +1299,9 @@ public class Table {
 
     protected boolean doExistsForeignKey(String foreignTableName, List<String> localColumnNameList,
             List<String> foreignColumnNameList, String fixedSuffix, boolean compareSuffix) {
-        final ForeignKey fk = doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList,
-                fixedSuffix, compareSuffix, true);
+        final ForeignKey fk =
+                doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix,
+                        compareSuffix, true);
         return fk != null;
     }
 
@@ -2120,6 +2121,23 @@ public class Table {
      */
     public String getJavaBeansRulePropertyName() {
         return Srl.initBeansProp(getJavaName());
+    }
+
+    // -----------------------------------------------------
+    //                                     Lambda Short Name
+    //                                     -----------------
+    public String getLambdaShortName() { // e.g. memberLambda, securityLambda
+        final String name = getUnderscoreLastRearDbName();
+        if (Srl.isUpperCaseAll(name) || Srl.isLowerCaseAll(name)) { // e.g. MEMBER, purchase
+            return Srl.initUncap(Srl.camelize(name));
+        } else { // e.g. DB name is camel case or contains number (non case characters)
+            return "entity"; // unsupported here
+        }
+    }
+
+    protected String getUnderscoreLastRearDbName() {
+        final String dbName = getTableDbName();
+        return dbName.contains("_") ? Srl.substringLastRear(dbName, "_") : dbName;
     }
 
     // ===================================================================================

@@ -124,7 +124,7 @@ public class DfRelativeDateResolver {
 
     protected boolean isNumber(String str) { // except decimal
         final String minusRemovedStr = str.startsWith("-") ? Srl.substringFirstRear(str, "-") : str;
-        return Srl.isNumberHarf(minusRemovedStr);
+        return Srl.isNumberHarfAll(minusRemovedStr);
     }
 
     protected void throwLoadDataRelativeDateMethodArgPartNotFoundException(String tableName, String columnName,

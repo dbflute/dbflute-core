@@ -724,13 +724,13 @@ public class ${myClassName} extends AbstractConditionBean {
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
-     * @param leftSpecifyQuery The specify-query for left column. (NotNull)
+     * @param colCBLambda The callback for specify-query of left column. (NotNull)
      * @return The object for setting up operand and right column. (NotNull)
      */
-    public ${colQyOperandClass}<${myConditionBeanClassName}> columnQuery(final SpecifyQuery<${myConditionBeanClassName}> leftSpecifyQuery) {
+    public ${colQyOperandClass}<${myConditionBeanClassName}> columnQuery(final SpecifyQuery<${myConditionBeanClassName}> colCBLambda) {
         return ${colQyOperandCreator}(new HpColQyHandler<${myConditionBeanClassName}>() {
             public HpCalculator handle(SpecifyQuery<${myConditionBeanClassName}> rightSp, String operand) {
-                return xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), leftSpecifyQuery, rightSp, operand);
+                return xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), colCBLambda, rightSp, operand);
             }
         });
     }
@@ -775,10 +775,10 @@ public class ${myClassName} extends AbstractConditionBean {
      *     }
      * });
      * </pre>
-     * @param orQuery The query for or-condition. (NotNull)
+     * @param orCBLambda The callback for query of or-condition. (NotNull)
      */
-    public void orScopeQuery(OrQuery<${myConditionBeanClassName}> orQuery) {
-        xorSQ((${myConditionBeanClassName})this, orQuery);
+    public void orScopeQuery(OrQuery<${myConditionBeanClassName}> orCBLambda) {
+        xorSQ((${myConditionBeanClassName})this, orCBLambda);
     }
 #if ($table.isCompatibleOrScopeQueryPurposeNoCheck())
 
@@ -805,10 +805,10 @@ public class ${myClassName} extends AbstractConditionBean {
      *     }
      * });
      * </pre>
-     * @param andQuery The query for and-condition. (NotNull)
+     * @param andCBLambda The callback for query of and-condition. (NotNull)
      */
-    public void orScopeQueryAndPart(AndQuery<${myConditionBeanClassName}> andQuery) {
-        xorSQAP((${myConditionBeanClassName})this, andQuery);
+    public void orScopeQueryAndPart(AndQuery<${myConditionBeanClassName}> andCBLambda) {
+        xorSQAP((${myConditionBeanClassName})this, andCBLambda);
     }
 #if ($table.isCursorSelectOptionAllowed())
 

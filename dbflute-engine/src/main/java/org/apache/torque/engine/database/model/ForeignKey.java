@@ -365,8 +365,8 @@ public class ForeignKey implements Constraint {
             }
             if (name.trim().length() > 0) { // means multiple FK columns exist
                 final String localTableDbName = getTable().getTableDbName();
-                final String aliasName = getMultipleFKPropertyColumnAliasName(localTableDbName,
-                        multipleFKColumnNameList);
+                final String aliasName =
+                        getMultipleFKPropertyColumnAliasName(localTableDbName, multipleFKColumnNameList);
                 if (aliasName != null && aliasName.trim().length() > 0) { // my young code
                     final String firstUpper = aliasName.substring(0, 1).toUpperCase();
                     if (aliasName.trim().length() == 1) {
@@ -511,6 +511,17 @@ public class ForeignKey implements Constraint {
         return propertyName != null ? "\"" + propertyName + "\"" : "null";
     }
 
+    // -----------------------------------------------------
+    //                                     Lambda Short Name
+    //                                     -----------------
+    public String getForeignLambdaShortName() {
+        return getTable().getLambdaShortName();
+    }
+
+    public String getForeignLambdaSubQueryCBName() {
+        return "subCBLambda"; // not use short name for fixed trick
+    }
+
     // ===================================================================================
     //                                                                   Referrer Property
     //                                                                   =================
@@ -634,6 +645,17 @@ public class ForeignKey implements Constraint {
     public String getReferrerReverseRelationPropertyNameArg() {
         final String propertyName = getForeignJavaBeansRulePropertyName();
         return "\"" + propertyName + "\"";
+    }
+
+    // -----------------------------------------------------
+    //                                     Lambda Short Name
+    //                                     -----------------
+    public String getReferrerLambdaShortName() {
+        return getTable().getLambdaShortName();
+    }
+
+    public String getReferrerLambdaSubQueryCBName() {
+        return "subCBLambda"; // not use short name for fixed trick
     }
 
     // ===================================================================================
