@@ -22,10 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
-import org.dbflute.BehaviorSelector;
+import org.dbflute.bhv.BehaviorSelector;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.dbflute.bhv.core.CommonColumnAutoSetupper;
 import org.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.bhv.hook.CommonColumnAutoSetupper;
 import ${database.DBFluteInitializerClass};
 import ${glPackageExtendedBhv}.*;
 
