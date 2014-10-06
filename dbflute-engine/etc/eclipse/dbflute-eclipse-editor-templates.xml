@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow" enabled="true" name="_arrow">-&gt; ${newName}</template><template autoinsert="true" context="java" deleted="false" description="Java8: forEach()" enabled="true" name="_foreach">${var}.forEach(${newName} -&gt; {
-});</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow as Inline" enabled="true" name="_li">${var} -&gt; ${var}${cursor}</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow with Linefeed" enabled="true" name="_ll">${var} -&gt; {
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow" enabled="true" name="_arrow">-&gt; ${cursor}</template><template autoinsert="true" context="java" deleted="false" description="Java8: forEach()" enabled="true" name="_foreach">${var}.forEach(${newName} -&gt; {
     ${cursor}
+});</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow as Inline" enabled="true" name="_li">${var} -&gt; ${var}.${newName}</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow with Linefeed" enabled="true" name="_ll">${var} -&gt; {
+    ${var}.${newName}
 }</template><template autoinsert="true" context="java-members" deleted="false" description="Commons Logging Logger" enabled="true" name="_logger">${:import(org.apache.commons.logging.Log,
 				org.apache.commons.logging.LogFactory)}
 				private static final Log
 				LOG =
-				LogFactory.getLog(${enclosing_type}.class);</template><template autoinsert="true" context="java" deleted="false" description="Review comment" enabled="true" name="_review">    // #review ${cursor} by ${user}</template><template autoinsert="true" context="java" deleted="false" description="Java8: stream().filter()" enabled="true" name="_sfilter">${var}.stream().filter(${newName} -&gt; {
+				LogFactory.getLog(${enclosing_type}.class);</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: .addOrderBy_..." enabled="true" name="_order">.addOrderBy_${newName}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: cb.query()" enabled="true" name="_query">${var}.query()</template><template autoinsert="true" context="java" deleted="false" description="Review comment" enabled="true" name="_review">    // #review ${cursor} by ${user}</template><template autoinsert="true" context="java" deleted="false" description="Java8: stream().filter()" enabled="true" name="_sfilter">${var}.stream().filter(${newName} -&gt; {
     return ${newName}${cursor};
 });</template><template autoinsert="true" context="java" deleted="false" description="Slf4j Logger" enabled="true" name="_slogger">${:import(org.slf4j.Logger,
 				org.slf4j.LoggerFactory)}
@@ -13,7 +14,7 @@
 				LOG =
 				LoggerFactory.getLogger(${enclosing_type}.class);</template><template autoinsert="true" context="java" deleted="false" description="Java8: stream().map()" enabled="true" name="_smap">${var}.stream().map(${newName} -&gt; {
     return ${newName}${cursor};
-});</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Accessor" enabled="true" name="_taacce">    // ===================================================================================
+});</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: cb.specify()" enabled="true" name="_specify">${var}.specify()</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Accessor" enabled="true" name="_taacce">    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========</template><template autoinsert="true" context="java" deleted="false" description="TagComment: Attribute" enabled="true" name="_taattr">    // ===================================================================================
     //                                                                           Attribute
@@ -51,4 +52,26 @@
 	//                                                                        Small Helper
 	//                                                                        ============</template><template autoinsert="true" context="java" deleted="false" description="Validation methods for Action" enabled="true" name="_tavalid">    // ===================================================================================
     //                                                                          Validation
-    //                                                                          ==========</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: Source Code Review Feedback" enabled="true" name="_tdfeedback">// TODO feedback by ${user} #${branchId} ${content}</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: Hopefully To Be Fixed" enabled="true" name="_tdhope">// #hope by ${user}(${date}) ${content}</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: To Be Fixed Sometime" enabled="true" name="_tdreview">// #review by ${user}(${date}) ${content}</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: Todo Comment for Yourself" enabled="true" name="_tdself">// TODO ${user} #${branchId} ${content}</template><template autoinsert="true" context="java" deleted="false" description="TODO comment" enabled="true" name="_todo">    // TODO ${user} ${cursor}</template></templates>
+    //                                                                          ==========</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: Source Code Review Feedback" enabled="true" name="_tdfeedback">// TODO feedback by ${user} #${branchId} ${content}</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: Hopefully To Be Fixed" enabled="true" name="_tdhope">// #hope by ${user}(${date}) ${content}</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: To Be Fixed Sometime" enabled="true" name="_tdreview">// #review by ${user}(${date}) ${content}</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: Todo Comment for Yourself" enabled="true" name="_tdself">// TODO ${user} #${branchId} ${content}</template><template autoinsert="true" context="java" deleted="false" description="TODO comment" enabled="true" name="_todo">    // TODO ${user} ${cursor}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQueryAndPart" enabled="true" name="andCBLambda">andCB -&gt; {
+    andCB.query().set${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ConditionBean" enabled="true" name="cbLambda">cb -&gt; {
+    cb.${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ColumnQuery" enabled="true" name="colCBLambda">colCB -&gt; {
+    colCB.specify().column${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for DerivedReferrer" enabled="true" name="derivedCBLambda">${var}CB -&gt; {
+    ${var}CB.specify().column${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Entity" enabled="true" name="entityLambda">${var} -&gt; {
+    ${var}.${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ReferrerLoader" enabled="true" name="loaderLambda">loader -&gt; {
+    loader.load${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for many-arguments" enabled="true" name="manyArgLambda">(${var}, ${newNew}) -&gt; {
+    ${cursor}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for no-argument" enabled="true" name="noArgLambda">() -&gt; {
+    ${cursor}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ConditionOption" enabled="true" name="opLambda">op -&gt; op.${newName}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQuery" enabled="true" name="orCBLambda">orCB -&gt; {
+    orCB.query().set${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for SubQuery" enabled="true" name="subCBLambda">${var}CB -&gt; {
+    ${var}CB.query().set${newName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Something" enabled="true" name="xxxLambda">${var} -&gt; {
+    ${var}.${newName}
+}</template></templates>
