@@ -91,8 +91,8 @@ public class ${myClassName} {
 #set ($loadMethodReturn = "NestedReferrerLoaderGateway<${referrerLoaderClassName}>")
 #end
     protected List<${referrerEntityClassName}> _referrer${referrer.referrerPropertyNameInitCap};
-    public ${loadMethodReturn} load${referrer.referrerPropertyNameInitCap}(${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> setupper) {
-        myBhv().load${referrer.referrerPropertyNameInitCap}(_selectedList, setupper).withNestedReferrer(new ReferrerListHandler<${referrerEntityClassName}>() {
+    public ${loadMethodReturn} load${referrer.referrerPropertyNameInitCap}(${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> refCBLambda) {
+        myBhv().load${referrer.referrerPropertyNameInitCap}(_selectedList, refCBLambda).withNestedReferrer(new ReferrerListHandler<${referrerEntityClassName}>() {
             public void handle(List<${referrerEntityClassName}> referrerList) { _referrer${referrer.referrerPropertyNameInitCap} = referrerList; }
         });
 #if ($referrer.table.hasReferrerLoader())
