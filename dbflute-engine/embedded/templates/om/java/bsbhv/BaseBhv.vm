@@ -1203,7 +1203,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #else
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
 #end
-     * @param updateColumnSpec The specification of update columns. (NotNull)
+     * @param colCBLambda The callback for specification of update columns. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
 #if ($table.hasOptimisticLock())
      * @exception BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
@@ -1211,8 +1211,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
-    public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> updateColumnSpec) {
-        return doBatchUpdate(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec));
+    public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> colCBLambda) {
+        return doBatchUpdate(${myEntityListVariableName}, createSpecifiedUpdateOption(colCBLambda));
     }
 #end
 #if ($table.hasOptimisticLock())
@@ -1269,12 +1269,12 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * and an optimistic lock column because they are specified implicitly.</p>
      * <p>And you should specify columns that are modified in any entities (at least one entity).</p>
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
-     * @param updateColumnSpec The specification of update columns. (NotNull)
+     * @param colCBLambda The callback for specification of update columns. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> updateColumnSpec) {
-        return doBatchUpdateNonstrict(${myEntityListVariableName}, createSpecifiedUpdateOption(updateColumnSpec));
+    public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> colCBLambda) {
+        return doBatchUpdateNonstrict(${myEntityListVariableName}, createSpecifiedUpdateOption(colCBLambda));
     }
 #end
 #end
@@ -1337,11 +1337,11 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      *     }
      * });
      * </pre>
-     * @param setupper The set-upper of query-insert. (NotNull)
+     * @param manyArgLambda The callback to set up query-insert. (NotNull)
      * @return The inserted count.
      */
-    public int queryInsert(QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> setupper) {
-        return doQueryInsert(setupper, null);
+    public int queryInsert(QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> manyArgLambda) {
+        return doQueryInsert(manyArgLambda, null);
     }
 #if ($table.isMakeCallbackConditionBeanSetup())
 

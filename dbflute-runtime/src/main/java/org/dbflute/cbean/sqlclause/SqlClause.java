@@ -29,7 +29,7 @@ import org.dbflute.cbean.coption.ConditionOption;
 import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.ordering.ManualOrderBean;
+import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.dbflute.cbean.sqlclause.join.FixedConditionLazyChecker;
@@ -277,9 +277,9 @@ public interface SqlClause {
      * @param fixedCondition The fixed condition on on-clause. (NullAllowed: if null, means no fixed condition)
      * @param fixedConditionResolver The resolver for variables on fixed-condition. (NullAllowed) 
      */
-    void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
-            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver);
+    void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName, String localTableDbName,
+            Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath, ForeignInfo foreignInfo, String fixedCondition,
+            FixedConditionResolver fixedConditionResolver);
 
     /**
      * Register outer-join using in-line view for fixed-conditions. <br />
@@ -294,9 +294,9 @@ public interface SqlClause {
      * @param fixedCondition The fixed condition on in-line view. (NullAllowed: if null, means no fixed condition)
      * @param fixedConditionResolver The resolver for variables on fixed-condition. (NullAllowed) 
      */
-    void registerOuterJoinFixedInline(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
-            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver);
+    void registerOuterJoinFixedInline(String foreignAliasName, String foreignTableDbName, String localAliasName, String localTableDbName,
+            Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath, ForeignInfo foreignInfo, String fixedCondition,
+            FixedConditionResolver fixedConditionResolver);
 
     /**
      * Register the lazy checker for the fixed condition. <br />
@@ -421,8 +421,8 @@ public interface SqlClause {
      * @param option The option of condition. (NullAllowed)
      * @param usedAliasName The alias name of table used on the where clause. (NotNull)
      */
-    void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value,
-            ColumnFunctionCipher cipher, ConditionOption option, String usedAliasName);
+    void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value, ColumnFunctionCipher cipher,
+            ConditionOption option, String usedAliasName);
 
     /**
      * Register 'where' clause. <br />
@@ -510,8 +510,8 @@ public interface SqlClause {
     // -----------------------------------------------------
     //                                In-line for Outer Join
     //                                ----------------------
-    void registerOuterJoinInlineWhereClause(String foreignAliasName, ColumnSqlName columnSqlName, ConditionKey key,
-            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option, boolean onClause);
+    void registerOuterJoinInlineWhereClause(String foreignAliasName, ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value,
+            ColumnFunctionCipher cipher, ConditionOption option, boolean onClause);
 
     void registerOuterJoinInlineWhereClause(String foreignAliasName, String clause, boolean onClause);
 
@@ -601,7 +601,7 @@ public interface SqlClause {
 
     void addNullsLastToPreviousOrderBy();
 
-    void addManualOrderToPreviousOrderByElement(ManualOrderBean manualOrderBean);
+    void addManualOrderToPreviousOrderByElement(ManualOrderOption manualOrderOption);
 
     /**
      * Does it have order-by clauses? <br />

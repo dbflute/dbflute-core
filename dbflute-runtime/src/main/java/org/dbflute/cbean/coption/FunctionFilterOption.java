@@ -97,6 +97,7 @@ public class FunctionFilterOption implements ParameterOption {
     //                                              Coalesce
     //                                              --------
     protected void doCoalesce(final Object coalesce) {
+        assertOptionValueNotNull("coalesce", coalesce);
         addProcessCallback("coalesce", new ProcessCallback() {
             public String callback(String functionExp, int index) {
                 return processCoalesce(functionExp, index, coalesce);
@@ -109,6 +110,7 @@ public class FunctionFilterOption implements ParameterOption {
     //                                                 Round
     //                                                 -----
     protected void doRound(final Object round) {
+        assertOptionValueNotNull("round", round);
         addProcessCallback("round", new ProcessCallback() {
             public String callback(String functionExp, int index) {
                 return processRound(functionExp, index, round);
@@ -120,6 +122,7 @@ public class FunctionFilterOption implements ParameterOption {
     //                                         Truncate Date
     //                                         -------------
     protected void doTrunc(final Object trunc) {
+        assertOptionValueNotNull("trunc", trunc);
         _tmpTrunc = trunc;
         addProcessCallback("trunc", new ProcessCallback() {
             public String callback(String functionExp, int index) {
@@ -148,7 +151,7 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     protected void doAddYear(final Object addedYear, final boolean minus) {
-        assertAddedValueNotNull("year", addedYear);
+        assertOptionValueNotNull("year", addedYear);
         addProcessCallback("addYear", new ProcessCallback() {
             public String callback(String functionExp, int index) {
                 return processAddYear(functionExp, index, addedYear, minus);
@@ -161,7 +164,7 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     protected void doAddMonth(final Object addedMonth, final boolean minus) {
-        assertAddedValueNotNull("month", addedMonth);
+        assertOptionValueNotNull("month", addedMonth);
         addProcessCallback("addMonth", new ProcessCallback() {
             public String callback(String functionExp, int index) {
                 return processAddMonth(functionExp, index, addedMonth, minus);
@@ -174,7 +177,7 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     protected void doAddDay(final Object addedDay, final boolean minus) {
-        assertAddedValueNotNull("day", addedDay);
+        assertOptionValueNotNull("day", addedDay);
         addProcessCallback("addDay", new ProcessCallback() {
             public String callback(String functionExp, int index) {
                 return processAddDay(functionExp, index, addedDay, minus);
@@ -187,7 +190,7 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     protected void doAddHour(final Object addedHour, final boolean minus) {
-        assertAddedValueNotNull("hour", addedHour);
+        assertOptionValueNotNull("hour", addedHour);
         addProcessCallback("addHour", new ProcessCallback() {
             public String callback(String functionExp, int index) {
                 return processAddHour(functionExp, index, addedHour, minus);
@@ -200,7 +203,7 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     protected void doAddMinute(final Object addedMinute, final boolean minus) {
-        assertAddedValueNotNull("minute", addedMinute);
+        assertOptionValueNotNull("minute", addedMinute);
         addProcessCallback("addMinute", new ProcessCallback() {
             public String callback(String functionExp, int index) {
                 return processAddMinute(functionExp, index, addedMinute, minus);
@@ -213,7 +216,7 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     protected void doAddSecond(final Object addedSecond, final boolean minus) {
-        assertAddedValueNotNull("second", addedSecond);
+        assertOptionValueNotNull("second", addedSecond);
         addProcessCallback("addSecond", new ProcessCallback() {
             public String callback(String functionExp, int index) {
                 return processAddSecond(functionExp, index, addedSecond, minus);
@@ -477,8 +480,7 @@ public class FunctionFilterOption implements ParameterOption {
         return doProcessDateAdd(functionExp, index, addedSecond, "addSecond", minus);
     }
 
-    protected String doProcessDateAdd(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAdd(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         if (addedValue == null) {
             return functionExp;
         }
@@ -505,8 +507,7 @@ public class FunctionFilterOption implements ParameterOption {
         }
     }
 
-    protected String doProcessDateAddMySQL(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAddMySQL(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         final String bindPath = buildAddedBindParameter(index, addedValue, propertyName);
         final String type = buildDateAddExpType(propertyName, null, false);
         final String prefixSign = minus ? "-" : "";
@@ -514,8 +515,7 @@ public class FunctionFilterOption implements ParameterOption {
         // e.g. date_add(FOO_DATE, interval 1 month)
     }
 
-    protected String doProcessDateAddPostgreSQL(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAddPostgreSQL(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         // no binding because it does not allowed
         final String type = buildDateAddExpType(propertyName, null, true);
         final String valueExp;
@@ -539,8 +539,7 @@ public class FunctionFilterOption implements ParameterOption {
         //  o FOO_DATE + (FOO_DAYS || 'months')::interval
     }
 
-    protected String doProcessDateAddOracle(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAddOracle(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         final String bindParameter = buildAddedBindParameter(index, addedValue, propertyName);
         final String prefixSign = minus ? "-" : "";
         final String calcSign = minus ? "-" : "+";
@@ -566,8 +565,7 @@ public class FunctionFilterOption implements ParameterOption {
         //  o FOO_DATE + 1 / 24
     }
 
-    protected String doProcessDateAddDB2(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAddDB2(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         final String bindParameter = buildAddedBindParameter(index, addedValue, propertyName);
         final String type = buildDateAddExpType(propertyName, null, false);
         final String calcSign = minus ? "-" : "+";
@@ -594,8 +592,7 @@ public class FunctionFilterOption implements ParameterOption {
         // e.g. FOO_DATE + 1 month
     }
 
-    protected String doProcessDateAddSQLServer(String functionExp, int index, Object addedValue, String propertyName,
-            boolean minus) {
+    protected String doProcessDateAddSQLServer(String functionExp, int index, Object addedValue, String propertyName, boolean minus) {
         final String valueExp = buildAddedEmbeddedValueExp(addedValue);
         final String type = buildDateAddExpType(propertyName, null, false);
         final String prefixSign = minus ? "-" : "";
@@ -697,22 +694,19 @@ public class FunctionFilterOption implements ParameterOption {
     // ===================================================================================
     //                                                                    Create Processor
     //                                                                    ================
-    public SpecifyDerivedReferrer createSpecifyDerivedReferrer(SubQueryPath subQueryPath,
-            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            GearedCipherManager cipherManager, String mainSubQueryIdentity, String aliasName) {
-        return new SpecifyDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
-                subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, aliasName);
+    public SpecifyDerivedReferrer createSpecifyDerivedReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity,
+            DBMeta subQueryDBMeta, GearedCipherManager cipherManager, String mainSubQueryIdentity, String aliasName) {
+        return new SpecifyDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
+                subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, aliasName);
     }
 
-    public QueryDerivedReferrer createQueryDerivedReferrer(SubQueryPath subQueryPath,
-            ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
-            int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            GearedCipherManager cipherManager, String mainSubQueryIdentity, String operand, Object value,
+    public QueryDerivedReferrer createQueryDerivedReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity,
+            DBMeta subQueryDBMeta, GearedCipherManager cipherManager, String mainSubQueryIdentity, String operand, Object value,
             String parameterPath) {
-        return new QueryDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
-                subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value,
-                parameterPath);
+        return new QueryDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
+                subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value, parameterPath);
     }
 
     // ===================================================================================
@@ -726,8 +720,7 @@ public class FunctionFilterOption implements ParameterOption {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected String processSimpleFunction(String functionExp, String functionName, String thirdArg, boolean leftArg,
-            Object bindKey) {
+    protected String processSimpleFunction(String functionExp, String functionName, String thirdArg, boolean leftArg, Object bindKey) {
         final String bindExp = buildBindParameter(bindKey);
         final StringBuilder sb = new StringBuilder();
         sb.append(functionName).append("(");
@@ -777,8 +770,8 @@ public class FunctionFilterOption implements ParameterOption {
         if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeDate()) {
             return true;
         }
-        // TODO jflute for LocalDate
-        if (_mysticBindingSnapshot != null && _mysticBindingSnapshot instanceof Date) {
+        final Object snapshot = _mysticBindingSnapshot;
+        if (snapshot != null && (snapshot instanceof Date || DfTypeUtil.isAnyLocalDate(snapshot))) {
             return true;
         }
         return false;
@@ -872,18 +865,18 @@ public class FunctionFilterOption implements ParameterOption {
         }
     }
 
-    protected void assertAddedValueNotNull(String keyword, Object addedValue) {
-        if (isAddedValueNullIgnored()) {
+    protected void assertOptionValueNotNull(String keyword, Object value) {
+        if (isOptionValueNullIgnored()) {
             return;
         }
-        if (addedValue == null) {
-            String msg = "The added value for " + keyword + " should not be null.";
+        if (value == null) {
+            String msg = "The option value for " + keyword + " should not be null.";
             throw new IllegalConditionBeanOperationException(msg);
         }
     }
 
-    protected boolean isAddedValueNullIgnored() {
-        return true; // #later false since java8 (and fix javadoc comment)
+    protected boolean isOptionValueNullIgnored() {
+        return false;
     }
 
     // ===================================================================================
@@ -899,7 +892,7 @@ public class FunctionFilterOption implements ParameterOption {
     @Override
     public String toString() {
         final String title = DfTypeUtil.toClassTitle(this);
-        String callbackExp = _callbackList != null ? _callbackList.toString() : null;
+        final String callbackExp = _callbackList != null ? _callbackList.toString() : null;
         return title + ":{callback=" + callbackExp + ", bind=" + _bindMap + "}";
     }
 

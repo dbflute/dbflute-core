@@ -27,8 +27,8 @@ import org.dbflute.cbean.ConditionBean;
  *     }
  * }
  * </pre>
- * @author jflute
  * @param <CB> The type of condition-bean.
+ * @author jflute
  */
 @FunctionalInterface
 public interface ScalarQuery<CB extends ConditionBean> {

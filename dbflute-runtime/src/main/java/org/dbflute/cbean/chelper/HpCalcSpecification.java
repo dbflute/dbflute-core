@@ -657,8 +657,8 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         //     }
         // });
         // MemberCB dreamCruiseCB = cb.dreamCruiseCB();
-        // ManualOrderBean mob = new ManualOrderBean();
-        // mob.multiply(dreamCruiseCB.specify().specifyMemberServiceAsOne().columnServicePointCount());
+        // ManualOrderOption option = new ManualOrderOption();
+        // option.multiply(dreamCruiseCB.specify().specifyMemberServiceAsOne().columnServicePointCount());
         column.setupSelectDreamCruiseJourneyLogBookIfUnionExists();
     }
 

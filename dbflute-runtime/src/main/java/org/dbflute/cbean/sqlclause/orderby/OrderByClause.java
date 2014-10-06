@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.dbflute.cbean.ordering.ManualOrderBean;
+import org.dbflute.cbean.ordering.ManualOrderOption;
 
 /**
  * @author jflute
@@ -103,11 +103,11 @@ public class OrderByClause implements Serializable {
         public String setup(String columnName, String orderByElementClause, boolean nullsFirst);
     }
 
-    public void addManualOrderByElement(ManualOrderBean mob) {
+    public void addManualOrderByElement(ManualOrderOption mob) {
         if (_orderByList.isEmpty()) {
             return;
         }
-        getOrderByLastElement().setManualOrderBean(mob);
+        getOrderByLastElement().setManualOrderOption(mob);
     }
 
     // ===================================================================================

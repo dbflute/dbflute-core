@@ -50,13 +50,13 @@ public class HpSSQFunction<CB extends ConditionBean> {
      *     }
      * });
      * </pre> 
-     * @param subQuery The sub query of myself. (NotNull)
+     * @param scalarCBLambda The callback for sub-query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
-    public HpSSQDecorator<CB> max(SubQuery<CB> subQuery) {
-        assertSubQuery(subQuery);
+    public HpSSQDecorator<CB> max(SubQuery<CB> scalarCBLambda) {
+        assertSubQuery(scalarCBLambda);
         final HpSSQOption<CB> option = createOption();
-        _setupper.setup("max", subQuery, option);
+        _setupper.setup("max", scalarCBLambda, option);
         return createDecorator(option);
     }
 
@@ -70,13 +70,13 @@ public class HpSSQFunction<CB extends ConditionBean> {
      *     }
      * });
      * </pre> 
-     * @param subQuery The sub query of myself. (NotNull)
+     * @param scalarCBLambda The callback for sub-query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
-    public HpSSQDecorator<CB> min(SubQuery<CB> subQuery) {
-        assertSubQuery(subQuery);
+    public HpSSQDecorator<CB> min(SubQuery<CB> scalarCBLambda) {
+        assertSubQuery(scalarCBLambda);
         final HpSSQOption<CB> option = createOption();
-        _setupper.setup("min", subQuery, option);
+        _setupper.setup("min", scalarCBLambda, option);
         return createDecorator(option);
     }
 
@@ -90,13 +90,13 @@ public class HpSSQFunction<CB extends ConditionBean> {
      *     }
      * });
      * </pre> 
-     * @param subQuery The sub query of myself. (NotNull)
+     * @param scalarCBLambda The callback for sub-query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
-    public HpSSQDecorator<CB> sum(SubQuery<CB> subQuery) {
-        assertSubQuery(subQuery);
+    public HpSSQDecorator<CB> sum(SubQuery<CB> scalarCBLambda) {
+        assertSubQuery(scalarCBLambda);
         final HpSSQOption<CB> option = createOption();
-        _setupper.setup("sum", subQuery, option);
+        _setupper.setup("sum", scalarCBLambda, option);
         return createDecorator(option);
     }
 
@@ -110,13 +110,13 @@ public class HpSSQFunction<CB extends ConditionBean> {
      *     }
      * });
      * </pre> 
-     * @param subQuery The sub query of myself. (NotNull)
+     * @param scalarCBLambda The callback for sub-query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
-    public HpSSQDecorator<CB> avg(SubQuery<CB> subQuery) {
-        assertSubQuery(subQuery);
+    public HpSSQDecorator<CB> avg(SubQuery<CB> scalarCBLambda) {
+        assertSubQuery(scalarCBLambda);
         final HpSSQOption<CB> option = createOption();
-        _setupper.setup("avg", subQuery, option);
+        _setupper.setup("avg", scalarCBLambda, option);
         return createDecorator(option);
     }
 
@@ -131,9 +131,9 @@ public class HpSSQFunction<CB extends ConditionBean> {
         return new HpSSQDecorator<CB>(option);
     }
 
-    protected void assertSubQuery(SubQuery<?> subQuery) {
-        if (subQuery == null) {
-            String msg = "The argument 'subQuery' for ScalarCondition should not be null.";
+    protected void assertSubQuery(SubQuery<?> scalarCBLambda) {
+        if (scalarCBLambda == null) {
+            String msg = "The argument 'scalarCBLambda' for ScalarCondition should not be null.";
             throw new IllegalArgumentException(msg);
         }
     }

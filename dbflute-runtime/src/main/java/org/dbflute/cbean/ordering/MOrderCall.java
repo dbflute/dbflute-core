@@ -15,9 +15,8 @@
  */
 package org.dbflute.cbean.ordering;
 
-
 /**
- * The callback interface of manual-order-bean.
+ * The callback interface of manual-order.
  * @author jflute
  * @since 1.1.0 (2014/09/28 Sunday)
  */
@@ -25,7 +24,7 @@ package org.dbflute.cbean.ordering;
 public interface MOrderCall {
 
     /**
-     * @param mob The bean of manual-order to be set up. (NotNull)
+     * @param option The option of manual-order to be set up. (NotNull)
      */
-    void callback(ManualOrderBean mob);
+    void callback(ManualOrderOption option);
 }

@@ -25,7 +25,7 @@ import org.dbflute.cbean.chelper.HpMobCaseWhenElement;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
-import org.dbflute.cbean.ordering.ManualOrderBean;
+import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.system.DBFluteSystem;
@@ -70,8 +70,8 @@ public class OrderByElement implements Serializable {
     /** Is nulls ordered first? (SetupLater) */
     protected boolean _nullsFirst;
 
-    /** The bean of manual order. (NullAllowed, SetupLater) */
-    protected transient ManualOrderBean _mob;
+    /** The option of manual order. (NullAllowed, SetupLater) */
+    protected transient ManualOrderOption _manualOrderOption;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -135,7 +135,7 @@ public class OrderByElement implements Serializable {
         }
         final StringBuilder sb = new StringBuilder();
         final String columnFullName = getColumnFullName();
-        if (_mob != null && _mob.hasManualOrder()) {
+        if (_manualOrderOption != null && _manualOrderOption.hasManualOrder()) {
             setupManualOrderClause(sb, columnFullName, null);
             return sb.toString();
         } else {
@@ -160,7 +160,7 @@ public class OrderByElement implements Serializable {
         }
         final String columnAlias = mappingToRealColumnAlias(selectClauseRealColumnAliasMap, getColumnFullName());
         final StringBuilder sb = new StringBuilder();
-        if (_mob != null && _mob.hasManualOrder()) {
+        if (_manualOrderOption != null && _manualOrderOption.hasManualOrder()) {
             setupManualOrderClause(sb, columnAlias, selectClauseRealColumnAliasMap);
             return sb.toString();
         } else {
@@ -181,11 +181,10 @@ public class OrderByElement implements Serializable {
         return columnAlias;
     }
 
-    protected void setupManualOrderClause(StringBuilder sb, String columnAlias,
-            Map<String, String> selectClauseRealColumnAliasMap) {
+    protected void setupManualOrderClause(StringBuilder sb, String columnAlias, Map<String, String> selectClauseRealColumnAliasMap) {
         final String realAlias;
-        if (_mob.hasOrderByCalculation()) {
-            final HpCalcSpecification<ConditionBean> calculationOrder = _mob.getOrderByCalculation();
+        if (_manualOrderOption.hasOrderByCalculation()) {
+            final HpCalcSpecification<ConditionBean> calculationOrder = _manualOrderOption.getOrderByCalculation();
             realAlias = calculationOrder.buildStatementToSpecifidName(columnAlias, selectClauseRealColumnAliasMap);
         } else {
             if (selectClauseRealColumnAliasMap != null) { // means union
@@ -194,7 +193,7 @@ public class OrderByElement implements Serializable {
                 realAlias = decryptIfNeeds(_columnInfo, columnAlias);
             }
         }
-        final List<HpMobCaseWhenElement> caseWhenList = _mob.getCaseWhenBoundList();
+        final List<HpMobCaseWhenElement> caseWhenList = _manualOrderOption.getCaseWhenBoundList();
         if (!caseWhenList.isEmpty()) {
             sb.append(ln()).append("   case").append(ln());
             int index = 0;
@@ -215,7 +214,7 @@ public class OrderByElement implements Serializable {
                 sb.append(" then ").append(thenExp).append(ln());
                 ++index;
             }
-            final Object elseValue = _mob.getElseValue();
+            final Object elseValue = _manualOrderOption.getElseValue();
             final String elseExp;
             if (elseValue != null) {
                 elseExp = elseValue.toString();
@@ -249,8 +248,7 @@ public class OrderByElement implements Serializable {
         return conditionKey.equals(ConditionKey.CK_IS_NULL) || conditionKey.equals(ConditionKey.CK_IS_NOT_NULL);
     }
 
-    protected void throwOrderByColumnNotFoundException(String columnName,
-            Map<String, String> selectClauseRealColumnAliasMap) {
+    protected void throwOrderByColumnNotFoundException(String columnName, Map<String, String> selectClauseRealColumnAliasMap) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The column for order-by was not found in select-clause!" + ln();
@@ -387,11 +385,11 @@ public class OrderByElement implements Serializable {
         _nullsFirst = nullsFirst;
     }
 
-    public void setManualOrderBean(ManualOrderBean mob) {
-        _mob = mob;
+    public void setManualOrderOption(ManualOrderOption manualOrderOption) {
+        _manualOrderOption = manualOrderOption;
     }
 
-    public ManualOrderBean getManualOrderBean() {
-        return _mob;
+    public ManualOrderOption getManualOrderOption() {
+        return _manualOrderOption;
     }
 }

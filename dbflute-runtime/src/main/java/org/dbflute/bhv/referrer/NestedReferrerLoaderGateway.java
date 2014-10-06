@@ -15,7 +15,6 @@
  */
 package org.dbflute.bhv.referrer;
 
-
 /**
  * The gateway of loader handling for nested referrer.
  * <pre>
@@ -75,7 +74,7 @@ public interface NestedReferrerLoaderGateway<LOADER> {
      *     }
      * }
      * </pre>
-     * @param handler The handler of referrer loader to load nested referrer. (NotNull)
+     * @param loaderLambda The callback for handler of referrer loader to load nested referrer. (NotNull)
      */
-    void withNestedReferrer(ReferrerLoaderHandler<LOADER> handler);
+    void withNestedReferrer(ReferrerLoaderHandler<LOADER> loaderLambda);
 }

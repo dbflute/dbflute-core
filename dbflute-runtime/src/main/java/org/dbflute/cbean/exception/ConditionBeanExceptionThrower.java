@@ -25,7 +25,7 @@ import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.ordering.ManualOrderBean;
+import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;
@@ -79,8 +79,7 @@ public class ConditionBeanExceptionThrower {
     // ===================================================================================
     //                                                                       Set up Select
     //                                                                       =============
-    public void throwSetupSelectIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
-            String foreignPropertyName) {
+    public void throwSetupSelectIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String foreignPropertyName) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The purpose was illegal for SetupSelect.");
         br.addItem("Advice");
@@ -296,8 +295,8 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyColumnNotSetupSelectColumnException(msg);
     }
 
-    public void throwSpecifyColumnWithDerivedReferrerException(HpCBPurpose purpose, ConditionBean baseCB,
-            String columnName, String referrerName) {
+    public void throwSpecifyColumnWithDerivedReferrerException(HpCBPurpose purpose, ConditionBean baseCB, String columnName,
+            String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("You specified both SpecifyColumn and (Specify)DerivedReferrer!");
         br.addItem("Advice");
@@ -386,8 +385,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyColumnAlreadySpecifiedExceptColumnException(msg);
     }
 
-    public void throwSpecifyEveryColumnAlreadySpecifiedColumnException(String tableDbName,
-            Map<String, HpSpecifiedColumn> specifiedColumnMap) {
+    public void throwSpecifyEveryColumnAlreadySpecifiedColumnException(String tableDbName, Map<String, HpSpecifiedColumn> specifiedColumnMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SpecifyEveryColumn is specified after SpecifyColumn.");
         br.addItem("Advice");
@@ -449,8 +447,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyExceptColumnAlreadySpecifiedColumnException(msg);
     }
 
-    public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
-            String relationName) {
+    public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String relationName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("You specified the relation in the purpose that is not allowed to do it.");
         br.addItem("Advice");
@@ -491,8 +488,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyRelationIllegalPurposeException(msg);
     }
 
-    public void throwSpecifyDerivedReferrerIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
-            String referrerName) {
+    public void throwSpecifyDerivedReferrerIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The purpose was illegal for derived-referrer specification.");
         br.addItem("Advice");
@@ -521,8 +517,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyDerivedReferrerIllegalPurposeException(msg);
     }
 
-    public void throwSpecifyDerivedReferrerTwoOrMoreException(HpCBPurpose purpose, ConditionBean baseCB,
-            String referrerName) {
+    public void throwSpecifyDerivedReferrerTwoOrMoreException(HpCBPurpose purpose, ConditionBean baseCB, String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The two-or-more derived-referrers was specifed.");
         br.addItem("Advice");
@@ -735,8 +730,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyDerivedReferrerUnmatchedColumnTypeException(msg);
     }
 
-    public void throwSpecifyDerivedReferrerSelectAllPossibleException(String function, ConditionQuery subQuery,
-            String aliasName) {
+    public void throwSpecifyDerivedReferrerSelectAllPossibleException(String function, ConditionQuery subQuery, String aliasName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The specify derived-referrer might select all.");
         br.addItem("Advice");
@@ -924,8 +918,7 @@ public class ConditionBeanExceptionThrower {
         throw new QueryThatsBadTimingException(msg);
     }
 
-    public void throwQueryAlreadyRegisteredException(ConditionKey key, Object value, ConditionValue cvalue,
-            String columnDbName) {
+    public void throwQueryAlreadyRegisteredException(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The query has been already registered. (cannot override it)");
         br.addItem("Advice");
@@ -1000,8 +993,7 @@ public class ConditionBeanExceptionThrower {
         throw new RequiredOptionNotFoundException(msg);
     }
 
-    public void throwOrderByIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String tableDbName,
-            String columnName) {
+    public void throwOrderByIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String tableDbName, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The purpose was illegal for order-by.");
         br.addItem("Advice");
@@ -1243,8 +1235,7 @@ public class ConditionBeanExceptionThrower {
         throw new ScalarConditionInvalidColumnSpecificationException(msg);
     }
 
-    public void throwScalarConditionUnmatchedColumnTypeException(String function, String deriveColumnName,
-            Class<?> deriveColumnType) {
+    public void throwScalarConditionUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The type of the specified the column unmatched with the function.");
         br.addItem("Advice");
@@ -1288,8 +1279,8 @@ public class ConditionBeanExceptionThrower {
     // ===================================================================================
     //                                                                      FixedCondition
     //                                                                      ==============
-    public void throwFixedConditionParameterNotFoundException(String tableDbName, String property,
-            String fixedCondition, Map<String, Object> parameterMap) {
+    public void throwFixedConditionParameterNotFoundException(String tableDbName, String property, String fixedCondition,
+            Map<String, Object> parameterMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the required parameter for the fixed condition.");
         br.addItem("Advice");
@@ -1343,7 +1334,7 @@ public class ConditionBeanExceptionThrower {
     // ===================================================================================
     //                                                                        Manual Order
     //                                                                        ============
-    public void throwManualOrderNotFoundOrderByException(ConditionBean baseCB, ManualOrderBean mob) {
+    public void throwManualOrderNotFoundOrderByException(ConditionBean baseCB, ManualOrderOption moOp) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found order-by element for the ManualOrder.");
         br.addItem("Advice");
@@ -1351,48 +1342,48 @@ public class ConditionBeanExceptionThrower {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    ManualOrderOption mob = new ManualOrderOption();");
         br.addElement("    mob.when_LessEqual(...);");
         br.addElement("    cb.query().withManualOrder(mob); // *NG");
         br.addElement("  (o):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    ManualOrderOption mob = new ManualOrderOption();");
         br.addElement("    mob.when_LessEqual(...);");
         br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(mob); // OK");
         br.addItem("ConditionBean");
         br.addElement(baseCB != null ? baseCB.getClass().getName() : baseCB); // check just in case
-        br.addItem("ManualOrderBean");
-        br.addElement(mob);
+        br.addItem("ManualOrderOption");
+        br.addElement(moOp);
         final String msg = br.buildExceptionMessage();
         throw new IllegalConditionBeanOperationException(msg);
     }
 
-    public void throwManualOrderSameBeanAlreadyExistsException(ConditionBean baseCB, ManualOrderBean existingMob,
-            OrderByElement existingOrder, ManualOrderBean specifiedMob, OrderByElement specifiedOrder) {
+    public void throwManualOrderSameBeanAlreadyExistsException(ConditionBean baseCB, ManualOrderOption existingMoOp,
+            OrderByElement existingOrder, ManualOrderOption specifiedMob, OrderByElement specifiedOrder) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The same manual-order-bean with other columns was registered.");
+        br.addNotice("The same manual-order option with other columns was registered.");
         br.addItem("Advice");
         br.addElement("You can use manual-order-bean one time.");
         br.addElement("Make sure your implementation:");
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    ManualOrderOption mob = new ManualOrderOption();");
         br.addElement("    mob.when_LessEqual(...);");
         br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(mob);");
         br.addElement("    cb.query().addOrderBy_MemberId_Asc().withManualOrder(mob); // *NG");
         br.addElement("  (o):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    ManualOrderBean birthMob = new ManualOrderBean();");
+        br.addElement("    ManualOrderOption birthMob = new ManualOrderOption();");
         br.addElement("    birthMob.when_LessEqual(...);");
         br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(birthMob);");
-        br.addElement("    ManualOrderBean idMob = new ManualOrderBean();");
+        br.addElement("    ManualOrderOption idMob = new ManualOrderOption();");
         br.addElement("    idMob.when_LessEqual(...);");
         br.addElement("    cb.query().addOrderBy_MemberId_Asc().withManualOrder(idMob); // OK");
         br.addItem("ConditionBean");
         br.addElement(baseCB != null ? baseCB.getClass().getName() : baseCB); // check just in case
-        br.addItem("Existing Bean");
-        br.addElement(existingMob);
+        br.addItem("Existing Option");
+        br.addElement(existingMoOp);
         br.addElement(existingOrder);
         br.addItem("Specified Bean");
         br.addElement(specifiedMob);

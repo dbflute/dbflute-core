@@ -16,6 +16,7 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.coption.FFOptionCall;
 import org.dbflute.cbean.coption.ScalarSelectOption;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.scoping.ScalarQuery;
@@ -69,11 +70,11 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
      * @return The count value calculated by function. (NotNull)
      */
-    public RESULT count(ScalarQuery<CB> scalarQuery) {
-        return doCount(scalarQuery, null);
+    public RESULT count(ScalarQuery<CB> cbLambda) {
+        return doCount(cbLambda, null);
     }
 
     /**
@@ -84,13 +85,15 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @param option The option for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
      * @return The count value calculated by function. (NotNull)
      */
-    public RESULT count(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public RESULT count(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doCount(scalarQuery, option);
+        return doCount(cbLambda, option);
     }
 
     protected RESULT doCount(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -107,11 +110,11 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
      * @return The count-distinct value calculated by function. (NotNull)
      */
-    public RESULT countDistinct(ScalarQuery<CB> scalarQuery) {
-        return doCountDistinct(scalarQuery, null);
+    public RESULT countDistinct(ScalarQuery<CB> cbLambda) {
+        return doCountDistinct(cbLambda, null);
     }
 
     /**
@@ -122,13 +125,15 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @param option The option for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
      * @return The count-distinct value calculated by function. (NotNull)
      */
-    public RESULT countDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public RESULT countDistinct(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doCountDistinct(scalarQuery, option);
+        return doCountDistinct(cbLambda, option);
     }
 
     protected RESULT doCountDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -144,11 +149,11 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
      * @return The maximum value calculated by function. (NullAllowed)
      */
-    public RESULT max(ScalarQuery<CB> scalarQuery) {
-        return doMax(scalarQuery, null);
+    public RESULT max(ScalarQuery<CB> cbLambda) {
+        return doMax(cbLambda, null);
     }
 
     /**
@@ -159,13 +164,15 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @param option The option for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
      * @return The maximum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public RESULT max(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public RESULT max(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doMax(scalarQuery, option);
+        return doMax(cbLambda, option);
     }
 
     protected RESULT doMax(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -181,11 +188,11 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
      * @return The minimum value calculated by function. (NullAllowed)
      */
-    public RESULT min(ScalarQuery<CB> scalarQuery) {
-        return doMin(scalarQuery, null);
+    public RESULT min(ScalarQuery<CB> cbLambda) {
+        return doMin(cbLambda, null);
     }
 
     /**
@@ -196,13 +203,15 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @param option The option for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
      * @return The minimum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public RESULT min(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public RESULT min(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doMin(scalarQuery, option);
+        return doMin(cbLambda, option);
     }
 
     protected RESULT doMin(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -218,11 +227,11 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
      * @return The summary value calculated by function. (NullAllowed)
      */
-    public RESULT sum(ScalarQuery<CB> scalarQuery) {
-        return doSum(scalarQuery, null);
+    public RESULT sum(ScalarQuery<CB> cbLambda) {
+        return doSum(cbLambda, null);
     }
 
     /**
@@ -233,13 +242,15 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @param option The option for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
      * @return The summary value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public RESULT sum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public RESULT sum(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doSum(scalarQuery, option);
+        return doSum(cbLambda, option);
     }
 
     protected RESULT doSum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -255,11 +266,11 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
      * @return The average value calculated by function. (NullAllowed)
      */
-    public RESULT avg(ScalarQuery<CB> scalarQuery) {
-        return doAvg(scalarQuery, null);
+    public RESULT avg(ScalarQuery<CB> cbLambda) {
+        return doAvg(cbLambda, null);
     }
 
     /**
@@ -270,13 +281,15 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
-     * @param option The option for scalar. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
      * @return The average value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public RESULT avg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public RESULT avg(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doAvg(scalarQuery, option);
+        return doAvg(cbLambda, option);
     }
 
     protected RESULT doAvg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -314,6 +327,10 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
+    protected ScalarSelectOption createScalarSelectOption() {
+        return new ScalarSelectOption();
+    }
+
     protected void setupScalarSelectOption(ScalarSelectOption option) {
         if (option != null) {
             _conditionBean.xacceptScalarSelectOption(option);

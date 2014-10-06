@@ -38,7 +38,7 @@ public interface HpCalculator {
      * <pre>
      * e.g. ManualOrder: order by PURCHASE_PRICE + PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
-     *  ManualOrderBean mob = new ManualOrderBean
+     *  ManualOrderOption option = new ManualOrderOption()
      *  mob.<span style="color: #DD4747">plus</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
@@ -71,7 +71,7 @@ public interface HpCalculator {
      * <pre>
      * e.g. ManualOrder: order by PURCHASE_PRICE - PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
-     *  ManualOrderBean mob = new ManualOrderBean
+     *  ManualOrderOption option = new ManualOrderOption()
      *  mob.<span style="color: #DD4747">minus</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
@@ -104,7 +104,7 @@ public interface HpCalculator {
      * <pre>
      * e.g. ManualOrder: order by PURCHASE_PRICE * PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
-     *  ManualOrderBean mob = new ManualOrderBean
+     *  ManualOrderOption option = new ManualOrderOption()
      *  mob.<span style="color: #DD4747">multiply</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
@@ -137,7 +137,7 @@ public interface HpCalculator {
      * <pre>
      * e.g. ManualOrder: order by PURCHASE_PRICE / PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
-     *  ManualOrderBean mob = new ManualOrderBean
+     *  ManualOrderOption option = new ManualOrderOption()
      *  mob.<span style="color: #DD4747">divide</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
