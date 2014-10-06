@@ -33,9 +33,9 @@ map:{
     #  Your possible choices are:
     #
     #    mysql, postgresql, oracle, db2, sqlserver,
-    #    h2, derby, (sqlite, msaccess)
+    #    h2, derby, (sqlite, msaccess, firebird)
     #
-    ; database = h2
+    ; database = @database@
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -45,7 +45,7 @@ map:{
     #
     #       java, csharp, scala
     #
-    ; targetLanguage = java
+    ; targetLanguage = @targetLanguage@
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -56,7 +56,7 @@ map:{
     #
     #       seasar, spring, guice, cdi
     #
-    ; targetContainer = seasar
+    ; targetContainer = @targetContainer@
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -76,7 +76,7 @@ map:{
     #      --> com.example.dbflute.basic.dbflute.exbhv
     #      --> com.example.dbflute.basic.dbflute.exentity
     #
-    ; packageBase = com.example.dbflute.basic.dbflute
+    ; packageBase = @packageBase@
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

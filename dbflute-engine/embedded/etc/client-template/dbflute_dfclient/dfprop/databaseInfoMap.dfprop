@@ -15,11 +15,11 @@
 # *The line that starts with '#' means comment-out.
 #
 map:{
-    ; driver   = {Please write your setting! at './dfprop/databaseInfoMap.dfprop'}
-    ; url      = ...
-    ; schema   = ...
-    ; user     = ...
-    ; password = ...
+    ; driver   = @driver@
+    ; url      = @url@
+    ; schema   = @schema@
+    ; user     = @user@
+    ; password = @password@
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o propertiesMap: (NotRequired - Default map:{})
