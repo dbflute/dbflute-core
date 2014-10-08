@@ -1681,7 +1681,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * <p>This function with Union is unsupported!</p>
      * <p>The order values are bound (treated as bind parameter).</p>
-     * @param opLambda The callback for option of manual order containing order values. (NotNull)
+     * @param opLambda The callback for option of manual-order containing order values. (NotNull)
      */
     public void withManualOrder(MOrderCall opLambda) { // is user public!
         ManualOrderOption op = cMOO(); opLambda.callback(op);
@@ -1719,7 +1719,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * <p>This function with Union is unsupported!</p>
      * <p>The order values are bound (treated as bind parameter).</p>
-     * @param mob The bean of manual order containing order values. (NotNull)
+     * @param option The option of manual-order containing order values. (NotNull)
      */
     public void withManualOrder(ManualOrderOption option) { // is user public!
         xdoWithManualOrder(option);

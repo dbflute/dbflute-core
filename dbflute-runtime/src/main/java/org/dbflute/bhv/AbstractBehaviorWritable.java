@@ -38,6 +38,7 @@ import org.dbflute.bhv.writable.DeleteOption;
 import org.dbflute.bhv.writable.InsertOption;
 import org.dbflute.bhv.writable.QueryInsertSetupper;
 import org.dbflute.bhv.writable.UpdateOption;
+import org.dbflute.bhv.writable.WOptionCall;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.DBMeta;
@@ -107,8 +108,23 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return cb;
     }
 
-    protected void assertInsertOptionNotNull(InsertOption<? extends ConditionBean> option) { // for varyingInsert()
-        assertObjectNotNull("option (for insert)", option);
+    protected InsertOption<CB> handleInsertOpCall(WOptionCall<CB, InsertOption<CB>> opCall) {
+        assertInsertOpCallNotNull(opCall);
+        final InsertOption<CB> op = createInsertOption();
+        opCall.callback(op);
+        return op;
+    }
+
+    protected InsertOption<CB> createInsertOption() {
+        return newInsertOption();
+    }
+
+    protected InsertOption<CB> newInsertOption() {
+        return new InsertOption<CB>();
+    }
+
+    protected void assertInsertOpCallNotNull(WOptionCall<CB, InsertOption<CB>> opCall) { // for varyingInsert()
+        assertObjectNotNull("opLambda (for insert)", opCall);
     }
 
     // -----------------------------------------------------
@@ -198,8 +214,23 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected void assertUpdateOptionNotNull(UpdateOption<? extends ConditionBean> option) { // for varyingUpdate()
-        assertObjectNotNull("option (for update)", option);
+    protected UpdateOption<CB> handleUpdateOpCall(WOptionCall<CB, UpdateOption<CB>> opCall) {
+        assertUpdateOpCallNotNull(opCall);
+        final UpdateOption<CB> op = createUpdateOption();
+        opCall.callback(op);
+        return op;
+    }
+
+    protected UpdateOption<CB> createUpdateOption() {
+        return newUpdateOption();
+    }
+
+    protected UpdateOption<CB> newUpdateOption() {
+        return new UpdateOption<CB>();
+    }
+
+    protected void assertUpdateOpCallNotNull(WOptionCall<CB, UpdateOption<CB>> opCall) { // for varyingUpdate()
+        assertObjectNotNull("opLambda (for update)", opCall);
     }
 
     // -----------------------------------------------------
@@ -359,8 +390,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected <RESULT extends ENTITY> void helpDeleteInternally(RESULT entity,
-            DeleteOption<? extends ConditionBean> option) {
+    protected <RESULT extends ENTITY> void helpDeleteInternally(RESULT entity, DeleteOption<? extends ConditionBean> option) {
         assertEntityNotNull(entity);
         assertEntityHasOptimisticLockValue(entity);
         final int deletedCount = delegateDelete(entity, option);
@@ -371,8 +401,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected <RESULT extends ENTITY> void helpDeleteNonstrictInternally(RESULT entity,
-            DeleteOption<? extends ConditionBean> option) {
+    protected <RESULT extends ENTITY> void helpDeleteNonstrictInternally(RESULT entity, DeleteOption<? extends ConditionBean> option) {
         assertEntityNotNull(entity);
         final int deletedCount = delegateDeleteNonstrict(entity, option);
         if (deletedCount == 0) {
@@ -396,8 +425,23 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     protected void assertDeleteOptionStatus(DeleteOption<? extends ConditionBean> option) {
     }
 
-    protected void assertDeleteOptionNotNull(DeleteOption<? extends ConditionBean> option) { // for varyingDelete()
-        assertObjectNotNull("option (for delete)", option);
+    protected DeleteOption<CB> handleDeleteOpCall(WOptionCall<CB, DeleteOption<CB>> opCall) {
+        assertDeleteOpCallNotNull(opCall);
+        final DeleteOption<CB> op = createDeleteOption();
+        opCall.callback(op);
+        return op;
+    }
+
+    protected DeleteOption<CB> createDeleteOption() {
+        return newDeleteOption();
+    }
+
+    protected DeleteOption<CB> newDeleteOption() {
+        return new DeleteOption<CB>();
+    }
+
+    protected void assertDeleteOpCallNotNull(WOptionCall<CB, DeleteOption<CB>> opCall) { // for varyingDelete()
+        assertObjectNotNull("opLambda (for delete)", opCall);
     }
 
     // -----------------------------------------------------
@@ -448,7 +492,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected InsertOption<CB> createPlainInsertOption() {
-        return new InsertOption<CB>();
+        return newInsertOption();
     }
 
     protected <ELEMENT extends ENTITY> void prepareBatchInsertOption(List<ELEMENT> entityList, InsertOption<CB> option) { // might be overridden to set option
@@ -796,8 +840,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected int[] delegateBatchUpdateNonstrict(List<? extends Entity> entityList,
-            UpdateOption<? extends ConditionBean> option) {
+    protected int[] delegateBatchUpdateNonstrict(List<? extends Entity> entityList, UpdateOption<? extends ConditionBean> option) {
         if (entityList.isEmpty()) {
             return new int[] {};
         }
@@ -815,8 +858,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected int[] delegateBatchDeleteNonstrict(List<? extends Entity> entityList,
-            DeleteOption<? extends ConditionBean> option) {
+    protected int[] delegateBatchDeleteNonstrict(List<? extends Entity> entityList, DeleteOption<? extends ConditionBean> option) {
         if (entityList.isEmpty()) {
             return new int[] {};
         }
@@ -826,8 +868,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                          Query Update
     //                                          ------------
-    protected int delegateQueryInsert(Entity entity, ConditionBean inCB, ConditionBean resCB,
-            InsertOption<? extends ConditionBean> option) {
+    protected int delegateQueryInsert(Entity entity, ConditionBean inCB, ConditionBean resCB, InsertOption<? extends ConditionBean> option) {
         if (!processBeforeQueryInsert(entity, inCB, resCB, option)) {
             return 0;
         }
@@ -996,8 +1037,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
      * @param option The option of update. (NullAllowed)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean processBeforeQueryUpdate(Entity entity, ConditionBean cb,
-            UpdateOption<? extends ConditionBean> option) {
+    protected boolean processBeforeQueryUpdate(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
         assertEntityNotNull(entity); // query-update doesn't need to check primary key
         assertCBStateValid(cb);
         frameworkFilterEntityOfUpdate(entity, option);
@@ -1244,8 +1284,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return new UpdateEntityCommand();
     }
 
-    protected UpdateNonstrictEntityCommand createUpdateNonstrictEntityCommand(Entity entity,
-            UpdateOption<? extends ConditionBean> option) {
+    protected UpdateNonstrictEntityCommand createUpdateNonstrictEntityCommand(Entity entity, UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createUpdateNonstrictEntityCommand");
         final UpdateNonstrictEntityCommand cmd = newUpdateNonstrictEntityCommand();
         xsetupEntityCommand(cmd, entity);
@@ -1269,8 +1308,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return new DeleteEntityCommand();
     }
 
-    protected DeleteNonstrictEntityCommand createDeleteNonstrictEntityCommand(Entity entity,
-            DeleteOption<? extends ConditionBean> option) {
+    protected DeleteNonstrictEntityCommand createDeleteNonstrictEntityCommand(Entity entity, DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createDeleteNonstrictEntityCommand");
         final DeleteNonstrictEntityCommand cmd = newDeleteNonstrictEntityCommand();
         xsetupEntityCommand(cmd, entity);
@@ -1285,8 +1323,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                                 Batch
     //                                                 -----
-    protected BatchInsertCommand createBatchInsertCommand(List<? extends Entity> entityList,
-            InsertOption<? extends ConditionBean> option) {
+    protected BatchInsertCommand createBatchInsertCommand(List<? extends Entity> entityList, InsertOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchInsertCommand");
         final BatchInsertCommand cmd = newBatchInsertCommand();
         xsetupListEntityCommand(cmd, entityList);
@@ -1298,8 +1335,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return new BatchInsertCommand();
     }
 
-    protected BatchUpdateCommand createBatchUpdateCommand(List<? extends Entity> entityList,
-            UpdateOption<? extends ConditionBean> option) {
+    protected BatchUpdateCommand createBatchUpdateCommand(List<? extends Entity> entityList, UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchUpdateCommand");
         final BatchUpdateCommand cmd = newBatchUpdateCommand();
         xsetupListEntityCommand(cmd, entityList);
@@ -1324,8 +1360,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return new BatchUpdateNonstrictCommand();
     }
 
-    protected BatchDeleteCommand createBatchDeleteCommand(List<? extends Entity> entityList,
-            DeleteOption<? extends ConditionBean> option) {
+    protected BatchDeleteCommand createBatchDeleteCommand(List<? extends Entity> entityList, DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchDeleteCommand");
         final BatchDeleteCommand cmd = newBatchDeleteCommand();
         xsetupListEntityCommand(cmd, entityList);
@@ -1368,8 +1403,8 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                                 Query
     //                                                 -----
-    protected QueryInsertCBCommand createQueryInsertCBCommand(Entity entity, ConditionBean intoCB,
-            ConditionBean resourceCB, InsertOption<? extends ConditionBean> option) {
+    protected QueryInsertCBCommand createQueryInsertCBCommand(Entity entity, ConditionBean intoCB, ConditionBean resourceCB,
+            InsertOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createQueryInsertCBCommand");
         final QueryInsertCBCommand cmd = new QueryInsertCBCommand();
         cmd.setTableDbName(getTableDbName());
@@ -1381,8 +1416,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return cmd;
     }
 
-    protected QueryUpdateCBCommand createQueryUpdateCBCommand(Entity entity, ConditionBean cb,
-            UpdateOption<? extends ConditionBean> option) {
+    protected QueryUpdateCBCommand createQueryUpdateCBCommand(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createQueryUpdateCBCommand");
         final QueryUpdateCBCommand cmd = new QueryUpdateCBCommand();
         cmd.setTableDbName(getTableDbName());
@@ -1393,8 +1427,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return cmd;
     }
 
-    protected QueryDeleteCBCommand createQueryDeleteCBCommand(ConditionBean cb,
-            DeleteOption<? extends ConditionBean> option) {
+    protected QueryDeleteCBCommand createQueryDeleteCBCommand(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createQueryDeleteCBCommand");
         final QueryDeleteCBCommand cmd = new QueryDeleteCBCommand();
         cmd.setTableDbName(getTableDbName());
@@ -1423,8 +1456,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     @SuppressWarnings("unchecked")
-    protected QueryInsertSetupper<ENTITY, CB> downcast(
-            QueryInsertSetupper<? extends Entity, ? extends ConditionBean> setupper) {
+    protected QueryInsertSetupper<ENTITY, CB> downcast(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> setupper) {
         return (QueryInsertSetupper<ENTITY, CB>) setupper;
     }
 

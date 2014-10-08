@@ -117,18 +117,18 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * }).<span style="color: #DD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
      * purchaseBhv.<span style="color: #DD4747">varyingUpdateNonstrict</span>(purchase, option);
      * </pre>
-     * @param selfCalculationSpecification The query for specification that specifies only one column. (NotNull)
+     * @param colCBLambda The callback for query for specification that specifies only one column. (NotNull)
      * @return The calculation of specification for the specified column. (NotNull)
      */
-    public HpCalculator self(SpecifyQuery<CB> selfCalculationSpecification) {
-        if (selfCalculationSpecification == null) {
-            String msg = "The argument 'selfCalculationSpecification' should not be null.";
+    public HpCalculator self(SpecifyQuery<CB> colCBLambda) {
+        if (colCBLambda == null) {
+            String msg = "The argument 'colCBLambda' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         if (_selfSpecificationList == null) {
             _selfSpecificationList = DfCollectionUtil.newArrayList();
         }
-        final HpCalcSpecification<CB> specification = new HpCalcSpecification<CB>(selfCalculationSpecification);
+        final HpCalcSpecification<CB> specification = new HpCalcSpecification<CB>(colCBLambda);
         _selfSpecificationList.add(specification);
         return specification;
     }
