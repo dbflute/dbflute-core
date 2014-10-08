@@ -42,8 +42,8 @@ public interface NodeAdviceFactory {
             ParameterCommentType commentType);
 
     /**
-     * @param likeDirection The direction of like-search, e.g. likePrefix (NotNull)
+     * @param mightBeLikeDirection It might be the direction of like-search, e.g. likePrefix (NotNull)
      * @return The new-created option of like-search. (NullAllowed: if null, in-loop like-search unsupported)
      */
-    FilteringBindOption createInLoopLikeSearchOption(String likeDirection);
+    FilteringBindOption createInLoopLikeSearchOption(String mightBeLikeDirection);
 }
