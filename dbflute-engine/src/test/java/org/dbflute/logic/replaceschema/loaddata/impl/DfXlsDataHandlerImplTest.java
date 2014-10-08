@@ -25,12 +25,12 @@ import java.util.regex.PatternSyntaxException;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
 import org.dbflute.helper.StringKeyMap;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  */
-public class DfXlsDataHandlerImplTest extends PlainTestCase {
+public class DfXlsDataHandlerImplTest extends EngineTestCase {
 
     // ===================================================================================
     //                                                                    Process per Type

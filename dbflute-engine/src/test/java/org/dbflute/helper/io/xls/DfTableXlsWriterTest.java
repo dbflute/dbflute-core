@@ -28,13 +28,13 @@ import org.dbflute.helper.io.xls.DfTableXlsReader;
 import org.dbflute.helper.io.xls.DfTableXlsWriter;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.infra.manage.refresh.DfRefreshResourceRequest;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 import org.dbflute.util.DfResourceUtil;
 
 /**
  * @author jflute
  */
-public class DfTableXlsWriterTest extends PlainTestCase {
+public class DfTableXlsWriterTest extends EngineTestCase {
 
     // ===================================================================================
     //                                                                          Large Data

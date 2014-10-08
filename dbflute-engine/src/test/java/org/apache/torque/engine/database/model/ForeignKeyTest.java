@@ -15,12 +15,12 @@
  */
 package org.apache.torque.engine.database.model;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  */
-public class ForeignKeyTest extends PlainTestCase {
+public class ForeignKeyTest extends EngineTestCase {
 
     // ===================================================================================
     //                                                                      Basic Override

@@ -30,14 +30,14 @@ import org.dbflute.helper.dataset.DfDataSet;
 import org.dbflute.helper.dataset.DfDataTable;
 import org.dbflute.helper.io.xls.DfTableXlsReader;
 import org.dbflute.helper.StringKeyMap;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 import org.dbflute.util.DfResourceUtil;
 
 /**
  * @author jflute
  * @since 0.7.9 (2008/08/24 Monday)
  */
-public class DfTableXlsReaderTest extends PlainTestCase {
+public class DfTableXlsReaderTest extends EngineTestCase {
 
     // ===================================================================================
     //                                                                          Basic Read

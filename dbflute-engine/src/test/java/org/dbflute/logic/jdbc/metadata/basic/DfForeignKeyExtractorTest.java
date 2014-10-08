@@ -22,13 +22,13 @@ import java.util.Set;
 
 import org.dbflute.logic.jdbc.metadata.basic.DfForeignKeyExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  * @since 1.0.5F (2014/05/07 Wednesday)
  */
-public class DfForeignKeyExtractorTest extends PlainTestCase {
+public class DfForeignKeyExtractorTest extends EngineTestCase {
 
     public void test_immobilizeOrder_basic() throws Exception {
         // ## Arrange ##

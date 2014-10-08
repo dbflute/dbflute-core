@@ -16,13 +16,13 @@
 package org.dbflute.logic.replaceschema.loaddata.impl;
 
 import org.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataHandlerImpl;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  * @since 0.5.9 (2007/12/21 Friday)
  */
-public class DfDelimiterDataHandlerImplTest extends PlainTestCase {
+public class DfDelimiterDataHandlerImplTest extends EngineTestCase {
 
     public void test_isUnsupportedEncodingDirectory() throws Exception {
         final DfDelimiterDataHandlerImpl target = new DfDelimiterDataHandlerImpl();

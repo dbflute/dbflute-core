@@ -17,9 +17,9 @@ package org.dbflute.logic.jdbc.urlanalyzer;
 
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerSQLServer;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
-public class DfUrlAnalyzerSQLServerTest extends PlainTestCase {
+public class DfUrlAnalyzerSQLServerTest extends EngineTestCase {
 
     public void test_extractCatalog_basic() throws Exception {
         // ## Arrange ##

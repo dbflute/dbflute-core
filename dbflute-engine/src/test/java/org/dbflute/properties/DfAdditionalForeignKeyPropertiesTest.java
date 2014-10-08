@@ -18,13 +18,13 @@ package org.dbflute.properties;
 import java.util.Properties;
 
 import org.dbflute.properties.DfAdditionalForeignKeyProperties;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class DfAdditionalForeignKeyPropertiesTest extends PlainTestCase {
+public class DfAdditionalForeignKeyPropertiesTest extends EngineTestCase {
 
     // ===================================================================================
     //                                                                     Fixed Condition

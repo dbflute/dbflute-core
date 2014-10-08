@@ -21,13 +21,13 @@ import org.dbflute.logic.outsidesqltest.DfOutsideSqlChecker;
 import org.dbflute.twowaysql.exception.EndCommentNotFoundException;
 import org.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
 import org.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  * @since 0.9.6 (2009/10/25 Sunday)
  */
-public class OutsideSqlCheckerTest extends PlainTestCase {
+public class OutsideSqlCheckerTest extends EngineTestCase {
 
     public void test_check_basic() {
         // ## Arrange ##

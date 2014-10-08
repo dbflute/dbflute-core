@@ -26,13 +26,13 @@ import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.DfLanguageDependencyJava;
 import org.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper;
 import org.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.DfMapperResource;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  * @since 0.9.5 (2009/04/21 Tuesday)
  */
-public class DfJdbcTypeMapperTest extends PlainTestCase {
+public class DfJdbcTypeMapperTest extends EngineTestCase {
 
     public void test_getColumnTorqueType_NameToTorqueTypeMap() {
         initializeEmptyProperty();

@@ -20,14 +20,14 @@ import java.util.List;
 
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.junit.Assert;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 import org.dbflute.util.DfResourceUtil;
 
 /**
  * @author jflute
  * @since 0.5.7 (2007/11/03 Saturday)
  */
-public class DfSqlFileGetterTest extends PlainTestCase {
+public class DfSqlFileGetterTest extends EngineTestCase {
 
     public void test_getSqlFileList() throws Exception {
         final DfSqlFileGetter getter = new DfSqlFileGetter();

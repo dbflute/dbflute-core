@@ -16,12 +16,12 @@
 package org.dbflute.logic.generate.language.typemapping;
 
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingCSharp;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  */
-public class DfLanguageTypeMappingCSharpTest extends PlainTestCase {
+public class DfLanguageTypeMappingCSharpTest extends EngineTestCase {
 
     public void test_switchParameterBeanTestValueType() throws Exception {
         // ## Arrange ##

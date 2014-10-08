@@ -18,12 +18,12 @@ package org.dbflute.properties;
 import static org.dbflute.properties.DfSimpleDtoProperties.doBuildFieldName;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  */
-public class DfSimpleDtoPropertiesTest extends PlainTestCase {
+public class DfSimpleDtoPropertiesTest extends EngineTestCase {
 
     public void test_doBuildFieldName_entry_basic() throws Exception {
         assertEquals("_memberName", doBuildFieldName("MemberName", "BEANS", false));

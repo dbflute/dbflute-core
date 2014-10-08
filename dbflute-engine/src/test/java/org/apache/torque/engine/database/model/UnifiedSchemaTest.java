@@ -15,12 +15,12 @@
  */
 package org.apache.torque.engine.database.model;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  */
-public class UnifiedSchemaTest extends PlainTestCase {
+public class UnifiedSchemaTest extends EngineTestCase {
 
     public void test_equals_basic() {
         // ## Arrange ##
