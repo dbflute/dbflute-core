@@ -18,6 +18,7 @@ package org.dbflute.hook;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dbflute.bhv.core.BehaviorCommandHook;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * The context of callback in DBFlute deep logic.
@@ -433,6 +434,23 @@ public class CallbackContext {
         return _behaviorCommandHook != null || _sqlFireHook != null // hook
                 || _sqlLogHandler != null || _sqlResultHandler != null // handler
                 || _sqlStringFilter != null; // filter
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        final String title = DfTypeUtil.toClassTitle(this);
+        final StringBuilder sb = new StringBuilder();
+        sb.append(title);
+        sb.append(":{behaviorCommandHook=").append(_behaviorCommandHook);
+        sb.append(", sqlFireHook=").append(_sqlFireHook);
+        sb.append(", sqlLogHandler=").append(_sqlLogHandler);
+        sb.append(", sqlResultHandler=").append(_sqlResultHandler);
+        sb.append(", sqlStringFilter=").append(_sqlStringFilter);
+        sb.append("}");
+        return sb.toString();
     }
 
     // ===================================================================================
