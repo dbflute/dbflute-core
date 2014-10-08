@@ -1287,39 +1287,34 @@ public class Table {
     // -----------------------------------------------------
     //                                  Existing Foreign Key
     //                                  --------------------
-    public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) { // no suffix
+    public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList) { // no suffix
         return doExistsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, null, false);
     }
 
-    public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList, String fixedSuffix) { // all
+    public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList,
+            String fixedSuffix) { // all
         return doExistsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, true);
     }
 
-    protected boolean doExistsForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList, String fixedSuffix, boolean compareSuffix) {
+    protected boolean doExistsForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList,
+            String fixedSuffix, boolean compareSuffix) {
         final ForeignKey fk =
-                doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix,
-                        compareSuffix, true);
+                doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, compareSuffix, true);
         return fk != null;
     }
 
-    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) { // no suffix
+    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList) { // no suffix
         return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, null, false, true);
     }
 
-    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> foreignColumnNameList,
-            String fixedSuffix) { // no local columns
+    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> foreignColumnNameList, String fixedSuffix) { // no local columns
         final List<String> emptyList = DfCollectionUtil.emptyList();
         return doFindExistingForeignKey(foreignTableName, emptyList, foreignColumnNameList, fixedSuffix, true, false);
     }
 
-    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList, String fixedSuffix) { // all
-        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix,
-                true, true);
+    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList,
+            String fixedSuffix) { // all
+        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, true, true);
     }
 
     protected ForeignKey doFindExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
@@ -3497,6 +3492,10 @@ public class Table {
         return getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
+    public boolean needsBehaviorCBeanScopingCallbackImport() {
+        return isMakeBatchUpdateSpecifyColumn();
+    }
+
     // -----------------------------------------------------
     //                                         Select Entity
     //                                         -------------
@@ -3550,6 +3549,9 @@ public class Table {
         return prop.isCompatibleSelectByPKOldStyle() ? "Value" : "";
     }
 
+    // -----------------------------------------------------
+    //                                     Compatible Option
+    //                                     -----------------
     public boolean isMakeCallbackConditionBeanSetup() {
         return getLittleAdjustmentProperties().isMakeCallbackConditionBeanSetup();
     }
@@ -3559,7 +3561,7 @@ public class Table {
     }
 
     public boolean isMakeBatchUpdateSpecifyColumn() {
-        return getLittleAdjustmentProperties().isMakeBatchUpdateSpecifyColumn();
+        return isWritable() && getLittleAdjustmentProperties().isMakeBatchUpdateSpecifyColumn();
     }
 
     public boolean isCompatibleSelectByPKWithDeletedCheck() {
