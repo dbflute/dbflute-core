@@ -294,8 +294,7 @@ public class Srl {
         return scopeList.get(0).replaceContentOnBaseString(fromStr, toStr);
     }
 
-    public static String replaceScopeInterspace(String str, String fromStr, String toStr, String beginMark,
-            String endMark) {
+    public static String replaceScopeInterspace(String str, String fromStr, String toStr, String beginMark, String endMark) {
         final List<ScopeInfo> scopeList = extractScopeList(str, beginMark, endMark);
         if (scopeList.isEmpty()) {
             return str;
@@ -408,8 +407,7 @@ public class Srl {
         return doIndexOf(ignoreCase, true, str, delimiters);
     }
 
-    protected static IndexOfInfo doIndexOf(final boolean ignoreCase, final boolean last, final String str,
-            final String... delimiters) {
+    protected static IndexOfInfo doIndexOf(final boolean ignoreCase, final boolean last, final String str, final String... delimiters) {
         final String filteredStr;
         if (ignoreCase) {
             filteredStr = str.toLowerCase();
@@ -713,8 +711,8 @@ public class Srl {
         return doSubstringFirstRear(true, true, true, str, delimiters);
     }
 
-    protected static final String doSubstringFirstRear(final boolean last, final boolean rear,
-            final boolean ignoreCase, final String str, String... delimiters) {
+    protected static final String doSubstringFirstRear(final boolean last, final boolean rear, final boolean ignoreCase, final String str,
+            String... delimiters) {
         assertStringNotNull(str);
         final IndexOfInfo info;
         if (ignoreCase) {
@@ -805,6 +803,36 @@ public class Srl {
         return false;
     }
 
+    public static boolean containsOrderedAll(String str, String... keywords) {
+        return doContainsOrderedAll(false, str, keywords);
+    }
+
+    public static boolean containsOrderedAllIgnoreCase(String str, String... keywords) {
+        return doContainsOrderedAll(true, str, keywords);
+    }
+
+    protected static boolean doContainsOrderedAll(boolean ignoreCase, String str, String... keywords) {
+        assertStringNotNull(str);
+        if (keywords == null || keywords.length == 0) {
+            return false;
+        }
+        if (ignoreCase) {
+            str = str.toLowerCase();
+        }
+        String current = str;
+        for (String keyword : keywords) {
+            if (ignoreCase) {
+                keyword = keyword != null ? keyword.toLowerCase() : null;
+            }
+            if (keyword != null && current.contains(keyword)) {
+                current = substringFirstRear(current, keyword);
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
     // -----------------------------------------------------
     //                                          List Element
     //                                          ------------
@@ -844,8 +872,8 @@ public class Srl {
         return doContainsElement(false, ignoreCase, ListElementContainsType.EQUAL, strList, elements);
     }
 
-    protected static boolean doContainsElement(boolean all, boolean ignoreCase, ListElementContainsType type,
-            Collection<String> strList, String... elements) {
+    protected static boolean doContainsElement(boolean all, boolean ignoreCase, ListElementContainsType type, Collection<String> strList,
+            String... elements) {
         assertStringListNotNull(strList);
         assertElementVaryingNotNull(elements);
         if (elements.length == 0) {
@@ -1102,8 +1130,7 @@ public class Srl {
         return doHasKeyword(false, ignoreCase, KeywordType.CONTAIN, keyword, strs);
     }
 
-    protected static final boolean doHasKeyword(boolean all, boolean ignoreCase, KeywordType type, String keyword,
-            final String... strs) {
+    protected static final boolean doHasKeyword(boolean all, boolean ignoreCase, KeywordType type, String keyword, final String... strs) {
         assertKeywordNotNull(keyword);
         if (strs == null || strs.length == 0) {
             return false;
@@ -1609,8 +1636,8 @@ public class Srl {
         return scopeList != null ? scopeList : new ArrayList<ScopeInfo>();
     }
 
-    protected static final List<ScopeInfo> doExtractScopeList(final String str, final String beginMark,
-            final String endMark, final boolean firstOnly) {
+    protected static final List<ScopeInfo> doExtractScopeList(final String str, final String beginMark, final String endMark,
+            final boolean firstOnly) {
         assertStringNotNull(str);
         assertBeginMarkNotNull(beginMark);
         assertEndMarkNotNull(endMark);
@@ -1699,6 +1726,21 @@ public class Srl {
 
         public boolean isInScope(int index) {
             return index >= _beginIndex && index <= _endIndex;
+        }
+
+        public String replaceContentOnBaseString(String toStr) {
+            final List<ScopeInfo> scopeList = takeScopeList();
+            final StringBuilder sb = new StringBuilder();
+            for (ScopeInfo scope : scopeList) {
+                sb.append(scope.substringInterspaceToPrevious());
+                sb.append(scope.getBeginMark());
+                sb.append(toStr);
+                sb.append(scope.getEndMark());
+                if (scope.getNext() == null) { // last
+                    sb.append(scope.substringInterspaceToNext());
+                }
+            }
+            return sb.toString();
         }
 
         public String replaceContentOnBaseString(String fromStr, String toStr) {
