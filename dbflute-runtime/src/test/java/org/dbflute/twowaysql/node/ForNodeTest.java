@@ -28,14 +28,14 @@ import org.dbflute.twowaysql.exception.ForCommentParameterNullElementException;
 import org.dbflute.twowaysql.exception.LoopCurrentVariableOutOfForCommentException;
 import org.dbflute.twowaysql.factory.NodeAdviceFactory;
 import org.dbflute.twowaysql.pmbean.ParameterBean;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class ForNodeTest extends PlainTestCase {
+public class ForNodeTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                               Basic

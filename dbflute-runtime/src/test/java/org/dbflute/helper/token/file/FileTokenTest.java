@@ -29,13 +29,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dbflute.helper.token.file.exception.FileMakingInvalidValueCountException;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.4 (2009/03/14 Saturday)
  */
-public class FileTokenTest extends PlainTestCase {
+public class FileTokenTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                            Tokenize

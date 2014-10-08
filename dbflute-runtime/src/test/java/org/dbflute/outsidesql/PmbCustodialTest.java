@@ -18,13 +18,13 @@ package org.dbflute.outsidesql;
 import org.dbflute.exception.CharParameterShortSizeException;
 import org.dbflute.outsidesql.PmbCustodial;
 import org.dbflute.outsidesql.PmbCustodial.ShortCharHandlingMode;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.6.1 (2009/11/17 Tuesday)
  */
-public class PmbCustodialTest extends PlainTestCase {
+public class PmbCustodialTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                       Empty to Null

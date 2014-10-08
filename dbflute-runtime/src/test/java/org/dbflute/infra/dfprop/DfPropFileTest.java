@@ -20,12 +20,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class DfPropFileTest extends PlainTestCase {
+public class DfPropFileTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                      Switched Style

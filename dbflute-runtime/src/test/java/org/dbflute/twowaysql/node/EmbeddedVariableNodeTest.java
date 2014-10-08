@@ -21,14 +21,14 @@ import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.exception.EmbeddedVariableCommentContainsBindSymbolException;
 import org.dbflute.twowaysql.exception.EmbeddedVariableCommentInScopeNotListException;
 import org.dbflute.twowaysql.exception.EmbeddedVariableCommentParameterNullValueException;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  * @since 0.9.7.0 (2010/05/29 Saturday)
  */
-public class EmbeddedVariableNodeTest extends PlainTestCase {
+public class EmbeddedVariableNodeTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                               Basic

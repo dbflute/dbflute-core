@@ -24,13 +24,13 @@ import org.dbflute.cbean.paging.PagingInvoker;
 import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.mock.MockColumnInfo;
 import org.dbflute.outsidesql.paging.SimplePagingBean;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.5 (2009/05/27 Wednesday)
  */
-public class PagingInvokerTest extends PlainTestCase {
+public class PagingInvokerTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                      invokePaging()

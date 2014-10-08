@@ -15,12 +15,12 @@
  */
 package org.dbflute.helper.jprop;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class JavaPropertiesReaderTest extends PlainTestCase {
+public class JavaPropertiesReaderTest extends RuntimeTestCase {
 
     public void test_loadConvert() {
         // ## Arrange ##

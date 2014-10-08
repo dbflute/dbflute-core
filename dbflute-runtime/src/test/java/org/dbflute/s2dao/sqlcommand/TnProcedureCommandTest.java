@@ -15,12 +15,12 @@
  */
 package org.dbflute.s2dao.sqlcommand;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class TnProcedureCommandTest extends PlainTestCase {
+public class TnProcedureCommandTest extends RuntimeTestCase {
 
     public void test_doBuildSqlAsCalledBySelect_Basic() throws Exception {
         // ## Arrange ##

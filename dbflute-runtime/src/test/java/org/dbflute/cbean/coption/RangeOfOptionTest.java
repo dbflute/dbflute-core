@@ -16,12 +16,12 @@
 package org.dbflute.cbean.coption;
 
 import org.dbflute.cbean.ckey.ConditionKey;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class RangeOfOptionTest extends PlainTestCase {
+public class RangeOfOptionTest extends RuntimeTestCase {
 
     public void test_ConditionKey_basic() throws Exception {
         // ## Arrange ##

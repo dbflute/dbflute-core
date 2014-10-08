@@ -19,13 +19,13 @@ import org.dbflute.hook.CallbackContext;
 import org.dbflute.hook.SqlLogHandler;
 import org.dbflute.hook.SqlLogInfo;
 import org.dbflute.hook.CallbackContext.CallbackContextHolder;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 1.0.5F (2014/05/05 Monday)
  */
-public class CallbackContextTest extends PlainTestCase {
+public class CallbackContextTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                          Management

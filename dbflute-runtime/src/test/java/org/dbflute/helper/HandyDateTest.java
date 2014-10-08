@@ -25,13 +25,13 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.dbflute.helper.secretary.BusinessDayDeterminer;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
  */
-public class HandyDateTest extends PlainTestCase {
+public class HandyDateTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                            Add Date

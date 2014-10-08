@@ -23,7 +23,7 @@ import java.util.TimeZone;
 import org.dbflute.twowaysql.DisplaySqlBuilder.DateFormatResource;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
@@ -32,7 +32,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.6 (2009/10/27 Tuesday)
  */
-public class DisplaySqlBuilderTest extends PlainTestCase {
+public class DisplaySqlBuilderTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                               Basic

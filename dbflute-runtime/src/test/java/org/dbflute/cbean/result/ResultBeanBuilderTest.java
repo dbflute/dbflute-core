@@ -19,13 +19,13 @@ import org.dbflute.cbean.result.ListResultBean;
 import org.dbflute.cbean.result.ResultBeanBuilder;
 import org.dbflute.mock.MockColumnInfo;
 import org.dbflute.outsidesql.paging.SimplePagingBean;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.5 (2009/05/27 Wednesday)
  */
-public class ResultBeanBuilderTest extends PlainTestCase {
+public class ResultBeanBuilderTest extends RuntimeTestCase {
 
     public void test_buildEmptyListResultBean() {
         // ## Arrange ##

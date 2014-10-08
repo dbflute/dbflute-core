@@ -18,13 +18,13 @@ package org.dbflute.dbway;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.dbway.DBWay;
 import org.dbflute.dbway.WayOfMySQL;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 1.0.5F (2014/05/05 Monday)
  */
-public class DBDefTest extends PlainTestCase {
+public class DBDefTest extends RuntimeTestCase {
 
     public void test_switchDBWay_basic() throws Exception {
         // ## Arrange ##

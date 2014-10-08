@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTraceViewUtil;
 
@@ -31,7 +31,7 @@ import org.dbflute.util.DfTraceViewUtil;
  * @author jflute
  * @since 0.9.5.1 (2009/06/20 Saturday)
  */
-public class StringKeyMapTest extends PlainTestCase {
+public class StringKeyMapTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                               Basic

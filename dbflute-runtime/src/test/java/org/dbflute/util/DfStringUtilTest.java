@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.Srl.DelimiterInfo;
 import org.dbflute.util.Srl.IndexOfInfo;
 import org.dbflute.util.Srl.ScopeInfo;
@@ -30,7 +30,7 @@ import org.dbflute.util.Srl.ScopeInfo;
  * @author jflute
  * @since 0.9.5 (2009/04/10 Friday)
  */
-public class DfStringUtilTest extends PlainTestCase {
+public class DfStringUtilTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                        Null & Empty
@@ -445,6 +445,32 @@ public class DfStringUtilTest extends PlainTestCase {
         assertTrue(containsAnyIgnoreCase("foobar", "Foo", "qux"));
         assertFalse(containsAnyIgnoreCase("foobar", new String[] {}));
         assertTrue(containsAnyIgnoreCase("foobar", null, "foo", null));
+    }
+
+    public void test_containsOrderedAll_basic() {
+        assertTrue(containsOrderedAll("foobar", "foo"));
+        assertTrue(containsOrderedAll("foobar", "foo", "bar"));
+        assertTrue(containsOrderedAll("foobar", "foo", "ba"));
+        assertFalse(containsOrderedAll("foobar", "foo", "Bar"));
+        assertFalse(containsOrderedAll("foobar", "bar", "foo"));
+        assertFalse(containsOrderedAll("foobar", "foo", "ob"));
+        assertFalse(containsOrderedAll("foobar", "foo", "baz"));
+        assertFalse(containsOrderedAll("foobar", "Foo", "qux"));
+        assertFalse(containsOrderedAll("foobar", new String[] {}));
+        assertFalse(containsOrderedAll("foobar", null, "foo", null));
+    }
+
+    public void test_containsOrderedAllIgnoreCase_basic() {
+        assertTrue(containsOrderedAllIgnoreCase("foobar", "foo"));
+        assertTrue(containsOrderedAllIgnoreCase("foobar", "foo", "bar"));
+        assertTrue(containsOrderedAllIgnoreCase("foobar", "foo", "ba"));
+        assertTrue(containsOrderedAllIgnoreCase("foobar", "foo", "Bar"));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", "bar", "foo"));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", "foo", "ob"));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", "foo", "baz"));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", "Foo", "qux"));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", new String[] {}));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", null, "foo", null));
     }
 
     // -----------------------------------------------------
@@ -1169,6 +1195,34 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("get( 99 )", extractScopeFirst("xget( 99 )x", "get(", ")").getScope()); // not trimmed
         assertEquals("get(foo)", extractScopeFirst("get(foo)-get(bar)", "get(", ")").getScope());
         assertEquals("@foo@", extractScopeFirst("@foo@-get@bar@", "@", "@").getScope());
+    }
+
+    public void test_extractScopeFirst_various() {
+        ScopeInfo scope = extractScopeFirst("FOObeginBARendDODO", "begin", "end");
+        log("baseString: " + scope.getBaseString());
+        log("scope: " + scope.getScope());
+        log("content: " + scope.getContent());
+        log("previous: " + scope.getPrevious());
+        log("next: " + scope.getNext());
+        log("substringInterspaceToPrevious(): " + scope.substringInterspaceToPrevious());
+        log("substringInterspaceToNext(): " + scope.substringInterspaceToNext());
+        log("substringScopeToPrevious(): " + scope.substringScopeToPrevious());
+        log("substringScopeToNext(): " + scope.substringScopeToNext());
+        log("replaceContentOnBaseString(): " + scope.replaceContentOnBaseString("SEA"));
+        log("replaceContentOnBaseString(): " + scope.replaceContentOnBaseString("A", "B"));
+        log("replaceInterspaceOnBaseString(): " + scope.replaceInterspaceOnBaseString("O", "R"));
+        assertEquals("FOObeginBARendDODO", scope.getBaseString());
+        assertEquals("beginBARend", scope.getScope());
+        assertEquals("BAR", scope.getContent());
+        assertNull(scope.getPrevious());
+        assertNull(scope.getNext());
+        assertEquals("FOO", scope.substringInterspaceToPrevious());
+        assertEquals("DODO", scope.substringInterspaceToNext());
+        assertEquals("FOObeginBARend", scope.substringScopeToPrevious());
+        assertEquals("beginBARendDODO", scope.substringScopeToNext());
+        assertEquals("FOObeginSEAendDODO", scope.replaceContentOnBaseString("SEA"));
+        assertEquals("FOObeginBBRendDODO", scope.replaceContentOnBaseString("A", "B"));
+        assertEquals("FRRbeginBARendDRDR", scope.replaceInterspaceOnBaseString("O", "R"));
     }
 
     public void test_extractScopeList_basic() {

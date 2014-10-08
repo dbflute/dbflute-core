@@ -27,13 +27,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.6.7 (2010/03/30 Tuesday)
  */
-public class DfReflectionUtilTest extends PlainTestCase {
+public class DfReflectionUtilTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                              Method

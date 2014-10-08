@@ -17,12 +17,12 @@ package org.dbflute.helper.mapstring;
 
 import java.io.ByteArrayInputStream;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class MapListFileTest extends PlainTestCase {
+public class MapListFileTest extends RuntimeTestCase {
 
     public void test_readString_lineComment_removed() throws Exception {
         // ## Arrange ##

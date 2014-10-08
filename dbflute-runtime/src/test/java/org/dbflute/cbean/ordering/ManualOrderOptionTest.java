@@ -22,14 +22,14 @@ import org.dbflute.cbean.chelper.HpManualOrderThemeListHandler;
 import org.dbflute.cbean.chelper.HpMobCaseWhenElement;
 import org.dbflute.cbean.chelper.HpMobConnectionMode;
 import org.dbflute.cbean.ckey.ConditionKey;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
  * @since 0.9.8.2 (2011/04/08 Friday)
  */
-public class ManualOrderOptionTest extends PlainTestCase {
+public class ManualOrderOptionTest extends RuntimeTestCase {
 
     public void test_DateFromTo() throws Exception {
         // ## Arrange ##

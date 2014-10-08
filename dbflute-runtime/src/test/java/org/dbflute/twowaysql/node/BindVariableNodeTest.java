@@ -23,14 +23,14 @@ import org.dbflute.twowaysql.exception.BindVariableCommentInScopeNotListExceptio
 import org.dbflute.twowaysql.exception.BindVariableCommentParameterNullValueException;
 import org.dbflute.twowaysql.exception.InLoopOptionOutOfLoopException;
 import org.dbflute.twowaysql.factory.NodeAdviceFactory;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  * @since 0.9.7.1 (2010/06/05 Saturday)
  */
-public class BindVariableNodeTest extends PlainTestCase {
+public class BindVariableNodeTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                               Basic

@@ -20,13 +20,13 @@ import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.mock.MockEntity;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.optional.OptionalThingExceptionThrower;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 1.0.5F (2014/05/05 Monday)
  */
-public class OptionalEntityTest extends PlainTestCase {
+public class OptionalEntityTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                      Value Handling

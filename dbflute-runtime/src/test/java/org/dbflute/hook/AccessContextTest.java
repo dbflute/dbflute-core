@@ -27,12 +27,12 @@ import org.dbflute.hook.AccessContext.AccessModuleProvider;
 import org.dbflute.hook.AccessContext.AccessProcessProvider;
 import org.dbflute.hook.AccessContext.AccessTimestampProvider;
 import org.dbflute.hook.AccessContext.AccessUserProvider;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class AccessContextTest extends PlainTestCase {
+public class AccessContextTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                             Setting

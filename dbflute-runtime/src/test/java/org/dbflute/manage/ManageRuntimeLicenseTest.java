@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfResourceUtil;
 import org.dbflute.util.Srl;
 
@@ -31,7 +31,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.9.8 (2012/09/14 Friday)
  */
-public class ManageRuntimeLicenseTest extends PlainTestCase {
+public class ManageRuntimeLicenseTest extends RuntimeTestCase {
 
     private static final String COPYRIGHT = "Copyright 2014-2014 the original author or authors.";
 

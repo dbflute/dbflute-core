@@ -41,7 +41,7 @@ import org.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.1.0 (2011/07/24 Sunday)
  */
-public abstract class PlainTestCase extends TestCase {
+public abstract class RuntimeTestCase extends TestCase {
 
     // ===================================================================================
     //                                                                          Definition

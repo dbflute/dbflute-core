@@ -15,13 +15,13 @@
  */
 package org.dbflute.cbean.sqlclause.subquery;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.8.6 (2011/06/24 Friday)
  */
-public class SubQueryIndentProcessorTest extends PlainTestCase {
+public class SubQueryIndentProcessorTest extends RuntimeTestCase {
 
     public void test_moveSubQueryEndToRearOnLastLine_basic() throws Exception {
         // ## Arrange ##

@@ -18,13 +18,13 @@ package org.dbflute.cbean.sqlclause;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.1 (2009/02/08 Sunday)
  */
-public class SqlClauseOracleTest extends PlainTestCase {
+public class SqlClauseOracleTest extends RuntimeTestCase {
 
     public void test_lockForUpdateNoWait() {
         // ## Arrange ##

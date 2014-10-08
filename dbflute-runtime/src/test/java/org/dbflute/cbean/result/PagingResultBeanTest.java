@@ -22,13 +22,13 @@ import java.util.List;
 import org.dbflute.cbean.paging.group.PageGroupBean;
 import org.dbflute.cbean.paging.range.PageRangeBean;
 import org.dbflute.cbean.result.PagingResultBean;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfReflectionUtil;
 
 /**
  * @author jflute
  */
-public class PagingResultBeanTest extends PlainTestCase {
+public class PagingResultBeanTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                      All Page Count

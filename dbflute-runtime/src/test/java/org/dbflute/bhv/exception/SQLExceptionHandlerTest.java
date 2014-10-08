@@ -18,12 +18,12 @@ package org.dbflute.bhv.exception;
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.InternalMapContext.InvokePathProvider;
 import org.dbflute.bhv.exception.SQLExceptionHandler;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class SQLExceptionHandlerTest extends PlainTestCase {
+public class SQLExceptionHandlerTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                 Behavior InvokePath

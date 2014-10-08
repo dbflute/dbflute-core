@@ -15,13 +15,13 @@
  */
 package org.dbflute.dbmeta.name;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.9.1B (2011/10/20 Thursday)
  */
-public class ColumnSqlNameTest extends PlainTestCase {
+public class ColumnSqlNameTest extends RuntimeTestCase {
 
     public void test_hasIrregularChar_basic() throws Exception {
         assertFalse(new ColumnSqlName("MEMBER_ID").hasIrregularChar());
