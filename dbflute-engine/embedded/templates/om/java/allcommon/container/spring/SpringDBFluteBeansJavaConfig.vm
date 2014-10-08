@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.dbflute.bhv.BehaviorSelector;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.bhv.core.InvokerAssistant;
-import org.dbflute.bhv.hook.CommonColumnAutoSetupper;
+import org.dbflute.hook.CommonColumnAutoSetupper;
 import ${database.DBFluteInitializerClass};
 import ${glPackageExtendedBhv}.*;
 
