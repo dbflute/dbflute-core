@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.dbflute</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>1.1-pilot1-SNAPSHOT</version>
+	<version>1.1-pilot4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>DBFlute Runtime</name>

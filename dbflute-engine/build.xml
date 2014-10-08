@@ -6,9 +6,9 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1" />
-	<property name="build.version" value="${version}-pilot3-SNAPSHOT" />
+	<property name="build.version" value="${version}-pilot4-SNAPSHOT" />
 	<property name="runtime.version" value="1.1" />
-	<property name="runtime.build.version" value="${runtime.version}-pilot3-SNAPSHOT" />
+	<property name="runtime.build.version" value="${runtime.version}-pilot4-SNAPSHOT" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
@@ -45,6 +45,9 @@
 	<!-- Test: Active Stage -->
 	<property name="test.active.dockside.dir" value="${test.active.stage.base}/dbflute-test-active-dockside" />
 	<property name="test.active.hanger.dir" value="${test.active.stage.base}/dbflute-test-active-hanger" />
+
+	<!-- Test: Option Stage -->
+	<property name="test.option.compatible10x.dir" value="${test.active.stage.base}/dbflute-test-option-compatible10x" />
 
 	<!-- Database Examples -->
 	<property name="mysql.example.dir" value="${example.database.base}/dbflute-mysql-example" />
@@ -242,17 +245,18 @@
 	</target>
 
 	<!-- ============================================================================= -->
-	<!--                                                        E X A M P L E  T A S K -->
-	<!--                                                        ====================== -->
+	<!--                                                              T E S T  T A S K -->
+	<!--                                                              ================ -->
 
-	<!-- for example projects -->
+	<!-- for test projects -->
 	<target name="prepare-reflection">
 		<delete dir="${extraction.dir}" />
 		<unzip src="${dist}/${module.zip}" dest="${extraction.dir}" />
 		<chmod dir="${extraction.dir}/ant/bin" perm="ugo+rx" includes="**/*" />
 	</target>
 
-	<target name="reflect-to-test-active-dockside" depends="prepare-reflection" description="==> reflect to test active dockside">
+	<target name="reflect-to-test-active-dockside" depends="prepare-reflection"
+			description="==> reflect to test as active dockside">
 		<delete dir="${test.active.dockside.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${test.active.dockside.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
@@ -260,9 +264,19 @@
 		<delete dir="${extraction.dir}" />
 	</target>
 
-	<target name="reflect-to-test-active-hanger" depends="prepare-reflection" description="==> reflect to test active hanger">
+	<target name="reflect-to-test-active-hanger" depends="prepare-reflection"
+			description="==> reflect to test as active hanger">
 		<delete dir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-test-option-compatible10x" depends="prepare-reflection"
+			description="==> reflect to test of option for compatible10x">
+		<delete dir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />
