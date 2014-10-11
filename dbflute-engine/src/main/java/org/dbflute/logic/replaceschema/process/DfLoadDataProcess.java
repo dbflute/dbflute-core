@@ -25,8 +25,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -48,6 +46,8 @@ import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterce
 import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSybase;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -58,7 +58,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfLoadDataProcess.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfLoadDataProcess.class);
 
     protected static final String COMMON_LOAD_TYPE = DfLoadedDataInfo.COMMON_LOAD_TYPE;
     protected static final String FIRSTXLS_FILE_TYPE = DfLoadedDataInfo.FIRSTXLS_FILE_TYPE;

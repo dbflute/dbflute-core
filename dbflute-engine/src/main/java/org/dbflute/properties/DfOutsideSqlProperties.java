@@ -22,8 +22,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.friends.velocity.DfGenerator;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
@@ -31,6 +29,8 @@ import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlLocation;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -42,7 +42,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfOutsideSqlProperties.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfOutsideSqlProperties.class);
 
     // ===================================================================================
     //                                                                         Constructor

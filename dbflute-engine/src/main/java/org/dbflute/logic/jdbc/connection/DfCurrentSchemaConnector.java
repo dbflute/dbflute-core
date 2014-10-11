@@ -19,11 +19,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.system.DBFluteSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -35,7 +35,7 @@ public class DfCurrentSchemaConnector {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfCurrentSchemaConnector.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfCurrentSchemaConnector.class);
 
     // ===================================================================================
     //                                                                           Attribute

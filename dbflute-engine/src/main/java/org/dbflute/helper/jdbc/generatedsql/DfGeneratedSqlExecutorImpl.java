@@ -24,8 +24,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -36,7 +36,7 @@ public class DfGeneratedSqlExecutorImpl implements DfGeneratedSqlExecutor {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static Log _log = LogFactory.getLog(DfGeneratedSqlExecutorImpl.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfGeneratedSqlExecutorImpl.class);
 
     // ===================================================================================
     //                                                                           Attribute

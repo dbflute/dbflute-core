@@ -39,8 +39,6 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.bhv.exception.SQLExceptionAdviser;
 import org.dbflute.dbway.DBDef;
@@ -70,6 +68,8 @@ import org.dbflute.properties.propreader.DfOutsideMapPropReader;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The implementation of xls data handler. And also of writer.
@@ -81,7 +81,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfXlsDataHandlerImpl.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfXlsDataHandlerImpl.class);
 
     // ===================================================================================
     //                                                                           Attribute

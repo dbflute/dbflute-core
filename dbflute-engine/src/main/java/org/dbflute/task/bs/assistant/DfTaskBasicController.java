@@ -17,8 +17,6 @@ package org.dbflute.task.bs.assistant;
 
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfDBFluteTaskCancelledException;
 import org.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
@@ -28,6 +26,8 @@ import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.task.bs.DfAbstractTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -38,7 +38,7 @@ public class DfTaskBasicController {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfAbstractTask.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfAbstractTask.class);
 
     // ===================================================================================
     //                                                                           Attribute

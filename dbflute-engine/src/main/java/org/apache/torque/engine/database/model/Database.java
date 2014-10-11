@@ -139,8 +139,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.apache.velocity.texen.util.FileUtil;
@@ -183,6 +181,8 @@ import org.dbflute.properties.initializer.DfAdditionalUniqueKeyInitializer;
 import org.dbflute.properties.initializer.DfIncludeQueryInitializer;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
 /**
@@ -196,7 +196,7 @@ public class Database {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(Database.class);
+    private static final Logger _log = LoggerFactory.getLogger(Database.class);
 
     // ===================================================================================
     //                                                                           Attribute

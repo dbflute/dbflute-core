@@ -26,14 +26,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.util.DfCollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -43,7 +43,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfUniqueKeyExtractor.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfUniqueKeyExtractor.class);
 
     // ===================================================================================
     //                                                                         Primary Key

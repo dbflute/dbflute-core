@@ -28,8 +28,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
@@ -50,6 +48,8 @@ import org.dbflute.properties.assistant.classification.DfClassificationSqlResour
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The properties for classification.
@@ -60,7 +60,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfClassificationProperties.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfClassificationProperties.class);
     private static final String SQL_MARK = "$sql:";
 
     // ===================================================================================

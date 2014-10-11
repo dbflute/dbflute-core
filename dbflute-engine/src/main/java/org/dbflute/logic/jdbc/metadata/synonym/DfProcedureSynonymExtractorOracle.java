@@ -26,8 +26,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.StringKeyMap;
@@ -38,6 +36,8 @@ import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeTranslatorOracle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -49,7 +49,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfProcedureSynonymExtractorOracle.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfProcedureSynonymExtractorOracle.class);
 
     // ===================================================================================
     //                                                                           Attribute

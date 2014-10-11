@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureCountNotExistsException;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureCountNotZeroException;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureListNotExistsException;
@@ -37,6 +35,8 @@ import org.dbflute.exception.DfTakeFinallyAssertionInvalidMarkException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -48,7 +48,7 @@ public class DfDataAssertProvider {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static Log _log = LogFactory.getLog(DfDataAssertProvider.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfDataAssertProvider.class);
 
     // ===================================================================================
     //                                                                           Attribute

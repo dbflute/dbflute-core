@@ -29,8 +29,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.hook.AccessContext;
 import org.dbflute.unit.markhere.MarkHereManager;
@@ -38,6 +36,8 @@ import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfResourceUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfTypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -49,7 +49,7 @@ public abstract class EngineTestCase extends TestCase {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for sub class. (NotNull) */
-    protected final Log _xlogger = LogFactory.getLog(getClass());
+    protected final Logger _xlogger = LoggerFactory.getLogger(getClass());
 
     // ===================================================================================
     //                                                                           Attribute

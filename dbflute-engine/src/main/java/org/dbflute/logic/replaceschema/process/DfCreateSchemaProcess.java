@@ -28,8 +28,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;
@@ -50,6 +48,8 @@ import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -61,7 +61,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfCreateSchemaProcess.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfCreateSchemaProcess.class);
 
     // ===================================================================================
     //                                                                           Attribute

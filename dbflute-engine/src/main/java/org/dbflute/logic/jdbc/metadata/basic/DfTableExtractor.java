@@ -23,14 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.StringSet;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class generates an XML schema of an existing database from JDBC meta data.
@@ -41,7 +41,7 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfTableExtractor.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfTableExtractor.class);
 
     // ===================================================================================
     //                                                                        Meta Getting

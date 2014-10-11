@@ -24,8 +24,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.dbflute.exception.DfTakeFinallyNonAssertionSqlFoundException;
@@ -51,6 +49,8 @@ import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -62,7 +62,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfTakeFinallyProcess.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfTakeFinallyProcess.class);
 
     // ===================================================================================
     //                                                                           Attribute

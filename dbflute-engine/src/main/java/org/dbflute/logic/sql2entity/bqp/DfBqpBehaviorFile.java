@@ -28,8 +28,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
@@ -37,6 +35,8 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -47,7 +47,7 @@ public class DfBqpBehaviorFile {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfBehaviorQueryPathSetupper.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfBehaviorQueryPathSetupper.class);
 
     // ===================================================================================
     //                                                                           Attribute

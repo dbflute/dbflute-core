@@ -20,15 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
  */
 public class DfDbCommentExtractorOracle extends DfDbCommentExtractorBase {
 
-    private static final Log _log = LogFactory.getLog(DfDbCommentExtractorBase.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfDbCommentExtractorBase.class);
 
     // ===================================================================================
     //                                                                    Select Meta Data

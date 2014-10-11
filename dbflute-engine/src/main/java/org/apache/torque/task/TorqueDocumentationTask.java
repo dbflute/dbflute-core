@@ -127,8 +127,6 @@ package org.apache.torque.task;
  * <http://www.apache.org/>.
  */
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
@@ -143,6 +141,8 @@ import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The DBFlute task generating documentations, SchemaHTML, HistoryHTML and so on.
@@ -154,7 +154,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(TorqueDocumentationTask.class);
+    private static final Logger _log = LoggerFactory.getLogger(TorqueDocumentationTask.class);
 
     // ===================================================================================
     //                                                                           Attribute

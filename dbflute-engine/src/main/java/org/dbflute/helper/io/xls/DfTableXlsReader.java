@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -50,6 +48,8 @@ import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author modified by jflute (originated in Seasar2)
@@ -59,7 +59,7 @@ public class DfTableXlsReader {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfTableXlsReader.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfTableXlsReader.class);
     public static final String LDATA_SHEET_NAME = "df$LARGE_DATA";
     public static final String LDATA_KEY_DELIMITER = "(df:delimiter)";
     public static final String LDATA_QUOTE_BEGIN = "{";

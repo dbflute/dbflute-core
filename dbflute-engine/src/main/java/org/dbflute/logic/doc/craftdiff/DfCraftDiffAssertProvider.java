@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.dbflute.exception.DfCraftDiffTableEqualsParameterNotFound;
@@ -44,6 +42,8 @@ import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -54,7 +54,7 @@ public class DfCraftDiffAssertProvider {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfCraftDiffAssertProvider.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfCraftDiffAssertProvider.class);
     public static final String TABLE_EQUALS_UNIQUE_NAME = "UNIQUE_CODE";
     public static final String TABLE_EQUALS_DATA_NAME = "TARGET_DATA";
 

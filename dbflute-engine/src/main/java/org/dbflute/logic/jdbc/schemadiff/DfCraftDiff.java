@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfCraftDiffIllegalCraftKeyNameException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -37,6 +35,8 @@ import org.dbflute.helper.token.file.FileTokenizingRowResource;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -47,7 +47,7 @@ public class DfCraftDiff extends DfAbstractDiff {
     // ===============================================================================
     //                                                                      Definition
     //                                                                      ==========
-    private static final Log _log = LogFactory.getLog(DfCraftDiff.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfCraftDiff.class);
 
     // ===================================================================================
     //                                                                           Attribute

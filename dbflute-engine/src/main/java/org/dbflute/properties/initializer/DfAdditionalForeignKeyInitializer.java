@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
@@ -36,6 +34,8 @@ import org.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The initializer of additional foreign key.
@@ -47,7 +47,7 @@ public class DfAdditionalForeignKeyInitializer {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfAdditionalForeignKeyInitializer.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfAdditionalForeignKeyInitializer.class);
 
     // ===================================================================================
     //                                                                           Attribute

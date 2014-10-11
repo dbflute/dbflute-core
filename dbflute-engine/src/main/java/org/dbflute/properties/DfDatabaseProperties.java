@@ -25,8 +25,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
@@ -39,6 +37,8 @@ import org.dbflute.properties.assistant.DfConnectionProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -48,7 +48,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfDatabaseProperties.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfDatabaseProperties.class);
     public static final String NO_NAME_SCHEMA = "$$NoNameSchema$$"; // basically for MySQL
 
     // ===================================================================================

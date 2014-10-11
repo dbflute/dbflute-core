@@ -137,8 +137,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.dbflute.DfBuildProperties;
@@ -171,6 +169,8 @@ import org.dbflute.properties.DfSimpleDtoProperties;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
 /**
@@ -181,7 +181,7 @@ public class Table {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(Table.class);
+    private static final Logger _log = LoggerFactory.getLogger(Table.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -4180,7 +4180,7 @@ public class Table {
             // as test cases), so we'll assume that we needn't add an
             // entry to the system name list for these.
         } catch (EngineException nameAlreadyInUse) {
-            _log.error(nameAlreadyInUse, nameAlreadyInUse);
+            _log.error("Failed to do naming: " + _name, nameAlreadyInUse);
         }
     }
 

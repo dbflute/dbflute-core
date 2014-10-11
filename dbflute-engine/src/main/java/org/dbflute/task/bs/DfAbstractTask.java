@@ -19,8 +19,6 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Task;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
@@ -42,6 +40,8 @@ import org.dbflute.task.bs.assistant.DfTaskControlCallback;
 import org.dbflute.task.bs.assistant.DfTaskControlLogic;
 import org.dbflute.task.bs.assistant.DfTaskDatabaseResource;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The abstract task.
@@ -53,7 +53,7 @@ public abstract class DfAbstractTask extends Task {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfAbstractTask.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfAbstractTask.class);
 
     // ===================================================================================
     //                                                                           Attribute

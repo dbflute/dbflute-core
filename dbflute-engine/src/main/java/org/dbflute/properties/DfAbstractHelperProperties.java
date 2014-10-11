@@ -31,8 +31,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
@@ -57,6 +55,8 @@ import org.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -66,7 +66,7 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                                      Definition
     //                                                                      ==========
-    private static final Log _log = LogFactory.getLog(DfAbstractHelperProperties.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfAbstractHelperProperties.class);
 
     // -----------------------------------------------------
     //                                         Default Value

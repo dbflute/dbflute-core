@@ -32,8 +32,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfDelimiterDataColumnDefNotFoundException;
 import org.dbflute.exception.DfDelimiterDataRegistrationFailureException;
@@ -48,6 +46,8 @@ import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataWriter;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -58,7 +58,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfDelimiterDataWriterImpl.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfDelimiterDataWriterImpl.class);
 
     // ===================================================================================
     //                                                                           Attribute

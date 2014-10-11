@@ -21,8 +21,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
@@ -30,6 +28,8 @@ import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -40,7 +40,7 @@ public class DfStructExtractorOracle {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfStructExtractorOracle.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfStructExtractorOracle.class);
 
     // ===================================================================================
     //                                                                           Attribute

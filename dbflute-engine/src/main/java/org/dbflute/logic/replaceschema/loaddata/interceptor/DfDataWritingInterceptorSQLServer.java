@@ -24,13 +24,13 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.dbway.WayOfSQLServer;
 import org.dbflute.helper.StringSet;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -41,7 +41,7 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfDataWritingInterceptorSQLServer.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfDataWritingInterceptorSQLServer.class);
 
     // ===================================================================================
     //                                                                           Attribute

@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfLoadDataRegistrationFailureException;
 import org.dbflute.exception.ParseDateExpressionFailureException;
@@ -44,6 +42,8 @@ import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.DfTypeUtil.ParseDateException;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -54,7 +54,7 @@ public class DfLoadingControlProp {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfLoadingControlProp.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfLoadingControlProp.class);
     public static final String LOADING_CONTROL_MAP_NAME = "loadingControlMap.dataprop";
     public static final String PROP_DATE_ADJUSTMENT_MAP = "dateAdjustmentMap";
     public static final String KEY_ORIGIN_DATE = "df:originDate";

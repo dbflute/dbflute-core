@@ -31,14 +31,14 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.jdbc.DfRunnerInformation;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -49,7 +49,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static Log _log = LogFactory.getLog(DfSqlFileRunnerBase.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfSqlFileRunnerBase.class);
 
     // ===================================================================================
     //                                                                           Attribute

@@ -28,12 +28,12 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.util.DfCollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Super simple facade for JDBC.
@@ -44,7 +44,7 @@ public class DfJdbcFacade {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfJdbcFacade.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfJdbcFacade.class);
 
     // ===================================================================================
     //                                                                           Attribute

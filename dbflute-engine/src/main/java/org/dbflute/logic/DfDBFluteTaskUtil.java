@@ -26,21 +26,20 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfDBFluteTaskCancelledException;
 import org.dbflute.exception.DfDBFluteTaskFailureException;
 import org.dbflute.exception.DfJDBCException;
-import org.dbflute.friends.log4j.DfFlutistEmergencyLog4JLogger;
 import org.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfStringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for DBFlute task.
@@ -52,15 +51,7 @@ public final class DfDBFluteTaskUtil {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log;
-    static {
-        final File emergencyFile = new File("./log/emergency-logging.dfmark");
-        if (emergencyFile.exists()) { // for log4j accident
-            _log = new DfFlutistEmergencyLog4JLogger();
-        } else {
-            _log = LogFactory.getLog(DfDBFluteTaskUtil.class);
-        }
-    }
+    private static final Logger _log = LoggerFactory.getLogger(DfDBFluteTaskUtil.class);
 
     // ===================================================================================
     //                                                             Build-Properties Set up
@@ -111,16 +102,14 @@ public final class DfDBFluteTaskUtil {
                         if (ins != null) {
                             try {
                                 ins.close();
-                            } catch (IOException ignored) {
-                            }
+                            } catch (IOException ignored) {}
                         }
                     }
                 } finally {
                     if (fis != null) {
                         try {
                             fis.close();
-                        } catch (IOException ignored) {
-                        }
+                        } catch (IOException ignored) {}
                     }
                 }
                 final Set<Entry<Object, Object>> entrySet = currentProp.entrySet();

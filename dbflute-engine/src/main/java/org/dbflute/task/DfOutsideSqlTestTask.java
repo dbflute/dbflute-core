@@ -22,8 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.DfOutsideSqlTestFailureFoundException;
 import org.dbflute.exception.SQLFailureException;
@@ -43,6 +41,8 @@ import org.dbflute.task.bs.assistant.DfSpecifiedSqlFile;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -53,7 +53,7 @@ public class DfOutsideSqlTestTask extends DfAbstractTask {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfOutsideSqlTestTask.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfOutsideSqlTestTask.class);
 
     // ===================================================================================
     //                                                                           Attribute

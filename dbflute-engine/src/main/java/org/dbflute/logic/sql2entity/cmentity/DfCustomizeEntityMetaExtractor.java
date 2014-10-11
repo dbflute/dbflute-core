@@ -20,18 +20,18 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DfCustomizeEntityMetaExtractor {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfCustomizeEntityMetaExtractor.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfCustomizeEntityMetaExtractor.class);
 
     public static interface DfForcedJavaNativeProvider {
         String provide(String columnName);

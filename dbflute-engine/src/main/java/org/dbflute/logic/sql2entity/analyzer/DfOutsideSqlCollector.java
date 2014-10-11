@@ -20,13 +20,13 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -38,7 +38,7 @@ public class DfOutsideSqlCollector {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfOutsideSqlCollector.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfOutsideSqlCollector.class);
 
     // ===================================================================================
     //                                                                           Attribute

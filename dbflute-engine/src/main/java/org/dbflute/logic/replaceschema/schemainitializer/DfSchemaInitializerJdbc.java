@@ -27,8 +27,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.StringSet;
@@ -41,6 +39,8 @@ import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The schema initializer with JDBC.
@@ -51,7 +51,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSchemaInitializerJdbc.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfSchemaInitializerJdbc.class);
     protected static final List<String> EMPTY_LIST = DfCollectionUtil.emptyList();
 
     // ===================================================================================

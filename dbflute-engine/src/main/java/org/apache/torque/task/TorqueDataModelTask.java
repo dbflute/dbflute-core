@@ -74,8 +74,6 @@
  */
 package org.apache.torque.task;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
@@ -85,6 +83,8 @@ import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractDbMetaTexenTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The DBFlute task generating classes from schema meta data.
@@ -95,7 +95,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(TorqueDataModelTask.class);
+    private static final Logger _log = LoggerFactory.getLogger(TorqueDataModelTask.class);
 
     // ===================================================================================
     //                                                                           Beginning

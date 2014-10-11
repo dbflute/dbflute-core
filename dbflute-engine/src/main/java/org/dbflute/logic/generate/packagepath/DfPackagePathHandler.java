@@ -17,11 +17,11 @@ package org.dbflute.logic.generate.packagepath;
 
 import java.io.File;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.util.DfStringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -33,7 +33,7 @@ public class DfPackagePathHandler {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(Database.class);
+    private static final Logger _log = LoggerFactory.getLogger(Database.class);
 
     // ===================================================================================
     //                                                                           Attribute

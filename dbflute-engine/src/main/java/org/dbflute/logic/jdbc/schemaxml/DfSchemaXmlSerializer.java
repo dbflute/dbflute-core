@@ -36,8 +36,6 @@ import java.util.TreeMap;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Constraint;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Index;
@@ -105,6 +103,8 @@ import org.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 
@@ -116,7 +116,7 @@ public class DfSchemaXmlSerializer {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSchemaXmlSerializer.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfSchemaXmlSerializer.class);
 
     protected static final PreviousForeignKeyProvider _previousForeignKeyProvider = new PreviousForeignKeyProvider();
     protected static final PreviousUniqueProvider _previousUniqueProvider = new PreviousUniqueProvider();

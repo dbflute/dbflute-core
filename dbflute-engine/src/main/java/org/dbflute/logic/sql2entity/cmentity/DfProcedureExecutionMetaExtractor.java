@@ -26,8 +26,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfJDBCException;
@@ -46,6 +44,8 @@ import org.dbflute.properties.DfTypeMappingProperties;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -56,7 +56,7 @@ public class DfProcedureExecutionMetaExtractor {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfProcedureExecutionMetaExtractor.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfProcedureExecutionMetaExtractor.class);
 
     // ===================================================================================
     //                                                                           Attribute

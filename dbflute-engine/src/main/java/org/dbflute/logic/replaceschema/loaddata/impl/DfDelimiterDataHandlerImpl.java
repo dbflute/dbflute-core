@@ -27,8 +27,6 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
@@ -38,6 +36,8 @@ import org.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfDefaultValueProp;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
 import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -48,7 +48,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfDelimiterDataHandlerImpl.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfDelimiterDataHandlerImpl.class);
 
     // ===================================================================================
     //                                                                           Attribute

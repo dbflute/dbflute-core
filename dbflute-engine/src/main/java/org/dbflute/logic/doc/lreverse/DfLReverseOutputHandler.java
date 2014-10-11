@@ -27,8 +27,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.DfBuildProperties;
@@ -46,6 +44,8 @@ import org.dbflute.helper.token.file.FileMakingRowWriter;
 import org.dbflute.helper.token.file.FileToken;
 import org.dbflute.properties.DfAdditionalTableProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -57,7 +57,7 @@ public class DfLReverseOutputHandler {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfLReverseOutputHandler.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfLReverseOutputHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute

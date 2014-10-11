@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.util.FileUtils;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.process.ProcessResult;
@@ -33,6 +31,8 @@ import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -44,7 +44,7 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfArrangeBeforeRepsProcess.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfArrangeBeforeRepsProcess.class);
 
     // ===================================================================================
     //                                                                             Process

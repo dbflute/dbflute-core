@@ -26,9 +26,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.helper.dataset.DfDataRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author modified by jflute (originated in Seasar2)
@@ -36,7 +36,7 @@ import org.dbflute.helper.dataset.DfDataRow;
  */
 public abstract class DfDtsAbstractRowState implements DfDtsRowState {
 
-    private static final Log _log = LogFactory.getLog(DfDtsAbstractRowState.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfDtsAbstractRowState.class);
 
     DfDtsAbstractRowState() {
     }

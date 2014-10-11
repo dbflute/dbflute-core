@@ -128,9 +128,9 @@ package org.apache.torque.engine.database.model;
  */
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A <code>NameGenerator</code> implementation for table-specific
@@ -141,7 +141,7 @@ import org.apache.torque.engine.EngineException;
 public class ConstraintNameGenerator implements NameGenerator {
 
     /** The logger instance for this class. (NotNull) */
-    private static Log log = LogFactory.getLog(ConstraintNameGenerator.class);
+    private static final Logger _log = LoggerFactory.getLogger(ConstraintNameGenerator.class);
 
     /**
      * First element of <code>inputs</code> should be of type {@link
@@ -164,8 +164,8 @@ public class ConstraintNameGenerator implements NameGenerator {
         final int maxColumnNameLength = 30; // Oracle has the least length.
         final int maxBodyLength = (maxColumnNameLength - namePostfix.length() - constraintNbr.length() - 2);
 
-        if (log.isDebugEnabled()) {
-            log.debug("maxColumnNameLength=" + maxColumnNameLength + " maxBodyLength=" + maxBodyLength);
+        if (_log.isDebugEnabled()) {
+            _log.debug("maxColumnNameLength=" + maxColumnNameLength + " maxBodyLength=" + maxBodyLength);
         }
 
         // Do any necessary trimming.

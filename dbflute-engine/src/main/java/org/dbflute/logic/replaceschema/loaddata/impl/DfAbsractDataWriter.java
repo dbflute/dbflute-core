@@ -35,8 +35,6 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
@@ -64,6 +62,8 @@ import org.dbflute.util.DfTypeUtil.ParseBooleanException;
 import org.dbflute.util.DfTypeUtil.ParseTimeException;
 import org.dbflute.util.DfTypeUtil.ParseTimestampException;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -75,7 +75,7 @@ public abstract class DfAbsractDataWriter {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfAbsractDataWriter.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfAbsractDataWriter.class);
 
     // ===================================================================================
     //                                                                           Attribute

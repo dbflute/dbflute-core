@@ -20,8 +20,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
@@ -35,6 +33,8 @@ import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -46,7 +46,7 @@ public class DfSchemaSyncChecker {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static Log _log = LogFactory.getLog(DfSchemaSyncChecker.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfSchemaSyncChecker.class);
 
     // ===================================================================================
     //                                                                           Attribute

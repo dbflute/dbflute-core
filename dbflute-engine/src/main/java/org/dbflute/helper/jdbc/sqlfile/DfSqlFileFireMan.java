@@ -19,13 +19,13 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.DfAlterCheckAlterScriptSQLException;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
 import org.dbflute.helper.token.line.LineToken;
 import org.dbflute.helper.token.line.LineTokenizingOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -36,7 +36,7 @@ public class DfSqlFileFireMan {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static Log _log = LogFactory.getLog(DfSqlFileFireMan.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfSqlFileFireMan.class);
 
     // ===================================================================================
     //                                                                           Attribute

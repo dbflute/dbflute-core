@@ -22,11 +22,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The schema initializer for Oracle.
@@ -38,7 +38,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSchemaInitializerOracle.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfSchemaInitializerOracle.class);
 
     // ===================================================================================
     //                                                                    Drop Foreign Key

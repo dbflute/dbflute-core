@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.util.FileUtils;
 import org.dbflute.exception.DfAlterCheckAlterScriptSQLException;
 import org.dbflute.exception.DfAlterCheckAlterSqlNotFoundException;
@@ -74,6 +72,8 @@ import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -85,7 +85,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfAlterCheckProcess.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfAlterCheckProcess.class);
 
     // ===================================================================================
     //                                                                           Attribute

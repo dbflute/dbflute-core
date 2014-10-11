@@ -27,8 +27,6 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.dbflute.properties.DfBasicProperties;
@@ -37,6 +35,8 @@ import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -47,7 +47,7 @@ public class DfPmbCommentSetupper {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfPmbCommentSetupper.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfPmbCommentSetupper.class);
 
     // ===================================================================================
     //                                                                           Attribute

@@ -20,8 +20,6 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.dbflute.DfBuildProperties;
@@ -46,6 +44,8 @@ import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -56,7 +56,7 @@ public class DfProcedurePmbSetupper {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DfProcedurePmbSetupper.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfProcedurePmbSetupper.class);
 
     // ===================================================================================
     //                                                                           Attribute
