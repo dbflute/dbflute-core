@@ -21,8 +21,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.exception.OutsideSqlNotFoundException;
@@ -33,6 +31,8 @@ import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfResourceUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The context of outside-SQL.
@@ -41,7 +41,7 @@ import org.dbflute.util.Srl;
 public class OutsideSqlContext {
 
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(OutsideSqlContext.class);
+    private static final Logger _log = LoggerFactory.getLogger(OutsideSqlContext.class);
 
     // ===================================================================================
     //                                                                        Thread Local

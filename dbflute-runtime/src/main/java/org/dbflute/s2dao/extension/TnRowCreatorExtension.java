@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.InternalMapContext;
@@ -45,6 +43,8 @@ import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -55,7 +55,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(TnRowCreatorExtension.class);
+    private static final Logger _log = LoggerFactory.getLogger(TnRowCreatorExtension.class);
 
     /** The key of DBMeta cache. */
     protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";

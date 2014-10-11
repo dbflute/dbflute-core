@@ -21,8 +21,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.dbflute.QLog;
 import org.dbflute.XLog;
 import org.dbflute.bhv.core.context.mapping.MappingDateTimeZoneProvider;
@@ -78,8 +78,8 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(${glDBFluteConfig}.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(${glDBFluteConfig}.class);
 
     /** Singleton instance. */
     private static final ${glDBFluteConfig} _instance = new ${glDBFluteConfig}();

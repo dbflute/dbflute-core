@@ -21,8 +21,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.ResourceContext;
@@ -32,6 +30,8 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author modified by jflute (originated in S2Dao)
@@ -42,7 +42,7 @@ public class TnStatementFactoryImpl implements StatementFactory {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(TnStatementFactoryImpl.class);
+    private static final Logger _log = LoggerFactory.getLogger(TnStatementFactoryImpl.class);
 
     // ===================================================================================
     //                                                                           Attribute

@@ -15,12 +15,12 @@
  */
 package org.dbflute.bhv.core.context;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.Entity;
 import org.dbflute.bhv.readable.EntityRowHandler;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.system.DBFluteSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The context of condition-bean.
@@ -32,7 +32,7 @@ public class ConditionBeanContext {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(ConditionBeanContext.class);
+    private static final Logger _log = LoggerFactory.getLogger(ConditionBeanContext.class);
 
     // ===================================================================================
     //                                                             ConditionBean on Thread

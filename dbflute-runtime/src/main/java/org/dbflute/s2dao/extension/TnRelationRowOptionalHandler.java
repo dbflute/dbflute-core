@@ -17,8 +17,6 @@ package org.dbflute.s2dao.extension;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.cbean.ConditionBean;
@@ -30,6 +28,8 @@ import org.dbflute.optional.OptionalThingExceptionThrower;
 import org.dbflute.optional.RelationOptionalFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -40,7 +40,7 @@ public class TnRelationRowOptionalHandler {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(TnRelationRowOptionalHandler.class);
+    private static final Logger _log = LoggerFactory.getLogger(TnRelationRowOptionalHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute

@@ -20,12 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.InternalMapContext;
-import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.core.context.InternalMapContext.InvokePathProvider;
+import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.EntityAlreadyExistsException;
@@ -33,6 +31,8 @@ import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.system.DBFluteSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -42,7 +42,7 @@ public class SQLExceptionHandler {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(SQLExceptionHandler.class);
+    private static final Logger _log = LoggerFactory.getLogger(SQLExceptionHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute

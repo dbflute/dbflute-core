@@ -23,8 +23,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.XLog;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.exception.SQLExceptionResource;
@@ -36,6 +34,8 @@ import org.dbflute.hook.SqlLogInfo;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author modified by jflute (originated in S2Dao)
@@ -46,7 +46,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(TnAbstractBatchHandler.class);
+    private static final Logger _log = LoggerFactory.getLogger(TnAbstractBatchHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute

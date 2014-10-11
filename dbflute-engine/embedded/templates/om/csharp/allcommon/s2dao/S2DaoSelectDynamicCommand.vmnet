@@ -31,7 +31,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                                      Definition
         //                                                                      ==========
-        /** Log instance. */
+        /** The logger instance for this class. (NotNull) */
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         // ===============================================================================

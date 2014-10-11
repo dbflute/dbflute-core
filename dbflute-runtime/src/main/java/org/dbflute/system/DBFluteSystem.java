@@ -19,10 +19,10 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.system.provider.DfCurrentDateProvider;
 import org.dbflute.system.provider.DfFinalTimeZoneProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -33,7 +33,7 @@ public class DBFluteSystem {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(DBFluteSystem.class);
+    private static final Logger _log = LoggerFactory.getLogger(DBFluteSystem.class);
 
     // ===================================================================================
     //                                                                    Option Attribute

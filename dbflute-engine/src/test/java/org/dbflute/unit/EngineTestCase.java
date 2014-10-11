@@ -41,19 +41,15 @@ import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
- * @since 0.1.0 (2011/07/24 Sunday)
+ * @since 1.1.0 (2014/10/12 Sunday)
  */
 public abstract class EngineTestCase extends TestCase {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance for sub class. (NotNull) */
+    /** The logger instance for sub class. (NotNull) */
     protected final Log _xlogger = LogFactory.getLog(getClass());
-    // UTFlute wants to use logger for caller output
-    // but should remove the dependency to Log4j
-    // (logging through commons-logging gives us fixed caller...)
-    //protected final Logger _xlogger = Logger.getLogger(getClass());
 
     // ===================================================================================
     //                                                                           Attribute

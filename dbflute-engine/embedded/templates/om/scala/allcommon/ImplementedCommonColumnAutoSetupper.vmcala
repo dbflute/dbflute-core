@@ -15,8 +15,8 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.dbflute.Entity;
 import org.dbflute.hook.CommonColumnAutoSetupper;
@@ -30,7 +30,7 @@ class ${glImplementedCommonColumnAutoSetupper} extends CommonColumnAutoSetupper 
     // =====================================================================================
     //                                                                            Definition
     //                                                                            ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private val _log: Log = LogFactory.getLog(classOf[${glImplementedCommonColumnAutoSetupper}]);
 #if ($database.isExistCommonColumnSetupElement())
 

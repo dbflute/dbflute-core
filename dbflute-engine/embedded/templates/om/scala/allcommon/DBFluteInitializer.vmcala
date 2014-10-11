@@ -21,8 +21,8 @@ import org.dbflute.jdbc.DataSourceHandler;
 import org.dbflute.jdbc.DBFluteSystem;
 import org.dbflute.s2dao.extension.TnSqlLogRegistry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ${database.classAuthor}
@@ -36,7 +36,7 @@ class ${glDBFluteInitializer} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private val _log: Log = LogFactory.getLog(classOf[${glDBFluteInitializer}]);
 
     // ===================================================================================

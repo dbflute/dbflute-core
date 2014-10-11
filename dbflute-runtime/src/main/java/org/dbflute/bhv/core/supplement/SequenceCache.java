@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.XLog;
 import org.dbflute.util.DfTypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The handler of sequence cache.
@@ -38,7 +38,7 @@ public class SequenceCache {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance for internal debug. (XLog should be used instead for execute-status log) */
-    private static final Log _log = LogFactory.getLog(SequenceCacheHandler.class);
+    private static final Logger _log = LoggerFactory.getLogger(SequenceCacheHandler.class);
 
     protected static final BigDecimal INITIAL_ADDED_COUNT = BigDecimal.ZERO;
     protected static final BigDecimal DEFAULT_ADD_SIZE = BigDecimal.ONE;

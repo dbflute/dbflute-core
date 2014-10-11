@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbmeta.DBMeta;
@@ -50,6 +48,8 @@ import org.dbflute.s2dao.metadata.impl.TnBeanMetaDataImpl;
 import org.dbflute.s2dao.metadata.impl.TnDBMetaBeanAnnotationReader;
 import org.dbflute.s2dao.metadata.impl.TnRelationPropertyTypeFactoryBuilderImpl;
 import org.dbflute.util.DfTypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The DBFlute extension of factory of bean meta data.
@@ -61,7 +61,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance for internal debug. (XLog should be used instead for execute-status log) */
-    private static final Log _log = LogFactory.getLog(TnBeanMetaDataFactoryExtension.class);
+    private static final Logger _log = LoggerFactory.getLogger(TnBeanMetaDataFactoryExtension.class);
 
     // ===================================================================================
     //                                                                           Attribute

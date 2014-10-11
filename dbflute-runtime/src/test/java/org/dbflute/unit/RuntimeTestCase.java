@@ -28,30 +28,26 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.hook.AccessContext;
 import org.dbflute.unit.markhere.MarkHereManager;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfTypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
- * @since 0.1.0 (2011/07/24 Sunday)
+ * @since 1.1.0 (2014/10/12 Sunday)
  */
 public abstract class RuntimeTestCase extends TestCase {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance for sub class. (NotNull) */
-    protected final Log _xlogger = LogFactory.getLog(getClass());
-    // UTFlute wants to use logger for caller output
-    // but should remove the dependency to Log4j
-    // (logging through commons-logging gives us fixed caller...)
-    //protected final Logger _xlogger = Logger.getLogger(getClass());
+    /** The logger instance for sub class. (NotNull) */
+    protected final Logger _xlogger = LoggerFactory.getLogger(getClass());
 
     // ===================================================================================
     //                                                                           Attribute

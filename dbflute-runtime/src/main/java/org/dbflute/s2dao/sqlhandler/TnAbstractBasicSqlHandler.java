@@ -25,8 +25,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.QLog;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.InternalMapContext;
@@ -55,6 +53,8 @@ import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.DisplaySqlBuilder;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The basic handler to execute SQL. <br />
@@ -68,7 +68,7 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance for internal debug. (QLog should be used instead for query log) */
-    private static final Log _log = LogFactory.getLog(TnAbstractBasicSqlHandler.class);
+    private static final Logger _log = LoggerFactory.getLogger(TnAbstractBasicSqlHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute

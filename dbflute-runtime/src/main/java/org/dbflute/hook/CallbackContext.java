@@ -15,10 +15,10 @@
  */
 package org.dbflute.hook;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.bhv.core.BehaviorCommandHook;
 import org.dbflute.util.DfTypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The context of callback in DBFlute deep logic.
@@ -30,7 +30,7 @@ public class CallbackContext {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(CallbackContext.class);
+    private static final Logger _log = LoggerFactory.getLogger(CallbackContext.class);
 
     // ===================================================================================
     //                                                                        Thread Local

@@ -18,8 +18,8 @@ package org.dbflute.dbway;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The definition of database.
@@ -46,7 +46,7 @@ public enum DBDef {
     // ===================================================================================
     //                                                                    Static Reference
     //                                                                    ================
-    private static final Log _log = LogFactory.getLog(DBDef.class);
+    private static final Logger _log = LoggerFactory.getLogger(DBDef.class);
 
     // -----------------------------------------------------
     //                                            Code Value

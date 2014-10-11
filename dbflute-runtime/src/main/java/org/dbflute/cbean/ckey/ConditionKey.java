@@ -19,8 +19,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
@@ -40,6 +38,8 @@ import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.dbway.ExtensionOperand;
 import org.dbflute.dbway.OnQueryStringConnector;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The abstract class of condition-key.
@@ -54,7 +54,7 @@ public abstract class ConditionKey implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** The logger instance for this class. (NotNull) */
-    private static final Log _log = LogFactory.getLog(ConditionKey.class);
+    private static final Logger _log = LoggerFactory.getLogger(ConditionKey.class);
 
     // ===================================================================================
     //                                                                          Definition

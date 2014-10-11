@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.exception.SpecifyDerivedReferrerUnknownAliasNameException;
 import org.dbflute.exception.UndefinedClassificationCodeException;
@@ -35,6 +33,8 @@ import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The interface of entity.
@@ -386,8 +386,8 @@ public interface Entity {
     //                                                                      ==============
     public static final class FunCustodial {
 
-        /** The instance of logging object for classification meta. */
-        private static final Log _clsMetaLog = LogFactory.getLog(ClassificationMeta.class);
+        /** The instance of logging object for classification meta. (NotNull) */
+        private static final Logger _clsMetaLog = LoggerFactory.getLogger(ClassificationMeta.class);
 
         @SuppressWarnings("unchecked")
         public static <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) {
@@ -457,8 +457,7 @@ public interface Entity {
             return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
         }
 
-        public static void checkClassificationCode(Entity entity, String columnDbName, ClassificationMeta meta,
-                Object code) {
+        public static void checkClassificationCode(Entity entity, String columnDbName, ClassificationMeta meta, Object code) {
             if (code == null) {
                 return;
             }
@@ -472,8 +471,7 @@ public interface Entity {
             handleUndefinedClassificationCode(entity.getTableDbName(), columnDbName, meta, code);
         }
 
-        public static void handleUndefinedClassificationCode(String tableDbName, String columnDbName,
-                ClassificationMeta meta, Object code) {
+        public static void handleUndefinedClassificationCode(String tableDbName, String columnDbName, ClassificationMeta meta, Object code) {
             final ClassificationUndefinedHandlingType undefinedHandlingType = meta.undefinedHandlingType();
             if (ClassificationUndefinedHandlingType.EXCEPTION.equals(undefinedHandlingType)) {
                 throwUndefinedClassificationCodeException(tableDbName, columnDbName, meta, code);
@@ -483,8 +481,8 @@ public interface Entity {
             // else means ALLOWED
         }
 
-        public static void throwUndefinedClassificationCodeException(String tableDbName, String columnDbName,
-                ClassificationMeta meta, Object code) {
+        public static void throwUndefinedClassificationCodeException(String tableDbName, String columnDbName, ClassificationMeta meta,
+                Object code) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Undefined classification code was set to the entity.");
             br.addItem("Advice");
@@ -529,8 +527,8 @@ public interface Entity {
             throw new UndefinedClassificationCodeException(msg);
         }
 
-        public static void showUndefinedClassificationCodeMessage(String tableDbName, String columnDbName,
-                ClassificationMeta meta, Object code) {
+        public static void showUndefinedClassificationCodeMessage(String tableDbName, String columnDbName, ClassificationMeta meta,
+                Object code) {
             if (_clsMetaLog.isInfoEnabled()) {
                 final String classificationName = meta.classificationName();
                 final String exp = tableDbName + "." + columnDbName + "->" + classificationName + "." + code;
