@@ -110,46 +110,6 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
     { throwIICBOE("NotExistsReferrer"); return null; }
 #end
-#if (${col.isInScopeRelationAllowedForeignKey()})
-#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
-    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
-    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
-#end
-#foreach ($referrer in $col.inScopeRelationReferrers)
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-#if (${referrer.isOneToOne()})
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
-#end
-    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
-    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
-#end
-#if (${col.isInScopeRelationAllowedForeignKey()})
-#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
-    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
-    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
-#end
-#foreach ($referrer in $col.inScopeRelationReferrers)
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-#if (${referrer.isOneToOne()})
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
-#end
-    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
-    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
-#end
 #foreach ($referrer in $col.derivedReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
@@ -196,46 +156,6 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
     { throwIICBOE("NotExistsReferrer"); return null; }
 #end
-#if (${col.isInScopeRelationAllowedForeignKey()})
-#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
-    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
-    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
-#end
-#foreach ($referrer in $col.inScopeRelationReferrers)
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-#if (${referrer.isOneToOne()})
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
-#end
-    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
-    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
-#end
-#if (${col.isInScopeRelationAllowedForeignKey()})
-#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
-    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
-    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
-#end
-#foreach ($referrer in $col.inScopeRelationReferrers)
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-#if (${referrer.isOneToOne()})
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
-#end
-    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
-    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
-#end
 #foreach ($referrer in $col.derivedReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
@@ -273,10 +193,6 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if ($table.isAvailableMyselfMyselfExists())
     public String keepMyselfExists(${myConditionQueryClassName} sq)
     { throwIICBOE("MyselfExists"); return null;}
-#end
-#if ($table.isAvailableMyselfMyselfInScope())
-    public String keepMyselfInScope(${myConditionQueryClassName} sq)
-    { throwIICBOE("MyselfInScope"); return null;}
 #end
 #end
 

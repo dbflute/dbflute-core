@@ -30,6 +30,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -57,7 +58,32 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance for sub class. */
-    private final Logger _logger = Logger.getLogger(getClass());
+    private final static Logger _logger = Logger.getLogger(DfTypeUtilTest.class);
+
+    // ===================================================================================
+    //                                                                            Settings
+    //                                                                            ========
+    // // TODO jflute FinalTimeZone test
+    // template for test finalTimeZone
+    //@Override
+    //protected void setUp() throws Exception {
+    //    DBFluteSystem.xunlock();
+    //    DBFluteSystem.xsetFinalTimeZoneProvider(new DfFinalTimeZoneProvider() {
+    //        public TimeZone provide() {
+    //            return TimeZone.getTimeZone("GMT");
+    //        }
+    //    });
+    //    DBFluteSystem.xlock();
+    //    super.setUp();
+    //}
+    //
+    //@Override
+    //protected void tearDown() throws Exception {
+    //    DBFluteSystem.xunlock();
+    //    DBFluteSystem.xsetFinalTimeZoneProvider(null);
+    //    DBFluteSystem.xlock();
+    //    super.tearDown();
+    //}
 
     // ===================================================================================
     //                                                                          Convert To
@@ -145,8 +171,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals(BigInteger.valueOf(-33333), DfTypeUtil.toBigInteger("-33333"));
         assertEquals(BigInteger.valueOf(33333), DfTypeUtil.toBigInteger("33,333"));
         assertEquals(new BigInteger("18446744073709551615"), DfTypeUtil.toBigInteger("18446744073709551615"));
-        assertEquals(new BigInteger("18446744073709551615"),
-                DfTypeUtil.toBigInteger(new BigDecimal("18446744073709551615")));
+        assertEquals(new BigInteger("18446744073709551615"), DfTypeUtil.toBigInteger(new BigDecimal("18446744073709551615")));
         assertEquals(new BigInteger("123456789123456"), DfTypeUtil.toBigInteger("123456789123456"));
         assertEquals(new BigInteger("18446744073709551615"), new BigInteger("18446744073709551615") {
             private static final long serialVersionUID = 1L;
@@ -172,6 +197,26 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         Date pureDate = toDate("2009-12-13 01:23:45.123", gmt9hour);
         LocalDate localDate = DfTypeUtil.toLocalDate(pureDate, gmt9hour);
         assertEquals("2009-12-13", localDate.format(DateTimeFormatter.ISO_DATE));
+    }
+
+    public void test_toLocalDate_illegal() {
+        TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        assertNotNull(DfTypeUtil.toLocalDate("2009-12-13 01:23:45.123", gmt2hour));
+        try {
+            assertNull(DfTypeUtil.toLocalDate("2009-12-13 01:23:45.123", null));
+            fail();
+        } catch (IllegalArgumentException e) {
+            log(e.getMessage());
+        }
+        assertNull(DfTypeUtil.toLocalDate(null, gmt2hour));
+        assertNull(DfTypeUtil.toLocalDate("", gmt2hour));
+        assertNull(DfTypeUtil.toLocalDate(" ", gmt2hour));
+        try {
+            assertNull(DfTypeUtil.toLocalDate("a", gmt2hour));
+            fail();
+        } catch (ParseDateException e) {
+            log(e.getMessage());
+        }
     }
 
     // -----------------------------------------------------
@@ -209,6 +254,36 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals(gmt7hour.getTime(), reversedDate.getTime());
     }
 
+    public void test_toLocalDateTime_illegal() {
+        TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        assertNotNull(DfTypeUtil.toLocalDateTime("2009-12-13 01:23:45.123", gmt2hour));
+        try {
+            assertNull(DfTypeUtil.toLocalDateTime("2009-12-13 01:23:45.123", null));
+            fail();
+        } catch (IllegalArgumentException e) {
+            log(e.getMessage());
+        }
+        assertNull(DfTypeUtil.toLocalDateTime(null, gmt2hour));
+        assertNull(DfTypeUtil.toLocalDateTime("", gmt2hour));
+        assertNull(DfTypeUtil.toLocalDateTime(" ", gmt2hour));
+        try {
+            assertNull(DfTypeUtil.toLocalDateTime("a", gmt2hour));
+            fail();
+        } catch (ParseDateException e) {
+            log(e.getMessage());
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                            Local Time
+    //                                            ----------
+    public void test_toLocalTime_fromUtilDate_timeZone() {
+        TimeZone gmt3Hour = TimeZone.getTimeZone("GMT+3");
+        Date pureDate = toDate("2009-12-13 12:34:56.123", gmt3Hour);
+        LocalTime localDate = DfTypeUtil.toLocalTime(pureDate, gmt3Hour);
+        assertEquals("12:34:56.123", localDate.format(DateTimeFormatter.ISO_TIME));
+    }
+
     // ===================================================================================
     //                                                                          (util)Date
     //                                                                          ==========
@@ -229,7 +304,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     public void test_toDate_subClass() {
         // ## Arrange ##
         DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");
-        Timestamp timestamp = Timestamp.valueOf("2009-12-13 12:34:56.123");
+        Timestamp timestamp = toTimestamp("2009-12-13 12:34:56.123");
 
         // ## Act ##
         Date date = toDate(timestamp);

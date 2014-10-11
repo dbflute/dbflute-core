@@ -15,13 +15,14 @@
  */
 package org.dbflute.helper.secretary;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author jflute
+ * @since 1.1.0 (2014/10/10 Friday)
  */
 @FunctionalInterface
-public interface DateCompareCallback {
+public interface LocalDateTimeCompareCallback {
 
-    boolean isTarget(Date current, Date date);
+    boolean isTarget(LocalDateTime current, LocalDateTime date);
 }

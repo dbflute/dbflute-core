@@ -32,6 +32,8 @@ import org.dbflute.exception.ParseDateExpressionFailureException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.secretary.BusinessDayDeterminer;
 import org.dbflute.helper.secretary.DateCompareCallback;
+import org.dbflute.helper.secretary.LocalDateCompareCallback;
+import org.dbflute.helper.secretary.LocalDateTimeCompareCallback;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.DfTypeUtil.ParseDateException;
@@ -84,6 +86,21 @@ public class HandyDate implements Serializable {
     //                                                                         Constructor
     //                                                                         ===========
     /**
+     * Construct the handy date by the specified local date for the default time-zone.
+     * <pre>
+     * e.g.
+     *  Date adjusted = new HandyDate(localDate).addDay(3).getDate();
+     * </pre>
+     * @param localDate The instance of the local date. (NotNull)
+     */
+    public HandyDate(LocalDate localDate) {
+        assertConstructorArgumentNotNull("localDate", localDate);
+        _cal = createCalendar(null); // means default zone
+        prepareDefaultBeginAttribute();
+        _cal.setTime(DfTypeUtil.toDate(localDate));
+    }
+
+    /**
      * Construct the handy date by the specified local date.
      * <pre>
      * e.g.
@@ -98,6 +115,21 @@ public class HandyDate implements Serializable {
         _cal = createCalendar(timeZone);
         prepareDefaultBeginAttribute();
         _cal.setTime(DfTypeUtil.toDate(localDate, timeZone));
+    }
+
+    /**
+     * Construct the handy date by the specified local date-time for the default time-zone.
+     * <pre>
+     * e.g.
+     *  Date adjusted = new HandyDate(localDateTime, timeZone).addDay(3).getDate();
+     * </pre>
+     * @param localDateTime The instance of the local date-time. (NotNull)
+     */
+    public HandyDate(LocalDateTime localDateTime) {
+        assertConstructorArgumentNotNull("localDateTime", localDateTime);
+        _cal = createCalendar(null); // means default zone
+        prepareDefaultBeginAttribute();
+        _cal.setTime(DfTypeUtil.toDate(localDateTime));
     }
 
     /**
@@ -1134,8 +1166,40 @@ public class HandyDate implements Serializable {
     }
 
     // -----------------------------------------------------
-    //                                          Greater Date
+    //                                          Greater Than
     //                                          ------------
+    /**
+     * Is this date greater than the specified local date?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterThan(2011/11/24): true
+     *  date.isGreaterThan(2011/11/27): false
+     *  date.isGreaterThan(2011/11/28): false
+     * </pre>
+     * @param date The comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterThan(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return isGreaterThanAll(date);
+    }
+
+    /**
+     * Is this date greater than the specified local date-time?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterThan(2011/11/24): true
+     *  date.isGreaterThan(2011/11/27): false
+     *  date.isGreaterThan(2011/11/28): false
+     * </pre>
+     * @param date The comparison target date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterThan(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return isGreaterThanAll(date);
+    }
+
     /**
      * Is this date greater than the specified date?
      * <pre>
@@ -1153,6 +1217,40 @@ public class HandyDate implements Serializable {
     }
 
     /**
+     * Is this date greater than all the specified local dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterThanAll(2011/11/24, 2011/11/26): true
+     *  date.isGreaterThanAll(2011/11/24, 2011/11/27): false
+     *  date.isGreaterThanAll(2011/11/24, 2011/11/28): false
+     *  date.isGreaterThanAll(2011/11/27, 2011/11/29): false
+     *  date.isGreaterThanAll(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterThanAll(LocalDate... dates) {
+        return doCompareAll(createGreaterThanLocalDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date greater than all the specified local date-times?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterThanAll(2011/11/24, 2011/11/26): true
+     *  date.isGreaterThanAll(2011/11/24, 2011/11/27): false
+     *  date.isGreaterThanAll(2011/11/24, 2011/11/28): false
+     *  date.isGreaterThanAll(2011/11/27, 2011/11/29): false
+     *  date.isGreaterThanAll(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target local date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterThanAll(LocalDateTime... dates) {
+        return doCompareAll(createGreaterThanLocalDateTimeCompareCallback(), dates);
+    }
+
+    /**
      * Is this date greater than all the specified dates?
      * <pre>
      * e.g. date: 2011/11/27
@@ -1166,7 +1264,41 @@ public class HandyDate implements Serializable {
      * @return The determination, true or false.
      */
     public boolean isGreaterThanAll(Date... dates) {
-        return doCompareAll(createGreaterThanCompareCallback(), dates);
+        return doCompareAll(createGreaterThanDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date greater than any specified local dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterThanAny(2011/11/24, 2011/11/26): true
+     *  date.isGreaterThanAny(2011/11/24, 2011/11/27): true
+     *  date.isGreaterThanAny(2011/11/24, 2011/11/28): true
+     *  date.isGreaterThanAny(2011/11/27, 2011/11/29): false
+     *  date.isGreaterThanAny(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterThanAny(LocalDate... dates) {
+        return doCompareAny(createGreaterThanLocalDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date greater than any specified local date-times?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterThanAny(2011/11/24, 2011/11/26): true
+     *  date.isGreaterThanAny(2011/11/24, 2011/11/27): true
+     *  date.isGreaterThanAny(2011/11/24, 2011/11/28): true
+     *  date.isGreaterThanAny(2011/11/27, 2011/11/29): false
+     *  date.isGreaterThanAny(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target local date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterThanAny(LocalDateTime... dates) {
+        return doCompareAny(createGreaterThanLocalDateTimeCompareCallback(), dates);
     }
 
     /**
@@ -1183,15 +1315,66 @@ public class HandyDate implements Serializable {
      * @return The determination, true or false.
      */
     public boolean isGreaterThanAny(Date... dates) {
-        return doCompareAny(createGreaterThanCompareCallback(), dates);
+        return doCompareAny(createGreaterThanDateCompareCallback(), dates);
     }
 
-    protected DateCompareCallback createGreaterThanCompareCallback() {
+    protected LocalDateCompareCallback createGreaterThanLocalDateCompareCallback() {
+        return new LocalDateCompareCallback() {
+            public boolean isTarget(LocalDate current, LocalDate date) {
+                return current.isAfter(date);
+            }
+        };
+    }
+
+    protected LocalDateTimeCompareCallback createGreaterThanLocalDateTimeCompareCallback() {
+        return new LocalDateTimeCompareCallback() {
+            public boolean isTarget(LocalDateTime current, LocalDateTime date) {
+                return current.isAfter(date);
+            }
+        };
+    }
+
+    protected DateCompareCallback createGreaterThanDateCompareCallback() {
         return new DateCompareCallback() {
             public boolean isTarget(Date current, Date date) {
                 return current.after(date);
             }
         };
+    }
+
+    // -----------------------------------------------------
+    //                                         Greater Equal
+    //                                         -------------
+    /**
+     * Is this date greater than or equal the specified local date?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterEqual(2011/11/24): true
+     *  date.isGreaterEqual(2011/11/27): true
+     *  date.isGreaterEqual(2011/11/28): false
+     * </pre>
+     * @param date The comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterEqual(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return isGreaterEqualAll(date);
+    }
+
+    /**
+     * Is this date greater than or equal the specified local date-times?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterEqual(2011/11/24): true
+     *  date.isGreaterEqual(2011/11/27): true
+     *  date.isGreaterEqual(2011/11/28): false
+     * </pre>
+     * @param date The comparison target local date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterEqual(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return isGreaterEqualAll(date);
     }
 
     /**
@@ -1211,6 +1394,40 @@ public class HandyDate implements Serializable {
     }
 
     /**
+     * Is this date greater than or equal all the specified local dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterEqualAll(2011/11/24, 2011/11/26): true
+     *  date.isGreaterEqualAll(2011/11/24, 2011/11/27): true
+     *  date.isGreaterEqualAll(2011/11/24, 2011/11/28): false
+     *  date.isGreaterEqualAll(2011/11/27, 2011/11/29): false
+     *  date.isGreaterEqualAll(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterEqualAll(LocalDate... dates) {
+        return doCompareAll(createGreaterEqualLocalDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date greater than or equal all the specified local date-times?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterEqualAll(2011/11/24, 2011/11/26): true
+     *  date.isGreaterEqualAll(2011/11/24, 2011/11/27): true
+     *  date.isGreaterEqualAll(2011/11/24, 2011/11/28): false
+     *  date.isGreaterEqualAll(2011/11/27, 2011/11/29): false
+     *  date.isGreaterEqualAll(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target local date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterEqualAll(LocalDateTime... dates) {
+        return doCompareAll(createGreaterEqualLocalDateTimeCompareCallback(), dates);
+    }
+
+    /**
      * Is this date greater than or equal all the specified dates?
      * <pre>
      * e.g. date: 2011/11/27
@@ -1224,7 +1441,41 @@ public class HandyDate implements Serializable {
      * @return The determination, true or false.
      */
     public boolean isGreaterEqualAll(Date... dates) {
-        return doCompareAll(createGreaterEqualCompareCallback(), dates);
+        return doCompareAll(createGreaterEqualDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date greater than or equal any specified local dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterEqualAny(2011/11/24, 2011/11/26): true
+     *  date.isGreaterEqualAny(2011/11/24, 2011/11/27): true
+     *  date.isGreaterEqualAny(2011/11/24, 2011/11/28): true
+     *  date.isGreaterEqualAny(2011/11/27, 2011/11/29): true
+     *  date.isGreaterEqualAny(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterEqualAny(LocalDate... dates) {
+        return doCompareAny(createGreaterEqualLocalDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date greater than or equal any specified local date-times?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterEqualAny(2011/11/24, 2011/11/26): true
+     *  date.isGreaterEqualAny(2011/11/24, 2011/11/27): true
+     *  date.isGreaterEqualAny(2011/11/24, 2011/11/28): true
+     *  date.isGreaterEqualAny(2011/11/27, 2011/11/29): true
+     *  date.isGreaterEqualAny(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target local date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterEqualAny(LocalDateTime... dates) {
+        return doCompareAny(createGreaterEqualLocalDateTimeCompareCallback(), dates);
     }
 
     /**
@@ -1241,10 +1492,26 @@ public class HandyDate implements Serializable {
      * @return The determination, true or false.
      */
     public boolean isGreaterEqualAny(Date... dates) {
-        return doCompareAny(createGreaterEqualCompareCallback(), dates);
+        return doCompareAny(createGreaterEqualDateCompareCallback(), dates);
     }
 
-    protected DateCompareCallback createGreaterEqualCompareCallback() {
+    protected LocalDateCompareCallback createGreaterEqualLocalDateCompareCallback() {
+        return new LocalDateCompareCallback() {
+            public boolean isTarget(LocalDate current, LocalDate date) {
+                return current.isAfter(date) || current.equals(date);
+            }
+        };
+    }
+
+    protected LocalDateTimeCompareCallback createGreaterEqualLocalDateTimeCompareCallback() {
+        return new LocalDateTimeCompareCallback() {
+            public boolean isTarget(LocalDateTime current, LocalDateTime date) {
+                return current.isAfter(date) || current.equals(date);
+            }
+        };
+    }
+
+    protected DateCompareCallback createGreaterEqualDateCompareCallback() {
         return new DateCompareCallback() {
             public boolean isTarget(Date current, Date date) {
                 return current.after(date) || current.equals(date);
@@ -1253,8 +1520,40 @@ public class HandyDate implements Serializable {
     }
 
     // -----------------------------------------------------
-    //                                             Less Date
+    //                                             Less Than
     //                                             ---------
+    /**
+     * Is this date less than the specified local date?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessThan(2011/11/24): false
+     *  date.isLessThan(2011/11/27): false
+     *  date.isLessThan(2011/11/28): true
+     * </pre>
+     * @param date The comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessThan(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return isLessThanAll(date);
+    }
+
+    /**
+     * Is this date less than the specified local date-time?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessThan(2011/11/24): false
+     *  date.isLessThan(2011/11/27): false
+     *  date.isLessThan(2011/11/28): true
+     * </pre>
+     * @param date The comparison target local date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessThan(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return isLessThanAll(date);
+    }
+
     /**
      * Is this date less than the specified date?
      * <pre>
@@ -1272,6 +1571,40 @@ public class HandyDate implements Serializable {
     }
 
     /**
+     * Is this date less than all the specified local dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessThanAll(2011/11/24, 2011/11/26): false
+     *  date.isLessThanAll(2011/11/24, 2011/11/27): false
+     *  date.isLessThanAll(2011/11/24, 2011/11/28): false
+     *  date.isLessThanAll(2011/11/27, 2011/11/29): false
+     *  date.isLessThanAll(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessThanAll(LocalDate... dates) {
+        return doCompareAll(createLessThanLocalDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date less than all the specified local date-times?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessThanAll(2011/11/24, 2011/11/26): false
+     *  date.isLessThanAll(2011/11/24, 2011/11/27): false
+     *  date.isLessThanAll(2011/11/24, 2011/11/28): false
+     *  date.isLessThanAll(2011/11/27, 2011/11/29): false
+     *  date.isLessThanAll(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target local date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessThanAll(LocalDateTime... dates) {
+        return doCompareAll(createLessThanLocalDateTimeCompareCallback(), dates);
+    }
+
+    /**
      * Is this date less than all the specified dates?
      * <pre>
      * e.g. date: 2011/11/27
@@ -1285,7 +1618,41 @@ public class HandyDate implements Serializable {
      * @return The determination, true or false.
      */
     public boolean isLessThanAll(Date... dates) {
-        return doCompareAll(createLessThanCompareCallback(), dates);
+        return doCompareAll(createLessThanDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date less than any specified local dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessThanAny(2011/11/24, 2011/11/26): false
+     *  date.isLessThanAny(2011/11/24, 2011/11/27): false
+     *  date.isLessThanAny(2011/11/24, 2011/11/28): true
+     *  date.isLessThanAny(2011/11/27, 2011/11/29): true
+     *  date.isLessThanAny(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessThanAny(LocalDate... dates) {
+        return doCompareAny(createLessThanLocalDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date less than any specified local date-times?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessThanAny(2011/11/24, 2011/11/26): false
+     *  date.isLessThanAny(2011/11/24, 2011/11/27): false
+     *  date.isLessThanAny(2011/11/24, 2011/11/28): true
+     *  date.isLessThanAny(2011/11/27, 2011/11/29): true
+     *  date.isLessThanAny(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target local date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessThanAny(LocalDateTime... dates) {
+        return doCompareAny(createLessThanLocalDateTimeCompareCallback(), dates);
     }
 
     /**
@@ -1302,15 +1669,66 @@ public class HandyDate implements Serializable {
      * @return The determination, true or false.
      */
     public boolean isLessThanAny(Date... dates) {
-        return doCompareAny(createLessThanCompareCallback(), dates);
+        return doCompareAny(createLessThanDateCompareCallback(), dates);
     }
 
-    protected DateCompareCallback createLessThanCompareCallback() {
+    protected LocalDateCompareCallback createLessThanLocalDateCompareCallback() {
+        return new LocalDateCompareCallback() {
+            public boolean isTarget(LocalDate current, LocalDate date) {
+                return current.isBefore(date);
+            }
+        };
+    }
+
+    protected LocalDateTimeCompareCallback createLessThanLocalDateTimeCompareCallback() {
+        return new LocalDateTimeCompareCallback() {
+            public boolean isTarget(LocalDateTime current, LocalDateTime date) {
+                return current.isBefore(date);
+            }
+        };
+    }
+
+    protected DateCompareCallback createLessThanDateCompareCallback() {
         return new DateCompareCallback() {
             public boolean isTarget(Date current, Date date) {
                 return current.before(date);
             }
         };
+    }
+
+    // -----------------------------------------------------
+    //                                            Less Equal
+    //                                            ----------
+    /**
+     * Is this date less than or equal the specified local date?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessEqual(2011/11/24): false
+     *  date.isLessEqual(2011/11/27): true
+     *  date.isLessEqual(2011/11/28): true
+     * </pre>
+     * @param date The comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessEqual(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return isLessEqualAll(date);
+    }
+
+    /**
+     * Is this date less than or equal the specified local date-time?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessEqual(2011/11/24): false
+     *  date.isLessEqual(2011/11/27): true
+     *  date.isLessEqual(2011/11/28): true
+     * </pre>
+     * @param date The comparison target local date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessEqual(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return isLessEqualAll(date);
     }
 
     /**
@@ -1330,6 +1748,40 @@ public class HandyDate implements Serializable {
     }
 
     /**
+     * Is this date less than or equal all the specified local dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessEqualAll(2011/11/24, 2011/11/26): false
+     *  date.isLessEqualAll(2011/11/24, 2011/11/27): false
+     *  date.isLessEqualAll(2011/11/24, 2011/11/28): false
+     *  date.isLessEqualAll(2011/11/27, 2011/11/29): true
+     *  date.isLessEqualAll(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessEqualAll(LocalDate... dates) {
+        return doCompareAll(createLessEqualLocalDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date less than or equal all the specified local date-times?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessEqualAll(2011/11/24, 2011/11/26): false
+     *  date.isLessEqualAll(2011/11/24, 2011/11/27): false
+     *  date.isLessEqualAll(2011/11/24, 2011/11/28): false
+     *  date.isLessEqualAll(2011/11/27, 2011/11/29): true
+     *  date.isLessEqualAll(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target local date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessEqualAll(LocalDateTime... dates) {
+        return doCompareAll(createLessEqualLocalDateTimeCompareCallback(), dates);
+    }
+
+    /**
      * Is this date less than or equal all the specified dates?
      * <pre>
      * e.g. date: 2011/11/27
@@ -1343,7 +1795,41 @@ public class HandyDate implements Serializable {
      * @return The determination, true or false.
      */
     public boolean isLessEqualAll(Date... dates) {
-        return doCompareAll(createLessEqualCompareCallback(), dates);
+        return doCompareAll(createLessEqualDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date less than or equal any specified local dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessEqualAny(2011/11/24, 2011/11/26): false
+     *  date.isLessEqualAny(2011/11/24, 2011/11/27): true
+     *  date.isLessEqualAny(2011/11/24, 2011/11/28): true
+     *  date.isLessEqualAny(2011/11/27, 2011/11/29): true
+     *  date.isLessEqualAny(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target local date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessEqualAny(LocalDate... dates) {
+        return doCompareAny(createLessEqualLocalDateCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date less than or equal any specified local date-times?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessEqualAny(2011/11/24, 2011/11/26): false
+     *  date.isLessEqualAny(2011/11/24, 2011/11/27): true
+     *  date.isLessEqualAny(2011/11/24, 2011/11/28): true
+     *  date.isLessEqualAny(2011/11/27, 2011/11/29): true
+     *  date.isLessEqualAny(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target local date-time. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessEqualAny(LocalDateTime... dates) {
+        return doCompareAny(createLessEqualLocalDateTimeCompareCallback(), dates);
     }
 
     /**
@@ -1360,10 +1846,26 @@ public class HandyDate implements Serializable {
      * @return The determination, true or false.
      */
     public boolean isLessEqualAny(Date... dates) {
-        return doCompareAny(createLessEqualCompareCallback(), dates);
+        return doCompareAny(createLessEqualDateCompareCallback(), dates);
     }
 
-    protected DateCompareCallback createLessEqualCompareCallback() {
+    protected LocalDateCompareCallback createLessEqualLocalDateCompareCallback() {
+        return new LocalDateCompareCallback() {
+            public boolean isTarget(LocalDate current, LocalDate date) {
+                return current.isBefore(date) || current.equals(date);
+            }
+        };
+    }
+
+    protected LocalDateTimeCompareCallback createLessEqualLocalDateTimeCompareCallback() {
+        return new LocalDateTimeCompareCallback() {
+            public boolean isTarget(LocalDateTime current, LocalDateTime date) {
+                return current.isBefore(date) || current.equals(date);
+            }
+        };
+    }
+
+    protected DateCompareCallback createLessEqualDateCompareCallback() {
         return new DateCompareCallback() {
             public boolean isTarget(Date current, Date date) {
                 return current.before(date) || current.equals(date);
@@ -1374,6 +1876,28 @@ public class HandyDate implements Serializable {
     // -----------------------------------------------------
     //                                        Compare Helper
     //                                        --------------
+    protected boolean doCompareAll(LocalDateCompareCallback callback, LocalDate... dates) {
+        assertCompareDateArrayValid(dates);
+        final LocalDate current = getLocalDate();
+        for (LocalDate date : dates) {
+            if (!callback.isTarget(current, date)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected boolean doCompareAll(LocalDateTimeCompareCallback callback, LocalDateTime... dates) {
+        assertCompareDateArrayValid(dates);
+        final LocalDateTime current = getLocalDateTime();
+        for (LocalDateTime date : dates) {
+            if (!callback.isTarget(current, date)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected boolean doCompareAll(DateCompareCallback callback, Date... dates) {
         assertCompareDateArrayValid(dates);
         final Date current = getDate();
@@ -1385,6 +1909,28 @@ public class HandyDate implements Serializable {
         return true;
     }
 
+    protected boolean doCompareAny(LocalDateCompareCallback callback, LocalDate... dates) {
+        assertCompareDateArrayValid(dates);
+        final LocalDate current = getLocalDate();
+        for (LocalDate date : dates) {
+            if (callback.isTarget(current, date)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean doCompareAny(LocalDateTimeCompareCallback callback, LocalDateTime... dates) {
+        assertCompareDateArrayValid(dates);
+        final LocalDateTime current = getLocalDateTime();
+        for (LocalDateTime date : dates) {
+            if (callback.isTarget(current, date)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected boolean doCompareAny(DateCompareCallback callback, Date... dates) {
         assertCompareDateArrayValid(dates);
         final Date current = getDate();
@@ -1394,6 +1940,20 @@ public class HandyDate implements Serializable {
             }
         }
         return false;
+    }
+
+    protected void assertCompareDateArrayValid(LocalDate[] dates) {
+        if (dates == null || dates.length == 0) {
+            String msg = "The argument 'dates' should not be null or empty.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertCompareDateArrayValid(LocalDateTime[] dates) {
+        if (dates == null || dates.length == 0) {
+            String msg = "The argument 'dates' should not be null or empty.";
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     protected void assertCompareDateArrayValid(Date[] dates) {
@@ -1417,6 +1977,28 @@ public class HandyDate implements Serializable {
      */
     public boolean isYear(int year) {
         return getYear() == year;
+    }
+
+    /**
+     * Is the year of this date same as the year of the specified local date? <br />
+     * e.g. if 2011/11/27, isYearSameAs(toLocalDate("2011/01/01")) is true
+     * @param date The local date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isYearSameAs(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return getYear() == prepareCompareDate(date).getYear();
+    }
+
+    /**
+     * Is the year of this date same as the year of the specified local date-time? <br />
+     * e.g. if 2011/11/27, isYearSameAs(toLocalDate("2011/01/01")) is true
+     * @param date The local date-time to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isYearSameAs(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return getYear() == prepareCompareDate(date).getYear();
     }
 
     /**
@@ -1483,6 +2065,7 @@ public class HandyDate implements Serializable {
         return getMonth() == month; // zero origin headache
     }
 
+    // TODO jflute HandyDate: isMonthSameAs() for LocalDate
     /**
      * Is the month of this date same as the month of the specified date? <br />
      * e.g. if 2011/11/27, isMonthSameAs(toDate("2013/11/01")) is true
@@ -3084,6 +3667,30 @@ public class HandyDate implements Serializable {
 
     /**
      * Create new instance for copy.
+     * @param date The local date for new instance. (NotNull)
+     * @return The new instance of this date. (NotNull)
+     */
+    protected HandyDate createCopyInstance(LocalDate date) {
+        final HandyDate copy = new HandyDate(date, _cal.getTimeZone());
+        //inheritTimeZone(copy); already inherited
+        inheritBeginAttribute(copy);
+        return copy;
+    }
+
+    /**
+     * Create new instance for copy.
+     * @param date The local date-time for new instance. (NotNull)
+     * @return The new instance of this date. (NotNull)
+     */
+    protected HandyDate createCopyInstance(LocalDateTime date) {
+        final HandyDate copy = new HandyDate(date, _cal.getTimeZone());
+        //inheritTimeZone(copy); already inherited
+        inheritBeginAttribute(copy);
+        return copy;
+    }
+
+    /**
+     * Create new instance for copy.
      * @param date The date for new instance. (NotNull)
      * @return The new instance of this date. (NotNull)
      */
@@ -3106,6 +3713,14 @@ public class HandyDate implements Serializable {
         cloned._monthBeginDay = _monthBeginDay;
         cloned._dayBeginHour = _dayBeginHour;
         cloned._weekBeginDay = _weekBeginDay;
+    }
+
+    protected HandyDate prepareCompareDate(LocalDate date) { // for internal compare logic
+        return createCopyInstance(date);
+    }
+
+    protected HandyDate prepareCompareDate(LocalDateTime date) { // for internal compare logic
+        return createCopyInstance(date);
     }
 
     protected HandyDate prepareCompareDate(Date date) { // for internal compare logic

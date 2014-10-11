@@ -1398,6 +1398,21 @@ public interface SqlClause {
      */
     boolean isCursorSelectByPagingAllowed();
 
+    // [DBFlute-1.1.0]
+    // ===================================================================================
+    //                                                                  ExistsReferrer Way
+    //                                                                  ==================
+    /**
+     * Use in-scope sub-query for exists-referrer. (save-only attribute)
+     */
+    void useInScopeSubQueryForExistsReferrer();
+
+    /**
+     * Does it use in-scope sub-query for exists-referrer?
+     * @return The determination, true or false.
+     */
+    boolean isUseInScopeSubQueryForExistsReferrer();
+
     // [DBFlute-0.9.8.4]
     // ===================================================================================
     //                                                                               DBWay

@@ -350,6 +350,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The list of lazy reflector for clause. (NullAllowed: lazy-load) */
     protected List<ClauseLazyReflector> _clauseLazyReflectorList;
 
+    // -----------------------------------------------------
+    //                                    ExistsReferrer Way
+    //                                    ------------------
+    /** Does it use in-scope sub-query for exists-referrer? (save-only attribute) */
+    protected boolean _useInScopeSubQueryForExistsReferrer;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -3598,6 +3604,24 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                                                 ===================
     public boolean isCursorSelectByPagingAllowed() {
         return false; // not allowed as default (e.g. MySQL overrides this)
+    }
+
+    // [DBFlute-1.1.0]
+    // ===================================================================================
+    //                                                                     Exists Referrer
+    //                                                                     ===============
+    /**
+     * {@inheritDoc}
+     */
+    public void useInScopeSubQueryForExistsReferrer() {
+        _useInScopeSubQueryForExistsReferrer = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isUseInScopeSubQueryForExistsReferrer() {
+        return _useInScopeSubQueryForExistsReferrer;
     }
 
     // ===================================================================================

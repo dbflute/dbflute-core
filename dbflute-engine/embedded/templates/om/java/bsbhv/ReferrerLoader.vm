@@ -86,19 +86,20 @@ public class ${myClassName} {
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($referrerLoaderClassName = "${referrer.referrerTableExtendedReferrerLoaderClassName}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($loadMethodReturn = "void")
 #if ($referrer.table.hasReferrerLoader())
 #set ($loadMethodReturn = "NestedReferrerLoaderGateway<${referrerLoaderClassName}>")
 #end
-    protected List<${referrerEntityClassName}> _referrer${referrer.referrerPropertyNameInitCap};
-    public ${loadMethodReturn} load${referrer.referrerPropertyNameInitCap}(${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> refCBLambda) {
-        myBhv().load${referrer.referrerPropertyNameInitCap}(_selectedList, refCBLambda).withNestedReferrer(new ReferrerListHandler<${referrerEntityClassName}>() {
-            public void handle(List<${referrerEntityClassName}> referrerList) { _referrer${referrer.referrerPropertyNameInitCap} = referrerList; }
+    protected List<${referrerEntityClassName}> _referrer${relationMethodIdentityName};
+    public ${loadMethodReturn} load${relationMethodIdentityName}(${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> refCBLambda) {
+        myBhv().load${relationMethodIdentityName}(_selectedList, refCBLambda).withNestedReferrer(new ReferrerListHandler<${referrerEntityClassName}>() {
+            public void handle(List<${referrerEntityClassName}> referrerList) { _referrer${relationMethodIdentityName} = referrerList; }
         });
 #if ($referrer.table.hasReferrerLoader())
         return new NestedReferrerLoaderGateway<${referrerLoaderClassName}>() {
             public void withNestedReferrer(ReferrerLoaderHandler<${referrerLoaderClassName}> handler) {
-                handler.handle(new ${referrerLoaderClassName}().ready(_referrer${referrer.referrerPropertyNameInitCap}, _selector));
+                handler.handle(new ${referrerLoaderClassName}().ready(_referrer${relationMethodIdentityName}, _selector));
             }
         };
 #end

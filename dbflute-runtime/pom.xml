@@ -9,14 +9,14 @@
 
 	<name>DBFlute Runtime</name>
 	<description>The runtime library of DBFlute</description>
+	<url>https://github.com/dbflute</url>
+	<inceptionYear>2014</inceptionYear>
 
 	<properties>
 		<commons.logging.version>1.1.1</commons.logging.version>
 		<junit.version>4.8.2</junit.version>
 	</properties>
 
-	<url>http://dbflute.seasar.org/</url>
-	<inceptionYear>2006</inceptionYear>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -37,12 +37,12 @@
 	</developers>
 
 	<issueManagement>
-		<system>JIRA</system>
-		<url>https://www.seasar.org/issues/browse/DBFLUTE</url>
+		<system>Github</system>
+		<url>https://github.com/dbflute-test/dbflute-test-option-compatible10x/issues</url>
 	</issueManagement>
 	<mailingLists>
 		<mailingList>
-			<name>dbflute-user</name>
+			<name>DBFlute-users</name>
 			<subscribe>https://groups.google.com/forum/#!forum/dbflute</subscribe>
 			<unsubscribe>https://groups.google.com/forum/#!forum/dbflute</unsubscribe>
 			<post>dbflute@googlegroups.com</post>
@@ -51,9 +51,9 @@
 	</mailingLists>
 
 	<scm>
-		<url>https://github.com/seasarorg/dbflute</url>
-		<connection>scm:git:https://github.com/seasarorg/dbflute.git</connection>
-		<developerConnection>scm:git:https://github.com/seasarorg/dbflute.git</developerConnection>
+		<url>https://github.com/dbflute</url>
+		<connection>scm:git:https://github.com/dbflute/dbflute-core.git</connection>
+		<developerConnection>scm:git:https://github.com/dbflute/dbflute-core.git</developerConnection>
 	</scm>
 
 	<build>

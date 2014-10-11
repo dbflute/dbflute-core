@@ -656,6 +656,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #foreach ($referrer in $table.derivedReferrerReferrers)
 #set ($tmpPropertyName = "${referrer.referrerPropertyName}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($tmpMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($tmpEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
@@ -664,7 +665,7 @@ public class ${myClassName} extends AbstractConditionBean {
          * {select max(FOO) from ${referrer.table.tableDbName} where ...) as FOO_MAX} <br />
          * ${referrer.referrerDispForJavaDocNest}
          * <pre>
-         * cb.specify().<span style="color: #DD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {
+         * cb.specify().<span style="color: #DD4747">derived${tmpMethodIdentityName}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {
          *     public void query(${tmpCBClassName} subCB) {
          *         subCB.specify().<span style="color: #DD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
          *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
@@ -673,7 +674,7 @@ public class ${myClassName} extends AbstractConditionBean {
          * </pre>
          * @return The object to set up a function for referrer table. (NotNull)
          */
-        public HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> derived${tmpPropertyNameInitCap}() {
+        public HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> derived${tmpMethodIdentityName}() {
             assertDerived("${tmpPropertyName}"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
             return new HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _qyCall.qy(), new HpSDRSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() {
                 public void setup(String fn, SubQuery<${tmpCBClassName}> sq, ${tmpLocalCQClassName} cq, String al, DerivedReferrerOption op) {

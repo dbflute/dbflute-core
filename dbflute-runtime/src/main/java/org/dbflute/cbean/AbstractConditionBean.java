@@ -211,8 +211,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         final String foreignTableAliasName = callback.qf().xgetAliasName();
         final String localRelationPath = localCQ().xgetRelationPath();
         final String foreignRelationPath = callback.qf().xgetRelationPath();
-        getSqlClause().registerSelectedRelation(foreignTableAliasName, getTableDbName(), foreignPropertyName,
-                localRelationPath, foreignRelationPath);
+        getSqlClause().registerSelectedRelation(foreignTableAliasName, getTableDbName(), foreignPropertyName, localRelationPath,
+                foreignRelationPath);
     }
 
     protected static interface SsCall {
@@ -298,8 +298,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                        Column Query
     //                                                                        ============
-    protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
-            SpecifyQuery<CB> rightSp, final String operand) {
+    protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp, SpecifyQuery<CB> rightSp,
+            final String operand) {
         assertQueryPurpose();
 
         final HpCalcSpecification<CB> leftCalcSp = xcreateCalcSpecification(leftSp);
@@ -323,8 +323,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return new HpColQyOperand<CB>(handler);
     }
 
-    protected <CB extends ConditionBean> HpColQyOperand.HpExtendedColQyOperandMySql<CB> xcreateColQyOperandMySql(
-            HpColQyHandler<CB> handler) {
+    protected <CB extends ConditionBean> HpColQyOperand.HpExtendedColQyOperandMySql<CB> xcreateColQyOperandMySql(HpColQyHandler<CB> handler) {
         return new HpColQyOperand.HpExtendedColQyOperandMySql<CB>(handler);
     }
 
@@ -341,8 +340,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return xbuildColQyColumn(rightCB, realName.toString(), "right");
     }
 
-    protected <CB extends ConditionBean> ColumnRealName xextractColQyColumnRealName(CB cb,
-            HpCalcSpecification<CB> calcSp) {
+    protected <CB extends ConditionBean> ColumnRealName xextractColQyColumnRealName(CB cb, HpCalcSpecification<CB> calcSp) {
         final Object mysticBinding = cb.xgetMysticBinding();
         if (mysticBinding != null) {
             calcSp.setMysticBindingSnapshot(mysticBinding);
@@ -351,14 +349,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return xdoExtractColQyColumnSpecifiedColumn(calcSp);
     }
 
-    protected <CB extends ConditionBean> ColumnRealName xdoExtractColQyColumnMysticBinding(CB cb,
-            final Object mysticBinding) {
+    protected <CB extends ConditionBean> ColumnRealName xdoExtractColQyColumnMysticBinding(CB cb, final Object mysticBinding) {
         final String exp = cb.getSqlClause().registerFreeParameterToThemeList("mystic", mysticBinding);
         return ColumnRealName.create(null, new ColumnSqlName(exp));
     }
 
-    protected <CB extends ConditionBean> ColumnRealName xdoExtractColQyColumnSpecifiedColumn(
-            HpCalcSpecification<CB> calcSp) {
+    protected <CB extends ConditionBean> ColumnRealName xdoExtractColQyColumnSpecifiedColumn(HpCalcSpecification<CB> calcSp) {
         final ColumnRealName realName = calcSp.getResolvedSpecifiedColumnRealName();
         if (realName == null) {
             createCBExThrower().throwColumnQueryInvalidColumnSpecificationException(this);
@@ -450,8 +446,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return SubQueryIndentProcessor.moveSubQueryEndToRear(columnExp + inserted);
     }
 
-    protected <CB extends ConditionBean> void xregisterColQyClause(QueryClause queryClause,
-            final HpCalcSpecification<CB> leftCalcSp, final HpCalcSpecification<CB> rightCalcSp) {
+    protected <CB extends ConditionBean> void xregisterColQyClause(QueryClause queryClause, final HpCalcSpecification<CB> leftCalcSp,
+            final HpCalcSpecification<CB> rightCalcSp) {
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
         // may null-revived -> no way to be inner-join
         // (DerivedReferrer or conversion's coalesce)
@@ -1642,6 +1638,30 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     public Object xconvertToDerivedMapValue(HpDerivingSubQueryInfo derivingInfo, Object value) {
         return value; // no convert as default
+    }
+
+    // [DBFlute-1.1.0]
+    // ===================================================================================
+    //                                                                  ExistsReferrer Way
+    //                                                                  ==================
+    /**
+     * Use in-scope sub-query for exists-referrer, basically for performance tuning. <br />
+     * The exists-referrer uses plain sub-query way instead of correlation way. <br />
+     * <pre>
+     * cb.query().existsPurchase(purchaseCB -&gt; {
+     *     purchaseCB.<span style="color: #DD4747">useInScopeSubQuery()</span>;
+     *     purchaseCB.query().set...
+     *     purchaseCB.query().set...
+     * });
+     * </pre>
+     */
+    public void useInScopeSubQuery() {
+        final HpCBPurpose purpose = getPurpose();
+        if (!purpose.isAny(HpCBPurpose.EXISTS_REFERRER, HpCBPurpose.MYSELF_EXISTS)) {
+            String msg = "The method 'useInScopeSubQuery()' can be called only when ExistsReferrer.";
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        getSqlClause().useInScopeSubQueryForExistsReferrer();
     }
 
     // [DBFlute-0.7.4]

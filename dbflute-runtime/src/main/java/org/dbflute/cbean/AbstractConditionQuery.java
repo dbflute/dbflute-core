@@ -1181,6 +1181,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerExistsReferrer(final ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName, String referrerPropertyName, boolean notExists) {
         assertSubQueryNotNull("ExistsReferrer", relatedColumnDbName, subQuery);
+        if (subQuery.xgetSqlClause().isUseInScopeSubQueryForExistsReferrer()) {
+            registerInScopeRelation(subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, notExists);
+            return;
+        }
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
         final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
@@ -1261,18 +1265,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                     InScopeRelation
     //                                                                     ===============
     // {Modified at DBFlute-0.7.5}
-    protected void registerInScopeRelation(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName, String propertyName,
-            String relationPropertyName) {
-        registerInScopeRelation(subQuery, columnDbName, relatedColumnDbName, propertyName, relationPropertyName, null);
-    }
-
-    protected void registerNotInScopeRelation(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
-            String propertyName, String relationPropertyName) {
-        registerInScopeRelation(subQuery, columnDbName, relatedColumnDbName, propertyName, relationPropertyName, "not");
-    }
-
     protected void registerInScopeRelation(final ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
-            String propertyName, String relationPropertyName, String inScopeOption) {
+            String propertyName, String relationPropertyName, boolean notInScope) {
         assertSubQueryNotNull("InScopeRelation", columnDbName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
@@ -1291,6 +1285,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 new InScopeRelation(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
                         subQueryIdentity, subQueryDBMeta, cipherManager, suppressLocalAliasName);
         final String correlatedFixedCondition = xbuildForeignCorrelatedFixedCondition(subQuery, relationPropertyName);
+        final String inScopeOption = notInScope ? "not" : null;
         final String clause =
                 inScopeRelation.buildInScopeRelation(columnDbName, relatedColumnDbName, correlatedFixedCondition, inScopeOption);
         registerWhereClause(clause);
@@ -1525,6 +1520,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                        MyselfExists
     //                                                                        ============
     protected void registerMyselfExists(ConditionQuery subQuery, String subQueryPropertyName) {
+        if (subQuery.xgetSqlClause().isUseInScopeSubQueryForExistsReferrer()) {
+            registerMyselfInScope(subQuery, subQueryPropertyName);
+            return;
+        }
         final String relatedColumnDbName;
         {
             subQuery.xgetSqlClause().getSpecifiedColumnInfoAsOne();
@@ -1557,7 +1556,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 relatedColumnDbName = primaryColumnInfo.getColumnDbName();
             }
         }
-        registerInScopeRelation(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName, null);
+        registerInScopeRelation(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName, null, false);
     }
 
     // ===================================================================================

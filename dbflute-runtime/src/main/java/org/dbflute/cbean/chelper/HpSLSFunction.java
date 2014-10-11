@@ -176,6 +176,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     }
 
     protected RESULT doMax(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+        // TODO jflute OptionalThing
         assertScalarQuery(scalarQuery);
         return exec(scalarQuery, SelectClauseType.MAX, option);
     }

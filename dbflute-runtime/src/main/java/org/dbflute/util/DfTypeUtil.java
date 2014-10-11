@@ -72,10 +72,9 @@ public final class DfTypeUtil {
         // *the value of millisecond may depend on JDK implementation
     }
 
-    private static final char[] ENCODE_TABLE = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-            'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-            'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
-            '4', '5', '6', '7', '8', '9', '+', '/' };
+    private static final char[] ENCODE_TABLE = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+            'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/' };
 
     private static final char PAD = '=';
 
@@ -165,8 +164,7 @@ public final class DfTypeUtil {
             if (sw != null) {
                 try {
                     sw.close();
-                } catch (IOException e) {
-                }
+                } catch (IOException e) {}
             }
         }
     }
@@ -759,17 +757,20 @@ public final class DfTypeUtil {
     // TODO jflute toLocalDate() javadoc
     public static LocalDate toLocalDate(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalDate()", timeZone);
-        return obj != null ? toZonedDateTime(toZonedResourceDate(obj, timeZone), timeZone).toLocalDate() : null;
+        final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);
+        return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, timeZone).toLocalDate() : null;
     }
 
     public static LocalDateTime toLocalDateTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalDateTime()", timeZone);
-        return obj != null ? toZonedDateTime(toZonedResourceDate(obj, timeZone), timeZone).toLocalDateTime() : null;
+        final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);
+        return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, timeZone).toLocalDateTime() : null;
     }
 
     public static LocalTime toLocalTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalTime()", timeZone);
-        return obj != null ? toZonedDateTime(toZonedResourceDate(obj, timeZone), timeZone).toLocalTime() : null;
+        final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);
+        return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, timeZone).toLocalTime() : null;
     }
 
     public static ZonedDateTime toZonedDateTime(Object obj, TimeZone timeZone) {
@@ -777,8 +778,12 @@ public final class DfTypeUtil {
         if (obj == null) {
             return null;
         }
+        final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);
+        if (zonedResourceDate == null) {
+            return null;
+        }
         final ZoneId zoneId = ZoneId.of(timeZone.getID());
-        return ZonedDateTime.ofInstant(toZonedResourceDate(obj, timeZone).toInstant(), zoneId);
+        return ZonedDateTime.ofInstant(zonedResourceDate.toInstant(), zoneId);
     }
 
     protected static Date toZonedResourceDate(Object obj, TimeZone timeZone) {
@@ -1166,7 +1171,8 @@ public final class DfTypeUtil {
         if (localDateTime == null) {
             return null;
         }
-        final ZoneId zoneId = timeZone != null ? ZoneId.of(timeZone.getID()) : ZoneId.systemDefault();
+        final TimeZone realZone = chooseRealZone(timeZone);
+        final ZoneId zoneId = timeZone != null ? ZoneId.of(realZone.getID()) : ZoneId.systemDefault();
         return Date.from(localDateTime.toInstant(zoneId.getRules().getOffset(localDateTime)));
     }
 
@@ -1182,7 +1188,8 @@ public final class DfTypeUtil {
         if (localDateTime == null) {
             return null;
         }
-        final ZoneId zoneId = timeZone != null ? ZoneId.of(timeZone.getID()) : ZoneId.systemDefault();
+        final TimeZone realZone = chooseRealZone(timeZone);
+        final ZoneId zoneId = timeZone != null ? ZoneId.of(realZone.getID()) : ZoneId.systemDefault();
         return Timestamp.from(localDateTime.toInstant(zoneId.getRules().getOffset(localDateTime)));
     }
 

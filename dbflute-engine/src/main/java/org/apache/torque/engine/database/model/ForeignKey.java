@@ -365,8 +365,7 @@ public class ForeignKey implements Constraint {
             }
             if (name.trim().length() > 0) { // means multiple FK columns exist
                 final String localTableDbName = getTable().getTableDbName();
-                final String aliasName =
-                        getMultipleFKPropertyColumnAliasName(localTableDbName, multipleFKColumnNameList);
+                final String aliasName = getMultipleFKPropertyColumnAliasName(localTableDbName, multipleFKColumnNameList);
                 if (aliasName != null && aliasName.trim().length() > 0) { // my young code
                     final String firstUpper = aliasName.substring(0, 1).toUpperCase();
                     if (aliasName.trim().length() == 1) {
@@ -529,30 +528,37 @@ public class ForeignKey implements Constraint {
     //                                                 Basic
     //                                                 -----
     public String getReferrerPropertyName() {
-        return getReferrerPropertyName(false);
+        return getReferrerPropertyName(false, getReferrerPropertyListSuffix());
     }
 
     public String getReferrerJavaBeansRulePropertyName() {
-        return getReferrerPropertyName(true);
+        return getReferrerPropertyName(true, getReferrerPropertyListSuffix());
     }
 
     public String getReferrerJavaBeansRulePropertyNameInitCap() {
-        final String referrerPropertyName = getReferrerPropertyName(true);
-        return initCap(referrerPropertyName);
+        return initCap(getReferrerPropertyName(true, getReferrerPropertyListSuffix()));
     }
 
-    public String getReferrerPropertyName(boolean isJavaBeansRule) {
+    public String getReferrerConditionMethodIdentityName() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final boolean hasListSufix = prop.isCompatibleReferrerCBMethodIdentityNameListSuffix();
+        final String suffix = hasListSufix ? "List" : "";
+        return initCap(getReferrerPropertyName(true, suffix));
+    }
+
+    protected String getReferrerPropertyListSuffix() {
+        return "List";
+    }
+
+    protected String getReferrerPropertyName(boolean isJavaBeansRule, String listSuffix) {
         final List<Column> localColumnList = getLocalColumnList();
-
         final List<String> columnNameList = new ArrayList<String>();
-
         String name = "";
         if (hasFixedSuffix()) {
             name = getFixedSuffix();
         } else {
             for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
                 final Column col = (Column) ite.next();
-
                 if (col.isMultipleFK()) {
                     columnNameList.add(col.getName());
                     name = name + col.getJavaName();
@@ -577,12 +583,15 @@ public class ForeignKey implements Constraint {
             name = name + "Self";
         }
         if (isJavaBeansRule) {
-            return getTable().getJavaBeansRulePropertyName() + name + "List";
+            return getTable().getJavaBeansRulePropertyName() + name + listSuffix;
         } else {
-            return getTable().getUncapitalisedJavaName() + name + "List";
+            return getTable().getUncapitalisedJavaName() + name + listSuffix;
         }
     }
 
+    // -----------------------------------------------------
+    //                                                as One
+    //                                                ------
     public String getReferrerPropertyNameAsOne() {
         return getReferrerPropertyNameAsOne(false);
     }
@@ -652,6 +661,10 @@ public class ForeignKey implements Constraint {
     //                                     -----------------
     public String getReferrerLambdaShortName() {
         return getTable().getLambdaShortName();
+    }
+
+    public String getReferrerLambdaExampleCBName() {
+        return getTable().getLambdaShortName() + "CB";
     }
 
     public String getReferrerLambdaSubQueryCBName() {
@@ -1317,8 +1330,8 @@ public class ForeignKey implements Constraint {
         return null; // unreachable
     }
 
-    protected String doExtractFixedConditionEmbeddedCommentClassificationNormalCode(
-            DfClassificationTop classificationTop, String elementName) {
+    protected String doExtractFixedConditionEmbeddedCommentClassificationNormalCode(DfClassificationTop classificationTop,
+            String elementName) {
         final String codeType = classificationTop.getCodeType();
         final List<DfClassificationElement> elementList = classificationTop.getClassificationElementList();
         String code = null;
@@ -1332,8 +1345,7 @@ public class ForeignKey implements Constraint {
         return code;
     }
 
-    protected String doExtractFixedConditionEmbeddedCommentClassificationGroupCode(
-            DfClassificationTop classificationTop, String elementName) {
+    protected String doExtractFixedConditionEmbeddedCommentClassificationGroupCode(DfClassificationTop classificationTop, String elementName) {
         String code = null;
         final String codeType = classificationTop.getCodeType();
         final List<DfClassificationGroup> groupList = classificationTop.getGroupList();
@@ -1375,8 +1387,8 @@ public class ForeignKey implements Constraint {
         throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
     }
 
-    protected void throwFixedConditionEmbeddedCommentClassificationElementNotFoundException(
-            DfClassificationTop classificationTop, String elementName) {
+    protected void throwFixedConditionEmbeddedCommentClassificationElementNotFoundException(DfClassificationTop classificationTop,
+            String elementName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the classification element in fixed condition.");
         br.addItem("Foreign Key");

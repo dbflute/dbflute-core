@@ -720,16 +720,15 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
 #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
+#set ($referrerMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
     /**
      * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br />
      * ${referrer.referrerDispForJavaDoc}
      * <pre>
-     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ${table.loadReferrerConditionSetupperName}&lt;${referrerCBClassName}&gt;() {
-     *     public void setup(${referrerCBClassName} cb) {
-     *         cb.setupSelect...();
-     *         cb.query().setFoo...(value);
-     *         cb.query().addOrderBy_Bar...();
-     *     }
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">load${referrerMethodIdentityName}</span>(${myEntityListVariableName}, ${referrer.referrerLambdaExampleCBName} -&gt; {
+     *     ${referrer.referrerLambdaExampleCBName}.setupSelect...();
+     *     ${referrer.referrerLambdaExampleCBName}.query().setFoo...(value);
+     *     ${referrer.referrerLambdaExampleCBName}.query().addOrderBy_Bar...();
      * }); <span style="color: #3F7E5E">// you can load nested referrer from here</span>
      * <span style="color: #3F7E5E">//}).withNestedList(referrerList -&gt {</span>
      * <span style="color: #3F7E5E">//    ...</span>
@@ -753,21 +752,19 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param refCBLambda The callback to set up referrer condition-bean for loading referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
      */
-    public NestedReferrerListGateway<${referrerEntityClassName}> load${referrer.referrerPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> refCBLambda) {
+    public NestedReferrerListGateway<${referrerEntityClassName}> load${referrerMethodIdentityName}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> refCBLambda) {
         xassLRArg(${myEntityListVariableName}, refCBLambda);
-        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(refCBLambda));
+        return doLoad${referrerMethodIdentityName}(${myEntityListVariableName}, new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(refCBLambda));
     }
 
     /**
      * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br />
      * ${referrer.referrerDispForJavaDoc}
      * <pre>
-     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ${table.loadReferrerConditionSetupperName}&lt;${referrerCBClassName}&gt;() {
-     *     public void setup(${referrerCBClassName} cb) {
-     *         cb.setupSelect...();
-     *         cb.query().setFoo...(value);
-     *         cb.query().addOrderBy_Bar...();
-     *     }
+     * ${myEntityVariableName}Bhv.<span style="color: #DD4747">load${referrerMethodIdentityName}</span>(${myEntityListVariableName}, ${referrer.referrerLambdaExampleCBName} -&gt; {
+     *     ${referrer.referrerLambdaExampleCBName}.setupSelect...();
+     *     ${referrer.referrerLambdaExampleCBName}.query().setFoo...(value);
+     *     ${referrer.referrerLambdaExampleCBName}.query().addOrderBy_Bar...();
      * }); <span style="color: #3F7E5E">// you can load nested referrer from here</span>
      * <span style="color: #3F7E5E">//}).withNestedList(referrerList -&gt {</span>
      * <span style="color: #3F7E5E">//    ...</span>
@@ -789,9 +786,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param refCBLambda The callback to set up referrer condition-bean for loading referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
      */
-    public NestedReferrerListGateway<${referrerEntityClassName}> load${referrer.referrerPropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, ${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> refCBLambda) {
+    public NestedReferrerListGateway<${referrerEntityClassName}> load${referrerMethodIdentityName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> refCBLambda) {
         xassLRArg(${myEntityVariableName}, refCBLambda);
-        return doLoad${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(refCBLambda));
+        return doLoad${referrerMethodIdentityName}(xnewLRLs(${myEntityVariableName}), new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(refCBLambda));
     }
 
 #if ($table.isAvailableLoadReferrerByOldOption())
@@ -801,9 +798,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param loadReferrerOption The option of load-referrer. (NotNull)
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
      */
-    public NestedReferrerListGateway<${referrerEntityClassName}> load${referrer.referrerPropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+    public NestedReferrerListGateway<${referrerEntityClassName}> load${referrerMethodIdentityName}(${myExtendedObjectClassName} ${myEntityVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         xassLRArg(${myEntityVariableName}, loadReferrerOption);
-        return load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
+        return load${referrerMethodIdentityName}(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
     }
 
     /**
@@ -813,14 +810,14 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
      */
     @SuppressWarnings("unchecked")
-    public NestedReferrerListGateway<${referrerEntityClassName}> load${referrer.referrerPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+    public NestedReferrerListGateway<${referrerEntityClassName}> load${referrerMethodIdentityName}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         xassLRArg(${myEntityListVariableName}, loadReferrerOption);
         if (${myEntityListVariableName}.isEmpty()) { return (NestedReferrerListGateway<${referrerEntityClassName}>)EMPTY_NREF_LGWAY; }
-        return doLoad${referrer.referrerPropertyNameInitCap}(${myEntityListVariableName}, loadReferrerOption);
+        return doLoad${referrerMethodIdentityName}(${myEntityListVariableName}, loadReferrerOption);
     }
 
 #end
-    protected NestedReferrerListGateway<${referrerEntityClassName}> doLoad${referrer.referrerPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> option) {
+    protected NestedReferrerListGateway<${referrerEntityClassName}> doLoad${referrerMethodIdentityName}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> option) {
         return helpLoadReferrerInternally(${myEntityListVariableName}, option, "${referrer.referrerPropertyName}");
     }
 
