@@ -65,24 +65,24 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      * @param object The wrapped thing which is optional. (NotNull)
      * @return The new-created instance as existing optional thing. (NotNull)
      */
-    public static <ENTITY> OptionalThing<ENTITY> of(ENTITY object) {
+    public static <OBJ> OptionalThing<OBJ> of(OBJ object) {
         if (object == null) {
             String msg = "The argument 'object' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        return new OptionalThing<ENTITY>(object, NOWAY_THROWER);
+        return new OptionalThing<OBJ>(object, NOWAY_THROWER);
     }
 
     /**
      * @param object The wrapped instance or thing. (NullAllowed)
-     * @param thrower The exception thrower when illegal access. (NotNull)
+     * @param noArgLambda The callback for exception when illegal access. (NotNull)
      * @return The new-created instance as existing or empty optional object. (NotNull)
      */
-    public static <ENTITY> OptionalThing<ENTITY> ofNullable(ENTITY object, OptionalThingExceptionThrower thrower) {
+    public static <OBJ> OptionalThing<OBJ> ofNullable(OBJ object, OptionalThingExceptionThrower noArgLambda) {
         if (object != null) {
             return of(object);
         } else {
-            return new OptionalThing<ENTITY>(object, thrower);
+            return new OptionalThing<OBJ>(object, noArgLambda);
         }
     }
 
@@ -102,12 +102,12 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      * Handle the wrapped thing if it is present. <br />
      * You should call this if null object handling is unnecessary (do nothing if null). <br />
      * If exception is preferred when null object, use required().
-     * @param objLambda The callback interface to consume the optional object. (NotNull)
+     * @param oneArgLambda The callback interface to consume the optional object. (NotNull)
      * @return The handler of after process when if not present. (NotNull)
      */
-    public OptionalThingIfPresentAfter ifPresent(OptionalThingConsumer<THING> objLambda) {
-        assertObjLambdaNotNull(objLambda);
-        return callbackIfPresent(objLambda);
+    public OptionalThingIfPresentAfter ifPresent(OptionalThingConsumer<THING> oneArgLambda) {
+        assertOneArgLambdaNotNull(oneArgLambda);
+        return callbackIfPresent(oneArgLambda);
     }
 
     /**
@@ -120,12 +120,12 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
 
     /**
      * Filter the object by the predicate.
-     * @param objLambda The callback to predicate whether the object is remained. (NotNull)
+     * @param oneArgLambda The callback to predicate whether the object is remained. (NotNull)
      * @return The filtered optional object, might be empty. (NotNull)
      */
-    public OptionalThing<THING> filter(OptionalThingPredicate<THING> objLambda) {
-        assertObjLambdaNotNull(objLambda);
-        return (OptionalThing<THING>) callbackFilter(objLambda);
+    public OptionalThing<THING> filter(OptionalThingPredicate<THING> oneArgLambda) {
+        assertOneArgLambdaNotNull(oneArgLambda);
+        return (OptionalThing<THING>) callbackFilter(oneArgLambda);
     }
 
     /**
@@ -138,13 +138,13 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
 
     /**
      * Apply the mapping of object to result object.
-     * @param objLambda The callback interface to apply. (NotNull)
+     * @param oneArgLambda The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     @SuppressWarnings("unchecked")
-    public <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super THING, ? extends RESULT> objLambda) {
-        assertObjLambdaNotNull(objLambda);
-        return (OptionalThing<RESULT>) callbackMapping(objLambda); // downcast allowed because factory is overridden
+    public <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super THING, ? extends RESULT> oneArgLambda) {
+        assertOneArgLambdaNotNull(oneArgLambda);
+        return (OptionalThing<RESULT>) callbackMapping(oneArgLambda); // downcast allowed because factory is overridden
     }
 
     /**
@@ -157,12 +157,12 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
 
     /**
      * Apply the flat-mapping of object to result object.
-     * @param objLambda The callback interface to apply. (NotNull)
+     * @param oneArgLambda The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    public <RESULT> OptionalThing<RESULT> flatMap(OptionalThingFunction<? super THING, OptionalThing<RESULT>> objLambda) {
-        assertObjLambdaNotNull(objLambda);
-        return callbackFlatMapping(objLambda);
+    public <RESULT> OptionalThing<RESULT> flatMap(OptionalThingFunction<? super THING, OptionalThing<RESULT>> oneArgLambda) {
+        assertOneArgLambdaNotNull(oneArgLambda);
+        return callbackFlatMapping(oneArgLambda);
     }
 
     /**
@@ -183,20 +183,20 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
 
     /**
      * Handle the object in the optional thing or exception if not present.
-     * @param objLambda The callback interface to consume the optional object. (NotNull)
+     * @param oneArgLambda The callback interface to consume the optional object. (NotNull)
      * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
      */
-    public void alwaysPresent(OptionalThingConsumer<THING> objLambda) {
-        assertObjLambdaNotNull(objLambda);
-        callbackAlwaysPresent(objLambda);
+    public void alwaysPresent(OptionalThingConsumer<THING> oneArgLambda) {
+        assertOneArgLambdaNotNull(oneArgLambda);
+        callbackAlwaysPresent(oneArgLambda);
     }
 
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
-    protected void assertObjLambdaNotNull(Object objLambda) {
-        if (objLambda == null) {
-            throw new IllegalArgumentException("The argument 'objLambda' should not be null.");
+    protected void assertOneArgLambdaNotNull(Object oneArgLambda) {
+        if (oneArgLambda == null) {
+            throw new IllegalArgumentException("The argument 'oneArgLambda' should not be null.");
         }
     }
 }
