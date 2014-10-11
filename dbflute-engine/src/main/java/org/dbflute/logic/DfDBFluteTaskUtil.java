@@ -51,7 +51,7 @@ public final class DfDBFluteTaskUtil {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log-instance. */
+    /** The logger instance for this class. (NotNull) */
     private static final Log _log;
     static {
         final File emergencyFile = new File("./log/emergency-logging.dfmark");

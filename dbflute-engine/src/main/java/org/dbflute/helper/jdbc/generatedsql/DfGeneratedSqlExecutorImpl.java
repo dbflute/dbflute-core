@@ -35,7 +35,7 @@ public class DfGeneratedSqlExecutorImpl implements DfGeneratedSqlExecutor {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private static Log _log = LogFactory.getLog(DfGeneratedSqlExecutorImpl.class);
 
     // ===================================================================================

@@ -186,7 +186,7 @@ public class TypeMap {
     // ===================================================================================
     //                                                                                 Log
     //                                                                                 ===
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     public static final Log _log = LogFactory.getLog(TypeMap.class);
 
     // ===================================================================================

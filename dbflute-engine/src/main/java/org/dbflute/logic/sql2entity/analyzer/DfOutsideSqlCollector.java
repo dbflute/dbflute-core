@@ -37,7 +37,7 @@ public class DfOutsideSqlCollector {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private static final Log _log = LogFactory.getLog(DfOutsideSqlCollector.class);
 
     // ===================================================================================

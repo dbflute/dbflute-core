@@ -45,7 +45,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private static final Log _log = LogFactory.getLog(TnAbstractBatchHandler.class);
 
     // ===================================================================================

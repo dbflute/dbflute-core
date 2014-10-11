@@ -30,7 +30,7 @@ public abstract class DfGenerator {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     public static final Log _log = LogFactory.getLog(DfGenerator.class);
 
     /** The implementation instance of generator. (Singleton) */

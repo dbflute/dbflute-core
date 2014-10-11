@@ -89,7 +89,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L; // but serializing is already bankrupt
 
     protected static final SelectClauseType DEFAULT_SELECT_CLAUSE_TYPE = SelectClauseType.COLUMNS;

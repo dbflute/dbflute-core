@@ -40,7 +40,7 @@ public class DfSerialVersionUIDResolver {
     }
 
     public void reflectAllExSerialUID(String path) {
-        final String serialComment = "/** Serial version UID. (Default) */";
+        final String serialComment = "/** The serial version UID for object serialization. (Default) */";
         final String serialDefinition = "private static final long serialVersionUID = 1L;";
         final File exfile = new File(path);
         final String encoding = _sourceEncoding;

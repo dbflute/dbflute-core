@@ -74,7 +74,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
 
     // ===================================================================================

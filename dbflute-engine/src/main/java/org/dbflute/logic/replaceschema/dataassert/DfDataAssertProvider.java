@@ -47,7 +47,7 @@ public class DfDataAssertProvider {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private static Log _log = LogFactory.getLog(DfDataAssertProvider.class);
 
     // ===================================================================================

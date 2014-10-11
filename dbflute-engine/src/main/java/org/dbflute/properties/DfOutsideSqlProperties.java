@@ -41,7 +41,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private static final Log _log = LogFactory.getLog(DfOutsideSqlProperties.class);
 
     // ===================================================================================

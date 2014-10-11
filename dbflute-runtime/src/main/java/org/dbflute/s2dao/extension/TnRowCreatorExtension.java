@@ -54,7 +54,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private static final Log _log = LogFactory.getLog(TnRowCreatorExtension.class);
 
     /** The key of DBMeta cache. */

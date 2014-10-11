@@ -294,7 +294,7 @@ public class DfPropertyUtil {
     //                                                                       =========
     public static class PropertyNotFoundException extends RuntimeException {
 
-        /** Serial version UID. (Default) */
+        /** The serial version UID for object serialization. (Default) */
         private static final long serialVersionUID = 1L;
 
         /**
@@ -309,7 +309,7 @@ public class DfPropertyUtil {
 
     public static class PropertyBooleanFormatException extends RuntimeException {
 
-        /** Serial version UID. (Default) */
+        /** The serial version UID for object serialization. (Default) */
         private static final long serialVersionUID = 1L;
 
         /**
@@ -324,7 +324,7 @@ public class DfPropertyUtil {
 
     public static class PropertyIntegerFormatException extends RuntimeException {
 
-        /** Serial version UID. (Default) */
+        /** The serial version UID for object serialization. (Default) */
         private static final long serialVersionUID = 1L;
 
         /**

@@ -50,10 +50,10 @@ public abstract class ConditionKey implements Serializable {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
-    /** Log-instance. */
+    /** The logger instance for this class. (NotNull) */
     private static final Log _log = LogFactory.getLog(ConditionKey.class);
 
     // ===================================================================================

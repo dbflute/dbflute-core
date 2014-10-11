@@ -140,7 +140,7 @@ import org.apache.torque.engine.EngineException;
  */
 public class ConstraintNameGenerator implements NameGenerator {
 
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private static Log log = LogFactory.getLog(ConstraintNameGenerator.class);
 
     /**

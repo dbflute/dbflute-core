@@ -86,7 +86,7 @@ public interface Entity {
      */
     public static class EntityUniqueDrivenProperties implements Serializable {
 
-        /** Serial version UID. (Default) */
+        /** The serial version UID for object serialization. (Default) */
         private static final long serialVersionUID = 1L;
 
         /** The set of property names. (NullAllowed: lazy-loaded) */
@@ -176,7 +176,7 @@ public interface Entity {
      */
     public static class EntityModifiedProperties implements Serializable {
 
-        /** Serial version UID. (Default) */
+        /** The serial version UID for object serialization. (Default) */
         private static final long serialVersionUID = 1L;
 
         /** The set of property names. (NullAllowed: lazy-loaded) */
@@ -262,7 +262,7 @@ public interface Entity {
      */
     public static class EntityDerivedMap implements Serializable {
 
-        /** Serial version UID. (Default) */
+        /** The serial version UID for object serialization. (Default) */
         private static final long serialVersionUID = 1L;
 
         /** The map of derived value. map:{alias-name = value} (NullAllowed: lazy-loaded) */

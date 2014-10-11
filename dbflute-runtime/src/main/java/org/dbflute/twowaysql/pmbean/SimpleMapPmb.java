@@ -30,7 +30,7 @@ public class SimpleMapPmb<VALUE> implements MapParameterBean<VALUE>, Serializabl
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================

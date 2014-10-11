@@ -57,7 +57,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private static final Log _log = LogFactory.getLog(DfLoadDataProcess.class);
 
     protected static final String COMMON_LOAD_TYPE = DfLoadedDataInfo.COMMON_LOAD_TYPE;

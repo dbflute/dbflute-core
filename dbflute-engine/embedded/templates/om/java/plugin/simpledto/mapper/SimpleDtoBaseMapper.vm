@@ -82,7 +82,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================

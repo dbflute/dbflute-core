@@ -153,7 +153,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private static final Log _log = LogFactory.getLog(TorqueDocumentationTask.class);
 
     // ===================================================================================

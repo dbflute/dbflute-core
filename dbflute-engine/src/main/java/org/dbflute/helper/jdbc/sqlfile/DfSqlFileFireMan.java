@@ -35,7 +35,7 @@ public class DfSqlFileFireMan {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
+    /** The logger instance for this class. (NotNull) */
     private static Log _log = LogFactory.getLog(DfSqlFileFireMan.class);
 
     // ===================================================================================
