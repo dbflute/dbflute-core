@@ -21,7 +21,7 @@ import java.util.List;
 import org.dbflute.*;
 import org.dbflute.bhv.*;
 import org.dbflute.bhv.readable.*;
-#if ($table.isWritable())
+#if ($table.isWritable() || $table.hasBehaviorFilterBeforeColumn())
 import org.dbflute.bhv.writable.*;
 #end
 import org.dbflute.bhv.referrer.*;

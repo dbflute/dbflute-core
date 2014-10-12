@@ -33,6 +33,8 @@ import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.CursorSelectOption;
+import org.dbflute.cbean.coption.DerivedReferrerOption;
+import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.ordering.OrderByBean;
@@ -1642,6 +1644,30 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     // [DBFlute-1.1.0]
     // ===================================================================================
+    //                                                              DerivedReferrer Option
+    //                                                              ======================
+    protected FactoryOfDerivedReferrerOption xcFofSDROp() { // xcreateFactoryOfSpecifyDerivedReferrerOption()
+        return new FactoryOfDerivedReferrerOption() {
+            public DerivedReferrerOption create() {
+                return createSpecifyDerivedReferrerOption();
+            }
+        };
+    }
+
+    protected DerivedReferrerOption createSpecifyDerivedReferrerOption() {
+        return newSpecifyDerivedReferrerOption();
+    }
+
+    /**
+     * New-create the option of (specify) derived-referrer as plain.
+     * @return The new-created option of (specify) derived-referrer. (NotNull)
+     */
+    protected DerivedReferrerOption newSpecifyDerivedReferrerOption() {
+        return new DerivedReferrerOption();
+    }
+
+    // [DBFlute-1.1.0]
+    // ===================================================================================
     //                                                                  ExistsReferrer Way
     //                                                                  ==================
     /**
@@ -1657,6 +1683,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void useInScopeSubQuery() {
         final HpCBPurpose purpose = getPurpose();
+        // TODO jflute Purpose and Exception
         if (!purpose.isAny(HpCBPurpose.EXISTS_REFERRER, HpCBPurpose.MYSELF_EXISTS)) {
             String msg = "The method 'useInScopeSubQuery()' can be called only when ExistsReferrer.";
             throw new IllegalConditionBeanOperationException(msg);

@@ -19,6 +19,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
 import org.dbflute.cbean.coption.FFOptionCall;
+import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.scoping.SubQuery;
 import org.dbflute.dbmeta.DBMetaProvider;
@@ -40,16 +41,18 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     protected final LOCAL_CQ _localCQ;
     protected final HpSDRSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
     protected final DBMetaProvider _dbmetaProvider;
+    protected final FactoryOfDerivedReferrerOption _sdrOpFactory;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public HpSDRFunction(ConditionBean baseCB, LOCAL_CQ localCQ, HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper,
-            DBMetaProvider dbmetaProvider) {
+            DBMetaProvider dbmetaProvider, FactoryOfDerivedReferrerOption sdrOpFactory) {
         _baseCB = baseCB;
         _localCQ = localCQ;
         _querySetupper = querySetupper;
         _dbmetaProvider = dbmetaProvider;
+        _sdrOpFactory = sdrOpFactory;
     }
 
     // ===================================================================================
@@ -323,7 +326,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     //                                                                       Assist Helper
     //                                                                       =============
     protected DerivedReferrerOption createDerivedReferrerOption() {
-        return new DerivedReferrerOption();
+        return _sdrOpFactory.create();
     }
 
     protected void assertSubQuery(SubQuery<?> subQuery) {

@@ -21,6 +21,9 @@ import java.util.Map;
 import org.dbflute.cbean.*;
 import org.dbflute.cbean.chelper.*;
 import org.dbflute.cbean.coption.*;
+#if (${table.hasCompoundKeyReferrer()})
+import org.dbflute.cbean.scoping.*;
+#end
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.sqlclause.SqlClause;
 #if ($table.isAvailableMyselfInlineView())
@@ -564,7 +567,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         return xcreateQDRFunction${relationPropertyNameInitCap}();
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${relationPropertyNameInitCap}() {
-        return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
+        return xcQDRFunc(new HpQDRSetupper<${relatedCBClassName}>() {
             public void setup(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
                 xqderive${relationPropertyNameInitCap}(fn, sq, rd, vl, op);
             }

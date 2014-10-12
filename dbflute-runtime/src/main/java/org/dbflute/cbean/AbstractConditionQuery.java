@@ -47,6 +47,7 @@ import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.ckey.ConditionKeyInScope;
 import org.dbflute.cbean.coption.ConditionOption;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
+import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
 import org.dbflute.cbean.coption.FromToOption;
 import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.cbean.coption.ParameterOption;
@@ -1319,7 +1320,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerSpecifyDerivedReferrer(String function, ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String referrerPropertyName, String aliasName, DerivedReferrerOption option) {
         doRegisterSpecifyDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName,
-                aliasName, option != null ? option : new DerivedReferrerOption());
+                aliasName, option != null ? option : createDefaultDerivedReferrerOption());
     }
 
     protected void doRegisterSpecifyDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
@@ -1363,6 +1364,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return new HpDerivingSubQueryInfo(function, aliasName, clause, derivedReferrer);
     }
 
+    protected DerivedReferrerOption createDefaultDerivedReferrerOption() {
+        return newDefaultDerivedReferrerOption();
+    }
+
+    /**
+     * New-create the option of (both specify and query) derived-referrer as plain.
+     * @return The new-created option of (both specify and query) derived-referrer. (NotNull)
+     */
+    protected DerivedReferrerOption newDefaultDerivedReferrerOption() {
+        return new DerivedReferrerOption(); // both Specify and Query
+    }
+
+    // -----------------------------------------------------
+    //                                  (Query)MyselfDerived
+    //                                  --------------------
     protected void registerSpecifyMyselfDerived(String function, ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName, String referrerPropertyName, String aliasName, DerivedReferrerOption option) {
         doRegisterSpecifyDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName,
@@ -1370,7 +1386,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected DerivedReferrerOption resolveMyselfDerivedReferrerOption(DerivedReferrerOption option) {
-        final DerivedReferrerOption resolvedOption = option != null ? option : new DerivedReferrerOption();
+        final DerivedReferrerOption resolvedOption = option != null ? option : createDefaultDerivedReferrerOption();
         resolvedOption.suppressCorrelation();
         return resolvedOption;
     }
@@ -1383,7 +1399,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String propertyName, String referrerPropertyName, String operand, Object value, String parameterPropertyName,
             DerivedReferrerOption option) {
         doRegisterQueryDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, operand,
-                value, parameterPropertyName, option != null ? option : new DerivedReferrerOption());
+                value, parameterPropertyName, option != null ? option : createDefaultDerivedReferrerOption());
     }
 
     protected void doRegisterQueryDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
@@ -1441,6 +1457,33 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         registerWhereClause(clause, noWayInner);
     }
 
+    protected <CB extends ConditionBean> HpQDRFunction<CB> xcQDRFunc(HpQDRSetupper<CB> setupper) {
+        return new HpQDRFunction<CB>(setupper, xcFofQDROp());
+    }
+
+    protected FactoryOfDerivedReferrerOption xcFofQDROp() { // xcreateFactoryOfQueryDerivedReferrerOption()
+        return new FactoryOfDerivedReferrerOption() {
+            public DerivedReferrerOption create() {
+                return createQueryDerivedReferrerOption();
+            }
+        };
+    }
+
+    protected DerivedReferrerOption createQueryDerivedReferrerOption() {
+        return newQueryDerivedReferrerOption();
+    }
+
+    /**
+     * New-create the option of (query) derived-referrer as plain.
+     * @return The new-created option of (query) derived-referrer. (NotNull)
+     */
+    protected DerivedReferrerOption newQueryDerivedReferrerOption() {
+        return new DerivedReferrerOption();
+    }
+
+    // -----------------------------------------------------
+    //                                  (Query)MyselfDerived
+    //                                  --------------------
     protected void registerQueryMyselfDerived(String function, ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName, String referrerPropertyName, String operand, Object value, String parameterPropertyName,
             DerivedReferrerOption option) {
@@ -1450,7 +1493,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     // type argument for cast
     protected <CB extends ConditionBean> HpQDRFunction<CB> xcreateQDRFunctionMyselfDerived(Class<CB> cbType) {
-        return new HpQDRFunction<CB>(new HpQDRSetupper<CB>() {
+        return xcQDRFunc(new HpQDRSetupper<CB>() {
             public void setup(String fn, SubQuery<CB> sq, String rd, Object vl, DerivedReferrerOption op) {
                 xqderiveMyselfDerived(fn, sq, rd, vl, op);
             }

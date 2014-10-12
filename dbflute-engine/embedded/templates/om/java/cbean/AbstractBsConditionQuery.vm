@@ -506,7 +506,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
-        return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
+        return xcQDRFunc(new HpQDRSetupper<${relatedCBClassName}>() {
             public void setup(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
                 xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
             }
@@ -890,7 +890,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
-        return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
+        return xcQDRFunc(new HpQDRSetupper<${relatedCBClassName}>() {
             public void setup(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
                 xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
             }
@@ -1595,6 +1595,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     protected String xabCQ() { return ${myConditionQueryClassName}.class.getName(); }
     protected String xabLSO() { return LikeSearchOption.class.getName(); }
     protected String xabSSQS() { return HpSSQSetupper.class.getName(); }
+    protected String xabSCP() { return SubQuery.class.getName(); }
 #if ($database.isDatabaseMSAccess())
     @Override
     protected boolean xsuppressEscape() { return true; } // bacause MS-Access does not support escape

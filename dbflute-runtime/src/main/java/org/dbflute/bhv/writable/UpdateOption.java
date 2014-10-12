@@ -353,14 +353,14 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * });
      * memberBhv.varyingUpdate(member, option);
      * </pre>
-     * @param updateColumnSpecification The query for specifying update columns. (NotNull)
+     * @param colCBLambda The callback for query of specifying update columns. (NotNull)
      */
-    public void specify(SpecifyQuery<CB> updateColumnSpecification) {
-        if (updateColumnSpecification == null) {
+    public void specify(SpecifyQuery<CB> colCBLambda) {
+        if (colCBLambda == null) {
             String msg = "The argument 'updateColumnSpecification' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        _updateColumnSpecification = updateColumnSpecification;
+        _updateColumnSpecification = colCBLambda;
     }
 
     public void resolveUpdateColumnSpecification(CB cb) {

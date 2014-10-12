@@ -62,7 +62,7 @@ public class ${glDBFluteBeansJavaConfig} {
     //                                                                   =================
     @Bean(name="${database.DBFluteInitializerComponentName}")
     public ${glDBFluteInitializer} createDBFluteInitializer() {
-        return new ${glDBFluteInitializer}(dataSource);
+        return new ${database.DBFluteInitializerClass}(dataSource);
     }
 
     @Bean(name="${database.invokerAssistantComponentName}")
