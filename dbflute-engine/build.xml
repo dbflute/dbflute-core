@@ -16,6 +16,8 @@
 	<property name="dbflute.base" value="${workspace.base}/dbflute-core" />
 	<property name="dbflute.www.base" value="${workspace.base}/dbflute-www" />
 	<property name="test.active.stage.base" value="${workspace.base}" />
+	<property name="test.dbms.stage.base" value="${workspace.base}" />
+	<property name="test.option.stage.base" value="${workspace.base}" />
 	<property name="example.container.base" value="${workspace.base}/dbflute-example-container" />
 	<property name="example.database.base" value="${workspace.base}/dbflute-example-database" />
 	<property name="example.multipledb.base" value="${workspace.base}/dbflute-example-multipledb" />
@@ -46,8 +48,12 @@
 	<property name="test.active.dockside.dir" value="${test.active.stage.base}/dbflute-test-active-dockside" />
 	<property name="test.active.hanger.dir" value="${test.active.stage.base}/dbflute-test-active-hanger" />
 
+	<!-- Test: DBMS Stage -->
+	<property name="test.dbms.mysql.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-mysql" />
+	<property name="test.dbms.postgresql.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-postgresql" />
+
 	<!-- Test: Option Stage -->
-	<property name="test.option.compatible10x.dir" value="${test.active.stage.base}/dbflute-test-option-compatible10x" />
+	<property name="test.option.compatible10x.dir" value="${test.option.stage.base}/dbflute-test-option-compatible10x" />
 
 	<!-- Database Examples -->
 	<property name="mysql.example.dir" value="${example.database.base}/dbflute-mysql-example" />
@@ -268,6 +274,24 @@
 			description="==> reflect to test as active hanger">
 		<delete dir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-test-dbms-mysql" depends="prepare-reflection"
+			description="==> reflect to test of DBMS MySQL">
+		<delete dir="${test.dbms.mysql.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.dbms.mysql.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-test-dbms-postgresql" depends="prepare-reflection"
+			description="==> reflect to test of DBMS PostgreSQL">
+		<delete dir="${test.dbms.postgresql.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.dbms.postgresql.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />
