@@ -49,8 +49,8 @@ public class DfPropHtmlPropertyLangElement {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPropHtmlPropertyLangElement(String propertyKey, String langType, String propertyValue, int uniqueNo,
-            String comment, boolean override) {
+    public DfPropHtmlPropertyLangElement(String propertyKey, String langType, String propertyValue, int uniqueNo, String comment,
+            boolean override) {
         _propertyKey = propertyKey;
         _langType = langType;
 

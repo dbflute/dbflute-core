@@ -152,8 +152,7 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
         return col.getJavaName();
     }
 
-    public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber,
-            boolean toBoolean) {
+    public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber, boolean toBoolean) {
         final String cdefCode = cdefBase + ".Code";
         if (toNumber || toBoolean) {
             return toValueTypeRemovedCSharpNullable(valueType) + ".Parse(" + cdefCode + ")";

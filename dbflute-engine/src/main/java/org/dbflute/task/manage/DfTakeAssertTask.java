@@ -113,8 +113,7 @@ public class DfTakeAssertTask extends DfAbstractTask {
         throwTakeAssertAssertionFailureException(_takeAssertExList);
     }
 
-    protected void throwTakeAssertAssertionFailureException(
-            List<DfTakeFinallyAssertionFailureException> takeAssertExList) {
+    protected void throwTakeAssertAssertionFailureException(List<DfTakeFinallyAssertionFailureException> takeAssertExList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Assertion failures were found.");
         br.addItem("Advice");
@@ -143,8 +142,7 @@ public class DfTakeAssertTask extends DfAbstractTask {
             if (bw != null) {
                 try {
                     bw.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

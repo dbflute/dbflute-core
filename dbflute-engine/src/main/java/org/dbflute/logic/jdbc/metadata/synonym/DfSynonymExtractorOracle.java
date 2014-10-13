@@ -170,20 +170,17 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             if (statement != null) {
                 try {
                     statement.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
         translateFKTable(synonymMap); // It translates foreign key meta informations. 
@@ -223,8 +220,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
     }
 
-    protected void setupBasicConstraintInfo(DfSynonymMeta info, UnifiedSchema tableOwner, String tableName,
-            Connection conn) throws SQLException {
+    protected void setupBasicConstraintInfo(DfSynonymMeta info, UnifiedSchema tableOwner, String tableName, Connection conn)
+            throws SQLException {
         final DatabaseMetaData md = conn.getMetaData();
         final DfPrimaryKeyMeta pkInfo = getPKList(md, tableOwner, tableName);
         info.setPrimaryKey(pkInfo);
@@ -302,8 +299,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
     }
 
-    protected Map<String, Map<Integer, String>> getUQMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, List<String> primaryKeyNameList) {
+    protected Map<String, Map<Integer, String>> getUQMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
+            List<String> primaryKeyNameList) {
         try {
             return _uniqueKeyExtractor.getUniqueKeyMap(metaData, unifiedSchema, tableName, primaryKeyNameList);
         } catch (SQLException e) {
@@ -311,8 +308,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
     }
 
-    protected Map<String, DfForeignKeyMeta> getFKMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName) {
+    protected Map<String, DfForeignKeyMeta> getFKMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName) {
         try {
             return _foreignKeyExtractor.getForeignKeyMap(metaData, unifiedSchema, tableName);
         } catch (SQLException e) {
@@ -320,8 +316,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
     }
 
-    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) {
+    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
+            Map<String, Map<Integer, String>> uniqueKeyMap) {
         try {
             return _indexExtractor.getIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap);
         } catch (SQLException e) {
@@ -330,8 +326,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
     }
 
-    protected boolean isAutoIncrement(Connection conn, UnifiedSchema tableOwner, String tableName,
-            String primaryKeyColumnName) {
+    protected boolean isAutoIncrement(Connection conn, UnifiedSchema tableOwner, String tableName, String primaryKeyColumnName) {
         return false; // because Oracle does not support identity
         //try {
         //    final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
@@ -512,8 +507,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     // -----------------------------------------------------
     //                             Supplementary Column Info
     //                             -------------------------
-    protected List<DfColumnMeta> getSynonymColumns(Connection conn, UnifiedSchema synonymOwner, String synonymName)
-            throws SQLException {
+    protected List<DfColumnMeta> getSynonymColumns(Connection conn, UnifiedSchema synonymOwner, String synonymName) throws SQLException {
         final List<DfColumnMeta> columnList = new ArrayList<DfColumnMeta>();
         Statement st = null;
         ResultSet rs = null;
@@ -546,14 +540,12 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             if (st != null) {
                 try {
                     st.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }
@@ -561,8 +553,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     // -----------------------------------------------------
     //                                   For DB Link Synonym
     //                                   -------------------
-    protected DfPrimaryKeyMeta getDBLinkSynonymPKInfo(Connection conn, String tableName, String dbLinkName)
-            throws SQLException {
+    protected DfPrimaryKeyMeta getDBLinkSynonymPKInfo(Connection conn, String tableName, String dbLinkName) throws SQLException {
         final DfPrimaryKeyMeta pkInfo = new DfPrimaryKeyMeta();
         StringBuilder sb = new StringBuilder();
         sb.append("select cols.OWNER, cols.CONSTRAINT_NAME, cols.TABLE_NAME, cols.COLUMN_NAME");
@@ -587,20 +578,18 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             if (statement != null) {
                 try {
                     statement.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }
 
-    protected Map<String, Map<Integer, String>> getDBLinkSynonymUQMap(Connection conn, String tableName,
-            String dbLinkName) throws SQLException {
+    protected Map<String, Map<Integer, String>> getDBLinkSynonymUQMap(Connection conn, String tableName, String dbLinkName)
+            throws SQLException {
         final Map<String, Map<Integer, String>> uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
         final StringBuilder sb = new StringBuilder();
         sb.append("select cols.OWNER, cols.CONSTRAINT_NAME, cols.TABLE_NAME, cols.COLUMN_NAME, cols.POSITION");
@@ -631,14 +620,12 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             if (statement != null) {
                 try {
                     statement.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }

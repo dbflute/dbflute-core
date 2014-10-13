@@ -67,8 +67,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
                 //     }
                 //     ; ...
                 // - - - - - - - - - -/ 
-                final Map<String, String> commonColumnMap = (Map<String, String>) _commonColumnTopMap
-                        .get(KEY_commonColumnMap);
+                final Map<String, String> commonColumnMap = (Map<String, String>) _commonColumnTopMap.get(KEY_commonColumnMap);
                 final Map<String, String> flmap = StringKeyMap.createAsFlexibleOrdered();
                 flmap.putAll(commonColumnMap);
                 _commonColumnMap = flmap;

@@ -54,8 +54,7 @@ public class DfCraftDiffAssertSqlFire {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCraftDiffAssertSqlFire(DfSchemaSource dataSource, String craftMetaDir,
-            DfCraftDiffAssertDirection assertDirection) {
+    public DfCraftDiffAssertSqlFire(DfSchemaSource dataSource, String craftMetaDir, DfCraftDiffAssertDirection assertDirection) {
         _dataSource = dataSource;
         _craftMetaDir = craftMetaDir;
         _assertDirection = assertDirection;
@@ -86,8 +85,7 @@ public class DfCraftDiffAssertSqlFire {
         return new DfCraftDiffAssertProvider(_craftMetaDir, _assertDirection, tableList);
     }
 
-    protected DfSqlFileRunner getSqlFileRunner4CraftDiff(final DfRunnerInformation runInfo,
-            final DfCraftDiffAssertProvider provider) {
+    protected DfSqlFileRunner getSqlFileRunner4CraftDiff(final DfRunnerInformation runInfo, final DfCraftDiffAssertProvider provider) {
         final DfSqlFileRunnerExecute runnerExecute = new DfSqlFileRunnerExecute(runInfo, _dataSource) {
             @Override
             protected String getTerminator4Tool() {

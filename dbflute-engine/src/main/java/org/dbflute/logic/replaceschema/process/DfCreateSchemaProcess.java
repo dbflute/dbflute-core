@@ -93,8 +93,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
         _lazyConnection = lazyConnection;
     }
 
-    public static DfCreateSchemaProcess createAsCore(String sqlRootDir, CreatingDataSourcePlayer dataSourcePlayer,
-            boolean lazyConnection) {
+    public static DfCreateSchemaProcess createAsCore(String sqlRootDir, CreatingDataSourcePlayer dataSourcePlayer, boolean lazyConnection) {
         return new DfCreateSchemaProcess(sqlRootDir, dataSourcePlayer, lazyConnection);
     }
 

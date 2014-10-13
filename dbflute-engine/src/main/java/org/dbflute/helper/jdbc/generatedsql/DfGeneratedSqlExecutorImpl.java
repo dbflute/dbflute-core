@@ -88,8 +88,8 @@ public class DfGeneratedSqlExecutorImpl implements DfGeneratedSqlExecutor {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("DfGeneratedSqlExecutorImpl.execute() threw the exception: baseSql=" + sql
-                    + " generatedSql=" + currentGeneratedSql, e);
+            throw new RuntimeException("DfGeneratedSqlExecutorImpl.execute() threw the exception: baseSql=" + sql + " generatedSql="
+                    + currentGeneratedSql, e);
         } finally {
             try {
                 if (rs != null) {

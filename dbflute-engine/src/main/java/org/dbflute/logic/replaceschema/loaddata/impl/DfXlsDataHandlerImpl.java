@@ -241,8 +241,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     }
                     try {
                         retryPs.close();
-                    } catch (SQLException ignored) {
-                    }
+                    } catch (SQLException ignored) {}
                     throw e;
                 } finally {
                     if (!transactionClosed) {
@@ -327,8 +326,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
-    protected void throwXlsDataEmptyRowDataException(String dataDirectory, File file, DfDataTable dataTable,
-            int rowNumber) {
+    protected void throwXlsDataEmptyRowDataException(String dataDirectory, File file, DfDataTable dataTable, int rowNumber) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The empty row data on the xls file was found.");
         br.addItem("Advice");
@@ -347,8 +345,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         throw new DfXlsDataEmptyRowDataException(msg);
     }
 
-    protected void handleXlsDataRegistartionFailureException(String dataDirectory, File file, String tableDbName,
-            RuntimeException e) {
+    protected void handleXlsDataRegistartionFailureException(String dataDirectory, File file, String tableDbName, RuntimeException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to register the xls data for ReplaceSchema.");
         br.addItem("Advice");
@@ -373,8 +370,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             mainEx = nextEx; // switch
         }
         final String tableDbName = dataTable.getTableDbName();
-        final String msg = buildWriteFailureMessage(dataDirectory, file, tableDbName, mainEx, retryEx, retryDataRow,
-                columnNameList);
+        final String msg = buildWriteFailureMessage(dataDirectory, file, tableDbName, mainEx, retryEx, retryDataRow, columnNameList);
         throw new DfXlsDataRegistrationFailureException(msg, mainEx);
     }
 
@@ -451,8 +447,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     //                                               DataRow
     //                                               -------
     protected boolean doWriteDataRow(DfXlsDataResource resource, File file, DfDataTable dataTable, DfDataRow dataRow,
-            Map<String, DfColumnMeta> columnMetaMap, Connection conn, PreparedStatement ps,
-            LoggingInsertType loggingInsertType, boolean suppressBatchUpdate) throws SQLException {
+            Map<String, DfColumnMeta> columnMetaMap, Connection conn, PreparedStatement ps, LoggingInsertType loggingInsertType,
+            boolean suppressBatchUpdate) throws SQLException {
         final String tableDbName = dataTable.getTableDbName();
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
         final String dataDirectory = resource.getDataDirectory();
@@ -473,8 +469,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         for (Entry<String, Object> entry : columnValueMap.entrySet()) {
             final String columnName = entry.getKey();
             final Object obj = entry.getValue();
-            processBindColumnValue(resource, dataDirectory, file, tableDbName, columnName, obj, conn, ps, bindCount,
-                    columnMetaMap, rowNumber);
+            processBindColumnValue(resource, dataDirectory, file, tableDbName, columnName, obj, conn, ps, bindCount, columnMetaMap,
+                    rowNumber);
             bindCount++;
         }
         if (suppressBatchUpdate) {
@@ -526,9 +522,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return true; // all columns are null or empty so invalid row
     }
 
-    protected void processBindColumnValue(DfXlsDataResource resource, String dataDirectory, File file,
-            String tableDbName, String columnName, Object obj, Connection conn, PreparedStatement ps, int bindCount,
-            Map<String, DfColumnMeta> columnMetaMap, int rowNumber) throws SQLException {
+    protected void processBindColumnValue(DfXlsDataResource resource, String dataDirectory, File file, String tableDbName,
+            String columnName, Object obj, Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnMetaMap,
+            int rowNumber) throws SQLException {
         // - - - - - - - - - - - - - - - - - - -
         // Process Null (against Null Headache)
         // - - - - - - - - - - - - - - - - - - -
@@ -541,8 +537,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         // - - - - - - - - - - - - - - -
         // If the value is not null and the value has the own type except string,
         // It registers the value to statement by the type.
-        if (processNotNullNotString(dataDirectory, tableDbName, columnName, obj, conn, ps, bindCount, columnMetaMap,
-                rowNumber)) {
+        if (processNotNullNotString(dataDirectory, tableDbName, columnName, obj, conn, ps, bindCount, columnMetaMap, rowNumber)) {
             return;
         }
 
@@ -550,8 +545,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         // Process NotNull and StringExpression
         // - - - - - - - - - - - - - - - - - - -
         final String value = (String) obj;
-        processNotNullString(dataDirectory, file, tableDbName, columnName, value, conn, ps, bindCount, columnMetaMap,
-                rowNumber);
+        processNotNullString(dataDirectory, file, tableDbName, columnName, value, conn, ps, bindCount, columnMetaMap, rowNumber);
     }
 
     // ===================================================================================
@@ -562,8 +556,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         final Map<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectory);
         final Map<String, List<String>> emptyStringTableColumnMap = getEmptyStringTableColumnMap(dataDirectory);
         final boolean rtrimCellValue = isRTrimCellValue(dataDirectory);
-        return new DfTableXlsReader(file, tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap,
-                _skipSheetPattern, rtrimCellValue);
+        return new DfTableXlsReader(file, tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap, _skipSheetPattern, rtrimCellValue);
     }
 
     protected List<File> getXlsList(DfXlsDataResource resource) {
@@ -609,8 +602,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                 Column Value Filter
     //                                                                 ===================
-    protected void convertColumnValueIfNeeds(String dataDirectory, String tableName,
-            Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap) {
+    protected void convertColumnValueIfNeeds(String dataDirectory, String tableName, Map<String, Object> columnValueMap,
+            Map<String, DfColumnMeta> columnMetaMap) {
         // handling both convertValueMap and defaultValueMap
         final Map<String, Map<String, String>> convertValueMap = getConvertValueMap(dataDirectory);
         final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectory);
@@ -620,8 +613,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 && (defaultValueMap == null || defaultValueMap.isEmpty())) { // and no default
             return;
         }
-        final DfColumnValueConverter converter = new DfColumnValueConverter(convertValueMap, defaultValueMap,
-                new DfColumnBindTypeProvider() {
+        final DfColumnValueConverter converter =
+                new DfColumnValueConverter(convertValueMap, defaultValueMap, new DfColumnBindTypeProvider() {
                     public Class<?> provide(String tableName, DfColumnMeta columnMeta) {
                         return getBindType(tableName, columnMeta);
                     }
@@ -688,8 +681,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return resolveControlCharacter(resultMap);
     }
 
-    protected static Map<String, Map<String, String>> resolveControlCharacter(
-            Map<String, Map<String, String>> convertValueMap) {
+    protected static Map<String, Map<String, String>> resolveControlCharacter(Map<String, Map<String, String>> convertValueMap) {
         final Map<String, Map<String, String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
         for (Entry<String, Map<String, String>> entry : convertValueMap.entrySet()) {
             final Map<String, String> elementMap = DfCollectionUtil.newLinkedHashMap();
@@ -893,8 +885,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             if (bw != null) {
                 try {
                     bw.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

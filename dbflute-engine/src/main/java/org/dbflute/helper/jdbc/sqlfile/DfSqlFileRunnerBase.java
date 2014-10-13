@@ -138,8 +138,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         } finally {
             try {
                 rollback();
-            } catch (SQLException ignored) {
-            }
+            } catch (SQLException ignored) {}
             closeStatement();
             closeConnection();
             closeReader(br);
@@ -217,20 +216,17 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             if (_currentConnection != null) {
                 _currentConnection.rollback();
             }
-        } catch (SQLException ignored) {
-        }
+        } catch (SQLException ignored) {}
         try {
             if (_beginTransaction) {
                 _currentConnection.setAutoCommit(true);
             }
-        } catch (SQLException ignored) {
-        }
+        } catch (SQLException ignored) {}
         try {
             if (_currentConnection != null) {
                 _currentConnection.close();
             }
-        } catch (SQLException ignored) {
-        } finally {
+        } catch (SQLException ignored) {} finally {
             _currentConnection = null;
         }
     }
@@ -316,8 +312,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             if (_currentStatement != null) {
                 _currentStatement.close();
             }
-        } catch (SQLException ignored) {
-        } finally {
+        } catch (SQLException ignored) {} finally {
             _currentStatement = null;
         }
     }
@@ -327,8 +322,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             if (reader != null) {
                 reader.close();
             }
-        } catch (IOException ignored) {
-        } finally {
+        } catch (IOException ignored) {} finally {
             reader = null;
         }
     }
@@ -353,8 +347,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 if (!inGroup && isSqlTrimAndRemoveLineSeparator()) {
                     line = line.trim();
                 }
-                if (!alwaysNeedsLineSeparator && isSqlTrimAndRemoveLineSeparator()
-                        && isHandlingCommentOnLineSeparator()) {
+                if (!alwaysNeedsLineSeparator && isSqlTrimAndRemoveLineSeparator() && isHandlingCommentOnLineSeparator()) {
                     if (isDbCommentLine(line)) {
                         alwaysNeedsLineSeparator = true;
                     }

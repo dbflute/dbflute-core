@@ -85,8 +85,7 @@ public class Sequence {
     //                                                                      ==============
     @Override
     public String toString() {
-        return _unifiedSchema + "." + _sequenceName + ":{" + _minimumValue + " to " + _maximumValue + ", increment "
-                + _incrementSize + "}";
+        return _unifiedSchema + "." + _sequenceName + ":{" + _minimumValue + " to " + _maximumValue + ", increment " + _incrementSize + "}";
     }
 
     // ===================================================================================

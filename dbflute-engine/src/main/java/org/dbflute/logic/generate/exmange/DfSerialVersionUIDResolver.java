@@ -71,8 +71,7 @@ public class DfSerialVersionUIDResolver {
         } finally {
             try {
                 br.close();
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
         BufferedWriter bw = null;
         try {
@@ -92,8 +91,7 @@ public class DfSerialVersionUIDResolver {
             if (bw != null) {
                 try {
                     bw.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

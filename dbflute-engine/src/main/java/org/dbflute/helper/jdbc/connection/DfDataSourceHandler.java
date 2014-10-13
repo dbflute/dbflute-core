@@ -101,8 +101,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }
@@ -124,8 +123,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
                 _log.info("...close()");
                 conn.close();
             }
-        } catch (SQLException ignored) {
-        } finally {
+        } catch (SQLException ignored) {} finally {
             if (DfDataSourceContext.isExistDataSource()) {
                 DfDataSourceContext.clearDataSource();
             }

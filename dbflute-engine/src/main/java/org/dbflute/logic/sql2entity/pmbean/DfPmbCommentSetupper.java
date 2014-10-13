@@ -71,8 +71,7 @@ public class DfPmbCommentSetupper {
         if (getBasicProperties().isFriendsS2JDBC()) {
             return;
         }
-        final String fileExt = getBasicProperties().getLanguageDependency().getLanguageGrammar()
-                .getClassFileExtension();
+        final String fileExt = getBasicProperties().getLanguageDependency().getLanguageGrammar().getClassFileExtension();
         for (DfPmbMetaData pmbMetaData : _pmbMetaDataList) {
             final String basePath = derivePmbFileBasePath(pmbMetaData);
             final String classFilePath = basePath + "/" + pmbMetaData.getExtendedClassName() + "." + fileExt;

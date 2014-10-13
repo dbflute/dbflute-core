@@ -40,8 +40,8 @@ public class DfProcedureSynonymExtractorFactory {
      * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      * @param databaseProperties The database properties. (NotNull)
      */
-    public DfProcedureSynonymExtractorFactory(DfSchemaSource dataSource,
-            DfDatabaseTypeFacadeProp databaseTypeFacadeProp, DfDatabaseProperties databaseProperties) {
+    public DfProcedureSynonymExtractorFactory(DfSchemaSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
+            DfDatabaseProperties databaseProperties) {
         _dataSource = dataSource;
         _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _databaseProperties = databaseProperties;

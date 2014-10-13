@@ -368,8 +368,8 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
                 }
             }
 
-            final DfOutsideSqlLocation sqlApLocation = createOutsideSqlLocation(projectName, sqlDirectory,
-                    sql2EntityOutputDirectory, true, suppressDirectoryCheck);
+            final DfOutsideSqlLocation sqlApLocation =
+                    createOutsideSqlLocation(projectName, sqlDirectory, sql2EntityOutputDirectory, true, suppressDirectoryCheck);
             _outsideSqlLocationList.add(sqlApLocation);
         }
         return _outsideSqlLocationList;
@@ -393,10 +393,9 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return plainDir;
     }
 
-    protected DfOutsideSqlLocation createOutsideSqlLocation(String projectName, String sqlDirectory,
-            String sql2EntityOutputDirectory, boolean sqlAp, boolean suppressDirectoryCheck) {
-        return new DfOutsideSqlLocation(projectName, sqlDirectory, sql2EntityOutputDirectory, sqlAp,
-                suppressDirectoryCheck);
+    protected DfOutsideSqlLocation createOutsideSqlLocation(String projectName, String sqlDirectory, String sql2EntityOutputDirectory,
+            boolean sqlAp, boolean suppressDirectoryCheck) {
+        return new DfOutsideSqlLocation(projectName, sqlDirectory, sql2EntityOutputDirectory, sqlAp, suppressDirectoryCheck);
     }
 
     // -----------------------------------------------------

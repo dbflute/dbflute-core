@@ -71,8 +71,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param tableName The name of table. (NotNull, CaseInsensitiveByOption)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
-            throws SQLException {
+    public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName) throws SQLException {
         final String translatedName = translateTableCaseName(tableName);
         List<DfColumnMeta> ls = doGetColumnList(metaData, unifiedSchema, translatedName, false);
         if (isRetryCaseInsensitiveColumn()) {
@@ -86,8 +85,8 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
         return ls;
     }
 
-    protected List<DfColumnMeta> doGetColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, boolean retry) throws SQLException {
+    protected List<DfColumnMeta> doGetColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName, boolean retry)
+            throws SQLException {
         final List<DfColumnMeta> columnList = DfCollectionUtil.newArrayList();
 
         // Column names for duplicate check
@@ -169,8 +168,8 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
         return columnList;
     }
 
-    protected ResultSet extractColumnMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
-            boolean retry) throws SQLException {
+    protected ResultSet extractColumnMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName, boolean retry)
+            throws SQLException {
         final String catalogName = unifiedSchema.getPureCatalog();
         final String schemaName = unifiedSchema.getPureSchema();
         try {

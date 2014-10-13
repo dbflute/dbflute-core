@@ -117,8 +117,8 @@ public class DfLReverseOutputHandler {
      * @param xlsFile The file of XLS. (NotNull)
      * @param sectionInfoList The list of section info. (NotNull)
      */
-    protected void transferToXls(Map<String, Table> tableMap, Map<String, DfLReverseDataResult> loadDataMap, int limit,
-            File xlsFile, List<String> sectionInfoList) {
+    protected void transferToXls(Map<String, Table> tableMap, Map<String, DfLReverseDataResult> loadDataMap, int limit, File xlsFile,
+            List<String> sectionInfoList) {
         final DfDataSet dataSet = new DfDataSet();
         int index = 0;
         for (Entry<String, Table> entry : tableMap.entrySet()) {
@@ -141,8 +141,8 @@ public class DfLReverseOutputHandler {
     // ===================================================================================
     //                                                                            Xls Data
     //                                                                            ========
-    protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList,
-            int index, List<String> sectionInfoList) {
+    protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList, int index,
+            List<String> sectionInfoList) {
         final List<Map<String, String>> recordList;
         {
             final String tableInfo = "  " + table.getTableDispName() + " (" + extractedList.size() + ")";

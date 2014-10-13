@@ -31,8 +31,7 @@ public class DfJFadResultSetWrapper {
     protected final Map<String, ValueType> _columnValueTypeMap;
     protected final DfJFadStringConverter _stringConverter;
 
-    public DfJFadResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap,
-            DfJFadStringConverter stringConverter) {
+    public DfJFadResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap, DfJFadStringConverter stringConverter) {
         _rs = rs;
         _columnValueTypeMap = columnValueTypeMap;
         _stringConverter = stringConverter;

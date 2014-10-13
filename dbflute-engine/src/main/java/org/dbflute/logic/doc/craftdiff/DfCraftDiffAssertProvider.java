@@ -68,8 +68,7 @@ public class DfCraftDiffAssertProvider {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCraftDiffAssertProvider(String craftMetaDir, DfCraftDiffAssertDirection nextDirection,
-            List<DfTableMeta> tableList) {
+    public DfCraftDiffAssertProvider(String craftMetaDir, DfCraftDiffAssertDirection nextDirection, List<DfTableMeta> tableList) {
         _craftMetaDir = craftMetaDir;
         _nextDirection = nextDirection;
         _tableList = tableList;
@@ -179,8 +178,7 @@ public class DfCraftDiffAssertProvider {
             final String exceptExp) {
         return new DfCraftDiffAssertHandler(_craftMetaDir, _nextDirection, craftTitle) {
             @Override
-            protected List<Map<String, String>> selectDiffDataList(File sqlFile, Statement st, String sql)
-                    throws SQLException {
+            protected List<Map<String, String>> selectDiffDataList(File sqlFile, Statement st, String sql) throws SQLException {
                 final List<Map<String, String>> unifiedList = new ArrayList<Map<String, String>>();
                 final Map<String, String> tableSqlMap = toTableSqlMap(tableHint, exceptExp);
                 for (DfTableMeta tableMeta : _tableList) {

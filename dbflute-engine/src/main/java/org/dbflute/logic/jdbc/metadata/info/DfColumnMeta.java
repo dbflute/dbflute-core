@@ -102,8 +102,8 @@ public class DfColumnMeta {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _tableName + "." + _columnName + ", " + _dbTypeName + "(" + _columnSize + "," + _decimalDigits
-                + "), " + _jdbcDefValue + ", " + _required + ", " + _columnComment + ", " + _defaultValue + "}";
+        return "{" + _tableName + "." + _columnName + ", " + _dbTypeName + "(" + _columnSize + "," + _decimalDigits + "), " + _jdbcDefValue
+                + ", " + _required + ", " + _columnComment + ", " + _defaultValue + "}";
     }
 
     // ===================================================================================

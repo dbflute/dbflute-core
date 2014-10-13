@@ -143,8 +143,7 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
         return _grammarJava.buildEntityPropertyName(col);
     }
 
-    public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber,
-            boolean toBoolean) {
+    public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber, boolean toBoolean) {
         final String cdefCode = cdefBase + ".code";
         if (toNumber) {
             return "toNumber(" + cdefCode + ", classOf[" + valueType + "])";

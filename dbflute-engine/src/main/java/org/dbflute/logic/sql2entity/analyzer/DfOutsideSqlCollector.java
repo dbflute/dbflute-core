@@ -73,8 +73,7 @@ public class DfOutsideSqlCollector {
                 handleSecondaryDirectory(outsideSqlPack, sqlLocation, sqlDirectory, false);
             } else {
                 final boolean suppressCheck = _suppressDirectoryCheck || sqlLocation.isSuppressDirectoryCheck();
-                final boolean foundSecondaryDirectory = handleSecondaryDirectory(outsideSqlPack, sqlLocation,
-                        sqlDirectory, suppressCheck);
+                final boolean foundSecondaryDirectory = handleSecondaryDirectory(outsideSqlPack, sqlLocation, sqlDirectory, suppressCheck);
                 if (!foundSecondaryDirectory && !suppressCheck) { // means both primary and secondary directory
                     String msg = "The sqlDirectory does not exist: " + sqlDirectory;
                     throw new IllegalStateException(msg);
@@ -93,8 +92,7 @@ public class DfOutsideSqlCollector {
         return new File(sqlDirPath).exists();
     }
 
-    protected List<DfOutsideSqlFile> collectSqlFile(String realSqlDirectory, DfOutsideSqlLocation sqlLocation)
-            throws FileNotFoundException {
+    protected List<DfOutsideSqlFile> collectSqlFile(String realSqlDirectory, DfOutsideSqlLocation sqlLocation) throws FileNotFoundException {
         final List<File> sqlFileList = createSqlFileGetter().getSqlFileList(realSqlDirectory);
         final List<DfOutsideSqlFile> outsideSqlList = new ArrayList<DfOutsideSqlFile>();
         for (File sqlFile : sqlFileList) {
@@ -116,8 +114,8 @@ public class DfOutsideSqlCollector {
         };
     }
 
-    protected boolean handleSecondaryDirectory(DfOutsideSqlPack outsideSqlPack, DfOutsideSqlLocation sqlLocation,
-            String sqlDirectory, boolean checkNotFound) {
+    protected boolean handleSecondaryDirectory(DfOutsideSqlPack outsideSqlPack, DfOutsideSqlLocation sqlLocation, String sqlDirectory,
+            boolean checkNotFound) {
         final DfBasicProperties basicProp = getBasicProperties();
         final DfLanguageDependency lang = basicProp.getLanguageDependency();
         final String secondaryDirectory = lang.convertToSecondaryOutsideSqlDirectory(sqlDirectory);

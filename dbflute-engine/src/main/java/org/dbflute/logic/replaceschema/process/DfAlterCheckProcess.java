@@ -317,8 +317,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return copyToFileList;
     }
 
-    protected void doCopyToPreviousResource(File mainFile, String previousDir, String playSqlDirSymbol,
-            List<File> copyToFileList) {
+    protected void doCopyToPreviousResource(File mainFile, String previousDir, String playSqlDirSymbol, List<File> copyToFileList) {
         final String relativePath = Srl.substringLastRear(resolvePath(mainFile), playSqlDirSymbol);
         final File copyToFile = new File(previousDir + "/" + relativePath);
         final File copyToDir = new File(Srl.substringLastFront(resolvePath(copyToFile), "/"));
@@ -355,8 +354,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return true;
     }
 
-    protected void setupAlterCheckSavePreviousFailureException(DfAlterCheckFinalInfo finalInfo,
-            RuntimeException threwLater) {
+    protected void setupAlterCheckSavePreviousFailureException(DfAlterCheckFinalInfo finalInfo, RuntimeException threwLater) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(getAlterCheckSavePreviousFailureNotice());
         br.addItem("Advice");
@@ -806,8 +804,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return "Failed to execute the AlterDDL statements.";
     }
 
-    protected void handleTakeFinallyAssertionFailureException(DfAlterCheckFinalInfo finalInfo,
-            DfTakeFinallyAssertionFailureException e) {
+    protected void handleTakeFinallyAssertionFailureException(DfAlterCheckFinalInfo finalInfo, DfTakeFinallyAssertionFailureException e) {
         finalInfo.setResultMessage("{Alter Schema}: *asserted");
         final int fileListSize = _executedAlterSqlFileList.size();
         int index = 0;
@@ -840,8 +837,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         reflectTakeFinallyResultToFinalInfo(finalInfo, takeFinally);
     }
 
-    protected void reflectTakeFinallyResultToFinalInfo(DfAlterCheckFinalInfo finalInfo,
-            DfTakeFinallyFinalInfo takeFinally) {
+    protected void reflectTakeFinallyResultToFinalInfo(DfAlterCheckFinalInfo finalInfo, DfTakeFinallyFinalInfo takeFinally) {
         final List<String> detailMessageList = takeFinally.getDetailMessageList();
         for (String detailMessage : detailMessageList) {
             finalInfo.addDetailMessage(detailMessage);
@@ -887,8 +883,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml, DfCraftDiffAssertDirection direction) {
         final String historyFile = null; // no use history here (use SchemaDiff directly later)
-        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml,
-                historyFile);
+        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml, historyFile);
         final String craftMetaDir = getMigrationAlterCheckCraftMetaDir();
         serializer.enableCraftDiff(_dataSource, craftMetaDir, direction);
         return serializer;
@@ -1312,8 +1307,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             if (bw != null) {
                 try {
                     bw.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

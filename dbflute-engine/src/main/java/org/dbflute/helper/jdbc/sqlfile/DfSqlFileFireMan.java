@@ -94,8 +94,8 @@ public class DfSqlFileFireMan {
         return fireResult;
     }
 
-    protected void buildResultMessage(List<File> sqlFileList, final DfSqlFileFireResult fireResult, int goodSqlCount,
-            int totalSqlCount, final String title) {
+    protected void buildResultMessage(List<File> sqlFileList, final DfSqlFileFireResult fireResult, int goodSqlCount, int totalSqlCount,
+            final String title) {
         final StringBuilder resultSb = new StringBuilder();
         resultSb.append("{").append(title).append("}: success=").append(goodSqlCount);
         if (fireResult.getBreakCause() != null) {

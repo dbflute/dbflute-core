@@ -43,8 +43,8 @@ public class DfColumnValueConverter {
     protected Map<String, String> _allColumnConvertMap; // derived lazily
     protected boolean _emptyToNullIfNoConvert;
 
-    public DfColumnValueConverter(Map<String, Map<String, String>> convertValueMap,
-            Map<String, String> defaultValueMap, DfColumnBindTypeProvider bindTypeProvider) {
+    public DfColumnValueConverter(Map<String, Map<String, String>> convertValueMap, Map<String, String> defaultValueMap,
+            DfColumnBindTypeProvider bindTypeProvider) {
         _convertValueMap = convertValueMap;
         _defaultValueMap = defaultValueMap;
         _bindTypeProvider = bindTypeProvider;
@@ -87,8 +87,8 @@ public class DfColumnValueConverter {
     // ===================================================================================
     //                                                                       Convert Value
     //                                                                       =============
-    protected Object resolveConvertValue(String tableName, String columnName, Object plainValue,
-            Set<String> convertedSet, Map<String, DfColumnMeta> columnMetaMap) {
+    protected Object resolveConvertValue(String tableName, String columnName, Object plainValue, Set<String> convertedSet,
+            Map<String, DfColumnMeta> columnMetaMap) {
         if (_convertValueMap == null || _convertValueMap.isEmpty()) {
             return plainValue;
         }
@@ -147,8 +147,8 @@ public class DfColumnValueConverter {
         return plainValue.toString();
     }
 
-    protected String processType(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap,
-            String filteredValue, String before, String after) {
+    protected String processType(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap, String filteredValue,
+            String before, String after) {
         String processed = null;
 
         processed = processTimestamp(tableName, columnName, columnMetaMap, filteredValue, before, after);
@@ -159,8 +159,8 @@ public class DfColumnValueConverter {
         return null;
     }
 
-    protected String processTimestamp(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap,
-            String filteredValue, String before, String after) {
+    protected String processTimestamp(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap, String filteredValue,
+            String before, String after) {
         if (!"$$timestamp$$".equalsIgnoreCase(before)) {
             return null;
         }

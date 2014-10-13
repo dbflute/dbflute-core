@@ -75,8 +75,8 @@ public class DfPropTableLoader {
         return new DfFreeGenTable(tableMap, tableName, columnList);
     }
 
-    protected JavaPropertiesReader createReader(String requestName, DfFreeGenResource resource,
-            Map<String, Object> tableMap, Map<String, DfFreeGenRequest> requestMap) {
+    protected JavaPropertiesReader createReader(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
+            Map<String, DfFreeGenRequest> requestMap) {
         final String resourceFile = resource.getResourceFile();
         final String title = requestName + ":" + resourceFile;
         final JavaPropertiesReader reader = new JavaPropertiesReader(title, new JavaPropertiesStreamProvider() {
@@ -181,8 +181,7 @@ public class DfPropTableLoader {
         return doConvertToMapList(propertyList, tableMap);
     }
 
-    protected List<Map<String, Object>> doConvertToMapList(final List<JavaPropertiesProperty> propertyList,
-            Map<String, Object> tableMap) {
+    protected List<Map<String, Object>> doConvertToMapList(final List<JavaPropertiesProperty> propertyList, Map<String, Object> tableMap) {
         final List<String> exceptKeyList = extractExceptKeyList(tableMap);
         final Map<String, String> groupingKeyMap = extractDeterminationMap(tableMap);
         final DfDocumentProperties prop = getDocumentProperties();

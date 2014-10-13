@@ -74,16 +74,15 @@ public class DfJsonKeyTableLoader {
     // ===================================================================================
     //                                                                       Trace KeyList
     //                                                                       =============
-    protected List<String> traceKeyList(String requestName, DfFreeGenResource resource, Map<String, Object> rootMap,
-            String keyPath, List<String> pathList) {
+    protected List<String> traceKeyList(String requestName, DfFreeGenResource resource, Map<String, Object> rootMap, String keyPath,
+            List<String> pathList) {
         return new DfJsonFreeAgent().traceKeyList(requestName, resource, rootMap, keyPath, pathList);
     }
 
     // ===================================================================================
     //                                                                   Set up ColumnList
     //                                                                   =================
-    protected List<Map<String, Object>> setupColumnList(String requestName, DfFreeGenResource resource,
-            List<String> keyList) {
+    protected List<Map<String, Object>> setupColumnList(String requestName, DfFreeGenResource resource, List<String> keyList) {
         final List<Map<String, Object>> columnList = new ArrayList<Map<String, Object>>();
         for (String key : keyList) {
             final Map<String, Object> columnMap = new HashMap<String, Object>();

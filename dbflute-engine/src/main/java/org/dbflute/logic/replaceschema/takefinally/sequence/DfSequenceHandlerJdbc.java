@@ -134,8 +134,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
                 callSequenceLoop(st, sequenceName, actualValue);
             }
         } catch (SQLException e) {
-            throwIncrementSequenceToDataMaxFailureException(tableName, sequenceName, tableInfo, pkInfo, tableSqlName,
-                    actualValue, e);
+            throwIncrementSequenceToDataMaxFailureException(tableName, sequenceName, tableInfo, pkInfo, tableSqlName, actualValue, e);
         } finally {
             if (st != null) {
                 try {
@@ -226,8 +225,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         }
     }
 
-    protected Integer selectDataMax(Statement statement, DfTableMeta tableInfo, String primaryKeyColumnName)
-            throws SQLException {
+    protected Integer selectDataMax(Statement statement, DfTableMeta tableInfo, String primaryKeyColumnName) throws SQLException {
         final String tableSqlName = tableInfo.getTableSqlName();
         final String sql = "select max(" + primaryKeyColumnName + ") as MAX_VALUE from " + tableSqlName;
         ResultSet rs = null;
@@ -263,8 +261,8 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
 
     protected abstract Integer selectNextVal(Statement statement, String sequenceName) throws SQLException;
 
-    protected void throwIncrementSequenceToDataMaxFailureException(String tableName, String sequenceName,
-            DfTableMeta tableInfo, DfPrimaryKeyMeta pkInfo, String tableSqlName, Integer actualValue, SQLException e) {
+    protected void throwIncrementSequenceToDataMaxFailureException(String tableName, String sequenceName, DfTableMeta tableInfo,
+            DfPrimaryKeyMeta pkInfo, String tableSqlName, Integer actualValue, SQLException e) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "Failed to handle serial type sequence!" + ln();

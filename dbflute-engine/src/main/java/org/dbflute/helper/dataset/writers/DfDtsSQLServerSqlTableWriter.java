@@ -84,8 +84,7 @@ public class DfDtsSQLServerSqlTableWriter extends DfDtsSqlTableWriter {
                 if (stmt != null) {
                     try {
                         stmt.close();
-                    } catch (SQLException ignored) {
-                    }
+                    } catch (SQLException ignored) {}
                 }
             }
         } finally {
@@ -112,20 +111,17 @@ public class DfDtsSQLServerSqlTableWriter extends DfDtsSqlTableWriter {
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (stmt != null) {
                 try {
                     stmt.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }

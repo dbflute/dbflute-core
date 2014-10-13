@@ -95,8 +95,7 @@ public class DfTaskBasicController {
             if (isUseDataSource()) {
                 try {
                     commitDataSource();
-                } catch (SQLException ignored) {
-                } finally {
+                } catch (SQLException ignored) {} finally {
                     try {
                         destroyDataSource();
                     } catch (Exception ignored) {

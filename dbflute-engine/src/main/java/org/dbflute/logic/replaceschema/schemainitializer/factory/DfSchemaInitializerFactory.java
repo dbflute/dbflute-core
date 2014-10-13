@@ -60,8 +60,7 @@ public class DfSchemaInitializerFactory {
     //                                                                         Constructor
     //                                                                         ===========
     public DfSchemaInitializerFactory(DataSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
-            DfDatabaseProperties databaseProperties, DfReplaceSchemaProperties replaceSchemaProperties,
-            InitializeType initializeType) {
+            DfDatabaseProperties databaseProperties, DfReplaceSchemaProperties replaceSchemaProperties, InitializeType initializeType) {
         _dataSource = dataSource;
         _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _databaseProperties = databaseProperties;

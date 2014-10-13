@@ -725,8 +725,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     protected void checkArrangeUnsupportedManupulation(Map<String, Map<String, Object>> arrangeMap) {
         if (arrangeMap.size() >= 4) { // may support other manipulations
-            String msg = "The arrangeBeforeReps supports only 'define' and 'copy' and 'script' now: "
-                    + arrangeMap.keySet();
+            String msg = "The arrangeBeforeReps supports only 'define' and 'copy' and 'script' now: " + arrangeMap.keySet();
             throw new DfIllegalPropertySettingException(msg);
         }
     }

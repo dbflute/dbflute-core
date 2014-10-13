@@ -43,8 +43,7 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 0.9.6.2 (2009/12/08 Tuesday)
  */
-public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtractor implements
-        DfProcedureSynonymExtractor {
+public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtractor implements DfProcedureSynonymExtractor {
 
     // ===================================================================================
     //                                                                          Definition
@@ -133,20 +132,17 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
             if (st != null) {
                 try {
                     st.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
         return procedureSynonymMap;
@@ -184,8 +180,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
         }
     }
 
-    protected DfProcedureMeta findProcedureMeta(UnifiedSchema tableOwner, String tableName,
-            Map<String, DfProcedureMeta> procedureMap) {
+    protected DfProcedureMeta findProcedureMeta(UnifiedSchema tableOwner, String tableName, Map<String, DfProcedureMeta> procedureMap) {
         final String procedureKey = tableOwner.buildSchemaQualifiedName(tableName);
         DfProcedureMeta procedureMeta = procedureMap.get(procedureKey);
         if (procedureMeta == null) { // it may be package procedure

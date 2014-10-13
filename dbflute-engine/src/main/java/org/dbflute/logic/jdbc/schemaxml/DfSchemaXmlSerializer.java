@@ -203,8 +203,7 @@ public class DfSchemaXmlSerializer {
     //                                           Thread Fire
     //                                           -----------
     private final Set<String> _tableMetaDataSyncSet = Collections.synchronizedSet(new HashSet<String>());
-    private final Map<String, Element> _tableElementStagingMap = Collections
-            .synchronizedMap(new TreeMap<String, Element>()); // simple order
+    private final Map<String, Element> _tableElementStagingMap = Collections.synchronizedMap(new TreeMap<String, Element>()); // simple order
 
     // ===================================================================================
     //                                                                         Constructor
@@ -325,8 +324,7 @@ public class DfSchemaXmlSerializer {
             if (writer != null) {
                 try {
                     writer.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
 
@@ -416,8 +414,8 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                                 Table
     //                                                 -----
-    protected void processTable(final Connection conn, final DatabaseMetaData metaData,
-            final List<DfTableMeta> tableList) throws SQLException {
+    protected void processTable(final Connection conn, final DatabaseMetaData metaData, final List<DfTableMeta> tableList)
+            throws SQLException {
         _log.info("");
         _log.info("$ /= = = = = = = = = = = = = = = = = = = = = = = = = =");
         _log.info("$ [Table List]");
@@ -444,8 +442,7 @@ public class DfSchemaXmlSerializer {
         return prop.getMetaDataCountDownRaceRunnerCount();
     }
 
-    protected void countDownRaceProcessTable(final List<DfTableMeta> tableList, int runnerCount,
-            final DfFittingDataSource fittingDs) {
+    protected void countDownRaceProcessTable(final List<DfTableMeta> tableList, int runnerCount, final DfFittingDataSource fittingDs) {
         final CountDownRace fireMan = new CountDownRace(runnerCount);
         fireMan.readyGo(new CountDownRaceExecution() {
             public void execute(CountDownRaceRunner resource) {
@@ -474,8 +471,7 @@ public class DfSchemaXmlSerializer {
                     if (runnerConn != null) {
                         try {
                             runnerConn.close();
-                        } catch (SQLException e) {
-                        }
+                        } catch (SQLException e) {}
                     }
                     DfDataSourceContext.clearDataSource();
                 }
@@ -495,8 +491,7 @@ public class DfSchemaXmlSerializer {
         });
     }
 
-    protected boolean doProcessTable(Connection conn, DatabaseMetaData metaData, DfTableMeta tableMeta)
-            throws SQLException {
+    protected boolean doProcessTable(Connection conn, DatabaseMetaData metaData, DfTableMeta tableMeta) throws SQLException {
         final String tableFullQualifiedName = tableMeta.getTableFullQualifiedName();
         if (tableMeta.isOutOfGenerateTarget()) {
             // for example, sequence synonym and so on...
@@ -537,8 +532,7 @@ public class DfSchemaXmlSerializer {
         }
 
         processForeignKey(metaData, tableMeta, tableElement);
-        final Map<String, Map<Integer, String>> uniqueKeyMap = processUniqueKey(metaData, tableMeta, pkInfo,
-                tableElement);
+        final Map<String, Map<Integer, String>> uniqueKeyMap = processUniqueKey(metaData, tableMeta, pkInfo, tableElement);
         processIndex(metaData, tableMeta, tableElement, uniqueKeyMap);
 
         _tableElementStagingMap.put(tableFullQualifiedName, tableElement);
@@ -630,8 +624,8 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected void processAutoIncrement(DfTableMeta tableMeta, DfColumnMeta columnMeta, DfPrimaryKeyMeta pkMeta,
-            Connection conn, Element columnElement) throws SQLException {
+    protected void processAutoIncrement(DfTableMeta tableMeta, DfColumnMeta columnMeta, DfPrimaryKeyMeta pkMeta, Connection conn,
+            Element columnElement) throws SQLException {
         final String columnName = columnMeta.getColumnName();
         if (pkMeta.containsColumn(columnName)) {
             if (isAutoIncrementColumn(conn, tableMeta, columnMeta)) {
@@ -643,8 +637,7 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                            ForeignKey
     //                                            ----------
-    protected void processForeignKey(DatabaseMetaData metaData, DfTableMeta tableMeta, Element tableElement)
-            throws SQLException {
+    protected void processForeignKey(DatabaseMetaData metaData, DfTableMeta tableMeta, Element tableElement) throws SQLException {
         final Map<String, DfForeignKeyMeta> foreignKeyMap = getForeignKeys(metaData, tableMeta);
         if (foreignKeyMap.isEmpty()) {
             return;
@@ -690,8 +683,7 @@ public class DfSchemaXmlSerializer {
     }
 
     // constraint common
-    protected Set<String> deriveConstraintKeyLoopSet(Map<String, ? extends Object> nextMap,
-            List<? extends Constraint> previousList) {
+    protected Set<String> deriveConstraintKeyLoopSet(Map<String, ? extends Object> nextMap, List<? extends Constraint> previousList) {
         if (nextMap.size() != previousList.size()) {
             return nextMap.keySet(); // added or deleted exists
         }
@@ -718,8 +710,8 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                             UniqueKey
     //                                             ---------
-    protected Map<String, Map<Integer, String>> processUniqueKey(DatabaseMetaData metaData, DfTableMeta tableMeta,
-            DfPrimaryKeyMeta pkInfo, Element tableElement) throws SQLException {
+    protected Map<String, Map<Integer, String>> processUniqueKey(DatabaseMetaData metaData, DfTableMeta tableMeta, DfPrimaryKeyMeta pkInfo,
+            Element tableElement) throws SQLException {
         final Map<String, Map<Integer, String>> uniqueMap = getUniqueKeyMap(metaData, tableMeta, pkInfo);
         if (uniqueMap.isEmpty()) {
             return uniqueMap;
@@ -847,8 +839,7 @@ public class DfSchemaXmlSerializer {
         sequenceGroupElement.appendChild(sequenceElement);
     }
 
-    protected void setupSequenceAttributeNumber(DfSequenceMeta sequenceMeta, Element tableElement, String key,
-            Number number) {
+    protected void setupSequenceAttributeNumber(DfSequenceMeta sequenceMeta, Element tableElement, String key, Number number) {
         if (number != null) {
             tableElement.setAttribute(key, DfTypeUtil.toString(number));
         }
@@ -1123,8 +1114,7 @@ public class DfSchemaXmlSerializer {
         return columnList;
     }
 
-    protected List<DfColumnMeta> helpColumnAdjustment(DatabaseMetaData dbMeta, DfTableMeta tableMeta,
-            List<DfColumnMeta> columnList) {
+    protected List<DfColumnMeta> helpColumnAdjustment(DatabaseMetaData dbMeta, DfTableMeta tableMeta, List<DfColumnMeta> columnList) {
         if (!canHandleSynonym(tableMeta)) {
             return columnList;
         }
@@ -1198,8 +1188,7 @@ public class DfSchemaXmlSerializer {
      * @return The meta information of primary key. (NotNull)
      * @throws SQLException
      */
-    protected DfPrimaryKeyMeta getPrimaryColumnMetaInfo(DatabaseMetaData metaData, DfTableMeta tableMeta)
-            throws SQLException {
+    protected DfPrimaryKeyMeta getPrimaryColumnMetaInfo(DatabaseMetaData metaData, DfTableMeta tableMeta) throws SQLException {
         final DfPrimaryKeyMeta pkInfo = _uniqueKeyExtractor.getPrimaryKey(metaData, tableMeta);
         final List<String> pkList = pkInfo.getPrimaryKeyList();
         if (!canHandleSynonym(tableMeta) || !pkList.isEmpty()) {
@@ -1224,10 +1213,9 @@ public class DfSchemaXmlSerializer {
      * @return The list of unique columns. (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableMeta,
-            DfPrimaryKeyMeta pkInfo) throws SQLException {
-        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyExtractor.getUniqueKeyMap(metaData, tableMeta,
-                pkInfo);
+    protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableMeta, DfPrimaryKeyMeta pkInfo)
+            throws SQLException {
+        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyExtractor.getUniqueKeyMap(metaData, tableMeta, pkInfo);
         if (!canHandleSynonym(tableMeta) || !uniqueKeyMap.isEmpty()) {
             return uniqueKeyMap;
         }
@@ -1246,8 +1234,7 @@ public class DfSchemaXmlSerializer {
      * @return Auto-increment column name. (NullAllowed)
      * @throws SQLException
      */
-    protected boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableMeta, DfColumnMeta primaryKeyColumnInfo)
-            throws SQLException {
+    protected boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableMeta, DfColumnMeta primaryKeyColumnInfo) throws SQLException {
         if (_autoIncrementExtractor.isAutoIncrementColumn(conn, tableMeta, primaryKeyColumnInfo)) {
             return true;
         }
@@ -1289,8 +1276,7 @@ public class DfSchemaXmlSerializer {
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    protected Map<String, DfForeignKeyMeta> getForeignKeys(DatabaseMetaData metaData, DfTableMeta tableMeta)
-            throws SQLException {
+    protected Map<String, DfForeignKeyMeta> getForeignKeys(DatabaseMetaData metaData, DfTableMeta tableMeta) throws SQLException {
         final Map<String, DfForeignKeyMeta> foreignKeyMap = _foreignKeyExtractor.getForeignKeyMap(metaData, tableMeta);
         if (!canHandleSynonym(tableMeta) || !foreignKeyMap.isEmpty()) {
             return foreignKeyMap;
@@ -1312,8 +1298,7 @@ public class DfSchemaXmlSerializer {
      */
     protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, DfTableMeta tableMeta,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
-        final Map<String, Map<Integer, String>> indexMap = _indexExtractor.getIndexMap(metaData, tableMeta,
-                uniqueKeyMap);
+        final Map<String, Map<Integer, String>> indexMap = _indexExtractor.getIndexMap(metaData, tableMeta, uniqueKeyMap);
         if (!canHandleSynonym(tableMeta) || !indexMap.isEmpty()) {
             return indexMap;
         }
@@ -1451,8 +1436,7 @@ public class DfSchemaXmlSerializer {
 
     protected DfSynonymExtractorFactory createSynonymExtractorFactory() {
         // The synonym extractor needs the map of generated tables for reference table check.
-        return new DfSynonymExtractorFactory(_dataSource, getDatabaseTypeFacadeProp(), getDatabaseProperties(),
-                _generatedTableMap);
+        return new DfSynonymExtractorFactory(_dataSource, getDatabaseTypeFacadeProp(), getDatabaseProperties(), _generatedTableMap);
     }
 
     // ===================================================================================
@@ -1510,8 +1494,7 @@ public class DfSchemaXmlSerializer {
         _schemaDiff.suppressSchema();
     }
 
-    public void enableCraftDiff(DfSchemaSource dataSource, String craftMetaDir,
-            DfCraftDiffAssertDirection assertDirection) {
+    public void enableCraftDiff(DfSchemaSource dataSource, String craftMetaDir, DfCraftDiffAssertDirection assertDirection) {
         if (craftMetaDir == null) {
             return;
         }

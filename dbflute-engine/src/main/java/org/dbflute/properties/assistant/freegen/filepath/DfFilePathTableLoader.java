@@ -140,10 +140,8 @@ public class DfFilePathTableLoader {
         });
     }
 
-    protected boolean isCollectFile(String targetExt, String targetKeyword, List<String> exceptPathList,
-            File currentFile) {
-        return !isExceptFile(exceptPathList, currentFile)
-                && isHitByTargetExt(toPath(currentFile), targetExt, targetKeyword);
+    protected boolean isCollectFile(String targetExt, String targetKeyword, List<String> exceptPathList, File currentFile) {
+        return !isExceptFile(exceptPathList, currentFile) && isHitByTargetExt(toPath(currentFile), targetExt, targetKeyword);
     }
 
     protected boolean isExceptFile(List<String> exceptPathList, File baseFile) {

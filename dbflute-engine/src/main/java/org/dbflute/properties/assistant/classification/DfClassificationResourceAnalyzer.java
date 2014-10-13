@@ -124,9 +124,8 @@ public class DfClassificationResourceAnalyzer {
             if (!classificationTopList.isEmpty()) {
                 for (DfClassificationTop top : classificationTopList) {
                     _log.info("    " + top.getClassificationName() + ", " + top.getTopCommentDisp() + ", "
-                            + top.isCheckClassificationCode() + ", " + top.getUndefinedHandlingType() + ", "
-                            + top.isCheckImplicitSet() + ", " + top.isCheckSelectedClassification() + ", "
-                            + top.isForceClassificationSetting());
+                            + top.isCheckClassificationCode() + ", " + top.getUndefinedHandlingType() + ", " + top.isCheckImplicitSet()
+                            + ", " + top.isCheckSelectedClassification() + ", " + top.isForceClassificationSetting());
                 }
             } else {
                 _log.info(" -> no classification in resource file");

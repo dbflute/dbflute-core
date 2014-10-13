@@ -255,8 +255,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return new DfSequenceExtractorFactory(dataSource, facadeProp, getDatabaseProperties());
     }
 
-    protected DfSequenceMeta getSequenceElement(UnifiedSchema unifiedSchema, String sequenceName,
-            Map<String, DfSequenceMeta> sequenceMap) {
+    protected DfSequenceMeta getSequenceElement(UnifiedSchema unifiedSchema, String sequenceName, Map<String, DfSequenceMeta> sequenceMap) {
         DfSequenceMeta info = sequenceMap.get(sequenceName);
         if (info != null) {
             return info;
@@ -278,8 +277,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Minimum Value
     //                                         -------------
-    public BigDecimal getSequenceMinimumValueByTableName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
-            String tableName) {
+    public BigDecimal getSequenceMinimumValueByTableName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
@@ -287,14 +285,12 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return getSequenceMinimumValueBySequenceName(dataSource, unifiedSchema, sequenceName);
     }
 
-    public BigDecimal getSequenceMinimumValueBySequenceName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
-            String sequenceName) {
+    public BigDecimal getSequenceMinimumValueBySequenceName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema, String sequenceName) {
         final Map<String, DfSequenceMeta> sequenceMap = getSequenceMap(dataSource);
         return getSequenceMinimumValue(unifiedSchema, sequenceName, sequenceMap);
     }
 
-    protected BigDecimal getSequenceMinimumValue(UnifiedSchema unifiedSchema, String sequenceName,
-            Map<String, DfSequenceMeta> sequenceMap) {
+    protected BigDecimal getSequenceMinimumValue(UnifiedSchema unifiedSchema, String sequenceName, Map<String, DfSequenceMeta> sequenceMap) {
         final DfSequenceMeta info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
         if (info != null) {
             final BigDecimal minimumValue = info.getMinimumValue();
@@ -311,8 +307,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Maximum Value
     //                                         -------------
-    public BigDecimal getSequenceMaximumValueByTableName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
-            String tableName) {
+    public BigDecimal getSequenceMaximumValueByTableName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
@@ -320,14 +315,12 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return getSequenceMaximumValueBySequenceName(dataSource, unifiedSchema, sequenceName);
     }
 
-    public BigDecimal getSequenceMaximumValueBySequenceName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
-            String sequenceName) {
+    public BigDecimal getSequenceMaximumValueBySequenceName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema, String sequenceName) {
         final Map<String, DfSequenceMeta> sequenceMap = getSequenceMap(dataSource);
         return getSequenceMaximumValue(unifiedSchema, sequenceName, sequenceMap);
     }
 
-    protected BigDecimal getSequenceMaximumValue(UnifiedSchema unifiedSchema, String sequenceName,
-            Map<String, DfSequenceMeta> sequenceMap) {
+    protected BigDecimal getSequenceMaximumValue(UnifiedSchema unifiedSchema, String sequenceName, Map<String, DfSequenceMeta> sequenceMap) {
         final DfSequenceMeta info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
         if (info != null) {
             final BigDecimal maximumValue = info.getMaximumValue();
@@ -344,8 +337,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                        Increment Size
     //                                        --------------
-    public Integer getSequenceIncrementSizeByTableName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
-            String tableName) {
+    public Integer getSequenceIncrementSizeByTableName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
@@ -353,14 +345,12 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return getSequenceIncrementSizeBySequenceName(dataSource, unifiedSchema, sequenceName);
     }
 
-    public Integer getSequenceIncrementSizeBySequenceName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
-            String sequenceName) {
+    public Integer getSequenceIncrementSizeBySequenceName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema, String sequenceName) {
         final Map<String, DfSequenceMeta> sequenceMap = getSequenceMap(dataSource);
         return getSequenceIncrementSize(unifiedSchema, sequenceName, sequenceMap);
     }
 
-    protected Integer getSequenceIncrementSize(UnifiedSchema unifiedSchema, String sequenceName,
-            Map<String, DfSequenceMeta> sequenceMap) {
+    protected Integer getSequenceIncrementSize(UnifiedSchema unifiedSchema, String sequenceName, Map<String, DfSequenceMeta> sequenceMap) {
         final DfSequenceMeta info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
         if (info != null) {
             final Integer incrementSize = info.getIncrementSize();
@@ -446,8 +436,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         }
     }
 
-    protected void assertCacheSizeOverOne(Integer cacheSize, UnifiedSchema unifiedSchema, String tableName,
-            String sequenceProp, String sequenceName, Integer incrementSize) {
+    protected void assertCacheSizeOverOne(Integer cacheSize, UnifiedSchema unifiedSchema, String tableName, String sequenceProp,
+            String sequenceName, Integer incrementSize) {
         if (cacheSize <= 1) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
@@ -481,8 +471,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     //    }
     //}
 
-    protected void assertIncrementSizeNotDecrement(Integer incrementSize, UnifiedSchema unifiedSchema,
-            String tableName, String sequenceProp, String sequenceName) {
+    protected void assertIncrementSizeNotDecrement(Integer incrementSize, UnifiedSchema unifiedSchema, String tableName,
+            String sequenceProp, String sequenceName) {
         if (incrementSize <= 0) { // contains zero just in case
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
@@ -497,8 +487,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         }
     }
 
-    protected void assertExtraValueZero(Integer cacheSize, Integer incrementSize, UnifiedSchema unifiedSchema,
-            String tableName, String sequenceProp, String sequenceName) {
+    protected void assertExtraValueZero(Integer cacheSize, Integer incrementSize, UnifiedSchema unifiedSchema, String tableName,
+            String sequenceProp, String sequenceName) {
         final Integer extraValue = cacheSize % incrementSize;
         if (extraValue != 0) {
             String msg = "Look! Read the message below." + ln();
@@ -516,8 +506,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         }
     }
 
-    protected void assertIncrementSizeExistsIfNoCacheSize(Integer incrementSize, UnifiedSchema unifiedSchema,
-            String tableName, String sequenceProp, String sequenceName) {
+    protected void assertIncrementSizeExistsIfNoCacheSize(Integer incrementSize, UnifiedSchema unifiedSchema, String tableName,
+            String sequenceProp, String sequenceName) {
         if (incrementSize == null) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();

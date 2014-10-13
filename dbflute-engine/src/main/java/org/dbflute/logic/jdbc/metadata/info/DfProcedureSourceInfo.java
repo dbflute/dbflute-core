@@ -26,8 +26,7 @@ public class DfProcedureSourceInfo {
     protected Integer _sourceSize; // not accurate
 
     public String toSourceHash() {
-        final String resource = (_sourceCode != null ? _sourceCode : "")
-                + (_supplementCode != null ? "\n" + _supplementCode : "");
+        final String resource = (_sourceCode != null ? _sourceCode : "") + (_supplementCode != null ? "\n" + _supplementCode : "");
         return Integer.toHexString(resource.hashCode());
     }
 

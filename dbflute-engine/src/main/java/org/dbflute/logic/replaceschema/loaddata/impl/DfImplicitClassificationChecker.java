@@ -74,8 +74,8 @@ public class DfImplicitClassificationChecker {
                 illegalCodeList.add(rs.getString(1));
             }
             if (!illegalCodeList.isEmpty()) {
-                handleLoadDataIllegalImplicitClassificationValueException(file, tableDbName, columnDbName,
-                        classificationName, codeList, illegalCodeList, undefinedHandlingType);
+                handleLoadDataIllegalImplicitClassificationValueException(file, tableDbName, columnDbName, classificationName, codeList,
+                        illegalCodeList, undefinedHandlingType);
             }
         } finally {
             if (rs != null) {
@@ -104,8 +104,8 @@ public class DfImplicitClassificationChecker {
         return sb.toString();
     }
 
-    protected void handleLoadDataIllegalImplicitClassificationValueException(File file, String tableDbName,
-            String columnDbName, String classificationName, List<String> codeList, List<String> illegalCodeList,
+    protected void handleLoadDataIllegalImplicitClassificationValueException(File file, String tableDbName, String columnDbName,
+            String classificationName, List<String> codeList, List<String> illegalCodeList,
             ClassificationUndefinedHandlingType undefinedHandlingType) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Undefined classification code was found.");

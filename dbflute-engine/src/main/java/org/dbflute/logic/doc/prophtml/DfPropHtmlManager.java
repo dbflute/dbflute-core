@@ -114,8 +114,7 @@ public class DfPropHtmlManager {
         return new DfPropHtmlRequest(requestName, diffIgnored, masked, envOnly, extendsProp, checkImpOver);
     }
 
-    protected void assertPropHtmlRootFileExists(Map<String, DfPropHtmlFileAttribute> defaultEnvMap, String requestName,
-            String rootFile) {
+    protected void assertPropHtmlRootFileExists(Map<String, DfPropHtmlFileAttribute> defaultEnvMap, String requestName, String rootFile) {
         if (!defaultEnvMap.isEmpty()) {
             return;
         }
@@ -132,18 +131,17 @@ public class DfPropHtmlManager {
     // ===================================================================================
     //                                                                     Set up Property
     //                                                                     ===============
-    protected Map<String, DfPropHtmlFileAttribute> setupDefaultEnvProperty(DfPropHtmlRequest request,
-            String propertiesFile) {
+    protected Map<String, DfPropHtmlFileAttribute> setupDefaultEnvProperty(DfPropHtmlRequest request, String propertiesFile) {
         return doSetupEnvironmentProperty(request, propertiesFile, ENV_TYPE_DEFAULT, null);
     }
 
-    protected Map<String, DfPropHtmlFileAttribute> setupEnvironmentProperty(DfPropHtmlRequest request,
-            String propertiesFile, String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
+    protected Map<String, DfPropHtmlFileAttribute> setupEnvironmentProperty(DfPropHtmlRequest request, String propertiesFile,
+            String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
         return doSetupEnvironmentProperty(request, propertiesFile, envType, defaultEnvMap);
     }
 
-    protected Map<String, DfPropHtmlFileAttribute> doSetupEnvironmentProperty(DfPropHtmlRequest request,
-            String propertiesFile, String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
+    protected Map<String, DfPropHtmlFileAttribute> doSetupEnvironmentProperty(DfPropHtmlRequest request, String propertiesFile,
+            String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
         final List<File> familyFileList = extractFamilyFileList(request.getRequestName(), propertiesFile);
         if (familyFileList.isEmpty()) {
             return DfCollectionUtil.emptyMap();
@@ -292,8 +290,7 @@ public class DfPropHtmlManager {
         });
     }
 
-    protected void prepareExtendsProperties(DfPropHtmlRequest request, JavaPropertiesReader reader,
-            DfPropHtmlFileAttribute extendsAttribute) {
+    protected void prepareExtendsProperties(DfPropHtmlRequest request, JavaPropertiesReader reader, DfPropHtmlFileAttribute extendsAttribute) {
         DfPropHtmlFileAttribute current = extendsAttribute;
         while (true) {
             if (current == null) {
@@ -330,8 +327,7 @@ public class DfPropHtmlManager {
         return extendsPropRequest;
     }
 
-    protected DfPropHtmlFileAttribute findExtendsAttribute(DfPropHtmlRequest extendsRequest, String envType,
-            String langType) {
+    protected DfPropHtmlFileAttribute findExtendsAttribute(DfPropHtmlRequest extendsRequest, String envType, String langType) {
         if (extendsRequest == null) {
             return null;
         }
@@ -357,8 +353,7 @@ public class DfPropHtmlManager {
         }
     }
 
-    protected void doAnalyzePropertiesDiff(DfPropHtmlRequest request, Set<String> ignoredSet,
-            DfPropHtmlFileAttribute attribute) {
+    protected void doAnalyzePropertiesDiff(DfPropHtmlRequest request, Set<String> ignoredSet, DfPropHtmlFileAttribute attribute) {
         if (attribute.isRootFile()) {
             return;
         }

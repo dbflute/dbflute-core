@@ -53,16 +53,14 @@ public class DfIncludeQueryInitializer {
     //                                                                          Initialize
     //                                                                          ==========
     public void initializeIncludeQuery() {
-        final Map<String, Map<String, Map<String, List<String>>>> includeQueryMap = _includeQueryProperties
-                .getIncludeQueryMap();
+        final Map<String, Map<String, Map<String, List<String>>>> includeQueryMap = _includeQueryProperties.getIncludeQueryMap();
         if (!includeQueryMap.isEmpty()) {
             _log.info("/=============================");
             _log.info("...Initializing include query.");
             checkQueryMap(includeQueryMap);
             _log.info("========/");
         }
-        final Map<String, Map<String, Map<String, List<String>>>> excludeQueryMap = _includeQueryProperties
-                .getExcludeQueryMap();
+        final Map<String, Map<String, Map<String, List<String>>>> excludeQueryMap = _includeQueryProperties.getExcludeQueryMap();
         if (!excludeQueryMap.isEmpty()) {
             _log.info("/=============================");
             _log.info("...Initializing exclude query.");

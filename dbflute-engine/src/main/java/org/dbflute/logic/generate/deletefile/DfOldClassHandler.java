@@ -440,8 +440,7 @@ public class DfOldClassHandler {
 
     protected DfOldTableClassDeletor createTCD(String packagePath, String classPrefix, String classSuffix,
             NotDeleteTCNSetupper... setuppers) { // createOldTableClassDeletor()
-        final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(_generator.getOutputPath(),
-                createPackagePathHandler());
+        final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(_generator.getOutputPath(), createPackagePathHandler());
         deletor.addPackagePath(packagePath);
         deletor.setClassPrefix(classPrefix);
         deletor.setClassSuffix(classSuffix);
@@ -579,8 +578,7 @@ public class DfOldClassHandler {
                     return null;
                 }
             };
-            final DfOldTableClassDeletor deletor = createCCD(outputDirectory, packagePath, classPrefix, classSuffix,
-                    setupper);
+            final DfOldTableClassDeletor deletor = createCCD(outputDirectory, packagePath, classPrefix, classSuffix, setupper);
             final List<String> deletedList = deletor.deleteOldTableClass();
             deletedListMap.put(outputDirectory, deletedList);
         }
@@ -611,8 +609,7 @@ public class DfOldClassHandler {
                     return null;
                 }
             };
-            final DfOldTableClassDeletor deletor = createCCD(outputDirectory, packagePath, classPrefix, classSuffix,
-                    setupper);
+            final DfOldTableClassDeletor deletor = createCCD(outputDirectory, packagePath, classPrefix, classSuffix, setupper);
             if (oldStylePackagePath != null) { // e.g. cursor
                 deletor.addPackagePath(oldStylePackagePath);
             }
@@ -646,8 +643,7 @@ public class DfOldClassHandler {
                     return null;
                 }
             };
-            final DfOldTableClassDeletor deletor = createCCD(outputDirectory, packagePath, classPrefix, classSuffix,
-                    setupperWrapper);
+            final DfOldTableClassDeletor deletor = createCCD(outputDirectory, packagePath, classPrefix, classSuffix, setupperWrapper);
             if (oldStylePackagePath != null) { // e.g. cursor
                 deletor.addPackagePath(oldStylePackagePath);
             }
@@ -679,8 +675,7 @@ public class DfOldClassHandler {
             for (String pmbName : elementMap.keySet()) {
                 notDeleteClassNameSet.add(getProjectPrefix() + getBasePrefix() + pmbName);
             }
-            final DfOldTableClassDeletor deletor = createCCD(outputDirectory, packagePath, classPrefix, null,
-                    notDeleteClassNameSet);
+            final DfOldTableClassDeletor deletor = createCCD(outputDirectory, packagePath, classPrefix, null, notDeleteClassNameSet);
             deletor.addPackagePath(oldStylePackagePath); // for Old Style Package
             final List<String> deletedList = deletor.deleteOldTableClass();
             _deletedOldCustomizeBaseParameterBeanListMap.put(outputDirectory, deletedList);
@@ -747,13 +742,13 @@ public class DfOldClassHandler {
     // -----------------------------------------------------
     //                                         Common Helper
     //                                         -------------
-    protected DfOldTableClassDeletor createCCD(String outputDirectory, String packagePath, String classPrefix,
-            String classSuffix, NotDeleteTCNSetupper... setuppers) { // createOldCustomizeClassDeletor()
+    protected DfOldTableClassDeletor createCCD(String outputDirectory, String packagePath, String classPrefix, String classSuffix,
+            NotDeleteTCNSetupper... setuppers) { // createOldCustomizeClassDeletor()
         return createCCD(outputDirectory, packagePath, classPrefix, classSuffix, createNotDeleteTCNSet(setuppers));
     }
 
-    protected DfOldTableClassDeletor createCCD(String outputDirectory, String packagePath, String classPrefix,
-            String classSuffix, Set<String> notDeleteClassNameSet) { // createOldCustomizeClassDeletor()
+    protected DfOldTableClassDeletor createCCD(String outputDirectory, String packagePath, String classPrefix, String classSuffix,
+            Set<String> notDeleteClassNameSet) { // createOldCustomizeClassDeletor()
         final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
         final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(outputDirectory, packagePathHandler);
         deletor.addPackagePath(packagePath);
@@ -773,8 +768,7 @@ public class DfOldClassHandler {
         }
     }
 
-    protected void deleteCustomizeExtendedClass(String outputDirectory, List<String> deletedBaseList,
-            String... packagePathList) {
+    protected void deleteCustomizeExtendedClass(String outputDirectory, List<String> deletedBaseList, String... packagePathList) {
         final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
         for (String packagePath : packagePathList) {
             final String dirPath = outputDirectory + "/" + packagePathHandler.getPackageAsPath(packagePath);
@@ -993,8 +987,7 @@ public class DfOldClassHandler {
     }
 
     public void deleteOldCustomizeClass_for_SimpleDtoExtendedMapper() {
-        if (_deletedOldCustomizeSimpleDtoBaseMapperList == null
-                || _deletedOldCustomizeSimpleDtoBaseMapperList.isEmpty()) {
+        if (_deletedOldCustomizeSimpleDtoBaseMapperList == null || _deletedOldCustomizeSimpleDtoBaseMapperList.isEmpty()) {
             return;
         }
         final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackage();

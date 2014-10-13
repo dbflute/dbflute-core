@@ -193,8 +193,7 @@ public abstract class DfAbstractHelperProperties {
         return defaultValue;
     }
 
-    public boolean isPropertyIfNotExistsFromBuildProp(String key, boolean defaultValue,
-            Map<String, ? extends Object> map) {
+    public boolean isPropertyIfNotExistsFromBuildProp(String key, boolean defaultValue, Map<String, ? extends Object> map) {
         Object obj = map.get(key);
         if (obj == null) {
             final String anotherKey = deriveBooleanAnotherKey(key);
@@ -484,8 +483,7 @@ public abstract class DfAbstractHelperProperties {
         return resolved != null ? resolved : ""; // password not allowed to be null
     }
 
-    protected void throwDatabaseUserPasswordFileNotFoundException(String propTitle, String user, String password,
-            File pwdFile) {
+    protected void throwDatabaseUserPasswordFileNotFoundException(String propTitle, String user, String password, File pwdFile) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The password file for the user was not found.");
         br.addItem("Advice");
@@ -531,8 +529,7 @@ public abstract class DfAbstractHelperProperties {
             if (br != null) {
                 try {
                     br.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

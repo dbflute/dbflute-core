@@ -77,16 +77,14 @@ public class DfProcedureExecutionMetaExtractor {
     // ===================================================================================
     //                                                                             Process
     //                                                                             =======
-    public void extractExecutionMetaData(DataSource dataSource, List<DfProcedureMeta> procedureList)
-            throws SQLException {
+    public void extractExecutionMetaData(DataSource dataSource, List<DfProcedureMeta> procedureList) throws SQLException {
         final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
         for (DfProcedureMeta procedure : procedureList) {
             final String procedureFullQualifiedName = procedure.getProcedureFullQualifiedName();
             final String procedureSchemaQualifiedName = procedure.getProcedureSchemaQualifiedName();
             final String procedureName = procedure.getProcedureName();
             if (prop.isExecutionMetaProcedureName(procedureFullQualifiedName)
-                    || prop.isExecutionMetaProcedureName(procedureSchemaQualifiedName)
-                    || prop.isExecutionMetaProcedureName(procedureName)) {
+                    || prop.isExecutionMetaProcedureName(procedureSchemaQualifiedName) || prop.isExecutionMetaProcedureName(procedureName)) {
                 doExtractExecutionMetaData(dataSource, procedure);
             }
         }
@@ -123,8 +121,7 @@ public class DfProcedureExecutionMetaExtractor {
                 try {
                     try {
                         cs.close();
-                    } catch (SQLException ignored) {
-                    }
+                    } catch (SQLException ignored) {}
                     cs = conn.prepareCall(retrySql);
                     setupBindParameter(conn, cs, columnList, testValueList, boundColumnList);
                     executed = cs.execute();
@@ -457,8 +454,8 @@ public class DfProcedureExecutionMetaExtractor {
         }
     }
 
-    protected void registerOutParameter(Connection conn, CallableStatement cs, int paramIndex, int jdbcDefType,
-            DfProcedureColumnMeta column) throws SQLException {
+    protected void registerOutParameter(Connection conn, CallableStatement cs, int paramIndex, int jdbcDefType, DfProcedureColumnMeta column)
+            throws SQLException {
         final ValueType valueType;
         {
             final ValueType forcedType = getForcedValueType(column);
@@ -491,8 +488,7 @@ public class DfProcedureExecutionMetaExtractor {
         }
     }
 
-    protected String buildOutParameterExceptionMessage(int paramIndex, int jdbcDefType, DfProcedureColumnMeta column,
-            ValueType valueType) {
+    protected String buildOutParameterExceptionMessage(int paramIndex, int jdbcDefType, DfProcedureColumnMeta column, ValueType valueType) {
         String msg = "Failed to register OUT parameter(" + paramIndex + "|" + jdbcDefType + "):";
         msg = msg + " " + column.getColumnNameDisp() + " - " + column.getColumnDefinitionLineDisp();
         msg = msg + " :: " + valueType.getClass().getName();
@@ -527,8 +523,8 @@ public class DfProcedureExecutionMetaExtractor {
         }
     }
 
-    protected String buildBindingExceptionMessage(int paramIndex, int jdbcDefType, Object value,
-            DfProcedureColumnMeta column, ValueType valueType) {
+    protected String buildBindingExceptionMessage(int paramIndex, int jdbcDefType, Object value, DfProcedureColumnMeta column,
+            ValueType valueType) {
         String msg = "Failed to bind parameter(" + paramIndex + "|" + jdbcDefType + "):";
         msg = msg + " " + column.getColumnNameDisp() + " - " + column.getColumnDefinitionLineDisp();
         msg = msg + " :: " + value + ", " + valueType.getClass().getName();
@@ -561,8 +557,7 @@ public class DfProcedureExecutionMetaExtractor {
         if (rs != null) {
             try {
                 rs.close();
-            } catch (SQLException ignored) {
-            }
+            } catch (SQLException ignored) {}
         }
     }
 

@@ -65,8 +65,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     //                                                                          Drop Table
     //                                                                          ==========
     @Override
-    protected List<DfTableMeta> prepareSortedTableList(Connection conn, List<DfTableMeta> viewList,
-            List<DfTableMeta> otherList) {
+    protected List<DfTableMeta> prepareSortedTableList(Connection conn, List<DfTableMeta> viewList, List<DfTableMeta> otherList) {
         // order for inherit tables
         final List<Map<String, String>> resultList = selectInheritList(conn);
         final Set<String> childSet = StringSet.createAsCaseInsensitive();

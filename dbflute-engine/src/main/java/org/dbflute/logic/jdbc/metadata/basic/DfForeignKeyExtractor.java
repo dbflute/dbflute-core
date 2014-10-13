@@ -53,7 +53,8 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                                                          Definition
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfForeignKeyExtractor.class);
-    protected static final Map<UnifiedSchema, Map<String, List<DfForeignKeyMeta>>> _uniqueKeyFkMap = new ConcurrentHashMap<UnifiedSchema, Map<String, List<DfForeignKeyMeta>>>(); // singleton cache
+    protected static final Map<UnifiedSchema, Map<String, List<DfForeignKeyMeta>>> _uniqueKeyFkMap =
+            new ConcurrentHashMap<UnifiedSchema, Map<String, List<DfForeignKeyMeta>>>(); // singleton cache
 
     // ===================================================================================
     //                                                                           Attribute
@@ -70,8 +71,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo)
-            throws SQLException {
+    public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo) throws SQLException {
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
         return getForeignKeyMap(metaData, unifiedSchema, tableName);
@@ -85,8 +85,8 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName) throws SQLException {
+    public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
+            throws SQLException {
         final String translatedName = translateTableCaseName(tableName);
         Map<String, DfForeignKeyMeta> map = doGetForeignKeyMap(metaData, unifiedSchema, translatedName, false);
         if (isRetryCaseInsensitiveForeignKey()) {
@@ -100,8 +100,8 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         return map;
     }
 
-    protected Map<String, DfForeignKeyMeta> doGetForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, boolean retry) throws SQLException {
+    protected Map<String, DfForeignKeyMeta> doGetForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
+            boolean retry) throws SQLException {
         final Map<String, DfForeignKeyMeta> fkMap = newTableConstraintMap();
         if (isForeignKeyExtractingUnsupported()) {
             return fkMap;
@@ -201,8 +201,8 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         return immobilizeOrder(filterSameStructureForeignKey(fkMap));
     }
 
-    protected ResultSet extractForeignKeyMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, boolean retry) throws SQLException {
+    protected ResultSet extractForeignKeyMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName, boolean retry)
+            throws SQLException {
         try {
             final String catalogName = unifiedSchema.getPureCatalog();
             final String schemaName = unifiedSchema.getPureSchema();
@@ -408,8 +408,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             throw new IllegalStateException(msg);
         }
         final DfDatabaseTypeFacadeProp facadeProp = new DfDatabaseTypeFacadeProp(getBasicProperties());
-        final DfUniqueKeyFkExtractorFactory factory = new DfUniqueKeyFkExtractorFactory(dataSource, unifiedSchema,
-                facadeProp);
+        final DfUniqueKeyFkExtractorFactory factory = new DfUniqueKeyFkExtractorFactory(dataSource, unifiedSchema, facadeProp);
         return factory.createUniqueKeyFkExtractor();
     }
 

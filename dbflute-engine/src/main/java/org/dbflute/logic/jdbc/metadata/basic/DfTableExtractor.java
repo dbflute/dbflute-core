@@ -58,8 +58,7 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
         return doGetTableList(metaData, unifiedSchema);
     }
 
-    protected List<DfTableMeta> doGetTableList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
-            throws SQLException {
+    protected List<DfTableMeta> doGetTableList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) throws SQLException {
         final String[] objectTypes = getRealObjectTypeTargetArray(unifiedSchema);
         final List<DfTableMeta> tableList = new ArrayList<DfTableMeta>();
         ResultSet rs = null;
@@ -159,8 +158,7 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    public Map<String, DfTableMeta> getTableMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
-            throws SQLException {
+    public Map<String, DfTableMeta> getTableMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) throws SQLException {
         final List<DfTableMeta> tableList = getTableList(metaData, unifiedSchema);
         final Map<String, DfTableMeta> map = DfCollectionUtil.newLinkedHashMap();
         for (DfTableMeta tableInfo : tableList) {

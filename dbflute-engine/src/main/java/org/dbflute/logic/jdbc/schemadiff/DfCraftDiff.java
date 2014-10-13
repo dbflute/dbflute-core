@@ -193,8 +193,7 @@ public class DfCraftDiff extends DfAbstractDiff {
         doRegisterMeta(craftTitle, valueList, _previousTitleCraftValueMap);
     }
 
-    protected void doRegisterMeta(String craftTitle, List<DfCraftValue> craftValueList,
-            Map<String, Map<String, DfCraftValue>> titleValueMap) {
+    protected void doRegisterMeta(String craftTitle, List<DfCraftValue> craftValueList, Map<String, Map<String, DfCraftValue>> titleValueMap) {
         Map<String, DfCraftValue> valueMap = titleValueMap.get(craftTitle);
         if (valueMap == null) {
             valueMap = DfCollectionUtil.newLinkedHashMap();
@@ -244,8 +243,7 @@ public class DfCraftDiff extends DfAbstractDiff {
         craftKeyNameSet.add(craftKeyName);
     }
 
-    protected void throwCraftDiffCraftKeyNameDuplicateException(String craftKeyName, File metaFile,
-            FileTokenizingRowResource rowResource) {
+    protected void throwCraftDiffCraftKeyNameDuplicateException(String craftKeyName, File metaFile, FileTokenizingRowResource rowResource) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The craft key name has duplicate entry.");
         final FileTokenizingHeaderInfo headerInfo = rowResource.getHeaderInfo();
@@ -352,9 +350,8 @@ public class DfCraftDiff extends DfAbstractDiff {
         doDiffNextPrevious(diff, differ, nextDiffValue, previousDiffValue);
     }
 
-    protected void doDiffNextPrevious(DfCraftRowDiff diff,
-            StringNextPreviousDiffer<DfCraftValue, DfCraftRowDiff> differ, final String nextValue,
-            final String previousValue) {
+    protected void doDiffNextPrevious(DfCraftRowDiff diff, StringNextPreviousDiffer<DfCraftValue, DfCraftRowDiff> differ,
+            final String nextValue, final String previousValue) {
         if (!differ.isMatch(nextValue, previousValue)) {
             final String nextDisp = differ.disp(nextValue, true);
             final String previousDisp = differ.disp(previousValue, false);

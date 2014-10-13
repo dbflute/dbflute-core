@@ -111,8 +111,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     public static DfTakeFinallyProcess createAsTakeAssert(String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
         final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null);
-        return process.suppressSequenceIncrement().skipIfNonAssetionSql().rollbackTransaction()
-                .continueIfAssetionFailure();
+        return process.suppressSequenceIncrement().skipIfNonAssetionSql().rollbackTransaction().continueIfAssetionFailure();
     }
 
     public static DfTakeFinallyProcess createAsAlterCheck(final String sqlRootDir, DataSource dataSource) {
@@ -177,8 +176,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         return finalInfo;
     }
 
-    protected DfSqlFileFireResult createFailureFireResult(DfTakeFinallyAssertionFailureException e,
-            DfSqlFileFireResult originalResult) {
+    protected DfSqlFileFireResult createFailureFireResult(DfTakeFinallyAssertionFailureException e, DfSqlFileFireResult originalResult) {
         final DfSqlFileFireResult fireResult = new DfSqlFileFireResult();
         fireResult.setExistsError(true);
         fireResult.setResultMessage("{Take Finally}: *asserted");
@@ -361,8 +359,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
-    protected DfTakeFinallyFinalInfo createFinalInfo(DfSqlFileFireResult fireResult,
-            DfTakeFinallyAssertionFailureException assertionEx) {
+    protected DfTakeFinallyFinalInfo createFinalInfo(DfSqlFileFireResult fireResult, DfTakeFinallyAssertionFailureException assertionEx) {
         final DfTakeFinallyFinalInfo finalInfo = new DfTakeFinallyFinalInfo();
         finalInfo.addTakeFinallySqlFileAll(_executedSqlFileList);
         if (fireResult != null) {

@@ -172,8 +172,7 @@ public class DfUpgradeTask extends DfAbstractTask {
         doReplaceVersionScript(upgradeVersion, textIO, "./_project.sh", "/dbflute-");
     }
 
-    protected void doReplaceVersionScript(final String upgradeVersion, FileTextIO textIO, String scriptPath,
-            final String versionKeyword) {
+    protected void doReplaceVersionScript(final String upgradeVersion, FileTextIO textIO, String scriptPath, final String versionKeyword) {
         final File versionScript = new File(scriptPath);
         if (versionScript.exists()) { // basically true (just in case)
             _log.info("...Replacing version script: " + scriptPath);

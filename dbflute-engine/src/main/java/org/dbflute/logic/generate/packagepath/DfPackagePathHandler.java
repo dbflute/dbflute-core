@@ -56,13 +56,11 @@ public class DfPackagePathHandler {
             String msg = "The argument 'pckge' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        final String omitDirectoryPackage = _basicProperties != null ? _basicProperties.getOmitDirectoryPackage()
-                : null;
+        final String omitDirectoryPackage = _basicProperties != null ? _basicProperties.getOmitDirectoryPackage() : null;
         if (omitDirectoryPackage != null && omitDirectoryPackage.trim().length() > 0) {
             pckge = removeOmitPackage(pckge, omitDirectoryPackage);
         }
-        final String flatDirectoryPackage = _basicProperties != null ? _basicProperties.getFlatDirectoryPackage()
-                : null;
+        final String flatDirectoryPackage = _basicProperties != null ? _basicProperties.getFlatDirectoryPackage() : null;
         if (flatDirectoryPackage == null || flatDirectoryPackage.trim().length() == 0) {
             return resolvePackageAsPath(pckge);
         }

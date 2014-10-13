@@ -220,35 +220,34 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
         return new DfFreeGenRequest(_manager, requestName, resource, output);
     }
 
-    protected DfFreeGenTable loadTableFromProp(String requestName, DfFreeGenResource resource,
-            Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap,
-            Map<String, DfFreeGenRequest> requestMap) throws IOException {
+    protected DfFreeGenTable loadTableFromProp(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
+            Map<String, Map<String, String>> mappingMap, Map<String, DfFreeGenRequest> requestMap) throws IOException {
         return _propTableLoader.loadTable(requestName, resource, tableMap, mappingMap, requestMap);
     }
 
-    protected DfFreeGenTable loadTableFromXls(String requestName, DfFreeGenResource resource,
-            Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
+    protected DfFreeGenTable loadTableFromXls(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
+            Map<String, Map<String, String>> mappingMap) throws IOException {
         return _xlsTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
     }
 
-    protected DfFreeGenTable loadTableFromFilePath(String requestName, DfFreeGenResource resource,
-            Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
+    protected DfFreeGenTable loadTableFromFilePath(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
+            Map<String, Map<String, String>> mappingMap) throws IOException {
         return _filePathTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
     }
 
-    protected DfFreeGenTable loadTableFromJsonKey(String requestName, DfFreeGenResource resource,
-            Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
+    protected DfFreeGenTable loadTableFromJsonKey(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
+            Map<String, Map<String, String>> mappingMap) throws IOException {
         return _jsonKeyTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
     }
 
-    protected DfFreeGenTable loadTableFromJsonSchema(String requestName, DfFreeGenResource resource,
-            Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
+    protected DfFreeGenTable loadTableFromJsonSchema(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
+            Map<String, Map<String, String>> mappingMap) throws IOException {
         final DfJsonSchemaTableLoader loader = new DfJsonSchemaTableLoader(requestName, resource, tableMap, mappingMap);
         return loader.loadTable();
     }
 
-    protected DfFreeGenTable loadTableFromSolrXml(String requestName, DfFreeGenResource resource,
-            Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
+    protected DfFreeGenTable loadTableFromSolrXml(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
+            Map<String, Map<String, String>> mappingMap) throws IOException {
         return _solrXmlTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
     }
 

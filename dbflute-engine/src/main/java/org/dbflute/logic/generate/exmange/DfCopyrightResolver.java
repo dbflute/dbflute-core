@@ -73,8 +73,7 @@ public class DfCopyrightResolver {
         } finally {
             try {
                 br.close();
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
         BufferedWriter bw = null;
         try {
@@ -94,8 +93,7 @@ public class DfCopyrightResolver {
             if (bw != null) {
                 try {
                     bw.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

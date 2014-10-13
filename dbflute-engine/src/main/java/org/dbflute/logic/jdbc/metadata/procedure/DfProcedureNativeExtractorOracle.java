@@ -199,21 +199,20 @@ public class DfProcedureNativeExtractorOracle {
     //                                                                       Argument Info
     //                                                                       =============
     protected Map<String, List<DfProcedureArgumentInfo>> selectProcedureArgumentInfoMap(UnifiedSchema unifiedSchema) {
-        final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(
-                _dataSource, _suppressLogging);
+        final DfProcedureParameterNativeExtractorOracle extractor =
+                new DfProcedureParameterNativeExtractorOracle(_dataSource, _suppressLogging);
         final List<DfProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
         return arrangeProcedureArgumentInfoMap(allArgList);
     }
 
     protected Map<String, List<DfProcedureArgumentInfo>> selectDBLinkProcedureArgumentInfoMap(String dbLinkName) {
-        final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(
-                _dataSource, _suppressLogging);
+        final DfProcedureParameterNativeExtractorOracle extractor =
+                new DfProcedureParameterNativeExtractorOracle(_dataSource, _suppressLogging);
         final List<DfProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoToDBLinkList(dbLinkName);
         return arrangeProcedureArgumentInfoMap(allArgList);
     }
 
-    protected Map<String, List<DfProcedureArgumentInfo>> arrangeProcedureArgumentInfoMap(
-            List<DfProcedureArgumentInfo> allArgList) {
+    protected Map<String, List<DfProcedureArgumentInfo>> arrangeProcedureArgumentInfoMap(List<DfProcedureArgumentInfo> allArgList) {
         final Map<String, List<DfProcedureArgumentInfo>> map = DfCollectionUtil.newLinkedHashMap();
         for (DfProcedureArgumentInfo currentArgInfo : allArgList) {
             final String packageName = currentArgInfo.getPackageName();

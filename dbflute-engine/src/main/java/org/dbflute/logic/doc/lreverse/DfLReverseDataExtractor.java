@@ -229,20 +229,17 @@ public class DfLReverseDataExtractor {
         if (rs != null) {
             try {
                 rs.close();
-            } catch (SQLException ignored) {
-            }
+            } catch (SQLException ignored) {}
         }
         if (st != null) {
             try {
                 st.close();
-            } catch (SQLException ignored) {
-            }
+            } catch (SQLException ignored) {}
         }
         if (conn != null) {
             try {
                 conn.close();
-            } catch (SQLException ignored) {
-            }
+            } catch (SQLException ignored) {}
         }
     }
 

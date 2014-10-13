@@ -40,8 +40,7 @@ public class DfFreeGenRequest {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenRequest(DfFreeGenManager manager, String requestName, DfFreeGenResource resource,
-            DfFreeGenOutput output) {
+    public DfFreeGenRequest(DfFreeGenManager manager, String requestName, DfFreeGenResource resource, DfFreeGenOutput output) {
         _manager = manager;
         _requestName = requestName;
         _resource = resource;

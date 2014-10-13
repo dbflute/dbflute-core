@@ -85,8 +85,7 @@ public class DfCurrentSchemaConnector {
             if (st != null) {
                 try {
                     st.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }

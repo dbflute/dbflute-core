@@ -115,16 +115,14 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     }
 
     protected boolean doDropTypeObject(Connection conn, String orderBy, boolean errorContinue) {
-        return dropDicObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME", orderBy, false,
-                errorContinue, null);
+        return dropDicObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME", orderBy, false, errorContinue, null);
     }
 
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected boolean dropDicObject(Connection conn, String titleName, String sqlName, String tableName,
-            String ownerColumnName, String targetColumnName, String orderBy, boolean schemaPrefix,
-            boolean errorContinue, ObjectExceptCallback callback) {
+    protected boolean dropDicObject(Connection conn, String titleName, String sqlName, String tableName, String ownerColumnName,
+            String targetColumnName, String orderBy, boolean schemaPrefix, boolean errorContinue, ObjectExceptCallback callback) {
         if (!_unifiedSchema.hasSchema()) {
             return true;
         }

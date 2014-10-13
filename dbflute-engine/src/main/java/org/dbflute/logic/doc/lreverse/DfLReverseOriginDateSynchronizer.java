@@ -82,8 +82,7 @@ public class DfLReverseOriginDateSynchronizer {
             if (br != null) {
                 try {
                     br.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
         final String mapString = sb.toString();
@@ -179,8 +178,7 @@ public class DfLReverseOriginDateSynchronizer {
             if (bw != null) {
                 try {
                     bw.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

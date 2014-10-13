@@ -45,8 +45,7 @@ public class DfDbCommentExtractorFactory {
      * @param unifiedSchema The unified schema to extract. (NullAllowed)
      * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      */
-    public DfDbCommentExtractorFactory(DataSource dataSource, UnifiedSchema unifiedSchema,
-            DfDatabaseTypeFacadeProp databaseTypeFacadeProp) {
+    public DfDbCommentExtractorFactory(DataSource dataSource, UnifiedSchema unifiedSchema, DfDatabaseTypeFacadeProp databaseTypeFacadeProp) {
         _dataSource = dataSource;
         _unifiedSchema = unifiedSchema;
         _databaseTypeFacadeProp = databaseTypeFacadeProp;

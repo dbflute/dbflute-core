@@ -356,8 +356,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             if (br != null) {
                 try {
                     br.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }
@@ -419,8 +418,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             if (br != null) {
                 try {
                     br.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

@@ -236,8 +236,7 @@ public class DfTableXlsReader {
         throw new DfXlsReaderReadFailureException(msg);
     }
 
-    protected void throwLargeDataInvalidManagedDataException(String sheetName, String columnTitle, DfDataRow row,
-            String value) {
+    protected void throwLargeDataInvalidManagedDataException(String sheetName, String columnTitle, DfDataRow row, String value) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Invalid managed large data.");
         br.addItem("Advice");
@@ -390,8 +389,8 @@ public class DfTableXlsReader {
         }
     }
 
-    protected void throwCellValueHandlingException(DfDataTable table, DfDataColumn column, HSSFRow row, HSSFCell cell,
-            Object value, RuntimeException cause) {
+    protected void throwCellValueHandlingException(DfDataTable table, DfDataColumn column, HSSFRow row, HSSFCell cell, Object value,
+            RuntimeException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to handle the cell value on the xls file.");
         br.addItem("Advice");
@@ -534,8 +533,7 @@ public class DfTableXlsReader {
         return str;
     }
 
-    protected void throwLargeDataReferenceDataNotFoundException(DfDataTable table, int columnIndex, HSSFRow row,
-            String str, String dataKey) {
+    protected void throwLargeDataReferenceDataNotFoundException(DfDataTable table, int columnIndex, HSSFRow row, String str, String dataKey) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the reference data of large data for the column.");
         br.addItem("Xls File");

@@ -62,8 +62,7 @@ public abstract class DfDtsAbstractRowState implements DfDtsRowState {
                 if (ps != null) {
                     try {
                         ps.close();
-                    } catch (SQLException ignored) {
-                    }
+                    } catch (SQLException ignored) {}
                 }
             }
         } finally {
@@ -135,8 +134,7 @@ public abstract class DfDtsAbstractRowState implements DfDtsRowState {
         try {
             Timestamp.valueOf(value);
             return true;
-        } catch (RuntimeException e) {
-        }
+        } catch (RuntimeException e) {}
         return false;
     }
 

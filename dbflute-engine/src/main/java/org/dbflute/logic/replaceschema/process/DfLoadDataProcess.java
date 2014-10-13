@@ -371,8 +371,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         lazyCheckLoadedClassifiaction(_dataSource, _loadedDataInfo.getImplicitClassificationLazyChecker());
     }
 
-    protected void lazyCheckLoadedClassifiaction(DataSource dataSource,
-            List<DfLoadedClassificationLazyChecker> checkerList) {
+    protected void lazyCheckLoadedClassifiaction(DataSource dataSource, List<DfLoadedClassificationLazyChecker> checkerList) {
         if (checkerList.isEmpty()) {
             return;
         }
@@ -395,8 +394,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }
@@ -437,8 +435,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void setupDetailMessage(List<String> detailMessageList) {
-        final Map<String, Map<String, List<DfLoadedFile>>> hierarchyMap = _loadedDataInfo
-                .getLoadedFileListHierarchyMap();
+        final Map<String, Map<String, List<DfLoadedFile>>> hierarchyMap = _loadedDataInfo.getLoadedFileListHierarchyMap();
 
         // order according to registration
         doSetupDetailMessageEnvType(detailMessageList, COMMON_LOAD_TYPE, hierarchyMap.get(COMMON_LOAD_TYPE));
@@ -464,8 +461,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(XLS_FILE_TYPE), 10);
     }
 
-    protected void doSetupDetailMessageFileType(List<String> detailMessageList, List<DfLoadedFile> loadedFileList,
-            int limit) {
+    protected void doSetupDetailMessageFileType(List<String> detailMessageList, List<DfLoadedFile> loadedFileList, int limit) {
         if (loadedFileList == null || loadedFileList.isEmpty()) {
             return; // means no files for the file type
         }

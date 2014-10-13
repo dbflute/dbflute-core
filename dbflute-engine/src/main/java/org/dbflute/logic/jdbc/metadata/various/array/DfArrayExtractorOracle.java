@@ -154,8 +154,8 @@ public class DfArrayExtractorOracle {
         return flatArrayInfoMap;
     }
 
-    protected void setupFlatArrayInfo(StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap,
-            List<DfProcedureArgumentInfo> argInfoList, DfProcedureArgumentInfo argInfo, int index) {
+    protected void setupFlatArrayInfo(StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap, List<DfProcedureArgumentInfo> argInfoList,
+            DfProcedureArgumentInfo argInfo, int index) {
         final UnifiedSchema owner = UnifiedSchema.createAsDynamicSchema(null, argInfo.getTypeOwner());
         final String realTypeName = buildArrayTypeName(argInfo);
         final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo(owner, realTypeName);
@@ -168,8 +168,7 @@ public class DfArrayExtractorOracle {
         }
     }
 
-    protected boolean reflectArrayElementType(List<DfProcedureArgumentInfo> argInfoList, int i,
-            DfTypeArrayInfo arrayInfo) {
+    protected boolean reflectArrayElementType(List<DfProcedureArgumentInfo> argInfoList, int i, DfTypeArrayInfo arrayInfo) {
         boolean nestedArray = false;
         final int nextIndex = (i + 1);
         if (argInfoList.size() > nextIndex) { // element type is in data type of next record

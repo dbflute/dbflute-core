@@ -487,8 +487,7 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
         return contentList;
     }
 
-    protected void setupNestDiffList(List<DfNestDiffContent> contentList, String title,
-            List<? extends DfNestDiff> nestDiffList) {
+    protected void setupNestDiffList(List<DfNestDiffContent> contentList, String title, List<? extends DfNestDiff> nestDiffList) {
         if (!nestDiffList.isEmpty()) {
             final DfNestDiffContent content = new DfNestDiffContent();
             content.setTitleName(title);

@@ -43,8 +43,8 @@ public class DfFreeGenOutput {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{templateFile=" + _templateFile + ", outputDirectory=" + _outputDirectory + ", package=" + _package
-                + ", className=" + _className + "}";
+        return "{templateFile=" + _templateFile + ", outputDirectory=" + _outputDirectory + ", package=" + _package + ", className="
+                + _className + "}";
     }
 
     // ===================================================================================

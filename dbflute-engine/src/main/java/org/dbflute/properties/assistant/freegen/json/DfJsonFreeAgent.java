@@ -68,8 +68,7 @@ public class DfJsonFreeAgent {
             if (ins != null) {
                 try {
                     ins.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
         @SuppressWarnings("unchecked")
@@ -77,8 +76,7 @@ public class DfJsonFreeAgent {
         return rootMap;
     }
 
-    protected void throwJsonDecoderNotFoundException(String requestName, String resourceFile, String decoderName,
-            ClassNotFoundException e) {
+    protected void throwJsonDecoderNotFoundException(String requestName, String resourceFile, String decoderName, ClassNotFoundException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the JSON decoder for FreeGen.");
         br.addItem("Advice");
@@ -112,8 +110,8 @@ public class DfJsonFreeAgent {
     // ===================================================================================
     //                                                                       Trace KeyList
     //                                                                       =============
-    public List<String> traceKeyList(String requestName, DfFreeGenResource resource, Map<String, Object> rootMap,
-            String keyPath, List<String> pathList) {
+    public List<String> traceKeyList(String requestName, DfFreeGenResource resource, Map<String, Object> rootMap, String keyPath,
+            List<String> pathList) {
         // e.g.
         //  keyPath = categories -> map.keys
         //  keyPath = categories -> map.values -> list.elements
@@ -156,8 +154,8 @@ public class DfJsonFreeAgent {
                     keyList = new ArrayList<String>();
                     for (Object element : currentList) {
                         if (!(element instanceof String)) {
-                            throwKeyPathExpectedStringListButNotStringException(requestName, resource, keyPath,
-                                    pathElement, currentList, element);
+                            throwKeyPathExpectedStringListButNotStringException(requestName, resource, keyPath, pathElement, currentList,
+                                    element);
                         }
                         keyList.add((String) element);
                     }
@@ -167,8 +165,7 @@ public class DfJsonFreeAgent {
                     keyList = new ArrayList<String>();
                     for (Object element : currentList) {
                         if (!(element instanceof Map<?, ?>)) {
-                            throwKeyPathExpectedMapListButNotMapException(requestName, resource, keyPath, pathElement,
-                                    currentList, element);
+                            throwKeyPathExpectedMapListButNotMapException(requestName, resource, keyPath, pathElement, currentList, element);
                         }
                         @SuppressWarnings("unchecked")
                         final Map<String, Object> elementMap = (Map<String, Object>) element;
@@ -192,8 +189,7 @@ public class DfJsonFreeAgent {
         return keyList;
     }
 
-    protected void throwRootMapKeyNotFoundException(String requestName, DfFreeGenResource resource, String keyPath,
-            String rootMapKey) {
+    protected void throwRootMapKeyNotFoundException(String requestName, DfFreeGenResource resource, String keyPath, String rootMapKey) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the key in the root map. (FreeGen)");
         br.addItem("Request Name");
@@ -208,8 +204,8 @@ public class DfJsonFreeAgent {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwKeyPathExpectedMapButNotMapException(String requestName, DfFreeGenResource resource,
-            String keyPath, String targetPath, Object current) {
+    protected void throwKeyPathExpectedMapButNotMapException(String requestName, DfFreeGenResource resource, String keyPath,
+            String targetPath, Object current) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The key path expects map type but not map. (FreeGen)");
         br.addItem("Request Name");
@@ -227,8 +223,8 @@ public class DfJsonFreeAgent {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwKeyPathExpectedListButNotListException(String requestName, DfFreeGenResource resource,
-            String keyPath, String targetPath, Object current) {
+    protected void throwKeyPathExpectedListButNotListException(String requestName, DfFreeGenResource resource, String keyPath,
+            String targetPath, Object current) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The key path expects list type but not list. (FreeGen)");
         br.addItem("Request Name");
@@ -246,8 +242,8 @@ public class DfJsonFreeAgent {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwKeyPathExpectedStringListButNotStringException(String requestName, DfFreeGenResource resource,
-            String keyPath, String targetPath, List<Object> currentList, Object element) {
+    protected void throwKeyPathExpectedStringListButNotStringException(String requestName, DfFreeGenResource resource, String keyPath,
+            String targetPath, List<Object> currentList, Object element) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The key path expects string type in list but not string. (FreeGen)");
         br.addItem("Request Name");
@@ -268,8 +264,8 @@ public class DfJsonFreeAgent {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwKeyPathExpectedMapListButNotMapException(String requestName, DfFreeGenResource resource,
-            String keyPath, String targetPath, List<Object> currentList, Object element) {
+    protected void throwKeyPathExpectedMapListButNotMapException(String requestName, DfFreeGenResource resource, String keyPath,
+            String targetPath, List<Object> currentList, Object element) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The key path expects string type in list but not string. (FreeGen)");
         br.addItem("Request Name");
@@ -309,8 +305,7 @@ public class DfJsonFreeAgent {
     // ===================================================================================
     //                                                                           Trace Map
     //                                                                           =========
-    public Map<String, Object> traceMap(String requestName, DfFreeGenResource resource, Map<String, Object> rootMap,
-            String tracePath) {
+    public Map<String, Object> traceMap(String requestName, DfFreeGenResource resource, Map<String, Object> rootMap, String tracePath) {
         // e.g.
         //  jsonPath = map
         //  jsonPath = tables -> map
@@ -335,8 +330,7 @@ public class DfJsonFreeAgent {
         return currentMap;
     }
 
-    protected void throwJsonMapKeyNotFoundException(String requestName, DfFreeGenResource resource, String tracePath,
-            String pathElement) {
+    protected void throwJsonMapKeyNotFoundException(String requestName, DfFreeGenResource resource, String tracePath, String pathElement) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the key in the map. (FreeGen)");
         br.addItem("Request Name");
@@ -351,8 +345,8 @@ public class DfJsonFreeAgent {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwJsonTracePathNotMapException(String requestName, DfFreeGenResource resource, String tracePath,
-            String pathElement, Object current) {
+    protected void throwJsonTracePathNotMapException(String requestName, DfFreeGenResource resource, String tracePath, String pathElement,
+            Object current) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The trace path expects map type but not map. (FreeGen)");
         br.addItem("Request Name");

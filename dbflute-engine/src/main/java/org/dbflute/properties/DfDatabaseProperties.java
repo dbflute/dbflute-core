@@ -295,8 +295,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return _tableExceptGenOnlyList;
     }
 
-    protected void setupTableOrColumnExceptList(List<String> plainList, List<String> exceptList,
-            List<String> exceptGenOnlyList) {
+    protected void setupTableOrColumnExceptList(List<String> plainList, List<String> exceptList, List<String> exceptGenOnlyList) {
         final String genOnlySuffix = "@gen";
         for (String element : plainList) {
             if (Srl.endsWithIgnoreCase(element, genOnlySuffix)) {
@@ -752,8 +751,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             final StringBuilder sb = new StringBuilder();
             final Set<String> keySet = _databaseInfoMap.keySet();
             for (String key : keySet) {
-                if (equalsKeys(key, KEY_DRIVER, KEY_URL, KEY_CATALOG, KEY_SCHEMA, KEY_USER, KEY_PASSWORD,
-                        KEY_PROPERTIES_MAP, KEY_VARIOUS_MAP)) {
+                if (equalsKeys(key, KEY_DRIVER, KEY_URL, KEY_CATALOG, KEY_SCHEMA, KEY_USER, KEY_PASSWORD, KEY_PROPERTIES_MAP,
+                        KEY_VARIOUS_MAP)) {
                     continue;
                 }
                 final Object value = _databaseInfoMap.get(key);

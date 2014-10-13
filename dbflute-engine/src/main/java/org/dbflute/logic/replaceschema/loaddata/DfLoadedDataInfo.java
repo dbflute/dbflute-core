@@ -47,8 +47,10 @@ public class DfLoadedDataInfo {
     protected final List<DfLoadedFile> _loadedFileList = new ArrayList<DfLoadedFile>();
     protected final Map<String, List<DfLoadedFile>> _loadTypeListMap = new LinkedHashMap<String, List<DfLoadedFile>>();
     protected final Map<String, List<DfLoadedFile>> _fileTypeListMap = new LinkedHashMap<String, List<DfLoadedFile>>();
-    protected final Map<String, Map<String, List<DfLoadedFile>>> _hierarchyListMap = new LinkedHashMap<String, Map<String, List<DfLoadedFile>>>();
-    protected final List<DfLoadedClassificationLazyChecker> _loadedClassificationLazyChecker = new ArrayList<DfLoadedClassificationLazyChecker>();
+    protected final Map<String, Map<String, List<DfLoadedFile>>> _hierarchyListMap =
+            new LinkedHashMap<String, Map<String, List<DfLoadedFile>>>();
+    protected final List<DfLoadedClassificationLazyChecker> _loadedClassificationLazyChecker =
+            new ArrayList<DfLoadedClassificationLazyChecker>();
 
     // ===================================================================================
     //                                                                           Attribute

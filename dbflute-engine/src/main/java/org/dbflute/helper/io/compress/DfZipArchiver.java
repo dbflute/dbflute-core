@@ -90,20 +90,17 @@ public class DfZipArchiver {
             if (archive != null) {
                 try {
                     archive.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
             if (out != null) {
                 try {
                     out.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }
 
-    protected void addAll(ArchiveOutputStream archive, File topDir, File targetFile, FileFilter filter)
-            throws IOException {
+    protected void addAll(ArchiveOutputStream archive, File topDir, File targetFile, FileFilter filter) throws IOException {
         if (_suppressCompressSubDir && isSubDir(topDir, targetFile)) {
             return; // sub directory
         }
@@ -149,8 +146,7 @@ public class DfZipArchiver {
             if (ins != null) {
                 try {
                     ins.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
         archive.closeArchiveEntry();
@@ -217,8 +213,7 @@ public class DfZipArchiver {
                         if (out != null) {
                             try {
                                 out.close();
-                            } catch (IOException ignored) {
-                            }
+                            } catch (IOException ignored) {}
                         }
                     }
                 }
@@ -230,14 +225,12 @@ public class DfZipArchiver {
             if (archive != null) {
                 try {
                     archive.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
             if (ins != null) {
                 try {
                     ins.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

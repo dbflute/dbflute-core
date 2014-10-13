@@ -278,8 +278,7 @@ public class DfDataAssertProvider {
         throw new DfTakeFinallyAssertionFailureCountNotExistsException(msg);
     }
 
-    protected void throwAssertionFailureListNotZeroException(File sqlFile, String sql, int resultCount,
-            List<Map<String, String>> resultList) {
+    protected void throwAssertionFailureListNotZeroException(File sqlFile, String sql, int resultCount, List<Map<String, String>> resultList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SQL expects ZERO but the result was NOT ZERO.");
         br.addItem("Advice");
