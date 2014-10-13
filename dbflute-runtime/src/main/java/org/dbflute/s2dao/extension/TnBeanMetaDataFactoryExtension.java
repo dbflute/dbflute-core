@@ -161,8 +161,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
         return null;
     }
 
-    protected TnBeanMetaData findOrCreateCachedMetaIfNeeds(DatabaseMetaData dbMetaData, Class<?> beanClass,
-            int relationNestLevel) {
+    protected TnBeanMetaData findOrCreateCachedMetaIfNeeds(DatabaseMetaData dbMetaData, Class<?> beanClass, int relationNestLevel) {
         if (isDBFluteEntity(beanClass)) {
             final TnBeanMetaData cachedMeta = getMetaFromCache(beanClass);
             if (cachedMeta != null) {
@@ -283,13 +282,12 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     // ===================================================================================
     //                                                                       Property Type
     //                                                                       =============
-    protected TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> beanClass,
-            TnBeanMetaDataImpl localBeanMetaData, TnBeanAnnotationReader beanAnnotationReader,
-            DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation) {
+    protected TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> beanClass, TnBeanMetaDataImpl localBeanMetaData,
+            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation) {
         // DBFlute needs local BeanMetaData for relation property type
         final TnRelationPropertyTypeFactoryBuilder builder = createRelationPropertyTypeFactoryBuilder();
-        return builder.build(beanClass, localBeanMetaData, beanAnnotationReader, dbMetaData, relationNestLevel,
-                stopRelationCreation, getRelationOptionalEntityType());
+        return builder.build(beanClass, localBeanMetaData, beanAnnotationReader, dbMetaData, relationNestLevel, stopRelationCreation,
+                getRelationOptionalEntityType());
     }
 
     protected TnRelationPropertyTypeFactoryBuilder createRelationPropertyTypeFactoryBuilder() {

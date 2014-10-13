@@ -61,8 +61,8 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractBatchHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
-            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+    public TnAbstractBatchHandler(DataSource dataSource, StatementFactory statementFactory, String sql, TnBeanMetaData beanMetaData,
+            TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory, sql, beanMetaData, boundPropTypes);
     }
 
@@ -154,8 +154,8 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     protected abstract Integer getBatchLoggingLimit();
 
     @Override
-    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled,
-            boolean hasSqlFireHook, boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
+    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlFireHook,
+            boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
         if (_batchLoggingSb == null) {
             _batchLoggingSb = new StringBuilder(1000);
         }

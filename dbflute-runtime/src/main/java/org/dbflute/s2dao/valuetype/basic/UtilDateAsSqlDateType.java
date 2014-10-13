@@ -68,8 +68,7 @@ public class UtilDateAsSqlDateType extends TnAbstractValueType {
         _sqlDateType.bindValue(conn, ps, index, toSqlDate(value));
     }
 
-    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException {
         _sqlDateType.bindValue(conn, cs, parameterName, toSqlDate(value));
     }
 

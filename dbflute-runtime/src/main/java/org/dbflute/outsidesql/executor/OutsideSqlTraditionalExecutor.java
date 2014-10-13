@@ -18,6 +18,7 @@ package org.dbflute.outsidesql.executor;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.result.ListResultBean;
 import org.dbflute.cbean.result.PagingResultBean;
+import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.jdbc.CursorHandler;
 import org.dbflute.optional.OptionalEntity;
 
@@ -71,8 +72,8 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      */
     public <ENTITY> OptionalEntity<ENTITY> selectEntity(String path, Object pmb, Class<ENTITY> entityType) {
         return OptionalEntity.ofNullable(_basicExecutor.entityHandling().selectEntity(path, pmb, entityType), () -> {
-            // TODO jflute exception
-                throw new IllegalStateException("TODO jflute");
+            // TODO jflute OutsideSql optional exception
+                throw new EntityAlreadyDeletedException("TODO jflute");
             });
     }
 

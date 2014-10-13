@@ -69,8 +69,7 @@ public class BoundValueTracer {
      * @param specifiedSql The specified SQL for logging only. (NotNull)
      * @param commentType The type of comment for logging only. (NotNull)
      */
-    public BoundValueTracer(List<String> nameList, String expression, String specifiedSql,
-            ParameterCommentType commentType) {
+    public BoundValueTracer(List<String> nameList, String expression, String specifiedSql, ParameterCommentType commentType) {
         _nameList = nameList;
         _expression = expression;
         _specifiedSql = specifiedSql;
@@ -218,8 +217,7 @@ public class BoundValueTracer {
         return DfReflectionUtil.invoke(method, target, null);
     }
 
-    protected void throwPropertyReadFailureException(Class<?> targetType, String propertyName,
-            DfBeanIllegalPropertyException e) {
+    protected void throwPropertyReadFailureException(Class<?> targetType, String propertyName, DfBeanIllegalPropertyException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("Failed to read the property on the " + _commentType.textName() + ".");
         br.addItem("Advice");

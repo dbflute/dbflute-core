@@ -168,8 +168,7 @@ public interface ConditionQuery {
      * @param conditionOption The option of the condition. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
-    void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue,
-            ConditionOption conditionOption);
+    void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue, ConditionOption conditionOption);
 
     /**
      * Invoke setting query of equal. {RelationResolved}

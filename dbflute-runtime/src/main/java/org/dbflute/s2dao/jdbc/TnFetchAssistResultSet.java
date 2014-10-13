@@ -81,8 +81,7 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
      * @param offsetByCursorForcedly Offset by cursor forcedly.
      * @param limitByCursorForcedly Limit by cursor forcedly.
      */
-    public TnFetchAssistResultSet(ResultSet resultSet, FetchBean fetchBean, boolean offsetByCursorForcedly,
-            boolean limitByCursorForcedly) {
+    public TnFetchAssistResultSet(ResultSet resultSet, FetchBean fetchBean, boolean offsetByCursorForcedly, boolean limitByCursorForcedly) {
         super(resultSet);
 
         _resultSet = resultSet;

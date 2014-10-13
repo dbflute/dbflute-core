@@ -77,8 +77,7 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     protected final Map<String, TnPropertyType> _columnPropertyTypeMap = StringKeyMap.createAsCaseInsensitive();
     protected final List<TnRelationPropertyType> _relationPropertyTypes = new ArrayList<TnRelationPropertyType>();
     protected final List<TnIdentifierGenerator> _identifierGeneratorList = new ArrayList<TnIdentifierGenerator>();
-    protected final Map<String, TnIdentifierGenerator> _identifierGeneratorsByPropertyName = StringKeyMap
-            .createAsCaseInsensitive();
+    protected final Map<String, TnIdentifierGenerator> _identifierGeneratorsByPropertyName = StringKeyMap.createAsCaseInsensitive();
 
     protected String _versionNoPropertyName;
     protected String _timestampPropertyName;

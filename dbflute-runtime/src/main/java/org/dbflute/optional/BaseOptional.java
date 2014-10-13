@@ -145,8 +145,7 @@ public abstract class BaseOptional<OBJ> {
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as flat-mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    protected <RESULT> OptionalThing<RESULT> callbackFlatMapping(
-            OptionalThingFunction<? super OBJ, OptionalThing<RESULT>> mapper) {
+    protected <RESULT> OptionalThing<RESULT> callbackFlatMapping(OptionalThingFunction<? super OBJ, OptionalThing<RESULT>> mapper) {
         if (mapper == null) {
             String msg = "The argument 'mapper' should not be null.";
             throw new IllegalArgumentException(msg);

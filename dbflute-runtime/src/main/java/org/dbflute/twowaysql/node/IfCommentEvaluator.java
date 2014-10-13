@@ -69,8 +69,8 @@ public class IfCommentEvaluator {
     protected static final String METHOD_SUFFIX = "()";
 
     protected static final String[] CONNECTORS = new String[] { AND.trim(), OR.trim() };
-    protected static final String[] OPERANDS = new String[] { EQUAL.trim(), NOT_EQUAL.trim(), GREATER_THAN.trim(),
-            LESS_THAN.trim(), GREATER_EQUAL.trim(), LESS_EQUAL.trim() };
+    protected static final String[] OPERANDS = new String[] { EQUAL.trim(), NOT_EQUAL.trim(), GREATER_THAN.trim(), LESS_THAN.trim(),
+            GREATER_EQUAL.trim(), LESS_EQUAL.trim() };
 
     public static String[] getConnectors() {
         return CONNECTORS;
@@ -260,8 +260,7 @@ public class IfCommentEvaluator {
         }
     }
 
-    protected boolean compareLeftRight(Object leftResult, Object rightResult, ComparaDeterminer determiner,
-            String booleanClause) {
+    protected boolean compareLeftRight(Object leftResult, Object rightResult, ComparaDeterminer determiner, String booleanClause) {
         assertCompareType(leftResult, rightResult, booleanClause);
         if (leftResult instanceof Date) {
             final Date leftDate = (Date) leftResult;
@@ -331,14 +330,12 @@ public class IfCommentEvaluator {
                     final String literal = rearValue.substring(qlen, rearValue.length() - qlen).trim();
                     try {
                         return DfTypeUtil.toTimestamp(literal);
-                    } catch (ParseTimestampException ignored) {
-                    }
+                    } catch (ParseTimestampException ignored) {}
                 }
             }
             try {
                 return DfTypeUtil.toBigDecimal(piece);
-            } catch (NumberFormatException ignored) {
-            }
+            } catch (NumberFormatException ignored) {}
         }
         final List<String> propertyList = new ArrayList<String>();
         String preProperty = setupPropertyList(piece, propertyList);
@@ -548,8 +545,7 @@ public class IfCommentEvaluator {
         msg = msg + "  e.g. ExParameterBean (your original property)" + ln();
         msg = msg + "  /- - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "  public boolean isOriginalMemberProperty() {" + ln();
-        msg = msg + "      return (getMemberId() != null || getBirthdate() != null) && getMemberName() != null);"
-                + ln();
+        msg = msg + "      return (getMemberId() != null || getBirthdate() != null) && getMemberName() != null);" + ln();
         msg = msg + "  }" + ln();
         msg = msg + "  - - - - - - - - - -/" + ln();
         msg = msg + "  " + ln();
@@ -590,8 +586,7 @@ public class IfCommentEvaluator {
         throw new IfCommentIllegalParameterBeanSpecificationException(msg);
     }
 
-    protected void throwIfCommentPropertyReadFailureException(Object baseObject, String propertyName,
-            DfBeanIllegalPropertyException e) {
+    protected void throwIfCommentPropertyReadFailureException(Object baseObject, String propertyName, DfBeanIllegalPropertyException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("Failed to read the property on the IF comment!");
         br.addItem("Advice");
@@ -644,8 +639,7 @@ public class IfCommentEvaluator {
         throw new IfCommentNotFoundMethodException(msg);
     }
 
-    protected void throwIfCommentMethodInvocationFailureException(Object baseObject, String methodName,
-            ReflectionFailureException e) {
+    protected void throwIfCommentMethodInvocationFailureException(Object baseObject, String methodName, ReflectionFailureException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("Failed to invoke the method on the IF comment!");
         br.addItem("Advice");
@@ -780,8 +774,7 @@ public class IfCommentEvaluator {
         throw new IfCommentNotBooleanResultException(msg);
     }
 
-    protected void throwIfCommentListIndexNotNumberException(List<?> list, String notNumberIndex,
-            NumberFormatException e) {
+    protected void throwIfCommentListIndexNotNumberException(List<?> list, String notNumberIndex, NumberFormatException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The list index on the IF comment was not number!");
         br.addItem("Advice");
@@ -802,8 +795,7 @@ public class IfCommentEvaluator {
         throw new IfCommentListIndexNotNumberException(msg, e);
     }
 
-    protected void throwIfCommentListIndexOutOfBoundsException(List<?> list, String numberIndex,
-            IndexOutOfBoundsException e) {
+    protected void throwIfCommentListIndexOutOfBoundsException(List<?> list, String numberIndex, IndexOutOfBoundsException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The list index on the IF comment was out of bounds!");
         br.addItem("Advice");

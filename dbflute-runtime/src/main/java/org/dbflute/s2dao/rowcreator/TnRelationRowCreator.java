@@ -43,8 +43,8 @@ public interface TnRelationRowCreator {
      */
     Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
             Map<String, Map<String, Integer>> selectIndexMap, TnRelationKey relKey,
-            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
-            TnRelationSelector relSelector) throws SQLException;
+            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache, TnRelationSelector relSelector)
+            throws SQLException;
 
     /**
      * Create relation property cache.
@@ -56,8 +56,7 @@ public interface TnRelationRowCreator {
      * @throws SQLException
      */
     Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Map<String, String> selectColumnMap,
-            Map<String, Map<String, Integer>> selectIndexMap, TnRelationSelector relSelector, TnBeanMetaData baseBmd)
-            throws SQLException;
+            Map<String, Map<String, Integer>> selectIndexMap, TnRelationSelector relSelector, TnBeanMetaData baseBmd) throws SQLException;
 
     /**
      * Filter the relation row as optional object if it needs.

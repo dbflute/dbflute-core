@@ -79,8 +79,7 @@ public class ClassificationType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException {
         String msg = "Binding as classification for Procedure is unsupported: value=" + value;
         throw new UnsupportedOperationException(msg);
     }

@@ -109,8 +109,7 @@ public class NotClosingConnectionWrapper implements Connection {
         return _actualConnection.createStatement();
     }
 
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
-            throws SQLException {
+    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         return _actualConnection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
@@ -158,8 +157,8 @@ public class NotClosingConnectionWrapper implements Connection {
         return _actualConnection.nativeSQL(sql);
     }
 
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
-            int resultSetHoldability) throws SQLException {
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)
+            throws SQLException {
         return _actualConnection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
@@ -171,13 +170,12 @@ public class NotClosingConnectionWrapper implements Connection {
         return _actualConnection.prepareCall(sql);
     }
 
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency,
-            int resultSetHoldability) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)
+            throws SQLException {
         return _actualConnection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
-            throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         return _actualConnection.prepareStatement(sql, resultSetType, resultSetConcurrency);
     }
 

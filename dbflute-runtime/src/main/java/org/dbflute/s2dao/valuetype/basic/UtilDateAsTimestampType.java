@@ -68,8 +68,7 @@ public class UtilDateAsTimestampType extends TnAbstractValueType {
         _timestampType.bindValue(conn, ps, index, toTimestamp(value));
     }
 
-    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException {
         _timestampType.bindValue(conn, cs, parameterName, toTimestamp(value));
     }
 

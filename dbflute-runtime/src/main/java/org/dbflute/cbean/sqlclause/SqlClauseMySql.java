@@ -235,8 +235,8 @@ public class SqlClauseMySql extends AbstractSqlClause {
      * @param aliasName The alias name of the target table. (NotNull)
      * @return The condition string of match statement. (NotNull)
      */
-    public String buildMatchCondition(List<ColumnInfo> textColumnList, String conditionValue,
-            FullTextSearchModifier modifier, String tableDbName, String aliasName) {
+    public String buildMatchCondition(List<ColumnInfo> textColumnList, String conditionValue, FullTextSearchModifier modifier,
+            String tableDbName, String aliasName) {
         assertTextColumnList(textColumnList);
         assertVariousTextSearchResource(conditionValue, modifier, tableDbName, aliasName);
         final StringBuilder sb = new StringBuilder();
@@ -280,8 +280,8 @@ public class SqlClauseMySql extends AbstractSqlClause {
         }
     }
 
-    protected void assertVariousTextSearchResource(String conditionValue, FullTextSearchModifier modifier,
-            String tableDbName, String aliasName) {
+    protected void assertVariousTextSearchResource(String conditionValue, FullTextSearchModifier modifier, String tableDbName,
+            String aliasName) {
         if (conditionValue == null || conditionValue.length() == 0) {
             String msg = "The argument 'conditionValue' should not be null or empty: " + conditionValue;
             throw new IllegalArgumentException(msg);

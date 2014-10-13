@@ -15,7 +15,6 @@
  */
 package org.dbflute.bhv.exception;
 
-
 /**
  * @author jflute
  */

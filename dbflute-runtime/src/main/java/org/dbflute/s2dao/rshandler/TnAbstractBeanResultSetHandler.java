@@ -51,8 +51,7 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @param rowCreator Row creator. (NotNull)
      * @param relationRowCreator Relation row creator. (NotNul)
      */
-    public TnAbstractBeanResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
-            TnRelationRowCreator relationRowCreator) {
+    public TnAbstractBeanResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator, TnRelationRowCreator relationRowCreator) {
         _beanMetaData = beanMetaData;
         _rowCreator = rowCreator;
         _relationRowCreator = relationRowCreator;
@@ -84,9 +83,8 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @return The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<String, TnPropertyMapping>> createRelationPropertyCache(
-            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
-            TnRelationSelector relSelector) throws SQLException {
+    protected Map<String, Map<String, TnPropertyMapping>> createRelationPropertyCache(Map<String, String> selectColumnMap,
+            Map<String, Map<String, Integer>> selectIndexMap, TnRelationSelector relSelector) throws SQLException {
         return _relationRowCreator.createPropertyCache(selectColumnMap, selectIndexMap, relSelector, _beanMetaData);
     }
 
@@ -101,8 +99,8 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @return The created row. (NotNull)
      * @throws SQLException
      */
-    protected Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap,
-            Map<String, TnPropertyMapping> propertyCache) throws SQLException {
+    protected Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap, Map<String, TnPropertyMapping> propertyCache)
+            throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
@@ -125,8 +123,8 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      */
     protected Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
             Map<String, Map<String, Integer>> selectIndexMap, TnRelationKey relKey,
-            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
-            TnRelationSelector relSelector) throws SQLException {
+            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache, TnRelationSelector relSelector)
+            throws SQLException {
         return _relationRowCreator.createRelationRow(rs, rpt // basic resource
                 , selectColumnMap, selectIndexMap // select resource
                 , relKey, relPropCache, relRowCache, relSelector); // relation resource

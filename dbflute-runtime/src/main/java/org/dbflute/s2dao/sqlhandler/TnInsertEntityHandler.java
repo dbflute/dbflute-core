@@ -32,8 +32,8 @@ public class TnInsertEntityHandler extends TnAbstractEntityHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnInsertEntityHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
-            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+    public TnInsertEntityHandler(DataSource dataSource, StatementFactory statementFactory, String sql, TnBeanMetaData beanMetaData,
+            TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory, sql, beanMetaData, boundPropTypes);
         setOptimisticLockHandling(false);
     }

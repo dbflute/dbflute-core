@@ -65,8 +65,7 @@ public class ConditionKeyNotLikeSearch extends ConditionKeyLikeSearch {
     //                                                                     Condition Value
     //                                                                     ===============
     @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
-            ConditionOption option) {
+    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location, ConditionOption option) {
         conditionValue.setupNotLikeSearch((String) value, (LikeSearchOption) option, location);
     }
 }

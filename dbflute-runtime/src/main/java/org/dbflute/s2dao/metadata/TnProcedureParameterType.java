@@ -39,8 +39,8 @@ public class TnProcedureParameterType {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnProcedureParameterType(TnProcedureParameterAccessor parameterAccessor, String parameterName,
-            Class<?> parameterType, Class<?> elementType) {
+    public TnProcedureParameterType(TnProcedureParameterAccessor parameterAccessor, String parameterName, Class<?> parameterType,
+            Class<?> elementType) {
         this._parameterAccessor = parameterAccessor;
         this._parameterName = parameterName;
         this._parameterType = parameterType;

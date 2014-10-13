@@ -44,8 +44,7 @@ public class SubQueryClause {
      * @param subQuerySqlClause The SQL clause for sub-query. (NotNull)
      * @param localAliasName The alias name of sub-query local table. (NullAllowed: if plain)
      */
-    public SubQueryClause(SubQueryPath subQueryPath, String selectClause, SqlClause subQuerySqlClause,
-            String localAliasName) {
+    public SubQueryClause(SubQueryPath subQueryPath, String selectClause, SqlClause subQuerySqlClause, String localAliasName) {
         _subQueryPath = subQueryPath;
         _selectClause = selectClause;
         _subQuerySqlClause = subQuerySqlClause;
@@ -87,8 +86,8 @@ public class SubQueryClause {
      * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause string of correlation sub-query. (NotNull)
      */
-    public String buildCorrelationSubQueryFromWhereClause(ColumnRealName correlatedColumnRealName,
-            ColumnSqlName relatedColumnSqlName, String correlatedFixedCondition) {
+    public String buildCorrelationSubQueryFromWhereClause(ColumnRealName correlatedColumnRealName, ColumnSqlName relatedColumnSqlName,
+            String correlatedFixedCondition) {
         final String clause = xprepareCorrelationSubQueryFromWhereClause();
         final String joinCondition = _localAliasName + "." + relatedColumnSqlName + " = " + correlatedColumnRealName;
         return xreplaceCorrelationSubQueryFromWhereClause(clause, joinCondition, correlatedFixedCondition);
@@ -125,8 +124,7 @@ public class SubQueryClause {
         return resolveParameterLocationPath(clause, _subQueryPath);
     }
 
-    protected String xreplaceCorrelationSubQueryFromWhereClause(String clause, String joinCondition,
-            String fixedCondition) {
+    protected String xreplaceCorrelationSubQueryFromWhereClause(String clause, String joinCondition, String fixedCondition) {
         final String correlationCondition;
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
             correlationCondition = joinCondition + ln() + "   and " + fixedCondition;

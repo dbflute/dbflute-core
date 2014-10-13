@@ -26,8 +26,8 @@ import org.dbflute.dbmeta.info.ColumnInfo;
  * @param <LOCAL_RELATION_TRACE> The type of local relation trace.
  */
 @SuppressWarnings("unchecked")
-public class HierarchyBasicRequest<LOCAL_ENTITY extends Entity, LOCAL_RELATION_TRACE extends DBMeta.RelationTrace>
-        extends HierarchyRequest<LOCAL_ENTITY> {
+public class HierarchyBasicRequest<LOCAL_ENTITY extends Entity, LOCAL_RELATION_TRACE extends DBMeta.RelationTrace> extends
+        HierarchyRequest<LOCAL_ENTITY> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -82,8 +82,7 @@ public class HierarchyBasicRequest<LOCAL_ENTITY extends Entity, LOCAL_RELATION_T
         final Object target = destinationDBMeta;
         java.lang.reflect.Method method = null;
         try {
-            method = target.getClass().getMethod("createRelationTrace",
-                    new Class[] { DBMeta.RelationTraceFixHandler.class });
+            method = target.getClass().getMethod("createRelationTrace", new Class[] { DBMeta.RelationTraceFixHandler.class });
         } catch (NoSuchMethodException e) {
             String msg = "Not found method: method=createRelationTrace(DBMeta.RelationTraceFixHandler)";
             throw new IllegalStateException(msg, e);

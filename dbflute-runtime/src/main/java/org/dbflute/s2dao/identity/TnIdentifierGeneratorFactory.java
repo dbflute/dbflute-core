@@ -102,8 +102,7 @@ public class TnIdentifierGeneratorFactory {
     }
 
     protected static TnIdentifierGenerator createIdentifierGenerator(Class<?> clazz, TnPropertyType propertyType) {
-        final Constructor<?> constructor = DfReflectionUtil.getConstructor(clazz,
-                new Class<?>[] { TnPropertyType.class });
+        final Constructor<?> constructor = DfReflectionUtil.getConstructor(clazz, new Class<?>[] { TnPropertyType.class });
         return (TnIdentifierGenerator) DfReflectionUtil.newInstance(constructor, new Object[] { propertyType });
     }
 

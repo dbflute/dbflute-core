@@ -53,8 +53,7 @@ public class TnBasicSelectHandler extends TnBasicParameterHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBasicSelectHandler(DataSource dataSource, String sql, TnResultSetHandler resultSetHandler,
-            StatementFactory statementFactory) {
+    public TnBasicSelectHandler(DataSource dataSource, String sql, TnResultSetHandler resultSetHandler, StatementFactory statementFactory) {
         super(dataSource, statementFactory, sql);
         _resultSetHandler = resultSetHandler;
     }
@@ -147,8 +146,7 @@ public class TnBasicSelectHandler extends TnBasicParameterHandler {
         return false;
     }
 
-    protected TnFetchAssistResultSet createFunctionalResultSet(ResultSet rs, FetchBean fcbean, boolean offset,
-            boolean limit) {
+    protected TnFetchAssistResultSet createFunctionalResultSet(ResultSet rs, FetchBean fcbean, boolean offset, boolean limit) {
         return new TnFetchAssistResultSet(rs, fcbean, offset, limit);
     }
 }

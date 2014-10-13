@@ -393,8 +393,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                     final IndexOfInfo rearIndex = Srl.indexOfFirst(relationEndIndex.substringRearTrimmed(), ".");
                     if (rearIndex == null || rearIndex.getIndex() > 0) {
                         String notice = "The OverRelation variable should continue to column after the variable.";
-                        throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation,
-                                fixedCondition);
+                        throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition);
                         return null; // unreachable
                     }
                     final String columnStart = rearIndex.substringRear(); // e.g. REMINDER_QUESTION = ...
@@ -425,8 +424,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                     pointDBMeta = _dbmetaProvider.provideDBMeta(pointTable);
                 } catch (DBMetaNotFoundException e) {
                     String notice = "The table for relation on fixed condition does not exist.";
-                    throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition,
-                            e);
+                    throwIllegalFixedConditionOverRelationException(notice, pointTable, targetRelation, fixedCondition, e);
                     return null; // unreachable
                 }
                 ConditionQuery referrerQuery = _localCQ.xgetReferrerQuery();
@@ -627,8 +625,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         return optimizedCondition;
     }
 
-    protected String reverseOptimizedColumnAlias(String optimizedCondition,
-            Map<String, String> optimizedReverseColumnMap) {
+    protected String reverseOptimizedColumnAlias(String optimizedCondition, Map<String, String> optimizedReverseColumnMap) {
         if (optimizedReverseColumnMap != null) {
             for (Entry<String, String> entry : optimizedReverseColumnMap.entrySet()) {
                 final String logicalName = entry.getKey();
@@ -639,8 +636,8 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         return optimizedCondition;
     }
 
-    protected void collectAdditionalRealColumnList(List<String> additionalRealColumnList,
-            String resolvedFixedCondition, InlineViewResource resource, String foreignAlias) {
+    protected void collectAdditionalRealColumnList(List<String> additionalRealColumnList, String resolvedFixedCondition,
+            InlineViewResource resource, String foreignAlias) {
         final Set<String> additionalColumnSet = resource.getAdditionalColumnSet();
         if (additionalColumnSet == null) { // basically no way here (but just in case)
             return;
@@ -745,13 +742,13 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     // ===================================================================================
     //                                                                  Exception Handling
     //                                                                  ==================
-    protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName,
-            String relationName, String fixedCondition) {
+    protected void throwIllegalFixedConditionOverRelationException(String notice, String tableName, String relationName,
+            String fixedCondition) {
         throwIllegalFixedConditionOverRelationException(notice, tableName, relationName, fixedCondition, null);
     }
 
-    protected void throwIllegalFixedConditionOverRelationException(String notice, String pointTable,
-            String targetRelation, String fixedCondition, Exception e) {
+    protected void throwIllegalFixedConditionOverRelationException(String notice, String pointTable, String targetRelation,
+            String fixedCondition, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
         br.addItem("Point Table");

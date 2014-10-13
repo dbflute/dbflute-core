@@ -90,8 +90,7 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         doAccept(ctx, firstValue, firstType, loopInfo, false);
     }
 
-    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo,
-            boolean inheritLoop) {
+    protected void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo loopInfo, boolean inheritLoop) {
         assertInLoopOnlyOptionInLoop(loopInfo);
         final BoundValue boundValue = new BoundValue();
         boundValue.setFirstValue(firstValue);
@@ -208,8 +207,7 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     //                                                                           =========
     protected void throwBindOrEmbeddedCommentParameterNullValueException(BoundValue boundValue) {
         final Class<?> targetType = boundValue.getTargetType();
-        NodeChecker.throwBindOrEmbeddedCommentParameterNullValueException(_expression, targetType, _specifiedSql,
-                isBind());
+        NodeChecker.throwBindOrEmbeddedCommentParameterNullValueException(_expression, targetType, _specifiedSql, isBind());
     }
 
     protected void throwBindOrEmbeddedCommentInScopeNotListException(BoundValue boundValue) {
@@ -218,8 +216,7 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
     }
 
     protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException() {
-        NodeChecker.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression, _specifiedSql,
-                isBind());
+        NodeChecker.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression, _specifiedSql, isBind());
     }
 
     protected void throwBindOrEmbeddedCommentParameterEmptyListException() {

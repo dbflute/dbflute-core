@@ -41,8 +41,8 @@ public class OutsideSqlExecuteExecution extends AbstractOutsideSqlExecution {
      * @param argNameTypeMap The map of names and types for arguments. (NotNull)
      * @param twoWaySql The SQL string as 2Way-SQL. (NotNull)
      */
-    public OutsideSqlExecuteExecution(DataSource dataSource, StatementFactory statementFactory,
-            Map<String, Class<?>> argNameTypeMap, String twoWaySql) {
+    public OutsideSqlExecuteExecution(DataSource dataSource, StatementFactory statementFactory, Map<String, Class<?>> argNameTypeMap,
+            String twoWaySql) {
         super(dataSource, statementFactory, argNameTypeMap, twoWaySql);
     }
 

@@ -505,8 +505,8 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
      * @param localEntity The interface of local entity. (NotNull)
      * @param primaryKeyMap The map of primary key. (NotNull)
      */
-    protected void doLastLoopInjection(TopInfo<LOCAL_ENTITY> topInfo, HierarchyRequestElement requestElement,
-            Entity localEntity, Map<String, Object> primaryKeyMap) {
+    protected void doLastLoopInjection(TopInfo<LOCAL_ENTITY> topInfo, HierarchyRequestElement requestElement, Entity localEntity,
+            Map<String, Object> primaryKeyMap) {
         final ColumnInfo destinationColumnInfo = requestElement.getDestinationColumnInfo();
         if (!primaryKeyMap.containsKey(destinationColumnInfo.getColumnDbName())) {// The column is primary key!
             final HierarchySourceRow sourceRow = topInfo.getSourceRow();
@@ -555,8 +555,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
      * @param columnInfo Column info. (NotNull)
      * @param columnValue Column value. (NotNull)
      */
-    protected void injectColumnValueToDestinationIfNotNull(Entity entity, ColumnInfo columnInfo,
-            final Object columnValue) {
+    protected void injectColumnValueToDestinationIfNotNull(Entity entity, ColumnInfo columnInfo, final Object columnValue) {
         if (columnValue != null) {
             injectColumnValueToDestination(entity, columnInfo.getColumnDbName(), columnValue);
         }
@@ -582,8 +581,8 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
 
     protected void injectForeignEntity(Entity entity, String foreignPropName, Entity foreignEntity) {
         final String capPropReferrerName = initCap(foreignPropName);
-        final Method method = findMethod(entity.getClass(), "set" + capPropReferrerName, new Class[] { foreignEntity
-                .getDBMeta().getEntityType() });
+        final Method method =
+                findMethod(entity.getClass(), "set" + capPropReferrerName, new Class[] { foreignEntity.getDBMeta().getEntityType() });
         invoke(method, entity, new Object[] { foreignEntity });
     }
 
@@ -614,8 +613,8 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         injectColumnValueMapToDestination(localEntity, localForeignKeyMap);
     }
 
-    protected void injectReferrerForeignKey(TopInfo<LOCAL_ENTITY> topInfo, Entity referrerEntity,
-            ReferrerInfo referrerInfo, String localRelationPath) {
+    protected void injectReferrerForeignKey(TopInfo<LOCAL_ENTITY> topInfo, Entity referrerEntity, ReferrerInfo referrerInfo,
+            String localRelationPath) {
         final HierarchyRequest<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final Map<String, Object> localPrimaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, localRelationPath);
         final List<HierarchyRequestElement> primaryKeyElementList = request.findPrimaryKeyElement(localRelationPath);
@@ -674,8 +673,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
             msg = msg + " methodArgTypes     = {" + createTypeViewFromTypeArray(parameterTypes) + "}" + ln;
             msg = msg + " specifiedArgValues = {" + createValueViewFromValueArray(args) + "}" + ln;
             msg = msg + " specifiedArgTypes  = {" + createTypeViewFromValueArray(args) + "}" + ln;
-            if (parameterTypes.length > 0 && args.length > 0 && args[0] != null
-                    && !parameterTypes[0].equals(args[0].getClass())) {
+            if (parameterTypes.length > 0 && args.length > 0 && args[0] != null && !parameterTypes[0].equals(args[0].getClass())) {
                 msg = msg + " " + ln;
                 final String compareString = "{" + parameterTypes[0] + " -- " + args[0].getClass() + "}";
                 msg = msg + " *Warning! The argType is ummatched: " + compareString + ln;

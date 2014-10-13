@@ -74,14 +74,12 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
     public LoadReferrerOption() {
     }
 
-    public LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> xinit(
-            ReferrerConditionSetupper<REFERRER_CB> referrerConditionSetupper) { // internal
+    public LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> xinit(ReferrerConditionSetupper<REFERRER_CB> referrerConditionSetupper) { // internal
         setReferrerConditionSetupper(referrerConditionSetupper);
         return this;
     }
 
-    public LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> xinit(
-            ConditionBeanSetupper<REFERRER_CB> conditionBeanSetupper) { // internal
+    public LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> xinit(ConditionBeanSetupper<REFERRER_CB> conditionBeanSetupper) { // internal
         setConditionBeanSetupper(conditionBeanSetupper);
         return this;
     }

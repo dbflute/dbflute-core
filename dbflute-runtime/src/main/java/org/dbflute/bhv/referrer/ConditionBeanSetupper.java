@@ -22,6 +22,5 @@ import org.dbflute.cbean.ConditionBean;
  * @param <CONDITION_BEAN> The type of condition-bean.
  * @author jflute
  */
-public interface ConditionBeanSetupper<CONDITION_BEAN extends ConditionBean> extends
-        ReferrerConditionSetupper<CONDITION_BEAN> {
+public interface ConditionBeanSetupper<CONDITION_BEAN extends ConditionBean> extends ReferrerConditionSetupper<CONDITION_BEAN> {
 }

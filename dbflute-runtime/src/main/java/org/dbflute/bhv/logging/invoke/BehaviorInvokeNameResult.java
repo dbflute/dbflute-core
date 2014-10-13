@@ -30,8 +30,8 @@ public class BehaviorInvokeNameResult {
     protected final InvokeNameResult _invokeNameHeadResult;
     protected final List<InvokeNameResult> _invokeNameResultList;
 
-    public BehaviorInvokeNameResult(String invocationExp, String invocationExpNoMethodSuffix,
-            InvokeNameResult invokeNameHeadResult, List<InvokeNameResult> invokeNameResultList) {
+    public BehaviorInvokeNameResult(String invocationExp, String invocationExpNoMethodSuffix, InvokeNameResult invokeNameHeadResult,
+            List<InvokeNameResult> invokeNameResultList) {
         _invocationExp = invocationExp;
         _invocationExpNoMethodSuffix = invocationExpNoMethodSuffix;
         _invokeNameHeadResult = invokeNameHeadResult;

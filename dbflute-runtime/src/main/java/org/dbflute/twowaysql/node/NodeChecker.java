@@ -51,8 +51,8 @@ public class NodeChecker {
     // ===================================================================================
     //                                                                   Exception Thrower
     //                                                                   =================
-    public static void throwBindOrEmbeddedCommentParameterNullValueException(String expression, Class<?> targetType,
-            String specifiedSql, boolean bind) {
+    public static void throwBindOrEmbeddedCommentParameterNullValueException(String expression, Class<?> targetType, String specifiedSql,
+            boolean bind) {
         final String name = (bind ? "bind variable" : "embedded variable");
         final String emmark = (bind ? "" : "$");
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -78,8 +78,8 @@ public class NodeChecker {
         }
     }
 
-    public static void throwBindOrEmbeddedCommentInScopeNotListException(String expression, Class<?> targetType,
-            String specifiedSql, boolean bind) {
+    public static void throwBindOrEmbeddedCommentInScopeNotListException(String expression, Class<?> targetType, String specifiedSql,
+            boolean bind) {
         final String emmark = (bind ? "" : "$");
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The parameter for in-scope condition was not list or array.");
@@ -103,8 +103,8 @@ public class NodeChecker {
         }
     }
 
-    public static void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(String expression,
-            String specifiedSql, boolean bind) {
+    public static void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(String expression, String specifiedSql,
+            boolean bind) {
         final String name = (bind ? "bind variable" : "embedded variable");
         final String emmark = (bind ? "" : "$");
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -149,8 +149,7 @@ public class NodeChecker {
         }
     }
 
-    public static void throwBindOrEmbeddedCommentParameterEmptyListException(String expression, String specifiedSql,
-            boolean bind) {
+    public static void throwBindOrEmbeddedCommentParameterEmptyListException(String expression, String specifiedSql, boolean bind) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The list of " + (bind ? "bind" : "embedded") + " variable was empty." + ln();
@@ -174,8 +173,7 @@ public class NodeChecker {
         throw new IllegalStateException(msg);
     }
 
-    public static void throwBindOrEmbeddedCommentParameterNullOnlyListException(String expression, String specifiedSql,
-            boolean bind) {
+    public static void throwBindOrEmbeddedCommentParameterNullOnlyListException(String expression, String specifiedSql, boolean bind) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The list of " + (bind ? "bind" : "embedded") + " variable was null-only list." + ln();

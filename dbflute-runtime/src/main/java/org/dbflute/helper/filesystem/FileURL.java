@@ -94,8 +94,7 @@ public class FileURL {
             if (ous != null) {
                 try {
                     ous.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

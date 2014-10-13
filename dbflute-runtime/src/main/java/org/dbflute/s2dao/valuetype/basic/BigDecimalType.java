@@ -58,8 +58,7 @@ public class BigDecimalType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {

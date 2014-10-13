@@ -28,8 +28,7 @@ public class OrScopeQuerySetupper {
     // ===================================================================================
     //                                                                              Set up
     //                                                                              ======
-    public void setupOrScopeQuery(List<OrScopeQueryClauseGroup> clauseGroupList, List<QueryClause> realList,
-            boolean line) {
+    public void setupOrScopeQuery(List<OrScopeQueryClauseGroup> clauseGroupList, List<QueryClause> realList, boolean line) {
         if (clauseGroupList == null || clauseGroupList.isEmpty()) {
             return;
         }

@@ -52,22 +52,20 @@ public class OrScopeQueryReflector {
     public void reflectTmpOrClauseToRealObject(OrScopeQueryInfo localInfo) {
         {
             // to Normal Query (where clause)
-            final List<OrScopeQueryClauseGroup> groupList = setupTmpOrListList(localInfo,
-                    new OrScopeQueryClauseListProvider() {
-                        public List<QueryClause> provide(OrScopeQueryInfo tmpOrScopeQueryInfo) {
-                            return tmpOrScopeQueryInfo.getTmpOrWhereList();
-                        }
-                    });
+            final List<OrScopeQueryClauseGroup> groupList = setupTmpOrListList(localInfo, new OrScopeQueryClauseListProvider() {
+                public List<QueryClause> provide(OrScopeQueryInfo tmpOrScopeQueryInfo) {
+                    return tmpOrScopeQueryInfo.getTmpOrWhereList();
+                }
+            });
             setupOrScopeQuery(groupList, _whereList, true);
         }
         {
             // to InlineView for baseTable
-            final List<OrScopeQueryClauseGroup> groupList = setupTmpOrListList(localInfo,
-                    new OrScopeQueryClauseListProvider() {
-                        public List<QueryClause> provide(OrScopeQueryInfo tmpOrScopeQueryInfo) {
-                            return tmpOrScopeQueryInfo.getTmpOrBaseTableInlineWhereList();
-                        }
-                    });
+            final List<OrScopeQueryClauseGroup> groupList = setupTmpOrListList(localInfo, new OrScopeQueryClauseListProvider() {
+                public List<QueryClause> provide(OrScopeQueryInfo tmpOrScopeQueryInfo) {
+                    return tmpOrScopeQueryInfo.getTmpOrBaseTableInlineWhereList();
+                }
+            });
             setupOrScopeQuery(groupList, _baseTableInlineWhereList, false);
         }
         {
@@ -102,8 +100,7 @@ public class OrScopeQueryReflector {
         }
     }
 
-    protected List<OrScopeQueryClauseGroup> setupTmpOrListList(OrScopeQueryInfo parentInfo,
-            OrScopeQueryClauseListProvider provider) {
+    protected List<OrScopeQueryClauseGroup> setupTmpOrListList(OrScopeQueryInfo parentInfo, OrScopeQueryClauseListProvider provider) {
         final List<OrScopeQueryClauseGroup> resultList = new ArrayList<OrScopeQueryClauseGroup>();
         final OrScopeQueryClauseGroup groupInfo = new OrScopeQueryClauseGroup();
         groupInfo.setOrClauseList(provider.provide(parentInfo));
@@ -116,8 +113,7 @@ public class OrScopeQueryReflector {
         return resultList;
     }
 
-    protected void setupOrScopeQuery(List<OrScopeQueryClauseGroup> clauseGroupList, List<QueryClause> realList,
-            boolean line) {
+    protected void setupOrScopeQuery(List<OrScopeQueryClauseGroup> clauseGroupList, List<QueryClause> realList, boolean line) {
         _setupper.setupOrScopeQuery(clauseGroupList, realList, line);
     }
 }

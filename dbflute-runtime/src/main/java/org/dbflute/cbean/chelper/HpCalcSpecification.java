@@ -525,8 +525,8 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      * @param removeCalcAlias Does it remove alias of calculation column.
      * @return The expression of calculation statement. (NotNull)
      */
-    protected String buildCalculationExp(String targetExp, Map<String, String> columnAliasMap,
-            HpCalcElement calculation, boolean removeCalcAlias) {
+    protected String buildCalculationExp(String targetExp, Map<String, String> columnAliasMap, HpCalcElement calculation,
+            boolean removeCalcAlias) {
         final CalculationType calculationType = calculation.getCalculationType();
         if (calculationType.equals(CalculationType.CONV)) { // convert
             final ColumnConversionOption columnConversionOption = calculation.getColumnConversionOption();
@@ -585,8 +585,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         return specifiedRealName;
     }
 
-    protected void throwCalculationColumnRelationUnresolvedException(String targetExp,
-            HpSpecifiedColumn calculationColumn) {
+    protected void throwCalculationColumnRelationUnresolvedException(String targetExp, HpSpecifiedColumn calculationColumn) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The relation for the calculation column was unresolved.");
         br.addItem("Advice");
@@ -709,8 +708,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     @Override
     public String toString() {
         final String title = DfTypeUtil.toClassTitle(this);
-        return title + ":{left=" + _leftMode + ", convert=" + _convert + ", logBook="
-                + _synchronizeSetupSelectByJourneyLogBook + "}";
+        return title + ":{left=" + _leftMode + ", convert=" + _convert + ", logBook=" + _synchronizeSetupSelectByJourneyLogBook + "}";
     }
 
     // ===================================================================================

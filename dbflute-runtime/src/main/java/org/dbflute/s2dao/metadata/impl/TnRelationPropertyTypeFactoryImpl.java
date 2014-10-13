@@ -56,9 +56,8 @@ public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyType
     //                                                                         Constructor
     //                                                                         ===========
     public TnRelationPropertyTypeFactoryImpl(Class<?> localBeanClass, TnBeanMetaData localBeanMetaData,
-            TnBeanAnnotationReader beanAnnotationReader, TnBeanMetaDataFactory beanMetaDataFactory,
-            DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation,
-            Class<?> optionalEntityType) {
+            TnBeanAnnotationReader beanAnnotationReader, TnBeanMetaDataFactory beanMetaDataFactory, DatabaseMetaData dbMetaData,
+            int relationNestLevel, boolean stopRelationCreation, Class<?> optionalEntityType) {
         _localBeanClass = localBeanClass;
         _localBeanMetaData = localBeanMetaData;
         _beanAnnotationReader = beanAnnotationReader;
@@ -135,10 +134,9 @@ public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyType
         return propertyType;
     }
 
-    protected TnRelationPropertyType createRelationPropertyType(DfPropertyDesc propertyDesc, String[] myKeys,
-            String[] yourKeys, int relno, TnBeanMetaData relationBeanMetaData) {
-        return new TnRelationPropertyTypeImpl(propertyDesc, relno, myKeys, yourKeys, _localBeanMetaData,
-                relationBeanMetaData);
+    protected TnRelationPropertyType createRelationPropertyType(DfPropertyDesc propertyDesc, String[] myKeys, String[] yourKeys, int relno,
+            TnBeanMetaData relationBeanMetaData) {
+        return new TnRelationPropertyTypeImpl(propertyDesc, relno, myKeys, yourKeys, _localBeanMetaData, relationBeanMetaData);
     }
 
     protected TnBeanMetaData createRelationBeanMetaData(Class<?> relationBeanClass) {

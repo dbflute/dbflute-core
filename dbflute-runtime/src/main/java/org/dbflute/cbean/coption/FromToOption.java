@@ -116,7 +116,7 @@ public class FromToOption implements ConditionOption {
     protected Integer _moveToScope;
     protected boolean _usePattern;
     protected boolean _orIsNull;
-    
+
     /** Does it allow one-side only from-to? */
     protected boolean _oneSideAllowed;
 

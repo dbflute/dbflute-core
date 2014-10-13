@@ -46,12 +46,12 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     //                                                                         ===========
     public TnPropertyTypeImpl(DfPropertyDesc propertyDesc) {
         // for non persistent property (for example, relation)
-        this(propertyDesc, TnValueTypes.DEFAULT_OBJECT, propertyDesc.getPropertyName(), new ColumnSqlName(
-                propertyDesc.getPropertyName()), null);
+        this(propertyDesc, TnValueTypes.DEFAULT_OBJECT, propertyDesc.getPropertyName(), new ColumnSqlName(propertyDesc.getPropertyName()),
+                null);
     }
 
-    public TnPropertyTypeImpl(DfPropertyDesc propertyDesc, ValueType valueType, String columnDbName,
-            ColumnSqlName columnSqlName, ColumnInfo entityColumnInfo) {
+    public TnPropertyTypeImpl(DfPropertyDesc propertyDesc, ValueType valueType, String columnDbName, ColumnSqlName columnSqlName,
+            ColumnInfo entityColumnInfo) {
         _propertyDesc = propertyDesc;
         _propertyName = propertyDesc.getPropertyName();
         _valueType = valueType;
@@ -65,8 +65,8 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     //                                                                      ==============
     @Override
     public String toString() {
-        return DfTypeUtil.toClassTitle(this) + ":{" + _propertyName + "(" + _columnDbName + "), "
-                + DfTypeUtil.toClassTitle(_valueType) + ", " + _primaryKey + ", " + _persistent + "}";
+        return DfTypeUtil.toClassTitle(this) + ":{" + _propertyName + "(" + _columnDbName + "), " + DfTypeUtil.toClassTitle(_valueType)
+                + ", " + _primaryKey + ", " + _persistent + "}";
     }
 
     // ===================================================================================

@@ -38,19 +38,18 @@ public class InScopeRelation extends AbstractSubQuery {
     //                                                                         Constructor
     //                                                                         ===========
     public InScopeRelation(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
-            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
-            String subQueryIdentity, DBMeta subQueryDBMeta, GearedCipherManager cipherManager,
-            boolean suppressLocalAliasName) {
-        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
-                subQueryIdentity, subQueryDBMeta, cipherManager);
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause, String subQueryIdentity,
+            DBMeta subQueryDBMeta, GearedCipherManager cipherManager, boolean suppressLocalAliasName) {
+        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause, subQueryIdentity,
+                subQueryDBMeta, cipherManager);
         _suppressLocalAliasName = suppressLocalAliasName;
     }
 
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
-    public String buildInScopeRelation(String columnDbName, String relatedColumnDbName,
-            String correlatedFixedCondition, String inScopeOption) {
+    public String buildInScopeRelation(String columnDbName, String relatedColumnDbName, String correlatedFixedCondition,
+            String inScopeOption) {
         inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
         final String subQueryClause;
         {
@@ -69,8 +68,7 @@ public class InScopeRelation extends AbstractSubQuery {
                 columnRealName = localRealName;
             }
         }
-        return columnRealName + " " + inScopeOption + "in (" + beginMark + subQueryClause + ln() + endIndent + ")"
-                + endMark;
+        return columnRealName + " " + inScopeOption + "in (" + beginMark + subQueryClause + ln() + endIndent + ")" + endMark;
     }
 
     protected String getSubQueryClause(ColumnSqlName relatedColumnSqlName, String correlatedFixedCondition) {

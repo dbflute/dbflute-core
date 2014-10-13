@@ -76,8 +76,7 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         }
     }
 
-    protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,
-            InsertOption<ConditionBean> option) {
+    protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql, InsertOption<ConditionBean> option) {
         final TnInsertEntityHandler handler = createInsertEntityHandler(propertyTypes, sql, option);
         final Object[] realArgs = new Object[] { bean };
         handler.setExceptionMessageSqlArgs(realArgs);
@@ -131,8 +130,7 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         return propertyName.equalsIgnoreCase(timestampProp) || propertyName.equalsIgnoreCase(versionNoProp);
     }
 
-    protected boolean isSpecifiedProperty(Object bean, InsertOption<ConditionBean> option, Set<?> modifiedSet,
-            TnPropertyType pt) {
+    protected boolean isSpecifiedProperty(Object bean, InsertOption<ConditionBean> option, Set<?> modifiedSet, TnPropertyType pt) {
         if (option != null && option.hasSpecifiedInsertColumn()) { // basically BatchUpdate
             // BatchUpdate's modified properties are translated to specified columns
             // so all BatchUpdate commands are here
@@ -183,8 +181,7 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     // ===================================================================================
     //                                                                          Insert SQL
     //                                                                          ==========
-    protected String createInsertSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes,
-            InsertOption<ConditionBean> option) {
+    protected String createInsertSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes, InsertOption<ConditionBean> option) {
         final String tableDbName = _targetDBMeta.getTableDbName();
         final StringBuilder columnSb = new StringBuilder(48);
         final StringBuilder valuesSb = new StringBuilder(48);
@@ -211,8 +208,7 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     //                                                                             =======
     protected TnInsertEntityHandler createInsertEntityHandler(TnPropertyType[] boundPropTypes, String sql,
             InsertOption<ConditionBean> option) {
-        final TnInsertEntityHandler handler = new TnInsertEntityHandler(_dataSource, _statementFactory, sql,
-                _beanMetaData, boundPropTypes);
+        final TnInsertEntityHandler handler = new TnInsertEntityHandler(_dataSource, _statementFactory, sql, _beanMetaData, boundPropTypes);
         handler.setInsertOption(option);
         return handler;
     }

@@ -15,7 +15,6 @@
  */
 package org.dbflute.cbean.coption;
 
-
 /**
  * The callback interface of condition option.
  * @param <OP> The type of condition option to be set up.

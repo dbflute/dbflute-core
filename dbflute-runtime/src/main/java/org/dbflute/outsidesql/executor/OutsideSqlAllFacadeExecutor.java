@@ -17,6 +17,7 @@ package org.dbflute.outsidesql.executor;
 
 import org.dbflute.cbean.result.ListResultBean;
 import org.dbflute.cbean.result.PagingResultBean;
+import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.jdbc.CursorHandler;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.optional.OptionalEntity;
@@ -99,8 +100,8 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      */
     public <ENTITY> OptionalEntity<ENTITY> selectEntity(EntityHandlingPmb<BEHAVIOR, ENTITY> pmb) {
         return OptionalEntity.ofNullable(_basicExecutor.entityHandling().selectEntity(pmb), () -> {
-            // TODO jflute exception
-                throw new IllegalStateException("TODO jflute");
+            // TODO jflute OutsideSql optional exception
+                throw new EntityAlreadyDeletedException("TODO jflute");
             });
     }
 

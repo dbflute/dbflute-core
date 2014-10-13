@@ -995,8 +995,7 @@ public class MapListString {
         return result;
     }
 
-    protected void assertMapStringEqualIndex(String remainderString, int equalIndex, String mapString,
-            Map<String, Object> currentMap) {
+    protected void assertMapStringEqualIndex(String remainderString, int equalIndex, String mapString, Map<String, Object> currentMap) {
         if (remainderString == null) {
             final String notice = "The remainderString should not be null:";
             throwMapStringEqualFailureException(notice, remainderString, equalIndex, mapString, currentMap);
@@ -1017,8 +1016,8 @@ public class MapListString {
         }
     }
 
-    protected void throwMapStringEqualFailureException(String notice, String remainderMapString, int equalIndex,
-            String mapString, Map<String, Object> currentMap) {
+    protected void throwMapStringEqualFailureException(String notice, String remainderMapString, int equalIndex, String mapString,
+            Map<String, Object> currentMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
         br.addItem("Remainder String");
@@ -1034,52 +1033,50 @@ public class MapListString {
         throw new MapListStringParseFailureException(msg);
     }
 
-    protected void assertMapStringEndBraceIndex(String remainderString, int endBraceIndex, String mapString,
+    protected void assertMapStringEndBraceIndex(String remainderString, int endBraceIndex, String mapString, Map<String, Object> currentMap) {
+        if (remainderString == null) {
+            final String notice = "The remainderString should not be null:";
+            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
+        }
+        if (endBraceIndex < 0) {
+            final String notice = "Not found the end brace.";
+            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
+        }
+        // deep (or unneeded?) check (written by younger jflute)
+        if (remainderString.length() < endBraceIndex) {
+            final String notice = "The remainderString length should be greater than endMarkIndex:";
+            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
+        }
+        final String extractedMark = remainderString.substring(endBraceIndex, endBraceIndex + _endBrace.length());
+        if (!extractedMark.equals(_endBrace)) {
+            final String notice = "The remainderString should have end brace at the endMarkIndex:";
+            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
+        }
+    }
+
+    protected void assertListStringEndBraceIndex(String remainderString, int endBraceIndex, String listString, List<?> currentList) {
+        if (remainderString == null) {
+            final String notice = "The remainderString should not be null:";
+            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
+        }
+        if (endBraceIndex < 0) {
+            final String notice = "Not found the end brace.";
+            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
+        }
+        // deep (or unneeded?) check (written by younger jflute)
+        if (remainderString.length() < endBraceIndex) {
+            final String notice = "The remainderString length should be greater than endMarkIndex:";
+            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
+        }
+        final String extractedMark = remainderString.substring(endBraceIndex, endBraceIndex + _endBrace.length());
+        if (!extractedMark.equals(_endBrace)) {
+            final String notice = "The remainderString should have end brace at the endMarkIndex:";
+            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
+        }
+    }
+
+    protected void throwMapStringEndBraceFailureException(String notice, String remainderMapString, int equalIndex, String mapString,
             Map<String, Object> currentMap) {
-        if (remainderString == null) {
-            final String notice = "The remainderString should not be null:";
-            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
-        }
-        if (endBraceIndex < 0) {
-            final String notice = "Not found the end brace.";
-            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
-        }
-        // deep (or unneeded?) check (written by younger jflute)
-        if (remainderString.length() < endBraceIndex) {
-            final String notice = "The remainderString length should be greater than endMarkIndex:";
-            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
-        }
-        final String extractedMark = remainderString.substring(endBraceIndex, endBraceIndex + _endBrace.length());
-        if (!extractedMark.equals(_endBrace)) {
-            final String notice = "The remainderString should have end brace at the endMarkIndex:";
-            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
-        }
-    }
-
-    protected void assertListStringEndBraceIndex(String remainderString, int endBraceIndex, String listString,
-            List<?> currentList) {
-        if (remainderString == null) {
-            final String notice = "The remainderString should not be null:";
-            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
-        }
-        if (endBraceIndex < 0) {
-            final String notice = "Not found the end brace.";
-            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
-        }
-        // deep (or unneeded?) check (written by younger jflute)
-        if (remainderString.length() < endBraceIndex) {
-            final String notice = "The remainderString length should be greater than endMarkIndex:";
-            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
-        }
-        final String extractedMark = remainderString.substring(endBraceIndex, endBraceIndex + _endBrace.length());
-        if (!extractedMark.equals(_endBrace)) {
-            final String notice = "The remainderString should have end brace at the endMarkIndex:";
-            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
-        }
-    }
-
-    protected void throwMapStringEndBraceFailureException(String notice, String remainderMapString, int equalIndex,
-            String mapString, Map<String, Object> currentMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
         br.addItem("Remainder Map String");
@@ -1095,8 +1092,8 @@ public class MapListString {
         throw new MapListStringParseFailureException(msg);
     }
 
-    protected void throwListStringEndBraceFailureException(String notice, String remainderMapString, int equalIndex,
-            String listString, List<?> currentList) {
+    protected void throwListStringEndBraceFailureException(String notice, String remainderMapString, int equalIndex, String listString,
+            List<?> currentList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
         br.addItem("Remainder List String");

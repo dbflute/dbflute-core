@@ -152,8 +152,8 @@ public class PagingInvoker<ENTITY> {
         return handler.paging();
     }
 
-    protected PagingResultBean<ENTITY> reselect(PagingHandler<ENTITY> handler, PagingBean pagingBean,
-            ResultBeanBuilder<ENTITY> builder, PagingResultBean<ENTITY> rb) {
+    protected PagingResultBean<ENTITY> reselect(PagingHandler<ENTITY> handler, PagingBean pagingBean, ResultBeanBuilder<ENTITY> builder,
+            PagingResultBean<ENTITY> rb) {
         pagingBean.fetchPage(rb.getAllPageCount());
         final InvocationResultResource<ENTITY> resource = doPaging(handler, pagingBean, builder);
         final int allRecordCount = resource.getAllRecordCount();

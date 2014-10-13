@@ -29,8 +29,7 @@ public class GearedCipherManager {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, Map<String, ColumnFunctionCipher>> _cipherMap = StringKeyMap
-            .createAsFlexibleConcurrent();
+    protected final Map<String, Map<String, ColumnFunctionCipher>> _cipherMap = StringKeyMap.createAsFlexibleConcurrent();
 
     // ===================================================================================
     //                                                                             Prepare

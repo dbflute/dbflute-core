@@ -76,8 +76,7 @@ public class ProcessConsoleReader extends Thread {
         } finally {
             try {
                 _reader.close();
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
     }
 }

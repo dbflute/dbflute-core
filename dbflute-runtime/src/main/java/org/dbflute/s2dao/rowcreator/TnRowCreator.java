@@ -36,8 +36,8 @@ public interface TnRowCreator {
      * @return The created row. (NotNull)
      * @throws SQLException
      */
-    Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap,
-            Map<String, TnPropertyMapping> columnPropertyTypeMap, Class<?> beanClass) throws SQLException;
+    Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap, Map<String, TnPropertyMapping> columnPropertyTypeMap,
+            Class<?> beanClass) throws SQLException;
 
     /**
      * Create property cache as map. <br />

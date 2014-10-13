@@ -34,6 +34,6 @@ public interface TnRelationPropertyTypeFactoryBuilder {
      * @return The created factory. (NotNull)
      */
     TnRelationPropertyTypeFactory build(Class<?> localBeanClass, TnBeanMetaData localBeanMetaData,
-            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData, int relationNestLevel,
-            boolean stopRelationCreation, Class<?> optionalEntityType);
+            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation,
+            Class<?> optionalEntityType);
 }

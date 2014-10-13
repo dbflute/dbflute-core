@@ -55,8 +55,7 @@ public class HpSpecifiedColumn implements HpCalculator {
         _derived = false;
     }
 
-    public HpSpecifiedColumn(String tableAliasName, ColumnInfo columnInfo, ConditionBean baseCB,
-            String columnDirectName, boolean derived) {
+    public HpSpecifiedColumn(String tableAliasName, ColumnInfo columnInfo, ConditionBean baseCB, String columnDirectName, boolean derived) {
         assertColumnInfo(tableAliasName, columnInfo);
         assertBaseCB(tableAliasName, baseCB);
         _tableAliasName = tableAliasName;

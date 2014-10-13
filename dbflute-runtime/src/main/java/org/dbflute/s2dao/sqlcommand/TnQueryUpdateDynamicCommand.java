@@ -161,8 +161,8 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
      * @param boundPropTypeList The type list of bound property. (NotNull, AlwaysEmpty)
      * @return The two-way SQL of query update. (NullAllowed: if non-modification, return null)
      */
-    protected String buildQueryUpdateTwoWaySql(Entity entity, ConditionBean cb,
-            final UpdateOption<ConditionBean> option, List<TnPropertyType> boundPropTypeList) {
+    protected String buildQueryUpdateTwoWaySql(Entity entity, ConditionBean cb, final UpdateOption<ConditionBean> option,
+            List<TnPropertyType> boundPropTypeList) {
         final Map<String, Object> columnParameterMap = new LinkedHashMap<String, Object>();
         final DBMeta dbmeta = entity.getDBMeta();
         final Set<String> modifiedPropertyNames = entity.modifiedProperties();

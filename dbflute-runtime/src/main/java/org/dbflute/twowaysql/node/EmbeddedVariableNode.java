@@ -185,16 +185,14 @@ public class EmbeddedVariableNode extends VariableNode {
         return Srl.count(_testValue, "'") > 1;
     }
 
-    protected boolean processDynamicBinding(CommandContext ctx, Object firstValue, Class<?> firstType,
-            String embeddedString) {
+    protected boolean processDynamicBinding(CommandContext ctx, Object firstValue, Class<?> firstType, String embeddedString) {
         final ScopeInfo first = Srl.extractScopeFirst(embeddedString, "/*", "*/");
         if (first == null) {
             return false;
         }
         final SqlAnalyzer analyzer = new SqlAnalyzer(embeddedString, _blockNullParameter);
         final Node rootNode = analyzer.analyze();
-        final CommandContextCreator creator = new CommandContextCreator(new String[] { "pmb" },
-                new Class<?>[] { firstType });
+        final CommandContextCreator creator = new CommandContextCreator(new String[] { "pmb" }, new Class<?>[] { firstType });
         final CommandContext rootCtx = creator.createCommandContext(new Object[] { firstValue });
         rootNode.accept(rootCtx);
         final String sql = rootCtx.getSql();

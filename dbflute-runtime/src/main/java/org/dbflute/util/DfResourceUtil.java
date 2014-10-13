@@ -231,8 +231,7 @@ public class DfResourceUtil {
         } finally {
             try {
                 fileOutputStream.close();
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
     }
 

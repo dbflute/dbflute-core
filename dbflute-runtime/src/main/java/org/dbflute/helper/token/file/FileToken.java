@@ -115,8 +115,8 @@ public class FileToken {
      * @throws IOException When the file reading failed.
      * @throws FileTokenizingSQLHandlingFailureException When the SQL handling fails in the row handling process.
      */
-    public void tokenize(String filePath, FileTokenizingCallback callback, FileTokenizingOption option)
-            throws FileNotFoundException, IOException {
+    public void tokenize(String filePath, FileTokenizingCallback callback, FileTokenizingOption option) throws FileNotFoundException,
+            IOException {
         assertStringNotNullAndNotTrimmedEmpty("filePath", filePath);
 
         FileInputStream fis = null;
@@ -127,8 +127,7 @@ public class FileToken {
             if (fis != null) {
                 try {
                     fis.close(); // basically no needed but just in case
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }
@@ -155,8 +154,8 @@ public class FileToken {
      * @throws IOException When the file reading failed.
      * @throws FileTokenizingSQLHandlingFailureException When the SQL handling fails in the row handling process. 
      */
-    public void tokenize(InputStream ins, FileTokenizingCallback callback, FileTokenizingOption option)
-            throws FileNotFoundException, IOException {
+    public void tokenize(InputStream ins, FileTokenizingCallback callback, FileTokenizingOption option) throws FileNotFoundException,
+            IOException {
         assertObjectNotNull("ins", ins);
         assertObjectNotNull("callback", callback);
         assertObjectNotNull("option", option);
@@ -254,8 +253,7 @@ public class FileToken {
                 if (br != null) {
                     br.close();
                 }
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
     }
 
@@ -460,8 +458,7 @@ public class FileToken {
      * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
      * @throws FileMakingSQLHandlingFailureException When the SQL handling fails in the row writing process.
      */
-    public void make(String filePath, FileMakingCallback callback, FileMakingOption option)
-            throws FileNotFoundException, IOException {
+    public void make(String filePath, FileMakingCallback callback, FileMakingOption option) throws FileNotFoundException, IOException {
         assertStringNotNullAndNotTrimmedEmpty("filePath", filePath);
         FileOutputStream fos = null;
         try {
@@ -471,8 +468,7 @@ public class FileToken {
             if (fos != null) {
                 try {
                     fos.close(); // basically no needed but just in case
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }
@@ -502,13 +498,12 @@ public class FileToken {
      * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
      * @throws FileMakingSQLHandlingFailureException When the SQL handling fails in the row writing process.
      */
-    public void make(OutputStream ous, FileMakingCallback callback, FileMakingOption option)
-            throws FileNotFoundException, IOException {
+    public void make(OutputStream ous, FileMakingCallback callback, FileMakingOption option) throws FileNotFoundException, IOException {
         doMake(ous, callback, option);
     }
 
-    protected void doMake(OutputStream ous, FileMakingCallback callback, final FileMakingOption option)
-            throws FileNotFoundException, IOException {
+    protected void doMake(OutputStream ous, FileMakingCallback callback, final FileMakingOption option) throws FileNotFoundException,
+            IOException {
         assertObjectNotNull("ous", ous);
         assertObjectNotNull("callback", callback);
         assertObjectNotNull("option", option);
@@ -539,8 +534,8 @@ public class FileToken {
         }
     }
 
-    protected void doWriterHeader(Writer writer, List<String> columnNameList, FileMakingOption option,
-            Set<String> doneMarkSet) throws IOException {
+    protected void doWriterHeader(Writer writer, List<String> columnNameList, FileMakingOption option, Set<String> doneMarkSet)
+            throws IOException {
         if (doneMarkSet.contains(HEADER_DONE_MARK)) { // basically no way but just in case
             return;
         }
@@ -556,9 +551,8 @@ public class FileToken {
         }
     }
 
-    protected void callbackDataRowWriter(FileMakingCallback callback, final FileMakingOption option,
-            final String lineSep, final LineMakingOption lineOption, final Writer writer, final Set<String> doneMarkSet)
-            throws IOException {
+    protected void callbackDataRowWriter(FileMakingCallback callback, final FileMakingOption option, final String lineSep,
+            final LineMakingOption lineOption, final Writer writer, final Set<String> doneMarkSet) throws IOException {
         final FileMakingRowResource resource = new FileMakingRowResource();
         try {
             callback.write(new FileMakingRowWriter() {
@@ -588,8 +582,8 @@ public class FileToken {
         }
     }
 
-    protected void doWriteDataRow(Writer writer, FileMakingRowResource resource, FileMakingOption option,
-            LineMakingOption lineOption, String lineSep, Set<String> doneMarkSet) throws IOException {
+    protected void doWriteDataRow(Writer writer, FileMakingRowResource resource, FileMakingOption option, LineMakingOption lineOption,
+            String lineSep, Set<String> doneMarkSet) throws IOException {
         if (!resource.hasRowData()) {
             return;
         }

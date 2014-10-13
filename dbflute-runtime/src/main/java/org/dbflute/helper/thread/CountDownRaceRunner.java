@@ -33,8 +33,7 @@ public class CountDownRaceRunner {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public CountDownRaceRunner(long threadId, CountDownRaceLatch ourLatch, int entryNumber, Object lockObj,
-            int countOfEntry) {
+    public CountDownRaceRunner(long threadId, CountDownRaceLatch ourLatch, int entryNumber, Object lockObj, int countOfEntry) {
         _threadId = threadId;
         _ourLatch = ourLatch;
         _entryNumber = entryNumber;
@@ -89,8 +88,8 @@ public class CountDownRaceRunner {
 
     protected void checkEntryNumber(int entryNumber) {
         if (entryNumber > _countOfEntry) {
-            String msg = "The specified entry number is over count of entries: entryNumber=" + entryNumber
-                    + ", countOfEntry=" + _countOfEntry;
+            String msg =
+                    "The specified entry number is over count of entries: entryNumber=" + entryNumber + ", countOfEntry=" + _countOfEntry;
             throw new IllegalArgumentException(msg);
         }
     }

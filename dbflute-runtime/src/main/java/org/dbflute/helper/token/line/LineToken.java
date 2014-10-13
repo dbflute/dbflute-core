@@ -63,12 +63,12 @@ public class LineToken {
         assertObjectNotNull("lineMakingOption", lineMakingOption);
         final String delimiter = lineMakingOption.getDelimiter();
         assertObjectNotNull("lineMakingOption.getDelimiter()", delimiter);
-        return createLineString(valueList, delimiter, lineMakingOption.isQuoteAll(),
-                lineMakingOption.isQuoteMinimally(), lineMakingOption.isTrimSpace());
+        return createLineString(valueList, delimiter, lineMakingOption.isQuoteAll(), lineMakingOption.isQuoteMinimally(),
+                lineMakingOption.isTrimSpace());
     }
 
-    protected String createLineString(Collection<String> valueList, String delimiter, boolean quoteAll,
-            boolean quoteMinimamlly, boolean trimSpace) {
+    protected String createLineString(Collection<String> valueList, String delimiter, boolean quoteAll, boolean quoteMinimamlly,
+            boolean trimSpace) {
         final StringBuilder sb = new StringBuilder();
         for (String value : valueList) {
             value = (value != null ? value : "");

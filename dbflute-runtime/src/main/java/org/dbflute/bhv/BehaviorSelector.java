@@ -15,7 +15,6 @@
  */
 package org.dbflute.bhv;
 
-
 /**
  * The interface of behavior-selector.
  * @author jflute

@@ -31,8 +31,8 @@ public class TnBatchInsertHandler extends TnAbstractBatchHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBatchInsertHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
-            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+    public TnBatchInsertHandler(DataSource dataSource, StatementFactory statementFactory, String sql, TnBeanMetaData beanMetaData,
+            TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory, sql, beanMetaData, boundPropTypes);
         setOptimisticLockHandling(false);
     }

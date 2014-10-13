@@ -219,8 +219,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
             }
             final String methodName = method.getName();
             if (methodName.startsWith("get")) {
-                if (method.getParameterTypes().length != 0 || methodName.equals("getClass")
-                        || method.getReturnType() == void.class) {
+                if (method.getParameterTypes().length != 0 || methodName.equals("getClass") || method.getReturnType() == void.class) {
                     continue;
                 }
                 final String propertyName = initBeansProp(methodName.substring(3));
@@ -233,8 +232,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
                 final String propertyName = initBeansProp(methodName.substring(2));
                 setupReadMethod(method, propertyName);
             } else if (methodName.startsWith("set")) {
-                if (method.getParameterTypes().length != 1 || methodName.equals("setClass")
-                        || method.getReturnType() != void.class) {
+                if (method.getParameterTypes().length != 1 || methodName.equals("setClass") || method.getReturnType() != void.class) {
                     continue;
                 }
                 final String propertyName = initBeansProp(methodName.substring(3));
@@ -419,8 +417,8 @@ public class DfBeanDescImpl implements DfBeanDesc {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected DfPropertyDesc createPropertyDesc(String propertyName, Class<?> propertyType, Method readMethod,
-            Method writeMethod, Field field) {
+    protected DfPropertyDesc createPropertyDesc(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
+            Field field) {
         return new DfPropertyDescImpl(this, propertyName, propertyType, readMethod, writeMethod, field);
     }
 

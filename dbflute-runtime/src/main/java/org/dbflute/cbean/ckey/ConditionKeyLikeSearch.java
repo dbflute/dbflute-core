@@ -72,8 +72,8 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     //                                                                        Where Clause
     //                                                                        ============
     @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value,
+            ColumnFunctionCipher cipher, ConditionOption option) {
         assertLikeSearchOption(columnRealName, value, option);
         conditionList.add(buildBindClause(columnRealName, getLocation(value), cipher, option));
     }

@@ -79,7 +79,8 @@ public class ConditionBeanContext {
     //                                                          EntityRowHandler on Thread
     //                                                          ==========================
     /** The thread-local for entity row handler. */
-    private static final ThreadLocal<EntityRowHandler<? extends Entity>> _entityRowHandlerLocal = new ThreadLocal<EntityRowHandler<? extends Entity>>();
+    private static final ThreadLocal<EntityRowHandler<? extends Entity>> _entityRowHandlerLocal =
+            new ThreadLocal<EntityRowHandler<? extends Entity>>();
 
     /**
      * Get the handler of entity row. on thread.
@@ -128,8 +129,7 @@ public class ConditionBeanContext {
         {
             final Class<?> clazz = org.dbflute.outsidesql.paging.SimplePagingBean.class;
             if (debugEnabled) {
-                sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass())
-                        .append(ln());
+                sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(ln());
             }
         }
         {

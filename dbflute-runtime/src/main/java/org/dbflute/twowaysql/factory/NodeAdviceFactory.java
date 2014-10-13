@@ -38,8 +38,7 @@ public interface NodeAdviceFactory {
      * @param commentType The type of comment corresponding the value. (NotNull)
      * @return The new-created set-upper of the value and type. (NotNull)
      */
-    BoundValueTracer createBoundValueTracer(List<String> nameList, String expression, String specifiedSql,
-            ParameterCommentType commentType);
+    BoundValueTracer createBoundValueTracer(List<String> nameList, String expression, String specifiedSql, ParameterCommentType commentType);
 
     /**
      * @param mightBeLikeDirection It might be the direction of like-search, e.g. likePrefix (NotNull)

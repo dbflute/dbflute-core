@@ -75,8 +75,8 @@ public class ConditionKeyEqual extends ConditionKey {
     //                                                                        Where Clause
     //                                                                        ============
     @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value,
+            ColumnFunctionCipher cipher, ConditionOption option) {
         conditionList.add(buildBindClause(columnRealName, value.getEqualLatestLocation(), cipher, option));
     }
 

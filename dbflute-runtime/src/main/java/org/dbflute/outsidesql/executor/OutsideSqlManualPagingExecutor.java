@@ -34,11 +34,9 @@ public class OutsideSqlManualPagingExecutor<BEHAVIOR> extends AbstractOutsideSql
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlManualPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption,
-            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
-        super(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig, outsideSqlOption,
-                outsideSqlExecutorFactory);
+    public OutsideSqlManualPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+        super(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig, outsideSqlOption, outsideSqlExecutorFactory);
     }
 
     // ===================================================================================

@@ -73,8 +73,7 @@ public class LocalTimeAsTimeType extends TnAbstractValueType {
         _timeType.bindValue(conn, ps, index, toSqlDate(value));
     }
 
-    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException {
         _timeType.bindValue(conn, cs, parameterName, toSqlDate(value));
     }
 

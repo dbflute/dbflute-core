@@ -117,8 +117,8 @@ public class TnRelationRowOptionalHandler {
         };
     }
 
-    protected void throwRelationEntityNotFoundException(Object row, String propertyName, DBMeta localDBMeta,
-            ConditionBean cb, String outsideSqlPath, Object parameterBean) {
+    protected void throwRelationEntityNotFoundException(Object row, String propertyName, DBMeta localDBMeta, ConditionBean cb,
+            String outsideSqlPath, Object parameterBean) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The relation entity was NOT found.");
         br.addItem("Advice");

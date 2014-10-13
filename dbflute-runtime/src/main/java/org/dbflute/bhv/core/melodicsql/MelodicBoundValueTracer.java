@@ -30,8 +30,7 @@ import org.dbflute.twowaysql.node.ParameterCommentType;
  */
 public class MelodicBoundValueTracer extends BoundValueTracer {
 
-    public MelodicBoundValueTracer(List<String> nameList, String expression, String specifiedSql,
-            ParameterCommentType commentType) {
+    public MelodicBoundValueTracer(List<String> nameList, String expression, String specifiedSql, ParameterCommentType commentType) {
         super(nameList, expression, specifiedSql, commentType);
     }
 

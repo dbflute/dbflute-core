@@ -34,8 +34,7 @@ public class ExecutionTimeInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ExecutionTimeInfo(Long commandBeforeTimeMillis, Long commandAfterTimeMillis, Long sqlBeforeTimeMillis,
-            Long sqlAfterTimeMillis) {
+    public ExecutionTimeInfo(Long commandBeforeTimeMillis, Long commandAfterTimeMillis, Long sqlBeforeTimeMillis, Long sqlAfterTimeMillis) {
         _commandBeforeTimeMillis = commandBeforeTimeMillis;
         _commandAfterTimeMillis = commandAfterTimeMillis;
         _sqlBeforeTimeMillis = sqlBeforeTimeMillis;

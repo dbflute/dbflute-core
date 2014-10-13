@@ -372,8 +372,8 @@ public class DfReflectionUtil {
         return findMethod(clazz, methodName, argTypes, VisibilityType.WHOLE, true);
     }
 
-    protected static Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes,
-            VisibilityType visibilityType, boolean flexibly) {
+    protected static Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes, VisibilityType visibilityType,
+            boolean flexibly) {
         final Method method = doFindMethodBasic(clazz, methodName, argTypes, visibilityType);
         if (method != null) {
             return method;
@@ -386,8 +386,7 @@ public class DfReflectionUtil {
         }
     }
 
-    protected static Method doFindMethodBasic(Class<?> clazz, String methodName, Class<?>[] argTypes,
-            VisibilityType visibilityType) {
+    protected static Method doFindMethodBasic(Class<?> clazz, String methodName, Class<?>[] argTypes, VisibilityType visibilityType) {
         for (Class<?> target = clazz; target != null && target != Object.class; target = target.getSuperclass()) {
             final Method declaredMethod;
             try {
@@ -413,8 +412,7 @@ public class DfReflectionUtil {
         return null;
     }
 
-    protected static Method doFindMethodFlexibly(Class<?> clazz, String methodName, Class<?>[] argTypes,
-            VisibilityType visibilityType) {
+    protected static Method doFindMethodFlexibly(Class<?> clazz, String methodName, Class<?>[] argTypes, VisibilityType visibilityType) {
         for (Class<?> target = clazz; target != null && target != Object.class; target = target.getSuperclass()) {
             final Method[] methods = target.getDeclaredMethods();
             for (int methodIndex = 0; methodIndex < methods.length; ++methodIndex) {
@@ -454,8 +452,7 @@ public class DfReflectionUtil {
         return visibilityType == VisibilityType.PUBLIC && !Modifier.isPublic(modifier);
     }
 
-    protected static boolean isOutOfTargetForAccessible(VisibilityType visibilityType, int modifier, Class<?> clazz,
-            Class<?> target) {
+    protected static boolean isOutOfTargetForAccessible(VisibilityType visibilityType, int modifier, Class<?> clazz, Class<?> target) {
         return visibilityType == VisibilityType.ACCESSIBLE && clazz != target && isDefaultOrPrivate(modifier);
     }
 

@@ -193,8 +193,8 @@ public class BehaviorExceptionThrower {
         br.addElement(cb.toDisplaySql());
     }
 
-    public <ENTITY> void throwPagingCountSelectNotCountException(String tableDbName, String path, PagingBean pmb,
-            Class<ENTITY> entityType, EntityDuplicatedException e) { // for OutsideSql
+    public <ENTITY> void throwPagingCountSelectNotCountException(String tableDbName, String path, PagingBean pmb, Class<ENTITY> entityType,
+            EntityDuplicatedException e) { // for OutsideSql
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The count select for paging could not get a count.");
         br.addItem("Advice");

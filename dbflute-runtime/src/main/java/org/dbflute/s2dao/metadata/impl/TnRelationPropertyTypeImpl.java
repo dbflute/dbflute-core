@@ -53,8 +53,8 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnRelationPropertyTypeImpl(final DfPropertyDesc propertyDesc, int relationNo, String[] myKeys,
-            String[] yourKeys, TnBeanMetaData myBeanMetaData, TnBeanMetaData yourBeanMetaData) {
+    public TnRelationPropertyTypeImpl(final DfPropertyDesc propertyDesc, int relationNo, String[] myKeys, String[] yourKeys,
+            TnBeanMetaData myBeanMetaData, TnBeanMetaData yourBeanMetaData) {
         super(propertyDesc);
         _relationNo = relationNo;
         _relationNoSuffixPart = buildRelationNoSuffixPart(relationNo);

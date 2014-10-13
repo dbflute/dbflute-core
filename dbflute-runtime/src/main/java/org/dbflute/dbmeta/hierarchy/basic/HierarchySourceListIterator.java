@@ -19,8 +19,7 @@ package org.dbflute.dbmeta.hierarchy.basic;
  * @author jflute
  * @param <SOURCE_ROW> The type of source.
  */
-public class HierarchySourceListIterator<SOURCE_ROW> implements
-        org.dbflute.dbmeta.hierarchy.HierarchySourceIterator {
+public class HierarchySourceListIterator<SOURCE_ROW> implements org.dbflute.dbmeta.hierarchy.HierarchySourceIterator {
 
     protected java.util.List<? extends Object> sourceRowList;
 
@@ -30,8 +29,7 @@ public class HierarchySourceListIterator<SOURCE_ROW> implements
 
     protected org.dbflute.dbmeta.hierarchy.HierarchySourceRow currentSourceEntity;
 
-    public HierarchySourceListIterator(java.util.List<SOURCE_ROW> sourceRowList,
-            HierarchySourceRowSetupper<SOURCE_ROW> sourceRowSetupper) {
+    public HierarchySourceListIterator(java.util.List<SOURCE_ROW> sourceRowList, HierarchySourceRowSetupper<SOURCE_ROW> sourceRowSetupper) {
         this.sourceRowList = sourceRowList;
         this.sourceRowSetupper = sourceRowSetupper;
         this.sourceBeanListIterator = sourceRowList.iterator();

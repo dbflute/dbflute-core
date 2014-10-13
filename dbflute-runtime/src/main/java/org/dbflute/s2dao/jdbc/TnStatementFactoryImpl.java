@@ -72,8 +72,7 @@ public class TnStatementFactoryImpl implements StatementFactory {
         return ps;
     }
 
-    protected PreparedStatement prepareStatement(Connection conn, String sql, int resultSetType,
-            int resultSetConcurrency) {
+    protected PreparedStatement prepareStatement(Connection conn, String sql, int resultSetType, int resultSetConcurrency) {
         try {
             return conn.prepareStatement(sql, resultSetType, resultSetConcurrency);
         } catch (SQLException e) {
@@ -145,8 +144,8 @@ public class TnStatementFactoryImpl implements StatementFactory {
         final boolean existsCursor = cursorSelectFetchSize != null;
 
         final Integer queryTimeout = getActualQueryTimeout(config, existsRequest, defaultConfig, existsDefault);
-        final Integer fetchSize = getActualFetchSize(config, existsRequest, cursorSelectFetchSize, existsCursor,
-                defaultConfig, existsDefault);
+        final Integer fetchSize =
+                getActualFetchSize(config, existsRequest, cursorSelectFetchSize, existsCursor, defaultConfig, existsDefault);
         final Integer maxRows = getActualMaxRows(config, existsRequest, defaultConfig, existsDefault);
         if (queryTimeout == null && fetchSize == null && maxRows == null) {
             return null;
@@ -178,8 +177,8 @@ public class TnStatementFactoryImpl implements StatementFactory {
         return _cursorSelectFetchSize;
     }
 
-    protected Integer getActualQueryTimeout(StatementConfig config, boolean existsRequest,
-            StatementConfig defaultConfig, boolean existsDefault) {
+    protected Integer getActualQueryTimeout(StatementConfig config, boolean existsRequest, StatementConfig defaultConfig,
+            boolean existsDefault) {
         final Integer queryTimeout;
         if (existsRequest && config.hasQueryTimeout()) { // priority 1
             queryTimeout = config.getQueryTimeout();
@@ -206,8 +205,7 @@ public class TnStatementFactoryImpl implements StatementFactory {
         return fetchSize;
     }
 
-    protected Integer getActualMaxRows(StatementConfig config, boolean existsRequest, StatementConfig defaultConfig,
-            boolean existsDefault) {
+    protected Integer getActualMaxRows(StatementConfig config, boolean existsRequest, StatementConfig defaultConfig, boolean existsDefault) {
         final Integer maxRows;
         if (existsRequest && config.hasMaxRows()) { // priority 1
             maxRows = config.getMaxRows();

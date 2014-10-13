@@ -224,8 +224,8 @@ public class TnProcedureMetaDataFactory {
             throw new NullPointerException("clazz");
         }
         return clazz == String.class || clazz.isPrimitive() || clazz == Boolean.class || clazz == Character.class
-                || Number.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz)
-                || Calendar.class.isAssignableFrom(clazz) || clazz == byte[].class;
+                || Number.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz) || Calendar.class.isAssignableFrom(clazz)
+                || clazz == byte[].class;
     }
 
     protected boolean isContainerType(Class<?> clazz) {

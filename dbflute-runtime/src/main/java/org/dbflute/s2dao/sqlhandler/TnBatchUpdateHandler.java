@@ -29,8 +29,8 @@ public class TnBatchUpdateHandler extends TnAbstractBatchHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBatchUpdateHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
-            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+    public TnBatchUpdateHandler(DataSource dataSource, StatementFactory statementFactory, String sql, TnBeanMetaData beanMetaData,
+            TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory, sql, beanMetaData, boundPropTypes);
     }
 

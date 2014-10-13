@@ -39,8 +39,7 @@ public class TnBeanCursorResultSetHandler extends TnBeanListResultSetHandler {
      * @param rowCreator Row creator. (NotNull)
      * @param relationRowCreator Relation row creator. (NotNul)
      */
-    public TnBeanCursorResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
-            TnRelationRowCreator relationRowCreator) {
+    public TnBeanCursorResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator, TnRelationRowCreator relationRowCreator) {
         super(beanMetaData, rowCreator, relationRowCreator);
     }
 

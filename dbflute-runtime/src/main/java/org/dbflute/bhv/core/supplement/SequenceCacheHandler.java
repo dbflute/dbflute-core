@@ -60,8 +60,8 @@ public class SequenceCacheHandler {
      * @param incrementSize The size of increment of sequence. (NullAllowed, f null, batch way is invalid) 
      * @return The object for sequence cache. (NullAllowed) 
      */
-    public SequenceCache findSequenceCache(String tableName, String sequenceName, DataSource dataSource,
-            Class<?> resultType, Integer cacheSize, Integer incrementSize) {
+    public SequenceCache findSequenceCache(String tableName, String sequenceName, DataSource dataSource, Class<?> resultType,
+            Integer cacheSize, Integer incrementSize) {
         if (cacheSize == null || cacheSize <= 1) { // if it is not cache valid size
             return null;
         }
@@ -95,8 +95,8 @@ public class SequenceCacheHandler {
         return _sequenceCacheMap.get(key);
     }
 
-    protected SequenceCache createSequenceCache(String sequenceName, DataSource dataSource, Class<?> resultType,
-            Integer cacheSize, Integer incrementSize) {
+    protected SequenceCache createSequenceCache(String sequenceName, DataSource dataSource, Class<?> resultType, Integer cacheSize,
+            Integer incrementSize) {
         final SequenceCache cache = new SequenceCache(resultType, new BigDecimal(cacheSize), incrementSize);
         cache.setInternalDebug(_internalDebug);
         return cache;
@@ -221,16 +221,14 @@ public class SequenceCacheHandler {
         }
     }
 
-    protected void assertCacheSizeCanBeDividedByIncrementSize(Integer cacheSize, Integer incrementSize,
-            String nextValSql) {
+    protected void assertCacheSizeCanBeDividedByIncrementSize(Integer cacheSize, Integer incrementSize, String nextValSql) {
         final Integer extraValue = cacheSize % incrementSize;
         if (extraValue != 0) {
             throwSequenceCacheSizeNotDividedIncrementSizeException(cacheSize, incrementSize, nextValSql);
         }
     }
 
-    protected void throwSequenceCacheSizeNotDividedIncrementSizeException(Integer cacheSize, Integer incrementSize,
-            String nextValSql) {
+    protected void throwSequenceCacheSizeNotDividedIncrementSizeException(Integer cacheSize, Integer incrementSize, String nextValSql) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The cache size cannot be divided by increment size!" + ln();

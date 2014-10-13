@@ -87,8 +87,8 @@ public class OutsideSqlContext {
     // ===================================================================================
     //                                                                          Unique Key
     //                                                                          ==========
-    public static String generateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb,
-            OutsideSqlOption option, Class<?> resultType) {
+    public static String generateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, OutsideSqlOption option,
+            Class<?> resultType) {
         final String pmbKey = (pmb != null ? pmb.getClass().getName() : "null");
         final String resultKey;
         if (resultType != null) {
@@ -98,8 +98,7 @@ public class OutsideSqlContext {
         }
         final String tableDbName = option.getTableDbName();
         final String generatedUniqueKey = option.generateUniqueKey();
-        return tableDbName + ":" + methodName + "():" + path + ":" + pmbKey + ":" + generatedUniqueKey + ":"
-                + resultKey;
+        return tableDbName + ":" + methodName + "():" + path + ":" + pmbKey + ":" + generatedUniqueKey + ":" + resultKey;
     }
 
     // ===================================================================================
@@ -339,10 +338,8 @@ public class OutsideSqlContext {
             final String behaviorQueryPath = _outsideSqlPath.substring(_outsideSqlPath.lastIndexOf(":") + ":".length());
             final String behaviorClassPath = replaceString(buildBehaviorSqlPackageName(), ".", "/");
             final String behaviorPackagePath = behaviorClassPath.substring(0, behaviorClassPath.lastIndexOf("/"));
-            final String behaviorClassName = behaviorClassPath.substring(behaviorClassPath.lastIndexOf("/")
-                    + "/".length());
-            _outsideSqlPath = behaviorPackagePath + "/" + subDirectoryPath + "/" + behaviorClassName + "_"
-                    + behaviorQueryPath + ".sql";
+            final String behaviorClassName = behaviorClassPath.substring(behaviorClassPath.lastIndexOf("/") + "/".length());
+            _outsideSqlPath = behaviorPackagePath + "/" + subDirectoryPath + "/" + behaviorClassName + "_" + behaviorQueryPath + ".sql";
         } else {
             _outsideSqlPath = replaceString(buildBehaviorSqlPackageName(), ".", "/") + "_" + _outsideSqlPath + ".sql";
         }
@@ -353,8 +350,7 @@ public class OutsideSqlContext {
         final String behaviorTypeName = dbmeta.getBehaviorTypeName();
         final String outsideSqlPackage = _outsideSqlPackage;
         if (outsideSqlPackage != null && outsideSqlPackage.trim().length() > 0) {
-            final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".")
-                    + ".".length());
+            final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
             String tmp = behaviorTypeName.substring(0, behaviorTypeName.lastIndexOf("."));
             final String exbhvName = tmp.contains(".") ? tmp.substring(tmp.lastIndexOf(".") + ".".length()) : tmp;
             return outsideSqlPackage + "." + exbhvName + "." + behaviorClassName;
@@ -367,8 +363,7 @@ public class OutsideSqlContext {
         if (isProcedure()) { // [DBFlute-0.7.5]
             return false;
         }
-        return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && !_outsideSqlPath.contains(".")
-                && _tableDbName != null;
+        return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && !_outsideSqlPath.contains(".") && _tableDbName != null;
     }
 
     // ===================================================================================
@@ -436,8 +431,7 @@ public class OutsideSqlContext {
             if (br != null) {
                 try {
                     br.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
         return sb.toString();

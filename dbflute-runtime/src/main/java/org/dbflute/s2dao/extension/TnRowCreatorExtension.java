@@ -121,8 +121,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     /**
      * {@inheritDoc}
      */
-    public Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap,
-            Map<String, TnPropertyMapping> propertyCache, Class<?> beanClass) throws SQLException {
+    public Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap, Map<String, TnPropertyMapping> propertyCache,
+            Class<?> beanClass) throws SQLException {
         if (propertyCache.isEmpty()) {
             String msg = "The propertyCache should not be empty: bean=" + beanClass.getName();
             throw new IllegalStateException(msg);
@@ -228,8 +228,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
     }
 
-    protected Object getValue(ResultSet rs, String columnName, ValueType valueType,
-            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+    protected Object getValue(ResultSet rs, String columnName, ValueType valueType, Map<String, Map<String, Integer>> selectIndexMap)
+            throws SQLException {
         final Object value;
         if (selectIndexMap != null) {
             value = ResourceContext.getLocalValue(rs, columnName, valueType, selectIndexMap);
@@ -239,8 +239,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         return value;
     }
 
-    protected void throwMappingClassCastException(Object entity, DBMeta dbmeta, TnPropertyMapping mapping,
-            Object selectedValue, ClassCastException e) {
+    protected void throwMappingClassCastException(Object entity, DBMeta dbmeta, TnPropertyMapping mapping, Object selectedValue,
+            ClassCastException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to cast a class while data mapping.");
         br.addItem("Advice");

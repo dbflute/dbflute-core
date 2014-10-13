@@ -172,8 +172,8 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         }
     }
 
-    protected void setupNextRelationRowElement(TnRelationRowCreationResource res, Object row,
-            TnRelationPropertyType nextRpt) throws SQLException {
+    protected void setupNextRelationRowElement(TnRelationRowCreationResource res, Object row, TnRelationPropertyType nextRpt)
+            throws SQLException {
         res.prepareNextRelationProperty(nextRpt);
         try {
             mappingNextRelation(res, row);
@@ -262,16 +262,14 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     // -----------------------------------------------------
     //                                         Next Relation
     //                                         -------------
-    protected void setupNextPropertyCache(TnRelationRowCreationResource res, TnBeanMetaData nextBmd)
-            throws SQLException {
+    protected void setupNextPropertyCache(TnRelationRowCreationResource res, TnBeanMetaData nextBmd) throws SQLException {
         final List<TnRelationPropertyType> nextRptList = nextBmd.getRelationPropertyTypeList();
         for (TnRelationPropertyType nextRpt : nextRptList) {
             setupNextPropertyCacheElement(res, nextRpt);
         }
     }
 
-    protected void setupNextPropertyCacheElement(TnRelationRowCreationResource res, TnRelationPropertyType nextRpt)
-            throws SQLException {
+    protected void setupNextPropertyCacheElement(TnRelationRowCreationResource res, TnRelationPropertyType nextRpt) throws SQLException {
         res.prepareNextRelationProperty(nextRpt);
         try {
             setupPropertyCache(res); // recursive call

@@ -26,6 +26,5 @@ import org.dbflute.outsidesql.typed.CursorHandlingPmb;
  * @author jflute
  * @since 1.0.5J (2014/06/16 Monday)
  */
-public interface ImmutableCursorHandlingPmb<BEHAVIOR, IMMU, DBLE extends DBableEntity<IMMU>> extends
-        CursorHandlingPmb<BEHAVIOR, DBLE> {
+public interface ImmutableCursorHandlingPmb<BEHAVIOR, IMMU, DBLE extends DBableEntity<IMMU>> extends CursorHandlingPmb<BEHAVIOR, DBLE> {
 }

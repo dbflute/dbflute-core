@@ -123,9 +123,8 @@ public abstract class ConditionKey implements Serializable {
      * @return The determination, true or false.
      */
     public static boolean isNullaleConditionKey(ConditionKey key) {
-        return CK_GREATER_EQUAL_OR_IS_NULL.equals(key) || CK_GREATER_THAN_OR_IS_NULL.equals(key)
-                || CK_LESS_EQUAL_OR_IS_NULL.equals(key) || CK_LESS_THAN_OR_IS_NULL.equals(key)
-                || CK_IS_NULL.equals(key) || CK_IS_NULL_OR_EMPTY.equals(key);
+        return CK_GREATER_EQUAL_OR_IS_NULL.equals(key) || CK_GREATER_THAN_OR_IS_NULL.equals(key) || CK_LESS_EQUAL_OR_IS_NULL.equals(key)
+                || CK_LESS_THAN_OR_IS_NULL.equals(key) || CK_IS_NULL.equals(key) || CK_IS_NULL_OR_EMPTY.equals(key);
     }
 
     // ===================================================================================
@@ -208,8 +207,8 @@ public abstract class ConditionKey implements Serializable {
      * @param cipher The cipher of column by function. (NullAllowed)
      * @param option The option of condition. (NullAllowed)
      */
-    protected abstract void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue cvalue, ColumnFunctionCipher cipher, ConditionOption option);
+    protected abstract void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue cvalue,
+            ColumnFunctionCipher cipher, ConditionOption option);
 
     // ===================================================================================
     //                                                                     Condition Value
@@ -243,8 +242,7 @@ public abstract class ConditionKey implements Serializable {
      * @param location The location on parameter comment. (NotNull)
      * @param option The option of condition. (NullAllowed)
      */
-    protected abstract void doSetupConditionValue(ConditionValue cvalue, Object value, String location,
-            ConditionOption option);
+    protected abstract void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option);
 
     // ===================================================================================
     //                                                                         Bind Clause
@@ -273,15 +271,14 @@ public abstract class ConditionKey implements Serializable {
      * @param option The option of condition. (NullAllowed)
      * @return The query clause as bind clause. (NotNull)
      */
-    protected QueryClause buildBindClauseOrIsNull(ColumnRealName columnRealName, String location,
-            ColumnFunctionCipher cipher, ConditionOption option) {
+    protected QueryClause buildBindClauseOrIsNull(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
+            ConditionOption option) {
         final String mainQuery = doBuildBindClause(columnRealName, location, cipher, option);
         final String clause = "(" + mainQuery + " or " + columnRealName + " is null)";
         return new StringQueryClause(clause);
     }
 
-    protected String doBuildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
-            ConditionOption option) {
+    protected String doBuildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher, ConditionOption option) {
         final BindClauseResult result = resolveBindClause(columnRealName, location, cipher, option);
         return result.toBindClause();
     }
@@ -299,8 +296,8 @@ public abstract class ConditionKey implements Serializable {
     // -----------------------------------------------------
     //                                       Clause Resolver
     //                                       ---------------
-    protected BindClauseResult resolveBindClause(ColumnRealName columnRealName, String location,
-            ColumnFunctionCipher cipher, ConditionOption option) {
+    protected BindClauseResult resolveBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
+            ConditionOption option) {
         final String basicBindExp = buildBindVariableExp(location, option);
         final String bindExp;
         final ColumnRealName resolvedColumn;

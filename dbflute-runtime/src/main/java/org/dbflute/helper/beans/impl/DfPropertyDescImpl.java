@@ -55,8 +55,8 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPropertyDescImpl(DfBeanDesc beanDesc, String propertyName, Class<?> propertyType, Method readMethod,
-            Method writeMethod, Field field) {
+    public DfPropertyDescImpl(DfBeanDesc beanDesc, String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
+            Field field) {
         if (propertyName == null) {
             String msg = "The argument 'propertyName' should not be null!";
             throw new IllegalArgumentException(msg);

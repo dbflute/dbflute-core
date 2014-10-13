@@ -47,11 +47,10 @@ public class SpecifyDerivedReferrer extends DerivedReferrer {
     //                                                                         Constructor
     //                                                                         ===========
     public SpecifyDerivedReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
-            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
-            String subQueryIdentity, DBMeta subQueryDBMeta, GearedCipherManager cipherManager,
-            String mainSubQueryIdentity, String aliasName) {
-        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
-                subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity);
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause, String subQueryIdentity,
+            DBMeta subQueryDBMeta, GearedCipherManager cipherManager, String mainSubQueryIdentity, String aliasName) {
+        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause, subQueryIdentity,
+                subQueryDBMeta, cipherManager, mainSubQueryIdentity);
         _aliasName = aliasName;
     }
 
@@ -59,16 +58,14 @@ public class SpecifyDerivedReferrer extends DerivedReferrer {
     //                                                                        Build Clause
     //                                                                        ============
     @Override
-    protected String doBuildDerivedReferrer(String function, ColumnRealName correlatedColumnRealName,
-            ColumnSqlName relatedColumnSqlName, String subQueryClause, String beginMark, String endMark,
-            String endIndent) {
+    protected String doBuildDerivedReferrer(String function, ColumnRealName correlatedColumnRealName, ColumnSqlName relatedColumnSqlName,
+            String subQueryClause, String beginMark, String endMark, String endIndent) {
         return buildCompleteClause(subQueryClause, beginMark, endMark, endIndent);
     }
 
     @Override
     protected String doBuildDerivedReferrer(String function, ColumnRealName[] correlatedColumnRealNames,
-            ColumnSqlName[] relatedColumnSqlNames, String subQueryClause, String beginMark, String endMark,
-            String endIndent) {
+            ColumnSqlName[] relatedColumnSqlNames, String subQueryClause, String beginMark, String endMark, String endIndent) {
         return buildCompleteClause(subQueryClause, beginMark, endMark, endIndent);
     }
 
@@ -94,19 +91,16 @@ public class SpecifyDerivedReferrer extends DerivedReferrer {
     }
 
     @Override
-    protected void doAssertDerivedReferrerColumnType(String function, String derivedColumnDbName,
-            Class<?> derivedColumnType) {
+    protected void doAssertDerivedReferrerColumnType(String function, String derivedColumnDbName, Class<?> derivedColumnType) {
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
             if (!Number.class.isAssignableFrom(derivedColumnType)) {
-                throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName,
-                        derivedColumnType);
+                throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
             }
         }
     }
 
     protected void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
             Class<?> derivedColumnType) {
-        createCBExThrower().throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName,
-                derivedColumnType);
+        createCBExThrower().throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
     }
 }

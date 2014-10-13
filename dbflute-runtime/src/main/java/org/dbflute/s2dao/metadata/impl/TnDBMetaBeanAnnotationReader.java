@@ -76,8 +76,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
 
     protected boolean isSimpleType(Class<?> clazz) {
         return clazz == String.class || clazz.isPrimitive() || clazz == Boolean.class || clazz == Character.class
-                || Number.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz)
-                || Calendar.class.isAssignableFrom(clazz);
+                || Number.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz) || Calendar.class.isAssignableFrom(clazz);
     }
 
     // ===================================================================================

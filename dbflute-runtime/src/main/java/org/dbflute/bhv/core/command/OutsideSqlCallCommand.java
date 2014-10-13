@@ -127,8 +127,7 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
         return cmd;
     }
 
-    protected TnProcedureCommand newProcedureCommand(TnProcedureMetaData metaData,
-            TnProcedureResultSetHandlerFactory factory) {
+    protected TnProcedureCommand newProcedureCommand(TnProcedureMetaData metaData, TnProcedureResultSetHandlerFactory factory) {
         return new TnProcedureCommand(_dataSource, _statementFactory, metaData, factory);
     }
 

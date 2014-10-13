@@ -47,8 +47,7 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnCommandContextHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
-            CommandContext commandContext) {
+    public TnCommandContextHandler(DataSource dataSource, StatementFactory statementFactory, String sql, CommandContext commandContext) {
         super(dataSource, statementFactory, sql);
         assertObjectNotNull("commandContext", commandContext);
         _commandContext = commandContext;
@@ -93,8 +92,7 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
     // ===================================================================================
     //                                                                          Bind Scope
     //                                                                          ==========
-    protected int bindFirstScope(Connection conn, PreparedStatement ps, Object[] bindVariables,
-            Class<?>[] bindVariableTypes) {
+    protected int bindFirstScope(Connection conn, PreparedStatement ps, Object[] bindVariables, Class<?>[] bindVariableTypes) {
         final List<Object> firstVariableList = new ArrayList<Object>();
         final List<ValueType> firstValueTypeList = new ArrayList<ValueType>();
         int index = 0;
@@ -107,8 +105,7 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
         return index;
     }
 
-    protected void bindSecondScope(Connection conn, PreparedStatement ps, Object[] bindVariables,
-            Class<?>[] bindVariableTypes, int index) {
+    protected void bindSecondScope(Connection conn, PreparedStatement ps, Object[] bindVariables, Class<?>[] bindVariableTypes, int index) {
         bindArgs(conn, ps, bindVariables, bindVariableTypes, index);
     }
 

@@ -97,8 +97,7 @@ public class DfRepsExecuteLimitter {
             if (br != null) {
                 try {
                     br.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

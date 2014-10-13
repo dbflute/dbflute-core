@@ -36,8 +36,7 @@ public class SqlFireResultInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SqlFireResultInfo(Object nativeResult, SqlLogInfo sqlLogInfo, ExecutionTimeInfo millisInfo,
-            SQLException nativeCause) {
+    public SqlFireResultInfo(Object nativeResult, SqlLogInfo sqlLogInfo, ExecutionTimeInfo millisInfo, SQLException nativeCause) {
         _nativeResult = nativeResult;
         _sqlLogInfo = sqlLogInfo;
         _executionTimeInfo = millisInfo;

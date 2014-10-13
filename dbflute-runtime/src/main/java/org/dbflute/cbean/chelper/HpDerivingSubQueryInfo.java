@@ -35,8 +35,7 @@ public class HpDerivingSubQueryInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpDerivingSubQueryInfo(String function, String aliasName, String derivingSubQuery,
-            DerivedReferrer derivedReferrer) {
+    public HpDerivingSubQueryInfo(String function, String aliasName, String derivingSubQuery, DerivedReferrer derivedReferrer) {
         _function = function;
         _aliasName = aliasName;
         _derivingSubQuery = derivingSubQuery;
