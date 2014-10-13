@@ -30,6 +30,12 @@ import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.dbflute.outsidesql.paging.SimplePagingBean;
+import org.dbflute.outsidesql.typed.AutoPagingHandlingPmb;
+import org.dbflute.outsidesql.typed.CursorHandlingPmb;
+import org.dbflute.outsidesql.typed.EntityHandlingPmb;
+import org.dbflute.outsidesql.typed.ExecuteHandlingPmb;
+import org.dbflute.outsidesql.typed.ListHandlingPmb;
+import org.dbflute.outsidesql.typed.ManualPagingHandlingPmb;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
@@ -120,24 +126,29 @@ public class DfPmbGenerationHandler {
 
             // several typed interfaces can be implemented
             if (isTypedListHandling(className)) {
+                final String name = ListHandlingPmb.class.getSimpleName();
                 sb.append(delimiter).append(immuPrefix);
-                sb.append("ListHandlingPmb").append(entityGenericDef);
+                sb.append(name).append(entityGenericDef);
             }
             if (isTypedEntityHandling(className)) {
+                final String name = EntityHandlingPmb.class.getSimpleName();
                 sb.append(delimiter).append(immuPrefix);
-                sb.append("EntityHandlingPmb").append(entityGenericDef);
+                sb.append(name).append(entityGenericDef);
             }
             if (isTypedManualPagingHandling(className)) {
+                final String name = ManualPagingHandlingPmb.class.getSimpleName();
                 sb.append(delimiter).append(immuPrefix);
-                sb.append("ManualPagingHandlingPmb").append(entityGenericDef);
+                sb.append(name).append(entityGenericDef);
             }
             if (isTypedAutoPagingHandling(className)) {
+                final String name = AutoPagingHandlingPmb.class.getSimpleName();
                 sb.append(delimiter).append(immuPrefix);
-                sb.append("AutoPagingHandlingPmb").append(entityGenericDef);
+                sb.append(name).append(entityGenericDef);
             }
             if (isTypedCursorHandling(className)) {
+                final String name = CursorHandlingPmb.class.getSimpleName();
                 sb.append(delimiter).append(immuPrefix);
-                sb.append("CursorHandlingPmb");
+                sb.append(name);
                 if (isTypedPagingHandling(className)) { // cursor with paging
                     sb.append(entityGenericDef);
                 } else { // pure cursor
@@ -145,8 +156,9 @@ public class DfPmbGenerationHandler {
                 }
             }
             if (isTypedExecuteHandling(className)) {
+                final String name = ExecuteHandlingPmb.class.getSimpleName();
                 sb.append(delimiter).append(immuPrefix);
-                sb.append("ExecuteHandlingPmb").append(noResultGenericDef);
+                sb.append(name).append(noResultGenericDef);
             }
         }
         if (sb.length() > 0) {
@@ -185,8 +197,7 @@ public class DfPmbGenerationHandler {
         return entityGenericDef;
     }
 
-    protected String prepareVoidResultGenericDef(boolean immutable, String bhvType, String customizeType,
-            String immuType) {
+    protected String prepareVoidResultGenericDef(boolean immutable, String bhvType, String customizeType, String immuType) {
         // it works when not use void in Java but not need it and also for compatibility 
         // (Scala cannot use void in the generic so customize this logic here)
         final DfLanguageGrammar grammar = getLanguageGrammar();
@@ -452,15 +463,13 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).getPropertyOptionClassificationFixedElementValueExp(propertyName);
     }
 
-    public DfClassificationTop getPropertyOptionClassificationTop(String className, String propertyName,
-            AppData schemaData) {
+    public DfClassificationTop getPropertyOptionClassificationTop(String className, String propertyName, AppData schemaData) {
         return findPmbMetaData(className).getPropertyOptionClassificationTop(propertyName, schemaData);
     }
 
-    public String getPropertyOptionClassificationSettingElementValueExp(String className, String propertyName,
-            String element, AppData schemaData) {
-        return findPmbMetaData(className).getPropertyOptionClassificationSettingElementValueExp(propertyName, element,
-                schemaData);
+    public String getPropertyOptionClassificationSettingElementValueExp(String className, String propertyName, String element,
+            AppData schemaData) {
+        return findPmbMetaData(className).getPropertyOptionClassificationSettingElementValueExp(propertyName, element, schemaData);
     }
 
     // -----------------------------------------------------

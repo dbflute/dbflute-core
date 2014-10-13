@@ -21,7 +21,7 @@ import org.dbflute.cbean.chelper.HpSLSFunction;
 import org.dbflute.cbean.result.ListResultBean;
 import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
+import org.dbflute.outsidesql.executor.OutsideSqlAllFacadeExecutor;
 
 /**
  * The interface of behavior-readable.
@@ -141,9 +141,9 @@ public interface BehaviorReadable {
     /**
      * Prepare an outside-SQL execution by returning an instance of the executor for outside-SQL.
      * @param <BEHAVIOR> The type of behavior.
-     * @return The basic executor for outside-SQL. (NotNull) 
+     * @return The facade for outside-SQL. (NotNull) 
      */
-    <BEHAVIOR extends BehaviorReadable> OutsideSqlBasicExecutor<BEHAVIOR> readyOutsideSql();
+    <BEHAVIOR extends BehaviorReadable> OutsideSqlAllFacadeExecutor<BEHAVIOR> readyOutsideSql();
 
     // ===================================================================================
     //                                                                             Warm Up

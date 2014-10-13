@@ -23,5 +23,5 @@ import org.dbflute.cbean.paging.PagingBean;
  * @param <ENTITY> The type of an entity (may be scalar) for result.
  * @author jflute
  */
-public interface ManualPagingHandlingPmb<BEHAVIOR, ENTITY> extends TypedSelectPmb<BEHAVIOR, ENTITY>, PagingBean {
+public interface ManualPagingHandlingPmb<BEHAVIOR, ENTITY> extends PagingHandlingPmb<BEHAVIOR, ENTITY>, PagingBean {
 }

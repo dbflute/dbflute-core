@@ -133,7 +133,7 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
      *  order by member.UPDATE_DATETIME desc
      *  <span style="color: #3F7E5E">/*END&#42;/</span>
      *  <span style="color: #3F7E5E">/*IF pmb.isPaging()&#42;/</span>
-     *  limit <span style="color: #3F7E5E">/*$pmb.pageStartIndex&#42;/</span>80, <span style="color: #3F7E5E">/*$pmb.fetchSize&#42;/</span>20
+     *  limit <span style="color: #3F7E5E">/*pmb.pageStartIndex&#42;/</span>80, <span style="color: #3F7E5E">/*pmb.fetchSize&#42;/</span>20
      *  <span style="color: #3F7E5E">/*END&#42;/</span>
      * </pre>
      * @param <ENTITY> The type of entity.
@@ -274,7 +274,7 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
      *    <span style="color: #3F7E5E">/*END&#42;/</span>
      *  <span style="color: #3F7E5E">/*END&#42;/</span>
      *  order by member.UPDATE_DATETIME desc
-     *  limit <span style="color: #3F7E5E">/*$pmb.pageStartIndex&#42;/</span>80, <span style="color: #3F7E5E">/*$pmb.fetchSize&#42;/</span>20
+     *  limit <span style="color: #3F7E5E">/*pmb.pageStartIndex&#42;/</span>80, <span style="color: #3F7E5E">/*pmb.fetchSize&#42;/</span>20
      * </pre>
      * @param <ENTITY> The type of entity.
      * @param path The path of SQL that executes count and paging. (NotNull)

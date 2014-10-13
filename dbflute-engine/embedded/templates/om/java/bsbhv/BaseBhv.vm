@@ -1818,39 +1818,43 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     //                                                                          OutsideSql
     //                                                                          ==========
     /**
-     * Prepare the basic executor of outside-SQL to execute it. <br />
-     * The invoker of behavior command should be not null when you call this method.
+     * Prepare the all facade executor of outside-SQL to execute it.
      * <pre>
-     * You can use the methods for outside-SQL are as follows:
-     * {Basic}
-     *   o selectList()
-     *   o execute()
-     *   o call()
+     * <span style="color: #3F7E5E">// main style</span> 
+     * ${myEntityVariableName}Bhv.outideSql().selectEntity(pmb); <span style="color: #3F7E5E">// optional</span> 
+     * ${myEntityVariableName}Bhv.outideSql().selectList(pmb); <span style="color: #3F7E5E">// ListResultBean</span>
+     * ${myEntityVariableName}Bhv.outideSql().selectPage(pmb); <span style="color: #3F7E5E">// PagingResultBean</span>
+     * ${myEntityVariableName}Bhv.outideSql().selectPagedListOnly(pmb); <span style="color: #3F7E5E">// ListResultBean</span>
+     * ${myEntityVariableName}Bhv.outideSql().selectCursor(pmb, handler); <span style="color: #3F7E5E">// (by handler)</span>
+     * ${myEntityVariableName}Bhv.outideSql().execute(pmb); <span style="color: #3F7E5E">// int (updated count)</span>
+     * ${myEntityVariableName}Bhv.outideSql().call(pmb); <span style="color: #3F7E5E">// void (pmb has OUT parameters)</span>
      *
-     * {Entity}
-     *   o entityHandling().selectEntity()
-     *   o entityHandling().selectEntityWithDeletedCheck()
+     * <span style="color: #3F7E5E">// traditional style</span> 
+     * ${myEntityVariableName}Bhv.outideSql().traditionalStyle().selectEntity(path, pmb, entityType);
+     * ${myEntityVariableName}Bhv.outideSql().traditionalStyle().selectList(path, pmb, entityType);
+     * ${myEntityVariableName}Bhv.outideSql().traditionalStyle().selectPage(path, pmb, entityType);
+     * ${myEntityVariableName}Bhv.outideSql().traditionalStyle().selectPagedListOnly(path, pmb, entityType);
+     * ${myEntityVariableName}Bhv.outideSql().traditionalStyle().selectCursor(path, pmb, handler);
+     * ${myEntityVariableName}Bhv.outideSql().traditionalStyle().execute(path, pmb);
      *
-     * {Paging}
-     *   o autoPaging().selectList()
-     *   o autoPaging().selectPage()
-     *   o manualPaging().selectList()
-     *   o manualPaging().selectPage()
-     *
-     * {Cursor}
-     *   o cursorHandling().selectCursor()
-     *
-     * {Option}
-     *   o dynamicBinding().selectList()
-     *   o removeBlockComment().selectList()
-     *   o removeLineComment().selectList()
-     *   o formatSql().selectList()
+     * <span style="color: #3F7E5E">// options</span> 
+     * ${myEntityVariableName}Bhv.outideSql().removeBlockComment().selectList()
+     * ${myEntityVariableName}Bhv.outideSql().removeLineComment().selectList()
+     * ${myEntityVariableName}Bhv.outideSql().formatSql().selectList()
      * </pre>
-     * @return The basic executor of outside-SQL. (NotNull)
+     * <p>The invoker of behavior command should be not null when you call this method.</p>
+     * @return The new-created all facade executor of outside-SQL. (NotNull)
      */
+#if ($table.isCompatibleOutsideSqlFacadeChainOldStyle())
     public OutsideSqlBasicExecutor<${myExtendedBhvClassName}> outsideSql() {
+        OutsideSqlAllFacadeExecutor<${myExtendedBhvClassName}> facadeExecutor = doOutsideSql();
+        return facadeExecutor.xbasicExecutor();
+    }
+#else
+    public OutsideSqlAllFacadeExecutor<${myExtendedBhvClassName}> outsideSql() {
         return doOutsideSql();
     }
+#end
 #if ($table.hasBehaviorFilterBeforeColumn())
 
     // ===================================================================================

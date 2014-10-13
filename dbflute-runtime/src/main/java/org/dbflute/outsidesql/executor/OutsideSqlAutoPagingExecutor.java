@@ -25,7 +25,7 @@ import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.dbflute.outsidesql.typed.AutoPagingHandlingPmb;
 
 /**
- * The auto-paging executor of outside-SQL.
+ * The auto-paging (cursor-skip) executor of outside-SQL.
  * @param <BEHAVIOR> The type of behavior.
  * @author jflute
  */
@@ -34,11 +34,9 @@ public class OutsideSqlAutoPagingExecutor<BEHAVIOR> extends AbstractOutsideSqlPa
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlAutoPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption,
-            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
-        super(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig, outsideSqlOption,
-                outsideSqlExecutorFactory);
+    public OutsideSqlAutoPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+        super(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig, outsideSqlOption, outsideSqlExecutorFactory);
     }
 
     // ===================================================================================

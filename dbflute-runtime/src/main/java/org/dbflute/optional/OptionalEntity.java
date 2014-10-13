@@ -101,14 +101,14 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
 
     /**
      * @param entity The wrapped instance or entity. (NullAllowed)
-     * @param thrower The exception thrower when illegal access. (NotNull)
+     * @param noArgLambda The exception thrower when illegal access. (NotNull)
      * @return The new-created instance as existing or empty optional object. (NotNull)
      */
-    public static <ENTITY> OptionalEntity<ENTITY> ofNullable(ENTITY entity, OptionalThingExceptionThrower thrower) {
+    public static <ENTITY> OptionalEntity<ENTITY> ofNullable(ENTITY entity, OptionalThingExceptionThrower noArgLambda) {
         if (entity != null) {
             return of(entity);
         } else {
-            return new OptionalEntity<ENTITY>(entity, thrower);
+            return new OptionalEntity<ENTITY>(entity, noArgLambda);
         }
     }
 

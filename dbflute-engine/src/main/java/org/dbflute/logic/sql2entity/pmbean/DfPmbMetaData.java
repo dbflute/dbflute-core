@@ -370,8 +370,7 @@ public class DfPmbMetaData {
             return Srl.containsAllIgnoreCase(sql, "row_number()");
         } else if (getBasicProperties().isDatabaseH2()) {
             // H2 implements both limit only (same as MySQL) and offset + limit
-            return Srl.containsAllIgnoreCase(sql, "offset", "limit")
-                    || Srl.containsAllIgnoreCase(sql, "limit", "pmb.fetchSize");
+            return Srl.containsAllIgnoreCase(sql, "offset", "limit") || Srl.containsAllIgnoreCase(sql, "limit", "pmb.fetchSize");
         } else if (getBasicProperties().isDatabaseDerby()) {
             return Srl.containsAllIgnoreCase(sql, "offset", "fetch");
         } else if (getBasicProperties().isDatabaseSQLite()) {
@@ -642,14 +641,13 @@ public class DfPmbMetaData {
             if (isPropertyOptionClassificationFixedElementList(propertyName)) {
                 final List<String> fixedElementList = getPropertyOptionClassificationFixedElementList(propertyName);
                 for (String fixedElement : fixedElementList) {
-                    final String valueExp = buildPropertyOptionClassificationElementValueExp(propertyName,
-                            classificationName, fixedElement);
+                    final String valueExp =
+                            buildPropertyOptionClassificationElementValueExp(propertyName, classificationName, fixedElement);
                     elementList.add(valueExp);
                 }
             } else { // property is list but specified one
                 final String fixedElement = getPropertyOptionClassificationFixedElement(propertyName);
-                final String valueExp = buildPropertyOptionClassificationElementValueExp(propertyName,
-                        classificationName, fixedElement);
+                final String valueExp = buildPropertyOptionClassificationElementValueExp(propertyName, classificationName, fixedElement);
                 elementList.add(valueExp);
             }
             final DfLanguageGrammar grammar = getLanguageGrammar();
@@ -691,8 +689,7 @@ public class DfPmbMetaData {
         return DfCollectionUtil.emptyList();
     }
 
-    protected String buildPropertyOptionClassificationElementValueExp(String propertyName, String classificationName,
-            String element) {
+    protected String buildPropertyOptionClassificationElementValueExp(String propertyName, String classificationName, String element) {
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String valueType;
         if (isPropertyTypeList(propertyName)) {
@@ -717,8 +714,7 @@ public class DfPmbMetaData {
         return column.getClassificationTop();
     }
 
-    public String getPropertyOptionClassificationSettingElementValueExp(String propertyName, String element,
-            AppData schemaData) {
+    public String getPropertyOptionClassificationSettingElementValueExp(String propertyName, String element, AppData schemaData) {
         final String classificationName = getPropertyOptionClassificationName(propertyName, schemaData);
         return buildPropertyOptionClassificationElementValueExp(propertyName, classificationName, element);
     }
@@ -995,8 +991,7 @@ public class DfPmbMetaData {
 
     public boolean needsOracleArrayHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        if (!getBasicProperties().isDatabaseOracle()
-                || !getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
+        if (!getBasicProperties().isDatabaseOracle() || !getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
             return false;
         }
         final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
@@ -1005,8 +1000,7 @@ public class DfPmbMetaData {
 
     public boolean needsOracleStructHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        if (!getBasicProperties().isDatabaseOracle()
-                || !getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
+        if (!getBasicProperties().isDatabaseOracle() || !getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC()) {
             return false;
         }
         final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);

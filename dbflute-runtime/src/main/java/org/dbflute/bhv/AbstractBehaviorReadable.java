@@ -85,7 +85,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.optional.OptionalThingExceptionThrower;
 import org.dbflute.optional.RelationOptionalFactory;
-import org.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
+import org.dbflute.outsidesql.executor.OutsideSqlAllFacadeExecutor;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfReflectionUtil;
@@ -588,7 +588,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     /**
      * {@inheritDoc}
      */
-    public <BEHAVIOR extends BehaviorReadable> OutsideSqlBasicExecutor<BEHAVIOR> readyOutsideSql() {
+    public <BEHAVIOR extends BehaviorReadable> OutsideSqlAllFacadeExecutor<BEHAVIOR> readyOutsideSql() {
         return doOutsideSql();
     }
 
@@ -596,11 +596,11 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      * Prepare an outside-SQL execution by returning an instance of the executor for outside-SQL. <br />
      * It's an extension point for your adding original customization to outside-SQL executions.
      * @param <BEHAVIOR> The type of behavior.
-     * @return The basic executor for outside-SQL. (NotNull) 
+     * @return The facade for outside-SQL. (NotNull) 
      */
-    protected <BEHAVIOR extends BehaviorReadable> OutsideSqlBasicExecutor<BEHAVIOR> doOutsideSql() {
+    protected <BEHAVIOR extends BehaviorReadable> OutsideSqlAllFacadeExecutor<BEHAVIOR> doOutsideSql() {
         assertBehaviorCommandInvoker("outsideSql");
-        return _behaviorCommandInvoker.createOutsideSqlBasicExecutor(getTableDbName());
+        return _behaviorCommandInvoker.createOutsideSqlAllFacadeExecutor(getTableDbName());
     }
 
     // ===================================================================================

@@ -60,8 +60,7 @@ public class PageGroupBean implements Serializable {
      * @param pageNumberLinkSetupper Page number link set-upper. (NotNull and Required LINK)
      * @return The list of Page number link. (NotNull)
      */
-    public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(
-            PageNumberLinkSetupper<LINK> pageNumberLinkSetupper) {
+    public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(PageNumberLinkSetupper<LINK> pageNumberLinkSetupper) {
         final List<Integer> pageNumberList = createPageNumberList();
         final List<LINK> pageNumberLinkList = new ArrayList<LINK>();
         for (Integer pageNumber : pageNumberList) {
@@ -233,15 +232,15 @@ public class PageGroupBean implements Serializable {
     //                                                                            Accessor
     //                                                                            ========
     public void setCurrentPageNumber(int currentPageNumber) {
-        this._currentPageNumber = currentPageNumber;
+        _currentPageNumber = currentPageNumber;
     }
 
     public void setAllPageCount(int allPageCount) {
-        this._allPageCount = allPageCount;
+        _allPageCount = allPageCount;
     }
 
     public void setPageGroupOption(PageGroupOption pageGroupOption) {
-        this._pageGroupOption = pageGroupOption;
+        _pageGroupOption = pageGroupOption;
     }
 
     // -----------------------------------------------------
