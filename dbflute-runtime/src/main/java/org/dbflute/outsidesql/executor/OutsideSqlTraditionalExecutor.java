@@ -21,6 +21,8 @@ import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.jdbc.CursorHandler;
 import org.dbflute.optional.OptionalEntity;
+import org.dbflute.outsidesql.typed.AutoPagingHandlingPmb;
+import org.dbflute.outsidesql.typed.ManualPagingHandlingPmb;
 
 /**
  * The traditional executor of outside-SQL.
@@ -186,8 +188,14 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> PagingResultBean<ENTITY> selectPage(String path, PagingBean pmb, Class<ENTITY> entityType) {
-        // TODO jflute autoPaging
-        return _basicExecutor.manualPaging().selectPage(path, pmb, entityType);
+        if (pmb instanceof ManualPagingHandlingPmb) {
+            return _basicExecutor.manualPaging().selectPage(path, pmb, entityType);
+        } else if (pmb instanceof AutoPagingHandlingPmb) {
+            return _basicExecutor.autoPaging().selectPage(path, pmb, entityType);
+        } else {
+            String msg = "Unknown paging handling parameter-bean: " + pmb;
+            throw new IllegalStateException(msg);
+        }
     }
 
     /**
@@ -243,8 +251,14 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectPagedListOnly(String path, PagingBean pmb, Class<ENTITY> entityType) {
-        // TODO jflute autoPaging
-        return _basicExecutor.manualPaging().selectList(path, pmb, entityType);
+        if (pmb instanceof ManualPagingHandlingPmb) {
+            return _basicExecutor.manualPaging().selectPage(path, pmb, entityType);
+        } else if (pmb instanceof AutoPagingHandlingPmb) {
+            return _basicExecutor.autoPaging().selectPage(path, pmb, entityType);
+        } else {
+            String msg = "Unknown paging handling parameter-bean: " + pmb;
+            throw new IllegalStateException(msg);
+        }
     }
 
     // ===================================================================================
