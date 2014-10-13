@@ -42,6 +42,7 @@ public class PageRangeBean implements Serializable {
     protected PageRangeOption _pageRangeOption;
     protected List<Integer> _cachedPageNumberList;
 
+    // TODO jflute javadoc: Paging Object
     // ===================================================================================
     //                                                                    Page Number List
     //                                                                    ================
@@ -60,8 +61,7 @@ public class PageRangeBean implements Serializable {
      * @param pageNumberLinkSetupper The setup interface of Page number link. (NotNull, Required LINK)
      * @return The list of Page number link. (NotNull)
      */
-    public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(
-            PageNumberLinkSetupper<LINK> pageNumberLinkSetupper) {
+    public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(PageNumberLinkSetupper<LINK> pageNumberLinkSetupper) {
         final List<Integer> pageNumberList = createPageNumberList();
         final List<LINK> pageNumberLinkList = new ArrayList<LINK>();
         for (Integer pageNumber : pageNumberList) {

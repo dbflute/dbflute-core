@@ -65,19 +65,19 @@ public class PageRangeOption implements Serializable {
     /**
      * Set the size of page range.
      * <pre>
-     * e.g. range-size=5, current-page=8 
-     * PageRangeOption option = new PageRangeOption();
-     * option.<span style="color: #DD4747">setPageRangeSize</span>(5);
-     * page.<span style="color: #DD4747">setPageRangeOption</span>(option);
-     * List&lt;Integer&gt; numberList = page.<span style="color: #DD4747">pageRange()</span>.createPageNumberList();
-     * 
+     * e.g. range-size=5, current-page=8
+     * PageRangeBean pageRange = page.pageRange(op -> op.<span style="color: #DD4747">rangeSize</span>(5));
+     * List&lt;Integer&gt; numberList = pageRange.createPageNumberList();
+     *
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
      * </pre>
      * @param pageRangeSize The size of page range.
+     * @return this. (NotNull)
      */
-    public void setPageRangeSize(int pageRangeSize) {
-        this._pageRangeSize = pageRangeSize;
+    public PageRangeOption rangeSize(int pageRangeSize) {
+        _pageRangeSize = pageRangeSize;
+        return this;
     }
 
     /**
@@ -91,12 +91,9 @@ public class PageRangeOption implements Serializable {
     /**
      * Set fill-limit option.
      * <pre>
-     * e.g. range-size=5, current-page=8 
-     * PageRangeOption option = new PageRangeOption();
-     * option.<span style="color: #DD4747">setPageRangeSize</span>(5);
-     * option.<span style="color: #DD4747">setFillLimit</span>(true);
-     * page.<span style="color: #DD4747">setPageRangeOption</span>(option);
-     * List&lt;Integer&gt; numberList = page.<span style="color: #DD4747">pageRange()</span>.createPageNumberList();
+     * e.g. range-size=5, current-page=8
+     * PageRangeBean pageRange = page.pageRange(op -> op.rangeSize(5).<span style="color: #DD4747">fillLimit()</span>);
+     * List&lt;Integer&gt; numberList = pageRange.createPageNumberList();
      * 
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
@@ -105,9 +102,10 @@ public class PageRangeOption implements Serializable {
      * <span style="color: #3F7E5E">//  3 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">//</span> <span style="color: #DD4747">1 2 3 4 5 6 7 8 9 10 11</span> <span style="color: #3F7E5E">next</span>
      * </pre>
-     * @param fillLimit Is fill-limit valid?
+     * @return this. (NotNull)
      */
-    public void setFillLimit(boolean fillLimit) {
-        this._fillLimit = fillLimit;
+    public PageRangeOption fillLimit() {
+        _fillLimit = true;
+        return this;
     }
 }

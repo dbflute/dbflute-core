@@ -15,6 +15,7 @@
  */
 package org.dbflute.cbean.result;
 
+import org.dbflute.cbean.paging.PgOptionCall;
 import org.dbflute.cbean.paging.group.PageGroupBean;
 import org.dbflute.cbean.paging.group.PageGroupOption;
 import org.dbflute.cbean.paging.range.PageRangeBean;
@@ -107,200 +108,102 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     // ===================================================================================
     //                                                                    Page Group/Range
     //                                                                    ================
-    protected void initializeCachedBeans() {
-        initializePageGroup();
-        initializePageRange();
-    }
-
     // -----------------------------------------------------
     //                                            Page Group
     //                                            ----------
-    protected void initializePageGroup() {
-        _pageGroupBean = null;
-    }
-
-    /**
-     * Get the value of pageGroupSize.
-     * @return The value of pageGroupSize.
-     */
-    public int getPageGroupSize() {
-        return _pageGroupOption != null ? _pageGroupOption.getPageGroupSize() : 0;
-    }
-
-    /**
-     * Set the value of pageGroupSize. <br />
-     * pageGroup() needs this setting before calling. <br />
-     * This method is easy-to-use of setPageGroupOption(). (only setting size)
-     * <pre>
-     * page.<span style="color: #DD4747">setPageGroupSize</span>(10);
-     * List&lt;Integer&gt; numberList = page.<span style="color: #DD4747">pageGroup()</span>.createPageNumberList();
-     * 
-     * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous 1 2 3 4 5 6 7 8 9 10 next</span>
-     * </pre>
-     * @param pageGroupSize The value of pageGroupSize.
-     */
-    public void setPageGroupSize(int pageGroupSize) {
-        final PageGroupOption option = new PageGroupOption();
-        option.setPageGroupSize(pageGroupSize);
-        setPageGroupOption(option);
-    }
-
-    /**
-     * Set the value of pageGroupOption. <br />
-     * pageGroup() needs this setting before calling.
-     * <pre>
-     * PageGroupOption option = new PageGroupOption();
-     * option.<span style="color: #DD4747">setPageGroupSize</span>(10);
-     * page.<span style="color: #DD4747">setPageGroupOption</span>(option);
-     * List&lt;Integer&gt; numberList = page.<span style="color: #DD4747">pageGroup()</span>.createPageNumberList();
-     * 
-     * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous 1 2 3 4 5 6 7 8 9 10 next</span>
-     * </pre>
-     * @param pageGroupOption The value of pageGroupOption. (NullAllowed)
-     */
-    public void setPageGroupOption(PageGroupOption pageGroupOption) {
-        initializePageGroup();
-        _pageGroupOption = pageGroupOption;
-    }
-
-    // TODO jflute PagingResultBean refactor
-    // PageGroupBean bean = pageGroup(op -> op.setPageGroupSize(3));
     /**
      * Get the value of pageGroupBean.
      * <pre>
-     * e.g. group-size=10, current-page=8 
-     * page.<span style="color: #DD4747">setPageGroupSize</span>(10);
-     * List&lt;Integer&gt; numberList = page.<span style="color: #DD4747">pageGroup()</span>.createPageNumberList();
-     * 
+     * e.g. group-size=10, current-page=8
+     * PageGroupBean pageGroup = page.<span style="color: #DD4747">pageGroup</span>(op -> op.groupSize(3));
+     * List&lt;Integer&gt; numberList = pageGroup.createPageNumberList();
+     *
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
      * </pre>
+     * @param opLambda The callback for setting of page-group option. (NotNull)
      * @return The value of pageGroupBean. (NotNull)
      */
-    public PageGroupBean pageGroup() {
-        assertPageGroupValid();
-        if (_pageGroupBean == null) {
-            _pageGroupBean = new PageGroupBean();
-            _pageGroupBean.setPageGroupOption(_pageGroupOption);
-            _pageGroupBean.setCurrentPageNumber(getCurrentPageNumber());
-            _pageGroupBean.setAllPageCount(getAllPageCount());
-        }
-        return _pageGroupBean;
+    public PageGroupBean pageGroup(PgOptionCall<PageGroupOption> opLambda) {
+        assertPageGroupOptionCall(opLambda);
+        return createPageGroupBean(createPageGroupOption(opLambda));
     }
 
-    protected void assertPageGroupValid() {
-        if (_pageGroupOption == null) {
-            String msg = "The pageGroupOption should not be null. Please call setPageGroupOption().";
-            throw new IllegalStateException(msg);
+    protected void assertPageGroupOptionCall(PgOptionCall<PageGroupOption> opLambda) {
+        if (opLambda == null) {
+            throw new IllegalArgumentException("The argument 'opLambda' should not be null.");
         }
-        if (_pageGroupOption.getPageGroupSize() == 0) {
-            String msg = "The pageGroupSize should be greater than 1. But the value is zero.";
-            msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
-            throw new IllegalStateException(msg);
-        }
-        if (_pageGroupOption.getPageGroupSize() == 1) {
-            String msg = "The pageGroupSize should be greater than 1. But the value is one.";
-            msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
-            throw new IllegalStateException(msg);
-        }
+    }
+
+    protected PageGroupOption createPageGroupOption(PgOptionCall<PageGroupOption> opLambda) {
+        final PageGroupOption op = newPageGroupOption();
+        opLambda.callback(op);
+        return op;
+    }
+
+    protected PageGroupOption newPageGroupOption() {
+        return new PageGroupOption();
+    }
+
+    protected PageGroupBean createPageGroupBean(PageGroupOption op) {
+        final PageGroupBean bean = newPageGroupBean();
+        bean.setPageGroupOption(op);
+        bean.setCurrentPageNumber(getCurrentPageNumber());
+        bean.setAllPageCount(getAllPageCount());
+        return bean;
+    }
+
+    protected PageGroupBean newPageGroupBean() {
+        return new PageGroupBean();
     }
 
     // -----------------------------------------------------
     //                                            Page Range
     //                                            ----------
-    protected void initializePageRange() {
-        _pageRangeBean = null;
-    }
-
-    /**
-     * Get the value of pageRangeSize.
-     * @return The value of pageRangeSize.
-     */
-    public int getPageRangeSize() {
-        return _pageRangeOption != null ? _pageRangeOption.getPageRangeSize() : 0;
-    }
-
-    /**
-     * Set the value of pageRangeSize. <br />
-     * pageRange() needs this setting before calling. <br />
-     * This method is easy-to-use of setPageRangeOption(). (only setting size)
-     * <pre>
-     * e.g. range-size=5, current-page=8 
-     * page.<span style="color: #DD4747">setPageRangeSize</span>(5);
-     * List&lt;Integer&gt; numberList = page.<span style="color: #DD4747">pageRange()</span>.createPageNumberList();
-     * 
-     * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
-     * </pre>
-     * @param pageRangeSize The value of pageRangeSize.
-     */
-    public void setPageRangeSize(int pageRangeSize) {
-        final PageRangeOption option = new PageRangeOption();
-        option.setPageRangeSize(pageRangeSize);
-        setPageRangeOption(option);
-    }
-
-    /**
-     * Set the value of pageRangeOption. <br />
-     * pageRange() needs this setting before calling. <br />
-     * If you want to use fill-limit option, use this instead of setPageRangeSize()
-     * <pre>
-     * e.g. range-size=5, current-page=8 
-     * PageRangeOption option = new PageRangeOption();
-     * option.<span style="color: #DD4747">setPageRangeSize</span>(5);
-     * option.<span style="color: #DD4747">setFillLimit</span>(true);
-     * page.<span style="color: #DD4747">setPageRangeOption</span>(option);
-     * List&lt;Integer&gt; numberList = page.<span style="color: #DD4747">pageRange()</span>.createPageNumberList();
-     * 
-     * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
-     * 
-     * <span style="color: #3F7E5E">// e.g. fillLimit=true, current-page=3</span>
-     * <span style="color: #3F7E5E">//  3 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">//</span> <span style="color: #DD4747">1 2 3 4 5 6 7 8 9 10 11</span> <span style="color: #3F7E5E">next</span>
-     * </pre>
-     * @param pageRangeOption The value of pageRangeOption. (NullAllowed)
-     */
-    public void setPageRangeOption(PageRangeOption pageRangeOption) {
-        initializePageRange();
-        _pageRangeOption = pageRangeOption;
-    }
-
     /**
      * Get the value of pageRangeBean.
      * <pre>
-     * e.g. range-size=5, current-page=8 
-     * page.<span style="color: #DD4747">setPageRangeSize</span>(5);
-     * List&lt;Integer&gt; numberList = page.<span style="color: #DD4747">pageRange()</span>.createPageNumberList();
-     * 
+     * e.g. group-size=10, current-page=8
+     * PageRangeBean pageRange = page.<span style="color: #DD4747">pageRange</span>(op -> op.rangeSize(3));
+     * List&lt;Integer&gt; numberList = pageRange.createPageNumberList();
+     *
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
      * </pre>
+     * @param opLambda The callback for setting of page-range option. (NotNull)
      * @return The value of pageRangeBean. (NotNull)
      */
-    public PageRangeBean pageRange() {
-        assertPageRangeValid();
-        if (_pageRangeBean == null) {
-            _pageRangeBean = new PageRangeBean();
-            _pageRangeBean.setPageRangeOption(_pageRangeOption);
-            _pageRangeBean.setCurrentPageNumber(getCurrentPageNumber());
-            _pageRangeBean.setAllPageCount(getAllPageCount());
-        }
-        return _pageRangeBean;
+    public PageRangeBean pageRange(PgOptionCall<PageRangeOption> opLambda) {
+        assertPageRangeOptionCall(opLambda);
+        return createPageRangeBean(createPageRangeOption(opLambda));
     }
 
-    protected void assertPageRangeValid() {
-        if (_pageRangeOption == null) {
-            String msg = "The pageRangeOption should not be null. Please call setPageRangeOption().";
-            throw new IllegalStateException(msg);
+    protected void assertPageRangeOptionCall(PgOptionCall<PageRangeOption> opLambda) {
+        if (opLambda == null) {
+            throw new IllegalArgumentException("The argument 'opLambda' should not be null.");
         }
-        final int pageRangeSize = _pageRangeOption.getPageRangeSize();
-        if (pageRangeSize == 0) {
-            String msg = "The pageRangeSize should be greater than 1. But the value is zero.";
-            throw new IllegalStateException(msg);
-        }
+    }
+
+    protected PageRangeOption createPageRangeOption(PgOptionCall<PageRangeOption> opLambda) {
+        final PageRangeOption op = newPageRangeOption();
+        opLambda.callback(op);
+        return op;
+    }
+
+    protected PageRangeOption newPageRangeOption() {
+        return new PageRangeOption();
+    }
+
+    protected PageRangeBean createPageRangeBean(PageRangeOption op) {
+        final PageRangeBean bean = newPageRangeBean();
+        bean.setPageRangeOption(op);
+        bean.setCurrentPageNumber(getCurrentPageNumber());
+        bean.setAllPageCount(getAllPageCount());
+        return bean;
+    }
+
+    protected PageRangeBean newPageRangeBean() {
+        return new PageRangeBean();
     }
 
     // ===================================================================================
@@ -344,8 +247,6 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
         mappingList.setOrderByClause(getOrderByClause());
         mappingList.setPageSize(getPageSize());
         mappingList.setCurrentPageNumber(getCurrentPageNumber());
-        mappingList.setPageRangeOption(_pageRangeOption);
-        mappingList.setPageGroupOption(_pageGroupOption);
         return mappingList;
     }
 
@@ -396,13 +297,6 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
         sb.append("{").append(getCurrentPageNumber()).append("/").append(getAllPageCount());
         sb.append(" of ").append(getAllRecordCount());
         sb.append(" ").append(isExistPrePage()).append("/").append(isExistNextPage());
-        if (_pageGroupOption != null) {
-            sb.append(" group:{").append(getPageGroupSize()).append(",").append(pageGroup().createPageNumberList()).append("}");
-        }
-        if (_pageRangeOption != null) {
-            sb.append(" range:{").append(getPageRangeSize()).append(",").append(_pageRangeOption.isFillLimit());
-            sb.append(",").append(pageRange().createPageNumberList()).append("}");
-        }
         sb.append(" list=").append(getSelectedList() != null ? Integer.valueOf(getSelectedList().size()) : null);
         sb.append(" page=").append(getPageSize());
         sb.append("}");
@@ -434,7 +328,6 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      */
     @Override
     public void setAllRecordCount(int allRecordCount) {
-        initializeCachedBeans();
         super.setAllRecordCount(allRecordCount);
     }
 
@@ -451,7 +344,6 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param pageSize The value of pageSize.
      */
     public void setPageSize(int pageSize) {
-        initializeCachedBeans();
         _pageSize = pageSize;
     }
 
@@ -473,7 +365,6 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param currentPageNumber The value of currentPageNumber.
      */
     public void setCurrentPageNumber(int currentPageNumber) {
-        initializeCachedBeans();
         _currentPageNumber = currentPageNumber;
     }
 

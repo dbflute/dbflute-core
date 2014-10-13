@@ -53,27 +53,28 @@ public class PageGroupOption implements Serializable {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Get the size of paga group.
-     * @return The size of paga group.
+     * Get the size of page group.
+     * @return The size of page group.
      */
     public int getPageGroupSize() {
         return _pageGroupSize;
     }
 
     /**
-     * Set the size of paga group.
+     * Set the size of page group.
      * <pre>
-     * PageGroupOption option = new PageGroupOption();
-     * option.<span style="color: #DD4747">setPageGroupSize</span>(10);
-     * page.<span style="color: #DD4747">setPageGroupOption</span>(option);
-     * List&lt;Integer&gt; numberList = page.<span style="color: #DD4747">pageGroup()</span>.createPageNumberList();
-     * 
+     * e.g. group-size=10, current-page=8
+     * PageGroupBean pageGroup = page.pageGroup(op -> op.<span style="color: #DD4747">groupSize</span>(3));
+     * List&lt;Integer&gt; numberList = pageGroup.createPageNumberList();
+     *
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous 1 2 3 4 5 6 7 8 9 10 next</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
      * </pre>
-     * @param pageGroupSize The size of paga group.
+     * @param pageGroupSize The size of page group.
+     * @return this. (NotNull)
      */
-    public void setPageGroupSize(int pageGroupSize) {
-        this._pageGroupSize = pageGroupSize;
+    public PageGroupOption groupSize(int pageGroupSize) {
+        _pageGroupSize = pageGroupSize;
+        return this;
     }
 }
