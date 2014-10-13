@@ -15,11 +15,11 @@
  */
 package org.dbflute.cbean.result;
 
-import org.dbflute.cbean.paging.PgOptionCall;
-import org.dbflute.cbean.paging.group.PageGroupBean;
-import org.dbflute.cbean.paging.group.PageGroupOption;
-import org.dbflute.cbean.paging.range.PageRangeBean;
-import org.dbflute.cbean.paging.range.PageRangeOption;
+import org.dbflute.cbean.paging.numberlink.PNLOptionCall;
+import org.dbflute.cbean.paging.numberlink.group.PageGroupBean;
+import org.dbflute.cbean.paging.numberlink.group.PageGroupOption;
+import org.dbflute.cbean.paging.numberlink.range.PageRangeBean;
+import org.dbflute.cbean.paging.numberlink.range.PageRangeOption;
 import org.dbflute.cbean.result.mapping.EntityDtoMapper;
 
 /**
@@ -124,18 +124,18 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param opLambda The callback for setting of page-group option. (NotNull)
      * @return The value of pageGroupBean. (NotNull)
      */
-    public PageGroupBean pageGroup(PgOptionCall<PageGroupOption> opLambda) {
+    public PageGroupBean pageGroup(PNLOptionCall<PageGroupOption> opLambda) {
         assertPageGroupOptionCall(opLambda);
         return createPageGroupBean(createPageGroupOption(opLambda));
     }
 
-    protected void assertPageGroupOptionCall(PgOptionCall<PageGroupOption> opLambda) {
+    protected void assertPageGroupOptionCall(PNLOptionCall<PageGroupOption> opLambda) {
         if (opLambda == null) {
             throw new IllegalArgumentException("The argument 'opLambda' should not be null.");
         }
     }
 
-    protected PageGroupOption createPageGroupOption(PgOptionCall<PageGroupOption> opLambda) {
+    protected PageGroupOption createPageGroupOption(PNLOptionCall<PageGroupOption> opLambda) {
         final PageGroupOption op = newPageGroupOption();
         opLambda.callback(op);
         return op;
@@ -173,18 +173,18 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param opLambda The callback for setting of page-range option. (NotNull)
      * @return The value of pageRangeBean. (NotNull)
      */
-    public PageRangeBean pageRange(PgOptionCall<PageRangeOption> opLambda) {
+    public PageRangeBean pageRange(PNLOptionCall<PageRangeOption> opLambda) {
         assertPageRangeOptionCall(opLambda);
         return createPageRangeBean(createPageRangeOption(opLambda));
     }
 
-    protected void assertPageRangeOptionCall(PgOptionCall<PageRangeOption> opLambda) {
+    protected void assertPageRangeOptionCall(PNLOptionCall<PageRangeOption> opLambda) {
         if (opLambda == null) {
             throw new IllegalArgumentException("The argument 'opLambda' should not be null.");
         }
     }
 
-    protected PageRangeOption createPageRangeOption(PgOptionCall<PageRangeOption> opLambda) {
+    protected PageRangeOption createPageRangeOption(PNLOptionCall<PageRangeOption> opLambda) {
         final PageRangeOption op = newPageRangeOption();
         opLambda.callback(op);
         return op;

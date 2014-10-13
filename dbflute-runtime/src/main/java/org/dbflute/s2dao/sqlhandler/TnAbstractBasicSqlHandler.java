@@ -25,7 +25,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.dbflute.QLog;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.ResourceContext;
@@ -50,6 +49,7 @@ import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.system.QLog;
 import org.dbflute.twowaysql.DisplaySqlBuilder;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;

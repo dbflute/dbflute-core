@@ -121,7 +121,7 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
      * @param fetchSize The size of fetch. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
-    PagingBean fetchScope(int fetchStartIndex, int fetchSize);
+    PagingBean xfetchScope(int fetchStartIndex, int fetchSize);
 
     /**
      * Fetch page. {Internal}<br />
@@ -132,7 +132,7 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
      * @param fetchPageNumber The page number of fetch. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
-    PagingBean fetchPage(int fetchPageNumber);
+    PagingBean xfetchPage(int fetchPageNumber);
 
     // ===================================================================================
     //                                                                     Paging Resource

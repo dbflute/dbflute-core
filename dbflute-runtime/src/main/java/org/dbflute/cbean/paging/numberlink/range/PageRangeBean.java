@@ -13,14 +13,14 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.paging.range;
+package org.dbflute.cbean.paging.numberlink.range;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dbflute.cbean.paging.PageNumberLink;
-import org.dbflute.cbean.paging.PageNumberLinkSetupper;
+import org.dbflute.cbean.paging.numberlink.PageNumberLink;
+import org.dbflute.cbean.paging.numberlink.PageNumberLinkSetupper;
 
 /**
  * The bean of page range.
@@ -58,14 +58,14 @@ public class PageRangeBean implements Serializable {
      * });
      * </pre>
      * @param <LINK> The type of link.
-     * @param pageNumberLinkSetupper The setup interface of Page number link. (NotNull, Required LINK)
+     * @param manyArgLambda The setup interface of Page number link. (NotNull, Required LINK)
      * @return The list of Page number link. (NotNull)
      */
-    public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(PageNumberLinkSetupper<LINK> pageNumberLinkSetupper) {
+    public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(PageNumberLinkSetupper<LINK> manyArgLambda) {
         final List<Integer> pageNumberList = createPageNumberList();
         final List<LINK> pageNumberLinkList = new ArrayList<LINK>();
         for (Integer pageNumber : pageNumberList) {
-            pageNumberLinkList.add(pageNumberLinkSetupper.setup(pageNumber, pageNumber.equals(_currentPageNumber)));
+            pageNumberLinkList.add(manyArgLambda.setup(pageNumber, pageNumber.equals(_currentPageNumber)));
         }
         return pageNumberLinkList;
     }
@@ -122,16 +122,6 @@ public class PageRangeBean implements Serializable {
         }
         _cachedPageNumberList = resultList;
         return _cachedPageNumberList;
-    }
-
-    /**
-     * Get the array of page number. <br />
-     * This method returns array of same numbers as createPageNumberList().
-     * @return The array of page number. (NotNull)
-     */
-    public int[] createPageNumberArray() {
-        assertPageRangeValid();
-        return convertListToIntArray(createPageNumberList());
     }
 
     // ===================================================================================

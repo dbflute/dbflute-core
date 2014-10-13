@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.dbflute.XLog;
+import org.dbflute.system.XLog;
 import org.dbflute.util.DfTypeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

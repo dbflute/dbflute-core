@@ -817,8 +817,8 @@ public class ${myClassName} extends AbstractConditionBean {
     // ===================================================================================
     //                                                                       Cursor Select
     //                                                                       =============
-    public void customizeCursorSelect(CursorSelectOption cursorSelectOption) {
-        _cursorSelectOption = cursorSelectOption;
+    public void customizeCursorSelect(SVOptionCall<CursorSelectOption> opLambda) {
+        doAcceptCursorSelectOption(opLambda);
     }
 #end
 #if ($table.isCompatibleConditionBeanOldNamingCheckInvalid())

@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.dbflute.Entity;
-import org.dbflute.XLog;
 import org.dbflute.bhv.core.InvokerAssistant.DisposableProcess;
 import org.dbflute.bhv.core.context.ContextStack;
 import org.dbflute.bhv.core.context.FetchAssistContext;
@@ -52,6 +51,7 @@ import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.outsidesql.executor.OutsideSqlAllFacadeExecutor;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.system.XLog;
 import org.dbflute.util.DfTraceViewUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;

@@ -23,7 +23,6 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.dbflute.Entity;
-import org.dbflute.XLog;
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.writable.UpdateOption;
 import org.dbflute.cbean.ConditionBean;
@@ -34,6 +33,7 @@ import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.sqlhandler.TnUpdateEntityHandler;
+import org.dbflute.system.XLog;
 
 /**
  * @author modified by jflute (originated in S2Dao)

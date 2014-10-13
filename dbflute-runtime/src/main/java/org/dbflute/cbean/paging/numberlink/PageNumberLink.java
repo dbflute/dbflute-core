@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.paging;
+package org.dbflute.cbean.paging.numberlink;
 
 import java.io.Serializable;
 
@@ -102,7 +102,7 @@ public class PageNumberLink implements Serializable {
     }
 
     public void setPageNumberElement(int pageNumberElement) {
-        this._pageNumberElement = pageNumberElement;
+        _pageNumberElement = pageNumberElement;
     }
 
     public boolean isCurrent() {
@@ -110,7 +110,7 @@ public class PageNumberLink implements Serializable {
     }
 
     public void setCurrent(boolean current) {
-        this._current = current;
+        _current = current;
     }
 
     public String getPageNumberLinkHref() {
@@ -118,6 +118,6 @@ public class PageNumberLink implements Serializable {
     }
 
     public void setPageNumberLinkHref(String pageNumberLinkHref) {
-        this._pageNumberLinkHref = pageNumberLinkHref;
+        _pageNumberLinkHref = pageNumberLinkHref;
     }
 }

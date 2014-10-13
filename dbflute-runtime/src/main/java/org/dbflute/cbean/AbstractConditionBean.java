@@ -35,6 +35,7 @@ import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
 import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
+import org.dbflute.cbean.coption.SVOptionCall;
 import org.dbflute.cbean.coption.ScalarSelectOption;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.ordering.OrderByBean;
@@ -832,7 +833,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             throwPagingPageSizeNotPlusException(pageSize, pageNumber);
         }
         fetchFirst(pageSize);
-        fetchPage(pageNumber);
+        xfetchPage(pageNumber);
     }
 
     protected void throwPagingPageSizeNotPlusException(int pageSize, int pageNumber) {
@@ -946,7 +947,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public PagingBean fetchScope(int fetchStartIndex, int fetchSize) {
+    public PagingBean xfetchScope(int fetchStartIndex, int fetchSize) {
         getSqlClause().fetchScope(fetchStartIndex, fetchSize);
         return this;
     }
@@ -954,7 +955,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public PagingBean fetchPage(int fetchPageNumber) {
+    public PagingBean xfetchPage(int fetchPageNumber) {
         getSqlClause().fetchPage(fetchPageNumber);
         return this;
     }
@@ -1207,6 +1208,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public CursorSelectOption getCursorSelectOption() {
         return _cursorSelectOption;
+    }
+
+    protected void doAcceptCursorSelectOption(SVOptionCall<CursorSelectOption> opLambda) {
+        final CursorSelectOption op = newCursorSelectOption();
+        opLambda.callback(op);
+        _cursorSelectOption = op;
+    }
+
+    protected CursorSelectOption newCursorSelectOption() {
+        return new CursorSelectOption();
     }
 
     // ===================================================================================
@@ -1649,13 +1660,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected FactoryOfDerivedReferrerOption xcFofSDROp() { // xcreateFactoryOfSpecifyDerivedReferrerOption()
         return new FactoryOfDerivedReferrerOption() {
             public DerivedReferrerOption create() {
-                return createSpecifyDerivedReferrerOption();
+                return newSpecifyDerivedReferrerOption();
             }
         };
-    }
-
-    protected DerivedReferrerOption createSpecifyDerivedReferrerOption() {
-        return newSpecifyDerivedReferrerOption();
     }
 
     /**

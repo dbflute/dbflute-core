@@ -142,8 +142,8 @@ public class ConditionBeanContext {
             loadClass(org.dbflute.cbean.result.grouping.GroupingRowEndDeterminer.class);
             loadClass(org.dbflute.cbean.result.grouping.GroupingRowResource.class);
             loadClass(org.dbflute.cbean.result.grouping.GroupingRowSetupper.class);
-            loadClass(org.dbflute.cbean.paging.PageNumberLink.class);
-            loadClass(org.dbflute.cbean.paging.PageNumberLinkSetupper.class);
+            loadClass(org.dbflute.cbean.paging.numberlink.PageNumberLink.class);
+            loadClass(org.dbflute.cbean.paging.numberlink.PageNumberLinkSetupper.class);
             loadClass(org.dbflute.jdbc.CursorHandler.class);
             if (debugEnabled) {
                 sb.append("  ...Loading class of ...and so on");

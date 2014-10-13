@@ -23,7 +23,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.dbflute.XLog;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.exception.SQLExceptionResource;
 import org.dbflute.dbway.DBDef;
@@ -34,6 +33,7 @@ import org.dbflute.hook.SqlLogInfo;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
+import org.dbflute.system.XLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

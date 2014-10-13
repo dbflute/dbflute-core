@@ -13,19 +13,19 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.paging;
+package org.dbflute.cbean.coption;
 
 /**
- * The callback interface of paging option.
- * @param <OP> The type of paging option to be set up.
+ * The callback interface of small various option.
+ * @param <OP> The type of small various option to be set up.
  * @author jflute
  * @since 1.1.0 (2014/10/13 Monday)
  */
 @FunctionalInterface
-public interface PgOptionCall<OP> {
+public interface SVOptionCall<OP> {
 
     /**
-     * @param op The option of paging to be set up. (NotNull)
+     * @param op The option of small various process to be set up. (NotNull)
      */
     void callback(OP op);
 }

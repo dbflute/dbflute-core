@@ -13,15 +13,17 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.paging.group;
+package org.dbflute.cbean.paging.numberlink.range;
 
 import java.io.Serializable;
 
+import org.dbflute.cbean.paging.numberlink.PageNumberLinkOption;
+
 /**
- * The option of page group.
+ * The option of page range.
  * @author jflute
  */
-public class PageGroupOption implements Serializable {
+public class PageRangeOption implements PageNumberLinkOption, Serializable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -32,7 +34,8 @@ public class PageGroupOption implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected int _pageGroupSize;
+    protected int _pageRangeSize;
+    protected boolean _fillLimit;
 
     // ===================================================================================
     //                                                                      Basic Override
@@ -44,7 +47,8 @@ public class PageGroupOption implements Serializable {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("{");
-        sb.append(" pageGroupSize=").append(_pageGroupSize);
+        sb.append("pageRangeSize=").append(_pageRangeSize);
+        sb.append(", fillLimit=").append(_fillLimit);
         sb.append("}");
         return sb.toString();
     }
@@ -53,28 +57,57 @@ public class PageGroupOption implements Serializable {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Get the size of page group.
-     * @return The size of page group.
+     * Get the size of page range.
+     * @return The size of page range.
      */
-    public int getPageGroupSize() {
-        return _pageGroupSize;
+    public int getPageRangeSize() {
+        return _pageRangeSize;
     }
 
     /**
-     * Set the size of page group.
+     * Set the size of page range.
      * <pre>
-     * e.g. group-size=10, current-page=8
-     * PageGroupBean pageGroup = page.pageGroup(op -> op.<span style="color: #DD4747">groupSize</span>(3));
-     * List&lt;Integer&gt; numberList = pageGroup.createPageNumberList();
+     * e.g. range-size=5, current-page=8
+     * PageRangeBean pageRange = page.pageRange(op -> op.<span style="color: #DD4747">rangeSize</span>(5));
+     * List&lt;Integer&gt; numberList = pageRange.createPageNumberList();
      *
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
      * </pre>
-     * @param pageGroupSize The size of page group.
+     * @param pageRangeSize The size of page range.
      * @return this. (NotNull)
      */
-    public PageGroupOption groupSize(int pageGroupSize) {
-        _pageGroupSize = pageGroupSize;
+    public PageRangeOption rangeSize(int pageRangeSize) {
+        _pageRangeSize = pageRangeSize;
+        return this;
+    }
+
+    /**
+     * Is fill-limit valid?
+     * @return The determination, true or false.
+     */
+    public boolean isFillLimit() {
+        return _fillLimit;
+    }
+
+    /**
+     * Set fill-limit option.
+     * <pre>
+     * e.g. range-size=5, current-page=8
+     * PageRangeBean pageRange = page.pageRange(op -> op.rangeSize(5).<span style="color: #DD4747">fillLimit()</span>);
+     * List&lt;Integer&gt; numberList = pageRange.createPageNumberList();
+     * 
+     * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
+     * 
+     * <span style="color: #3F7E5E">// e.g. fillLimit=true, current-page=3</span>
+     * <span style="color: #3F7E5E">//  3 / 23 pages (453 records)</span>
+     * <span style="color: #3F7E5E">//</span> <span style="color: #DD4747">1 2 3 4 5 6 7 8 9 10 11</span> <span style="color: #3F7E5E">next</span>
+     * </pre>
+     * @return this. (NotNull)
+     */
+    public PageRangeOption fillLimit() {
+        _fillLimit = true;
         return this;
     }
 }

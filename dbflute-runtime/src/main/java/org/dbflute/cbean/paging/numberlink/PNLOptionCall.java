@@ -13,18 +13,19 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.ordering;
+package org.dbflute.cbean.paging.numberlink;
 
 /**
- * The callback interface of manual-order.
+ * The callback interface of page-number link option.
+ * @param <OP> The type of paging option to be set up.
  * @author jflute
- * @since 1.1.0 (2014/09/28 Sunday)
+ * @since 1.1.0 (2014/10/13 Monday)
  */
 @FunctionalInterface
-public interface MOrderCall {
+public interface PNLOptionCall<OP extends PageNumberLinkOption> {
 
     /**
-     * @param op The option of manual-order to be set up. (NotNull)
+     * @param op The option of paging to be set up. (NotNull)
      */
-    void callback(ManualOrderOption op);
+    void callback(OP op);
 }

@@ -19,8 +19,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dbflute.cbean.paging.group.PageGroupBean;
-import org.dbflute.cbean.paging.range.PageRangeBean;
+import org.dbflute.cbean.paging.numberlink.group.PageGroupBean;
+import org.dbflute.cbean.paging.numberlink.range.PageRangeBean;
 import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfReflectionUtil;
 

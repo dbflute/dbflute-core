@@ -45,6 +45,7 @@ import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.ckey.ConditionKeyInScope;
+import org.dbflute.cbean.coption.COptionCall;
 import org.dbflute.cbean.coption.ConditionOption;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
 import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
@@ -55,6 +56,7 @@ import org.dbflute.cbean.coption.RangeOfOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
+import org.dbflute.cbean.ordering.MOOptionCall;
 import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.scoping.SubQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
@@ -412,7 +414,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                  Nested SetupSelect
     //                                                                  ==================
-    public void doNss(NssCall callback) { // very internal
+    public void xdoNss(NssCall callback) { // very internal
         final String foreignPropertyName = callback.qf().xgetForeignPropertyName();
         final String foreignTableAliasName = callback.qf().xgetAliasName();
         final String localRelationPath = xgetRelationPath();
@@ -1320,7 +1322,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerSpecifyDerivedReferrer(String function, ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String referrerPropertyName, String aliasName, DerivedReferrerOption option) {
         doRegisterSpecifyDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName,
-                aliasName, option != null ? option : createDefaultDerivedReferrerOption());
+                aliasName, option != null ? option : newDefaultDerivedReferrerOption());
     }
 
     protected void doRegisterSpecifyDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
@@ -1364,10 +1366,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return new HpDerivingSubQueryInfo(function, aliasName, clause, derivedReferrer);
     }
 
-    protected DerivedReferrerOption createDefaultDerivedReferrerOption() {
-        return newDefaultDerivedReferrerOption();
-    }
-
     /**
      * New-create the option of (both specify and query) derived-referrer as plain.
      * @return The new-created option of (both specify and query) derived-referrer. (NotNull)
@@ -1386,7 +1384,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected DerivedReferrerOption resolveMyselfDerivedReferrerOption(DerivedReferrerOption option) {
-        final DerivedReferrerOption resolvedOption = option != null ? option : createDefaultDerivedReferrerOption();
+        final DerivedReferrerOption resolvedOption = option != null ? option : newDefaultDerivedReferrerOption();
         resolvedOption.suppressCorrelation();
         return resolvedOption;
     }
@@ -1399,7 +1397,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String propertyName, String referrerPropertyName, String operand, Object value, String parameterPropertyName,
             DerivedReferrerOption option) {
         doRegisterQueryDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, operand,
-                value, parameterPropertyName, option != null ? option : createDefaultDerivedReferrerOption());
+                value, parameterPropertyName, option != null ? option : newDefaultDerivedReferrerOption());
     }
 
     protected void doRegisterQueryDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
@@ -1464,13 +1462,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected FactoryOfDerivedReferrerOption xcFofQDROp() { // xcreateFactoryOfQueryDerivedReferrerOption()
         return new FactoryOfDerivedReferrerOption() {
             public DerivedReferrerOption create() {
-                return createQueryDerivedReferrerOption();
+                return newQueryDerivedReferrerOption();
             }
         };
-    }
-
-    protected DerivedReferrerOption createQueryDerivedReferrerOption() {
-        return newQueryDerivedReferrerOption();
     }
 
     /**
@@ -1798,8 +1792,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          Manual Order
     //                                          ------------
-    protected ManualOrderOption cMOO() { // createManualOrderOption()
-        return newManualOrderOption();
+    protected ManualOrderOption cMOO(MOOptionCall opCall) { // createManualOrderOption()
+        final ManualOrderOption op = newManualOrderOption();
+        opCall.callback(op);
+        return op;
     }
 
     /**
@@ -2424,8 +2420,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                            LikeSearch
     //                                            ----------
-    protected LikeSearchOption cLSOP() { // called by template: createLikeSearchOption()
-        return newLikeSearchOption();
+    protected LikeSearchOption xcLSOP(COptionCall<LikeSearchOption> opCall) { // called by template: createLikeSearchOption()
+        final LikeSearchOption op = newLikeSearchOption();
+        opCall.callback(op);
+        return op;
+    }
+
+    protected LikeSearchOption xcLSOPPre() { // for old style PrefixSearch
+        return newLikeSearchOption().likePrefix();
     }
 
     /**
@@ -2439,8 +2441,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                               RangeOf
     //                                               -------
-    protected RangeOfOption cROOP() { // called by template: createRangeOfOption()
-        return newRangeOfOption();
+    protected RangeOfOption xcROOP(COptionCall<RangeOfOption> opCall) { // called by template: createRangeOfOption()
+        final RangeOfOption op = newRangeOfOption();
+        opCall.callback(op);
+        return op;
     }
 
     /**
@@ -2454,8 +2458,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                                FromTo
     //                                                ------
-    protected FromToOption cFTOP() { // called by template: createFromToOption()
-        return newFromToOption();
+    protected FromToOption xcFTOP(COptionCall<FromToOption> opCall) { // called by template: createFromToOption()
+        final FromToOption op = newFromToOption();
+        opCall.callback(op);
+        return op;
+    }
+
+    protected FromToOption xcDFTOP() { // for old style DateFromTo
+        return newFromToOption().compareAsDate();
     }
 
     /**

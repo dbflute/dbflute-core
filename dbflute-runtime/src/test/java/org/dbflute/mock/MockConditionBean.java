@@ -150,11 +150,11 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public PagingBean fetchPage(int fetchPageNumber) {
+    public PagingBean xfetchPage(int fetchPageNumber) {
         return null;
     }
 
-    public PagingBean fetchScope(int fetchStartIndex, int fetchSize) {
+    public PagingBean xfetchScope(int fetchStartIndex, int fetchSize) {
         return null;
     }
 

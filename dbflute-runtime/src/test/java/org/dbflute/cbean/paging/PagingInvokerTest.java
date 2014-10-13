@@ -276,7 +276,7 @@ public class PagingInvokerTest extends RuntimeTestCase {
         };
         pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
-        pagingBean.fetchPage(2);
+        pagingBean.xfetchPage(2);
         PagingInvoker<String> tgt = createTarget();
 
         // ## Act ##
@@ -354,7 +354,7 @@ public class PagingInvokerTest extends RuntimeTestCase {
         };
         pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
-        pagingBean.fetchPage(3);
+        pagingBean.xfetchPage(3);
         PagingInvoker<String> tgt = createTarget();
 
         // ## Act ##
@@ -396,7 +396,7 @@ public class PagingInvokerTest extends RuntimeTestCase {
         };
         pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
-        pagingBean.fetchPage(3);
+        pagingBean.xfetchPage(3);
         PagingInvoker<String> tgt = createTarget();
 
         // ## Act ##
@@ -462,12 +462,12 @@ public class PagingInvokerTest extends RuntimeTestCase {
         PagingInvoker<String> tgt = createTarget();
 
         // ## Act & Assert ##
-        pagingBean.fetchPage(1);
+        pagingBean.xfetchPage(1);
         fillList(selectedList, 28);
         assertEquals(28, tgt.deriveAllRecordCountByLastPage(selectedList, pagingBean));
         fillList(selectedList, 30);
         assertEquals(30, tgt.deriveAllRecordCountByLastPage(selectedList, pagingBean));
-        pagingBean.fetchPage(2);
+        pagingBean.xfetchPage(2);
         fillList(selectedList, 28);
         assertEquals(58, tgt.deriveAllRecordCountByLastPage(selectedList, pagingBean));
         fillList(selectedList, 30);

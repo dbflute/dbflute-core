@@ -21,12 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.dbflute.XLog;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.SequenceCacheIllegalStateException;
 import org.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.system.XLog;
 import org.dbflute.util.Srl;
 
 /**
