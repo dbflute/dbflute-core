@@ -124,7 +124,8 @@ public class DfUpgradeTask extends DfAbstractTask {
         if (isVersionSpecified()) {
             return _version;
         }
-        final String latestVersion = dfprop.getDBFluteLatestVersion();
+        // TODO jflute formal version after release
+        final String latestVersion = dfprop.getDBFluteLatestSnapshotVersion();
         if (latestVersion == null) {
             String msg = "Not found the latest version for DBFlute in publicMap.";
             throw new IllegalStateException(msg);
@@ -194,6 +195,18 @@ public class DfUpgradeTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
+    @Override
+    protected void showFinalMessage(long before, long after, boolean abort) {
+        super.showFinalMessage(before, after, abort);
+        waitAfterFinalMessage();
+    }
+
+    protected void waitAfterFinalMessage() {
+        try {
+            Thread.sleep(3000L); // to get runtime version notification looked at
+        } catch (InterruptedException ignored) {}
+    }
+
     @Override
     protected String getFinalInformation() {
         return buildFinalMessage();
