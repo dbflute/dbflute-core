@@ -371,7 +371,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected <CB extends ConditionBean> HpCalcSpecification<CB> xcreateCalcSpecification(SpecifyQuery<CB> calcSp) {
-        return new HpCalcSpecification<CB>(calcSp, this);
+        return xnewCalcSpecification(calcSp, this);
+    }
+
+    protected <CB extends ConditionBean> HpCalcSpecification<CB> xnewCalcSpecification(SpecifyQuery<CB> calcSp, ConditionBean baseCB) {
+        return new HpCalcSpecification<CB>(calcSp, baseCB);
     }
 
     // -----------------------------------------------------

@@ -22,7 +22,7 @@ package org.dbflute.cbean.coption;
  * @since 1.1.0 (2014/09/30 Tuesday)
  */
 @FunctionalInterface
-public interface FFOptionCall<OP extends FunctionFilterOption> {
+public interface FunctionFilterOptionCall<OP extends FunctionFilterOption> {
 
     /**
      * @param op The option of function filter to be set up. (NotNull)

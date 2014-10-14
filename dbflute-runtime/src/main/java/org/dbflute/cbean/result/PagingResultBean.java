@@ -15,7 +15,7 @@
  */
 package org.dbflute.cbean.result;
 
-import org.dbflute.cbean.paging.numberlink.PNLOptionCall;
+import org.dbflute.cbean.paging.numberlink.PageNumberLinkOptionCall;
 import org.dbflute.cbean.paging.numberlink.group.PageGroupBean;
 import org.dbflute.cbean.paging.numberlink.group.PageGroupOption;
 import org.dbflute.cbean.paging.numberlink.range.PageRangeBean;
@@ -124,18 +124,18 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param opLambda The callback for setting of page-group option. (NotNull)
      * @return The value of pageGroupBean. (NotNull)
      */
-    public PageGroupBean pageGroup(PNLOptionCall<PageGroupOption> opLambda) {
+    public PageGroupBean pageGroup(PageNumberLinkOptionCall<PageGroupOption> opLambda) {
         assertPageGroupOptionCall(opLambda);
         return createPageGroupBean(createPageGroupOption(opLambda));
     }
 
-    protected void assertPageGroupOptionCall(PNLOptionCall<PageGroupOption> opLambda) {
+    protected void assertPageGroupOptionCall(PageNumberLinkOptionCall<PageGroupOption> opLambda) {
         if (opLambda == null) {
             throw new IllegalArgumentException("The argument 'opLambda' should not be null.");
         }
     }
 
-    protected PageGroupOption createPageGroupOption(PNLOptionCall<PageGroupOption> opLambda) {
+    protected PageGroupOption createPageGroupOption(PageNumberLinkOptionCall<PageGroupOption> opLambda) {
         final PageGroupOption op = newPageGroupOption();
         opLambda.callback(op);
         return op;
@@ -173,18 +173,18 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param opLambda The callback for setting of page-range option. (NotNull)
      * @return The value of pageRangeBean. (NotNull)
      */
-    public PageRangeBean pageRange(PNLOptionCall<PageRangeOption> opLambda) {
+    public PageRangeBean pageRange(PageNumberLinkOptionCall<PageRangeOption> opLambda) {
         assertPageRangeOptionCall(opLambda);
         return createPageRangeBean(createPageRangeOption(opLambda));
     }
 
-    protected void assertPageRangeOptionCall(PNLOptionCall<PageRangeOption> opLambda) {
+    protected void assertPageRangeOptionCall(PageNumberLinkOptionCall<PageRangeOption> opLambda) {
         if (opLambda == null) {
             throw new IllegalArgumentException("The argument 'opLambda' should not be null.");
         }
     }
 
-    protected PageRangeOption createPageRangeOption(PNLOptionCall<PageRangeOption> opLambda) {
+    protected PageRangeOption createPageRangeOption(PageNumberLinkOptionCall<PageRangeOption> opLambda) {
         final PageRangeOption op = newPageRangeOption();
         opLambda.callback(op);
         return op;

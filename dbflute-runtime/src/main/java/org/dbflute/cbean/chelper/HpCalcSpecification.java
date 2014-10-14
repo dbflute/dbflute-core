@@ -22,7 +22,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcElement.CalculationType;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.ColumnConversionOption;
-import org.dbflute.cbean.coption.FFOptionCall;
+import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
@@ -368,7 +368,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator convert(FFOptionCall<ColumnConversionOption> opLambda) {
+    public HpCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
         assertObjectNotNull("opLambda", opLambda);
         if (_leftMode) {
             assertLeftCalcSp();

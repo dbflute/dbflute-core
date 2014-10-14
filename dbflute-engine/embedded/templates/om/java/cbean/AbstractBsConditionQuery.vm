@@ -333,7 +333,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch. (NullAllowed: if null (or empty), no condition)
      * @param opLambda The callback for option of like-search. (NotNull)
      */
-    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, COptionCall<LikeSearchOption> opLambda) {
+    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ConditionOptionCall<LikeSearchOption> opLambda) {
         set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, xcLSOP(opLambda));
     }
 #end
@@ -359,7 +359,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch. (NullAllowed: if null (or empty), no condition)
      * @param opLambda The callback for option of like-search. (NotNull)
      */
-    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, COptionCall<LikeSearchOption> opLambda) {
+    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ConditionOptionCall<LikeSearchOption> opLambda) {
         set${tmpJavaName}_NotLikeSearch(${tmpUncapitalisedJavaName}, xcLSOP(opLambda));
     }
 #end
@@ -675,7 +675,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param maxNumber The max number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param opLambda The callback for option of range-of. (NotNull)
      */
-    public void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, COptionCall<RangeOfOption> opLambda) {
+    public void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, ConditionOptionCall<RangeOfOption> opLambda) {
         set${tmpJavaName}_RangeOf(minNumber, maxNumber, xcROOP(opLambda));
     }
 #end
@@ -980,7 +980,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param opLambda The callback for option of from-to. (NotNull)
      */
-    public void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, COptionCall<FromToOption> opLambda) {
+    public void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, ConditionOptionCall<FromToOption> opLambda) {
         set${tmpJavaName}_FromTo(fromDatetime, toDatetime, xcFTOP(opLambda));
     }
 #end
@@ -1455,7 +1455,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * <p>The order values are bound (treated as bind parameter).</p>
      * @param opLambda The callback for option of manual-order containing order values. (NotNull)
      */
-    public void withManualOrder(MOOptionCall opLambda) { // is user public!
+    public void withManualOrder(ManualOrderOptionCall opLambda) { // is user public!
         xdoWithManualOrder(cMOO(opLambda));
     }
 

@@ -17,7 +17,7 @@ package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.coption.ColumnConversionOption;
-import org.dbflute.cbean.coption.FFOptionCall;
+import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
@@ -232,7 +232,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn convert(FFOptionCall<ColumnConversionOption> opLambda) {
+    public HpSpecifiedColumn convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
         assertObjectNotNull("opLambda", opLambda);
         initializeCalcSpecificationIfNeeds();
         _calcSpecification.convert(op -> {
@@ -258,9 +258,12 @@ public class HpSpecifiedColumn implements HpCalculator {
         return _calcSpecification.right();
     }
 
+    // -----------------------------------------------------
+    //                            CalcSpecification Handling
+    //                            --------------------------
     protected void initializeCalcSpecificationIfNeeds() {
         if (_calcSpecification == null) {
-            _calcSpecification = createCalcSpecification();
+            _calcSpecification = createEmptyCalcSpecification();
             final ConditionBean handlingCB;
             if (_baseCB.xisDreamCruiseShip()) {
                 // to tell option parameters by DreamCruise to base condition-bean
@@ -272,8 +275,8 @@ public class HpSpecifiedColumn implements HpCalculator {
         }
     }
 
-    protected HpCalcSpecification<ConditionBean> createCalcSpecification() {
-        return new HpCalcSpecification<ConditionBean>(createEmptySpecifyQuery());
+    protected HpCalcSpecification<ConditionBean> createEmptyCalcSpecification() {
+        return newCalcSpecification(createEmptySpecifyQuery());
     }
 
     protected SpecifyQuery<ConditionBean> createEmptySpecifyQuery() {
@@ -281,6 +284,10 @@ public class HpSpecifiedColumn implements HpCalculator {
             public void specify(ConditionBean cb) {
             }
         };
+    }
+
+    protected HpCalcSpecification<ConditionBean> newCalcSpecification(SpecifyQuery<ConditionBean> specifyQuery) {
+        return new HpCalcSpecification<ConditionBean>(specifyQuery);
     }
 
     public boolean hasSpecifyCalculation() {
@@ -296,6 +303,9 @@ public class HpSpecifiedColumn implements HpCalculator {
         _calcSpecification.specify(_baseCB);
     }
 
+    // -----------------------------------------------------
+    //                             ConversionOption Handling
+    //                             -------------------------
     protected void initializeConvOptionColumn(ColumnConversionOption option) {
         // e.g. DreamCruise specifies several columns
         // then cannot set the target column later so needs to set here

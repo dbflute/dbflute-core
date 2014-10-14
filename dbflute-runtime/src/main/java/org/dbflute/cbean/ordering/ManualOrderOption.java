@@ -31,10 +31,10 @@ import org.dbflute.cbean.chelper.HpMobConnectedBean;
 import org.dbflute.cbean.chelper.HpMobConnectionMode;
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.ckey.ConditionKey;
-import org.dbflute.cbean.coption.COptionCall;
 import org.dbflute.cbean.coption.ColumnConversionOption;
-import org.dbflute.cbean.coption.FFOptionCall;
+import org.dbflute.cbean.coption.ConditionOptionCall;
 import org.dbflute.cbean.coption.FromToOption;
+import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
@@ -176,14 +176,14 @@ public class ManualOrderOption implements HpCalculator {
     }
 
     // TODO jflute FromTo javadoc
-    public HpMobConnectedBean when_FromTo(LocalDate fromDate, LocalDate toDate, COptionCall<FromToOption> opLambda) {
+    public HpMobConnectedBean when_FromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) {
         assertFromToOption(opLambda);
         final FromToOption op = createFromToOption();
         opLambda.callback(op);
         return doWhen_FromTo(toDate(fromDate), toDate(toDate), op);
     }
 
-    public HpMobConnectedBean when_FromTo(LocalDateTime fromDate, LocalDateTime toDate, COptionCall<FromToOption> opLambda) {
+    public HpMobConnectedBean when_FromTo(LocalDateTime fromDate, LocalDateTime toDate, ConditionOptionCall<FromToOption> opLambda) {
         assertFromToOption(opLambda);
         final FromToOption op = createFromToOption();
         opLambda.callback(op);
@@ -200,14 +200,14 @@ public class ManualOrderOption implements HpCalculator {
      * @param opLambda The callback for option of from-to. (NotNull)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public HpMobConnectedBean when_FromTo(Date fromDate, Date toDate, COptionCall<FromToOption> opLambda) {
+    public HpMobConnectedBean when_FromTo(Date fromDate, Date toDate, ConditionOptionCall<FromToOption> opLambda) {
         assertFromToOption(opLambda);
         final FromToOption op = createFromToOption();
         opLambda.callback(op);
         return doWhen_FromTo(fromDate, toDate, op);
     }
 
-    protected void assertFromToOption(COptionCall<FromToOption> opLambda) {
+    protected void assertFromToOption(ConditionOptionCall<FromToOption> opLambda) {
         if (opLambda == null) {
             String msg = "The argument 'opLambda' for from-to option of ManualOrder should not be null.";
             throw new IllegalArgumentException(msg);
@@ -489,7 +489,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator convert(FFOptionCall<ColumnConversionOption> opLambda) {
+    public HpCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
         assertObjectNotNull("opLambda", opLambda);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.convert(opLambda);
@@ -513,13 +513,13 @@ public class ManualOrderOption implements HpCalculator {
 
     protected void initializeCalcSpecificationIfNeeds() {
         if (_calcSpecification == null) {
-            _calcSpecification = createCalcSpecification();
+            _calcSpecification = createEmptyCalcSpecification();
         }
     }
 
-    protected HpCalcSpecification<ConditionBean> createCalcSpecification() {
-        SpecifyQuery<ConditionBean> emptySpecifyQuery = createEmptySpecifyQuery();
-        final HpCalcSpecification<ConditionBean> spec = new HpCalcSpecification<ConditionBean>(emptySpecifyQuery);
+    protected HpCalcSpecification<ConditionBean> createEmptyCalcSpecification() {
+        final SpecifyQuery<ConditionBean> emptySpecifyQuery = createEmptySpecifyQuery();
+        final HpCalcSpecification<ConditionBean> spec = newCalcSpecification(emptySpecifyQuery);
         spec.synchronizeSetupSelectByJourneyLogBook();
         return spec;
     }
@@ -529,6 +529,10 @@ public class ManualOrderOption implements HpCalculator {
             public void specify(ConditionBean cb) {
             }
         };
+    }
+
+    protected HpCalcSpecification<ConditionBean> newCalcSpecification(SpecifyQuery<ConditionBean> emptySpecifyQuery) {
+        return new HpCalcSpecification<ConditionBean>(emptySpecifyQuery);
     }
 
     public boolean hasOrderByCalculation() {

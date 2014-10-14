@@ -17,7 +17,7 @@ package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
-import org.dbflute.cbean.coption.FFOptionCall;
+import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
 import org.dbflute.cbean.scoping.SubQuery;
 
@@ -75,7 +75,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Integer> count(SubQuery<CB> derivedCBLambda, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public HpQDRParameter<CB, Integer> count(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -117,7 +117,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> derivedCBLambda, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -159,7 +159,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Object> max(SubQuery<CB> derivedCBLambda, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public HpQDRParameter<CB, Object> max(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -201,7 +201,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Object> min(SubQuery<CB> derivedCBLambda, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public HpQDRParameter<CB, Object> min(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -243,7 +243,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Number> sum(SubQuery<CB> derivedCBLambda, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public HpQDRParameter<CB, Number> sum(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -285,7 +285,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Number> avg(SubQuery<CB> derivedCBLambda, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public HpQDRParameter<CB, Number> avg(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -316,7 +316,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
         }
     }
 
-    protected void assertDerivedReferrerOption(FFOptionCall<DerivedReferrerOption> opLambda) {
+    protected void assertDerivedReferrerOption(FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         if (opLambda == null) {
             String msg = "The argument 'opLambda' for DerivedReferrer should not be null.";
             throw new IllegalArgumentException(msg);

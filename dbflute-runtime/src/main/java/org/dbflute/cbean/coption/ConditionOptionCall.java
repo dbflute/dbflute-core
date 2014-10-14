@@ -13,19 +13,19 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.paging.numberlink;
+package org.dbflute.cbean.coption;
 
 /**
- * The callback interface of page-number link option.
- * @param <OP> The type of paging option to be set up.
+ * The callback interface of condition option.
+ * @param <OP> The type of condition option to be set up.
  * @author jflute
- * @since 1.1.0 (2014/10/13 Monday)
+ * @since 1.1.0 (2014/09/28 Sunday)
  */
 @FunctionalInterface
-public interface PNLOptionCall<OP extends PageNumberLinkOption> {
+public interface ConditionOptionCall<OP extends ConditionOption> {
 
     /**
-     * @param op The option of paging to be set up. (NotNull)
+     * @param op The option of condition to be set up. (NotNull)
      */
     void callback(OP op);
 }

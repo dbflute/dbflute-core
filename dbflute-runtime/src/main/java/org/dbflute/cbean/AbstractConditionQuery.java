@@ -45,7 +45,7 @@ import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.ckey.ConditionKeyInScope;
-import org.dbflute.cbean.coption.COptionCall;
+import org.dbflute.cbean.coption.ConditionOptionCall;
 import org.dbflute.cbean.coption.ConditionOption;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
 import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
@@ -56,7 +56,7 @@ import org.dbflute.cbean.coption.RangeOfOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
-import org.dbflute.cbean.ordering.MOOptionCall;
+import org.dbflute.cbean.ordering.ManualOrderOptionCall;
 import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.scoping.SubQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
@@ -1792,7 +1792,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          Manual Order
     //                                          ------------
-    protected ManualOrderOption cMOO(MOOptionCall opCall) { // createManualOrderOption()
+    protected ManualOrderOption cMOO(ManualOrderOptionCall opCall) { // createManualOrderOption()
         final ManualOrderOption op = newManualOrderOption();
         opCall.callback(op);
         return op;
@@ -2420,7 +2420,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                            LikeSearch
     //                                            ----------
-    protected LikeSearchOption xcLSOP(COptionCall<LikeSearchOption> opCall) { // called by template: createLikeSearchOption()
+    protected LikeSearchOption xcLSOP(ConditionOptionCall<LikeSearchOption> opCall) { // called by template: createLikeSearchOption()
         final LikeSearchOption op = newLikeSearchOption();
         opCall.callback(op);
         return op;
@@ -2441,7 +2441,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                               RangeOf
     //                                               -------
-    protected RangeOfOption xcROOP(COptionCall<RangeOfOption> opCall) { // called by template: createRangeOfOption()
+    protected RangeOfOption xcROOP(ConditionOptionCall<RangeOfOption> opCall) { // called by template: createRangeOfOption()
         final RangeOfOption op = newRangeOfOption();
         opCall.callback(op);
         return op;
@@ -2458,7 +2458,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                                FromTo
     //                                                ------
-    protected FromToOption xcFTOP(COptionCall<FromToOption> opCall) { // called by template: createFromToOption()
+    protected FromToOption xcFTOP(ConditionOptionCall<FromToOption> opCall) { // called by template: createFromToOption()
         final FromToOption op = newFromToOption();
         opCall.callback(op);
         return op;

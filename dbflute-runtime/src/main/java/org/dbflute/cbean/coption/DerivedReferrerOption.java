@@ -568,14 +568,29 @@ public class DerivedReferrerOption extends FunctionFilterOption {
         return this;
     }
 
+    // -----------------------------------------------------
+    //                            CalcSpecification Handling
+    //                            --------------------------
     protected HpCalcSpecification<ConditionBean> getCalcSpecification() {
         if (_calcSpecification == null) {
-            _calcSpecification = new HpCalcSpecification<ConditionBean>(new SpecifyQuery<ConditionBean>() {
-                public void specify(ConditionBean cb) { // as dummy
-                }
-            });
+            _calcSpecification = createEmptyCalcSpecification();
         }
         return _calcSpecification;
+    }
+
+    protected HpCalcSpecification<ConditionBean> createEmptyCalcSpecification() {
+        return newCalcSpecification(createEmptySpecifyQuery());
+    }
+
+    protected SpecifyQuery<ConditionBean> createEmptySpecifyQuery() {
+        return new SpecifyQuery<ConditionBean>() {
+            public void specify(ConditionBean cb) { // as dummy
+            }
+        };
+    }
+
+    protected HpCalcSpecification<ConditionBean> newCalcSpecification(SpecifyQuery<ConditionBean> specifyQuery) {
+        return new HpCalcSpecification<ConditionBean>(specifyQuery);
     }
 
     public void xacceptBaseCB(ConditionBean cb) { // called after registered internally

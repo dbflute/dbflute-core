@@ -16,12 +16,12 @@
 package org.dbflute.cbean.ordering;
 
 /**
- * The callback interface of manual-order.
+ * The callback interface of manual-order option.
  * @author jflute
  * @since 1.1.0 (2014/09/28 Sunday)
  */
 @FunctionalInterface
-public interface MOOptionCall {
+public interface ManualOrderOptionCall {
 
     /**
      * @param op The option of manual-order to be set up. (NotNull)

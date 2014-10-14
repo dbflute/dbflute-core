@@ -128,9 +128,17 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         if (_selfSpecificationList == null) {
             _selfSpecificationList = DfCollectionUtil.newArrayList();
         }
-        final HpCalcSpecification<CB> specification = new HpCalcSpecification<CB>(colCBLambda);
+        final HpCalcSpecification<CB> specification = createCalcSpecification(colCBLambda);
         _selfSpecificationList.add(specification);
         return specification;
+    }
+
+    protected HpCalcSpecification<CB> createCalcSpecification(SpecifyQuery<CB> colCBLambda) {
+        return newCalcSpecification(colCBLambda);
+    }
+
+    protected HpCalcSpecification<CB> newCalcSpecification(SpecifyQuery<CB> colCBLambda) {
+        return new HpCalcSpecification<CB>(colCBLambda);
     }
 
     public boolean hasSelfSpecification() {

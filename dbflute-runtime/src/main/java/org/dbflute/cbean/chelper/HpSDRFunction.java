@@ -18,7 +18,7 @@ package org.dbflute.cbean.chelper;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
-import org.dbflute.cbean.coption.FFOptionCall;
+import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.scoping.SubQuery;
@@ -89,7 +89,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void count(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public void count(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -133,7 +133,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void countDistinct(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public void countDistinct(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -177,7 +177,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void max(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public void max(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -221,7 +221,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void min(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public void min(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -265,7 +265,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void sum(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public void sum(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -309,7 +309,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void avg(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FFOptionCall<DerivedReferrerOption> opLambda) {
+    public void avg(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);
@@ -377,7 +377,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         createCBExThrower().throwSpecifyDerivedReferrerInvalidAliasNameException(_localCQ);
     }
 
-    protected void assertDerivedReferrerOption(FFOptionCall<DerivedReferrerOption> opLambda) {
+    protected void assertDerivedReferrerOption(FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         if (opLambda == null) {
             String msg = "The argument 'opLambda' for DerivedReferrer should not be null.";
             throw new IllegalArgumentException(msg);

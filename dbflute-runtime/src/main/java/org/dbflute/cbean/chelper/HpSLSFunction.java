@@ -16,7 +16,7 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
-import org.dbflute.cbean.coption.FFOptionCall;
+import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 import org.dbflute.cbean.coption.ScalarSelectOption;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.scoping.ScalarQuery;
@@ -91,7 +91,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @param opLambda The callback for option of scalar. (NotNull)
      * @return The count value calculated by function. (NotNull)
      */
-    public RESULT count(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+    public RESULT count(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
         final ScalarSelectOption option = createScalarSelectOption();
         opLambda.callback(option);
         assertScalarSelectOption(option);
@@ -131,7 +131,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @param opLambda The callback for option of scalar. (NotNull)
      * @return The count-distinct value calculated by function. (NotNull)
      */
-    public RESULT countDistinct(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+    public RESULT countDistinct(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
         final ScalarSelectOption option = createScalarSelectOption();
         opLambda.callback(option);
         assertScalarSelectOption(option);
@@ -170,7 +170,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @param opLambda The callback for option of scalar. (NotNull)
      * @return The optional thing for maximum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public OptionalThing<RESULT> max(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+    public OptionalThing<RESULT> max(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
         final ScalarSelectOption option = createScalarSelectOption();
         opLambda.callback(option);
         assertScalarSelectOption(option);
@@ -209,7 +209,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @param opLambda The callback for option of scalar. (NotNull)
      * @return The optional thing for minimum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public OptionalThing<RESULT> min(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+    public OptionalThing<RESULT> min(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
         final ScalarSelectOption option = createScalarSelectOption();
         opLambda.callback(option);
         assertScalarSelectOption(option);
@@ -248,7 +248,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @param opLambda The callback for option of scalar. (NotNull)
      * @return The optional thing for summary value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public OptionalThing<RESULT> sum(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+    public OptionalThing<RESULT> sum(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
         final ScalarSelectOption option = createScalarSelectOption();
         opLambda.callback(option);
         assertScalarSelectOption(option);
@@ -287,7 +287,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @param opLambda The callback for option of scalar. (NotNull)
      * @return The optional thing for average value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public OptionalThing<RESULT> avg(ScalarQuery<CB> cbLambda, FFOptionCall<ScalarSelectOption> opLambda) {
+    public OptionalThing<RESULT> avg(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
         final ScalarSelectOption option = createScalarSelectOption();
         opLambda.callback(option);
         assertScalarSelectOption(option);

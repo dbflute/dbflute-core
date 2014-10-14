@@ -203,7 +203,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator convert(FFOptionCall<ColumnConversionOption> opLambda) {
+    public HpCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
         assertObjectNotNull("opLambda", opLambda);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.convert(opLambda);
@@ -225,9 +225,12 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
         return _calcSpecification.right();
     }
 
+    // -----------------------------------------------------
+    //                            CalcSpecification Handling
+    //                            --------------------------
     protected void initializeCalcSpecificationIfNeeds() {
         if (_calcSpecification == null) {
-            _calcSpecification = createCalcSpecification();
+            _calcSpecification = createEmptyCalcSpecification();
         }
     }
 
@@ -235,8 +238,8 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
         column.setupSelectDreamCruiseJourneyLogBookIfUnionExists();
     }
 
-    protected HpCalcSpecification<ConditionBean> createCalcSpecification() {
-        return new HpCalcSpecification<ConditionBean>(createEmptySpecifyQuery());
+    protected HpCalcSpecification<ConditionBean> createEmptyCalcSpecification() {
+        return newCalcSpecification(createEmptySpecifyQuery());
     }
 
     protected SpecifyQuery<ConditionBean> createEmptySpecifyQuery() {
@@ -244,6 +247,10 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
             public void specify(ConditionBean cb) {
             }
         };
+    }
+
+    protected HpCalcSpecification<ConditionBean> newCalcSpecification(SpecifyQuery<ConditionBean> specifyQuery) {
+        return new HpCalcSpecification<ConditionBean>(specifyQuery);
     }
 
     public boolean hasCalculationRange() {
