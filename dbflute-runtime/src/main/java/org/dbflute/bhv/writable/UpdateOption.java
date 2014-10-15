@@ -145,12 +145,17 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         return _selfSpecificationList != null && !_selfSpecificationList.isEmpty();
     }
 
-    public void resolveSelfSpecification(CB cb) {
+    public static interface UpdateSelfSpecificationCBFactory<CB> {
+        CB create();
+    }
+
+    public void resolveSelfSpecification(UpdateSelfSpecificationCBFactory<CB> factory) {
         if (_selfSpecificationList == null || _selfSpecificationList.isEmpty()) {
             return;
         }
         _selfSpecificationMap = StringKeyMap.createAsFlexibleOrdered();
         for (HpCalcSpecification<CB> specification : _selfSpecificationList) {
+            final CB cb = factory.create(); // needs independent instance per specification 
             specification.specify(cb);
             final String columnDbName = specification.getResolvedSpecifiedColumnDbName();
             assertSpecifiedColumn(cb, columnDbName);

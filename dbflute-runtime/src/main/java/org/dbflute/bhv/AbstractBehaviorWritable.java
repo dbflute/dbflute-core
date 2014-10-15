@@ -158,8 +158,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
         assertUpdateOptionStatus(option);
         if (option.hasSelfSpecification()) {
-            final CB cb = createCBForVaryingUpdate();
-            option.resolveSelfSpecification(cb);
+            option.resolveSelfSpecification(() -> createCBForVaryingUpdate());
         }
         if (option.hasSpecifiedUpdateColumn()) {
             final CB cb = createCBForSpecifiedUpdate();
