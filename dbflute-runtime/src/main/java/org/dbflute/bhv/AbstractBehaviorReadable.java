@@ -600,7 +600,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      * Prepare an outside-SQL execution by returning an instance of the executor for outside-SQL. <br />
      * It's an extension point for your adding original customization to outside-SQL executions.
      * @param <BEHAVIOR> The type of behavior.
-     * @return The facade for outside-SQL. (NotNull) 
+     * @return The facade for outside-SQL. (NotNull)
      */
     protected <BEHAVIOR extends BehaviorReadable> OutsideSqlAllFacadeExecutor<BEHAVIOR> doOutsideSql() {
         assertBehaviorCommandInvoker("outsideSql");

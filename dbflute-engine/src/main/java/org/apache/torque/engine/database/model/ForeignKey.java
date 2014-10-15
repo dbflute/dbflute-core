@@ -350,42 +350,61 @@ public class ForeignKey implements Constraint {
      * @return Generated string.
      */
     protected String getForeignPropertyName(boolean isJavaBeansRule) {
-        final List<Column> localColumnList = getLocalColumnList();
         String name = "";
+        name = buildForeignPropertySubIdentityName(name);
+        name = buildForeignPropertySelfRelationName(name);
+        name = buildForeignPropertyTableIdentityName(isJavaBeansRule, name);
+        name = buildForeignPropertySpecifiedPrefixName(name);
+        return name;
+    }
+
+    protected String buildForeignPropertySubIdentityName(String name) {
+        final List<Column> localColumnList = getLocalColumnList();
         if (hasFixedSuffix()) {
-            name = getFixedSuffix();
-        } else {
-            final List<String> multipleFKColumnNameList = new ArrayList<String>();
-            for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
-                final Column col = (Column) ite.next();
-                if (col.isMultipleFK()) { // the bug exists (refer to the method's source code)
-                    multipleFKColumnNameList.add(col.getName());
-                    name = name + col.getJavaName();
-                }
-            }
-            if (name.trim().length() > 0) { // means multiple FK columns exist
-                final String localTableDbName = getTable().getTableDbName();
-                final String aliasName = getMultipleFKPropertyColumnAliasName(localTableDbName, multipleFKColumnNameList);
-                if (aliasName != null && aliasName.trim().length() > 0) { // my young code
-                    final String firstUpper = aliasName.substring(0, 1).toUpperCase();
-                    if (aliasName.trim().length() == 1) {
-                        name = "By" + firstUpper;
-                    } else {
-                        name = "By" + firstUpper + aliasName.substring(1, aliasName.length());
-                    }
-                } else {
-                    name = "By" + name;
-                }
+            return getFixedSuffix();
+        }
+        final List<String> multipleFKColumnNameList = new ArrayList<String>();
+        for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
+            final Column col = (Column) ite.next();
+            if (col.isMultipleFK()) { // the bug exists (refer to the method's source code)
+                multipleFKColumnNameList.add(col.getName());
+                name = name + col.getJavaName();
             }
         }
+        if (name.trim().length() > 0) { // means multiple FK columns exist
+            final String localTableDbName = getTable().getTableDbName();
+            final String aliasName = getMultipleFKPropertyColumnAliasName(localTableDbName, multipleFKColumnNameList);
+            if (aliasName != null && aliasName.trim().length() > 0) { // my young code
+                final String firstUpper = aliasName.substring(0, 1).toUpperCase();
+                if (aliasName.trim().length() == 1) {
+                    name = "By" + firstUpper;
+                } else {
+                    name = "By" + firstUpper + aliasName.substring(1, aliasName.length());
+                }
+            } else {
+                name = "By" + name;
+            }
+        }
+        return name;
+    }
+
+    protected String buildForeignPropertySelfRelationName(String name) {
         if (getForeignTable().getTableDbName().equals(getTable().getTableDbName())) {
             name = name + "Self";
         }
+        return name;
+    }
+
+    protected String buildForeignPropertyTableIdentityName(boolean isJavaBeansRule, String name) {
         if (isJavaBeansRule) {
             name = getForeignTable().getJavaBeansRulePropertyName() + name;
         } else {
             name = getForeignTable().getUncapitalisedJavaName() + name;
         }
+        return name;
+    }
+
+    protected String buildForeignPropertySpecifiedPrefixName(String name) {
         if (_foreignPropertyNamePrefix != null) {
             name = _foreignPropertyNamePrefix + name;
         }
@@ -551,42 +570,54 @@ public class ForeignKey implements Constraint {
     }
 
     protected String getReferrerPropertyName(boolean isJavaBeansRule, String listSuffix) {
+        final String firstName = buildReferrerPropertyTableIdentityName(isJavaBeansRule);
+        final String subIdentityName = buildReferrerPropertySubIdentityName();
+        return firstName + subIdentityName + listSuffix;
+    }
+
+    protected String buildReferrerPropertyTableIdentityName(boolean isJavaBeansRule) {
+        final String tableIdentityName;
+        if (isJavaBeansRule) {
+            tableIdentityName = getTable().getJavaBeansRulePropertyName();
+        } else {
+            tableIdentityName = getTable().getUncapitalisedJavaName();
+        }
+        return tableIdentityName;
+    }
+
+    protected String buildReferrerPropertySubIdentityName() {
         final List<Column> localColumnList = getLocalColumnList();
         final List<String> columnNameList = new ArrayList<String>();
-        String name = "";
+        String secondName = "";
         if (hasFixedSuffix()) {
-            name = getFixedSuffix();
+            secondName = getFixedSuffix();
         } else {
             for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
                 final Column col = (Column) ite.next();
                 if (col.isMultipleFK()) {
                     columnNameList.add(col.getName());
-                    name = name + col.getJavaName();
+                    secondName = secondName + col.getJavaName();
                 }
             }
-            if (name.trim().length() != 0) { // isMultipleFK()==true
+            if (secondName.trim().length() != 0) { // isMultipleFK()==true
                 final String foreignTableDbName = getForeignTable().getTableDbName();
                 final String aliasName = getMultipleFKPropertyColumnAliasName(foreignTableDbName, columnNameList);
                 if (aliasName != null && aliasName.trim().length() != 0) {
                     final String firstUpper = aliasName.substring(0, 1).toUpperCase();
                     if (aliasName.trim().length() == 1) {
-                        name = "By" + firstUpper;
+                        secondName = "By" + firstUpper;
                     } else {
-                        name = "By" + firstUpper + aliasName.substring(1, aliasName.length());
+                        secondName = "By" + firstUpper + aliasName.substring(1, aliasName.length());
                     }
                 } else {
-                    name = "By" + name;
+                    secondName = "By" + secondName;
                 }
             }
         }
         if (getTable().getTableDbName().equals(getForeignTable().getTableDbName())) {
-            name = name + "Self";
+            secondName = secondName + "Self";
         }
-        if (isJavaBeansRule) {
-            return getTable().getJavaBeansRulePropertyName() + name + listSuffix;
-        } else {
-            return getTable().getUncapitalisedJavaName() + name + listSuffix;
-        }
+        return secondName;
     }
 
     // -----------------------------------------------------
@@ -617,26 +648,28 @@ public class ForeignKey implements Constraint {
     }
 
     protected String getReferrerPropertyNameAsOne(boolean isJavaBeansRule) {
+        final String firstName = buildReferrerPropertyTableIdentityName(isJavaBeansRule);
+        final String secondName = buildReferrerPropertySubIdentityNameAsOne();
+        final String asOneSuffix = "AsOne";
+        return firstName + secondName + asOneSuffix;
+    }
+
+    protected String buildReferrerPropertySubIdentityNameAsOne() {
         final List<Column> localColumnList = getLocalColumnList();
-        String name = "";
+        String subIdentityName = "";
         for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column col = (Column) ite.next();
-
             if (col.isMultipleFK()) {
-                name = name + col.getJavaName();
+                subIdentityName = subIdentityName + col.getJavaName();
             }
         }
-        if (name.trim().length() != 0) {
-            name = "By" + name;
+        if (subIdentityName.trim().length() != 0) {
+            subIdentityName = "By" + subIdentityName;
         }
         if (getTable().getTableDbName().equals(getForeignTable().getTableDbName())) {
-            name = name + "Self";
+            subIdentityName = subIdentityName + "Self";
         }
-        if (isJavaBeansRule) {
-            return getTable().getJavaBeansRulePropertyName() + name + "AsOne";
-        } else {
-            return getTable().getUncapitalisedJavaName() + name + "AsOne";
-        }
+        return subIdentityName;
     }
 
     public String getReferrerPropertyNameInitCap() {
@@ -1010,21 +1043,7 @@ public class ForeignKey implements Constraint {
     //                                            for S2JDBC
     //                                            ----------
     public String getReferrerPropertyNameAsOneS2Jdbc() { // for S2JDBC
-        final List<Column> localColumnList = getLocalColumnList();
-        String name = "";
-        for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
-            final Column col = (Column) ite.next();
-
-            if (col.isMultipleFK()) {
-                name = name + col.getJavaName();
-            }
-        }
-        if (name.trim().length() != 0) {
-            name = "By" + name;
-        }
-        if (getTable().getTableDbName().equals(getForeignTable().getTableDbName())) {
-            name = name + "Self";
-        }
+        String name = buildReferrerPropertySubIdentityNameAsOne();
         return getTable().getUncapitalisedJavaName() + name;
     }
 
