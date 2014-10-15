@@ -279,8 +279,9 @@ public interface Entity {
 
         /**
          * Find the derived value in the map.
+         * @param <VALUE> The type of derived value.
          * @param aliasName The alias name of derived-referrer. (NotNull)
-         * * @return The derived value found in the map. (NullAllowed: when null selected)
+         * @return The derived value found in the map. (NullAllowed: when null selected)
          */
         public <VALUE> VALUE findDerivedValue(String aliasName) {
             if (aliasName == null) {

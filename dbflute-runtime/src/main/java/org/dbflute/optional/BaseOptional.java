@@ -122,6 +122,7 @@ public abstract class BaseOptional<OBJ> {
     protected abstract <ARG> BaseOptional<ARG> createOptionalFilteredObject(ARG obj);
 
     /**
+     * @param <RESULT> The type of mapping result.
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
@@ -142,6 +143,7 @@ public abstract class BaseOptional<OBJ> {
     protected abstract <ARG> BaseOptional<ARG> createOptionalMappedObject(ARG obj);
 
     /**
+     * @param <RESULT> The type of mapping result.
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as flat-mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */

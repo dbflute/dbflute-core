@@ -54,6 +54,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
     }
 
     /**
+     * @param <EMPTY> The type of empty optional thing.
      * @return The fixed instance as empty. (NotNull)
      */
     @SuppressWarnings("unchecked")
@@ -62,6 +63,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
     }
 
     /**
+     * @param <OBJ> The type of object wrapped in the optional thing.
      * @param object The wrapped thing which is optional. (NotNull)
      * @return The new-created instance as existing optional thing. (NotNull)
      */
@@ -74,6 +76,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
     }
 
     /**
+     * @param <OBJ> The type of object wrapped in the optional thing.
      * @param object The wrapped instance or thing. (NullAllowed)
      * @param noArgLambda The callback for exception when illegal access. (NotNull)
      * @return The new-created instance as existing or empty optional object. (NotNull)
@@ -138,6 +141,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
 
     /**
      * Apply the mapping of object to result object.
+     * @param <RESULT> The type of mapping result.
      * @param oneArgLambda The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
@@ -157,6 +161,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
 
     /**
      * Apply the flat-mapping of object to result object.
+     * @param <RESULT> The type of mapping result.
      * @param oneArgLambda The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */

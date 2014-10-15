@@ -1034,6 +1034,7 @@ public class FromToOption implements ConditionOption {
 
     /**
      * Filter the date as To. It requires this method is called before getToDateConditionKey().
+     * @param <DATE> The type of sub-class for java.util.Date.
      * @param toDate The date as To. (NullAllowed: If the value is null, it returns null)
      * @return The filtered date as To. (NullAllowed)
      */

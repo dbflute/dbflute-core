@@ -80,6 +80,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     /**
+     * @param <EMPTY> The type of empty optional entity.
      * @return The fixed instance as empty. (NotNull)
      */
     @SuppressWarnings("unchecked")
@@ -88,6 +89,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     /**
+     * @param <ENTITY> The type of entity wrapped in the optional entity.
      * @param entity The wrapped entity for the optional object. (NotNull)
      * @return The new-created instance as existing optional object. (NotNull)
      */
@@ -100,6 +102,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     /**
+     * @param <ENTITY> The type of entity for the optional type.
      * @param entity The wrapped instance or entity. (NullAllowed)
      * @param noArgLambda The exception thrower when illegal access. (NotNull)
      * @return The new-created instance as existing or empty optional object. (NotNull)
@@ -113,6 +116,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     /**
+     * @param <EMPTY> The type of empty optional entity.
      * @param entity The base entity of the relation for exception message. (NotNull)
      * @param relation The property name of the relation for exception message. (NotNull)
      * @return The new-created instance as existing or empty optional object. (NotNull)
@@ -273,6 +277,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      *     return new MemberWebBean(member);
      * });
      * </pre>
+     * @param <RESULT> The type of mapping result.
      * @param entityLambda The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
