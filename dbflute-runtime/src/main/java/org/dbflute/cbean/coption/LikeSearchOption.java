@@ -180,14 +180,14 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
      * <pre>
      * e.g. 'and' condition
      * LikeSearchOption option = new LikeSearchOption();
-     * option.likeContain().<span style="color: #DD4747">splitByBlank()</span>;
+     * option.likeContain().<span style="color: #CC4747">splitByBlank()</span>;
      * cb.query().setFoo_ContainSearch("ab g kl", option);
      * <span style="color: #3F7E5E">// FOO like '%ab%' and FOO like '%g%' and FOO like '%kl%'</span>
      * <span style="color: #3F7E5E">// (all conditions have escape statements)</span>
      * 
      * e.g. 'or' condition
      * LikeSearchOption option = new LikeSearchOption();
-     * option.likeContain().splitByBlank().<span style="color: #DD4747">asOrSplit()</span>;
+     * option.likeContain().splitByBlank().<span style="color: #CC4747">asOrSplit()</span>;
      * cb.query().setFoo_ContainSearch("ab g kl", option);
      * <span style="color: #3F7E5E">// FOO like '%ab%' or FOO like '%g%' or FOO like '%kl%'</span>
      * <span style="color: #3F7E5E">// (conditions have escape statements)</span>
@@ -320,7 +320,7 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
      * e.g. LikeSearch: MEMBER_NAME || MEMBER_ACCOUNT like ...
      *  MemberCB cb = new MemberCB();
      *  LikeSearchOption option = new LikeSearchOption().likeContain()
-     *      .<span style="color: #DD4747">addCompoundColumn</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnMemberAccount());
+     *      .<span style="color: #CC4747">addCompoundColumn</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnMemberAccount());
      *  cb.query().setMemberName_LikeSearch("S", option);
      * </pre>
      * @param compoundColumn The compound column specified by Dream Cruise. (NotNull)

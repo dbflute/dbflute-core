@@ -81,7 +81,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
      * SimpleMember member
-     *     = memberBhv.outsideSql().entityHandling().<span style="color: #DD4747">selectEntity</span>(pmb);
+     *     = memberBhv.outsideSql().entityHandling().<span style="color: #CC4747">selectEntity</span>(pmb);
      * if (member != null) {
      *     ... = member.get...();
      * } else {
@@ -111,7 +111,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * pmb.setMemberId(3);
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * SimpleMember member
-     *     = memberBhv.outsideSql().entityHandling().<span style="color: #DD4747">selectEntity</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().entityHandling().<span style="color: #CC4747">selectEntity</span>(path, pmb, entityType);
      * if (member != null) {
      *     ... = member.get...();
      * } else {
@@ -209,7 +209,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
      * SimpleMember member
-     *     = memberBhv.outsideSql().entityHandling().<span style="color: #DD4747">selectEntityWithDeletedCheck</span>(pmb);
+     *     = memberBhv.outsideSql().entityHandling().<span style="color: #CC4747">selectEntityWithDeletedCheck</span>(pmb);
      * ... = member.get...(); <span style="color: #3F7E5E">// the entity always be not null</span>
      * </pre>
      * @param <ENTITY> The type of entity.
@@ -236,7 +236,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * pmb.setMemberId(3);
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * SimpleMember member
-     *     = memberBhv.outsideSql().entityHandling().<span style="color: #DD4747">selectEntityWithDeletedCheck</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().entityHandling().<span style="color: #CC4747">selectEntityWithDeletedCheck</span>(path, pmb, entityType);
      * ... = member.get...(); <span style="color: #3F7E5E">// the entity always be not null</span>
      * </pre>
      * @param <ENTITY> The type of entity.

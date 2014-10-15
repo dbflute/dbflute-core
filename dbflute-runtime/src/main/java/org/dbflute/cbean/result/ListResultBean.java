@@ -78,14 +78,14 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * This method needs the property 'selectedList' only.
      * <pre>
      * <span style="color: #3F7E5E">// e.g. grouping per three records</span>
-     * List&lt;ListResultBean&lt;Member&gt;&gt; groupingList = memberList.<span style="color: #DD4747">groupingList</span>(new GroupingListDeterminer&lt;Member&gt;() {
+     * List&lt;ListResultBean&lt;Member&gt;&gt; groupingList = memberList.<span style="color: #CC4747">groupingList</span>(new GroupingListDeterminer&lt;Member&gt;() {
      *     public boolean isBreakRow(GroupingListRowResource&lt;Member&gt; rowResource, Member nextEntity) {
      *         return rowResource.getNextIndex() >= 3;
      *     }
      * }, groupingOption);
      * 
      * <span style="color: #3F7E5E">// e.g. grouping per initial character of MEMBER_NAME</span>
-     * List&lt;ListResultBean&lt;Member&gt;&gt; groupingList = memberList.<span style="color: #DD4747">groupingList</span>(new GroupingListDeterminer&lt;Member&gt;() {
+     * List&lt;ListResultBean&lt;Member&gt;&gt; groupingList = memberList.<span style="color: #CC4747">groupingList</span>(new GroupingListDeterminer&lt;Member&gt;() {
      *     public boolean isBreakRow(GroupingListRowResource&lt;Member&gt; rowResource, Member nextEntity) {
      *         Member currentEntity = rowResource.getCurrentEntity();
      *         String currentInitChar = currentEntity.getMemberName().substring(0, 1);
@@ -134,7 +134,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * This method needs the property 'selectedList' only.
      * <pre>
      * <span style="color: #3F7E5E">// e.g. grouping per initial character of MEMBER_NAME</span>
-     * Map&lt;String, ListResultBean&lt;Member&gt;&gt; groupingMap = memberList.<span style="color: #DD4747">groupingMap</span>(new GroupingMapDeterminer&lt;Member&gt;() {
+     * Map&lt;String, ListResultBean&lt;Member&gt;&gt; groupingMap = memberList.<span style="color: #CC4747">groupingMap</span>(new GroupingMapDeterminer&lt;Member&gt;() {
      *     public String provideKey(Member entity) {
      *         return entity.getMemberName().substring(0, 1);
      *     }
@@ -165,7 +165,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * This method needs the property 'selectedList' only.
      * <pre>
      * ListResultBean&lt;MemberDto&gt; dtoList
-     *         = entityList.<span style="color: #DD4747">mappingList</span>(new EntityDtoMapper&lt;Member, MemberDto&gt;() {
+     *         = entityList.<span style="color: #CC4747">mappingList</span>(new EntityDtoMapper&lt;Member, MemberDto&gt;() {
      *     public MemberDto map(Member entity) {
      *         MemberDto dto = new MemberDto();
      *         dto.setMemberId(entity.getMemberId());
@@ -198,7 +198,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * This method needs the property 'selectedList' only.
      * <pre>
      * List&lt;Integer&gt; memberIdList
-     *         = entityList.<span style="color: #DD4747">extractColumnList</span>(new EntityColumnExtractor&lt;Member, Integer&gt;() {
+     *         = entityList.<span style="color: #CC4747">extractColumnList</span>(new EntityColumnExtractor&lt;Member, Integer&gt;() {
      *     public Integer extract(Member entity) {
      *         return entity.getMemberId();
      *     }
@@ -224,7 +224,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * This method needs the property 'selectedList' only.
      * <pre>
      * Set&lt;Integer&gt; memberIdList
-     *         = entityList.<span style="color: #DD4747">extractColumnSet</span>(new EntityColumnExtractor&lt;Member, Integer&gt;() {
+     *         = entityList.<span style="color: #CC4747">extractColumnSet</span>(new EntityColumnExtractor&lt;Member, Integer&gt;() {
      *     public Integer extract(Member entity) {
      *         return entity.getMemberId();
      *     }

@@ -57,7 +57,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * pmb.setMemberId(3);
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * SimpleMember member
-     *     = memberBhv.outsideSql().entityHandling().<span style="color: #DD4747">selectEntity</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().entityHandling().<span style="color: #CC4747">selectEntity</span>(path, pmb, entityType);
      * if (member != null) {
      *     ... = member.get...();
      * } else {
@@ -90,7 +90,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * pmb.setMemberName_PrefixSearch("S");
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectList</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectList</span>(path, pmb, entityType);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -130,7 +130,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * PagingResultBean&lt;SimpleMember&gt; page
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #DD4747">selectPage</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectPage</span>(path, pmb, entityType);
      * int allRecordCount = page.getAllRecordCount();
      * int allPageCount = page.getAllPageCount();
      * boolean isExistPrePage = page.isExistPrePage();
@@ -208,7 +208,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #DD4747">selectList</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectList</span>(path, pmb, entityType);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -271,7 +271,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * memberBhv.outsideSql().cursorHandling()
-     *         .<span style="color: #DD4747">selectCursor</span>(path, pmb, new PurchaseSummaryMemberCursorHandler() {
+     *         .<span style="color: #CC4747">selectCursor</span>(path, pmb, new PurchaseSummaryMemberCursorHandler() {
      *     protected Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
      *         while (cursor.next()) {
      *             Integer memberId = cursor.getMemberId();
@@ -308,7 +308,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
-     * int count = memberBhv.outsideSql().<span style="color: #DD4747">execute</span>(path, pmb);
+     * int count = memberBhv.outsideSql().<span style="color: #CC4747">execute</span>(path, pmb);
      * </pre>
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)

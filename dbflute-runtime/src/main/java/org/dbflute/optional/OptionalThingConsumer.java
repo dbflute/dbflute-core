@@ -18,11 +18,11 @@ package org.dbflute.optional;
 /**
  * The consumer of optional thing.
  * <pre>
- * opt.<span style="color: #DD4747">ifPresent</span>(member -&gt; {
+ * opt.<span style="color: #CC4747">ifPresent</span>(member -&gt; {
  *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
  *     ... = member.getMemberName();
  * });
- * opt.<span style="color: #DD4747">required</span>(member -&gt; {
+ * opt.<span style="color: #CC4747">required</span>(member -&gt; {
  *     <span style="color: #3F7E5E">// called if value exists, or exception if not present</span>
  *     ... = member.getMemberName();
  * });
@@ -36,10 +36,10 @@ public interface OptionalThingConsumer<OBJ> {
     /**
      * Accept the value in the optional object.
      * <pre>
-     * when caller is <span style="color: #DD4747">ifPresent()</span>:
+     * when caller is <span style="color: #CC4747">ifPresent()</span>:
      *   called if value exists, not called if not present
      *
-     * when caller is <span style="color: #DD4747">required()</span>:
+     * when caller is <span style="color: #CC4747">required()</span>:
      *   called if value exists, or exception if not present
      * </pre>
      * @param obj The wrapped object in the optional object. (NotNull)

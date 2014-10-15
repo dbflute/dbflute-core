@@ -27,8 +27,8 @@ import org.dbflute.Entity;
  *     public void setup(PurchaseCB cb) {
  *         cb.query().addOrderBy_PurchaseDatetime_Asc();
  *     }
- * }).<span style="color: #DD4747">withNestedReferrer</span>(new ReferrerListHandler&lt;Purchase&gt;() {
- *     public void <span style="color: #DD4747">handle</span>(List&lt;Purchase&gt; referrerList) {
+ * }).<span style="color: #CC4747">withNestedReferrer</span>(new ReferrerListHandler&lt;Purchase&gt;() {
+ *     public void <span style="color: #CC4747">handle</span>(List&lt;Purchase&gt; referrerList) {
  *         <span style="color: #3F7E5E">// you can call LoadReferrer here for nested referrer as you like it</span>
  *         purchaseBhv.loadPurchasePaymentList(referrerList, new ReferrerConditionSetupper&lt;PurchasePaymentCB&gt;() {
  *             public void setup(PurchasePaymentCB cb) {
@@ -56,8 +56,8 @@ public interface NestedReferrerListGateway<REFERRER extends Entity> {
      *     public void setup(PurchaseCB cb) {
      *         cb.query().addOrderBy_PurchaseDatetime_Asc();
      *     }
-     * }).<span style="color: #DD4747">withNestedReferrer</span>(new ReferrerListHandler&lt;Purchase&gt;() {
-     *     public void <span style="color: #DD4747">handle</span>(List&lt;Purchase&gt; referrerList) {
+     * }).<span style="color: #CC4747">withNestedReferrer</span>(new ReferrerListHandler&lt;Purchase&gt;() {
+     *     public void <span style="color: #CC4747">handle</span>(List&lt;Purchase&gt; referrerList) {
      *         <span style="color: #3F7E5E">// you can call LoadReferrer here for nested referrer as you like it</span>
      *         purchaseBhv.loadPurchasePaymentList(referrerList, new ReferrerConditionSetupper&lt;PurchasePaymentCB&gt;() {
      *             public void setup(PurchasePaymentCB cb) {

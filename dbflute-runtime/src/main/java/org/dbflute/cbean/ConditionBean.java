@@ -136,7 +136,7 @@ public interface ConditionBean extends PagingBean {
      * e.g. member that purchases products only purchased by the member
      *  MemberCB cb = new MemberCB();
      *  cb.specify().columnBirthdate();
-     *  final MemberCB dreamCruiseCB = cb.<span style="color: #DD4747">dreamCruiseCB()</span>;
+     *  final MemberCB dreamCruiseCB = cb.<span style="color: #CC4747">dreamCruiseCB()</span>;
      *  cb.query().existsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
      *      public void query(PurchaseCB subCB) {
      *          subCB.query().queryProduct().notExistsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
@@ -147,7 +147,7 @@ public interface ConditionBean extends PagingBean {
      *                      }
      *                  }).notEqual(new SpecifyQuery&lt;PurchaseCB&gt;() {
      *                      public void specify(PurchaseCB cb) {
-     *                          cb.<span style="color: #DD4747">overTheWaves</span>(dreamCruiseCB.specify().columnMemberId());
+     *                          cb.<span style="color: #CC4747">overTheWaves</span>(dreamCruiseCB.specify().columnMemberId());
      *                      }
      *                  });
      *              }
@@ -238,10 +238,10 @@ public interface ConditionBean extends PagingBean {
      *      }
      *  }).greaterThan(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
-     *          cb.<span style="color: #DD4747">mysticRhythms</span>(toDate("2015/04/05"));
+     *          cb.<span style="color: #CC4747">mysticRhythms</span>(toDate("2015/04/05"));
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">addDay</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">addDay</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param mysticBinding
      */

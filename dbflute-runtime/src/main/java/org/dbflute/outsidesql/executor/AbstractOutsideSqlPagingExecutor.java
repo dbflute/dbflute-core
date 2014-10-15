@@ -87,7 +87,7 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * PagingResultBean&lt;SimpleMember&gt; page
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #DD4747">selectPage</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectPage</span>(path, pmb, entityType);
      * int allRecordCount = page.getAllRecordCount();
      * int allPageCount = page.getAllPageCount();
      * boolean isExistPrePage = page.isExistPrePage();
@@ -241,7 +241,7 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #DD4747">selectList</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectList</span>(path, pmb, entityType);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }

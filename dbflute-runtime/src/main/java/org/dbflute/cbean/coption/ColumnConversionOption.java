@@ -68,7 +68,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Truncate the month and day and time part of the date or the date-time value.
      * <pre>
-     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/<span style="color: #DD4747">01/01 00:00:00</span>
+     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/<span style="color: #CC4747">01/01 00:00:00</span>
      * </pre>
      * @return this. (NotNull)
      */
@@ -80,7 +80,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Truncate the day and time part of the date or the date-time value.
      * <pre>
-     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/12/<span style="color: #DD4747">01 00:00:00</span>
+     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/12/<span style="color: #CC4747">01 00:00:00</span>
      * </pre>
      * @return this. (NotNull)
      */
@@ -92,7 +92,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Truncate the time part of the date-time value.
      * <pre>
-     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/12/31 <span style="color: #DD4747">00:00:00</span>
+     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/12/31 <span style="color: #CC4747">00:00:00</span>
      * </pre>
      * @return this. (NotNull)
      */
@@ -129,7 +129,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">addYear</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">addYear</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
@@ -153,7 +153,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">subtractYear</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">subtractYear</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
@@ -191,7 +191,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">addMonth</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">addMonth</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
@@ -215,7 +215,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">subtractMonth</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">subtractMonth</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
@@ -253,7 +253,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">addDay</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">addDay</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
@@ -277,7 +277,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">subtractDay</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">subtractDay</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
@@ -315,7 +315,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">addHour</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">addHour</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
@@ -339,7 +339,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">subtractHour</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">subtractHour</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
@@ -377,7 +377,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">addMinute</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">addMinute</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
@@ -401,7 +401,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">subtractMinute</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">subtractMinute</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
@@ -439,7 +439,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">addSecond</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">addSecond</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
@@ -463,7 +463,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      *          cb.columnPurchaseDatetime();
      *      }
      *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">subtractSecond</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *          .<span style="color: #CC4747">subtractSecond</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)

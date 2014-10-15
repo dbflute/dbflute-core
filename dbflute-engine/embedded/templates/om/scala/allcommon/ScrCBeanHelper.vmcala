@@ -47,13 +47,13 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * Equal(=).
      * <pre>
      * <span style="color: #3F7E5E">// where FOO = BAR</span>
-     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * cb.<span style="color: #CC4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *         cb.specify().<span style="color: #CC4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
      *     }
-     * }).<span style="color: #DD4747">equal</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * }).<span style="color: #CC4747">equal</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *         cb.specify().<span style="color: #CC4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
@@ -66,13 +66,13 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * NotEqual(&lt;&gt;).
      * <pre>
      * <span style="color: #3F7E5E">// where FOO &lt;&gt; BAR</span>
-     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * cb.<span style="color: #CC4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *         cb.specify().<span style="color: #CC4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
      *     }
-     * }).<span style="color: #DD4747">notEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * }).<span style="color: #CC4747">notEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *         cb.specify().<span style="color: #CC4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
@@ -85,13 +85,13 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * GreaterThan(&gt;).
      * <pre>
      * <span style="color: #3F7E5E">// where FOO &gt; BAR</span>
-     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * cb.<span style="color: #CC4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *         cb.specify().<span style="color: #CC4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
      *     }
-     * }).<span style="color: #DD4747">greaterThan</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * }).<span style="color: #CC4747">greaterThan</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *         cb.specify().<span style="color: #CC4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
@@ -104,13 +104,13 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * LessThan(&lt;).
      * <pre>
      * <span style="color: #3F7E5E">// where FOO &lt; BAR</span>
-     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * cb.<span style="color: #CC4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *         cb.specify().<span style="color: #CC4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
      *     }
-     * }).<span style="color: #DD4747">lessThan</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * }).<span style="color: #CC4747">lessThan</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *         cb.specify().<span style="color: #CC4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
@@ -123,13 +123,13 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * GreaterEqual(&gt;=).
      * <pre>
      * <span style="color: #3F7E5E">// where FOO &gt;= BAR</span>
-     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * cb.<span style="color: #CC4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *         cb.specify().<span style="color: #CC4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * }).<span style="color: #CC4747">greaterEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *         cb.specify().<span style="color: #CC4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
@@ -142,13 +142,13 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * LessThan(&lt;=).
      * <pre>
      * <span style="color: #3F7E5E">// where FOO &lt;= BAR</span>
-     * cb.<span style="color: #DD4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * cb.<span style="color: #CC4747">columnQuery</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
+     *         cb.specify().<span style="color: #CC4747">columnFoo()</span>; <span style="color: #3F7E5E">// left column</span>
      *     }
-     * }).<span style="color: #DD4747">lessEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * }).<span style="color: #CC4747">lessEqual</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     def void query(MemberCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
+     *         cb.specify().<span style="color: #CC4747">columnBar()</span>; <span style="color: #3F7E5E">// right column</span>
      *     }
      * }); <span style="color: #3F7E5E">// you can calculate for right column like '}).plus(3);'</span>
      * </pre>
@@ -211,12 +211,12 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
     /**
      * Set up the sub query of referrer for the scalar 'count'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_purchaseCount</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_purchaseCount</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -230,12 +230,12 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
     /**
      * Set up the sub query of referrer for the scalar 'count-distinct'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_productKindCount</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_productKindCount</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -249,12 +249,12 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
     /**
      * Set up the sub query of referrer for the scalar 'max'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_latestPurchaseDatetime</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_latestPurchaseDatetime</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -268,12 +268,12 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
     /**
      * Set up the sub query of referrer for the scalar 'min'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_firstPurchaseDatetime</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_firstPurchaseDatetime</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -287,12 +287,12 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
     /**
      * Set up the sub query of referrer for the scalar 'sum'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceSummary</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceSummary</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -306,12 +306,12 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
     /**
      * Set up the sub query of referrer for the scalar 'avg'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceAverage</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceAverage</span>);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -350,12 +350,12 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
     /**
      * Set up the sub query of referrer for the scalar 'count'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     def void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -369,12 +369,12 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
     /**
      * Set up the sub query of referrer for the scalar 'count(with distinct)'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     def void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -388,12 +388,12 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
     /**
      * Set up the sub query of referrer for the scalar 'max'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     def void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -407,12 +407,12 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
     /**
      * Set up the sub query of referrer for the scalar 'min'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     def void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -426,12 +426,12 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
     /**
      * Set up the sub query of referrer for the scalar 'sum'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     def void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -445,12 +445,12 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
     /**
      * Set up the sub query of referrer for the scalar 'avg'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     def void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -685,8 +685,8 @@ class ScrHpSLSFunction[CB <: ConditionBean, RESULT](function: HpSLSFunction[CB, 
      * Select the count value. <br />
      * You can also get same result by selectCount(cb) method.
      * <pre>
-     * memberBhv.scalarSelect(Integer.class).<span style="color: #DD4747">count</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">count</span>(new ScalarQuery(MemberCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
@@ -703,8 +703,8 @@ class ScrHpSLSFunction[CB <: ConditionBean, RESULT](function: HpSLSFunction[CB, 
      * Select the count-distinct value. <br />
      * You can also get same result by selectCount(cb) method.
      * <pre>
-     * memberBhv.scalarSelect(Integer.class).<span style="color: #DD4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
@@ -720,8 +720,8 @@ class ScrHpSLSFunction[CB <: ConditionBean, RESULT](function: HpSLSFunction[CB, 
     /**
      * Select the maximum value.
      * <pre>
-     * memberBhv.scalarSelect(Date.class).<span style="color: #DD4747">max</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">max</span>(new ScalarQuery(MemberCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
@@ -737,8 +737,8 @@ class ScrHpSLSFunction[CB <: ConditionBean, RESULT](function: HpSLSFunction[CB, 
     /**
      * Select the minimum value.
      * <pre>
-     * memberBhv.scalarSelect(Date.class).<span style="color: #DD4747">min</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">min</span>(new ScalarQuery(MemberCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
@@ -754,8 +754,8 @@ class ScrHpSLSFunction[CB <: ConditionBean, RESULT](function: HpSLSFunction[CB, 
     /**
      * Select the summary value.
      * <pre>
-     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #DD4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
@@ -771,8 +771,8 @@ class ScrHpSLSFunction[CB <: ConditionBean, RESULT](function: HpSLSFunction[CB, 
     /**
      * Select the average value.
      * <pre>
-     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #DD4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
@@ -816,9 +816,9 @@ class ScrHpSSQFunction[CB <: ConditionBean](function: HpSSQFunction[CB]) {
     /**
      * Set up the sub query of myself for the scalar 'max'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     def void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
@@ -831,9 +831,9 @@ class ScrHpSSQFunction[CB <: ConditionBean](function: HpSSQFunction[CB]) {
     /**
      * Set up the sub query of myself for the scalar 'min'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     def void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
@@ -846,9 +846,9 @@ class ScrHpSSQFunction[CB <: ConditionBean](function: HpSSQFunction[CB]) {
     /**
      * Set up the sub query of myself for the scalar 'sum'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     def void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
@@ -861,9 +861,9 @@ class ScrHpSSQFunction[CB <: ConditionBean](function: HpSSQFunction[CB]) {
     /**
      * Set up the sub query of myself for the scalar 'avg'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     def void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
@@ -894,14 +894,14 @@ class ScrHpSSQDecorator[CB <: ConditionBean](decorator: HpSSQDecorator[CB]) {
      * Partition the scope of condition by the specified query. <br />
      * You can add a correlation condition to the sub-query.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     def query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">partitionBy</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
+     * }).<span style="color: #CC4747">partitionBy</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
      *     def specify(PurchaseCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnMemberId</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         cb.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *     }
      * });
      * </pre>
@@ -944,7 +944,7 @@ class ScrHpCalculator(calculator: HpCalculator) {
      * e.g. ManualOrder: order by PURCHASE_PRICE + PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  ManualOrderBean mob = new ManualOrderBean
-     *  mob.<span style="color: #DD4747">plus</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  mob.<span style="color: #CC4747">plus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
      * e.g. ColumnQuery: ... > PURCHASE_PRICE + PURCHASE_COUNT
@@ -957,7 +957,7 @@ class ScrHpCalculator(calculator: HpCalculator) {
      *      public void specify(Purchase cb) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }).<span style="color: #DD4747">plus</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  }).<span style="color: #CC4747">plus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param plusColumn The plus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
@@ -977,7 +977,7 @@ class ScrHpCalculator(calculator: HpCalculator) {
      * e.g. ManualOrder: order by PURCHASE_PRICE - PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  ManualOrderBean mob = new ManualOrderBean
-     *  mob.<span style="color: #DD4747">minus</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  mob.<span style="color: #CC4747">minus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
      * e.g. ColumnQuery: ... > PURCHASE_PRICE - PURCHASE_COUNT
@@ -990,7 +990,7 @@ class ScrHpCalculator(calculator: HpCalculator) {
      *      public void specify(Purchase cb) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }).<span style="color: #DD4747">minus</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  }).<span style="color: #CC4747">minus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param minusColumn The minus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
@@ -1010,7 +1010,7 @@ class ScrHpCalculator(calculator: HpCalculator) {
      * e.g. ManualOrder: order by PURCHASE_PRICE * PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  ManualOrderBean mob = new ManualOrderBean
-     *  mob.<span style="color: #DD4747">multiply</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  mob.<span style="color: #CC4747">multiply</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
      * e.g. ColumnQuery: ... > PURCHASE_PRICE * PURCHASE_COUNT
@@ -1023,7 +1023,7 @@ class ScrHpCalculator(calculator: HpCalculator) {
      *      public void specify(Purchase cb) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }).<span style="color: #DD4747">multiply</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  }).<span style="color: #CC4747">multiply</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param multiplyColumn The multiply column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
@@ -1043,7 +1043,7 @@ class ScrHpCalculator(calculator: HpCalculator) {
      * e.g. ManualOrder: order by PURCHASE_PRICE / PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  ManualOrderBean mob = new ManualOrderBean
-     *  mob.<span style="color: #DD4747">divide</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  mob.<span style="color: #CC4747">divide</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
      * e.g. ColumnQuery: ... > PURCHASE_PRICE / PURCHASE_COUNT
@@ -1056,7 +1056,7 @@ class ScrHpCalculator(calculator: HpCalculator) {
      *      public void specify(Purchase cb) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }).<span style="color: #DD4747">divide</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  }).<span style="color: #CC4747">divide</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param divideColumn The divide column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)

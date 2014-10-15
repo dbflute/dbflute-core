@@ -43,9 +43,9 @@ public class HpSSQFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of myself for the scalar 'max'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
@@ -63,9 +63,9 @@ public class HpSSQFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of myself for the scalar 'min'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
@@ -83,9 +83,9 @@ public class HpSSQFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of myself for the scalar 'sum'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
@@ -103,9 +103,9 @@ public class HpSSQFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of myself for the scalar 'avg'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });

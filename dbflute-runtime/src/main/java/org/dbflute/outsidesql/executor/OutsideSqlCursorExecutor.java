@@ -84,7 +84,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * memberBhv.outsideSql().cursorHandling()
-     *         .<span style="color: #DD4747">selectCursor</span>(pmb, new PurchaseSummaryMemberCursorHandler() {
+     *         .<span style="color: #CC4747">selectCursor</span>(pmb, new PurchaseSummaryMemberCursorHandler() {
      *     protected Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
      *         while (cursor.next()) {
      *             Integer memberId = cursor.getMemberId();
@@ -123,7 +123,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * memberBhv.outsideSql().cursorHandling()
-     *         .<span style="color: #DD4747">selectCursor</span>(path, pmb, new PurchaseSummaryMemberCursorHandler() {
+     *         .<span style="color: #CC4747">selectCursor</span>(path, pmb, new PurchaseSummaryMemberCursorHandler() {
      *     protected Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
      *         while (cursor.next()) {
      *             Integer memberId = cursor.getMemberId();

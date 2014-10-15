@@ -85,7 +85,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
      * SimpleMember member
-     *     = memberBhv.outsideSql().entityHandling().<span style="color: #DD4747">selectEntity</span>(pmb);
+     *     = memberBhv.outsideSql().entityHandling().<span style="color: #CC4747">selectEntity</span>(pmb);
      * if (member != null) {
      *     ... = member.get...();
      * } else {
@@ -115,7 +115,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectList</span>(pmb);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectList</span>(pmb);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -152,7 +152,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * PagingResultBean&lt;SimpleMember&gt; page
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #DD4747">selectPage</span>(pmb);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectPage</span>(pmb);
      * int allRecordCount = page.getAllRecordCount();
      * int allPageCount = page.getAllPageCount();
      * boolean isExistPrePage = page.isExistPrePage();
@@ -227,7 +227,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #DD4747">selectList</span>(pmb);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectList</span>(pmb);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -288,7 +288,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * memberBhv.outsideSql().cursorHandling()
-     *         .<span style="color: #DD4747">selectCursor</span>(pmb, new PurchaseSummaryMemberCursorHandler() {
+     *         .<span style="color: #CC4747">selectCursor</span>(pmb, new PurchaseSummaryMemberCursorHandler() {
      *     protected Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
      *         while (cursor.next()) {
      *             Integer memberId = cursor.getMemberId();
@@ -325,7 +325,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
-     * int count = memberBhv.outsideSql().<span style="color: #DD4747">execute</span>(pmb);
+     * int count = memberBhv.outsideSql().<span style="color: #CC4747">execute</span>(pmb);
      * </pre>
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @return The count of execution.
@@ -345,7 +345,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * SpInOutParameterPmb pmb = new SpInOutParameterPmb();
      * pmb.setVInVarchar("foo");
      * pmb.setVInOutVarchar("bar");
-     * memberBhv.outsideSql().<span style="color: #DD4747">call</span>(pmb);
+     * memberBhv.outsideSql().<span style="color: #CC4747">call</span>(pmb);
      * String outVar = pmb.getVOutVarchar();
      * </pre>
      * It needs to use parameter-bean for procedure (ProcedurePmb).

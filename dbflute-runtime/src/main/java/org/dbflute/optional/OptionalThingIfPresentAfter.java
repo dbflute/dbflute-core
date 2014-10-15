@@ -18,10 +18,10 @@ package org.dbflute.optional;
 /**
  * The consumer of optional value.
  * <pre>
- * opt.<span style="color: #DD4747">ifPresent</span>(member -&gt; {
+ * opt.<span style="color: #CC4747">ifPresent</span>(member -&gt; {
  *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
  *     ... = member.getMemberName();
- * }).<span style="color: #DD4747">orElse</span>(() =&gt; {
+ * }).<span style="color: #CC4747">orElse</span>(() =&gt; {
  *     <span style="color: #3F7E5E">// *here: called if value does not exist</span>
  * });
  * </pre>

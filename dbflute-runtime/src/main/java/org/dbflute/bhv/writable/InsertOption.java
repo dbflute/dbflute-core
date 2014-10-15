@@ -70,15 +70,15 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * <pre>
      * Member member = new Member();
      * member.set...(value);
-     * InsertOption&lt;MemberCB&gt; option = <span style="color: #DD4747">new InsertOption&lt;MemberCB&gt;()</span>;
+     * InsertOption&lt;MemberCB&gt; option = <span style="color: #CC4747">new InsertOption&lt;MemberCB&gt;()</span>;
      * 
      * <span style="color: #3F7E5E">// e.g. you can insert by your values for common columns</span>
-     * option.<span style="color: #DD4747">disableCommonColumnAutoSetup</span>();
+     * option.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>();
      * 
      * <span style="color: #3F7E5E">// e.g. you can insert by your values for primary key</span>
-     * option.<span style="color: #DD4747">disablePrimaryKeyIdentity</span>();
+     * option.<span style="color: #CC4747">disablePrimaryKeyIdentity</span>();
      * 
-     * memberBhv.<span style="color: #DD4747">varyingInsert</span>(member, option);
+     * memberBhv.<span style="color: #CC4747">varyingInsert</span>(member, option);
      * </pre>
      */
     public InsertOption() {
@@ -98,7 +98,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * member.setMemberId(3);
      * member.setOthers...(value);
      * InsertOption&lt;MemberCB&gt; option = new InsertOption&lt;MemberCB&gt;();
-     * option.<span style="color: #DD4747">specify</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * option.<span style="color: #CC4747">specify</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     public void query(MemberCB cb) {
      *         <span style="color: #3F7E5E">// only MemberName and Birthdate are updated</span>
      *         <span style="color: #3F7E5E">// with common columns for update and an exclusive control column</span>
@@ -362,7 +362,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * member.setUpdateDatetime(updateDatetime);
      * member.setUpdateUser(updateUser);
      * InsertOption&lt;MemberCB&gt; option = new InsertOption&lt;MemberCB&gt;();
-     * option.<span style="color: #DD4747">disableCommonColumnAutoSetup</span>();
+     * option.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>();
      * memberBhv.varyingInsert(member, option);
      * </pre>
      * @return The option of insert. (NotNull: returns this)
@@ -387,7 +387,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
      * member.setMemberId(123); <span style="color: #3F7E5E">// instead of identity</span>
      * member.setOthers...(value);
      * InsertOption&lt;MemberCB&gt; option = new InsertOption&lt;MemberCB&gt;();
-     * option.<span style="color: #DD4747">disablePrimaryKeyIdentity</span>();
+     * option.<span style="color: #CC4747">disablePrimaryKeyIdentity</span>();
      * memberBhv.varyingInsert(member, option);
      * </pre>
      * @return The option of insert. (NotNull: returns this)

@@ -116,7 +116,7 @@ public abstract class ConditionKey implements Serializable {
     /** Dummy-object for IsNull and IsNotNull and so on... */
     protected static final Object DUMMY_OBJECT = new Object();
 
-    // TODO jflute nullable
+    // TODO jflute refactor: nullable
     /**
      * Is the condition key null-able?
      * @param key The condition key. (NotNull)

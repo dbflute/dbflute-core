@@ -50,7 +50,7 @@ public class PageRangeBean implements Serializable {
      * Build the list of page number link.
      * <pre>
      * page.setPageRangeSize(5);
-     * List&lt;PageNumberLink&gt; linkList = page.pageRange().<span style="color: #DD4747">buildPageNumberLinkList</span>(new PageNumberLinkSetupper&lt;PageNumberLink&gt;() {
+     * List&lt;PageNumberLink&gt; linkList = page.pageRange().<span style="color: #CC4747">buildPageNumberLinkList</span>(new PageNumberLinkSetupper&lt;PageNumberLink&gt;() {
      *     public PageNumberLink setup(int pageNumberElement, boolean current) {
      *         String href = buildPagingHref(pageNumberElement); <span style="color: #3F7E5E">// for paging navigation links</span>
      *         return new PageNumberLink().initialize(pageNumberElement, current, href);
@@ -74,11 +74,11 @@ public class PageRangeBean implements Serializable {
      * Create the list of page number.
      * <pre>
      * e.g. range-size=5, current-page=8 
-     * page.<span style="color: #DD4747">setPageRangeSize</span>(5);
-     * List&lt;Integer&gt; numberList = page.pageRange().<span style="color: #DD4747">createPageNumberList()</span>;
+     * page.<span style="color: #CC4747">setPageRangeSize</span>(5);
+     * List&lt;Integer&gt; numberList = page.pageRange().<span style="color: #CC4747">createPageNumberList()</span>;
      * 
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #CC4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>
      * </pre>
      * @return The list of page number. (NotNull)
      */
@@ -134,7 +134,7 @@ public class PageRangeBean implements Serializable {
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 
-     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #DD4747">2</span>
+     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #CC4747">2</span>
      * </pre>
      * @return The determination, true or false.
      */
@@ -154,7 +154,7 @@ public class PageRangeBean implements Serializable {
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 
-     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #DD4747">14</span>
+     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #CC4747">14</span>
      * </pre>
      * @return The determination, true or false.
      */
@@ -235,7 +235,7 @@ public class PageRangeBean implements Serializable {
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 
-     * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #DD4747">2</span>
+     * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #CC4747">2</span>
      * </pre>
      * @return The value of preRangeNearestPageNumber.
      */
@@ -257,7 +257,7 @@ public class PageRangeBean implements Serializable {
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * 
-     * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #DD4747">14</span>
+     * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #CC4747">14</span>
      * </pre>
      * @return The value of nextRangeNearestPageNumber.
      */

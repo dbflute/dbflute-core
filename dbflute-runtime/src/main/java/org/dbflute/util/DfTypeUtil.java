@@ -754,7 +754,7 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                            Time API
     //                                                                            ========
-    // TODO jflute toLocalDate() javadoc
+    // TODO jflute javadoc: toLocalDate()
     public static LocalDate toLocalDate(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalDate()", timeZone);
         final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);

@@ -1769,7 +1769,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Order with the keyword 'nulls first'.
      * <pre>
      * MemberCB cb = new MemberCB();
-     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #DD4747">withNullsFirst()</span>;
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #CC4747">withNullsFirst()</span>;
      * <span style="color: #3F7E5E">// order by BIRTHDATE asc nulls first</span>
      * </pre>
      */
@@ -1781,7 +1781,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Order with the keyword 'nulls last'.
      * <pre>
      * MemberCB cb = new MemberCB();
-     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #DD4747">withNullsLast()</span>;
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #CC4747">withNullsLast()</span>;
      * <span style="color: #3F7E5E">// order by BIRTHDATE asc nulls last</span>
      * </pre>
      */

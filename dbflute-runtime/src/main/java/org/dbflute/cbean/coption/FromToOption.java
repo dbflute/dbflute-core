@@ -131,7 +131,7 @@ public class FromToOption implements ConditionOption {
      * The year part of the date is only used.
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007</span>/04/10 08:24:53} to:{<span style="color: #DD4747">2008</span>/08/16 14:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007</span>/04/10 08:24:53} to:{<span style="color: #CC4747">2008</span>/08/16 14:36:29}
      * 
      *   new FromToOption().compareAsYear();
      *     --&gt; column &gt;= '2007/01/01 00:00:00'
@@ -157,7 +157,7 @@ public class FromToOption implements ConditionOption {
      * The year and month parts of the date are only used. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007/04</span>/10 08:24:53} to:{<span style="color: #DD4747">2008/08</span>/16 14:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007/04</span>/10 08:24:53} to:{<span style="color: #CC4747">2008/08</span>/16 14:36:29}
      * 
      *   new FromToOption().compareAsMonth();
      *     --&gt; column &gt;= '2007/04/01 00:00:00'
@@ -183,7 +183,7 @@ public class FromToOption implements ConditionOption {
      * The year, month, day parts of the date are only used. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007/04/10</span> 08:24:53} to:{<span style="color: #DD4747">2007/04/16</span> 14:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007/04/10</span> 08:24:53} to:{<span style="color: #CC4747">2007/04/16</span> 14:36:29}
      * 
      *   new FromToOption().compareAsDate();
      *     --&gt; column &gt;= '2007/04/10 00:00:00'
@@ -209,7 +209,7 @@ public class FromToOption implements ConditionOption {
      * The year, month, day, hour parts of the date are only used. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007/04/10 08</span>:24:53} to:{<span style="color: #DD4747">2007/04/16 14</span>:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007/04/10 08</span>:24:53} to:{<span style="color: #CC4747">2007/04/16 14</span>:36:29}
      * 
      *   new FromToOption().compareAsHour();
      *     --&gt; column &gt;= '2007/04/10 08:00:00'
@@ -232,7 +232,7 @@ public class FromToOption implements ConditionOption {
      * This method ignores operand adjustments and other patterns. <br />
      * The default beginning day of week is Sunday, but you can change it by beginWeek_DayOfWeek...() methods.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007/04/10</span> 08:24:53} to:{<span style="color: #DD4747">2007/04/16</span> 14:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007/04/10</span> 08:24:53} to:{<span style="color: #CC4747">2007/04/16</span> 14:36:29}
      * 
      *   new FromToOption().compareAsWeek().beginWeek_DayOfWeek1st_Sunday();
      *     --&gt; column &gt;= '2007/04/08 00:00:00'
@@ -255,7 +255,7 @@ public class FromToOption implements ConditionOption {
      * This method ignores operand adjustments and other patterns. <br />
      * The default beginning of quarter of year is 1st month, but you can change it by beginYear_Month...() methods.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007/04</span>/10 08:24:53} to:{<span style="color: #DD4747">2008/08</span>/16 14:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007/04</span>/10 08:24:53} to:{<span style="color: #CC4747">2008/08</span>/16 14:36:29}
      * 
      *   new FromToOption().compareAsQuarterOfYear();
      *     --&gt; column &gt;= '2007/04/01 00:00:00'

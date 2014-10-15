@@ -39,7 +39,7 @@ public interface HpCalculator {
      * e.g. ManualOrder: order by PURCHASE_PRICE + PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  ManualOrderOption option = new ManualOrderOption()
-     *  mob.<span style="color: #DD4747">plus</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  mob.<span style="color: #CC4747">plus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
      * e.g. ColumnQuery: ... > PURCHASE_PRICE + PURCHASE_COUNT
@@ -52,7 +52,7 @@ public interface HpCalculator {
      *      public void specify(Purchase cb) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }).<span style="color: #DD4747">plus</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  }).<span style="color: #CC4747">plus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param plusColumn The plus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
@@ -72,7 +72,7 @@ public interface HpCalculator {
      * e.g. ManualOrder: order by PURCHASE_PRICE - PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  ManualOrderOption option = new ManualOrderOption()
-     *  mob.<span style="color: #DD4747">minus</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  mob.<span style="color: #CC4747">minus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
      * e.g. ColumnQuery: ... > PURCHASE_PRICE - PURCHASE_COUNT
@@ -85,7 +85,7 @@ public interface HpCalculator {
      *      public void specify(Purchase cb) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }).<span style="color: #DD4747">minus</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  }).<span style="color: #CC4747">minus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param minusColumn The minus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
@@ -105,7 +105,7 @@ public interface HpCalculator {
      * e.g. ManualOrder: order by PURCHASE_PRICE * PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  ManualOrderOption option = new ManualOrderOption()
-     *  mob.<span style="color: #DD4747">multiply</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  mob.<span style="color: #CC4747">multiply</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
      * e.g. ColumnQuery: ... > PURCHASE_PRICE * PURCHASE_COUNT
@@ -118,7 +118,7 @@ public interface HpCalculator {
      *      public void specify(Purchase cb) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }).<span style="color: #DD4747">multiply</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  }).<span style="color: #CC4747">multiply</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param multiplyColumn The multiply column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
@@ -138,7 +138,7 @@ public interface HpCalculator {
      * e.g. ManualOrder: order by PURCHASE_PRICE / PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  ManualOrderOption option = new ManualOrderOption()
-     *  mob.<span style="color: #DD4747">divide</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  mob.<span style="color: #CC4747">divide</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
      * e.g. ColumnQuery: ... > PURCHASE_PRICE / PURCHASE_COUNT
@@ -151,7 +151,7 @@ public interface HpCalculator {
      *      public void specify(Purchase cb) {
      *          cb.columnPurchasePrice();
      *      }
-     *  }).<span style="color: #DD4747">divide</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
+     *  }).<span style="color: #CC4747">divide</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
      * @param divideColumn The divide column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)

@@ -147,7 +147,7 @@ public class DTDResolver implements EntityResolver {
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DTDResolver.class);
 
-    // TODO jflute DTD web-site
+    // TODO jflute setting: DTD web-site
     /** URL the DTD is located on the web. */
     public static final String WEB_SITE_DTD = "http://dbflute.seasar.org/meta/database.dtd";
     // at the future, remove sandbox when DBFlute becomes product

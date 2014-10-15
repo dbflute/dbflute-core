@@ -34,6 +34,7 @@ import org.dbflute.exception.NonQueryDeleteNotAllowedException;
 import org.dbflute.exception.NonQueryUpdateNotAllowedException;
 import org.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.dbflute.exception.PagingCountSelectNotCountException;
+import org.dbflute.exception.ScalarSelectValueNotFoundException;
 import org.dbflute.exception.SelectEntityConditionNotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.FetchBean;
@@ -221,6 +222,41 @@ public class BehaviorExceptionThrower {
         br.addElement(entityType);
         final String msg = br.buildExceptionMessage();
         throw new PagingCountSelectNotCountException(msg, e);
+    }
+
+    public void throwScalarSelectValueNotFoundException(String title, ConditionBean cb, Class<?> resultType) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("Not found the selected scalar value by the condition.");
+        br.addItem("Advice");
+        br.addElement("No hit by the search condition or null-only column data.");
+        br.addElement("e.g. max(), min(), sun(), avg() can return null.");
+        br.addElement("");
+        br.addElement("So check the existence of your optional value.");
+        br.addElement("  (o):");
+        br.addElement("    memberBhv.scalarSelect(LocalDate.class).max(cb -> {");
+        br.addElement("        cb.specify().columnBirthdate();");
+        br.addElement("        cb.query()...");
+        br.addElement("    }).ifPresent(birthdate -> {");
+        br.addElement("        // birthdate is not null here");
+        br.addElement("    }).orElse(() -> {");
+        br.addElement("        // null birthdate");
+        br.addElement("    });");
+        br.addElement("");
+        br.addElement("And you can also set default value by coalesce() like this:");
+        br.addElement("  (o):");
+        br.addElement("    purchaseBhv.scalarSelect(Integer.class).avg(cb -> {");
+        br.addElement("        cb.specify().columnPurchasePrice();");
+        br.addElement("        cb.query()...");
+        br.addElement("    }, op -> op.coalesce(0)).alwaysPresent(price -> {");
+        br.addElement("        // price is not null here");
+        br.addElement("    });");
+        br.addItem("Function");
+        br.addElement(title);
+        br.addItem("Result Type");
+        br.addElement(resultType.getName());
+        setupDisplaySqlElement(br, cb);
+        final String msg = br.buildExceptionMessage();
+        throw new ScalarSelectValueNotFoundException(msg);
     }
 
     // ===================================================================================

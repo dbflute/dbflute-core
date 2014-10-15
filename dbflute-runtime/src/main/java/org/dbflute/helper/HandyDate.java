@@ -43,10 +43,10 @@ import org.dbflute.util.DfTypeUtil.ParseDateException;
  * <pre>
  * e.g.
  *  HandyDate date = new HandyDate("2011/11/27 12:34:56.789");
- *  date.addDay(1); // 2011/11/<span style="color: #DD4747">28</span> 12:34:56.789
- *  date.addMonth(1); // 2011/<span style="color: #DD4747">12</span>/28 12:34:56.789
- *  date.moveToDayJust(); // 2011/12/28 <span style="color: #DD4747">00:00:00.000</span>
- *  date.moveToMonthTerminal(); // 2011/12/<span style="color: #DD4747">31 23:59:59.999</span>
+ *  date.addDay(1); // 2011/11/<span style="color: #CC4747">28</span> 12:34:56.789
+ *  date.addMonth(1); // 2011/<span style="color: #CC4747">12</span>/28 12:34:56.789
+ *  date.moveToDayJust(); // 2011/12/28 <span style="color: #CC4747">00:00:00.000</span>
+ *  date.moveToMonthTerminal(); // 2011/12/<span style="color: #CC4747">31 23:59:59.999</span>
  *  date.isYear(2011); // true
  *  if (date.isGreaterThan(toDate("2011/12/30"))) { // true
  *      // 2011/12/31 23:59:59.999
@@ -322,7 +322,7 @@ public class HandyDate implements Serializable {
     //                                                                            Add Date
     //                                                                            ========
     /**
-     * Add years. e.g. addYear(1): 2001/01/01 to <span style="color: #DD4747">2002</span>/01/01
+     * Add years. e.g. addYear(1): 2001/01/01 to <span style="color: #CC4747">2002</span>/01/01
      * @param years The added count of year. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
@@ -332,7 +332,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Add months. e.g. addMonth(1): 2001/01/01 to 2001/<span style="color: #DD4747">02</span>/01
+     * Add months. e.g. addMonth(1): 2001/01/01 to 2001/<span style="color: #CC4747">02</span>/01
      * @param months The added count of month. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
@@ -342,7 +342,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Add days. e.g. addDay(1): 2001/01/01 to 2001/01/<span style="color: #DD4747">02</span>
+     * Add days. e.g. addDay(1): 2001/01/01 to 2001/01/<span style="color: #CC4747">02</span>
      * @param days The added count of day. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
@@ -352,7 +352,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Add hours. e.g. addHour(1): 2001/01/01 00:00:00 to 2001/01/02 <span style="color: #DD4747">01</span>:00:00
+     * Add hours. e.g. addHour(1): 2001/01/01 00:00:00 to 2001/01/02 <span style="color: #CC4747">01</span>:00:00
      * @param hours The added count of hour. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
@@ -362,7 +362,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Add minutes. e.g. addMinute(1): 2001/01/01 00:00:00 to 2001/01/02 00:<span style="color: #DD4747">01</span>:00
+     * Add minutes. e.g. addMinute(1): 2001/01/01 00:00:00 to 2001/01/02 00:<span style="color: #CC4747">01</span>:00
      * @param minutes The added count of minute. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
@@ -372,7 +372,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Add seconds. e.g. addSecond(1): 2001/01/01 00:00:00 to 2001/01/02 00:00:<span style="color: #DD4747">01</span>
+     * Add seconds. e.g. addSecond(1): 2001/01/01 00:00:00 to 2001/01/02 00:00:<span style="color: #CC4747">01</span>
      * @param seconds The added count of second. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
@@ -382,7 +382,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Add milliseconds. e.g. addMillisecond(1): 2001/01/01 00:00:00.000 to 2001/01/02 00:00:00.<span style="color: #DD4747">001</span>
+     * Add milliseconds. e.g. addMillisecond(1): 2001/01/01 00:00:00.000 to 2001/01/02 00:00:00.<span style="color: #CC4747">001</span>
      * @param milliseconds The added count of millisecond. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
@@ -392,7 +392,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Add weeks. e.g. addWeek(1): 2001/01/01 to 2001/01/<span style="color: #DD4747">08</span>
+     * Add weeks. e.g. addWeek(1): 2001/01/01 to 2001/01/<span style="color: #CC4747">08</span>
      * @param weeks The added count of week. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
@@ -411,8 +411,8 @@ public class HandyDate implements Serializable {
      * Move to the specified year.
      * <pre>
      * e.g.
-     *  moveToYear(2007): 2001/01/01 to <span style="color: #DD4747">2007</span>/01/01
-     *  moveToYear(-2007): 2001/01/01 to <span style="color: #DD4747">BC2007</span>/01/01
+     *  moveToYear(2007): 2001/01/01 to <span style="color: #CC4747">2007</span>/01/01
+     *  moveToYear(-2007): 2001/01/01 to <span style="color: #CC4747">BC2007</span>/01/01
      * </pre>
      * @param year The move-to year. (NotZero, MinusAllowed: if minus, means before Christ)
      * @return this. (NotNull)
@@ -424,7 +424,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the year just (beginning). <br />
-     * e.g. moveToYearJust(): 2011/11/27 12:34:56.789 to 2011/<span style="color: #DD4747">01/01 00:00:00.000</span>
+     * e.g. moveToYearJust(): 2011/11/27 12:34:56.789 to 2011/<span style="color: #CC4747">01/01 00:00:00.000</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToYearJust() {
@@ -457,7 +457,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the terminal of the year. <br />
-     * e.g. moveToYearTerminal(): 2011/11/27 12:34:56.789 to 2011/<span style="color: #DD4747">12/31 23:59:59.999</span>
+     * e.g. moveToYearTerminal(): 2011/11/27 12:34:56.789 to 2011/<span style="color: #CC4747">12/31 23:59:59.999</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToYearTerminal() {
@@ -493,7 +493,7 @@ public class HandyDate implements Serializable {
     //                                         -------------
     /**
      * Move to the specified month. <br />
-     * e.g. moveToMonth(9): 2011/11/27 to 2011/<span style="color: #DD4747">09</span>/27
+     * e.g. moveToMonth(9): 2011/11/27 to 2011/<span style="color: #CC4747">09</span>/27
      * @param month The move-to month. (NotZero, NotMinus)
      * @return this. (NotNull)
      */
@@ -505,7 +505,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the month just (beginning). <br />
-     * e.g. moveToMonthJust(): 2011/11/27 12:34:56.789 to 2011/11/<span style="color: #DD4747">01 00:00:00.000</span>
+     * e.g. moveToMonthJust(): 2011/11/27 12:34:56.789 to 2011/11/<span style="color: #CC4747">01 00:00:00.000</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToMonthJust() {
@@ -539,7 +539,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the terminal of the month. <br />
-     * e.g. moveToMonthTerminal(): 2011/11/27 12:34:56.789 to 2011/11/<span style="color: #DD4747">30 23:59:59.999</span>
+     * e.g. moveToMonthTerminal(): 2011/11/27 12:34:56.789 to 2011/11/<span style="color: #CC4747">30 23:59:59.999</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToMonthTerminal() {
@@ -573,7 +573,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the first weekday just of the month. <br />
-     * e.g. moveToMonthFirstWeekdayJust(): 2013/06/10 12:34:56.789 to 2013/06/<span style="color: #DD4747">03 00:00:00:000</span>
+     * e.g. moveToMonthFirstWeekdayJust(): 2013/06/10 12:34:56.789 to 2013/06/<span style="color: #CC4747">03 00:00:00:000</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToMonthFirstWeekdayJust() {
@@ -588,7 +588,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the terminal of the month last weekday. <br />
-     * e.g. moveToMonthWeekdayTerminal(): 2013/03/10 12:34:56.789 to 2013/03/<span style="color: #DD4747">29 23:59:59.999</span>
+     * e.g. moveToMonthWeekdayTerminal(): 2013/03/10 12:34:56.789 to 2013/03/<span style="color: #CC4747">29 23:59:59.999</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToMonthLastWeekdayTerminal() {
@@ -603,7 +603,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the first weekend just of the month. <br />
-     * e.g. moveToMonthFirstWeekendJust(): 2013/03/10 12:34:56.789 to 2013/03/<span style="color: #DD4747">02 00:00:00:000</span>
+     * e.g. moveToMonthFirstWeekendJust(): 2013/03/10 12:34:56.789 to 2013/03/<span style="color: #CC4747">02 00:00:00:000</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToMonthFirstWeekendJust() {
@@ -619,7 +619,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the terminal of the month last weekend. <br />
-     * e.g. moveToMonthWeekdayTerminal(): 2013/04/10 12:34:56.789 to 2013/04/<span style="color: #DD4747">28 23:59:59.999</span>
+     * e.g. moveToMonthWeekdayTerminal(): 2013/04/10 12:34:56.789 to 2013/04/<span style="color: #CC4747">28 23:59:59.999</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToMonthLastWeekendTerminal() {
@@ -638,7 +638,7 @@ public class HandyDate implements Serializable {
     //                                           -----------
     /**
      * Move to the specified day. <br />
-     * e.g. moveToDay(23): 2001/01/16 to 2007/01/<span style="color: #DD4747">23</span>
+     * e.g. moveToDay(23): 2001/01/16 to 2007/01/<span style="color: #CC4747">23</span>
      * @param day The move-to day. (NotZero, NotMinus)
      * @return this. (NotNull)
      */
@@ -650,7 +650,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the day just (beginning). <br />
-     * e.g. moveToDayJust(): 2011/11/27 12:34:56.789 to 2011/11/27 <span style="color: #DD4747">00:00:00.000</span>
+     * e.g. moveToDayJust(): 2011/11/27 12:34:56.789 to 2011/11/27 <span style="color: #CC4747">00:00:00.000</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToDayJust() {
@@ -683,7 +683,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the terminal of the day. <br />
-     * e.g. moveToDayTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 <span style="color: #DD4747">23:59:59.999</span>
+     * e.g. moveToDayTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 <span style="color: #CC4747">23:59:59.999</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToDayTerminal() {
@@ -721,8 +721,8 @@ public class HandyDate implements Serializable {
      * Move to the specified hour.
      * <pre>
      * e.g. 2011/11/27 17:00:00
-     *  moveToHour(23): 2007/11/27 <span style="color: #DD4747">23</span>:00:00
-     *  moveToHour(26): 2007/11/<span style="color: #DD4747">28 02</span>:00:00
+     *  moveToHour(23): 2007/11/27 <span style="color: #CC4747">23</span>:00:00
+     *  moveToHour(26): 2007/11/<span style="color: #CC4747">28 02</span>:00:00
      * </pre>
      * @param hour The move-to hour. (MinusAllowed)
      * @return this. (NotNull)
@@ -735,7 +735,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the hour just (beginning). <br />
-     * e.g. moveToHourJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:<span style="color: #DD4747">00:00.000</span>
+     * e.g. moveToHourJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:<span style="color: #CC4747">00:00.000</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToHourJust() {
@@ -768,7 +768,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the terminal of the hour. <br />
-     * e.g. moveToHourTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:<span style="color: #DD4747">59:59.999</span>
+     * e.g. moveToHourTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:<span style="color: #CC4747">59:59.999</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToHourTerminal() {
@@ -816,8 +816,8 @@ public class HandyDate implements Serializable {
      * Move to the specified minute.
      * <pre>
      * e.g. 2011/11/27 00:32:00
-     *  moveToMinute(12): to 2007/11/27 00:<span style="color: #DD4747">12</span>:00
-     *  moveToMinute(48): to 2007/11/27 00:<span style="color: #DD4747">48</span>:00
+     *  moveToMinute(12): to 2007/11/27 00:<span style="color: #CC4747">12</span>:00
+     *  moveToMinute(48): to 2007/11/27 00:<span style="color: #CC4747">48</span>:00
      * </pre>
      * @param minute The move-to minute. (MinusAllowed)
      * @return this. (NotNull)
@@ -830,7 +830,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the minute just (beginning). <br />
-     * e.g. moveToMinuteJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:<span style="color: #DD4747">00.000</span>
+     * e.g. moveToMinuteJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:<span style="color: #CC4747">00.000</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToMinuteJust() {
@@ -851,7 +851,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the terminal of the minute. <br />
-     * e.g. moveToMinuteTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:<span style="color: #DD4747">59.999</span>
+     * e.g. moveToMinuteTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:<span style="color: #CC4747">59.999</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToMinuteTerminal() {
@@ -877,8 +877,8 @@ public class HandyDate implements Serializable {
      * Move to the specified second.
      * <pre>
      * e.g. 2011/11/27 00:32:00
-     *  moveToSecond(12): to 2007/11/27 00:00:<span style="color: #DD4747">12</span>
-     *  moveToSecond(48): to 2007/11/27 00:00:<span style="color: #DD4747">48</span>
+     *  moveToSecond(12): to 2007/11/27 00:00:<span style="color: #CC4747">12</span>
+     *  moveToSecond(48): to 2007/11/27 00:00:<span style="color: #CC4747">48</span>
      * </pre>
      * @param second The move-to second. (MinusAllowed)
      * @return this. (NotNull)
@@ -891,7 +891,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the second just (beginning). <br />
-     * e.g. moveToSecondJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:56.<span style="color: #DD4747">000</span>
+     * e.g. moveToSecondJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:56.<span style="color: #CC4747">000</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToSecondJust() {
@@ -912,7 +912,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Move to the terminal of the second. <br />
-     * e.g. moveToSecondTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:56.<span style="color: #DD4747">999</span>
+     * e.g. moveToSecondTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:56.<span style="color: #CC4747">999</span>
      * @return this. (NotNull)
      */
     public HandyDate moveToSecondTerminal() {
@@ -938,8 +938,8 @@ public class HandyDate implements Serializable {
      * Move to the specified millisecond.
      * <pre>
      * e.g. 2011/11/27 00:00:00.456
-     *  moveToMillisecond(123): to 2007/11/27 00:00:00.<span style="color: #DD4747">123</span>
-     *  moveToMillisecond(877): to 2007/11/27 00:00:00.<span style="color: #DD4747">877</span>
+     *  moveToMillisecond(123): to 2007/11/27 00:00:00.<span style="color: #CC4747">123</span>
+     *  moveToMillisecond(877): to 2007/11/27 00:00:00.<span style="color: #CC4747">877</span>
      * </pre>
      * @param millisecond The move-to millisecond. (MinusAllowed)
      * @return this. (NotNull)
@@ -2065,7 +2065,7 @@ public class HandyDate implements Serializable {
         return getMonth() == month; // zero origin headache
     }
 
-    // TODO jflute HandyDate: isMonthSameAs() for LocalDate
+    // TODO jflute imp;: HandyDate isMonthSameAs() for LocalDate
     /**
      * Is the month of this date same as the month of the specified date? <br />
      * e.g. if 2011/11/27, isMonthSameAs(toDate("2013/11/01")) is true

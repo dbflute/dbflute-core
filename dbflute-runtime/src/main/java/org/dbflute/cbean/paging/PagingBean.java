@@ -54,8 +54,8 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
      * MemberCB cb = new MemberCB();
      * cb.query().setMemberName_PrefixSearch("S");
      * cb.query().addOrderBy_Birthdate_Desc();
-     * cb.<span style="color: #DD4747">paging</span>(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
-     * PagingResultBean&lt;Member&gt; page = memberBhv.<span style="color: #DD4747">selectPage</span>(cb);
+     * cb.<span style="color: #CC4747">paging</span>(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
+     * PagingResultBean&lt;Member&gt; page = memberBhv.<span style="color: #CC4747">selectPage</span>(cb);
      * </pre>
      * @param pageSize The page size per one page. (NotMinus & NotZero)
      * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
@@ -106,8 +106,8 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
      * MemberCB cb = new MemberCB();
      * cb.query().setMemberName_PrefixSearch("S");
      * cb.query().addOrderBy_Birthdate_Desc();
-     * cb.<span style="color: #DD4747">fetchFirst</span>(5); <span style="color: #3F7E5E">// top 5</span>
-     * ListResultBean&lt;Member&gt; memberList = memberBhv.<span style="color: #DD4747">selectList</span>(cb);
+     * cb.<span style="color: #CC4747">fetchFirst</span>(5); <span style="color: #3F7E5E">// top 5</span>
+     * ListResultBean&lt;Member&gt; memberList = memberBhv.<span style="color: #CC4747">selectList</span>(cb);
      * </pre>
      * @param fetchSize The size of fetch. (NotMinus & NotZero)
      * @return this. (NotNull)

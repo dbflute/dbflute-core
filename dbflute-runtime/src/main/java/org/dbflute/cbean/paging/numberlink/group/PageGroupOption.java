@@ -66,11 +66,11 @@ public class PageGroupOption implements PageNumberLinkOption, Serializable {
      * Set the size of page group.
      * <pre>
      * e.g. group-size=10, current-page=8
-     * PageGroupBean pageGroup = page.pageGroup(op -> op.<span style="color: #DD4747">groupSize</span>(3));
+     * PageGroupBean pageGroup = page.pageGroup(op -> op.<span style="color: #CC4747">groupSize</span>(3));
      * List&lt;Integer&gt; numberList = pageGroup.createPageNumberList();
      *
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #CC4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
      * </pre>
      * @param pageGroupSize The size of page group.
      * @return this. (NotNull)

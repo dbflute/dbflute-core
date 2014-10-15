@@ -1327,7 +1327,7 @@ public interface SqlClause {
      * Java8 cannot use the same name as lambda argument with already existing name in the scope.
      * <pre>
      * cb.query().existsPurchaseList(subCB -&gt; {
-     *     subCB.query().existsPurchaseDetailList(<span style="color: #DD4747">subCB</span> -&gt; { <span style="color: #3F7E5E">// *NG</span>
+     *     subCB.query().existsPurchaseDetailList(<span style="color: #CC4747">subCB</span> -&gt; { <span style="color: #3F7E5E">// *NG</span>
      *     });
      * });
      * </pre>

@@ -21,7 +21,7 @@ package org.dbflute.optional;
  * opt.ifPresent(member -&gt; {
  *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
  *     ... = member.getMemberName();
- * }).<span style="color: #DD4747">orElse</span>(() -&gt; {
+ * }).<span style="color: #CC4747">orElse</span>(() -&gt; {
  *     <span style="color: #3F7E5E">// *here: called if value does not exists</span>
  * });
  * </pre>

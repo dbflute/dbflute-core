@@ -683,10 +683,6 @@ public class FunctionFilterOption implements ParameterOption {
         return functionExp;
     }
 
-    protected void xxx() {
-        // TODO jflute 
-    }
-
     // ===================================================================================
     //                                                                    Parameter Option
     //                                                                    ================

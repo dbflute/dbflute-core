@@ -20,7 +20,7 @@ import org.dbflute.cbean.ConditionBean;
 /**
  * The interface of or-query.
  * <pre>
- * cb.<span style="color: #DD4747">orScopeQuery</span>(new OrQuery&lt;FooCB&gt;() {
+ * cb.<span style="color: #CC4747">orScopeQuery</span>(new OrQuery&lt;FooCB&gt;() {
  *     public void query(FooCB orCB) {
  *         orCB.query().setFoo...
  *         orCB.query().setBar...

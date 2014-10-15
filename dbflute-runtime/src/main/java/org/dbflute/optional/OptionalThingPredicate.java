@@ -18,7 +18,7 @@ package org.dbflute.optional;
 /**
  * The predicate of optional value.
  * <pre>
- * OptionalObject&lt;MemberWebBean&gt; beanOpt = entityOpt.<span style="color: #DD4747">filter</span>(member -&gt; {
+ * OptionalObject&lt;MemberWebBean&gt; beanOpt = entityOpt.<span style="color: #CC4747">filter</span>(member -&gt; {
  *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
  *     return member.getMemberId() % 2 == 0;
  * });

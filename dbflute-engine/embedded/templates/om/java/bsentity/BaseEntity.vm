@@ -496,11 +496,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * List&lt;UnpaidSummaryMember&gt; memberList = memberBhv.outsideSql()...;
      * List&lt;Member&gt; domainList = new ArrayList&lt;Member&gt;();
      * for (UnpaidSummaryMember member : memberList) {
-     *     domainList.add(member.<span style="color: #DD4747">prepareDomain()</span>);
+     *     domainList.add(member.<span style="color: #CC4747">prepareDomain()</span>);
      * }
-     * memberBhv.<span style="color: #DD4747">loadPurchaseList</span>(domainList, new ConditionBeanSetupper...);
+     * memberBhv.<span style="color: #CC4747">loadPurchaseList</span>(domainList, new ConditionBeanSetupper...);
      * for (UnpaidSummaryMember member : memberList) {
-     *     Purchase purchase = member.<span style="color: #DD4747">getPurchaseList()</span>; <span style="color: #3F7E5E">// you can get it</span>
+     *     Purchase purchase = member.<span style="color: #CC4747">getPurchaseList()</span>; <span style="color: #3F7E5E">// you can get it</span>
      *     ...
      * }
      * </pre>

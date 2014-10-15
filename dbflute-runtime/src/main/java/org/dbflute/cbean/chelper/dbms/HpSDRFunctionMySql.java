@@ -27,7 +27,7 @@ import org.dbflute.dbmeta.DBMetaProvider;
 
 /**
  * The MySQL function for (Specify)DerivedReferrer. <br />
- * <span style="color: #DD4747">This is base implementation for #future needs.</span>
+ * <span style="color: #CC4747">This is base implementation for #future needs.</span>
  * @param <REFERRER_CB> The type of referrer condition-bean.
  * @param <LOCAL_CQ> The type of local condition-query.
  * @author jflute

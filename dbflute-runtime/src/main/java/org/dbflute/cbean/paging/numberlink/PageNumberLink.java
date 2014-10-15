@@ -21,7 +21,7 @@ import java.io.Serializable;
  * The basic DTO of page number link.
  * <pre>
  * page.setPageRangeSize(5);
- * List&lt;PageNumberLink&gt; linkList = page.pageRange().<span style="color: #DD4747">buildPageNumberLinkList</span>(new PageNumberLinkSetupper&lt;PageNumberLink&gt;() {
+ * List&lt;PageNumberLink&gt; linkList = page.pageRange().<span style="color: #CC4747">buildPageNumberLinkList</span>(new PageNumberLinkSetupper&lt;PageNumberLink&gt;() {
  *     public PageNumberLink setup(int pageNumberElement, boolean current) {
  *         String href = buildPagingHref(pageNumberElement); <span style="color: #3F7E5E">// for paging navigation links</span>
  *         return new PageNumberLink().initialize(pageNumber, current, href);

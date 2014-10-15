@@ -49,8 +49,8 @@ import org.dbflute.util.DfTypeUtil;
  * <pre>
  * MemberCB cb = new MemberCB();
  * ManualOrderOption mob = new ManualOrderOption();
- * mob.<span style="color: #DD4747">when_GreaterEqual</span>(priorityDate); <span style="color: #3F7E5E">// e.g. 2000/01/01</span>
- * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+ * mob.<span style="color: #CC4747">when_GreaterEqual</span>(priorityDate); <span style="color: #3F7E5E">// e.g. 2000/01/01</span>
+ * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #CC4747">withManualOrder(mob)</span>;
  * <span style="color: #3F7E5E">// order by </span>
  * <span style="color: #3F7E5E">//   case</span>
  * <span style="color: #3F7E5E">//     when BIRTHDATE &gt;= '2000/01/01' then 0</span>
@@ -59,10 +59,10 @@ import org.dbflute.util.DfTypeUtil;
  *
  * MemberCB cb = new MemberCB();
  * ManualOrderOption mob = new ManualOrderOption();
- * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Withdrawal);
- * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Formalized);
- * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Provisional);
- * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+ * mob.<span style="color: #CC4747">when_Equal</span>(CDef.MemberStatus.Withdrawal);
+ * mob.<span style="color: #CC4747">when_Equal</span>(CDef.MemberStatus.Formalized);
+ * mob.<span style="color: #CC4747">when_Equal</span>(CDef.MemberStatus.Provisional);
+ * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #CC4747">withManualOrder(mob)</span>;
  * <span style="color: #3F7E5E">// order by </span>
  * <span style="color: #3F7E5E">//   case</span>
  * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>
@@ -175,7 +175,7 @@ public class ManualOrderOption implements HpCalculator {
         return doWhen(ConditionKey.CK_IS_NOT_NULL, null);
     }
 
-    // TODO jflute FromTo javadoc
+    // TODO jflute javadoc: FromTo
     public HpMobConnectedBean when_FromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) {
         assertFromToOption(opLambda);
         final FromToOption op = createFromToOption();
@@ -223,7 +223,7 @@ public class ManualOrderOption implements HpCalculator {
             String msg = "The argument 'option' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        // TODO jflute check one-side allowed
+        // TODO jflute impl: check one-side allowed
         final ConditionKey fromDateConditionKey = option.getFromDateConditionKey();
         final ConditionKey toDateConditionKey = option.getToDateConditionKey();
         final Date filteredFromDate = option.filterFromDate(fromDate);
@@ -243,8 +243,8 @@ public class ManualOrderOption implements HpCalculator {
      * orderValueList.add(CDef.MemberStatus.Formalized);
      * orderValueList.add(CDef.MemberStatus.Provisional);
      * ManualOrderOption mob = new ManualOrderOption();
-     * mob.<span style="color: #DD4747">acceptOrderValueList</span>(orderValueList);
-     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+     * mob.<span style="color: #CC4747">acceptOrderValueList</span>(orderValueList);
+     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #CC4747">withManualOrder(mob)</span>;
      * <span style="color: #3F7E5E">// order by </span>
      * <span style="color: #3F7E5E">//   case</span>
      * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>

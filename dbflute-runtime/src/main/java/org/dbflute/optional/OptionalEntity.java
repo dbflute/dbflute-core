@@ -23,25 +23,22 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
  * The entity as optional object, which has entity instance in it. <br />
  * You can handle null value by this methods without direct null handling.
  * <pre>
- * MemberCB cb = new MemberCB();
- * cb.query().set...
- * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
- *
  * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
- * entity.<span style="color: #DD4747">required</span>(member -&gt; {
- *     ...
+ * memberBhv.selectEntity(cb -&gt; {
+ *     cb.setupSelect_MemberStatus();
+ *     cb.query().setMemberId_Equal(1);
+ * }).<span style="color: #CC4747">alwaysPresent</span>(member -&gt; {
+ *     <span style="color: #3F7E5E">// called if present, or exception</span>
+ *     ... = member.getMemberName();
  * });
- * Member member = entity.<span style="color: #DD4747">get()</span>;
- *
- * <span style="color: #3F7E5E">// if it might be no data, isPresent(), orElseNull(), ...</span>
- * entity.<span style="color: #DD4747">ifPresent</span>(member -&gt; {
- *     ...
+ * 
+ * <span style="color: #3F7E5E">// if it might be no data, ...</span>
+ * memberBhv.selectEntity(cb -&gt; cb.acceptPK(1)).<span style="color: #CC4747">ifPresent</span>(member -&gt; {
+ *     <span style="color: #3F7E5E">// called if present</span>
+ *     ... = member.getMemberName();
+ * }).<span style="color: #994747">orElse</span>(() -&gt; {
+ *     <span style="color: #3F7E5E">// called if not present</span>
  * });
- * if (entity.<span style="color: #DD4747">isPresent()</span>) {
- *     Member member = entity.<span style="color: #DD4747">get()</span>;
- * } else {
- *     ...
- * }
  * </pre>
  * @param <ENTITY> The type of entity.
  * @author jflute
@@ -49,7 +46,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
  */
 public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
 
-    // TODO jflute fix optional javadoc
+    // TODO jflute javadoc: fix optional
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
@@ -179,10 +176,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * You should call this if null entity handling is unnecessary (do nothing if null). <br />
      * If exception is preferred when null entity, use required().
      * <pre>
-     * MemberCB cb = new MemberCB();
-     * cb.query().set...
-     * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-     * entity.<span style="color: #CC4747">ifPresent</span>(member -&gt; {
+     * memberBhv.selectEntity(cb -&gt; cb.acceptPK(1)).<span style="color: #CC4747">ifPresent</span>(member -&gt; {
      *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
      *     ... = member.getMemberName();
      * }).<span style="color: #994747">orElse</span>(() -&gt; {
@@ -200,11 +194,11 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     /**
      * Is the entity instance present? (existing?)
      * <pre>
-     * MemberCB cb = new MemberCB();
-     * cb.query().set...
-     * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-     * if (entity.<span style="color: #DD4747">isPresent()</span>) { <span style="color: #3F7E5E">// true if the entity exists</span>
-     *     Member member = entity.get();
+     * OptionalEntity&lt;Member&gt; optMember = memberBhv.selectEntity(cb -&gt; {
+     *     cb.query()...;
+     * });
+     * if (optMember.<span style="color: #CC4747">isPresent()</span>) { <span style="color: #3F7E5E">// true if the entity exists</span>
+     *     Member member = optMember.get();
      * } else {
      *     ...
      * }
@@ -223,11 +217,11 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
      *
      * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
-     * Member member = entity.<span style="color: #DD4747">get()</span>;
+     * Member member = entity.<span style="color: #CC4747">get()</span>;
      *
      * <span style="color: #3F7E5E">// if it might be no data, isPresent(), orElse(), ...</span>
-     * if (entity.<span style="color: #DD4747">isPresent()</span>) {
-     *     Member member = entity.<span style="color: #DD4747">get()</span>;
+     * if (entity.<span style="color: #CC4747">isPresent()</span>) {
+     *     Member member = entity.<span style="color: #CC4747">get()</span>;
      * } else {
      *     ...
      * }
@@ -245,7 +239,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * MemberCB cb = new MemberCB();
      * cb.query().set...
      * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-     * OptionalEntity&lt;Member&gt; filtered = entity.<span style="color: #DD4747">filter</span>(member -&gt; {
+     * OptionalEntity&lt;Member&gt; filtered = entity.<span style="color: #CC4747">filter</span>(member -&gt; {
      *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
      *     return member.getMemberId() % 2 == 0;
      * });
@@ -272,7 +266,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * MemberCB cb = new MemberCB();
      * cb.query().set...
      * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-     * OptionalObject&lt;MemberWebBean&gt; bean = entity.<span style="color: #DD4747">map</span>(member -&gt; {
+     * OptionalObject&lt;MemberWebBean&gt; bean = entity.<span style="color: #CC4747">map</span>(member -&gt; {
      *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
      *     return new MemberWebBean(member);
      * });
@@ -295,7 +289,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
         return new OptionalThing<ARG>(obj, _thrower);
     }
 
-    // TODO jflute make Optional.flatMap()
+    // TODO jflute impl: Optional.flatMap()
     // almost no needed
     ///**
     // * Apply the flat-mapping of entity to result object.
@@ -303,7 +297,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     // * MemberCB cb = new MemberCB();
     // * cb.query().set...
     // * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-    // * OptionalObject&lt;MemberWebBean&gt; bean = entity.<span style="color: #DD4747">map</span>(member -&gt; {
+    // * OptionalObject&lt;MemberWebBean&gt; bean = entity.<span style="color: #CC4747">map</span>(member -&gt; {
     // *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
     // *     if (member.getMemberId() % 2 == 0) {
     // *         return OptionalObject.of(new MemberWebBean(member));
@@ -326,7 +320,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     //public ENTITY orElseGet(...) {
     //    return ...;
     //}
-    // TODO jflute make Optional.orElseThrow(Supplier)
+    // TODO jflute impl: Optional.orElseThrow(Supplier)
 
     // ===================================================================================
     //                                                                   DBFlute Extension
@@ -337,7 +331,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * memberBhv.selectEntity(cb -&gt; {
      *     cb.setupSelect_MemberStatus();
      *     cb.query().setMemberId_Equal(1);
-     * }).<span style="color: #DD4747">alwaysPresent</span>(member -&gt; {
+     * }).<span style="color: #CC4747">alwaysPresent</span>(member -&gt; {
      *     <span style="color: #3F7E5E">// called if value exists, or exception if not present</span>
      *     ... = member.getMemberName();
      * });
@@ -356,7 +350,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * MemberCB cb = new MemberCB();
      * cb.query().set...
      * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-     * Member member = entity.<span style="color: #DD4747">orElseNull()</span> <span style="color: #3F7E5E">// returns null if not present</span>
+     * Member member = entity.<span style="color: #CC4747">orElseNull()</span> <span style="color: #3F7E5E">// returns null if not present</span>
      * </pre>
      * @return The object instance wrapped in this optional object or null. (NullAllowed: if not present)
      */
@@ -370,7 +364,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * MemberCB cb = new MemberCB();
      * cb.query().set...
      * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-     * entity.<span style="color: #DD4747">required</span>(member -&gt; {
+     * entity.<span style="color: #CC4747">required</span>(member -&gt; {
      *     <span style="color: #3F7E5E">// called if value exists, or exception if not present</span>
      *     ... = member.getMemberName();
      * });

@@ -44,14 +44,14 @@ public class HpSSQDecorator<CB extends ConditionBean> {
      * Partition the scope of condition by the specified query. <br />
      * You can add a correlation condition to the sub-query.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">partitionBy</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
+     * }).<span style="color: #CC4747">partitionBy</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
      *     public void specify(PurchaseCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnMemberId</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         cb.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *     }
      * });
      * </pre>

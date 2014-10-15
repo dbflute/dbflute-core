@@ -18,7 +18,7 @@ package org.dbflute.optional;
 /**
  * The function of optional thing.
  * <pre>
- * OptionalObject&lt;MemberWebBean&gt; beanOpt = entityOpt.<span style="color: #DD4747">map</span>(member -&gt; {
+ * OptionalObject&lt;MemberWebBean&gt; beanOpt = entityOpt.<span style="color: #CC4747">map</span>(member -&gt; {
  *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
  *     return new MemberWebBean(member);
  * });

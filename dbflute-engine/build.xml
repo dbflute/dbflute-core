@@ -6,9 +6,9 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1" />
-	<property name="build.version" value="${version}-pilot4-SNAPSHOT" />
+	<property name="build.version" value="${version}-pilot5-SNAPSHOT" />
 	<property name="runtime.version" value="1.1" />
-	<property name="runtime.build.version" value="${runtime.version}-pilot4-SNAPSHOT" />
+	<property name="runtime.build.version" value="${runtime.version}-pilot5-SNAPSHOT" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->

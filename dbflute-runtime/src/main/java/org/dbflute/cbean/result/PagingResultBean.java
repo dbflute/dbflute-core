@@ -83,7 +83,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * <pre>
      * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
-     * <span style="color: #DD4747">previous</span> 3 4 5 6 <span style="color: #DD4747">7</span> 8 9 10 11 12 13 next
+     * <span style="color: #CC4747">previous</span> 3 4 5 6 <span style="color: #CC4747">7</span> 8 9 10 11 12 13 next
      * </pre>
      * @return The determination, true or false.
      */
@@ -97,7 +97,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * <pre>
      * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
-     * previous 3 4 5 6 7 8 <span style="color: #DD4747">9</span> 10 11 12 13 <span style="color: #DD4747">next</span>
+     * previous 3 4 5 6 7 8 <span style="color: #CC4747">9</span> 10 11 12 13 <span style="color: #CC4747">next</span>
      * </pre>
      * @return The determination, true or false.
      */
@@ -115,11 +115,11 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Get the value of pageGroupBean.
      * <pre>
      * e.g. group-size=10, current-page=8
-     * PageGroupBean pageGroup = page.<span style="color: #DD4747">pageGroup</span>(op -> op.groupSize(3));
+     * PageGroupBean pageGroup = page.<span style="color: #CC4747">pageGroup</span>(op -> op.groupSize(3));
      * List&lt;Integer&gt; numberList = pageGroup.createPageNumberList();
      *
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #CC4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
      * </pre>
      * @param opLambda The callback for setting of page-group option. (NotNull)
      * @return The value of pageGroupBean. (NotNull)
@@ -164,11 +164,11 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Get the value of pageRangeBean.
      * <pre>
      * e.g. group-size=10, current-page=8
-     * PageRangeBean pageRange = page.<span style="color: #DD4747">pageRange</span>(op -> op.rangeSize(3));
+     * PageRangeBean pageRange = page.<span style="color: #CC4747">pageRange</span>(op -> op.rangeSize(3));
      * List&lt;Integer&gt; numberList = pageRange.createPageNumberList();
      *
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">// previous</span> <span style="color: #DD4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #CC4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
      * </pre>
      * @param opLambda The callback for setting of page-range option. (NotNull)
      * @return The value of pageRangeBean. (NotNull)
@@ -312,7 +312,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * This is not same as size() basically.
      * <pre>
      * e.g. range-size=5, current-page=8 
-     *  8 / 23 pages (<span style="color: #DD4747">453</span> records)
+     *  8 / 23 pages (<span style="color: #CC4747">453</span> records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * </pre>
      * @return allRecordCount The value of allRecordCount.
@@ -351,7 +351,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Get the value of currentPageNumber.
      * <pre>
      * e.g. range-size=5, current-page=8 
-     *  <span style="color: #DD4747">8</span> / 23 pages (453 records)
+     *  <span style="color: #CC4747">8</span> / 23 pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * </pre>
      * @return The value of currentPageNumber.
@@ -375,7 +375,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Get the value of allPageCount that is calculated.
      * <pre>
      * e.g. range-size=5, current-page=8 
-     *  8 / <span style="color: #DD4747">23</span> pages (453 records)
+     *  8 / <span style="color: #CC4747">23</span> pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * </pre>
      * @return The value of allPageCount.
@@ -390,7 +390,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * <pre>
      * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
-     * <span style="color: #DD4747">previous</span> 3 4 5 6 <span style="color: #DD4747">7</span> 8 9 10 11 12 13 next
+     * <span style="color: #CC4747">previous</span> 3 4 5 6 <span style="color: #CC4747">7</span> 8 9 10 11 12 13 next
      * </pre>
      * @return The value of prePageNumber.
      */
@@ -409,7 +409,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * <pre>
      * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
-     * previous 3 4 5 6 7 8 <span style="color: #DD4747">9</span> 10 11 12 13 <span style="color: #DD4747">next</span>
+     * previous 3 4 5 6 7 8 <span style="color: #CC4747">9</span> 10 11 12 13 <span style="color: #CC4747">next</span>
      * </pre>
      * @return The value of nextPageNumber.
      */

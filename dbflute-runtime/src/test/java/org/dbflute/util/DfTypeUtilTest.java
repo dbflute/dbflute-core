@@ -63,7 +63,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     // ===================================================================================
     //                                                                            Settings
     //                                                                            ========
-    // // TODO jflute FinalTimeZone test
+    // TODO jflute test: FinalTimeZone
     // template for test finalTimeZone
     //@Override
     //protected void setUp() throws Exception {

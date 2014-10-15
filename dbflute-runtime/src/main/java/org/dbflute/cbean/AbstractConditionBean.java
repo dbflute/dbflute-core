@@ -1720,7 +1720,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * The exists-referrer uses plain sub-query way instead of correlation way. <br />
      * <pre>
      * cb.query().existsPurchase(purchaseCB -&gt; {
-     *     purchaseCB.<span style="color: #DD4747">useInScopeSubQuery()</span>;
+     *     purchaseCB.<span style="color: #CC4747">useInScopeSubQuery()</span>;
      *     purchaseCB.query().set...
      *     purchaseCB.query().set...
      * });
@@ -1728,7 +1728,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void useInScopeSubQuery() {
         final HpCBPurpose purpose = getPurpose();
-        // TODO jflute Purpose and Exception
+        // TODO jflute refactor: Purpose and Exception
         if (!purpose.isAny(HpCBPurpose.EXISTS_REFERRER, HpCBPurpose.MYSELF_EXISTS)) {
             String msg = "The method 'useInScopeSubQuery()' can be called only when ExistsReferrer.";
             throw new IllegalConditionBeanOperationException(msg);
