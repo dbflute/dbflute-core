@@ -15,9 +15,9 @@
  */
 package org.dbflute.outsidesql.executor;
 
+import org.dbflute.bhv.exception.BehaviorExceptionThrower;
 import org.dbflute.cbean.result.ListResultBean;
 import org.dbflute.cbean.result.PagingResultBean;
-import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.jdbc.CursorHandler;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.optional.OptionalEntity;
@@ -100,9 +100,8 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      */
     public <ENTITY> OptionalEntity<ENTITY> selectEntity(EntityHandlingPmb<BEHAVIOR, ENTITY> pmb) {
         return OptionalEntity.ofNullable(_basicExecutor.entityHandling().selectEntity(pmb), () -> {
-            // TODO jflute OutsideSql optional exception
-                throw new EntityAlreadyDeletedException("TODO jflute");
-            });
+            createBhvExThrower().throwSelectEntityAlreadyDeletedException(pmb);
+        });
     }
 
     // ===================================================================================
@@ -336,14 +335,6 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
         return _basicExecutor.execute(pmb);
     }
 
-    // [DBFlute-1.1.0]
-    // ===================================================================================
-    //                                                                   Traditional Style
-    //                                                                   =================
-    public OutsideSqlTraditionalExecutor<BEHAVIOR> traditionalStyle() {
-        return _basicExecutor.traditionalStyle();
-    }
-
     // [DBFlute-0.7.5]
     // ===================================================================================
     //                                                                      Procedure Call
@@ -363,6 +354,14 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      */
     public void call(ProcedurePmb pmb) {
         _basicExecutor.call(pmb);
+    }
+
+    // [DBFlute-1.1.0]
+    // ===================================================================================
+    //                                                                   Traditional Style
+    //                                                                   =================
+    public OutsideSqlTraditionalExecutor<BEHAVIOR> traditionalStyle() {
+        return new OutsideSqlTraditionalExecutor<BEHAVIOR>(_basicExecutor);
     }
 
     // ===================================================================================
@@ -416,6 +415,13 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
         }
         _basicExecutor.configure(statementConfig);
         return this;
+    }
+
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected BehaviorExceptionThrower createBhvExThrower() {
+        return _basicExecutor.createBhvExThrower();
     }
 
     // ===================================================================================

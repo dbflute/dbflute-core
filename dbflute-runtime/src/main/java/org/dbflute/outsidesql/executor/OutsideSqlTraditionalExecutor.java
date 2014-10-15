@@ -15,10 +15,10 @@
  */
 package org.dbflute.outsidesql.executor;
 
+import org.dbflute.bhv.exception.BehaviorExceptionThrower;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.result.ListResultBean;
 import org.dbflute.cbean.result.PagingResultBean;
-import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.jdbc.CursorHandler;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.outsidesql.typed.AutoPagingHandlingPmb;
@@ -74,9 +74,8 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      */
     public <ENTITY> OptionalEntity<ENTITY> selectEntity(String path, Object pmb, Class<ENTITY> entityType) {
         return OptionalEntity.ofNullable(_basicExecutor.entityHandling().selectEntity(path, pmb, entityType), () -> {
-            // TODO jflute OutsideSql optional exception
-                throw new EntityAlreadyDeletedException("TODO jflute");
-            });
+            createBhvExThrower().throwSelectEntityAlreadyDeletedException(pmb);
+        });
     }
 
     // ===================================================================================
@@ -318,5 +317,12 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      */
     public int execute(String path, Object pmb) {
         return _basicExecutor.execute(path, pmb);
+    }
+
+    // ===================================================================================
+    //                                                                    Exception Helper
+    //                                                                    ================
+    protected BehaviorExceptionThrower createBhvExThrower() {
+        return _basicExecutor.createBhvExThrower();
     }
 }

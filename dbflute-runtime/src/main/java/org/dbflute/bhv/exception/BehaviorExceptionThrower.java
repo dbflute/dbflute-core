@@ -51,7 +51,7 @@ public class BehaviorExceptionThrower {
     //                                                                              ======
     public void throwSelectEntityAlreadyDeletedException(Object searchKey) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The selected entity was NOT found! It has already been deleted.");
+        br.addNotice("Not found the entity by the condition. (might be deleted?)");
         br.addItem("Advice");
         br.addElement("Please confirm the existence of your target record on your database.");
         br.addElement("Does the target record really created before this operation?");
@@ -64,7 +64,7 @@ public class BehaviorExceptionThrower {
 
     public void throwSelectEntityDuplicatedException(String resultCountExp, Object searchKey, Throwable cause) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The selected entity was duplicated! It should be the only one.");
+        br.addNotice("Duplicate entity by the condition. (should be the only one)");
         br.addItem("Advice");
         br.addElement("Confirm your search condition. Does it really select the only one?");
         br.addElement("And confirm your database. Does it really exist the only one?");

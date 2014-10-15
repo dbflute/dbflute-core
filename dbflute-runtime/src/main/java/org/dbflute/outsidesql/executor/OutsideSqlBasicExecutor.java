@@ -246,14 +246,6 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
         return invoke(createExecuteCommand(path, pmb));
     }
 
-    // [DBFlute-1.1.0]
-    // ===================================================================================
-    //                                                                   Traditional Style
-    //                                                                   =================
-    public OutsideSqlTraditionalExecutor<BEHAVIOR> traditionalStyle() {
-        return new OutsideSqlTraditionalExecutor<BEHAVIOR>(this);
-    }
-
     // [DBFlute-0.7.5]
     // ===================================================================================
     //                                                                      Procedure Call
@@ -488,7 +480,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     // ===================================================================================
     //                                                                    Exception Helper
     //                                                                    ================
-    protected BehaviorExceptionThrower createBhvExThrower() {
+    public BehaviorExceptionThrower createBhvExThrower() { // public for facade
         return _behaviorCommandInvoker.createBehaviorExceptionThrower();
     }
 
