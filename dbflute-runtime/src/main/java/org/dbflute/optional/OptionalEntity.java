@@ -172,32 +172,8 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     // ===================================================================================
-    //                                                                     Object Handling
-    //                                                                     ===============
-    /**
-     * Get the entity or exception if null.
-     * <pre>
-     * MemberCB cb = new MemberCB();
-     * cb.query().set...
-     * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-     *
-     * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
-     * Member member = entity.<span style="color: #DD4747">get()</span>;
-     *
-     * <span style="color: #3F7E5E">// if it might be no data, isPresent(), orElse(), ...</span>
-     * if (entity.<span style="color: #DD4747">isPresent()</span>) {
-     *     Member member = entity.<span style="color: #DD4747">get()</span>;
-     * } else {
-     *     ...
-     * }
-     * </pre>
-     * @return The entity instance wrapped in this optional object. (NotNull)
-     * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
-     */
-    public ENTITY get() {
-        return directlyGet();
-    }
-
+    //                                                                   Standard Handling
+    //                                                                   =================
     /**
      * Handle the wrapped entity if it is present. <br />
      * You should call this if null entity handling is unnecessary (do nothing if null). <br />
@@ -237,6 +213,30 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      */
     public boolean isPresent() {
         return exists();
+    }
+
+    /**
+     * Get the entity or exception if null.
+     * <pre>
+     * MemberCB cb = new MemberCB();
+     * cb.query().set...
+     * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
+     *
+     * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
+     * Member member = entity.<span style="color: #DD4747">get()</span>;
+     *
+     * <span style="color: #3F7E5E">// if it might be no data, isPresent(), orElse(), ...</span>
+     * if (entity.<span style="color: #DD4747">isPresent()</span>) {
+     *     Member member = entity.<span style="color: #DD4747">get()</span>;
+     * } else {
+     *     ...
+     * }
+     * </pre>
+     * @return The entity instance wrapped in this optional object. (NotNull)
+     * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     */
+    public ENTITY get() {
+        return directlyGet();
     }
 
     /**
@@ -329,8 +329,8 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     // TODO jflute make Optional.orElseThrow(Supplier)
 
     // ===================================================================================
-    //                                                                           Extension
-    //                                                                           =========
+    //                                                                   DBFlute Extension
+    //                                                                   =================
     /**
      * Handle the entity in the optional object or exception if not present.
      * <pre>

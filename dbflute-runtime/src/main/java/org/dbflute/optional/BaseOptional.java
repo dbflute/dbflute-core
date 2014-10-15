@@ -15,6 +15,8 @@
  */
 package org.dbflute.optional;
 
+import java.util.Optional;
+
 /**
  * The base class for optional object.
  * @param <OBJ> The type of wrapped object in the optional object.
@@ -59,14 +61,29 @@ public abstract class BaseOptional<OBJ> {
     // ===================================================================================
     //                                                                     Object Handling
     //                                                                     ===============
+    // -----------------------------------------------------
+    //                                               Present
+    //                                               -------
     /**
-     * @return The object instance wrapped in this optional object. (NotNull)
+     * Is the wrapped object present? (existing?)
+     * @return The determination, true or false.
      */
-    protected OBJ directlyGet() {
-        if (!exists()) {
+    protected boolean exists() {
+        return _obj != null;
+    }
+
+    /**
+     * @param objLambda The callback interface to consume the wrapped value. (NotNull)
+     */
+    protected void callbackAlwaysPresent(OptionalThingConsumer<OBJ> objLambda) {
+        if (objLambda == null) {
+            String msg = "The argument 'objLambda' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (_obj == null) {
             _thrower.throwNotFoundException();
         }
-        return _obj;
+        objLambda.accept(_obj);
     }
 
     /**
@@ -86,14 +103,30 @@ public abstract class BaseOptional<OBJ> {
         }
     }
 
+    // -----------------------------------------------------
+    //                                                 get()
+    //                                                 -----
     /**
-     * Is the wrapped object present? (existing?)
-     * @return The determination, true or false.
+     * @return The object instance wrapped in this optional object. (NotNull)
      */
-    protected boolean exists() {
-        return _obj != null;
+    protected OBJ directlyGet() {
+        if (!exists()) {
+            _thrower.throwNotFoundException();
+        }
+        return _obj;
     }
 
+    /**
+     * @param other The other instance to be returned if null. (NullAllowed: if null, returns null when entity is null)
+     * @return The object instance wrapped in this optional object or specified value. (NullAllowed: if null specified)
+     */
+    protected OBJ directlyGetOrElse(OBJ other) {
+        return exists() ? _obj : other;
+    }
+
+    // -----------------------------------------------------
+    //                                              filter()
+    //                                              --------
     /**
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
@@ -121,6 +154,9 @@ public abstract class BaseOptional<OBJ> {
      */
     protected abstract <ARG> BaseOptional<ARG> createOptionalFilteredObject(ARG obj);
 
+    // -----------------------------------------------------
+    //                                                 map()
+    //                                                 -----
     /**
      * @param <RESULT> The type of mapping result.
      * @param mapper The callback interface to apply. (NotNull)
@@ -155,26 +191,16 @@ public abstract class BaseOptional<OBJ> {
         return exists() ? mapper.apply(_obj) : null;
     }
 
+    // ===================================================================================
+    //                                                                   Standard Optional
+    //                                                                   =================
     /**
-     * @param other The other instance to be returned if null. (NullAllowed: if null, returns null when entity is null)
-     * @return The object instance wrapped in this optional object or specified value. (NullAllowed: if null specified)
+     * Convert to Java standard optional class. <br />
+     * For only when standard optional handling is needed, so basically you don't use this.
+     * @return The new-created instance or empty. (NotNull)
      */
-    protected OBJ directlyGetOrElse(OBJ other) {
-        return exists() ? _obj : other;
-    }
-
-    /**
-     * @param objLambda The callback interface to consume the wrapped value. (NotNull)
-     */
-    protected void callbackAlwaysPresent(OptionalThingConsumer<OBJ> objLambda) {
-        if (objLambda == null) {
-            String msg = "The argument 'objLambda' should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (_obj == null) {
-            _thrower.throwNotFoundException();
-        }
-        objLambda.accept(_obj);
+    public Optional<OBJ> toOptional() {
+        return Optional.ofNullable(directlyGetOrElse(null));
     }
 
     // ===================================================================================

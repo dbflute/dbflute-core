@@ -90,17 +90,8 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
     }
 
     // ===================================================================================
-    //                                                                     Object Handling
-    //                                                                     ===============
-    /**
-     * Get the thing or exception if null.
-     * @return The instance of the wrapped thing. (NotNull)
-     * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
-     */
-    public THING get() {
-        return directlyGet();
-    }
-
+    //                                                                   Standard Handling
+    //                                                                   =================
     /**
      * Handle the wrapped thing if it is present. <br />
      * You should call this if null object handling is unnecessary (do nothing if null). <br />
@@ -119,6 +110,23 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      */
     public boolean isPresent() {
         return exists();
+    }
+
+    /**
+     * Get the thing or exception if null.
+     * @return The instance of the wrapped thing. (NotNull)
+     * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
+     */
+    public THING get() {
+        return directlyGet();
+    }
+
+    /**
+     * @param other The object instance to be returned when the optional is empty. (NullAllowed)
+     * @return The wrapped instance or specified other object. (NullAllowed:)
+     */
+    public THING orElse(THING other) {
+        return directlyGetOrElse(other);
     }
 
     /**
@@ -170,22 +178,9 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
         return callbackFlatMapping(oneArgLambda);
     }
 
-    /**
-     * @param other The object instance to be returned when the optional is empty. (NullAllowed)
-     * @return The wrapped instance or specified other object. (NullAllowed:)
-     */
-    public THING orElse(THING other) {
-        return directlyGetOrElse(other);
-    }
-
-    /**
-     * Get the object instance or null if not present.
-     * @return The object instance wrapped in this optional object or null. (NullAllowed: if not present)
-     */
-    public THING orElseNull() {
-        return directlyGetOrElse(null);
-    }
-
+    // ===================================================================================
+    //                                                                   DBFlute Extension
+    //                                                                   =================
     /**
      * Handle the object in the optional thing or exception if not present.
      * @param oneArgLambda The callback interface to consume the optional object. (NotNull)
@@ -194,6 +189,14 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
     public void alwaysPresent(OptionalThingConsumer<THING> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         callbackAlwaysPresent(oneArgLambda);
+    }
+
+    /**
+     * Get the object instance or null if not present.
+     * @return The object instance wrapped in this optional object or null. (NullAllowed: if not present)
+     */
+    public THING orElseNull() {
+        return directlyGetOrElse(null);
     }
 
     // ===================================================================================
