@@ -18,11 +18,12 @@ package org.dbflute.cbean.chelper;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
+import org.dbflute.cbean.coption.DerivedReferrerOptionFactory;
 import org.dbflute.cbean.coption.FunctionFilterOptionCall;
-import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.scoping.SubQuery;
 import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.dbflute.util.Srl;
 
@@ -41,13 +42,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     protected final LOCAL_CQ _localCQ;
     protected final HpSDRSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
     protected final DBMetaProvider _dbmetaProvider;
-    protected final FactoryOfDerivedReferrerOption _sdrOpFactory;
+    protected final DerivedReferrerOptionFactory _sdrOpFactory;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public HpSDRFunction(ConditionBean baseCB, LOCAL_CQ localCQ, HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper,
-            DBMetaProvider dbmetaProvider, FactoryOfDerivedReferrerOption sdrOpFactory) {
+            DBMetaProvider dbmetaProvider, DerivedReferrerOptionFactory sdrOpFactory) {
         _baseCB = baseCB;
         _localCQ = localCQ;
         _querySetupper = querySetupper;
@@ -58,6 +59,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     // ===================================================================================
     //                                                                            Function
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Count
+    //                                                 -----
     /**
      * Set up the sub query of referrer for the scalar 'count'.
      * <pre>
@@ -90,10 +94,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
     public void count(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
-        assertDerivedReferrerOption(opLambda);
-        final DerivedReferrerOption option = createDerivedReferrerOption();
-        opLambda.callback(option);
-        doCount(derivedCBLambda, aliasName, option);
+        doCount(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doCount(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -102,6 +103,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _querySetupper.setup("count", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
+    // -----------------------------------------------------
+    //                                        Count Distinct
+    //                                        --------------
     /**
      * Set up the sub query of referrer for the scalar 'count-distinct'.
      * <pre>
@@ -133,11 +137,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void countDistinct(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
-        assertDerivedReferrerOption(opLambda);
-        final DerivedReferrerOption option = createDerivedReferrerOption();
-        opLambda.callback(option);
-        doCountDistinct(derivedCBLambda, aliasName, option);
+    public void countDistinct(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName,
+            FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        doCountDistinct(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doCountDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -146,6 +148,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _querySetupper.setup("count(distinct", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
+    // -----------------------------------------------------
+    //                                                  Max
+    //                                                 -----
     /**
      * Set up the sub query of referrer for the scalar 'max'.
      * <pre>
@@ -178,10 +183,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
     public void max(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
-        assertDerivedReferrerOption(opLambda);
-        final DerivedReferrerOption option = createDerivedReferrerOption();
-        opLambda.callback(option);
-        doMax(derivedCBLambda, aliasName, option);
+        doMax(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doMax(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -190,6 +192,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _querySetupper.setup("max", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
+    // -----------------------------------------------------
+    //                                                  Min
+    //                                                 -----
     /**
      * Set up the sub query of referrer for the scalar 'min'.
      * <pre>
@@ -222,10 +227,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
     public void min(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
-        assertDerivedReferrerOption(opLambda);
-        final DerivedReferrerOption option = createDerivedReferrerOption();
-        opLambda.callback(option);
-        doMin(derivedCBLambda, aliasName, option);
+        doMin(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doMin(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -234,6 +236,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _querySetupper.setup("min", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
+    // -----------------------------------------------------
+    //                                                  Sum
+    //                                                 -----
     /**
      * Set up the sub query of referrer for the scalar 'sum'.
      * <pre>
@@ -266,10 +271,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
     public void sum(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
-        assertDerivedReferrerOption(opLambda);
-        final DerivedReferrerOption option = createDerivedReferrerOption();
-        opLambda.callback(option);
-        doSum(derivedCBLambda, aliasName, option);
+        doSum(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doSum(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -278,6 +280,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _querySetupper.setup("sum", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
+    // -----------------------------------------------------
+    //                                               Average
+    //                                               -------
     /**
      * Set up the sub query of referrer for the scalar 'avg'.
      * <pre>
@@ -310,22 +315,53 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
     public void avg(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
-        assertDerivedReferrerOption(opLambda);
-        final DerivedReferrerOption option = createDerivedReferrerOption();
-        opLambda.callback(option);
-        doAvg(derivedCBLambda, aliasName, option);
+        doAvg(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doAvg(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        doSetupQuery("avg", subQuery, aliasName, option);
+    }
+
+    protected void doSetupQuery(String function, SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
         assertSubQuery(subQuery);
         assertAliasName(aliasName);
-        _querySetupper.setup("avg", subQuery, _localCQ, filterAliasName(aliasName), option);
+        _querySetupper.setup(function, subQuery, _localCQ, filterAliasName(aliasName), option);
+    }
+
+    // -----------------------------------------------------
+    //                                       User Definition
+    //                                       ---------------
+    /**
+     * Basically for database dependency (DBMS sub-class). {Internal} <br />
+     * Not public because of condition-bean policy: cannot input SQL string.
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
+     * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+     * @param function The function expression e.g. sum, max (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
+     */
+    protected void userDef(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, String function,
+            FunctionFilterOptionCall<DerivedReferrerOption> opLambda) { // closet
+        doUserDef(derivedCBLambda, aliasName, function, createDerivedReferrerOption(opLambda));
+    }
+
+    protected void doUserDef(SubQuery<REFERRER_CB> subQuery, String aliasName, String function, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
+        assertAliasName(aliasName);
+        assertUserDefFunction(aliasName, function);
+        _querySetupper.setup(function, subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected DerivedReferrerOption createDerivedReferrerOption() {
+    protected DerivedReferrerOption createDerivedReferrerOption(FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        assertDerivedReferrerOption(opLambda);
+        final DerivedReferrerOption option = newDerivedReferrerOption();
+        opLambda.callback(option);
+        return option;
+    }
+
+    protected DerivedReferrerOption newDerivedReferrerOption() {
         return _sdrOpFactory.create();
     }
 
@@ -408,6 +444,14 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
             } else { // basically no way because of checked before
                 return null;
             }
+        }
+    }
+
+    protected void assertUserDefFunction(String aliasName, String function) {
+        if (!Srl.isAlphabetNumberHarfAll(function)) { // e.g. ')', ';' are NG
+            String msg = "Illegal function, only alphabet or number can be allowed:";
+            msg = msg + " aliasName=" + aliasName + ", function=" + function;
+            throw new IllegalConditionBeanOperationException(msg);
         }
     }
 

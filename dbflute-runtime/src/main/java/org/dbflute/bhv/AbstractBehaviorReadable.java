@@ -137,15 +137,15 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return (ENTITY) getDBMeta().newEntity();
     }
 
-    /** {@inheritDoc} */
-    public abstract CB newConditionBean(); // defined here to resolve generic of return type
-
-    protected CB handleCBCall(CBCall<CB> cbCall) { // CB from callback
+    protected CB createCB(CBCall<CB> cbCall) { // CB from callback
         assertCBCallNotNull(cbCall);
         final CB cb = newConditionBean();
         cbCall.callback(cb);
         return cb;
     }
+
+    /** {@inheritDoc} */
+    public abstract CB newConditionBean(); // defined here to resolve generic of return type
 
     // ===================================================================================
     //                                                                        Count Select
@@ -563,6 +563,10 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     }
 
     protected <RESULT> HpSLSFunction<CB, RESULT> createSLSFunction(CB cb, Class<RESULT> resultType, HpSLSExecutor<CB, RESULT> exec) {
+        return newSLSFunction(cb, resultType, exec);
+    }
+
+    protected <RESULT> HpSLSFunction<CB, RESULT> newSLSFunction(CB cb, Class<RESULT> resultType, HpSLSExecutor<CB, RESULT> exec) {
         return new HpSLSFunction<CB, RESULT>(cb, resultType, exec);
     }
 

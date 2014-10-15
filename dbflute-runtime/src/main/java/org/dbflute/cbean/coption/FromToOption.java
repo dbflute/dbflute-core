@@ -988,6 +988,7 @@ public class FromToOption implements ConditionOption {
 
     /**
      * Filter the date as From. It requires this method is called before getFromDateConditionKey().
+     * @param <DATE> The type of (util)Date.
      * @param fromDate The date as From. (NullAllowed: If the value is null, it returns null)
      * @return The filtered date as From. (NullAllowed)
      */

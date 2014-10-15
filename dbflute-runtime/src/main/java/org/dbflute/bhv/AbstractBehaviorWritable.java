@@ -38,7 +38,7 @@ import org.dbflute.bhv.writable.DeleteOption;
 import org.dbflute.bhv.writable.InsertOption;
 import org.dbflute.bhv.writable.QueryInsertSetupper;
 import org.dbflute.bhv.writable.UpdateOption;
-import org.dbflute.bhv.writable.WOptionCall;
+import org.dbflute.bhv.writable.WritableOptionCall;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.DBMeta;
@@ -108,22 +108,18 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return cb;
     }
 
-    protected InsertOption<CB> handleInsertOpCall(WOptionCall<CB, InsertOption<CB>> opCall) {
+    protected InsertOption<CB> createInsertOption(WritableOptionCall<CB, InsertOption<CB>> opCall) {
         assertInsertOpCallNotNull(opCall);
-        final InsertOption<CB> op = createInsertOption();
+        final InsertOption<CB> op = newInsertOption();
         opCall.callback(op);
         return op;
-    }
-
-    protected InsertOption<CB> createInsertOption() {
-        return newInsertOption();
     }
 
     protected InsertOption<CB> newInsertOption() {
         return new InsertOption<CB>();
     }
 
-    protected void assertInsertOpCallNotNull(WOptionCall<CB, InsertOption<CB>> opCall) { // for varyingInsert()
+    protected void assertInsertOpCallNotNull(WritableOptionCall<CB, InsertOption<CB>> opCall) { // for varyingInsert()
         assertObjectNotNull("opLambda (for insert)", opCall);
     }
 
@@ -214,22 +210,18 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected UpdateOption<CB> handleUpdateOpCall(WOptionCall<CB, UpdateOption<CB>> opCall) {
+    protected UpdateOption<CB> createUpdateOption(WritableOptionCall<CB, UpdateOption<CB>> opCall) {
         assertUpdateOpCallNotNull(opCall);
-        final UpdateOption<CB> op = createUpdateOption();
+        final UpdateOption<CB> op = newUpdateOption();
         opCall.callback(op);
         return op;
-    }
-
-    protected UpdateOption<CB> createUpdateOption() {
-        return newUpdateOption();
     }
 
     protected UpdateOption<CB> newUpdateOption() {
         return new UpdateOption<CB>();
     }
 
-    protected void assertUpdateOpCallNotNull(WOptionCall<CB, UpdateOption<CB>> opCall) { // for varyingUpdate()
+    protected void assertUpdateOpCallNotNull(WritableOptionCall<CB, UpdateOption<CB>> opCall) { // for varyingUpdate()
         assertObjectNotNull("opLambda (for update)", opCall);
     }
 
@@ -425,22 +417,18 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     protected void assertDeleteOptionStatus(DeleteOption<? extends ConditionBean> option) {
     }
 
-    protected DeleteOption<CB> handleDeleteOpCall(WOptionCall<CB, DeleteOption<CB>> opCall) {
+    protected DeleteOption<CB> createDeleteOption(WritableOptionCall<CB, DeleteOption<CB>> opCall) {
         assertDeleteOpCallNotNull(opCall);
-        final DeleteOption<CB> op = createDeleteOption();
+        final DeleteOption<CB> op = newDeleteOption();
         opCall.callback(op);
         return op;
-    }
-
-    protected DeleteOption<CB> createDeleteOption() {
-        return newDeleteOption();
     }
 
     protected DeleteOption<CB> newDeleteOption() {
         return new DeleteOption<CB>();
     }
 
-    protected void assertDeleteOpCallNotNull(WOptionCall<CB, DeleteOption<CB>> opCall) { // for varyingDelete()
+    protected void assertDeleteOpCallNotNull(WritableOptionCall<CB, DeleteOption<CB>> opCall) { // for varyingDelete()
         assertObjectNotNull("opLambda (for delete)", opCall);
     }
 

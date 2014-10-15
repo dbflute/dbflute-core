@@ -45,10 +45,10 @@ import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.ckey.ConditionKeyInScope;
-import org.dbflute.cbean.coption.ConditionOptionCall;
 import org.dbflute.cbean.coption.ConditionOption;
+import org.dbflute.cbean.coption.ConditionOptionCall;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
-import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
+import org.dbflute.cbean.coption.DerivedReferrerOptionFactory;
 import org.dbflute.cbean.coption.FromToOption;
 import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.cbean.coption.ParameterOption;
@@ -56,8 +56,8 @@ import org.dbflute.cbean.coption.RangeOfOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
-import org.dbflute.cbean.ordering.ManualOrderOptionCall;
 import org.dbflute.cbean.ordering.ManualOrderOption;
+import org.dbflute.cbean.ordering.ManualOrderOptionCall;
 import org.dbflute.cbean.scoping.SubQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.SqlClauseMySql;
@@ -1456,11 +1456,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected <CB extends ConditionBean> HpQDRFunction<CB> xcQDRFunc(HpQDRSetupper<CB> setupper) {
-        return new HpQDRFunction<CB>(setupper, xcFofQDROp());
+        return new HpQDRFunction<CB>(setupper, createQueryDerivedReferrerOptionFactory());
     }
 
-    protected FactoryOfDerivedReferrerOption xcFofQDROp() { // xcreateFactoryOfQueryDerivedReferrerOption()
-        return new FactoryOfDerivedReferrerOption() {
+    protected DerivedReferrerOptionFactory createQueryDerivedReferrerOptionFactory() {
+        return new DerivedReferrerOptionFactory() {
             public DerivedReferrerOption create() {
                 return newQueryDerivedReferrerOption();
             }

@@ -13,22 +13,18 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.bhv.writable;
-
-import org.dbflute.cbean.ConditionBean;
+package org.dbflute.cbean.coption;
 
 /**
- * The callback interface of writable option.
- * @param <CB> The type of condition-bean for specification.
- * @param <OP> The type of writable option to be set up.
  * @author jflute
- * @since 1.1.0 (2014/09/28 Sunday)
+ * @since 1.1.0 (2014/10/13 Monday)
  */
 @FunctionalInterface
-public interface WOptionCall<CB extends ConditionBean, OP extends WritableOption<CB>> {
+public interface DerivedReferrerOptionFactory {
 
     /**
-     * @param op The option of writable to be set up. (NotNull)
+     * Create the option of derived-referrer.
+     * @return The new-created option. (NotNull)
      */
-    void callback(OP op);
+    DerivedReferrerOption create();
 }

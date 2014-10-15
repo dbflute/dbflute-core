@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
-import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.join.InnerJoinNoWaySpeaker;
@@ -45,7 +44,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     protected HpSpQyCall<CQ> _syncQyCall;
     protected final HpCBPurpose _purpose;
     protected final DBMetaProvider _dbmetaProvider;
-    protected final FactoryOfDerivedReferrerOption _sdrOpFactory; // (Specify)DerivedReferrerFactory
+    protected final HpSDRFunctionFactory _sdrFuncFactory;
     protected CQ _query; // lazy-loaded
     protected boolean _alreadySpecifiedRequiredColumn; // also means specification existence
     protected Map<String, HpSpecifiedColumn> _specifiedColumnMap; // saves specified columns (lazy-loaded)
@@ -60,15 +59,15 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
      * @param qyCall The call-back for condition-query. (NotNull)
      * @param purpose The purpose of condition-bean. (NotNull)
      * @param dbmetaProvider The provider of DB meta. (NotNull)
-     * @param sdrOpFactory The factory of (specify) derived-referrer option. (NotNull)
+     * @param sdrFuncFactory The factory of (specify) derived-referrer function. (NotNull)
      */
     protected HpAbstractSpecification(ConditionBean baseCB, HpSpQyCall<CQ> qyCall, HpCBPurpose purpose, DBMetaProvider dbmetaProvider,
-            FactoryOfDerivedReferrerOption sdrOpFactory) {
+            HpSDRFunctionFactory sdrFuncFactory) {
         _baseCB = baseCB;
         _qyCall = qyCall;
         _purpose = purpose;
         _dbmetaProvider = dbmetaProvider;
-        _sdrOpFactory = sdrOpFactory;
+        _sdrFuncFactory = sdrFuncFactory;
     }
 
     // ===================================================================================
@@ -388,18 +387,21 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     //                                                                    Derived Referrer
     //                                                                    ================
     // creator for sub-class
-    protected <REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> HpSDRFunction<REFERRER_CB, LOCAL_CQ> cHSDRF(
+    @SuppressWarnings("unchecked")
+    protected <FUNC extends HpSDRFunction<REFERRER_CB, LOCAL_CQ>, REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> FUNC cHSDRF(
             ConditionBean baseCB, LOCAL_CQ localCQ, HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper, DBMetaProvider dbmetaProvider) {
-        return newSDRFunction(baseCB, localCQ, querySetupper, dbmetaProvider);
+        // might be database dependency so cast it
+        return (FUNC) newSDRFunction(baseCB, localCQ, querySetupper, dbmetaProvider, _sdrFuncFactory);
     }
 
     protected <REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> HpSDRFunction<REFERRER_CB, LOCAL_CQ> newSDRFunction(
-            ConditionBean baseCB, LOCAL_CQ localCQ, HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper, DBMetaProvider dbmetaProvider) {
-        return new HpSDRFunction<REFERRER_CB, LOCAL_CQ>(baseCB, localCQ, querySetupper, dbmetaProvider, _sdrOpFactory);
+            ConditionBean baseCB, LOCAL_CQ localCQ, HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper, DBMetaProvider dbmetaProvider,
+            HpSDRFunctionFactory sdrOpFactory) {
+        return _sdrFuncFactory.create(baseCB, localCQ, querySetupper, dbmetaProvider);
     }
 
-    public FactoryOfDerivedReferrerOption xgetFofSDROp() { // to put to relation specification 
-        return _sdrOpFactory;
+    public HpSDRFunctionFactory xgetSDRFnFc() { // to put to relation specification 
+        return _sdrFuncFactory;
     }
 
     // ===================================================================================

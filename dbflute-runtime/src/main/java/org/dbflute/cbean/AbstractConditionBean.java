@@ -30,11 +30,14 @@ import org.dbflute.cbean.chelper.HpCalculator;
 import org.dbflute.cbean.chelper.HpColQyHandler;
 import org.dbflute.cbean.chelper.HpColQyOperand;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
+import org.dbflute.cbean.chelper.HpSDRFunction;
+import org.dbflute.cbean.chelper.HpSDRFunctionFactory;
+import org.dbflute.cbean.chelper.HpSDRSetupper;
 import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
-import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
+import org.dbflute.cbean.coption.DerivedReferrerOptionFactory;
 import org.dbflute.cbean.coption.SVOptionCall;
 import org.dbflute.cbean.coption.ScalarSelectOption;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
@@ -1659,10 +1662,41 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     // [DBFlute-1.1.0]
     // ===================================================================================
-    //                                                              DerivedReferrer Option
+    //                                                              DerivedReferrer Object
     //                                                              ======================
-    protected FactoryOfDerivedReferrerOption xcFofSDROp() { // xcreateFactoryOfSpecifyDerivedReferrerOption()
-        return new FactoryOfDerivedReferrerOption() {
+    protected HpSDRFunctionFactory xcSDRFnFc() { // xcreateFactoryOfSpecifyDerivedReferrerOption()
+        return new HpSDRFunctionFactory() {
+            public <REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> HpSDRFunction<REFERRER_CB, LOCAL_CQ> create(
+                    ConditionBean baseCB, LOCAL_CQ localCQ //
+                    , HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper //
+                    , DBMetaProvider dbmetaProvider) {
+                final DerivedReferrerOptionFactory optionFactory = createSpecifyDerivedReferrerOptionFactory();
+                return newSDFFunction(baseCB, localCQ, querySetupper, dbmetaProvider, optionFactory);
+            }
+        };
+    }
+
+    /**
+     * New-create the function handler of (specify) derived-referrer as plain.
+     * @param <REFERRER_CB> The type of referrer condition-bean.
+     * @param <LOCAL_CQ> The type of local condition-query.
+     * @param baseCB The condition-bean of base table. (NotNull)
+     * @param localCQ The condition-query of local table. (NotNull)
+     * @param querySetupper The set-upper of sub-query for (specify) derived-referrer. (NotNull)
+     * @param dbmetaProvider The provider of DB meta. (NotNull)
+     * @param optionFactory The factory of option for (specify) derived-referrer. (NotNull)
+     * @return The new-created option of (specify) derived-referrer. (NotNull)
+     */
+    protected <LOCAL_CQ extends ConditionQuery, REFERRER_CB extends ConditionBean> HpSDRFunction<REFERRER_CB, LOCAL_CQ> newSDFFunction(
+            ConditionBean baseCB, LOCAL_CQ localCQ //
+            , HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper //
+            , DBMetaProvider dbmetaProvider //
+            , DerivedReferrerOptionFactory optionFactory) {
+        return new HpSDRFunction<REFERRER_CB, LOCAL_CQ>(baseCB, localCQ, querySetupper, dbmetaProvider, optionFactory);
+    }
+
+    protected DerivedReferrerOptionFactory createSpecifyDerivedReferrerOptionFactory() {
+        return new DerivedReferrerOptionFactory() {
             public DerivedReferrerOption create() {
                 return newSpecifyDerivedReferrerOption();
             }

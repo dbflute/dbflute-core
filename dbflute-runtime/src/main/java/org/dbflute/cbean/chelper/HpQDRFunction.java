@@ -18,7 +18,7 @@ package org.dbflute.cbean.chelper;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
 import org.dbflute.cbean.coption.FunctionFilterOptionCall;
-import org.dbflute.cbean.coption.FactoryOfDerivedReferrerOption;
+import org.dbflute.cbean.coption.DerivedReferrerOptionFactory;
 import org.dbflute.cbean.scoping.SubQuery;
 
 /**
@@ -32,12 +32,12 @@ public class HpQDRFunction<CB extends ConditionBean> {
     //                                                                           Attribute
     //                                                                           =========
     protected final HpQDRSetupper<CB> _setupper;
-    protected final FactoryOfDerivedReferrerOption _derivedReferrerOptionFactory;
+    protected final DerivedReferrerOptionFactory _derivedReferrerOptionFactory;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpQDRFunction(HpQDRSetupper<CB> setupper, FactoryOfDerivedReferrerOption derivedReferrerOptionFactory) {
+    public HpQDRFunction(HpQDRSetupper<CB> setupper, DerivedReferrerOptionFactory derivedReferrerOptionFactory) {
         _setupper = setupper;
         _derivedReferrerOptionFactory = derivedReferrerOptionFactory;
     }

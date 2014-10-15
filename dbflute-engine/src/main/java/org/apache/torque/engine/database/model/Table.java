@@ -142,6 +142,8 @@ import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter
 import org.dbflute.DfBuildProperties;
 import org.dbflute.bhv.referrer.ConditionBeanSetupper;
 import org.dbflute.bhv.referrer.ReferrerConditionSetupper;
+import org.dbflute.cbean.chelper.HpSDRFunction;
+import org.dbflute.cbean.chelper.dbms.HpSDRFunctionMySql;
 import org.dbflute.dbmeta.derived.DerivedMappable;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.helper.StringKeyMap;
@@ -3676,6 +3678,30 @@ public class Table {
 
     public boolean isMakeDirectConditionManualOrder() {
         return getLittleAdjustmentProperties().isMakeDirectConditionManualOrder();
+    }
+
+    // -----------------------------------------------------
+    //                              DerivedReferrer Function
+    //                              ------------------------
+    // only (Specify)DerivedReferrer is here
+    // because this is base implementation for #future needs
+    public boolean needsSpecifyDerivedReferrerFunctionDBMSOverride() {
+        return chooseSpecifyDerivedReferrerFunctionDBMSClassName() != null;
+    }
+
+    public String getSpecifyDerivedReferrerFunctionClassName() {
+        final String dbmsClassName = chooseSpecifyDerivedReferrerFunctionDBMSClassName();
+        return dbmsClassName != null ? dbmsClassName : HpSDRFunction.class.getSimpleName();
+    }
+
+    protected String chooseSpecifyDerivedReferrerFunctionDBMSClassName() {
+        if (getLittleAdjustmentProperties().isAvailableDatabaseDependency()) {
+            // FQCN here because of no import in template
+            if (getBasicProperties().isDatabaseMySQL()) {
+                return HpSDRFunctionMySql.class.getName();
+            }
+        }
+        return null;
     }
 
     // ===================================================================================

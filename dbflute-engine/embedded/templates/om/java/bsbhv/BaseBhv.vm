@@ -131,7 +131,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @return The count for the condition. (NotMinus)
      */
     public int selectCount(CBCall<${myConditionBeanClassName}> cbLambda) {
-        return facadeSelectCount(handleCBCall(cbLambda));
+        return facadeSelectCount(createCB(cbLambda));
     }
 
 #end
@@ -209,7 +209,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     public ${table.filterSelectEntityOptionalReturnIfNeeds($myExtendedObjectClassName)} selectEntity(CBCall<${myConditionBeanClassName}> cbLambda) {
-        return facadeSelectEntity(handleCBCall(cbLambda));
+        return facadeSelectEntity(createCB(cbLambda));
     }
 
 #end
@@ -306,7 +306,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     ${table.selectEntityWithDeletedCheckModifier} ${myExtendedObjectClassName} selectEntityWithDeletedCheck(CBCall<${myConditionBeanClassName}> cbLambda) {
-        return facadeSelectEntityWithDeletedCheck(handleCBCall(cbLambda));
+        return facadeSelectEntityWithDeletedCheck(createCB(cbLambda));
     }
 #end
 #if ($table.isMakeDirectConditionBeanSetup())
@@ -435,7 +435,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception DangerousResultSizeException When the result size is over the specified safety size.
      */
     public ListResultBean<${myExtendedObjectClassName}> selectList(CBCall<${myConditionBeanClassName}> cbLambda) {
-        return facadeSelectList(handleCBCall(cbLambda));
+        return facadeSelectList(createCB(cbLambda));
     }
 
 #end
@@ -492,7 +492,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception DangerousResultSizeException When the result size is over the specified safety size.
      */
     public PagingResultBean<${myExtendedObjectClassName}> selectPage(CBCall<${myConditionBeanClassName}> cbLambda) {
-        return facadeSelectPage(handleCBCall(cbLambda));
+        return facadeSelectPage(createCB(cbLambda));
     }
 
 #end
@@ -543,7 +543,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param entityLambda The handler of entity row of ${myExtendedObjectClassName}. (NotNull)
      */
     public void selectCursor(CBCall<${myConditionBeanClassName}> cbLambda, EntityRowHandler<${myExtendedObjectClassName}> entityLambda) {
-        facadeSelectCursor(handleCBCall(cbLambda), entityLambda);
+        facadeSelectCursor(createCB(cbLambda), entityLambda);
     }
 
 #end
@@ -1362,7 +1362,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception NonQueryUpdateNotAllowedException When the query has no condition.
      */
     public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, CBCall<${myConditionBeanClassName}> cbLambda) {
-        return doQueryUpdate(${myEntityVariableName}, handleCBCall(cbLambda), null);
+        return doQueryUpdate(${myEntityVariableName}, createCB(cbLambda), null);
     }
 #end
 #if ($table.isMakeDirectConditionBeanSetup())
@@ -1407,7 +1407,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception NonQueryDeleteNotAllowedException When the query has no condition.
      */
     public int queryDelete(CBCall<${myConditionBeanClassName}> cbLambda) {
-        return doQueryDelete(handleCBCall(cbLambda), null);
+        return doQueryDelete(createCB(cbLambda), null);
     }
 #end
 #if ($table.isMakeDirectConditionBeanSetup())
@@ -1453,8 +1453,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param opLambda The callback for option of insert for varying requests. (NotNull)
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    public void varyingInsert(${myExtendedObjectClassName} ${myEntityVariableName}, WOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> opLambda) {
-        doInsert(${myEntityVariableName}, handleInsertOpCall(opLambda));
+    public void varyingInsert(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> opLambda) {
+        doInsert(${myEntityVariableName}, createInsertOption(opLambda));
     }
 
     /**
@@ -1498,8 +1498,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    public void varyingUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, WOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
-        doUpdate(${myEntityVariableName}, handleUpdateOpCall(opLambda));
+    public void varyingUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
+        doUpdate(${myEntityVariableName}, createUpdateOption(opLambda));
     }
 #if ($table.hasOptimisticLock())
 
@@ -1529,8 +1529,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    public void varyingUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, WOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
-        doUpdateNonstrict(${myEntityVariableName}, handleUpdateOpCall(opLambda));
+    public void varyingUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
+        doUpdateNonstrict(${myEntityVariableName}, createUpdateOption(opLambda));
     }
 #end
 
@@ -1548,8 +1548,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    public void varyingInsertOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, WOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> insertOpLambda, WOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> updateOpLambda) {
-        doInsertOrUpdate(${myEntityVariableName}, handleInsertOpCall(insertOpLambda), handleUpdateOpCall(updateOpLambda));
+    public void varyingInsertOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> insertOpLambda, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> updateOpLambda) {
+        doInsertOrUpdate(${myEntityVariableName}, createInsertOption(insertOpLambda), createUpdateOption(updateOpLambda));
     }
 #if ($table.hasOptimisticLock())
 
@@ -1563,8 +1563,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception EntityDuplicatedException When the entity has been duplicated.
      * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
-    public void varyingInsertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, WOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> insertOpLambda, WOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> updateOpLambda) {
-        doInsertOrUpdateNonstrict(${myEntityVariableName}, handleInsertOpCall(insertOpLambda), handleUpdateOpCall(updateOpLambda));
+    public void varyingInsertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> insertOpLambda, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> updateOpLambda) {
+        doInsertOrUpdateNonstrict(${myEntityVariableName}, createInsertOption(insertOpLambda), createUpdateOption(updateOpLambda));
     }
 #end
 
@@ -1585,8 +1585,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #end
      * @exception EntityDuplicatedException When the entity has been duplicated.
      */
-    public void varyingDelete(${myExtendedObjectClassName} ${myEntityVariableName}, WOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
-        doDelete(${myEntityVariableName}, handleDeleteOpCall(opLambda));
+    public void varyingDelete(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
+        doDelete(${myEntityVariableName}, createDeleteOption(opLambda));
     }
 #if ($table.hasOptimisticLock())
 
@@ -1599,8 +1599,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception EntityDuplicatedException When the entity has been duplicated.
      */
-    public void varyingDeleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, WOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
-        doDeleteNonstrict(${myEntityVariableName}, handleDeleteOpCall(opLambda));
+    public void varyingDeleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
+        doDeleteNonstrict(${myEntityVariableName}, createDeleteOption(opLambda));
     }
 #end
 
@@ -1616,8 +1616,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param opLambda The callback for option of insert for varying requests. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
      */
-    public int[] varyingBatchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, WOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> opLambda) {
-        return doBatchInsert(${myEntityListVariableName}, handleInsertOpCall(opLambda));
+    public int[] varyingBatchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, WritableOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> opLambda) {
+        return doBatchInsert(${myEntityListVariableName}, createInsertOption(opLambda));
     }
 
     /**
@@ -1629,8 +1629,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param opLambda The callback for option of update for varying requests. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
      */
-    public int[] varyingBatchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, WOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
-        return doBatchUpdate(${myEntityListVariableName}, handleUpdateOpCall(opLambda));
+    public int[] varyingBatchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
+        return doBatchUpdate(${myEntityListVariableName}, createUpdateOption(opLambda));
     }
 #if ($table.hasOptimisticLock())
 
@@ -1643,8 +1643,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param opLambda The callback for option of update for varying requests. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
      */
-    public int[] varyingBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, WOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
-        return doBatchUpdateNonstrict(${myEntityListVariableName}, handleUpdateOpCall(opLambda));
+    public int[] varyingBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
+        return doBatchUpdateNonstrict(${myEntityListVariableName}, createUpdateOption(opLambda));
     }
 #end
 
@@ -1656,8 +1656,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param opLambda The callback for option of delete for varying requests. (NotNull)
      * @return The array of deleted count. (NotNull, EmptyAllowed)
      */
-    public int[] varyingBatchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, WOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
-        return doBatchDelete(${myEntityListVariableName}, handleDeleteOpCall(opLambda));
+    public int[] varyingBatchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, WritableOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
+        return doBatchDelete(${myEntityListVariableName}, createDeleteOption(opLambda));
     }
 #if ($table.hasOptimisticLock())
 
@@ -1669,8 +1669,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param opLambda The callback for option of delete for varying requests. (NotNull)
      * @return The array of deleted count. (NotNull, EmptyAllowed)
      */
-    public int[] varyingBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, WOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
-        return doBatchDeleteNonstrict(${myEntityListVariableName}, handleDeleteOpCall(opLambda));
+    public int[] varyingBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, WritableOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
+        return doBatchDeleteNonstrict(${myEntityListVariableName}, createDeleteOption(opLambda));
     }
 #end
 
@@ -1685,8 +1685,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param opLambda The callback for option of insert for varying requests. (NotNull)
      * @return The inserted count.
      */
-    public int varyingQueryInsert(QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> manyArgLambda, WOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> opLambda) {
-        return doQueryInsert(manyArgLambda, handleInsertOpCall(opLambda));
+    public int varyingQueryInsert(QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> manyArgLambda, WritableOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> opLambda) {
+        return doQueryInsert(manyArgLambda, createInsertOption(opLambda));
     }
 #if ($table.isMakeCallbackConditionBeanSetup())
 
@@ -1720,8 +1720,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @return The updated count.
      * @exception NonQueryUpdateNotAllowedException When the query has no condition (if not allowed).
      */
-    public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, CBCall<${myConditionBeanClassName}> cbLambda, WOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
-        return doQueryUpdate(${myEntityVariableName}, handleCBCall(cbLambda), handleUpdateOpCall(opLambda));
+    public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, CBCall<${myConditionBeanClassName}> cbLambda, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
+        return doQueryUpdate(${myEntityVariableName}, createCB(cbLambda), createUpdateOption(opLambda));
     }
 #end
 #if ($table.isMakeDirectConditionBeanSetup())
@@ -1756,8 +1756,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @return The updated count.
      * @exception NonQueryUpdateNotAllowedException When the query has no condition (if not allowed).
      */
-    public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, WOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
-        return doQueryUpdate(${myEntityVariableName}, cb, handleUpdateOpCall(opLambda));
+    public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
+        return doQueryUpdate(${myEntityVariableName}, cb, createUpdateOption(opLambda));
     }
 #end
 #if ($table.isMakeCallbackConditionBeanSetup())
@@ -1771,8 +1771,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @return The deleted count.
      * @exception NonQueryDeleteNotAllowedException When the query has no condition (if not allowed).
      */
-    public int varyingQueryDelete(CBCall<${myConditionBeanClassName}> cbLambda, WOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
-        return doQueryDelete(handleCBCall(cbLambda), handleDeleteOpCall(opLambda));
+    public int varyingQueryDelete(CBCall<${myConditionBeanClassName}> cbLambda, WritableOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
+        return doQueryDelete(createCB(cbLambda), createDeleteOption(opLambda));
     }
 #end
 #if ($table.isMakeDirectConditionBeanSetup())
@@ -1786,8 +1786,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @return The deleted count.
      * @exception NonQueryDeleteNotAllowedException When the query has no condition (if not allowed).
      */
-    public int varyingQueryDelete(${myConditionBeanClassName} cb, WOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
-        return doQueryDelete(cb, handleDeleteOpCall(opLambda));
+    public int varyingQueryDelete(${myConditionBeanClassName} cb, WritableOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
+        return doQueryDelete(cb, createDeleteOption(opLambda));
     }
 #end
 #else
