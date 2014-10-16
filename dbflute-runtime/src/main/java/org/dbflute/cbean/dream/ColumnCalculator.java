@@ -13,15 +13,16 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.chelper;
+package org.dbflute.cbean.dream;
 
 import org.dbflute.cbean.coption.ColumnConversionOption;
 import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 
 /**
+ * The calculator interface of column, also providing one of DreamCruise.
  * @author jflute
  */
-public interface HpCalculator {
+public interface ColumnCalculator {
 
     // ===================================================================================
     //                                                                         Calculation
@@ -31,7 +32,7 @@ public interface HpCalculator {
      * @param plusValue The number value for plus. (NotNull)
      * @return this. (NotNull)
      */
-    HpCalculator plus(Number plusValue);
+    ColumnCalculator plus(Number plusValue);
 
     /**
      * Plus the specified column with the plus column. (+) {Dream Cruise}
@@ -57,14 +58,14 @@ public interface HpCalculator {
      * @param plusColumn The plus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    HpCalculator plus(HpSpecifiedColumn plusColumn);
+    ColumnCalculator plus(SpecifiedColumn plusColumn);
 
     /**
      * Minus the specified column with the value. (-)
      * @param minusValue The number value for minus. (NotNull)
      * @return this. (NotNull)
      */
-    HpCalculator minus(Number minusValue);
+    ColumnCalculator minus(Number minusValue);
 
     /**
      * Minus the specified column with the minus column. (-) {Dream Cruise}
@@ -90,14 +91,14 @@ public interface HpCalculator {
      * @param minusColumn The minus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    HpCalculator minus(HpSpecifiedColumn minusColumn);
+    ColumnCalculator minus(SpecifiedColumn minusColumn);
 
     /**
      * Multiply the value to the specified column. (*)
      * @param multiplyValue The number value for multiply. (NotNull)
      * @return this. (NotNull)
      */
-    HpCalculator multiply(Number multiplyValue);
+    ColumnCalculator multiply(Number multiplyValue);
 
     /**
      * Multiply the specified column with the multiply column. (*) {Dream Cruise}
@@ -123,14 +124,14 @@ public interface HpCalculator {
      * @param multiplyColumn The multiply column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    HpCalculator multiply(HpSpecifiedColumn multiplyColumn);
+    ColumnCalculator multiply(SpecifiedColumn multiplyColumn);
 
     /**
      * Divide the specified column by the value. (/)
      * @param divideValue The number value for divide. (NotNull)
      * @return this. (NotNull)
      */
-    HpCalculator divide(Number divideValue);
+    ColumnCalculator divide(Number divideValue);
 
     /**
      * Divide the specified column with the divide column. (/) {Dream Cruise}
@@ -156,14 +157,14 @@ public interface HpCalculator {
      * @param divideColumn The divide column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    HpCalculator divide(HpSpecifiedColumn divideColumn);
+    ColumnCalculator divide(SpecifiedColumn divideColumn);
 
     /**
      * Convert the value of right column by function.
      * @param opLambda The callback for conversion option of column. (NotNull)
      * @return this. (NotNull)
      */
-    HpCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda);
+    ColumnCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda);
 
     // ===================================================================================
     //                                                                     Left/Right Mode
@@ -172,12 +173,12 @@ public interface HpCalculator {
      * To be for left column.
      * @return this. (NotNull)
      */
-    HpCalculator left();
+    ColumnCalculator left();
 
     /**
      * To be for right column. (default)<br />
      * It also means main process internally.
      * @return this. (NotNull)
      */
-    HpCalculator right();
+    ColumnCalculator right();
 }

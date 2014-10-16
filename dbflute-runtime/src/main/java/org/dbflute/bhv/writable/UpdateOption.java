@@ -23,8 +23,8 @@ import java.util.Set;
 import org.dbflute.Entity;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
-import org.dbflute.cbean.chelper.HpCalculator;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.dbflute.cbean.dream.ColumnCalculator;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
@@ -120,7 +120,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * @param colCBLambda The callback for query for specification that specifies only one column. (NotNull)
      * @return The calculation of specification for the specified column. (NotNull)
      */
-    public HpCalculator self(SpecifyQuery<CB> colCBLambda) {
+    public ColumnCalculator self(SpecifyQuery<CB> colCBLambda) {
         if (colCBLambda == null) {
             String msg = "The argument 'colCBLambda' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -279,7 +279,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         if (calcSp == null) {
             return null;
         }
-        final HpSpecifiedColumn specifiedColumn = calcSp.getResolvedSpecifiedColumn();
+        final SpecifiedColumn specifiedColumn = calcSp.getResolvedSpecifiedColumn();
         if (specifiedColumn != null && specifiedColumn.hasSpecifyCalculation()) {
             throwVaryingUpdateSpecifyCalculatonUnsupportedException(columnDbName);
         }

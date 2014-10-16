@@ -15,7 +15,7 @@
  */
 package org.dbflute.cbean.coption;
 
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 
 /**
  * The conversion option for column. e.g. ColumnQuery <br />
@@ -134,7 +134,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption addYear(HpSpecifiedColumn addedColumn) {
+    public ColumnConversionOption addYear(SpecifiedColumn addedColumn) {
         doAddYear(addedColumn);
         return this;
     }
@@ -158,7 +158,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption subtractYear(HpSpecifiedColumn subtractedColumn) {
+    public ColumnConversionOption subtractYear(SpecifiedColumn subtractedColumn) {
         doAddYear(subtractedColumn, true);
         return this;
     }
@@ -196,7 +196,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption addMonth(HpSpecifiedColumn addedColumn) {
+    public ColumnConversionOption addMonth(SpecifiedColumn addedColumn) {
         doAddMonth(addedColumn);
         return this;
     }
@@ -220,7 +220,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption subtractMonth(HpSpecifiedColumn subtractedColumn) {
+    public ColumnConversionOption subtractMonth(SpecifiedColumn subtractedColumn) {
         doAddMonth(subtractedColumn, true);
         return this;
     }
@@ -258,7 +258,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption addDay(HpSpecifiedColumn addedColumn) {
+    public ColumnConversionOption addDay(SpecifiedColumn addedColumn) {
         doAddDay(addedColumn);
         return this;
     }
@@ -282,7 +282,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption subtractDay(HpSpecifiedColumn subtractedColumn) {
+    public ColumnConversionOption subtractDay(SpecifiedColumn subtractedColumn) {
         doAddDay(subtractedColumn, true);
         return this;
     }
@@ -320,7 +320,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption addHour(HpSpecifiedColumn addedColumn) {
+    public ColumnConversionOption addHour(SpecifiedColumn addedColumn) {
         doAddHour(addedColumn);
         return this;
     }
@@ -344,7 +344,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption subtractHour(HpSpecifiedColumn subtractedColumn) {
+    public ColumnConversionOption subtractHour(SpecifiedColumn subtractedColumn) {
         doAddHour(subtractedColumn, true);
         return this;
     }
@@ -382,7 +382,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption addMinute(HpSpecifiedColumn addedColumn) {
+    public ColumnConversionOption addMinute(SpecifiedColumn addedColumn) {
         doAddMinute(addedColumn);
         return this;
     }
@@ -406,7 +406,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption subtractMinute(HpSpecifiedColumn subtractedColumn) {
+    public ColumnConversionOption subtractMinute(SpecifiedColumn subtractedColumn) {
         doAddMinute(subtractedColumn, true);
         return this;
     }
@@ -444,7 +444,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption addSecond(HpSpecifiedColumn addedColumn) {
+    public ColumnConversionOption addSecond(SpecifiedColumn addedColumn) {
         doAddSecond(addedColumn);
         return this;
     }
@@ -468,7 +468,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public ColumnConversionOption subtractSecond(HpSpecifiedColumn subtractedColumn) {
+    public ColumnConversionOption subtractSecond(SpecifiedColumn subtractedColumn) {
         doAddSecond(subtractedColumn, true);
         return this;
     }

@@ -21,6 +21,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.chelper.*;
 import org.dbflute.cbean.coption.*;
+import org.dbflute.cbean.dream.*;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.dbflute.cbean.scoping.*;
@@ -529,7 +530,7 @@ public class ${myClassName} extends AbstractConditionBean {
          * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
          * @return The information object of specified column. (NotNull)
          */
-        public HpSpecifiedColumn column${col.javaName}() { return doColumn("${col.name}"); }
+        public SpecifiedColumn column${col.javaName}() { return doColumn("${col.name}"); }
 #end
         public void everyColumn() { doEveryColumn(); }
         public void exceptRecordMetaColumn() { doExceptRecordMetaColumn(); }
@@ -739,7 +740,7 @@ public class ${myClassName} extends AbstractConditionBean {
      */
     public ${colQyOperandClass}<${myConditionBeanClassName}> columnQuery(final SpecifyQuery<${myConditionBeanClassName}> colCBLambda) {
         return ${colQyOperandCreator}(new HpColQyHandler<${myConditionBeanClassName}>() {
-            public HpCalculator handle(SpecifyQuery<${myConditionBeanClassName}> rightSp, String operand) {
+            public ColumnCalculator handle(SpecifyQuery<${myConditionBeanClassName}> rightSp, String operand) {
                 return xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), colCBLambda, rightSp, operand);
             }
         });

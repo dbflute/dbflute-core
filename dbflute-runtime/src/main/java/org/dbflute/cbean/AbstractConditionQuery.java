@@ -40,7 +40,6 @@ import org.dbflute.cbean.chelper.HpQDRSetupper;
 import org.dbflute.cbean.chelper.HpSSQFunction;
 import org.dbflute.cbean.chelper.HpSSQOption;
 import org.dbflute.cbean.chelper.HpSSQSetupper;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
@@ -55,6 +54,7 @@ import org.dbflute.cbean.coption.ParameterOption;
 import org.dbflute.cbean.coption.RangeOfOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.ordering.ManualOrderOptionCall;
@@ -794,7 +794,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throw new IllegalStateException(msg);
         }
         // *char type only but no checked (cannot check)
-        final List<HpSpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
+        final List<SpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
         final List<Integer> sizeList = option.getCompoundColumnSizeList();
         String currentValue = value;
         int currentLength = value.length();
@@ -805,14 +805,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         try {
             boolean shortLengthBreak = false;
-            final Iterator<HpSpecifiedColumn> compoundColumnIterator = compoundColumnList.iterator();
+            final Iterator<SpecifiedColumn> compoundColumnIterator = compoundColumnList.iterator();
             for (Integer columnSize : sizeList) { // should be less or equal column count (checked in option)
                 if (currentLength >= columnSize) { // can treat current condition as equal
                     final String equalValue = currentValue.substring(0, columnSize);
                     invokeQueryEqual(currentColumn, equalValue);
                     currentValue = currentValue.substring(columnSize);
                     currentLength = currentValue.length();
-                    final HpSpecifiedColumn specifiedColumn;
+                    final SpecifiedColumn specifiedColumn;
                     if (compoundColumnIterator.hasNext()) {
                         specifiedColumn = compoundColumnIterator.next();
                         currentColumn = specifiedColumn.getColumnDbName();
@@ -1841,13 +1841,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    protected HpSpecifiedColumn xcreateManualOrderSpecifiedColumn(ConditionBean dreamCruiseCB) {
+    protected SpecifiedColumn xcreateManualOrderSpecifiedColumn(ConditionBean dreamCruiseCB) {
         final OrderByElement orderByLastElement = xgetSqlClause().getOrderByLastElement();
         final String aliasName = orderByLastElement.getAliasName();
         final String columnName = orderByLastElement.getColumnName();
         final ColumnInfo columnInfo = orderByLastElement.getColumnInfo();
         final boolean derived = orderByLastElement.isDerivedOrderBy();
-        return new HpSpecifiedColumn(aliasName, columnInfo, dreamCruiseCB, columnName, derived);
+        return new SpecifiedColumn(aliasName, columnInfo, dreamCruiseCB, columnName, derived);
     }
 
     // -----------------------------------------------------

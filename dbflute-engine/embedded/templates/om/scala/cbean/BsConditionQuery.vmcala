@@ -659,7 +659,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
     // very internal (for suppressing warn about 'Not Use Import')
     protected def xCB(): String = { return classOf[${myConditionBeanClassName}].getName(); }
     protected def xCQ(): String = { return classOf[${myConditionQueryClassName}].getName(); }
-    protected def xCHp(): String = { return classOf[HpCalculator].getName(); }
+    protected def xCHp(): String = { return classOf[ColumnCalculator].getName(); }
     protected def xCOp(): String = { return classOf[ConditionOption].getName(); }
     protected def xMap(): String = { return classOf[Map[_, _]].getName(); }
 }

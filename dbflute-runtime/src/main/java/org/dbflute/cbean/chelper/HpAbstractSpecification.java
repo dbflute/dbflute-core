@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.join.InnerJoinNoWaySpeaker;
@@ -47,7 +48,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     protected final HpSDRFunctionFactory _sdrFuncFactory;
     protected CQ _query; // lazy-loaded
     protected boolean _alreadySpecifiedRequiredColumn; // also means specification existence
-    protected Map<String, HpSpecifiedColumn> _specifiedColumnMap; // saves specified columns (lazy-loaded)
+    protected Map<String, SpecifiedColumn> _specifiedColumnMap; // saves specified columns (lazy-loaded)
     protected boolean _alreadySpecifiedEveryColumn;
     protected boolean _alreadySpecifiedExceptColumn;
 
@@ -73,11 +74,11 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     // ===================================================================================
     //                                                                Column Specification
     //                                                                ====================
-    public HpSpecifiedColumn xspecifyColumn(String columnName) { // for interface
+    public SpecifiedColumn xspecifyColumn(String columnName) { // for interface
         return doColumn(columnName);
     }
 
-    protected HpSpecifiedColumn doColumn(String columnName) { // for extended class
+    protected SpecifiedColumn doColumn(String columnName) { // for extended class
         checkSpecifiedThemeColumnStatus(columnName);
         if (isSpecifiedColumn(columnName)) {
             // returns the same instance as the specified before
@@ -100,7 +101,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
             keepDreamCruiseJourneyLogBookIfNeeds(relationPath, tableAliasName);
             reflectDreamCruiseWhereUsedToJoin(relationPath, tableAliasName);
         }
-        final HpSpecifiedColumn specifiedColumn = createSpecifiedColumn(columnName, tableAliasName);
+        final SpecifiedColumn specifiedColumn = createSpecifiedColumn(columnName, tableAliasName);
         sqlClause.specifySelectColumn(specifiedColumn);
         saveSpecifiedColumn(columnName, specifiedColumn);
         return specifiedColumn;
@@ -142,16 +143,16 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
 
     protected abstract String getTableDbName();
 
-    protected HpSpecifiedColumn createSpecifiedColumn(String columnName, String tableAliasName) {
+    protected SpecifiedColumn createSpecifiedColumn(String columnName, String tableAliasName) {
         final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(_query.getTableDbName());
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnName);
-        return new HpSpecifiedColumn(tableAliasName, columnInfo, _baseCB);
+        return new SpecifiedColumn(tableAliasName, columnInfo, _baseCB);
     }
 
     // -----------------------------------------------------
     //                             Specified Column Handling
     //                             -------------------------
-    public HpSpecifiedColumn getSpecifiedColumn(String columnName) {
+    public SpecifiedColumn getSpecifiedColumn(String columnName) {
         return _specifiedColumnMap != null ? _specifiedColumnMap.get(columnName) : null;
     }
 
@@ -163,9 +164,9 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
         return _specifiedColumnMap != null && _specifiedColumnMap.containsKey(columnName);
     }
 
-    protected void saveSpecifiedColumn(String columnName, HpSpecifiedColumn specifiedColumn) {
+    protected void saveSpecifiedColumn(String columnName, SpecifiedColumn specifiedColumn) {
         if (_specifiedColumnMap == null) {
-            _specifiedColumnMap = new LinkedHashMap<String, HpSpecifiedColumn>();
+            _specifiedColumnMap = new LinkedHashMap<String, SpecifiedColumn>();
         }
         _specifiedColumnMap.put(columnName, specifiedColumn);
     }

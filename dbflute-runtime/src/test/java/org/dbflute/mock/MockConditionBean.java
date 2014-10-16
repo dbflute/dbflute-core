@@ -21,9 +21,9 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpColumnSpHandler;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.ordering.OrderByBean;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.paging.PagingInvoker;
@@ -256,7 +256,7 @@ public class MockConditionBean implements ConditionBean {
     public void invokeSetupSelect(String foreignPropertyNamePath) {
     }
 
-    public HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath) {
+    public SpecifiedColumn invokeSpecifyColumn(String columnNamePath) {
         return null;
     }
 
@@ -318,10 +318,10 @@ public class MockConditionBean implements ConditionBean {
         return false;
     }
 
-    public void overTheWaves(HpSpecifiedColumn dreamCruiseTicket) {
+    public void overTheWaves(SpecifiedColumn dreamCruiseTicket) {
     }
 
-    public HpSpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias) {
+    public SpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias) {
         return null;
     }
 
@@ -344,7 +344,7 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public HpSpecifiedColumn xshowDreamCruiseTicket() {
+    public SpecifiedColumn xshowDreamCruiseTicket() {
         return null;
     }
 

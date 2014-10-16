@@ -24,17 +24,17 @@ import java.util.TimeZone;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
-import org.dbflute.cbean.chelper.HpCalculator;
 import org.dbflute.cbean.chelper.HpManualOrderThemeListHandler;
 import org.dbflute.cbean.chelper.HpMobCaseWhenElement;
 import org.dbflute.cbean.chelper.HpMobConnectedBean;
 import org.dbflute.cbean.chelper.HpMobConnectionMode;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.coption.ColumnConversionOption;
 import org.dbflute.cbean.coption.ConditionOptionCall;
 import org.dbflute.cbean.coption.FromToOption;
 import org.dbflute.cbean.coption.FunctionFilterOptionCall;
+import org.dbflute.cbean.dream.ColumnCalculator;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
@@ -76,7 +76,7 @@ import org.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.9.8.2 (2011/04/08 Friday)
  */
-public class ManualOrderOption implements HpCalculator {
+public class ManualOrderOption implements ColumnCalculator {
 
     // ===================================================================================
     //                                                                          Definition
@@ -409,7 +409,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator plus(Number plusValue) {
+    public ColumnCalculator plus(Number plusValue) {
         assertObjectNotNull("plusValue", plusValue);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.plus(plusValue);
@@ -418,7 +418,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator plus(HpSpecifiedColumn plusColumn) {
+    public ColumnCalculator plus(SpecifiedColumn plusColumn) {
         assertObjectNotNull("plusColumn", plusColumn);
         assertCalculationColumnNumber(plusColumn);
         assertSpecifiedDreamCruiseTicket(plusColumn);
@@ -429,7 +429,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator minus(Number minusValue) {
+    public ColumnCalculator minus(Number minusValue) {
         assertObjectNotNull("minusValue", minusValue);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.minus(minusValue);
@@ -438,7 +438,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator minus(HpSpecifiedColumn minusColumn) {
+    public ColumnCalculator minus(SpecifiedColumn minusColumn) {
         assertObjectNotNull("minusColumn", minusColumn);
         assertCalculationColumnNumber(minusColumn);
         assertSpecifiedDreamCruiseTicket(minusColumn);
@@ -449,7 +449,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator multiply(Number multiplyValue) {
+    public ColumnCalculator multiply(Number multiplyValue) {
         assertObjectNotNull("multiplyValue", multiplyValue);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.multiply(multiplyValue);
@@ -458,7 +458,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator multiply(HpSpecifiedColumn multiplyColumn) {
+    public ColumnCalculator multiply(SpecifiedColumn multiplyColumn) {
         assertObjectNotNull("multiplyColumn", multiplyColumn);
         assertCalculationColumnNumber(multiplyColumn);
         assertSpecifiedDreamCruiseTicket(multiplyColumn);
@@ -469,7 +469,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator divide(Number divideValue) {
+    public ColumnCalculator divide(Number divideValue) {
         assertObjectNotNull("divideValue", divideValue);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.divide(divideValue);
@@ -478,7 +478,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator divide(HpSpecifiedColumn divideColumn) {
+    public ColumnCalculator divide(SpecifiedColumn divideColumn) {
         assertObjectNotNull("divideColumn", divideColumn);
         assertCalculationColumnNumber(divideColumn);
         assertSpecifiedDreamCruiseTicket(divideColumn);
@@ -489,7 +489,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
+    public ColumnCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
         assertObjectNotNull("opLambda", opLambda);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.convert(opLambda);
@@ -498,7 +498,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator left() {
+    public ColumnCalculator left() {
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.left();
     }
@@ -506,7 +506,7 @@ public class ManualOrderOption implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator right() {
+    public ColumnCalculator right() {
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.right();
     }
@@ -617,7 +617,7 @@ public class ManualOrderOption implements HpCalculator {
         if (plainValue == null) {
             return null;
         }
-        if (plainValue instanceof HpSpecifiedColumn) {
+        if (plainValue instanceof SpecifiedColumn) {
             return resolveDreamCruiseExp(plainValue);
         }
         ClassificationCodeType codeType = null;
@@ -652,7 +652,7 @@ public class ManualOrderOption implements HpCalculator {
     }
 
     protected Object resolveDreamCruiseExp(Object plainValue) {
-        final HpSpecifiedColumn specifiedColumn = (HpSpecifiedColumn) plainValue;
+        final SpecifiedColumn specifiedColumn = (SpecifiedColumn) plainValue;
         final String columnExp = specifiedColumn.toColumnRealName().toString();
         if (specifiedColumn.hasSpecifyCalculation()) {
             specifiedColumn.xinitSpecifyCalculation();
@@ -874,7 +874,7 @@ public class ManualOrderOption implements HpCalculator {
         }
     }
 
-    protected void assertCalculationColumnNumber(HpSpecifiedColumn specifiedColumn) {
+    protected void assertCalculationColumnNumber(SpecifiedColumn specifiedColumn) {
         final ColumnInfo columnInfo = specifiedColumn.getColumnInfo();
         if (columnInfo == null) { // basically not null but just in case
             return;
@@ -885,7 +885,7 @@ public class ManualOrderOption implements HpCalculator {
         }
     }
 
-    protected void assertSpecifiedDreamCruiseTicket(HpSpecifiedColumn column) {
+    protected void assertSpecifiedDreamCruiseTicket(SpecifiedColumn column) {
         if (!column.isDreamCruiseTicket()) {
             final String msg = "The specified column was not dream cruise ticket: " + column;
             throw new IllegalConditionBeanOperationException(msg);

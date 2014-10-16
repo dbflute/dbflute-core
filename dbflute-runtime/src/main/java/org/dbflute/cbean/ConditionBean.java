@@ -19,9 +19,10 @@ import java.util.Map;
 
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpColumnSpHandler;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.dream.SpecifiedColumn;
+import org.dbflute.cbean.dream.WelcomeToDreamCruise;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.scoping.AndQuery;
 import org.dbflute.cbean.scoping.OrQuery;
@@ -37,7 +38,7 @@ import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
  * The bean for condition.
  * @author jflute
  */
-public interface ConditionBean extends PagingBean {
+public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
 
     // ===================================================================================
     //                                                                          Table Name
@@ -131,40 +132,11 @@ public interface ConditionBean extends PagingBean {
     //                                                                        Dream Cruise
     //                                                                        ============
     /**
-     * DBFlute Dreams.
-     * <pre>
-     * e.g. member that purchases products only purchased by the member
-     *  MemberCB cb = new MemberCB();
-     *  cb.specify().columnBirthdate();
-     *  final MemberCB dreamCruiseCB = cb.<span style="color: #CC4747">dreamCruiseCB()</span>;
-     *  cb.query().existsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
-     *      public void query(PurchaseCB subCB) {
-     *          subCB.query().queryProduct().notExistsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
-     *              public void query(PurchaseCB subCB) {
-     *                  subCB.columnQuery(new SpecifyQuery&lt;PurchaseCB&gt;() {
-     *                      public void specify(PurchaseCB cb) {
-     *                          cb.specify().columnMemberId();
-     *                      }
-     *                  }).notEqual(new SpecifyQuery&lt;PurchaseCB&gt;() {
-     *                      public void specify(PurchaseCB cb) {
-     *                          cb.<span style="color: #CC4747">overTheWaves</span>(dreamCruiseCB.specify().columnMemberId());
-     *                      }
-     *                  });
-     *              }
-     *          });
-     *      }
-     *  });
-     * </pre>
-     * @param dreamCruiseTicket The ticket column specified by your Dream Cruise. (NotNull)
-     */
-    void overTheWaves(HpSpecifiedColumn dreamCruiseTicket);
-
-    /**
      * Invite the derived column to dream cruise. (returns the ticket)
      * @param derivedAlias The alias name for derived column. (NotNull)
      * @return The ticket column specified by your Dream Cruise. (NotNull)
      */
-    HpSpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias);
+    SpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias); // user interface
 
     /**
      * Create condition-bean for dream cruise.
@@ -208,7 +180,7 @@ public interface ConditionBean extends PagingBean {
      * (get the specified column by Dream Cruise)
      * @return The information of specified column. (NullAllowed)
      */
-    HpSpecifiedColumn xshowDreamCruiseTicket();
+    SpecifiedColumn xshowDreamCruiseTicket();
 
     /**
      * Keep journey log-book of Dream Cruise. <br /> 
@@ -226,26 +198,6 @@ public interface ConditionBean extends PagingBean {
      * Set up select for journey log-book of Dream Cruise if union query exists.
      */
     void xsetupSelectDreamCruiseJourneyLogBookIfUnionExists();
-
-    /**
-     * DBFlute Dreams.
-     * <pre>
-     * e.g. ColumnQuery: ... > '2015/04/05' + (PURCHASE_COUNT days)
-     *  PurchaseCB cb = new PurchaseCB();
-     *  cb.columnQuery(new SpecifyQuery() {
-     *      public void specify(Purchase cb) {
-     *          cb.column...();
-     *      }
-     *  }).greaterThan(new SpecifyQuery() {
-     *      public void specify(Purchase cb) {
-     *          cb.<span style="color: #CC4747">mysticRhythms</span>(toDate("2015/04/05"));
-     *      }
-     *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #CC4747">addDay</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
-     * </pre>
-     * @param mysticBinding
-     */
-    void mysticRhythms(Object mysticBinding);
 
     /**
      * Get the value of mystic binding.
@@ -534,7 +486,7 @@ public interface ConditionBean extends PagingBean {
      * @return The info of specified column. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
-    HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath);
+    SpecifiedColumn invokeSpecifyColumn(String columnNamePath);
 
     /**
      * Invoke the method 'orScopeQuery()' by the query callback. <br />

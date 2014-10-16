@@ -17,9 +17,9 @@ package org.dbflute.cbean.coption;
 
 import java.util.List;
 
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.coption.parts.SplitOptionParts;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbway.ExtensionOperand;
 import org.dbflute.dbway.OnQueryStringConnector;
@@ -127,7 +127,7 @@ public class SimpleStringOption implements ConditionOption {
         return false;
     }
 
-    public List<HpSpecifiedColumn> getCompoundColumnList() {
+    public List<SpecifiedColumn> getCompoundColumnList() {
         return DfCollectionUtil.emptyList();
     }
 

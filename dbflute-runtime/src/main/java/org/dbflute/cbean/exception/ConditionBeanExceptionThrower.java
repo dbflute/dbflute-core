@@ -22,9 +22,9 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.dbflute.dbmeta.DBMeta;
@@ -385,7 +385,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyColumnAlreadySpecifiedExceptColumnException(msg);
     }
 
-    public void throwSpecifyEveryColumnAlreadySpecifiedColumnException(String tableDbName, Map<String, HpSpecifiedColumn> specifiedColumnMap) {
+    public void throwSpecifyEveryColumnAlreadySpecifiedColumnException(String tableDbName, Map<String, SpecifiedColumn> specifiedColumnMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SpecifyEveryColumn is specified after SpecifyColumn.");
         br.addItem("Advice");
@@ -408,8 +408,8 @@ public class ConditionBeanExceptionThrower {
         br.addElement(tableDbName);
         if (specifiedColumnMap != null) { // basically true
             br.addItem("Specified Column");
-            final Collection<HpSpecifiedColumn> columnList = specifiedColumnMap.values();
-            for (HpSpecifiedColumn column : columnList) {
+            final Collection<SpecifiedColumn> columnList = specifiedColumnMap.values();
+            for (SpecifiedColumn column : columnList) {
                 br.addElement(column);
             }
         }
@@ -418,7 +418,7 @@ public class ConditionBeanExceptionThrower {
     }
 
     public void throwSpecifyExceptColumnAlreadySpecifiedColumnException(String tableDbName,
-            Map<String, HpSpecifiedColumn> specifiedColumnMap) {
+            Map<String, SpecifiedColumn> specifiedColumnMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SpecifyExceptColumn is specified after SpecifyColumn.");
         br.addItem("Advice");
@@ -438,8 +438,8 @@ public class ConditionBeanExceptionThrower {
         br.addElement(tableDbName);
         if (specifiedColumnMap != null) { // basically true
             br.addItem("Specified Column");
-            final Collection<HpSpecifiedColumn> columnList = specifiedColumnMap.values();
-            for (HpSpecifiedColumn column : columnList) {
+            final Collection<SpecifiedColumn> columnList = specifiedColumnMap.values();
+            for (SpecifiedColumn column : columnList) {
                 br.addElement(column);
             }
         }

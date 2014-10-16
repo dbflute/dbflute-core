@@ -17,6 +17,7 @@ package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ckey.ConditionKey;
+import org.dbflute.cbean.dream.ColumnCalculator;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 
 /**
@@ -57,7 +58,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
      * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator equal(SpecifyQuery<CB> colCBLambda) {
+    public ColumnCalculator equal(SpecifyQuery<CB> colCBLambda) {
         return _handler.handle(colCBLambda, ConditionKey.CK_EQUAL.getOperand());
     }
 
@@ -78,7 +79,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
      * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator notEqual(SpecifyQuery<CB> colCBLambda) {
+    public ColumnCalculator notEqual(SpecifyQuery<CB> colCBLambda) {
         return _handler.handle(colCBLambda, ConditionKey.CK_NOT_EQUAL_STANDARD.getOperand());
     }
 
@@ -99,7 +100,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
      * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator greaterThan(SpecifyQuery<CB> colCBLambda) {
+    public ColumnCalculator greaterThan(SpecifyQuery<CB> colCBLambda) {
         return _handler.handle(colCBLambda, ConditionKey.CK_GREATER_THAN.getOperand());
     }
 
@@ -120,7 +121,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
      * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator lessThan(SpecifyQuery<CB> colCBLambda) {
+    public ColumnCalculator lessThan(SpecifyQuery<CB> colCBLambda) {
         return _handler.handle(colCBLambda, ConditionKey.CK_LESS_THAN.getOperand());
     }
 
@@ -141,7 +142,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
      * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator greaterEqual(SpecifyQuery<CB> colCBLambda) {
+    public ColumnCalculator greaterEqual(SpecifyQuery<CB> colCBLambda) {
         return _handler.handle(colCBLambda, ConditionKey.CK_GREATER_EQUAL.getOperand());
     }
 
@@ -162,7 +163,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
      * @param colCBLambda The callback for specify-query of right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    public HpCalculator lessEqual(SpecifyQuery<CB> colCBLambda) {
+    public ColumnCalculator lessEqual(SpecifyQuery<CB> colCBLambda) {
         return _handler.handle(colCBLambda, ConditionKey.CK_LESS_EQUAL.getOperand());
     }
 
@@ -180,7 +181,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
          * @param rightSpecifyQuery The specify-query for right column. (NotNull)
          * @return The calculator for right column. (NotNull)
          */
-        public HpCalculator bitAnd(SpecifyQuery<CB> rightSpecifyQuery) {
+        public ColumnCalculator bitAnd(SpecifyQuery<CB> rightSpecifyQuery) {
             return _handler.handle(rightSpecifyQuery, "&");
         }
 
@@ -189,7 +190,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
          * @param rightSpecifyQuery The specify-query for right column. (NotNull)
          * @return The calculator for right column. (NotNull)
          */
-        public HpCalculator bitOr(SpecifyQuery<CB> rightSpecifyQuery) {
+        public ColumnCalculator bitOr(SpecifyQuery<CB> rightSpecifyQuery) {
             return _handler.handle(rightSpecifyQuery, "|");
         }
     }

@@ -16,6 +16,7 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.coption.ColumnConversionOption;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 
 /**
  * @author jflute
@@ -27,7 +28,7 @@ public class HpCalcElement {
     //                                                                           =========
     protected CalculationType _calculationType;
     protected Number _calculationValue;
-    protected HpSpecifiedColumn _calculationColumn;
+    protected SpecifiedColumn _calculationColumn;
     protected ColumnConversionOption _columnConversionOption;
     protected boolean _preparedConvOption;
 
@@ -85,11 +86,11 @@ public class HpCalcElement {
         _calculationValue = calculationValue;
     }
 
-    public HpSpecifiedColumn getCalculationColumn() {
+    public SpecifiedColumn getCalculationColumn() {
         return _calculationColumn;
     }
 
-    public void setCalculationColumn(HpSpecifiedColumn calculationColumn) {
+    public void setCalculationColumn(SpecifiedColumn calculationColumn) {
         _calculationColumn = calculationColumn;
     }
 

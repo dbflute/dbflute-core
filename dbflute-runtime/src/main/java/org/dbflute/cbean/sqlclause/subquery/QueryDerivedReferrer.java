@@ -19,8 +19,8 @@ import java.util.List;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.name.ColumnRealName;
@@ -77,7 +77,7 @@ public class QueryDerivedReferrer extends DerivedReferrer {
         sb.append(_operand); // e.g. "(select max(...) from ...) >"
         if (_value != null) {
             sb.append(" "); // e.g. "(select max(...) from ...) > "
-            if (_value instanceof HpSpecifiedColumn) { // DreamCruise
+            if (_value instanceof SpecifiedColumn) { // DreamCruise
                 // e.g. "(select max(...) from ...) > ZAMBINI_PRICE"
                 buildRightClauseDreamCruiseExp(sb);
             } else { // normally here
@@ -90,7 +90,7 @@ public class QueryDerivedReferrer extends DerivedReferrer {
     }
 
     protected void buildRightClauseDreamCruiseExp(StringBuilder sb) {
-        final HpSpecifiedColumn specifiedColumn = (HpSpecifiedColumn) _value;
+        final SpecifiedColumn specifiedColumn = (SpecifiedColumn) _value;
         final String columnExp = specifiedColumn.toColumnRealName().toString();
         final String appended;
         if (specifiedColumn.hasSpecifyCalculation()) {

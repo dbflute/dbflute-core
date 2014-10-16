@@ -23,8 +23,8 @@ import java.util.Map;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.SqlClauseDb2;
 import org.dbflute.cbean.sqlclause.SqlClauseDerby;
@@ -792,12 +792,12 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     protected boolean isDreamCruiseTicket(Object value) {
-        return value instanceof HpSpecifiedColumn;
+        return value instanceof SpecifiedColumn;
     }
 
     protected String buildDreamCruiseTicketStatement(Object value) {
         final String bindPath;
-        final HpSpecifiedColumn specifiedColumn = ((HpSpecifiedColumn) value);
+        final SpecifiedColumn specifiedColumn = ((SpecifiedColumn) value);
         final String columnExp = specifiedColumn.toColumnRealName().toString();
         if (specifiedColumn.hasSpecifyCalculation()) {
             specifiedColumn.xinitSpecifyCalculation();
@@ -847,7 +847,7 @@ public class FunctionFilterOption implements ParameterOption {
     // -----------------------------------------------------
     //                                       Assert Pinpoint
     //                                       ---------------
-    protected void assertCalculationColumnNumber(HpSpecifiedColumn specifiedColumn) {
+    protected void assertCalculationColumnNumber(SpecifiedColumn specifiedColumn) {
         final ColumnInfo columnInfo = specifiedColumn.getColumnInfo();
         if (columnInfo == null) { // basically not null but just in case
             return;
@@ -858,7 +858,7 @@ public class FunctionFilterOption implements ParameterOption {
         }
     }
 
-    protected void assertSpecifiedDreamCruiseTicket(HpSpecifiedColumn column) {
+    protected void assertSpecifiedDreamCruiseTicket(SpecifiedColumn column) {
         if (!column.isDreamCruiseTicket()) {
             final String msg = "The specified column was not dream cruise ticket: " + column;
             throw new IllegalConditionBeanOperationException(msg);

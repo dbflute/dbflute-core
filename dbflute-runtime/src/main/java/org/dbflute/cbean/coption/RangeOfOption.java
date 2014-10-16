@@ -19,10 +19,10 @@ import java.util.List;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
-import org.dbflute.cbean.chelper.HpCalculator;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
+import org.dbflute.cbean.dream.ColumnCalculator;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbmeta.info.ColumnInfo;
@@ -36,7 +36,7 @@ import org.dbflute.util.DfTypeUtil;
  * The option of range-of scope for Number type.
  * @author jflute
  */
-public class RangeOfOption implements ConditionOption, HpCalculator {
+public class RangeOfOption implements ConditionOption, ColumnCalculator {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -119,7 +119,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator plus(Number plusValue) {
+    public ColumnCalculator plus(Number plusValue) {
         assertObjectNotNull("plusValue", plusValue);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.plus(plusValue);
@@ -128,7 +128,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator plus(HpSpecifiedColumn plusColumn) {
+    public ColumnCalculator plus(SpecifiedColumn plusColumn) {
         assertObjectNotNull("plusColumn", plusColumn);
         assertCalculationColumnNumber(plusColumn);
         assertSpecifiedDreamCruiseTicket(plusColumn);
@@ -140,7 +140,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator minus(Number minusValue) {
+    public ColumnCalculator minus(Number minusValue) {
         assertObjectNotNull("minusValue", minusValue);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.minus(minusValue);
@@ -149,7 +149,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator minus(HpSpecifiedColumn minusColumn) {
+    public ColumnCalculator minus(SpecifiedColumn minusColumn) {
         assertObjectNotNull("minusColumn", minusColumn);
         assertCalculationColumnNumber(minusColumn);
         assertSpecifiedDreamCruiseTicket(minusColumn);
@@ -161,7 +161,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator multiply(Number multiplyValue) {
+    public ColumnCalculator multiply(Number multiplyValue) {
         assertObjectNotNull("multiplyValue", multiplyValue);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.multiply(multiplyValue);
@@ -170,7 +170,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator multiply(HpSpecifiedColumn multiplyColumn) {
+    public ColumnCalculator multiply(SpecifiedColumn multiplyColumn) {
         assertObjectNotNull("multiplyColumn", multiplyColumn);
         assertCalculationColumnNumber(multiplyColumn);
         assertSpecifiedDreamCruiseTicket(multiplyColumn);
@@ -182,7 +182,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator divide(Number divideValue) {
+    public ColumnCalculator divide(Number divideValue) {
         assertObjectNotNull("divideValue", divideValue);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.divide(divideValue);
@@ -191,7 +191,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator divide(HpSpecifiedColumn divideColumn) {
+    public ColumnCalculator divide(SpecifiedColumn divideColumn) {
         assertObjectNotNull("divideColumn", divideColumn);
         assertCalculationColumnNumber(divideColumn);
         assertSpecifiedDreamCruiseTicket(divideColumn);
@@ -203,7 +203,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
+    public ColumnCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
         assertObjectNotNull("opLambda", opLambda);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.convert(opLambda);
@@ -212,7 +212,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator left() {
+    public ColumnCalculator left() {
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.left();
     }
@@ -220,7 +220,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator right() {
+    public ColumnCalculator right() {
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.right();
     }
@@ -234,7 +234,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
         }
     }
 
-    protected void setupSelectDreamCruiseJourneyLogBookIfUnionExists(HpSpecifiedColumn column) {
+    protected void setupSelectDreamCruiseJourneyLogBookIfUnionExists(SpecifiedColumn column) {
         column.setupSelectDreamCruiseJourneyLogBookIfUnionExists();
     }
 
@@ -281,7 +281,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
         return false;
     }
 
-    public List<HpSpecifiedColumn> getCompoundColumnList() {
+    public List<SpecifiedColumn> getCompoundColumnList() {
         return DfCollectionUtil.emptyList();
     }
 
@@ -319,7 +319,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
         }
     }
 
-    protected void assertCalculationColumnNumber(HpSpecifiedColumn specifiedColumn) {
+    protected void assertCalculationColumnNumber(SpecifiedColumn specifiedColumn) {
         final ColumnInfo columnInfo = specifiedColumn.getColumnInfo();
         if (columnInfo == null) { // basically not null but just in case
             return;
@@ -330,7 +330,7 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
         }
     }
 
-    protected void assertSpecifiedDreamCruiseTicket(HpSpecifiedColumn column) {
+    protected void assertSpecifiedDreamCruiseTicket(SpecifiedColumn column) {
         if (!column.isDreamCruiseTicket()) {
             final String msg = "The specified column was not dream cruise ticket: " + column;
             throw new IllegalConditionBeanOperationException(msg);

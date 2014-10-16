@@ -13,9 +13,10 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.chelper;
+package org.dbflute.cbean.dream;
 
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.chelper.HpCalcSpecification;
 import org.dbflute.cbean.coption.ColumnConversionOption;
 import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 import org.dbflute.cbean.scoping.SpecifyQuery;
@@ -25,9 +26,11 @@ import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
+ * The object of column specified by condition-bean. (return type of specify()) <br />
+ * And also it'll be DreamCruise ticket.
  * @author jflute
  */
-public class HpSpecifiedColumn implements HpCalculator {
+public class SpecifiedColumn implements ColumnCalculator {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -37,7 +40,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     protected final ConditionBean _baseCB; // required
     protected final String _columnDirectName;
     protected final boolean _derived;
-    protected HpSpecifiedColumn _mappedSpecifiedColumn;
+    protected SpecifiedColumn _mappedSpecifiedColumn;
     protected String _mappedDerivedAlias;
     protected String _onQueryName;
     protected HpCalcSpecification<ConditionBean> _calcSpecification;
@@ -45,7 +48,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpSpecifiedColumn(String tableAliasName, ColumnInfo columnInfo, ConditionBean baseCB) {
+    public SpecifiedColumn(String tableAliasName, ColumnInfo columnInfo, ConditionBean baseCB) {
         assertColumnInfo(tableAliasName, columnInfo);
         assertBaseCB(tableAliasName, baseCB);
         _tableAliasName = tableAliasName;
@@ -55,7 +58,7 @@ public class HpSpecifiedColumn implements HpCalculator {
         _derived = false;
     }
 
-    public HpSpecifiedColumn(String tableAliasName, ColumnInfo columnInfo, ConditionBean baseCB, String columnDirectName, boolean derived) {
+    public SpecifiedColumn(String tableAliasName, ColumnInfo columnInfo, ConditionBean baseCB, String columnDirectName, boolean derived) {
         assertColumnInfo(tableAliasName, columnInfo);
         assertBaseCB(tableAliasName, baseCB);
         _tableAliasName = tableAliasName;
@@ -112,7 +115,8 @@ public class HpSpecifiedColumn implements HpCalculator {
     // ===================================================================================
     //                                                                             Mapping
     //                                                                             =======
-    public void mappedFrom(HpSpecifiedColumn mappedSpecifiedInfo) {
+    // basically for queryInsert()
+    public void mappedFrom(SpecifiedColumn mappedSpecifiedInfo) {
         _mappedSpecifiedColumn = mappedSpecifiedInfo;
     }
 
@@ -137,7 +141,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn plus(Number plusValue) {
+    public SpecifiedColumn plus(Number plusValue) {
         assertObjectNotNull("plusValue", plusValue);
         initializeCalcSpecificationIfNeeds();
         _calcSpecification.plus(plusValue);
@@ -154,7 +158,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn plus(HpSpecifiedColumn plusColumn) {
+    public SpecifiedColumn plus(SpecifiedColumn plusColumn) {
         assertObjectNotNull("plusColumn", plusColumn);
         assertCalculationColumnNumber(plusColumn);
         assertSpecifiedDreamCruiseTicket(plusColumn);
@@ -166,7 +170,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn minus(Number minusValue) {
+    public SpecifiedColumn minus(Number minusValue) {
         assertObjectNotNull("minusValue", minusValue);
         initializeCalcSpecificationIfNeeds();
         _calcSpecification.minus(minusValue);
@@ -176,7 +180,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn minus(HpSpecifiedColumn minusColumn) {
+    public SpecifiedColumn minus(SpecifiedColumn minusColumn) {
         assertObjectNotNull("minusColumn", minusColumn);
         assertCalculationColumnNumber(minusColumn);
         assertSpecifiedDreamCruiseTicket(minusColumn);
@@ -188,7 +192,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn multiply(Number multiplyValue) {
+    public SpecifiedColumn multiply(Number multiplyValue) {
         assertObjectNotNull("multiplyValue", multiplyValue);
         initializeCalcSpecificationIfNeeds();
         _calcSpecification.multiply(multiplyValue);
@@ -198,7 +202,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn multiply(HpSpecifiedColumn multiplyColumn) {
+    public SpecifiedColumn multiply(SpecifiedColumn multiplyColumn) {
         assertObjectNotNull("multiplyColumn", multiplyColumn);
         assertCalculationColumnNumber(multiplyColumn);
         assertSpecifiedDreamCruiseTicket(multiplyColumn);
@@ -210,7 +214,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn divide(Number divideValue) {
+    public SpecifiedColumn divide(Number divideValue) {
         assertObjectNotNull("divideValue", divideValue);
         initializeCalcSpecificationIfNeeds();
         _calcSpecification.divide(divideValue);
@@ -220,7 +224,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn divide(HpSpecifiedColumn divideColumn) {
+    public SpecifiedColumn divide(SpecifiedColumn divideColumn) {
         assertObjectNotNull("divideColumn", divideColumn);
         assertCalculationColumnNumber(divideColumn);
         assertSpecifiedDreamCruiseTicket(divideColumn);
@@ -232,7 +236,7 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
+    public SpecifiedColumn convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
         assertObjectNotNull("opLambda", opLambda);
         initializeCalcSpecificationIfNeeds();
         _calcSpecification.convert(op -> {
@@ -242,10 +246,17 @@ public class HpSpecifiedColumn implements HpCalculator {
         return this;
     }
 
+    protected void initializeConvOptionColumn(ColumnConversionOption option) {
+        // e.g. DreamCruise specifies several columns
+        // then cannot set the target column later so needs to set here
+        // e.g. DerivedReferrer has only-one specified column so either way is OK
+        option.xsetTargetColumnInfo(_columnInfo); // to judge correctly e.g. Date type
+    }
+
     /**
      * {@inheritDoc}
      */
-    public HpCalculator left() {
+    public ColumnCalculator left() {
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.left();
     }
@@ -253,14 +264,14 @@ public class HpSpecifiedColumn implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator right() {
+    public ColumnCalculator right() {
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.right();
     }
 
-    // -----------------------------------------------------
-    //                            CalcSpecification Handling
-    //                            --------------------------
+    // ===================================================================================
+    //                                                          CalcSpecification Handling
+    //                                                          ==========================
     protected void initializeCalcSpecificationIfNeeds() {
         if (_calcSpecification == null) {
             _calcSpecification = createEmptyCalcSpecification();
@@ -290,6 +301,9 @@ public class HpSpecifiedColumn implements HpCalculator {
         return new HpCalcSpecification<ConditionBean>(specifyQuery);
     }
 
+    // -----------------------------------------------------
+    //                                        Public Service
+    //                                        --------------
     public boolean hasSpecifyCalculation() {
         return _calcSpecification != null;
     }
@@ -301,16 +315,6 @@ public class HpSpecifiedColumn implements HpCalculator {
     public void xinitSpecifyCalculation() { // called by e.g. HpHpCalcSpecification, DerivedReferrer
         // specify the condition-bean that has this specified column
         _calcSpecification.specify(_baseCB);
-    }
-
-    // -----------------------------------------------------
-    //                             ConversionOption Handling
-    //                             -------------------------
-    protected void initializeConvOptionColumn(ColumnConversionOption option) {
-        // e.g. DreamCruise specifies several columns
-        // then cannot set the target column later so needs to set here
-        // e.g. DerivedReferrer has only-one specified column so either way is OK
-        option.xsetTargetColumnInfo(_columnInfo); // to judge correctly e.g. Date type
     }
 
     // ===================================================================================
@@ -327,7 +331,7 @@ public class HpSpecifiedColumn implements HpCalculator {
         }
     }
 
-    protected void assertCalculationColumnNumber(HpSpecifiedColumn specifiedColumn) {
+    protected void assertCalculationColumnNumber(SpecifiedColumn specifiedColumn) {
         final ColumnInfo columnInfo = specifiedColumn.getColumnInfo();
         if (columnInfo == null) { // basically not null but just in case
             return;
@@ -338,7 +342,7 @@ public class HpSpecifiedColumn implements HpCalculator {
         }
     }
 
-    protected void assertSpecifiedDreamCruiseTicket(HpSpecifiedColumn column) {
+    protected void assertSpecifiedDreamCruiseTicket(SpecifiedColumn column) {
         if (!column.isDreamCruiseTicket()) {
             final String msg = "The specified column was not dream cruise ticket: " + column;
             throw new IllegalConditionBeanOperationException(msg);
@@ -378,7 +382,7 @@ public class HpSpecifiedColumn implements HpCalculator {
         return _derived;
     }
 
-    public HpSpecifiedColumn getMappedSpecifiedInfo() {
+    public SpecifiedColumn getMappedSpecifiedInfo() {
         return _mappedSpecifiedColumn;
     }
 
@@ -390,7 +394,7 @@ public class HpSpecifiedColumn implements HpCalculator {
         return _onQueryName;
     }
 
-    public void setOnQueryName(String onQueryName) {
-        this._onQueryName = onQueryName;
+    public void setOnQueryName(String onQueryName) { // called by SqlClause process
+        _onQueryName = onQueryName;
     }
 }

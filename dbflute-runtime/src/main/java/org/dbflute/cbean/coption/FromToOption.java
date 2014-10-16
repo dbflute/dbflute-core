@@ -21,9 +21,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbway.ExtensionOperand;
 import org.dbflute.dbway.OnQueryStringConnector;
@@ -1322,7 +1322,7 @@ public class FromToOption implements ConditionOption {
         return false;
     }
 
-    public List<HpSpecifiedColumn> getCompoundColumnList() {
+    public List<SpecifiedColumn> getCompoundColumnList() {
         return DfCollectionUtil.emptyList();
     }
 

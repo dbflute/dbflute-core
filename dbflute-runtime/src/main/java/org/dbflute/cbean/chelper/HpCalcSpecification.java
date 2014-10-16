@@ -23,6 +23,8 @@ import org.dbflute.cbean.chelper.HpCalcElement.CalculationType;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.ColumnConversionOption;
 import org.dbflute.cbean.coption.FunctionFilterOptionCall;
+import org.dbflute.cbean.dream.ColumnCalculator;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
@@ -37,7 +39,7 @@ import org.dbflute.util.Srl;
  * @param <CB> The type of condition-bean for column specification. 
  * @author jflute
  */
-public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculator, HpCalcStatement {
+public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalculator, HpCalcStatement {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -91,7 +93,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     public ColumnInfo getSpecifiedColumnInfo() { // only when plain (or dream cruise)
         checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
-            final HpSpecifiedColumn dreamCruiseTicket = _specifedCB.xshowDreamCruiseTicket();
+            final SpecifiedColumn dreamCruiseTicket = _specifedCB.xshowDreamCruiseTicket();
             return !dreamCruiseTicket.isDerived() ? dreamCruiseTicket.getColumnInfo() : null;
         }
         return _specifedCB.getSqlClause().getSpecifiedColumnInfoAsOne();
@@ -103,7 +105,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     public ColumnInfo getSpecifiedDerivingColumnInfo() { // only when deriving sub-query
         checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
-            final HpSpecifiedColumn dreamCruiseTicket = _specifedCB.xshowDreamCruiseTicket();
+            final SpecifiedColumn dreamCruiseTicket = _specifedCB.xshowDreamCruiseTicket();
             return dreamCruiseTicket.isDerived() ? dreamCruiseTicket.getColumnInfo() : null;
         }
         return _specifedCB.getSqlClause().getSpecifiedDerivingColumnInfoAsOne();
@@ -112,10 +114,10 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * @return The specified column of resolved column. (NullAllowed)
      */
-    public HpSpecifiedColumn getResolvedSpecifiedColumn() { // resolved plain or deriving sub-query
+    public SpecifiedColumn getResolvedSpecifiedColumn() { // resolved plain or deriving sub-query
         checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
-            final HpSpecifiedColumn dreamCruiseTicket = _specifedCB.xshowDreamCruiseTicket();
+            final SpecifiedColumn dreamCruiseTicket = _specifedCB.xshowDreamCruiseTicket();
             return !dreamCruiseTicket.isDerived() ? dreamCruiseTicket : null;
         }
         return _specifedCB.getSqlClause().getSpecifiedColumnAsOne();
@@ -139,7 +141,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     public String getResolvedSpecifiedColumnDbName() { // resolved plain or deriving sub-query
         checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
-            final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
+            final SpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
             return ticket.getColumnDbName();
         }
         final ColumnInfo columnInfo = getResolvedSpecifiedColumnInfo();
@@ -153,7 +155,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         // Basically for UpdateOption, No SpecifyCalculation.
         checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
-            final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
+            final SpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
             return ticket.toColumnSqlName();
         }
         return _specifedCB.getSqlClause().getSpecifiedResolvedColumnSqlNameAsOne();
@@ -165,7 +167,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     public ColumnRealName getResolvedSpecifiedColumnRealName() { // resolved plain or deriving sub-query and calculation
         checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
-            final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
+            final SpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
             return ticket.toColumnRealName();
         }
         return _specifedCB.getSqlClause().getSpecifiedResolvedColumnRealNameAsOne();
@@ -177,7 +179,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     public String getResolvedSpecifiedTableAliasName() { // resolved plain or deriving sub-query
         checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
-            final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
+            final SpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
             return ticket.getTableAliasName();
         }
         final ColumnRealName columnRealName = _specifedCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
@@ -221,7 +223,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator plus(Number plusValue) {
+    public ColumnCalculator plus(Number plusValue) {
         assertObjectNotNull("plusValue", plusValue);
         if (_leftMode) {
             assertLeftCalcSp();
@@ -235,7 +237,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator plus(HpSpecifiedColumn plusColumn) {
+    public ColumnCalculator plus(SpecifiedColumn plusColumn) {
         assertObjectNotNull("plusColumn", plusColumn);
         assertCalculationColumnNumber(plusColumn);
         assertSpecifiedDreamCruiseTicket(plusColumn);
@@ -251,7 +253,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator minus(Number minusValue) {
+    public ColumnCalculator minus(Number minusValue) {
         assertObjectNotNull("minusValue", minusValue);
         if (_leftMode) {
             assertLeftCalcSp();
@@ -265,7 +267,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator minus(HpSpecifiedColumn minusColumn) {
+    public ColumnCalculator minus(SpecifiedColumn minusColumn) {
         assertObjectNotNull("minusColumn", minusColumn);
         assertCalculationColumnNumber(minusColumn);
         assertSpecifiedDreamCruiseTicket(minusColumn);
@@ -281,7 +283,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator multiply(Number multiplyValue) {
+    public ColumnCalculator multiply(Number multiplyValue) {
         assertObjectNotNull("multiplyValue", multiplyValue);
         if (_leftMode) {
             assertLeftCalcSp();
@@ -295,7 +297,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator multiply(HpSpecifiedColumn multiplyColumn) {
+    public ColumnCalculator multiply(SpecifiedColumn multiplyColumn) {
         assertObjectNotNull("multiplyColumn", multiplyColumn);
         assertCalculationColumnNumber(multiplyColumn);
         assertSpecifiedDreamCruiseTicket(multiplyColumn);
@@ -311,7 +313,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator divide(Number divideValue) {
+    public ColumnCalculator divide(Number divideValue) {
         assertObjectNotNull("divideValue", divideValue);
         if (_leftMode) {
             assertLeftCalcSp();
@@ -325,7 +327,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator divide(HpSpecifiedColumn divideColumn) {
+    public ColumnCalculator divide(SpecifiedColumn divideColumn) {
         assertObjectNotNull("divideColumn", divideColumn);
         assertCalculationColumnNumber(divideColumn);
         assertSpecifiedDreamCruiseTicket(divideColumn);
@@ -338,7 +340,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         }
     }
 
-    protected HpCalculator register(CalculationType type, Number value) {
+    protected ColumnCalculator register(CalculationType type, Number value) {
         assertObjectNotNull("type", type);
         if (value == null) {
             String msg = "The null value was specified as " + type + ".";
@@ -351,7 +353,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         return this;
     }
 
-    protected HpCalculator register(CalculationType type, HpSpecifiedColumn column) {
+    protected ColumnCalculator register(CalculationType type, SpecifiedColumn column) {
         assertObjectNotNull("type", type);
         if (column == null) {
             String msg = "The null column was specified as " + type + ".";
@@ -368,7 +370,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
+    public ColumnCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
         assertObjectNotNull("opLambda", opLambda);
         if (_leftMode) {
             assertLeftCalcSp();
@@ -385,7 +387,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         return new ColumnConversionOption();
     }
 
-    protected HpCalculator registerConv(ColumnConversionOption option) {
+    protected ColumnCalculator registerConv(ColumnConversionOption option) {
         if (option == null) {
             String msg = "The null value was specified as conversion option.";
             throw new IllegalArgumentException(msg);
@@ -436,7 +438,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator left() {
+    public ColumnCalculator left() {
         _leftMode = true;
         return this;
     }
@@ -444,7 +446,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator right() {
+    public ColumnCalculator right() {
         _leftMode = false;
         return this;
     }
@@ -537,7 +539,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         if (calculation.hasCalculationValue()) { // number value
             calcValueExp = calculation.getCalculationValue();
         } else if (calculation.hasCalculationColumn()) { // number column
-            final HpSpecifiedColumn calculationColumn = calculation.getCalculationColumn();
+            final SpecifiedColumn calculationColumn = calculation.getCalculationColumn();
             final String columnExp;
             if (removeCalcAlias) { // means e.g. plain update
                 final String basePointAliasName = _baseCB.getSqlClause().getBasePointAliasName();
@@ -576,7 +578,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         return cipher != null ? cipher.decrypt(valueExp) : valueExp;
     }
 
-    protected Object filterNestedCalculation(Object specifiedRealName, HpSpecifiedColumn hpCol) {
+    protected Object filterNestedCalculation(Object specifiedRealName, SpecifiedColumn hpCol) {
         if (hpCol != null && hpCol.hasSpecifyCalculation()) {
             hpCol.xinitSpecifyCalculation();
             final HpCalcSpecification<ConditionBean> calcSpecification = hpCol.getSpecifyCalculation();
@@ -585,7 +587,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         return specifiedRealName;
     }
 
-    protected void throwCalculationColumnRelationUnresolvedException(String targetExp, HpSpecifiedColumn calculationColumn) {
+    protected void throwCalculationColumnRelationUnresolvedException(String targetExp, SpecifiedColumn calculationColumn) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The relation for the calculation column was unresolved.");
         br.addItem("Advice");
@@ -643,7 +645,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         }
     }
 
-    protected void setupSelectDreamCruiseJourneyLogBookIfUnionExists(HpSpecifiedColumn column) {
+    protected void setupSelectDreamCruiseJourneyLogBookIfUnionExists(SpecifiedColumn column) {
         if (!_synchronizeSetupSelectByJourneyLogBook) {
             return;
         }
@@ -684,7 +686,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         }
     }
 
-    protected void assertCalculationColumnNumber(HpSpecifiedColumn specifiedColumn) {
+    protected void assertCalculationColumnNumber(SpecifiedColumn specifiedColumn) {
         final ColumnInfo columnInfo = specifiedColumn.getColumnInfo();
         if (columnInfo == null) { // basically not null but just in case
             return;
@@ -695,7 +697,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         }
     }
 
-    protected void assertSpecifiedDreamCruiseTicket(HpSpecifiedColumn column) {
+    protected void assertSpecifiedDreamCruiseTicket(SpecifiedColumn column) {
         if (!column.isDreamCruiseTicket()) {
             final String msg = "The specified column was not dream cruise ticket: " + column;
             throw new IllegalConditionBeanOperationException(msg);

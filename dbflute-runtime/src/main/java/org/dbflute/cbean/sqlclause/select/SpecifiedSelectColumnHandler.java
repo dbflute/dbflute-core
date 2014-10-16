@@ -15,7 +15,7 @@
  */
 package org.dbflute.cbean.sqlclause.select;
 
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 
 /**
  * @author jflute
@@ -28,5 +28,5 @@ public interface SpecifiedSelectColumnHandler {
      * @param tableAliasName The alias name of table. (NotNull)
      * @param specifiedColumn The info about column specification. (NotNull)
      */
-    void handle(String tableAliasName, HpSpecifiedColumn specifiedColumn);
+    void handle(String tableAliasName, SpecifiedColumn specifiedColumn);
 }

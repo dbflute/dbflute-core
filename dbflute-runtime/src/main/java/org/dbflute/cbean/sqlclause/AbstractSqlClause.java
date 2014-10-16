@@ -35,7 +35,6 @@ import org.dbflute.cbean.chelper.HpCalcSpecification;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
@@ -44,6 +43,7 @@ import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
@@ -141,13 +141,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      * Specified select column map. (NullAllowed: lazy-loaded) <br />
      * map:{tableAliasName = map:{ columnName : specifiedInfo}}
      */
-    protected Map<String, Map<String, HpSpecifiedColumn>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
+    protected Map<String, Map<String, SpecifiedColumn>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
 
     /**
      * Specified select column map for backup. (NullAllowed: lazy-loaded) <br />
      * map:{tableAliasName = map:{ columnName : specifiedInfo}}
      */
-    protected Map<String, Map<String, HpSpecifiedColumn>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
+    protected Map<String, Map<String, SpecifiedColumn>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
 
     /** Specified derive sub-query map. A null key is acceptable. (NullAllowed: lazy-load) */
     protected Map<String, HpDerivingSubQueryInfo> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
@@ -593,7 +593,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected int processSelectClauseLocal(StringBuilder sb) {
         final String basePointAliasName = getBasePointAliasName();
         final DBMeta dbmeta = getDBMeta();
-        final Map<String, HpSpecifiedColumn> localSpecifiedMap;
+        final Map<String, SpecifiedColumn> localSpecifiedMap;
         if (_specifiedSelectColumnMap != null) {
             localSpecifiedMap = _specifiedSelectColumnMap.get(basePointAliasName);
         } else {
@@ -660,7 +660,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             getSelectClauseRealColumnAliasMap().put(realColumnName, onQueryName);
 
             if (validSpecifiedLocal && localSpecifiedMap.containsKey(columnDbName)) {
-                final HpSpecifiedColumn specifiedColumn = localSpecifiedMap.get(columnDbName);
+                final SpecifiedColumn specifiedColumn = localSpecifiedMap.get(columnDbName);
                 specifiedColumn.setOnQueryName(onQueryName); // basically for queryInsert()
             }
         }
@@ -675,7 +675,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final String tableAliasName = entry.getKey();
             final Map<String, SelectedRelationColumn> map = entry.getValue();
             final Collection<SelectedRelationColumn> selectColumnInfoList = map.values();
-            Map<String, HpSpecifiedColumn> foreginSpecifiedMap = null;
+            Map<String, SpecifiedColumn> foreginSpecifiedMap = null;
             if (_specifiedSelectColumnMap != null) {
                 foreginSpecifiedMap = _specifiedSelectColumnMap.get(tableAliasName);
             }
@@ -709,7 +709,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 getSelectClauseRealColumnAliasMap().put(realColumnName, onQueryName);
 
                 if (validSpecifiedForeign && foreginSpecifiedMap.containsKey(columnDbName)) {
-                    final HpSpecifiedColumn specifiedColumn = foreginSpecifiedMap.get(columnDbName);
+                    final SpecifiedColumn specifiedColumn = foreginSpecifiedMap.get(columnDbName);
                     specifiedColumn.setOnQueryName(onQueryName); // basically for queryInsert()
                 }
             }
@@ -867,7 +867,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         {
             final String decrypted = decryptSelectColumnIfNeeds(columnInfo, valueExp);
             final ColumnRealName beforeFilter = ColumnRealName.create(null, new ColumnSqlName(decrypted));
-            final HpSpecifiedColumn specifiedColumn = getSpecifiedColumnAsOne();
+            final SpecifiedColumn specifiedColumn = getSpecifiedColumnAsOne();
             filtered = filterSpecifyColumnCalculation(beforeFilter, specifiedColumn);
         }
         return doBuildFunctionExp(function, filtered.toString());
@@ -2667,17 +2667,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                        Specify Column
     //                                        --------------
-    public void specifySelectColumn(HpSpecifiedColumn specifiedColumn) {
+    public void specifySelectColumn(SpecifiedColumn specifiedColumn) {
         if (_specifiedSelectColumnMap == null) {
             _specifiedSelectColumnMap = StringKeyMap.createAsFlexible(); // not needs order
         }
         final String tableAliasName = specifiedColumn.getTableAliasName();
         if (!_specifiedSelectColumnMap.containsKey(tableAliasName)) {
-            final Map<String, HpSpecifiedColumn> elementMap = StringKeyMap.createAsFlexibleOrdered();
+            final Map<String, SpecifiedColumn> elementMap = StringKeyMap.createAsFlexibleOrdered();
             _specifiedSelectColumnMap.put(tableAliasName, elementMap);
         }
         final String columnDbName = specifiedColumn.getColumnDbName();
-        final Map<String, HpSpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        final Map<String, SpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
         elementMap.put(columnDbName, specifiedColumn);
     }
 
@@ -2689,7 +2689,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_specifiedSelectColumnMap == null) {
             return false;
         }
-        final Map<String, HpSpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        final Map<String, SpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
         if (elementMap == null) {
             return false;
         }
@@ -2700,11 +2700,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_specifiedSelectColumnMap == null) {
             return;
         }
-        final Map<String, HpSpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        final Map<String, SpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
         if (elementMap == null) {
             return;
         }
-        for (HpSpecifiedColumn specifiedColumn : elementMap.values()) {
+        for (SpecifiedColumn specifiedColumn : elementMap.values()) {
             columnHandler.handle(tableAliasName, specifiedColumn);
         }
     }
@@ -2728,8 +2728,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                      Specified as One
     //                                      ----------------
-    public HpSpecifiedColumn getSpecifiedColumnAsOne() {
-        final Map<String, HpSpecifiedColumn> elementMap = getSpecifiedColumnElementMapAsOne();
+    public SpecifiedColumn getSpecifiedColumnAsOne() {
+        final Map<String, SpecifiedColumn> elementMap = getSpecifiedColumnElementMapAsOne();
         if (elementMap != null && elementMap.size() == 1) {
             return elementMap.values().iterator().next();
         }
@@ -2742,7 +2742,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     public ColumnInfo getSpecifiedColumnInfoAsOne() {
-        final Map<String, HpSpecifiedColumn> elementMap = getSpecifiedColumnElementMapAsOne();
+        final Map<String, SpecifiedColumn> elementMap = getSpecifiedColumnElementMapAsOne();
         if (elementMap != null && elementMap.size() == 1) {
             return elementMap.values().iterator().next().getColumnInfo();
         }
@@ -2769,7 +2769,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return null;
     }
 
-    protected Map<String, HpSpecifiedColumn> getSpecifiedColumnElementMapAsOne() {
+    protected Map<String, SpecifiedColumn> getSpecifiedColumnElementMapAsOne() {
         if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
             return _specifiedSelectColumnMap.values().iterator().next();
         }
@@ -2826,7 +2826,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                       Deriving as One
     //                                       ---------------
-    public HpSpecifiedColumn getSpecifiedDerivingColumnAsOne() {
+    public SpecifiedColumn getSpecifiedDerivingColumnAsOne() {
         final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
         return derivingInfo != null ? derivingInfo.extractDerivingColumn() : null;
     }
@@ -2873,7 +2873,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public ColumnRealName getSpecifiedResolvedColumnRealNameAsOne() {
         final ColumnRealName specifiedRealName = getSpecifiedColumnRealNameAsOne();
         if (specifiedRealName != null) { // e.g. subCB.specify().column...()
-            final HpSpecifiedColumn hpCol = getSpecifiedColumnAsOne();
+            final SpecifiedColumn hpCol = getSpecifiedColumnAsOne();
             return filterSpecifyColumnCalculation(specifiedRealName, hpCol);
         } else {
             final String nestedSubQuery = getSpecifiedDerivingSubQueryAsOne();
@@ -2886,7 +2886,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
-    protected ColumnRealName filterSpecifyColumnCalculation(ColumnRealName specifiedRealName, HpSpecifiedColumn hpCol) {
+    protected ColumnRealName filterSpecifyColumnCalculation(ColumnRealName specifiedRealName, SpecifiedColumn hpCol) {
         if (hasSpecifyCalculation(hpCol)) {
             hpCol.xinitSpecifyCalculation();
             final HpCalcSpecification<ConditionBean> calcSpecification = hpCol.getSpecifyCalculation();
@@ -2896,7 +2896,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return specifiedRealName;
     }
 
-    protected boolean hasSpecifyCalculation(HpSpecifiedColumn hpCol) {
+    protected boolean hasSpecifyCalculation(SpecifiedColumn hpCol) {
         return hpCol != null && hpCol.hasSpecifyCalculation();
     }
 
@@ -3249,7 +3249,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             String msg = "The specified columns for query-insert are required.";
             throw new IllegalConditionBeanOperationException(msg);
         }
-        final Map<String, HpSpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(getBasePointAliasName());
+        final Map<String, SpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(getBasePointAliasName());
         if (elementMap == null || elementMap.isEmpty()) {
             String msg = "The specified columns of inserted table for query-insert are required.";
             throw new IllegalConditionBeanOperationException(msg);
@@ -3262,7 +3262,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnDbName = columnInfo.getColumnDbName();
-            final HpSpecifiedColumn specifiedColumn = elementMap.get(columnDbName);
+            final SpecifiedColumn specifiedColumn = elementMap.get(columnDbName);
             final String onQueryName;
             if (specifiedColumn != null) {
                 onQueryName = specifiedColumn.getValidMappedOnQueryName();

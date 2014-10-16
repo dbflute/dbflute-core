@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.coption.ConditionOption;
@@ -29,6 +28,7 @@ import org.dbflute.cbean.coption.RangeOfOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.cvalue.ConditionValue.CallbackProcessor;
 import org.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.query.QueryClause;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.cbean.sqlclause.query.StringQueryClause;
@@ -424,10 +424,10 @@ public abstract class ConditionKey implements Serializable {
             String msg = "The option should have string connector when compound column is specified: " + option;
             throw new IllegalConditionBeanOperationException(msg);
         }
-        final List<HpSpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
+        final List<SpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
         final List<ColumnRealName> realNameList = new ArrayList<ColumnRealName>();
         realNameList.add(baseRealName); // already cipher
-        for (HpSpecifiedColumn specifiedColumn : compoundColumnList) {
+        for (SpecifiedColumn specifiedColumn : compoundColumnList) {
             realNameList.add(doResolveCompoundColumn(option, specifiedColumn));
         }
         final OnQueryStringConnector stringConnector = option.getStringConnector();
@@ -435,7 +435,7 @@ public abstract class ConditionKey implements Serializable {
         return ColumnRealName.create(null, new ColumnSqlName(connected));
     }
 
-    protected ColumnRealName doResolveCompoundColumn(ConditionOption option, HpSpecifiedColumn specifiedColumn) {
+    protected ColumnRealName doResolveCompoundColumn(ConditionOption option, SpecifiedColumn specifiedColumn) {
         final GearedCipherManager cipherManager = option.getGearedCipherManager();
         final ColumnRealName specifiedName = specifiedColumn.toColumnRealName();
         if (cipherManager != null && !specifiedColumn.isDerived()) {

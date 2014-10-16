@@ -26,20 +26,20 @@ import java.util.Set;
 import org.dbflute.Entity;
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
-import org.dbflute.cbean.chelper.HpCalculator;
 import org.dbflute.cbean.chelper.HpColQyHandler;
 import org.dbflute.cbean.chelper.HpColQyOperand;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpSDRFunction;
 import org.dbflute.cbean.chelper.HpSDRFunctionFactory;
 import org.dbflute.cbean.chelper.HpSDRSetupper;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
 import org.dbflute.cbean.coption.DerivedReferrerOptionFactory;
 import org.dbflute.cbean.coption.SVOptionCall;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.dream.ColumnCalculator;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.ordering.OrderByBean;
 import org.dbflute.cbean.paging.PagingBean;
@@ -139,7 +139,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected ConditionBean _dreamCruiseDeparturePort;
 
     /** The ticket (specified column) of dream cruise. (used when dream cruise) (NullAllowed) */
-    protected HpSpecifiedColumn _dreamCruiseTicket;
+    protected SpecifiedColumn _dreamCruiseTicket;
 
     /** The journey log book (relation path) of dream cruise. (used when dream cruise) (NullAllowed) */
     protected List<String> _dreamCruiseJourneyLogBook;
@@ -304,7 +304,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                        Column Query
     //                                                                        ============
-    protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp, SpecifyQuery<CB> rightSp,
+    protected <CB extends ConditionBean> ColumnCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp, SpecifyQuery<CB> rightSp,
             final String operand) {
         assertQueryPurpose();
 
@@ -500,7 +500,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void overTheWaves(HpSpecifiedColumn dreamCruiseTicket) {
+    public void overTheWaves(SpecifiedColumn dreamCruiseTicket) {
         if (dreamCruiseTicket == null) {
             String msg = "The argument 'dreamCruiseColumn' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -515,7 +515,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias) {
+    public SpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias) {
         if (!xisDreamCruiseShip()) {
             String msg = "This invitation is only allowed by Dream Cruise Ship: " + derivedAlias;
             throw new IllegalConditionBeanOperationException(msg);
@@ -530,7 +530,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             String msg = "Not found the derived column by the argument 'derivedAlias': " + derivedAlias;
             throw new IllegalArgumentException(msg);
         }
-        return new HpSpecifiedColumn(null, columnInfo, this, derivedAlias, true);
+        return new SpecifiedColumn(null, columnInfo, this, derivedAlias, true);
     }
 
     /**
@@ -580,7 +580,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn xshowDreamCruiseTicket() {
+    public SpecifiedColumn xshowDreamCruiseTicket() {
         return _dreamCruiseTicket;
     }
 
@@ -668,7 +668,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             String msg = "The other mystic binding already exists: " + mysticBinding;
             throw new IllegalConditionBeanOperationException(msg);
         }
-        if (mysticBinding instanceof HpSpecifiedColumn) {
+        if (mysticBinding instanceof SpecifiedColumn) {
             String msg = "The mystic binding should be bound value: " + mysticBinding;
             throw new IllegalConditionBeanOperationException(msg);
         }
@@ -1489,7 +1489,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath) {
+    public SpecifiedColumn invokeSpecifyColumn(String columnNamePath) {
         final String delimiter = ".";
         Object currentObj = localSp();
         String remainder = columnNamePath;
@@ -1525,7 +1525,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 break;
             }
         }
-        return (HpSpecifiedColumn) currentObj;
+        return (SpecifiedColumn) currentObj;
     }
 
     /**

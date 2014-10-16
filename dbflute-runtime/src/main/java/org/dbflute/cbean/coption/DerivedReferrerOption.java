@@ -17,7 +17,7 @@ package org.dbflute.cbean.coption;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 
 /**
@@ -142,7 +142,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addYear(HpSpecifiedColumn addedColumn) {
+    public DerivedReferrerOption addYear(SpecifiedColumn addedColumn) {
         doAddYear(addedColumn);
         return this;
     }
@@ -162,7 +162,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption subtractYear(HpSpecifiedColumn subtractedColumn) {
+    public DerivedReferrerOption subtractYear(SpecifiedColumn subtractedColumn) {
         doAddYear(subtractedColumn, true);
         return this;
     }
@@ -196,7 +196,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addMonth(HpSpecifiedColumn addedColumn) {
+    public DerivedReferrerOption addMonth(SpecifiedColumn addedColumn) {
         doAddMonth(addedColumn);
         return this;
     }
@@ -216,7 +216,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption subtractMonth(HpSpecifiedColumn subtractedColumn) {
+    public DerivedReferrerOption subtractMonth(SpecifiedColumn subtractedColumn) {
         doAddMonth(subtractedColumn, true);
         return this;
     }
@@ -250,7 +250,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addDay(HpSpecifiedColumn addedColumn) {
+    public DerivedReferrerOption addDay(SpecifiedColumn addedColumn) {
         doAddDay(addedColumn);
         return this;
     }
@@ -270,7 +270,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption subtractDay(HpSpecifiedColumn subtractedColumn) {
+    public DerivedReferrerOption subtractDay(SpecifiedColumn subtractedColumn) {
         doAddDay(subtractedColumn, true);
         return this;
     }
@@ -304,7 +304,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addHour(HpSpecifiedColumn addedColumn) {
+    public DerivedReferrerOption addHour(SpecifiedColumn addedColumn) {
         doAddHour(addedColumn);
         return this;
     }
@@ -324,7 +324,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption subtractHour(HpSpecifiedColumn subtractedColumn) {
+    public DerivedReferrerOption subtractHour(SpecifiedColumn subtractedColumn) {
         doAddHour(subtractedColumn, true);
         return this;
     }
@@ -358,7 +358,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addMinute(HpSpecifiedColumn addedColumn) {
+    public DerivedReferrerOption addMinute(SpecifiedColumn addedColumn) {
         doAddMinute(addedColumn);
         return this;
     }
@@ -378,7 +378,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption subtractMinute(HpSpecifiedColumn subtractedColumn) {
+    public DerivedReferrerOption subtractMinute(SpecifiedColumn subtractedColumn) {
         doAddMinute(subtractedColumn, true);
         return this;
     }
@@ -412,7 +412,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedColumn The added column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addSecond(HpSpecifiedColumn addedColumn) {
+    public DerivedReferrerOption addSecond(SpecifiedColumn addedColumn) {
         doAddSecond(addedColumn);
         return this;
     }
@@ -432,7 +432,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param subtractedColumn The subtracted column specified by your Dream. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption subtractSecond(HpSpecifiedColumn subtractedColumn) {
+    public DerivedReferrerOption subtractSecond(SpecifiedColumn subtractedColumn) {
         doAddSecond(subtractedColumn, true);
         return this;
     }
@@ -466,7 +466,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param plusColumn The plus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption plus(HpSpecifiedColumn plusColumn) {
+    public DerivedReferrerOption plus(SpecifiedColumn plusColumn) {
         assertObjectNotNull("plusColumn", plusColumn);
         getCalcSpecification().plus(plusColumn);
         return this;
@@ -498,7 +498,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param minusColumn The minus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption minus(HpSpecifiedColumn minusColumn) {
+    public DerivedReferrerOption minus(SpecifiedColumn minusColumn) {
         assertObjectNotNull("minusColumn", minusColumn);
         getCalcSpecification().minus(minusColumn);
         return this;
@@ -530,7 +530,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param multiplyColumn The multiply column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption multiply(HpSpecifiedColumn multiplyColumn) {
+    public DerivedReferrerOption multiply(SpecifiedColumn multiplyColumn) {
         assertObjectNotNull("multiplyColumn", multiplyColumn);
         getCalcSpecification().multiply(multiplyColumn);
         return this;
@@ -562,7 +562,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param divideColumn The divide column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption divide(HpSpecifiedColumn divideColumn) {
+    public DerivedReferrerOption divide(SpecifiedColumn divideColumn) {
         assertObjectNotNull("divideColumn", divideColumn);
         getCalcSpecification().divide(divideColumn);
         return this;

@@ -21,7 +21,6 @@ import java.util.Map;
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
@@ -29,6 +28,7 @@ import org.dbflute.cbean.coption.ConditionOption;
 import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
@@ -833,7 +833,7 @@ public interface SqlClause {
      * It is overridden when the specified column has already been specified.
      * @param specifiedColumn The info about column specification. (NotNull)
      */
-    void specifySelectColumn(HpSpecifiedColumn specifiedColumn);
+    void specifySelectColumn(SpecifiedColumn specifiedColumn);
 
     /**
      * Does it have specified select columns?
@@ -881,7 +881,7 @@ public interface SqlClause {
      * Get the only one specified column.
      * @return The instance as specified column. (NullAllowed: if not found or duplicated, returns null)
      */
-    HpSpecifiedColumn getSpecifiedColumnAsOne();
+    SpecifiedColumn getSpecifiedColumnAsOne();
 
     /**
      * Get the DB name of only one specified column.
@@ -963,7 +963,7 @@ public interface SqlClause {
      * Get the specified column for specified deriving sub-query as specified one.
      * @return The instance as specified column. (NullAlowed: if not found or not one)
      */
-    HpSpecifiedColumn getSpecifiedDerivingColumnAsOne();
+    SpecifiedColumn getSpecifiedDerivingColumnAsOne();
 
     /**
      * Get the info of column for specified deriving sub-query as specified one.

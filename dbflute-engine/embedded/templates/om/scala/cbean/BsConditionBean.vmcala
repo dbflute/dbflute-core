@@ -524,7 +524,7 @@ class ${myClassName} extends AbstractConditionBean {
      */
     def columnQuery(leftSpecifyQuery: (${myConditionBeanClassName}) => Unit): ScrHpColQyOperand[${myConditionBeanClassName}] = {
         return new ScrHpColQyOperand[${myConditionBeanClassName}](new HpColQyHandler[${myConditionBeanClassName}]() {
-            def handle(rightSp: SpecifyQuery[${myConditionBeanClassName}], operand: String): HpCalculator = {
+            def handle(rightSp: SpecifyQuery[${myConditionBeanClassName}], operand: String): ColumnCalculator = {
                 return xcolqy(xcreateColumnQueryCB(), xcreateColumnQueryCB(), new SpecifyQuery[${myConditionBeanClassName}]() {
                     def specify(cb: ${myConditionBeanClassName}): Unit = { leftSpecifyQuery(cb); }
                 }, rightSp, operand);
@@ -685,7 +685,7 @@ object Hp${myConditionBeanClassName} {
          * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
          * @return The information object of specified column. (NotNull)
          */
-        def column${col.javaName}(): HpSpecifiedColumn = { return doColumn("${col.name}"); }
+        def column${col.javaName}(): SpecifiedColumn = { return doColumn("${col.name}"); }
 #end
         def everyColumn(): Unit = { doEveryColumn(); }
         def exceptRecordMetaColumn(): Unit = { doExceptRecordMetaColumn(); }

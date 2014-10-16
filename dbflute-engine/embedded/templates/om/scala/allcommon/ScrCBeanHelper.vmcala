@@ -60,7 +60,7 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    def equal(rightSpecifyQuery: (CB) => Unit): ScrHpCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_EQUAL) }
+    def equal(rightSpecifyQuery: (CB) => Unit): ScrColumnCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_EQUAL) }
 
     /**
      * NotEqual(&lt;&gt;).
@@ -79,7 +79,7 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    def notEqual(rightSpecifyQuery: (CB) => Unit): ScrHpCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_NOT_EQUAL_STANDARD) }
+    def notEqual(rightSpecifyQuery: (CB) => Unit): ScrColumnCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_NOT_EQUAL_STANDARD) }
 
     /**
      * GreaterThan(&gt;).
@@ -98,7 +98,7 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    def greaterThan(rightSpecifyQuery: (CB) => Unit): ScrHpCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_GREATER_THAN) }
+    def greaterThan(rightSpecifyQuery: (CB) => Unit): ScrColumnCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_GREATER_THAN) }
 
     /**
      * LessThan(&lt;).
@@ -117,7 +117,7 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    def lessThan(rightSpecifyQuery: (CB) => Unit): ScrHpCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_LESS_THAN) }
+    def lessThan(rightSpecifyQuery: (CB) => Unit): ScrColumnCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_LESS_THAN) }
 
     /**
      * GreaterEqual(&gt;=).
@@ -136,7 +136,7 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    def greaterEqual(rightSpecifyQuery: (CB) => Unit): ScrHpCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_GREATER_EQUAL) }
+    def greaterEqual(rightSpecifyQuery: (CB) => Unit): ScrColumnCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_GREATER_EQUAL) }
 
     /**
      * LessThan(&lt;=).
@@ -155,19 +155,19 @@ class ScrHpColQyOperand[CB <: ConditionBean](handler: HpColQyHandler[CB]) {
      * @param rightSpecifyQuery The specify-query for right column. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    def lessEqual(rightSpecifyQuery: (CB) => Unit): ScrHpCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_LESS_EQUAL) }
+    def lessEqual(rightSpecifyQuery: (CB) => Unit): ScrColumnCalculator = { doHandle(rightSpecifyQuery, ConditionKey.CK_LESS_EQUAL) }
 #set ($isColQyMySqlExtension = ($database.isAvailableDatabaseDependency() && $database.isDatabaseMySQL()))
 #if ($isColQyMySqlExtension)
 
-    def bitAnd(rightSpecifyQuery: (CB) => Unit): ScrHpCalculator = { doHandle(rightSpecifyQuery, "&") }
-    def bitOr(rightSpecifyQuery: (CB) => Unit): ScrHpCalculator = { doHandle(rightSpecifyQuery, "|") }
+    def bitAnd(rightSpecifyQuery: (CB) => Unit): ScrColumnCalculator = { doHandle(rightSpecifyQuery, "&") }
+    def bitOr(rightSpecifyQuery: (CB) => Unit): ScrColumnCalculator = { doHandle(rightSpecifyQuery, "|") }
 
-    protected def doHandle(rightSpecifyQuery: (CB) => Unit, operand: String): ScrHpCalculator =
-    { new ScrHpCalculator(handler.handle(toNativeSpecifyQuery(rightSpecifyQuery), operand)) }
+    protected def doHandle(rightSpecifyQuery: (CB) => Unit, operand: String): ScrColumnCalculator =
+    { new ScrColumnCalculator(handler.handle(toNativeSpecifyQuery(rightSpecifyQuery), operand)) }
 #end
 
-    protected def doHandle(rightSpecifyQuery: (CB) => Unit, ckey: ConditionKey): ScrHpCalculator =
-    { new ScrHpCalculator(handler.handle(toNativeSpecifyQuery(rightSpecifyQuery), ckey.getOperand())) }
+    protected def doHandle(rightSpecifyQuery: (CB) => Unit, ckey: ConditionKey): ScrColumnCalculator =
+    { new ScrColumnCalculator(handler.handle(toNativeSpecifyQuery(rightSpecifyQuery), ckey.getOperand())) }
 
     protected def toNativeSpecifyQuery(rightSpecifyQuery: (CB) => Unit): SpecifyQuery[CB] =
     { new SpecifyQuery[CB]() { def specify(cb: CB): Unit = { rightSpecifyQuery(cb) } } }
@@ -184,7 +184,7 @@ trait ScrHpColQyHandler[CB <: ConditionBean] {
      * @param operand The operand for column comparison. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    def handle(rightSp: SpecifyQuery[CB], operand: String): HpCalculator;
+    def handle(rightSp: SpecifyQuery[CB], operand: String): ColumnCalculator;
 }
 
 /* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
@@ -926,7 +926,7 @@ class ScrHpSSQDecorator[CB <: ConditionBean](decorator: HpSSQDecorator[CB]) {
 /**
  * @author jflute
  */
-class ScrHpCalculator(calculator: HpCalculator) {
+class ScrColumnCalculator(calculator: ColumnCalculator) {
 
     // ===================================================================================
     //                                                                         Calculation
@@ -936,7 +936,7 @@ class ScrHpCalculator(calculator: HpCalculator) {
      * @param plusValue The number value for plus. (NotNull)
      * @return this. (NotNull)
      */
-    def plus(plusValue: Number): ScrHpCalculator = { calculator.plus(plusValue); return this; }
+    def plus(plusValue: Number): ScrColumnCalculator = { calculator.plus(plusValue); return this; }
 
     /**
      * Plus the specified column with the plus column. (+) {Dream Cruise}
@@ -962,14 +962,14 @@ class ScrHpCalculator(calculator: HpCalculator) {
      * @param plusColumn The plus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    def plus(plusColumn: HpSpecifiedColumn): ScrHpCalculator = { calculator.plus(plusColumn); return this; }
+    def plus(plusColumn: SpecifiedColumn): ScrColumnCalculator = { calculator.plus(plusColumn); return this; }
 
     /**
      * Minus the specified column with the value. (-)
      * @param minusValue The number value for minus. (NotNull)
      * @return this. (NotNull)
      */
-    def minus(minusValue: Number): ScrHpCalculator = { calculator.minus(minusValue); return this; }
+    def minus(minusValue: Number): ScrColumnCalculator = { calculator.minus(minusValue); return this; }
 
     /**
      * Minus the specified column with the minus column. (-) {Dream Cruise}
@@ -995,14 +995,14 @@ class ScrHpCalculator(calculator: HpCalculator) {
      * @param minusColumn The minus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    def minus(minusColumn: HpSpecifiedColumn): ScrHpCalculator = { calculator.minus(minusColumn); return this; }
+    def minus(minusColumn: SpecifiedColumn): ScrColumnCalculator = { calculator.minus(minusColumn); return this; }
 
     /**
      * Multiply the value to the specified column. (*)
      * @param multiplyValue The number value for multiply. (NotNull)
      * @return this. (NotNull)
      */
-    def multiply(multiplyValue: Number): ScrHpCalculator = { calculator.multiply(multiplyValue); return this; }
+    def multiply(multiplyValue: Number): ScrColumnCalculator = { calculator.multiply(multiplyValue); return this; }
 
     /**
      * Multiply the specified column with the multiply column. (*) {Dream Cruise}
@@ -1028,14 +1028,14 @@ class ScrHpCalculator(calculator: HpCalculator) {
      * @param multiplyColumn The multiply column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    def multiply(multiplyColumn: HpSpecifiedColumn): ScrHpCalculator = { calculator.multiply(multiplyColumn); return this; }
+    def multiply(multiplyColumn: SpecifiedColumn): ScrColumnCalculator = { calculator.multiply(multiplyColumn); return this; }
 
     /**
      * Divide the specified column by the value. (/)
      * @param divideValue The number value for divide. (NotNull)
      * @return this. (NotNull)
      */
-    def divide(divideValue: Number): ScrHpCalculator = { calculator.divide(divideValue); return this; }
+    def divide(divideValue: Number): ScrColumnCalculator = { calculator.divide(divideValue); return this; }
 
     /**
      * Divide the specified column with the divide column. (/) {Dream Cruise}
@@ -1061,14 +1061,14 @@ class ScrHpCalculator(calculator: HpCalculator) {
      * @param divideColumn The divide column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    def divide(divideColumn: HpSpecifiedColumn): ScrHpCalculator = { calculator.divide(divideColumn); return this; }
+    def divide(divideColumn: SpecifiedColumn): ScrColumnCalculator = { calculator.divide(divideColumn); return this; }
 
     /**
      * Convert the value of right column by function.
      * @param option The conversion option of column. (NotNull)
      * @return this. (NotNull)
      */
-    def convert(optionCall: (ScrColumnConversionOption) => Unit): ScrHpCalculator =
+    def convert(optionCall: (ScrColumnConversionOption) => Unit): ScrColumnCalculator =
     { val option = new ScrColumnConversionOption(); optionCall(option); calculator.convert(option); return this; }
 
     // ===================================================================================
@@ -1078,12 +1078,12 @@ class ScrHpCalculator(calculator: HpCalculator) {
      * To be for left column.
      * @return this. (NotNull)
      */
-    def left(): ScrHpCalculator = { calculator.left(); return this; }
+    def left(): ScrColumnCalculator = { calculator.left(); return this; }
 
     /**
      * To be for right column. (default)<br />
      * It also means main process internally.
      * @return this. (NotNull)
      */
-    def right(): ScrHpCalculator = { calculator.right(); return this; }
+    def right(): ScrColumnCalculator = { calculator.right(); return this; }
 }
