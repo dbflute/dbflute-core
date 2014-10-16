@@ -108,7 +108,7 @@ public class InvokeNameResult {
     }
 
     public void setLineNumber(int lineNumber) {
-        this._lineNumber = lineNumber;
+        _lineNumber = lineNumber;
     }
 
     public int getFoundIndex() {
