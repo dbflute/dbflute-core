@@ -46,6 +46,9 @@ public class RangeOfOption implements ConditionOption, ColumnCalculator {
     protected boolean _orIsNull;
     protected HpCalcSpecification<ConditionBean> _calcSpecification;
 
+    /** Does it allow one-side only from-to? */
+    protected boolean _oneSideAllowed;
+
     // ===================================================================================
     //                                                                   Manual Adjustment
     //                                                                   =================
@@ -89,6 +92,27 @@ public class RangeOfOption implements ConditionOption, ColumnCalculator {
         return this;
     }
 
+    /**
+     * Allow you to set one-side only condition. (null allowed) <br />
+     * If you ignore null-or-empty query, you don't need to call this.
+     * @return this. (NotNull)
+     */
+    public RangeOfOption allowOneSide() {
+        _oneSideAllowed = true;
+        return this;
+    }
+
+    /**
+     * Does it allow you to set one-side only condition. <br />
+     * @return The determination, true or false.
+     */
+    public boolean isOneSideAllowed() {
+        return _oneSideAllowed;
+    }
+
+    // ===================================================================================
+    //                                                                       Internal Main
+    //                                                                       =============
     /**
      * Get the condition-key of the min number.
      * @return The condition-key of the min number. (NotNull)

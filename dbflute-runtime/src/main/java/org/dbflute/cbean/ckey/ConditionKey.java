@@ -145,7 +145,7 @@ public abstract class ConditionKey implements Serializable {
      * @param cvalue The object of condition value. (NotNull)
      * @param value The value of the condition. (NotNull)
      * @param callerName Caller's real name. (NotNull)
-     * @return Is the query valid?
+     * @return Does it need the query clause setup? (normally true, false: no value or overriding only)
      */
     public boolean prepareQuery(final QueryModeProvider provider, final ConditionValue cvalue, final Object value,
             final ColumnRealName callerName) {

@@ -57,7 +57,7 @@ public class ConditionKeyEqual extends ConditionKey {
                 return false;
             } else {
                 cvalue.overrideEqual(value);
-                return false;
+                return true;
             }
         }
         return true;

@@ -637,10 +637,24 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, option);
     }
 
+    /**
+     * @param key The condition key for the query. (NotNull)
+     * @param value The value of the condition. (NotNull)
+     * @param cvalue The object of condition value. (NotNull)
+     * @param columnDbName The DB name of column for the query. (NotNull)
+     * @return Does it need the query clause setup? (normally true, false: no value or overriding only)
+     */
     protected boolean prepareQueryChecked(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         return xdoPrepareQuery(key, value, cvalue, columnDbName, true);
     }
 
+    /**
+     * @param key The condition key for the query. (NotNull)
+     * @param value The value of the condition. (NotNull)
+     * @param cvalue The object of condition value. (NotNull)
+     * @param columnDbName The DB name of column for the query. (NotNull)
+     * @return Does it need the query clause setup? (normally true, false: no value or overriding only)
+     */
     protected boolean prepareQueryNoCheck(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         return xdoPrepareQuery(key, value, cvalue, columnDbName, false);
     }
@@ -930,37 +944,39 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void regFTQ(Date fromDate, Date toDate, ConditionValue cvalue, String columnDbName, FromToOption option) {
         assertObjectNotNull("option(FromToOption)", option);
         filterFromToOption(columnDbName, option); // for fixed option
+
+        // this FromTo process is very similar to RangeOf process
         final Date filteredFromDate = option.filterFromDate(fromDate);
         final ConditionKey fromKey = option.getFromDateConditionKey();
-        final boolean fromValidQuery = prepareQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName);
+        final boolean overrideFromValue = fromKey.needsOverrideValue(cvalue);
+        final boolean needsFromClauseSetup = prepareQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName);
 
         final Date filteredToDate = option.filterToDate(toDate);
         final ConditionKey toKey = option.getToDateConditionKey();
-        final boolean toValidQuery = prepareQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName);
+        final boolean overrideToValue = toKey.needsOverrideValue(cvalue);
+        final boolean needsToClauseSetup = prepareQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName);
 
-        final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && fromValidQuery && toValidQuery;
+        final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && needsFromClauseSetup && needsToClauseSetup;
         if (needsAndPart) {
             xgetSqlClause().beginOrScopeQueryAndPart();
         }
         try {
-            if (fromValidQuery) {
+            if (needsFromClauseSetup) {
                 final Object registered = filterFromToRegisteredDate(option, filteredFromDate, columnDbName);
                 setupConditionValueAndRegisterWhereClause(fromKey, registered, cvalue, columnDbName);
             }
-            if (toValidQuery) {
+            if (needsToClauseSetup) {
                 final Object registered = filterFromToRegisteredDate(option, filteredToDate, columnDbName);
                 setupConditionValueAndRegisterWhereClause(toKey, registered, cvalue, columnDbName);
             }
-            if (!fromValidQuery && !toValidQuery) { // both no condition
-                final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
-                final List<Date> valueList = newArrayList(fromDate, toDate);
-                handleInvalidQueryList(keyList, valueList, columnDbName);
-            } else if (!fromValidQuery || !toValidQuery) { // either no condition
-                if (!option.isOneSideAllowed()) { // not allowed (if both required)
-                    final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
-                    final List<Date> valueList = newArrayList(fromDate, toDate);
-                    handleInvalidQueryList(keyList, valueList, columnDbName);
+            if (!needsFromClauseSetup && !needsToClauseSetup) { // both no needs to setup
+                if (overrideFromValue || overrideToValue) { // one-side invalid or override 
+                    xhandleFromToOneSideInvalidQuery(fromDate, toDate, columnDbName, option, fromKey, toKey);
+                } else if (!overrideFromValue && !overrideToValue) { // both invalid
+                    xhandleFromToBothSideInvalidQuery(fromDate, toDate, columnDbName, option, fromKey, toKey);
                 }
+            } else if (!needsFromClauseSetup || !needsToClauseSetup) { // either no condition
+                xhandleFromToOneSideInvalidQuery(fromDate, toDate, columnDbName, option, fromKey, toKey);
             }
         } finally {
             if (needsAndPart) {
@@ -971,6 +987,25 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void filterFromToOption(String columnDbName, FromToOption option) {
         // do nothing as default, basically for option default
+    }
+
+    protected void xhandleFromToOneSideInvalidQuery(Date fromDate, Date toDate, String columnDbName, FromToOption option,
+            ConditionKey fromKey, ConditionKey toKey) {
+        if (!option.isOneSideAllowed()) { // not allowed (if both required)
+            xdoHandleFromToInvalidQuery(fromDate, toDate, columnDbName, option, fromKey, toKey);
+        }
+    }
+
+    protected void xhandleFromToBothSideInvalidQuery(Date fromDate, Date toDate, String columnDbName, FromToOption option,
+            ConditionKey fromKey, ConditionKey toKey) {
+        xdoHandleFromToInvalidQuery(fromDate, toDate, columnDbName, option, fromKey, toKey);
+    }
+
+    protected void xdoHandleFromToInvalidQuery(Date fromDate, Date toDate, String columnDbName, FromToOption option, ConditionKey fromKey,
+            ConditionKey toKey) {
+        final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
+        final List<Date> valueList = newArrayList(fromDate, toDate);
+        handleInvalidQueryList(keyList, valueList, columnDbName);
     }
 
     // -----------------------------------------------------
@@ -1047,38 +1082,61 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         assertObjectNotNull("option(RangeOfOption)", option);
         if (option.hasCalculationRange()) {
             final ConditionBean dreamCruiseCB = xgetBaseCB().xcreateDreamCruiseCB();
-            //dreamCruiseCB.x
-            //dreamCruiseCB.overTheWaves(xcreateManualOrderSpecifiedColumn(dreamCruiseCB));
             option.xinitCalculationRange(xgetBaseCB(), dreamCruiseCB);
         }
+        // this RangeOf process is very similar to FromTo process
         final ConditionKey minKey = option.getMinNumberConditionKey();
-        final boolean minValidQuery = prepareQueryNoCheck(minKey, minNumber, cvalue, columnDbName);
+        final boolean overrideMinValue = minKey.needsOverrideValue(cvalue);
+        final boolean needsMinClauseSetup = prepareQueryNoCheck(minKey, minNumber, cvalue, columnDbName);
 
         final ConditionKey maxKey = option.getMaxNumberConditionKey();
-        final boolean maxValidQuery = prepareQueryNoCheck(maxKey, maxNumber, cvalue, columnDbName);
+        final boolean overrideMaxValue = maxKey.needsOverrideValue(cvalue);
+        final boolean needsMaxClauseSetup = prepareQueryNoCheck(maxKey, maxNumber, cvalue, columnDbName);
 
-        final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && minValidQuery && maxValidQuery;
+        final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && needsMinClauseSetup && needsMaxClauseSetup;
         if (needsAndPart) {
             xgetSqlClause().beginOrScopeQueryAndPart();
         }
         try {
-            if (minValidQuery) {
+            if (needsMinClauseSetup) {
                 setupConditionValueAndRegisterWhereClause(minKey, minNumber, cvalue, columnDbName, option);
             }
-            if (maxValidQuery) {
+            if (needsMaxClauseSetup) {
                 setupConditionValueAndRegisterWhereClause(maxKey, maxNumber, cvalue, columnDbName, option);
-            } else {
-                if (!minValidQuery) { // means both queries are invalid
-                    final List<ConditionKey> keyList = newArrayList(minKey, maxKey);
-                    final List<Number> valueList = newArrayList(minNumber, maxNumber);
-                    handleInvalidQueryList(keyList, valueList, columnDbName);
+            }
+            if (!needsMinClauseSetup && !needsMaxClauseSetup) { // both no needs to setup
+                if (overrideMinValue || overrideMaxValue) { // one-side invalid or override 
+                    xhandleRangeOfOneSideInvalidQuery(minNumber, maxNumber, columnDbName, option, minKey, maxKey);
+                } else if (!overrideMinValue && !overrideMaxValue) { // both invalid
+                    xhandleRangeOfBothSideInvalidQuery(minNumber, maxNumber, columnDbName, option, minKey, maxKey);
                 }
+            } else if (!needsMinClauseSetup || !needsMaxClauseSetup) { // either no condition
+                xhandleRangeOfOneSideInvalidQuery(minNumber, maxNumber, columnDbName, option, minKey, maxKey);
             }
         } finally {
             if (needsAndPart) {
                 xgetSqlClause().endOrScopeQueryAndPart();
             }
         }
+    }
+
+    protected void xhandleRangeOfOneSideInvalidQuery(Number minNumber, Number maxNumber, String columnDbName, RangeOfOption option,
+            ConditionKey fromKey, ConditionKey toKey) {
+        if (!option.isOneSideAllowed()) { // not allowed (if both required)
+            xdoHandleRangeOfInvalidQuery(minNumber, maxNumber, columnDbName, option, fromKey, toKey);
+        }
+    }
+
+    protected void xhandleRangeOfBothSideInvalidQuery(Number minNumber, Number maxNumber, String columnDbName, RangeOfOption option,
+            ConditionKey fromKey, ConditionKey toKey) {
+        xdoHandleRangeOfInvalidQuery(minNumber, maxNumber, columnDbName, option, fromKey, toKey);
+    }
+
+    protected void xdoHandleRangeOfInvalidQuery(Number minNumber, Number maxNumber, String columnDbName, RangeOfOption option,
+            ConditionKey fromKey, ConditionKey toKey) {
+        final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
+        final List<Number> valueList = newArrayList(minNumber, maxNumber);
+        handleInvalidQueryList(keyList, valueList, columnDbName);
     }
 
     // ===================================================================================
@@ -1793,9 +1851,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          Manual Order
     //                                          ------------
     protected ManualOrderOption cMOO(ManualOrderOptionCall opCall) { // createManualOrderOption()
+        assertManualOrderOpCallNotNull(opCall);
         final ManualOrderOption op = newManualOrderOption();
         opCall.callback(op);
         return op;
+    }
+
+    protected void assertManualOrderOpCallNotNull(ManualOrderOptionCall opCall) {
+        if (opCall == null) {
+            throw new IllegalArgumentException("The argument 'opLambda' should not be null: " + getTableDbName());
+        }
     }
 
     /**

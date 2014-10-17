@@ -1391,7 +1391,9 @@ public class FromToOption implements ConditionOption {
         sb.append(title);
         sb.append(":{usePattern=").append(_usePattern);
         sb.append(", greaterThan=").append(_greaterThan).append(", lessThan=").append(_lessThan);
-        sb.append(", orIsNull=").append(_orIsNull).append("}");
+        sb.append(", orIsNull=").append(_orIsNull);
+        sb.append(", oneSideAllowed=").append(_oneSideAllowed);
+        sb.append("}");
         return sb.toString();
     }
 }
