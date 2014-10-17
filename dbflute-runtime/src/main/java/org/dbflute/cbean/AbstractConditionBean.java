@@ -45,6 +45,7 @@ import org.dbflute.cbean.ordering.OrderByBean;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.paging.PagingInvoker;
 import org.dbflute.cbean.scoping.AndQuery;
+import org.dbflute.cbean.scoping.ModeQuery;
 import org.dbflute.cbean.scoping.OrQuery;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.cbean.scoping.UnionQuery;
@@ -740,13 +741,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                       Invalid Query
     //                                                                       =============
-    /**
-     * {@inheritDoc}
-     */
-    public void checkNullOrEmptyQuery() {
-        getSqlClause().checkNullOrEmptyQuery();
-    }
-
+    // -----------------------------------------------------
+    //                                         Null or Empty
+    //                                         -------------
     /**
      * {@inheritDoc}
      */
@@ -757,7 +754,32 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void enableEmptyStringQuery() {
+    public void checkNullOrEmptyQuery() {
+        getSqlClause().checkNullOrEmptyQuery();
+    }
+
+    // -----------------------------------------------------
+    //                                          Empty String
+    //                                          ------------
+    /**
+     * {@inheritDoc}
+     */
+    public void enableEmptyStringQuery(ModeQuery noArgLambda) {
+        assertObjectNotNull("noArgLambda", noArgLambda);
+        final boolean originallyEnabled = getSqlClause().isEmptyStringQueryEnabled();
+        if (!originallyEnabled) {
+            doEnableEmptyStringQuery();
+        }
+        try {
+            noArgLambda.query();
+        } finally {
+            if (!originallyEnabled) {
+                disableEmptyStringQuery();
+            }
+        }
+    }
+
+    protected void doEnableEmptyStringQuery() {
         getSqlClause().enableEmptyStringQuery();
     }
 
@@ -768,10 +790,28 @@ public abstract class AbstractConditionBean implements ConditionBean {
         getSqlClause().disableEmptyStringQuery();
     }
 
+    // -----------------------------------------------------
+    //                                            Overriding
+    //                                            ----------
     /**
      * {@inheritDoc}
      */
-    public void enableOverridingQuery() {
+    public void enableOverridingQuery(ModeQuery noArgLambda) {
+        assertObjectNotNull("noArgLambda", noArgLambda);
+        final boolean originallyEnabled = getSqlClause().isOverridingQueryEnabled();
+        if (!originallyEnabled) {
+            doEnableOverridingQuery();
+        }
+        try {
+            noArgLambda.query();
+        } finally {
+            if (!originallyEnabled) {
+                disableOverridingQuery();
+            }
+        }
+    }
+
+    protected void doEnableOverridingQuery() {
         getSqlClause().enableOverridingQuery();
     }
 
@@ -1868,12 +1908,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
             ignoreNullOrEmptyQuery();
         }
         if (mainCQ.xgetSqlClause().isEmptyStringQueryEnabled()) {
-            enableEmptyStringQuery();
+            doEnableEmptyStringQuery();
         } else {
             disableEmptyStringQuery();
         }
         if (mainCQ.xgetSqlClause().isOverridingQueryEnabled()) {
-            enableOverridingQuery();
+            doEnableOverridingQuery();
         } else {
             disableOverridingQuery();
         }

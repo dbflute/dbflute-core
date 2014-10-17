@@ -44,6 +44,7 @@ import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.ckey.ConditionKeyInScope;
+import org.dbflute.cbean.ckey.ConditionKeyPrepareResult;
 import org.dbflute.cbean.coption.ConditionOption;
 import org.dbflute.cbean.coption.ConditionOptionCall;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
@@ -106,6 +107,8 @@ import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The abstract class of condition-query.
@@ -116,6 +119,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    private static final Logger _log = LoggerFactory.getLogger(AbstractConditionQuery.class);
+
     protected static final ConditionKey CK_EQ = ConditionKey.CK_EQUAL;
     protected static final ConditionKey CK_NES = ConditionKey.CK_NOT_EQUAL_STANDARD;
     protected static final ConditionKey CK_NET = ConditionKey.CK_NOT_EQUAL_TRADITION;
@@ -624,17 +629,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                        Normal Query
     //                                                                        ============
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
-            return;
+        if (prepareQueryChecked(key, value, cvalue, columnDbName).newClause()) {
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName);
         }
-        setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName);
     }
 
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName, ConditionOption option) {
-        if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
-            return;
+        if (prepareQueryChecked(key, value, cvalue, columnDbName).newClause()) {
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, option);
         }
-        setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, option);
     }
 
     /**
@@ -642,9 +645,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @param value The value of the condition. (NotNull)
      * @param cvalue The object of condition value. (NotNull)
      * @param columnDbName The DB name of column for the query. (NotNull)
-     * @return Does it need the query clause setup? (normally true, false: no value or overriding only)
+     * @return The result of the preparation for the condition key. (NotNull)
      */
-    protected boolean prepareQueryChecked(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+    protected ConditionKeyPrepareResult prepareQueryChecked(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         return xdoPrepareQuery(key, value, cvalue, columnDbName, true);
     }
 
@@ -653,26 +656,25 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @param value The value of the condition. (NotNull)
      * @param cvalue The object of condition value. (NotNull)
      * @param columnDbName The DB name of column for the query. (NotNull)
-     * @return Does it need the query clause setup? (normally true, false: no value or overriding only)
+     * @return The result of the preparation for the condition key. (NotNull)
      */
-    protected boolean prepareQueryNoCheck(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+    protected ConditionKeyPrepareResult prepareQueryNoCheck(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         return xdoPrepareQuery(key, value, cvalue, columnDbName, false);
     }
 
-    protected boolean xdoPrepareQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName, boolean checked) {
-        final ColumnRealName callerName = toColumnRealName(columnDbName); // logging only
-        final boolean overrideValue = key.needsOverrideValue(cvalue);
-        if (overrideValue) {
+    protected ConditionKeyPrepareResult xdoPrepareQuery(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
+            boolean invalidChecked) {
+        final ConditionKeyPrepareResult result = key.prepareQuery(xcreateQueryModeProvider(), cvalue, value);
+        if (result.overridden()) {
             handleOverridingQuery(key, value, cvalue, columnDbName);
         }
-        if (key.prepareQuery(xcreateQueryModeProvider(), cvalue, value, callerName)) {
-            return true;
-        } else {
-            if (!overrideValue && checked) {
-                handleInvalidQuery(key, value, cvalue, columnDbName);
-            }
-            return false;
+        if (result.duplicate()) {
+            noticeRegistered(key, value, cvalue, columnDbName);
         }
+        if (invalidChecked && result.invalid()) {
+            handleInvalidQuery(key, value, cvalue, columnDbName);
+        }
+        return result;
     }
 
     // ===================================================================================
@@ -687,6 +689,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected boolean isOverrideQueryAllowed(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         return xgetSqlClause().isOverridingQueryEnabled();
+    }
+
+    protected void noticeRegistered(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
+        if (_log.isDebugEnabled()) {
+            _log.debug("*Found the duplicate query: target=" + columnDbName + "." + key + " value=" + value);
+        }
     }
 
     // ===================================================================================
@@ -772,7 +780,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throwLikeSearchOptionNotFoundException(columnDbName, value);
             return; // unreachable
         }
-        if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
+        if (!prepareQueryChecked(key, value, cvalue, columnDbName).newClause()) {
             return;
         }
         if (xsuppressEscape()) {
@@ -948,34 +956,28 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // this FromTo process is very similar to RangeOf process
         final Date filteredFromDate = option.filterFromDate(fromDate);
         final ConditionKey fromKey = option.getFromDateConditionKey();
-        final boolean overrideFromValue = fromKey.needsOverrideValue(cvalue);
-        final boolean needsFromClauseSetup = prepareQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName);
+        final ConditionKeyPrepareResult fromResult = prepareQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName);
 
         final Date filteredToDate = option.filterToDate(toDate);
         final ConditionKey toKey = option.getToDateConditionKey();
-        final boolean overrideToValue = toKey.needsOverrideValue(cvalue);
-        final boolean needsToClauseSetup = prepareQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName);
+        final ConditionKeyPrepareResult toResult = prepareQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName);
 
-        final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && needsFromClauseSetup && needsToClauseSetup;
+        final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && fromResult.newClause() && toResult.newClause();
         if (needsAndPart) {
             xgetSqlClause().beginOrScopeQueryAndPart();
         }
         try {
-            if (needsFromClauseSetup) {
+            if (fromResult.newClause()) {
                 final Object registered = filterFromToRegisteredDate(option, filteredFromDate, columnDbName);
                 setupConditionValueAndRegisterWhereClause(fromKey, registered, cvalue, columnDbName);
             }
-            if (needsToClauseSetup) {
+            if (toResult.newClause()) {
                 final Object registered = filterFromToRegisteredDate(option, filteredToDate, columnDbName);
                 setupConditionValueAndRegisterWhereClause(toKey, registered, cvalue, columnDbName);
             }
-            if (!needsFromClauseSetup && !needsToClauseSetup) { // both no needs to setup
-                if (overrideFromValue || overrideToValue) { // one-side invalid or override 
-                    xhandleFromToOneSideInvalidQuery(fromDate, toDate, columnDbName, option, fromKey, toKey);
-                } else if (!overrideFromValue && !overrideToValue) { // both invalid
-                    xhandleFromToBothSideInvalidQuery(fromDate, toDate, columnDbName, option, fromKey, toKey);
-                }
-            } else if (!needsFromClauseSetup || !needsToClauseSetup) { // either no condition
+            if (fromResult.invalid() && toResult.invalid()) {
+                xhandleFromToBothSideInvalidQuery(fromDate, toDate, columnDbName, option, fromKey, toKey);
+            } else if (fromResult.invalid() || toResult.invalid()) {
                 xhandleFromToOneSideInvalidQuery(fromDate, toDate, columnDbName, option, fromKey, toKey);
             }
         } finally {
@@ -1086,31 +1088,25 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         // this RangeOf process is very similar to FromTo process
         final ConditionKey minKey = option.getMinNumberConditionKey();
-        final boolean overrideMinValue = minKey.needsOverrideValue(cvalue);
-        final boolean needsMinClauseSetup = prepareQueryNoCheck(minKey, minNumber, cvalue, columnDbName);
+        final ConditionKeyPrepareResult minResult = prepareQueryNoCheck(minKey, minNumber, cvalue, columnDbName);
 
         final ConditionKey maxKey = option.getMaxNumberConditionKey();
-        final boolean overrideMaxValue = maxKey.needsOverrideValue(cvalue);
-        final boolean needsMaxClauseSetup = prepareQueryNoCheck(maxKey, maxNumber, cvalue, columnDbName);
+        final ConditionKeyPrepareResult maxResult = prepareQueryNoCheck(maxKey, maxNumber, cvalue, columnDbName);
 
-        final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && needsMinClauseSetup && needsMaxClauseSetup;
+        final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && minResult.newClause() && maxResult.newClause();
         if (needsAndPart) {
             xgetSqlClause().beginOrScopeQueryAndPart();
         }
         try {
-            if (needsMinClauseSetup) {
+            if (minResult.newClause()) {
                 setupConditionValueAndRegisterWhereClause(minKey, minNumber, cvalue, columnDbName, option);
             }
-            if (needsMaxClauseSetup) {
+            if (maxResult.newClause()) {
                 setupConditionValueAndRegisterWhereClause(maxKey, maxNumber, cvalue, columnDbName, option);
             }
-            if (!needsMinClauseSetup && !needsMaxClauseSetup) { // both no needs to setup
-                if (overrideMinValue || overrideMaxValue) { // one-side invalid or override 
-                    xhandleRangeOfOneSideInvalidQuery(minNumber, maxNumber, columnDbName, option, minKey, maxKey);
-                } else if (!overrideMinValue && !overrideMaxValue) { // both invalid
-                    xhandleRangeOfBothSideInvalidQuery(minNumber, maxNumber, columnDbName, option, minKey, maxKey);
-                }
-            } else if (!needsMinClauseSetup || !needsMaxClauseSetup) { // either no condition
+            if (minResult.invalid() && maxResult.invalid()) {
+                xhandleRangeOfBothSideInvalidQuery(minNumber, maxNumber, columnDbName, option, minKey, maxKey);
+            } else if (minResult.invalid() || maxResult.invalid()) {
                 xhandleRangeOfOneSideInvalidQuery(minNumber, maxNumber, columnDbName, option, minKey, maxKey);
             }
         } finally {
@@ -1143,7 +1139,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                       InScope Query
     //                                                                       =============
     protected void regINS(ConditionKey key, List<?> value, ConditionValue cvalue, String columnDbName) {
-        if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
+        if (!prepareQueryChecked(key, value, cvalue, columnDbName).newClause()) {
             return;
         }
         final int inScopeLimit = xgetSqlClause().getInScopeLimit();
@@ -1204,9 +1200,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         doRegIQ(key, value, cvalue, columnDbName, option);
     }
 
-    protected void doRegIQ(final ConditionKey key, final Object value, final ConditionValue cvalue, final String columnDbName,
-            final ConditionOption option) {
-        if (!prepareQueryChecked(key, value, cvalue, columnDbName)) {
+    protected void doRegIQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName, ConditionOption option) {
+        if (!prepareQueryChecked(key, value, cvalue, columnDbName).newClause()) {
             return;
         }
         final DBMeta dbmeta = xgetDBMetaProvider().provideDBMetaChecked(getTableDbName());

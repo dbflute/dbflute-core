@@ -55,12 +55,8 @@ public class ConditionKeyIsNull extends ConditionKey {
     //                                                                       Prepare Query
     //                                                                       =============
     @Override
-    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
-        if (needsOverrideValue(cvalue)) {
-            noticeRegistered(callerName, value);
-            return false;
-        }
-        return true;
+    protected ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value) {
+        return chooseResultNonValue(cvalue);
     }
 
     // ===================================================================================

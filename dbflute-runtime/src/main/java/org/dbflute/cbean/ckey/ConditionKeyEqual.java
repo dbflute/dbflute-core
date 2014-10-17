@@ -47,20 +47,15 @@ public class ConditionKeyEqual extends ConditionKey {
     //                                                                       Prepare Query
     //                                                                       =============
     @Override
-    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+    protected ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value) {
         if (value == null) {
-            return false;
+            return RESULT_INVALID_QUERY;
         }
         if (needsOverrideValue(cvalue)) {
-            if (cvalue.equalEqual(value)) {
-                noticeRegistered(callerName, value);
-                return false;
-            } else {
-                cvalue.overrideEqual(value);
-                return true;
-            }
+            cvalue.overrideEqual(value);
+            return chooseResultAlreadyExists(cvalue.equalEqual(value));
         }
-        return true;
+        return RESULT_NEW_QUERY;
     }
 
     // ===================================================================================

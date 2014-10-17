@@ -28,6 +28,7 @@ import org.dbflute.cbean.ordering.OrderByBean;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.paging.PagingInvoker;
 import org.dbflute.cbean.scoping.AndQuery;
+import org.dbflute.cbean.scoping.ModeQuery;
 import org.dbflute.cbean.scoping.OrQuery;
 import org.dbflute.cbean.scoping.UnionQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
@@ -275,13 +276,13 @@ public class MockConditionBean implements ConditionBean {
     public void ignoreNullOrEmptyQuery() {
     }
 
-    public void enableEmptyStringQuery() {
+    public void enableEmptyStringQuery(ModeQuery modeQuery) {
     }
 
     public void disableEmptyStringQuery() {
     }
 
-    public void enableOverridingQuery() {
+    public void enableOverridingQuery(ModeQuery modeQuery) {
     }
 
     public void disableOverridingQuery() {

@@ -55,20 +55,15 @@ public class ConditionKeyLessEqual extends ConditionKey {
     //                                                                       Prepare Query
     //                                                                       =============
     @Override
-    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+    protected ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value) {
         if (value == null) {
-            return false;
+            return RESULT_INVALID_QUERY;
         }
         if (needsOverrideValue(cvalue)) {
-            if (cvalue.equalLessEqual(value)) {
-                noticeRegistered(callerName, value);
-                return false;
-            } else {
-                cvalue.overrideLessEqual(value);
-                return false;
-            }
+            cvalue.overrideLessEqual(value);
+            return chooseResultAlreadyExists(cvalue.equalLessEqual(value));
         }
-        return true;
+        return RESULT_NEW_QUERY;
     }
 
     // ===================================================================================

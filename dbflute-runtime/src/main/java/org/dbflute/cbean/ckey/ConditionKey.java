@@ -38,8 +38,6 @@ import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.dbway.ExtensionOperand;
 import org.dbflute.dbway.OnQueryStringConnector;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The abstract class of condition-key.
@@ -53,12 +51,12 @@ public abstract class ConditionKey implements Serializable {
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
-    /** The logger instance for this class. (NotNull) */
-    private static final Logger _log = LoggerFactory.getLogger(ConditionKey.class);
-
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    // -----------------------------------------------------
+    //                                         Condition Key
+    //                                         -------------
     /** The condition key of equal. */
     public static final ConditionKey CK_EQUAL = new ConditionKeyEqual();
 
@@ -127,6 +125,14 @@ public abstract class ConditionKey implements Serializable {
                 || CK_LESS_THAN_OR_IS_NULL.equals(key) || CK_IS_NULL.equals(key) || CK_IS_NULL_OR_EMPTY.equals(key);
     }
 
+    // -----------------------------------------------------
+    //                                        Prepare Result
+    //                                        --------------
+    protected static final ConditionKeyPrepareResult RESULT_NEW_QUERY = ConditionKeyPrepareResult.NEW_QUERY;
+    protected static final ConditionKeyPrepareResult RESULT_INVALID_QUERY = ConditionKeyPrepareResult.INVALID_QUERY;
+    protected static final ConditionKeyPrepareResult RESULT_OVERRIDING_QUERY = ConditionKeyPrepareResult.OVERRIDING_QUERY;
+    protected static final ConditionKeyPrepareResult RESULT_DUPLICATE_QUERY = ConditionKeyPrepareResult.DUPLICATE_QUERY;
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -144,14 +150,12 @@ public abstract class ConditionKey implements Serializable {
      * @param provider The provider of query mode. (NotNull)
      * @param cvalue The object of condition value. (NotNull)
      * @param value The value of the condition. (NotNull)
-     * @param callerName Caller's real name. (NotNull)
-     * @return Does it need the query clause setup? (normally true, false: no value or overriding only)
+     * @return The result of the preparation for the condition key. (NotNull)
      */
-    public boolean prepareQuery(final QueryModeProvider provider, final ConditionValue cvalue, final Object value,
-            final ColumnRealName callerName) {
-        return cvalue.process(new CallbackProcessor<Boolean>() {
-            public Boolean process() {
-                return doPrepareQuery(cvalue, value, callerName);
+    public ConditionKeyPrepareResult prepareQuery(final QueryModeProvider provider, final ConditionValue cvalue, final Object value) {
+        return cvalue.process(new CallbackProcessor<ConditionKeyPrepareResult>() {
+            public ConditionKeyPrepareResult process() {
+                return doPrepareQuery(cvalue, value);
             }
 
             public QueryModeProvider getProvider() {
@@ -160,17 +164,45 @@ public abstract class ConditionKey implements Serializable {
         });
     }
 
-    protected abstract boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName);
+    protected abstract ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value);
+
+    // -----------------------------------------------------
+    //                                         Choose Result
+    //                                         -------------
+    protected ConditionKeyPrepareResult chooseResultAlreadyExists(boolean equalValue) {
+        return equalValue ? RESULT_DUPLICATE_QUERY : RESULT_OVERRIDING_QUERY;
+    }
+
+    protected ConditionKeyPrepareResult chooseResultNonValue(ConditionValue cvalue) {
+        return needsOverrideValue(cvalue) ? RESULT_DUPLICATE_QUERY : RESULT_NEW_QUERY;
+    }
+
+    protected ConditionKeyPrepareResult chooseResultNonFixedQuery(Object value) {
+        return isInvalidNonFixedQuery(value) ? RESULT_INVALID_QUERY : RESULT_NEW_QUERY;
+    }
+
+    protected boolean isInvalidNonFixedQuery(Object value) {
+        return value == null;
+    }
+
+    protected ConditionKeyPrepareResult chooseResultListQuery(Object value) {
+        return isInvalidListQuery(value) ? RESULT_INVALID_QUERY : RESULT_NEW_QUERY;
+    }
+
+    protected boolean isInvalidListQuery(Object value) {
+        return value == null || !(value instanceof List<?>) || ((List<?>) value).isEmpty();
+    }
 
     // ===================================================================================
     //                                                                      Override Check
     //                                                                      ==============
     /**
-     * Does it need to override the existing value to register the value?
+     * Does it need to override the existing value to register the value? <br />
+     * This should be called in CallbackProcessor for e.g. in-line query
      * @param cvalue The object of condition value. (NotNull)
      * @return The determination, true or false.
      */
-    public abstract boolean needsOverrideValue(ConditionValue cvalue);
+    protected abstract boolean needsOverrideValue(ConditionValue cvalue);
 
     // ===================================================================================
     //                                                                        Where Clause
@@ -500,16 +532,6 @@ public abstract class ConditionKey implements Serializable {
 
         public void setArranger(QueryClauseArranger arranger) {
             this._arranger = arranger;
-        }
-    }
-
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected void noticeRegistered(ColumnRealName callerName, Object value) {
-        if (_log.isDebugEnabled()) {
-            final String target = callerName + "." + _conditionKey;
-            _log.debug("*Found the duplicate query: target=" + target + " value=" + value);
         }
     }
 

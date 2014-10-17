@@ -260,16 +260,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                    Invalid Query Info
     //                                    ------------------
-    /** Does it check an invalid query? */
+    /** Does it check an invalid query? (save-only attribute) */
     protected boolean _nullOrEmptyChecked;
 
-    /** The list of invalid query info. (NullAllowed: lazy-load) */
+    /** The list of invalid query info. (NullAllowed: lazy-load) (save-only attribute) */
     protected List<HpInvalidQueryInfo> _invalidQueryList;
 
-    /** Does it accept an empty string for query? */
+    /** Does it accept an empty string for query? (save-only attribute) */
     protected boolean _emptyStringQueryEnabled;
 
-    /** Does it allow overriding query? */
+    /** Does it allow overriding query? (save-only attribute) */
     protected boolean _overridingQueryEnabled;
 
     // -----------------------------------------------------
@@ -314,13 +314,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                         Paging Select
     //                                         -------------
-    /** Is the clause for paging select? */
+    /** Is the clause for paging select? (save-only attribute) */
     protected boolean _pagingAdjustmentEnabled;
 
-    /** Is the joins of count least? */
+    /** Is the joins of count least? (save-only attribute) */
     protected boolean _pagingCountLeastJoinEnabled;
 
-    /** Is the count executed later? */
+    /** Is the count executed later? (save-only attribute) */
     protected boolean _pagingCountLaterEnabled;
 
     /** Does it forcedly select only primary key? (basically for paging select and query split) */
@@ -335,13 +335,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                          Purpose Type
     //                                          ------------
-    /** The purpose of condition-bean for check at condition-query. (NotNull) */
+    /** The purpose of condition-bean for check at condition-query. (NotNull) (save-only attribute) */
     protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
 
-    /** Is the clause object locked? e.g. true if in sub-query process. */
+    /** Is the clause object locked? e.g. true if in sub-query process. (save-only attribute) */
     protected boolean _locked;
 
-    /** Does it allow "that's bad timing" check? */
+    /** Does it allow "that's bad timing" check? (save-only attribute) */
     protected boolean _thatsBadTimingDetectEffective;
 
     // -----------------------------------------------------

@@ -47,8 +47,8 @@ public class ConditionKeyNotInScope extends ConditionKey {
     //                                                                       Prepare Query
     //                                                                       =============
     @Override
-    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
-        return value != null && value instanceof List<?> && !((List<?>) value).isEmpty();
+    protected ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value) {
+        return chooseResultListQuery(value);
     }
 
     // ===================================================================================

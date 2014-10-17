@@ -56,8 +56,8 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     //                                                                       Prepare Query
     //                                                                       =============
     @Override
-    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
-        return value != null;
+    protected ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value) {
+        return chooseResultNonFixedQuery(value);
     }
 
     // ===================================================================================

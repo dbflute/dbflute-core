@@ -25,6 +25,7 @@ import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.dream.WelcomeToDreamCruise;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.scoping.AndQuery;
+import org.dbflute.cbean.scoping.ModeQuery;
 import org.dbflute.cbean.scoping.OrQuery;
 import org.dbflute.cbean.scoping.UnionQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
@@ -209,6 +210,22 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                       Invalid Query
     //                                                                       =============
     /**
+     * Ignore null-or-empty check for query when query is set. (default is checked) <br />
+     * (no condition if set query is invalid)
+     * <pre>
+     * memberBhv.selectList(cb -&gt; {
+     *     cb.ignoreNullOrEmptyQuery();
+     *     cb.query().setMemberName_Equal(null); // no condition (ignored)
+     *     cb.query().setMemberName_Equal("");   // no condition (ignored)
+     *     cb.query().setMemberName_Equal(" ");  // valid condition (MEMBER_NAME = ' ')
+     * });
+     * </pre>
+     * You should call this before registrations of where clause and other queries. <br />
+     * And Union and SubQuery and other sub condition-bean inherit this.
+     */
+    void ignoreNullOrEmptyQuery(); // no mode-query because of high use and wide scope
+
+    /**
      * Check null or empty value for query when query is set. (back to default) <br />
      * (it throws exception if set query is invalid, e.g. null, empty string, empty list) <br />
      * You should call this before registrations of where clause and other queries. <br />
@@ -217,26 +234,13 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     void checkNullOrEmptyQuery();
 
     /**
-     * Ignore null-or-empty check for query when query is set. (default is checked) <br />
-     * (no condition if set query is invalid)
-     * <pre>
-     * MemberCB cb = new MemberCB();
-     * cb.ignoreNullOrEmptyQuery();
-     * cb.query().setMemberName_PrefixSearch(null); // no condition
-     * cb.query().setMemberName_PrefixSearch(""); // no condition
-     * </pre>
-     * You should call this before registrations of where clause and other queries. <br />
-     * And Union and SubQuery and other sub condition-bean inherit this.
-     */
-    void ignoreNullOrEmptyQuery();
-
-    /**
      * Enable empty string for query. (default is disabled) <br />
      * (you can use an empty string as condition) <br />
      * You should call this before registrations of where clause and other queries. <br />
      * Union and SubQuery and other sub condition-bean inherit this.
+     * @param noArgLambda The callback for empty-string query. (NotNull)
      */
-    void enableEmptyStringQuery();
+    void enableEmptyStringQuery(ModeQuery noArgLambda);
 
     /**
      * Disable empty string for query. (back to default) <br />
@@ -249,8 +253,9 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
      * (you can override existing value as condition) <br />
      * You should call this before registrations of where clause and other queries. <br />
      * Union and SubQuery and other sub condition-bean inherit this.
+     * @param noArgLambda The callback for overriding query. (NotNull)
      */
-    void enableOverridingQuery();
+    void enableOverridingQuery(ModeQuery noArgLambda);
 
     /**
      * Disable overriding query. (back to default) <br />

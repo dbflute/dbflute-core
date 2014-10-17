@@ -55,20 +55,15 @@ public class ConditionKeyGreaterThan extends ConditionKey {
     //                                                                       Prepare Query
     //                                                                       =============
     @Override
-    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+    protected ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value) {
         if (value == null) {
-            return false;
+            return RESULT_INVALID_QUERY;
         }
         if (needsOverrideValue(cvalue)) {
-            if (cvalue.equalGreaterThan(value)) {
-                noticeRegistered(callerName, value);
-                return false;
-            } else {
-                cvalue.overrideGreaterThan(value);
-                return false;
-            }
+            cvalue.overrideGreaterThan(value);
+            return chooseResultAlreadyExists(cvalue.equalGreaterThan(value));
         }
-        return true;
+        return RESULT_NEW_QUERY;
     }
 
     // ===================================================================================
