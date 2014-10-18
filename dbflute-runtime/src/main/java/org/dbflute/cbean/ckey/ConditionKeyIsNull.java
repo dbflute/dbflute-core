@@ -83,4 +83,12 @@ public class ConditionKeyIsNull extends ConditionKey {
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setIsNull(DUMMY_OBJECT);
     }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return true;
+    }
 }

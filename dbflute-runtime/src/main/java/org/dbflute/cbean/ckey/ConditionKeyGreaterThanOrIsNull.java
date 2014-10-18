@@ -49,4 +49,12 @@ public class ConditionKeyGreaterThanOrIsNull extends ConditionKeyGreaterThan {
             ConditionOption option) {
         return buildBindClauseOrIsNull(columnRealName, location, cipher, option);
     }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return true;
+    }
 }

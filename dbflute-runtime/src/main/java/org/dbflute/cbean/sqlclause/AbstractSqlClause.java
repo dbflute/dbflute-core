@@ -1708,7 +1708,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, false, false);
         doReflectWhereUsedToJoin(usedAliasName);
-        if (!ConditionKey.isNullaleConditionKey(key)) {
+        if (!key.isNullaleKey()) {
             registerInnerJoinLazyReflector(usedAliasName);
         }
     }

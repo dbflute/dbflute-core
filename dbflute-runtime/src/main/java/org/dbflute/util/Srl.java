@@ -18,6 +18,7 @@ package org.dbflute.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -2255,6 +2256,14 @@ public class Srl {
 
     public static boolean isAlphabetNumberHarfAll(String str) {
         return isAnyCharAll(str, _alphabetHarfNumberHarfCharSet);
+    }
+
+    public static boolean isAlphabetNumberHarfAllOr(String str, Character... addedChars) {
+        final Set<Character> charSet = new HashSet<Character>(_alphabetHarfNumberHarfCharSet);
+        for (Character ch : addedChars) {
+            charSet.add(ch);
+        }
+        return isAnyCharAll(str, charSet);
     }
 
     public static boolean isAlphabetNumberHarfLowerAll(String str) {

@@ -111,4 +111,12 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupLikeSearch((String) value, (LikeSearchOption) option, location);
     }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return false;
+    }
 }

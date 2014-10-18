@@ -748,6 +748,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void ignoreNullOrEmptyQuery() {
+        assertOptionThatBadTiming("ignoreNullOrEmptyQuery()");
         getSqlClause().ignoreNullOrEmptyQuery();
     }
 
@@ -755,6 +756,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void checkNullOrEmptyQuery() {
+        assertOptionThatBadTiming("checkNullOrEmptyQuery()");
         getSqlClause().checkNullOrEmptyQuery();
     }
 
@@ -765,6 +767,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void enableEmptyStringQuery(ModeQuery noArgLambda) {
+        assertOptionThatBadTiming("enableEmptyStringQuery()");
         assertObjectNotNull("noArgLambda", noArgLambda);
         final boolean originallyEnabled = getSqlClause().isEmptyStringQueryEnabled();
         if (!originallyEnabled) {
@@ -787,6 +790,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void disableEmptyStringQuery() {
+        assertOptionThatBadTiming("disableEmptyStringQuery()");
         getSqlClause().disableEmptyStringQuery();
     }
 
@@ -797,6 +801,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void enableOverridingQuery(ModeQuery noArgLambda) {
+        assertOptionThatBadTiming("enableOverridingQuery()");
         assertObjectNotNull("noArgLambda", noArgLambda);
         final boolean originallyEnabled = getSqlClause().isOverridingQueryEnabled();
         if (!originallyEnabled) {
@@ -819,6 +824,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void disableOverridingQuery() {
+        assertOptionThatBadTiming("disableOverridingQuery()");
         getSqlClause().disableOverridingQuery();
     }
 
@@ -831,7 +837,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
         if (!getDBMeta().hasPrimaryKey()) {
             String msg = "The table has no primary-keys: " + getTableDbName();
-            throw new UnsupportedOperationException(msg);
+            throw new IllegalConditionBeanOperationException(msg);
         }
         final Entity entity = getDBMeta().newEntity();
         getDBMeta().acceptPrimaryKeyMap(entity, primaryKeyMap);
@@ -852,7 +858,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public boolean isPaging() { // for parameter comment
         String msg = "This method is unsupported on ConditionBean!";
-        throw new UnsupportedOperationException(msg);
+        throw new IllegalConditionBeanOperationException(msg);
     }
 
     /**
@@ -876,6 +882,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void paging(int pageSize, int pageNumber) {
+        assertOptionThatBadTiming("paging()");
         if (pageSize <= 0) {
             throwPagingPageSizeNotPlusException(pageSize, pageNumber);
         }
@@ -899,6 +906,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void enablePagingCountLater() {
+        assertOptionThatBadTiming("enablePagingCountLater()");
         _pagingCountLater = true;
         getSqlClause().enablePagingCountLater(); // tell her about it
     }
@@ -907,6 +915,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void disablePagingCountLater() {
+        assertOptionThatBadTiming("disablePagingCountLater()");
         _pagingCountLater = false;
         getSqlClause().disablePagingCountLater(); // tell her about it
     }
@@ -915,6 +924,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void enablePagingReSelect() {
+        assertOptionThatBadTiming("enablePagingReSelect()");
         _pagingReSelect = true;
     }
 
@@ -922,6 +932,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void disablePagingReSelect() {
+        assertOptionThatBadTiming("disablePagingReSelect()");
         _pagingReSelect = false;
     }
 
@@ -930,6 +941,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void enablePagingCountLeastJoin() {
+        assertOptionThatBadTiming("enablePagingCountLeastJoin()");
         getSqlClause().enablePagingCountLeastJoin();
     }
 
@@ -937,6 +949,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void disablePagingCountLeastJoin() {
+        assertOptionThatBadTiming("disablePagingCountLeastJoin()");
         getSqlClause().disablePagingCountLeastJoin();
     }
 
@@ -962,6 +975,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * @deprecated This is rare handling for performance tuning so don't use this easily.
      */
     public void enablePagingSelectAndQuerySplit() {
+        assertOptionThatBadTiming("enablePagingSelectAndQuerySplit()");
         final DBMeta dbmeta = getDBMeta();
         if (!dbmeta.hasPrimaryKey() || dbmeta.getPrimaryUniqueInfo().isTwoOrMore()) {
             String msg = "The PagingSelectAndQuerySplit needs only-one column key table: " + getTableDbName();
@@ -977,6 +991,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     public void disablePagingSelectAndQuerySplit() {
+        assertOptionThatBadTiming("disablePagingSelectAndQuerySplit()");
         _pagingSelectAndQuerySplit = false;
     }
 
@@ -987,6 +1002,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public PagingBean fetchFirst(int fetchSize) {
+        assertOptionThatBadTiming("fetchFirst()");
         getSqlClause().fetchFirst(fetchSize);
         return this;
     }
@@ -995,6 +1011,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public PagingBean xfetchScope(int fetchStartIndex, int fetchSize) {
+        assertOptionThatBadTiming("xfetchScope()");
         getSqlClause().fetchScope(fetchStartIndex, fetchSize);
         return this;
     }
@@ -1003,6 +1020,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public PagingBean xfetchPage(int fetchPageNumber) {
+        assertOptionThatBadTiming("xfetchPage()");
         getSqlClause().fetchPage(fetchPageNumber);
         return this;
     }
@@ -1104,6 +1122,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void checkSafetyResult(int safetyMaxResultSize) {
+        assertOptionThatBadTiming("checkSafetyResult()");
         _safetyMaxResultSize = safetyMaxResultSize;
     }
 
@@ -1200,6 +1219,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public ConditionBean lockForUpdate() {
+        assertOptionThatBadTiming("lockForUpdate()");
         getSqlClause().lockForUpdate();
         return this;
     }
@@ -1284,6 +1304,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void enableQueryUpdateCountPreCheck() {
+        assertOptionThatBadTiming("enableQueryUpdateCountPreCheck()");
         _queryUpdateCountPreCheck = true;
     }
 
@@ -1291,6 +1312,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void disableQueryUpdateCountPreCheck() {
+        assertOptionThatBadTiming("disableQueryUpdateCountPreCheck()");
         _queryUpdateCountPreCheck = false;
     }
 
@@ -1308,6 +1330,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void configure(StatementConfig statementConfig) {
+        assertOptionThatBadTiming("configure()");
         _statementConfig = statementConfig;
     }
 
@@ -1327,6 +1350,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * @deprecated You should not use this easily. It's a dangerous function.
      */
     public void disableRelationMappingCache() {
+        assertOptionThatBadTiming("disableRelationMappingCache()");
         // deprecated methods from the beginning are not defined as interface methods
         _relationMappingCache = false;
     }
@@ -1353,6 +1377,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void embedCondition(Set<ColumnInfo> embeddedColumnInfoSet, boolean quote) {
         // deprecated methods from the beginning are not defined as interface methods
+        assertOptionThatBadTiming("embedCondition()");
         if (embeddedColumnInfoSet == null) {
             String msg = "The argument 'embedCondition' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -1373,7 +1398,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     private void addWhereClauseSimpleFilter(QueryClauseFilter whereClauseSimpleFilter) {
-        this._sqlClause.addWhereClauseSimpleFilter(whereClauseSimpleFilter);
+        _sqlClause.addWhereClauseSimpleFilter(whereClauseSimpleFilter);
     }
 
     // ===================================================================================
@@ -1424,6 +1449,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void styleLogDateDisplay(BoundDateDisplayStyle logDateDisplayStyle) {
+        assertOptionThatBadTiming("styleLogDateDisplay()");
         _logDateDisplayStyle = logDateDisplayStyle;
     }
 
@@ -1767,8 +1793,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * </pre>
      */
     public void useInScopeSubQuery() {
+        assertOptionThatBadTiming("useInScopeSubQuery()");
         final HpCBPurpose purpose = getPurpose();
-        // TODO jflute refactor: Purpose and Exception
         if (!purpose.isAny(HpCBPurpose.EXISTS_REFERRER, HpCBPurpose.MYSELF_EXISTS)) {
             String msg = "The method 'useInScopeSubQuery()' can be called only when ExistsReferrer.";
             throw new IllegalConditionBeanOperationException(msg);
@@ -1968,6 +1994,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void enableThatsBadTiming() {
+        assertOptionThatBadTiming("enableThatsBadTiming()");
         getSqlClause().enableThatsBadTimingDetect();
     }
 
@@ -1975,7 +2002,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void disableThatsBadTiming() {
+        assertOptionThatBadTiming("disableThatsBadTiming()");
         getSqlClause().disableThatsBadTimingDetect();
+    }
+
+    protected void assertOptionThatBadTiming(String optionName) {
+        if (isLocked()) {
+            createCBExThrower().throwOptionThatsBadTimingException(this, optionName);
+        }
     }
 
     // ===================================================================================

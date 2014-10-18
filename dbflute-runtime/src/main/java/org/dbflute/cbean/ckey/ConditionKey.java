@@ -114,17 +114,6 @@ public abstract class ConditionKey implements Serializable {
     /** Dummy-object for IsNull and IsNotNull and so on... */
     protected static final Object DUMMY_OBJECT = new Object();
 
-    // TODO jflute refactor: nullable
-    /**
-     * Is the condition key null-able?
-     * @param key The condition key. (NotNull)
-     * @return The determination, true or false.
-     */
-    public static boolean isNullaleConditionKey(ConditionKey key) {
-        return CK_GREATER_EQUAL_OR_IS_NULL.equals(key) || CK_GREATER_THAN_OR_IS_NULL.equals(key) || CK_LESS_EQUAL_OR_IS_NULL.equals(key)
-                || CK_LESS_THAN_OR_IS_NULL.equals(key) || CK_IS_NULL.equals(key) || CK_IS_NULL_OR_EMPTY.equals(key);
-    }
-
     // -----------------------------------------------------
     //                                        Prepare Result
     //                                        --------------
@@ -136,10 +125,11 @@ public abstract class ConditionKey implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Condition-key. */
+    // not final because of no time of refactoring...
+    /** The key name of the condition. (NotNull: initialized in constructor of sub-class) */
     protected String _conditionKey;
 
-    /** Operand. */
+    /** The string of operand, used in SQL. (NotNull: initialized in constructor of sub-class) */
     protected String _operand;
 
     // ===================================================================================
@@ -534,6 +524,15 @@ public abstract class ConditionKey implements Serializable {
             this._arranger = arranger;
         }
     }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    /**
+     * Is the condition key null-able? (basically for join determination)
+     * @return The determination, true or false.
+     */
+    public abstract boolean isNullaleKey();
 
     // ===================================================================================
     //                                                                      Basic Override

@@ -448,7 +448,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     protected void assertUserDefFunction(String aliasName, String function) {
-        if (!Srl.isAlphabetNumberHarfAll(function)) { // e.g. ')', ';' are NG
+        if (!Srl.isAlphabetNumberHarfAllOr(function, '_')) { // e.g. ')', ';' are NG
             String msg = "Illegal function, only alphabet or number can be allowed:";
             msg = msg + " aliasName=" + aliasName + ", function=" + function;
             throw new IllegalConditionBeanOperationException(msg);

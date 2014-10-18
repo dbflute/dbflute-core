@@ -90,4 +90,12 @@ public class ConditionKeyLessEqual extends ConditionKey {
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupLessEqual(value, location);
     }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return false;
+    }
 }

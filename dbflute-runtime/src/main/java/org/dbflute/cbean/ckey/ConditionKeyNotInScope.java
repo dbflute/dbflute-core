@@ -83,4 +83,12 @@ public class ConditionKeyNotInScope extends ConditionKey {
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupNotInScope(value, location);
     }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return false;
+    }
 }

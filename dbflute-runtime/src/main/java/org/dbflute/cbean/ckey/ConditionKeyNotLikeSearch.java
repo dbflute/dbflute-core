@@ -68,4 +68,12 @@ public class ConditionKeyNotLikeSearch extends ConditionKeyLikeSearch {
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location, ConditionOption option) {
         conditionValue.setupNotLikeSearch((String) value, (LikeSearchOption) option, location);
     }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return false;
+    }
 }

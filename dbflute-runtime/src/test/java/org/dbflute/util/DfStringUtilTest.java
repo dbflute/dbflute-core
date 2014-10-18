@@ -1606,6 +1606,26 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertFalse(isAlphabetNumberHarfAll(" a"));
     }
 
+    public void test_isAlphabetNumberHarfAllOr_basic() throws Exception {
+        assertTrue(isAlphabetNumberHarfAllOr("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
+        assertTrue(isAlphabetNumberHarfAllOr("A"));
+        assertTrue(isAlphabetNumberHarfAllOr("BL"));
+        assertTrue(isAlphabetNumberHarfAllOr("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
+        assertTrue(isAlphabetNumberHarfAllOr("a"));
+        assertTrue(isAlphabetNumberHarfAllOr("bbbOoo"));
+        assertTrue(isAlphabetNumberHarfAllOr("ab2"));
+        assertTrue(isAlphabetNumberHarfAllOr("234789"));
+        assertTrue(isAlphabetNumberHarfAllOr("23A4789"));
+        assertTrue(isAlphabetNumberHarfAllOr("23A47a89"));
+        assertFalse(isAlphabetNumberHarfAllOr("-ab"));
+        assertFalse(isAlphabetNumberHarfAllOr(""));
+        assertFalse(isAlphabetNumberHarfAllOr(" "));
+        assertFalse(isAlphabetNumberHarfAllOr(" a"));
+        assertTrue(isAlphabetNumberHarfAllOr("-ab", '-'));
+        assertTrue(isAlphabetNumberHarfAllOr(" b", ' '));
+        assertFalse(isAlphabetNumberHarfAllOr("=ab", '-'));
+    }
+
     public void test_isAlphabetNumberHarfLowerAll_basic() throws Exception {
         assertFalse(isAlphabetNumberHarfLowerAll("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
         assertFalse(isAlphabetNumberHarfLowerAll("A"));

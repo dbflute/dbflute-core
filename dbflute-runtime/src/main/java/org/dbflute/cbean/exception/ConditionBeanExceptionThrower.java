@@ -32,6 +32,7 @@ import org.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;
 import org.dbflute.exception.FixedConditionParameterNotFoundException;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.InvalidQueryRegisteredException;
+import org.dbflute.exception.OptionThatsBadTimingException;
 import org.dbflute.exception.OrScopeQueryAndPartAlreadySetupException;
 import org.dbflute.exception.OrScopeQueryAndPartNotOrScopeException;
 import org.dbflute.exception.OrderByIllegalPurposeException;
@@ -882,14 +883,14 @@ public class ConditionBeanExceptionThrower {
         br.addElement("For example:");
         br.addElement("(x):");
         br.addElement("  MemberCB cb = new MemberCB()");
-        br.addElement("  cb.query().existsPurchaseList(subCB -> {");
-        br.addElement("      subCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
         br.addElement("      cb.query().setBirthdate_GreaterThan(currentDate()); // *NG");
         br.addElement("  });");
         br.addElement("(o):");
         br.addElement("  MemberCB cb = new MemberCB()");
-        br.addElement("  cb.query().existsPurchaseList(subCB -> {");
-        br.addElement("      subCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
         br.addElement("  });");
         br.addElement("  cb.query().setBirthdate_GreaterThan(currentDate()); // OK");
         br.addItem("Locked ConditionBean");
@@ -1365,6 +1366,39 @@ public class ConditionBeanExceptionThrower {
         br.addElement(specifiedOrder);
         final String msg = br.buildExceptionMessage();
         throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public void throwOptionThatsBadTimingException(ConditionBean lockedCB, String optionName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("That's bad timing for Option.");
+        br.addItem("Advice");
+        br.addElement("The condition-bean was locked in the timing.");
+        br.addElement("For example:");
+        br.addElement("(x):");
+        br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("      cb.ignoreNullOrEmptyQuery(); // *NG");
+        br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  });");
+        br.addElement("(o):");
+        br.addElement("  cb.ignoreNullOrEmptyQuery(); // OK");
+        br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  });");
+        br.addElement("(o):");
+        br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("      purchaseCB.ignoreNullOrEmptyQuery(); // OK");
+        br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  });");
+        br.addItem("Locked ConditionBean");
+        br.addElement(lockedCB.getClass().getName());
+        br.addElement("(" + lockedCB.getPurpose() + ")");
+        br.addItem("Called Option");
+        br.addElement(optionName);
+        final String msg = br.buildExceptionMessage();
+        throw new OptionThatsBadTimingException(msg);
     }
 
     // ===================================================================================
