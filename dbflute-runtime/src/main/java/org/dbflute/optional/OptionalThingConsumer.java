@@ -33,6 +33,7 @@ package org.dbflute.optional;
  */
 public interface OptionalThingConsumer<OBJ> {
 
+    // TODO jflute impl: function default method
     /**
      * Accept the value in the optional object.
      * <pre>

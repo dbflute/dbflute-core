@@ -34,7 +34,16 @@ import org.dbflute.cbean.result.mapping.EntityDtoMapper;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 
 /**
- * The result bean for list.
+ * The result bean for list. <br />
+ * You can treat it as normal List, because this implements java.util.List.
+ * <pre>
+ * [Extension Method]
+ * mappingList()  : mapping to other class, and returns as list
+ * groupingList() : grouping the list per category, and returns as list
+ * groupingMap()  : grouping the list per category, and returns as map
+ * extractColumnList() : extract one column as value list
+ * extractColumnSet()  : extract one column as value list
+ * </pre>
  * @param <ENTITY> The type of entity for the element of selected list.
  * @author jflute
  */
@@ -49,16 +58,16 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The value of table db-name. (NullAllowed: If it's null, it means 'Not Selected Yet'.) */
+    /** The DB name of table. (NullAllowed: if null, means not-selected-yet) */
     protected String _tableDbName;
 
-    /** The value of all record count. */
+    /** The count of all record. */
     protected int _allRecordCount;
 
-    /** The list of selected entity. (NotNull) */
+    /** The list of selected entity. (NotNull: but switch-able) */
     protected List<ENTITY> _selectedList = new ArrayList<ENTITY>();
 
-    /** The clause of order-by. (NotNull) */
+    /** The clause of order-by. (NotNull: but switch-able) */
     protected OrderByClause _orderByClause = new OrderByClause();
 
     // ===================================================================================
@@ -68,6 +77,36 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * Constructor.
      */
     public ListResultBean() {
+    }
+
+    // ===================================================================================
+    //                                                                             Mapping
+    //                                                                             =======
+    /**
+     * Map the entity list to the list of other object.
+     * <pre>
+     * ListResultBean&lt;MemberWebBean&gt; beanList = memberList.<span style="color: #CC4747">mappingList</span>(member -&gt; {
+     *     MemberWebBean bean = new MemberWebBean();
+     *     bean.setMemberId(member.getMemberId());
+     *     bean.setMemberName(member.getMemberName());
+     *     ...
+     *     return bean;
+     * });
+     * </pre>
+     * <p>This method needs the property 'selectedList' only.</p>
+     * @param <DTO> The type of DTO.
+     * @param entityLambda The callback for mapping of entity and DTO. (NotNull)
+     * @return The new mapped list as result bean. (NotNull)
+     */
+    public <DTO> ListResultBean<DTO> mappingList(EntityDtoMapper<ENTITY, DTO> entityLambda) {
+        final ListResultBean<DTO> mappingList = new ListResultBean<DTO>();
+        for (ENTITY entity : _selectedList) {
+            mappingList.add(entityLambda.map(entity));
+        }
+        mappingList.setTableDbName(getTableDbName());
+        mappingList.setAllRecordCount(getAllRecordCount());
+        mappingList.setOrderByClause(getOrderByClause());
+        return mappingList;
     }
 
     // ===================================================================================
@@ -134,10 +173,8 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * This method needs the property 'selectedList' only.
      * <pre>
      * <span style="color: #3F7E5E">// e.g. grouping per initial character of MEMBER_NAME</span>
-     * Map&lt;String, ListResultBean&lt;Member&gt;&gt; groupingMap = memberList.<span style="color: #CC4747">groupingMap</span>(new GroupingMapDeterminer&lt;Member&gt;() {
-     *     public String provideKey(Member entity) {
-     *         return entity.getMemberName().substring(0, 1);
-     *     }
+     * Map&lt;String, ListResultBean&lt;Member&gt;&gt; groupingMap = memberList.<span style="color: #CC4747">groupingMap</span>(member -&gt; {
+     *     return member.getMemberName().substring(0, 1);
      * });
      * </pre>
      * @param entityLambda The callback for determiner of grouping map. (NotNull)
@@ -158,58 +195,22 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     }
 
     // ===================================================================================
-    //                                                                             Mapping
-    //                                                                             =======
-    /**
-     * Map the entity list to the list of other object. <br />
-     * This method needs the property 'selectedList' only.
-     * <pre>
-     * ListResultBean&lt;MemberDto&gt; dtoList
-     *         = entityList.<span style="color: #CC4747">mappingList</span>(new EntityDtoMapper&lt;Member, MemberDto&gt;() {
-     *     public MemberDto map(Member entity) {
-     *         MemberDto dto = new MemberDto();
-     *         dto.setMemberId(entity.getMemberId());
-     *         dto.setMemberName(entity.getMemberName());
-     *         ...
-     *         return dto;
-     *     }
-     * });
-     * </pre>
-     * @param <DTO> The type of DTO.
-     * @param entityLambda The callback for mapping of entity and DTO. (NotNull)
-     * @return The new mapped list as result bean. (NotNull)
-     */
-    public <DTO> ListResultBean<DTO> mappingList(EntityDtoMapper<ENTITY, DTO> entityLambda) {
-        final ListResultBean<DTO> mappingList = new ListResultBean<DTO>();
-        for (ENTITY entity : _selectedList) {
-            mappingList.add(entityLambda.map(entity));
-        }
-        mappingList.setTableDbName(getTableDbName());
-        mappingList.setAllRecordCount(getAllRecordCount());
-        mappingList.setOrderByClause(getOrderByClause());
-        return mappingList;
-    }
-
-    // ===================================================================================
     //                                                                      Extract Column
     //                                                                      ==============
     /**
-     * Extract the value list of the column specified in extractor. <br />
-     * This method needs the property 'selectedList' only.
+     * Extract the value list of the column specified in extractor.
      * <pre>
-     * List&lt;Integer&gt; memberIdList
-     *         = entityList.<span style="color: #CC4747">extractColumnList</span>(new EntityColumnExtractor&lt;Member, Integer&gt;() {
-     *     public Integer extract(Member entity) {
-     *         return entity.getMemberId();
-     *     }
+     * List&lt;Integer&gt; memberIdList = memberList.<span style="color: #CC4747">extractColumnList</span>(member -&gt; {
+     *     return entity.getMemberId();
      * });
      * </pre>
+     * <p>This method needs the property 'selectedList' only.</p>
      * @param <COLUMN> The type of COLUMN.
      * @param entityLambda The callback for value extractor of entity column. (NotNull)
      * @return The value list of the entity column. (NotNull, NotNullElement)
      */
     public <COLUMN> List<COLUMN> extractColumnList(EntityColumnExtractor<ENTITY, COLUMN> entityLambda) {
-        final List<COLUMN> columnList = new ArrayList<COLUMN>();
+        final List<COLUMN> columnList = new ArrayList<COLUMN>(_selectedList.size());
         for (ENTITY entity : _selectedList) {
             final COLUMN column = entityLambda.extract(entity);
             if (column != null) {
@@ -220,22 +221,19 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     }
 
     /**
-     * Extract the value set of the column specified in extractor. <br />
-     * This method needs the property 'selectedList' only.
+     * Extract the value set of the column specified in extractor.
      * <pre>
-     * Set&lt;Integer&gt; memberIdList
-     *         = entityList.<span style="color: #CC4747">extractColumnSet</span>(new EntityColumnExtractor&lt;Member, Integer&gt;() {
-     *     public Integer extract(Member entity) {
-     *         return entity.getMemberId();
-     *     }
+     * Set&lt;Integer&gt; memberIdList = memberList.<span style="color: #CC4747">extractColumnSet</span>(member -&gt; {
+     *     return entity.getMemberId();
      * });
      * </pre>
+     * <p>This method needs the property 'selectedList' only.</p>
      * @param <COLUMN> The type of COLUMN.
      * @param entityLambda The callback for value extractor of entity column. (NotNull)
      * @return The value set of the entity column. (NotNull, NotNullElement)
      */
     public <COLUMN> Set<COLUMN> extractColumnSet(EntityColumnExtractor<ENTITY, COLUMN> entityLambda) {
-        final Set<COLUMN> columnSet = new LinkedHashSet<COLUMN>();
+        final Set<COLUMN> columnSet = new LinkedHashSet<COLUMN>(_selectedList.size());
         for (ENTITY entity : _selectedList) {
             COLUMN column = entityLambda.extract(entity);
             if (column != null) {

@@ -393,8 +393,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     protected ${foreignEntityClassName} ${foreignVariableName};
 
     /**
-     * [get] ${fk.foreignDispForJavaDoc}
+     * [get] ${fk.foreignDispForJavaDoc} <br />
+#if ($fk.isForeignPropertyOptionalEntity())
+     * Optional: alwaysPresent(), ifPresent().orElse(), get(), ...
+     * @return The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (NotNull, EmptyAllowed: when e.g. null FK column, no setupSelect)
+#else
      * @return The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (NullAllowed: when e.g. null FK column, no setupSelect)
+#end
      */
     public ${foreignEntityClassName} get${fk.foreignJavaBeansRulePropertyNameInitCap}() {
 #if ($foreignTable.canBeRelationalNullObjectForeign())
@@ -427,7 +432,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
     /**
      * [get] ${referrer.referrerDispAsOneForJavaDoc}
+#if ($referrer.isReferrerPropertyOptionalEntityAsOne())
+     * Optional: alwaysPresent(), ifPresent().orElse(), get(), ...
+     * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NotNull, EmptyAllowed: when e.g. no data, no setupSelect)
+#else
      * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NullAllowed: when e.g. no data, no setupSelect)
+#end
      */
     public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
 #if ($referrerTable.canBeRelationalNullObjectForeign())

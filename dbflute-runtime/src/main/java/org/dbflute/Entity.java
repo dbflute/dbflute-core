@@ -37,7 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The interface of entity.
+ * The interface of entity. <br />
+ * And it's the landmark class for DBFlute.
  * @author jflute
  */
 public interface Entity {

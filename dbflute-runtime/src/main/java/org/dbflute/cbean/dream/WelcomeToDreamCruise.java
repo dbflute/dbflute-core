@@ -38,12 +38,12 @@ public interface WelcomeToDreamCruise {
      * </pre>
      * @param dreamCruiseTicket The ticket column specified by your Dream Cruise. (NotNull)
      */
-    void overTheWaves(SpecifiedColumn dreamCruiseTicket);
+    void overTheWaves(SpecifiedColumn dreamCruiseTicket); // #dream
 
     /**
      * DBFlute Dreams.
      * <pre>
-     * e.g. ColumnQuery: ... > '2015/04/05' + (PURCHASE_COUNT days)
+     * e.g. ColumnQuery: ... &gt; '2015/04/05' + (PURCHASE_COUNT days)
      *  cb.columnQuery(colCB -&gt; {
      *      colCB.column...();
      *  }).greaterThan(colCB -&gt; {
@@ -52,5 +52,5 @@ public interface WelcomeToDreamCruise {
      * </pre>
      * @param mysticBinding
      */
-    void mysticRhythms(Object mysticBinding);
+    void mysticRhythms(Object mysticBinding); // #dream
 }

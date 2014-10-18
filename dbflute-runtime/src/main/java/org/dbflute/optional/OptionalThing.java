@@ -178,6 +178,8 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
         return callbackFlatMapping(oneArgLambda);
     }
 
+    // TODO jflute impl: OptionalThing.orElseThrow(Supplier) and others...
+
     // ===================================================================================
     //                                                                   DBFlute Extension
     //                                                                   =================
@@ -194,6 +196,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
     /**
      * Get the object instance or null if not present.
      * @return The object instance wrapped in this optional object or null. (NullAllowed: if not present)
+     * @deprecated basically use ifPresent() if might be not present, this is for emergency
      */
     public THING orElseNull() {
         return directlyGetOrElse(null);

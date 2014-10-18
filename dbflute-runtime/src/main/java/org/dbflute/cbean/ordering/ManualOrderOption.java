@@ -175,16 +175,35 @@ public class ManualOrderOption implements ColumnCalculator {
         return doWhen(ConditionKey.CK_IS_NOT_NULL, null);
     }
 
-    // TODO jflute javadoc: FromTo
+    /**
+     * Add 'when' element for 'case' statement as FromTo using local date. <br />
+     * You can set various from-to patterns by the from-to option. <br />
+     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br />
+     * See the {@link FromToOption} class for the details.
+     * @param fromDate The local date as from-date. (basically NotNull: null allowed if one-side allowed)
+     * @param toDate The local date as to-date. (basically NotNull: null allowed if one-side allowed)
+     * @param opLambda The callback for option of from-to. (NotNull)
+     * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
+     */
     public HpMobConnectedBean when_FromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) {
-        assertFromToOption(opLambda);
+        assertFromToOptionCall(opLambda);
         final FromToOption op = createFromToOption();
         opLambda.callback(op);
         return doWhen_FromTo(toDate(fromDate), toDate(toDate), op);
     }
 
+    /**
+     * Add 'when' element for 'case' statement as FromTo using local date-time. <br />
+     * You can set various from-to patterns by the from-to option. <br />
+     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br />
+     * See the {@link FromToOption} class for the details.
+     * @param fromDate The local date-time as from-date. (basically NotNull: null allowed if one-side allowed)
+     * @param toDate The local date-time as to-date. (basically NotNull: null allowed if one-side allowed)
+     * @param opLambda The callback for option of from-to. (NotNull)
+     * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
+     */
     public HpMobConnectedBean when_FromTo(LocalDateTime fromDate, LocalDateTime toDate, ConditionOptionCall<FromToOption> opLambda) {
-        assertFromToOption(opLambda);
+        assertFromToOptionCall(opLambda);
         final FromToOption op = createFromToOption();
         opLambda.callback(op);
         return doWhen_FromTo(toDate(fromDate), toDate(toDate), op);
@@ -195,19 +214,19 @@ public class ManualOrderOption implements ColumnCalculator {
      * You can set various from-to patterns by the from-to option. <br />
      * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br />
      * See the {@link FromToOption} class for the details.
-     * @param fromDate The from-date for ordering. (NullAllowed: if null, means invalid from-condition)
-     * @param toDate The to-date for ordering. (NullAllowed: if null, means invalid to-condition)
+     * @param fromDate The date as from-date. (basically NotNull: null allowed if one-side allowed)
+     * @param toDate The date as to-date. (basically NotNull: null allowed if one-side allowed)
      * @param opLambda The callback for option of from-to. (NotNull)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
     public HpMobConnectedBean when_FromTo(Date fromDate, Date toDate, ConditionOptionCall<FromToOption> opLambda) {
-        assertFromToOption(opLambda);
+        assertFromToOptionCall(opLambda);
         final FromToOption op = createFromToOption();
         opLambda.callback(op);
         return doWhen_FromTo(fromDate, toDate, op);
     }
 
-    protected void assertFromToOption(ConditionOptionCall<FromToOption> opLambda) {
+    protected void assertFromToOptionCall(ConditionOptionCall<FromToOption> opLambda) {
         if (opLambda == null) {
             String msg = "The argument 'opLambda' for from-to option of ManualOrder should not be null.";
             throw new IllegalArgumentException(msg);
@@ -219,16 +238,34 @@ public class ManualOrderOption implements ColumnCalculator {
     }
 
     protected HpMobConnectedBean doWhen_FromTo(Date fromDate, Date toDate, FromToOption option) {
-        if (option == null) {
-            String msg = "The argument 'option' should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        // TODO jflute impl: check one-side allowed
+        assertFromToOption(option);
+        assertFromToDateBothExistsOrOneSideAllowed(fromDate, toDate, option);
         final ConditionKey fromDateConditionKey = option.getFromDateConditionKey();
         final ConditionKey toDateConditionKey = option.getToDateConditionKey();
         final Date filteredFromDate = option.filterFromDate(fromDate);
         final Date filteredToDate = option.filterToDate(toDate);
         return doWhen(fromDateConditionKey, filteredFromDate).doAnd(toDateConditionKey, filteredToDate);
+    }
+
+    protected void assertFromToOption(FromToOption option) {
+        if (option == null) {
+            String msg = "The argument 'option' for from-to should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertFromToDateBothExistsOrOneSideAllowed(Date fromDate, Date toDate, FromToOption option) {
+        final boolean oneSideAllowed = option.isOneSideAllowed();
+        if (fromDate == null && toDate == null) {
+            String msg = "The both arguments for from-to were null: " + option;
+            throw new IllegalArgumentException(msg);
+        } else if (fromDate == null && !oneSideAllowed) {
+            String msg = "The argument 'fromDate' for from-to was null: toDate=" + toDate + " option=" + option;
+            throw new IllegalArgumentException(msg);
+        } else if (toDate == null && !oneSideAllowed) {
+            String msg = "The argument 'toDate' for from-to was null: fromDate=" + toDate + " option=" + option;
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     // -----------------------------------------------------
@@ -237,14 +274,13 @@ public class ManualOrderOption implements ColumnCalculator {
     /**
      * Accept the list of order value as equal condition.
      * <pre>
-     * MemberCB cb = new MemberCB();
      * List&lt;CDef.MemberStatus&gt; orderValueList = new ArrayList&lt;CDef.MemberStatus&gt;();
      * orderValueList.add(CDef.MemberStatus.Withdrawal);
      * orderValueList.add(CDef.MemberStatus.Formalized);
      * orderValueList.add(CDef.MemberStatus.Provisional);
-     * ManualOrderOption mob = new ManualOrderOption();
-     * mob.<span style="color: #CC4747">acceptOrderValueList</span>(orderValueList);
-     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #CC4747">withManualOrder(mob)</span>;
+     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #CC4747">withManualOrder</span>(op -&gt; {
+     *     op.<span style="color: #CC4747">acceptOrderValueList</span>(orderValueList);
+     * });
      * <span style="color: #3F7E5E">// order by </span>
      * <span style="color: #3F7E5E">//   case</span>
      * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>

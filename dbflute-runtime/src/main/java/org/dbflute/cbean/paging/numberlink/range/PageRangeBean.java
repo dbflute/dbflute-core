@@ -42,19 +42,17 @@ public class PageRangeBean implements Serializable {
     protected PageRangeOption _pageRangeOption;
     protected List<Integer> _cachedPageNumberList;
 
-    // TODO jflute javadoc: Paging Object
     // ===================================================================================
     //                                                                    Page Number List
     //                                                                    ================
     /**
      * Build the list of page number link.
      * <pre>
-     * page.setPageRangeSize(5);
-     * List&lt;PageNumberLink&gt; linkList = page.pageRange().<span style="color: #CC4747">buildPageNumberLinkList</span>(new PageNumberLinkSetupper&lt;PageNumberLink&gt;() {
-     *     public PageNumberLink setup(int pageNumberElement, boolean current) {
-     *         String href = buildPagingHref(pageNumberElement); <span style="color: #3F7E5E">// for paging navigation links</span>
-     *         return new PageNumberLink().initialize(pageNumberElement, current, href);
-     *     }
+     * List&lt;PageNumberLink&gt; linkList = page.pageRange(op -&gt; {
+     *     op.rangeSize(5);
+     * }).<span style="color: #CC4747">buildPageNumberLinkList</span>((pageNumberElement, current) -&gt; {
+     *     String href = buildPagingHref(pageNumberElement); <span style="color: #3F7E5E">// for paging navigation links</span>
+     *     return new PageNumberLink().initialize(pageNumberElement, current, href);
      * });
      * </pre>
      * @param <LINK> The type of link.
@@ -74,8 +72,9 @@ public class PageRangeBean implements Serializable {
      * Create the list of page number.
      * <pre>
      * e.g. range-size=5, current-page=8 
-     * page.<span style="color: #CC4747">setPageRangeSize</span>(5);
-     * List&lt;Integer&gt; numberList = page.pageRange().<span style="color: #CC4747">createPageNumberList()</span>;
+     * List&lt;Integer&gt; numberList = page.pageRange(op -&gt; {
+     *     op.rangeSize(5);
+     * }).<span style="color: #CC4747">createPageNumberList()</span>;
      * 
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
      * <span style="color: #3F7E5E">// previous</span> <span style="color: #CC4747">3 4 5 6 7 8 9 10 11 12 13</span> <span style="color: #3F7E5E">next</span>

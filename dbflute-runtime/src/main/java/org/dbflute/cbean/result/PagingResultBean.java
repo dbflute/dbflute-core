@@ -115,7 +115,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Get the value of pageGroupBean.
      * <pre>
      * e.g. group-size=10, current-page=8
-     * PageGroupBean pageGroup = page.<span style="color: #CC4747">pageGroup</span>(op -> op.groupSize(3));
+     * PageGroupBean pageGroup = page.<span style="color: #CC4747">pageGroup</span>(op -&gt; op.groupSize(3));
      * List&lt;Integer&gt; numberList = pageGroup.createPageNumberList();
      *
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
@@ -164,7 +164,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Get the value of pageRangeBean.
      * <pre>
      * e.g. group-size=10, current-page=8
-     * PageRangeBean pageRange = page.<span style="color: #CC4747">pageRange</span>(op -> op.rangeSize(3));
+     * PageRangeBean pageRange = page.<span style="color: #CC4747">pageRange</span>(op -&gt; op.rangeSize(3));
      * List&lt;Integer&gt; numberList = pageRange.createPageNumberList();
      *
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>

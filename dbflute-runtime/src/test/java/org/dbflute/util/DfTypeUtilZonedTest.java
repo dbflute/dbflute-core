@@ -50,13 +50,13 @@ import org.dbflute.util.DfTypeUtil.ParseTimestampOutOfCalendarException;
  * @author jflute
  * @since 1.1.0 (2014/10/17 Friday)
  */
-public class DfTypeUtilTimeZonedTest extends TestCase { // because PlainTestCase uses this
+public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase uses this
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance for sub class. */
-    private final static Logger _logger = Logger.getLogger(DfTypeUtilTimeZonedTest.class);
+    private final static Logger _logger = Logger.getLogger(DfTypeUtilZonedTest.class);
 
     // ===================================================================================
     //                                                                            Settings

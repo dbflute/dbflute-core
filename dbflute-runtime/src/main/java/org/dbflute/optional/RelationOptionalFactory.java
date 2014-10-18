@@ -29,7 +29,7 @@ public class RelationOptionalFactory {
      * @param thrower The exception thrower for optional object. (NotNull: if needs)
      * @return The optional object for the relation. (NotNull)
      */
-    public Object createOptionalNullEntity(OptionalThingExceptionThrower thrower) { // #extensionPoint, object for override
+    public Object createOptionalNullEntity(OptionalThingExceptionThrower thrower) { // #extPoint, object for override
         return OptionalEntity.ofNullable(null, thrower);
     }
 
@@ -41,7 +41,7 @@ public class RelationOptionalFactory {
      * @param relationRow The row instance of relation entity. (NotNull)
      * @return The optional object for the relation. (NotNull)
      */
-    public Object createOptionalPresentEntity(Object relationRow) { // #extensionPoint, object for override
+    public Object createOptionalPresentEntity(Object relationRow) { // #extPoint, object for override
         return OptionalEntity.of(relationRow);
     }
 
@@ -52,7 +52,7 @@ public class RelationOptionalFactory {
      * Get the type of optional entity for relation.
      * @return The class type of optional entity. (NotNull)
      */
-    public Class<?> getOptionalEntityType() { // #extensionPoint
+    public Class<?> getOptionalEntityType() { // #extPoint
         return OptionalEntity.class;
     }
 
@@ -65,8 +65,9 @@ public class RelationOptionalFactory {
      * @return The extracted entity or null. (NullAllowed)
      */
     @SuppressWarnings("unchecked")
-    public Object orElseNull(Object optional) { // #extensionPoint, object for override
-        return ((OptionalEntity<Object>) optional).orElseNull();
+    public Object orElseNull(Object optional) { // #extPoint, object for override
+        final OptionalEntity<Object> optObj = ((OptionalEntity<Object>) optional);
+        return optObj.isPresent() ? optObj.get() : null;
     }
 
     /**
