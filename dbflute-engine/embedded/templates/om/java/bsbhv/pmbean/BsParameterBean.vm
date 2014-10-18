@@ -42,14 +42,6 @@ import org.dbflute.outsidesql.PmbCustodial;
 import org.dbflute.outsidesql.PmbCustodial.PmbShortCharHandlingMode;
 #end
 import org.dbflute.util.DfTypeUtil;
-#if ($database.isAvailableJodaTimeEntity())
-#if ($database.isAvailableJodaTimeLocalDateEntity())
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-#end
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-#end
 import ${glPackageBaseCommon}.*;
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
 #if ($database.isApplicationBehaviorProject())

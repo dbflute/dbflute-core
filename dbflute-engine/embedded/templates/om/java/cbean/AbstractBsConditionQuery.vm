@@ -27,12 +27,6 @@ import org.dbflute.cbean.ordering.*;
 import org.dbflute.cbean.scoping.*;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMetaProvider;
-#if ($database.isAvailableJodaTimeLocalDateEntity())
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-#end
 import ${glPackageBaseCommon}.*;
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
@@ -1532,48 +1526,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     @Override
     protected void filterFromToOption(String columnDbName, FromToOption option) {
         option.allowOneSide();
-    }
-
-#end
-#if ($database.isAvailableJodaTimeLocalDateEntity())
-    @Override
-    protected Date xtoFromToUtilDate(Object date, String columnDbName, FromToOption option) {
-        if (date != null && date instanceof ReadablePartial) {
-            return new java.sql.Timestamp(((ReadablePartial) date).toDateTime(null).getMillis());
-        } else if (date != null && date instanceof ReadableInstant) {
-            return new java.sql.Timestamp(((ReadableInstant) date).getMillis());
-        }
-        return DfTypeUtil.toTimestamp(date);
-    }
-
-    @Override
-    protected Timestamp xtoFromToTimestamp(Object date, String columnDbName, FromToOption option) {
-        if (date != null && date instanceof ReadablePartial) {
-            return new java.sql.Timestamp(((ReadablePartial) date).toDateTime(null).getMillis());
-        } else if (date != null && date instanceof ReadableInstant) {
-            return new java.sql.Timestamp(((ReadableInstant) date).getMillis());
-        }
-        return DfTypeUtil.toTimestamp(date);
-    }
-
-    @Override
-    protected Object xtoFromToLocalDate(Object date, String columnDbName, FromToOption option) {
-        return LocalDate.fromDateFields(date);
-    }
-
-    @Override
-    protected Object xtoFromToLocalDateTime(Object date, String columnDbName, FromToOption option) {
-        return LocalDateTime.fromDateFields(date);
-    }
-
-    @Override
-    protected boolean xisNextTimeLocalDate(Class<?> nativeType) {
-        return LocalDate.class.isAssignableFrom(nativeType);
-    }
-
-    @Override
-    protected boolean xisNextTimeLocalDateTime(Class<?> nativeType) {
-        return LocalDateTime.class.isAssignableFrom(nativeType);
     }
 
 #end

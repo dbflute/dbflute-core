@@ -198,6 +198,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // basically use Java8-Time instead of JodaTime since 1.1
+    //  => *unsupported since 1.1
     public boolean isAvailableJodaTimeEntity() {
         return isAvailableJodaTimeLocalDateEntity() || isAvailableJodaTimeZonedDateEntity();
     }
