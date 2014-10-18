@@ -17,6 +17,8 @@ package org.dbflute.unit;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -30,6 +32,7 @@ import junit.framework.TestCase;
 
 import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.hook.AccessContext;
+import org.dbflute.system.DBFluteSystem;
 import org.dbflute.unit.markhere.MarkHereManager;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
@@ -662,6 +665,14 @@ public abstract class RuntimeTestCase extends TestCase {
 
     protected Timestamp currentTimestamp() {
         return new Timestamp(System.currentTimeMillis());
+    }
+
+    protected LocalDate toLocalDate(Object obj) {
+        return DfTypeUtil.toLocalDate(obj, DBFluteSystem.getFinalTimeZone());
+    }
+
+    protected LocalDateTime toLocalDateTime(Object obj) {
+        return DfTypeUtil.toLocalDateTime(obj, DBFluteSystem.getFinalTimeZone());
     }
 
     protected Date toDate(Object obj) {

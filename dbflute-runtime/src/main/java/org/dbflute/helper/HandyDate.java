@@ -121,7 +121,7 @@ public class HandyDate implements Serializable {
      * Construct the handy date by the specified local date-time for the default time-zone.
      * <pre>
      * e.g.
-     *  Date adjusted = new HandyDate(localDateTime, timeZone).addDay(3).getDate();
+     *  Date adjusted = new HandyDate(localDateTime).addDay(3).getDate();
      * </pre>
      * @param localDateTime The instance of the local date-time. (NotNull)
      */
@@ -2065,7 +2065,28 @@ public class HandyDate implements Serializable {
         return getMonth() == month; // zero origin headache
     }
 
-    // TODO jflute imp;: HandyDate isMonthSameAs() for LocalDate
+    /**
+     * Is the month of this date same as the month of the specified local date? <br />
+     * e.g. if 2011/11/27, isMonthSameAs(toLocalDate("2013/11/01")) is true
+     * @param date The local date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMonthSameAs(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return getMonthAsOneOrigin() == prepareCompareDate(date).getMonthAsOneOrigin();
+    }
+
+    /**
+     * Is the month of this date same as the month of the specified local date-time? <br />
+     * e.g. if 2011/11/27, isMonthSameAs(toLocalDateTime("2013/11/01")) is true
+     * @param date The local date-time to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMonthSameAs(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return getMonthAsOneOrigin() == prepareCompareDate(date).getMonthAsOneOrigin();
+    }
+
     /**
      * Is the month of this date same as the month of the specified date? <br />
      * e.g. if 2011/11/27, isMonthSameAs(toDate("2013/11/01")) is true
@@ -2220,6 +2241,28 @@ public class HandyDate implements Serializable {
     }
 
     /**
+     * Is the day of this date same as the day of the specified local date? <br />
+     * e.g. if 2011/11/27, isDaySameAs(toLocalDate("2013/09/27")) is true
+     * @param date The local date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isDaySameAs(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return getDay() == prepareCompareDate(date).getDay();
+    }
+
+    /**
+     * Is the day of this date same as the day of the specified local date-time? <br />
+     * e.g. if 2011/11/27, isDaySameAs(toLocalDateTime("2013/09/27")) is true
+     * @param date The local date-time to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isDaySameAs(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return getDay() == prepareCompareDate(date).getDay();
+    }
+
+    /**
      * Is the day of this date same as the day of the specified date? <br />
      * e.g. if 2011/11/27, isDaySameAs(toDate("2013/09/27")) is true
      * @param date The date to compare. (NotNull)
@@ -2239,6 +2282,28 @@ public class HandyDate implements Serializable {
     public boolean isDaySameAs(HandyDate handyDate) {
         assertArgumentNotNull("handyDate", handyDate);
         return getDay() == handyDate.getDay();
+    }
+
+    /**
+     * Is the date and day same as the specified local date? <br />
+     * e.g. if 2011/11/27 00:00:00, isDayOfDateSameAs(toLocalDate("2011/11/27 12:34:56")) is true
+     * @param date The local date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isDayOfDateSameAs(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return isDayOfDateSameAs(prepareCompareDate(date));
+    }
+
+    /**
+     * Is the date and day same as the specified local date-time? <br />
+     * e.g. if 2011/11/27 00:00:00, isDayOfDateSameAs(toLocalDateTime("2011/11/27 12:34:56")) is true
+     * @param date The local date-time to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isDayOfDateSameAs(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return isDayOfDateSameAs(prepareCompareDate(date));
     }
 
     /**
@@ -2307,6 +2372,17 @@ public class HandyDate implements Serializable {
     }
 
     /**
+     * Is the hour of this date same as the hour of the specified local date-time? <br />
+     * e.g. if 2011/11/27 12:34:56, isHourSameAs(toLocalDateTime("2013/09/24 12:21:58")) is true
+     * @param date The local date-time to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isHourSameAs(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return isHourSameAs(prepareCompareDate(date));
+    }
+
+    /**
      * Is the hour of this date same as the hour of the specified date? <br />
      * e.g. if 2011/11/27 12:34:56, isHourSameAs(toDate("2013/09/24 12:21:58")) is true
      * @param date The date to compare. (NotNull)
@@ -2364,6 +2440,17 @@ public class HandyDate implements Serializable {
     }
 
     /**
+     * Is the minute of this date same as the minute of the specified local date-time? <br />
+     * e.g. if 2011/11/27 12:34:56, isMinuteSameAs(toLocalDateTime("2013/09/26 07:34:31")) is true
+     * @param date The local date-time to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMinuteSameAs(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return isMinuteSameAs(prepareCompareDate(date));
+    }
+
+    /**
      * Is the minute of this date same as the minute of the specified date? <br />
      * e.g. if 2011/11/27 12:34:56, isMinuteSameAs(toDate("2013/09/26 07:34:31")) is true
      * @param date The date to compare. (NotNull)
@@ -2418,6 +2505,17 @@ public class HandyDate implements Serializable {
      */
     public boolean isSecond(int second) {
         return getSecond() == second;
+    }
+
+    /**
+     * Is the second of this date same as the second of the specified local date-time? <br />
+     * e.g. if 2011/11/27 12:34:56.123, isSecondSameAs(toLocalDateTime("2013/09/26 07:41:56.456")) is true
+     * @param date The local date-time to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isSecondSameAs(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return isSecondSameAs(prepareCompareDate(date));
     }
 
     /**
@@ -2553,10 +2651,44 @@ public class HandyDate implements Serializable {
      *  2014/03/03(this) and 2012/03/03(argument): -2
      *  2013/12/31(this) and 2014/01/01(argument): 1 *attention
      * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of year as distance between the two date. (MinusAllowed)
+     */
+    public int calculateCalendarDistanceYears(LocalDate date) {
+        return doCalculateCalendarDistanceYears(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of year between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/03/03(this) and 2014/03/03(argument): 1
+     *  2014/03/03(this) and 2012/03/03(argument): -2
+     *  2013/12/31(this) and 2014/01/01(argument): 1 *attention
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of year as distance between the two date. (MinusAllowed)
+     */
+    public int calculateCalendarDistanceYears(LocalDateTime date) {
+        return doCalculateCalendarDistanceYears(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of year between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/03/03(this) and 2014/03/03(argument): 1
+     *  2014/03/03(this) and 2012/03/03(argument): -2
+     *  2013/12/31(this) and 2014/01/01(argument): 1 *attention
+     * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of year as distance between the two date. (MinusAllowed)
      */
     public int calculateCalendarDistanceYears(Date date) {
+        return doCalculateCalendarDistanceYears(date);
+    }
+
+    protected int doCalculateCalendarDistanceYears(Date date) {
         assertArgumentNotNull("date", date);
         if (isYearSameAs(date)) {
             return 0;
@@ -2574,10 +2706,46 @@ public class HandyDate implements Serializable {
      *  2013/03/03(this) and 2014/01/03(argument): 10
      *  2013/03/31(this) and 2013/04/01(argument): 1 *attention
      * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of month as distance between the two date. (MinusAllowed)
+     */
+    public int calculateCalendarDistanceMonths(LocalDate date) {
+        return doCalculateCalendarDistanceMonths(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/03/03(this) and 2013/04/03(argument): 1
+     *  2013/03/03(this) and 2013/01/03(argument): -2
+     *  2013/03/03(this) and 2014/01/03(argument): 10
+     *  2013/03/31(this) and 2013/04/01(argument): 1 *attention
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of month as distance between the two date. (MinusAllowed)
+     */
+    public int calculateCalendarDistanceMonths(LocalDateTime date) {
+        return doCalculateCalendarDistanceMonths(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/03/03(this) and 2013/04/03(argument): 1
+     *  2013/03/03(this) and 2013/01/03(argument): -2
+     *  2013/03/03(this) and 2014/01/03(argument): 10
+     *  2013/03/31(this) and 2013/04/01(argument): 1 *attention
+     * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of month as distance between the two date. (MinusAllowed)
      */
     public int calculateCalendarDistanceMonths(Date date) {
+        return doCalculateCalendarDistanceMonths(date);
+    }
+
+    protected int doCalculateCalendarDistanceMonths(Date date) {
         assertArgumentNotNull("date", date);
         if (isMonthOfYearSameAs(date)) {
             return 0;
@@ -2609,10 +2777,48 @@ public class HandyDate implements Serializable {
      *  2013/03/03(this) and 2014/03/03(argument): 365
      *  2013/03/03 23:59:59(this) and 2013/03/07 00:00:00(argument): 4 *attention
      * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of day as distance between the two date. (MinusAllowed)
+     */
+    public int calculateCalendarDistanceDays(LocalDate date) {
+        return doCalculateCalendarDistanceDays(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of day between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03(this) and 2013/03/07(argument): 4
+     *  2013/03/03(this) and 2013/04/07(argument): 35
+     *  2013/04/07(this) and 2013/03/03(argument): -35
+     *  2013/03/03(this) and 2014/03/03(argument): 365
+     *  2013/03/03 23:59:59(this) and 2013/03/07 00:00:00(argument): 4 *attention
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of day as distance between the two date. (MinusAllowed)
+     */
+    public int calculateCalendarDistanceDays(LocalDateTime date) {
+        return doCalculateCalendarDistanceDays(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of day between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03(this) and 2013/03/07(argument): 4
+     *  2013/03/03(this) and 2013/04/07(argument): 35
+     *  2013/04/07(this) and 2013/03/03(argument): -35
+     *  2013/03/03(this) and 2014/03/03(argument): 365
+     *  2013/03/03 23:59:59(this) and 2013/03/07 00:00:00(argument): 4 *attention
+     * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of day as distance between the two date. (MinusAllowed)
      */
     public int calculateCalendarDistanceDays(Date date) {
+        return doCalculateCalendarDistanceDays(date);
+    }
+
+    protected int doCalculateCalendarDistanceDays(Date date) {
         assertArgumentNotNull("date", date);
         if (isDayOfDateSameAs(date)) {
             return 0;
@@ -2643,10 +2849,46 @@ public class HandyDate implements Serializable {
      *  2013/03/03 07:00:00(this) and 2013/03/04 14:34:56(argument): 31
      *  2013/03/03 07:59:59(this) and 2013/03/03 09:00:00(argument): 2 *attention
      * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of hour as distance between the two date. (MinusAllowed)
+     */
+    public int calculateCalendarDistanceHours(LocalDate date) {
+        return doCalculateCalendarDistanceHours(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of hour between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03 07:00:00(this) and 2013/03/03 12:34:56(argument): 5
+     *  2013/03/03 12:00:00(this) and 2013/03/03 07:34:56(argument): -5
+     *  2013/03/03 07:00:00(this) and 2013/03/04 14:34:56(argument): 31
+     *  2013/03/03 07:59:59(this) and 2013/03/03 09:00:00(argument): 2 *attention
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of hour as distance between the two date. (MinusAllowed)
+     */
+    public int calculateCalendarDistanceHours(LocalDateTime date) {
+        return doCalculateCalendarDistanceHours(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of hour between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03 07:00:00(this) and 2013/03/03 12:34:56(argument): 5
+     *  2013/03/03 12:00:00(this) and 2013/03/03 07:34:56(argument): -5
+     *  2013/03/03 07:00:00(this) and 2013/03/04 14:34:56(argument): 31
+     *  2013/03/03 07:59:59(this) and 2013/03/03 09:00:00(argument): 2 *attention
+     * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of hour as distance between the two date. (MinusAllowed)
      */
     public int calculateCalendarDistanceHours(Date date) {
+        return doCalculateCalendarDistanceHours(date);
+    }
+
+    protected int doCalculateCalendarDistanceHours(Date date) {
         assertArgumentNotNull("date", date);
         if (isHourOfDateSameAs(date)) {
             return 0;
@@ -2677,10 +2919,46 @@ public class HandyDate implements Serializable {
      *  2013/03/03 07:34:00(this) and 2013/03/03 07:22:56(argument): -12
      *  2013/03/03 07:34:59(this) and 2013/03/03 07:36:00(argument): 2 *attention
      * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of minute as distance between the two date. (MinusAllowed)
+     */
+    public long calculateCalendarDistanceMinutes(LocalDate date) {
+        return doCalculateCalendarDistanceMinutes(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of minute between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03 07:34:00(this) and 2013/03/03 07:57:00(argument): 23
+     *  2013/03/03 07:34:00(this) and 2013/03/03 12:34:00(argument): 300
+     *  2013/03/03 07:34:00(this) and 2013/03/03 07:22:56(argument): -12
+     *  2013/03/03 07:34:59(this) and 2013/03/03 07:36:00(argument): 2 *attention
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of minute as distance between the two date. (MinusAllowed)
+     */
+    public long calculateCalendarDistanceMinutes(LocalDateTime date) {
+        return doCalculateCalendarDistanceMinutes(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of minute between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03 07:34:00(this) and 2013/03/03 07:57:00(argument): 23
+     *  2013/03/03 07:34:00(this) and 2013/03/03 12:34:00(argument): 300
+     *  2013/03/03 07:34:00(this) and 2013/03/03 07:22:56(argument): -12
+     *  2013/03/03 07:34:59(this) and 2013/03/03 07:36:00(argument): 2 *attention
+     * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of minute as distance between the two date. (MinusAllowed)
      */
     public long calculateCalendarDistanceMinutes(Date date) {
+        return doCalculateCalendarDistanceMinutes(date);
+    }
+
+    protected long doCalculateCalendarDistanceMinutes(Date date) {
         assertArgumentNotNull("date", date);
         if (isMinuteOfDateSameAs(date)) {
             return 0;
@@ -2711,10 +2989,46 @@ public class HandyDate implements Serializable {
      *  2013/03/03 07:34:43(this) and 2013/03/03 07:34:22(argument): -21
      *  2013/03/03 07:34:56.999(this) and 2013/03/03 07:34.58.000(argument): 2 *attention
      * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of second as distance between the two date. (MinusAllowed)
+     */
+    public long calculateCalendarDistanceSeconds(LocalDate date) {
+        return doCalculateCalendarDistanceSeconds(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of second between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03 07:34:22(this) and 2013/03/03 07:34:37(argument): 15
+     *  2013/03/03 07:34:22(this) and 2013/03/03 07:35:24(argument): 62
+     *  2013/03/03 07:34:43(this) and 2013/03/03 07:34:22(argument): -21
+     *  2013/03/03 07:34:56.999(this) and 2013/03/03 07:34.58.000(argument): 2 *attention
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of second as distance between the two date. (MinusAllowed)
+     */
+    public long calculateCalendarDistanceSeconds(LocalDateTime date) {
+        return doCalculateCalendarDistanceSeconds(toDate(date));
+    }
+
+    /**
+     * Calculate calendar distance of second between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03 07:34:22(this) and 2013/03/03 07:34:37(argument): 15
+     *  2013/03/03 07:34:22(this) and 2013/03/03 07:35:24(argument): 62
+     *  2013/03/03 07:34:43(this) and 2013/03/03 07:34:22(argument): -21
+     *  2013/03/03 07:34:56.999(this) and 2013/03/03 07:34.58.000(argument): 2 *attention
+     * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of second as distance between the two date. (MinusAllowed)
      */
     public long calculateCalendarDistanceSeconds(Date date) {
+        return doCalculateCalendarDistanceSeconds(date);
+    }
+
+    protected long doCalculateCalendarDistanceSeconds(Date date) {
         assertArgumentNotNull("date", date);
         if (isSecondOfDateSameAs(date)) {
             return 0;
@@ -2764,12 +3078,92 @@ public class HandyDate implements Serializable {
      *  2014/01/01(this) and 2015/09/01(argument): 2
      *  2013/03/07(this) and 7099/10/07(argument): 5087
      * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public int calculateMeasuredDistanceYears(LocalDate date) {
+        return doCalculateMeasuredDistanceYears(toDate(date));
+    }
+
+    /**
+     * Calculate measured distance of year between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31(this) and 2014/01/01(argument): 0
+     *  2013/12/31(this) and 2014/07/15(argument): 1
+     *  2014/01/01(this) and 2015/04/01(argument): 1
+     *  2014/01/01(this) and 2015/09/01(argument): 2
+     *  2013/03/07(this) and 7099/10/07(argument): 5087
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public int calculateMeasuredDistanceYears(LocalDateTime date) {
+        return doCalculateMeasuredDistanceYears(toDate(date));
+    }
+
+    /**
+     * Calculate measured distance of year between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31(this) and 2014/01/01(argument): 0
+     *  2013/12/31(this) and 2014/07/15(argument): 1
+     *  2014/01/01(this) and 2015/04/01(argument): 1
+     *  2014/01/01(this) and 2015/09/01(argument): 2
+     *  2013/03/07(this) and 7099/10/07(argument): 5087
+     * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of year as measured distance between the two date. (MinusAllowed)
      */
     public int calculateMeasuredDistanceYears(Date date) {
+        return doCalculateMeasuredDistanceYears(date);
+    }
+
+    protected int doCalculateMeasuredDistanceYears(Date date) {
         final int months = calculateMeasuredDistanceMonths(date);
         return (months / 12) + ((months % 12) > 6 ? 1 : 0);
+    }
+
+    /**
+     * Calculate measured distance of month between two date. <br />
+     * The distance might have margin of error.
+     * <pre>
+     * e.g.
+     *  2013/03/20(this) and 2013/04/03(argument): 0
+     *  2013/03/07(this) and 2013/04/03(argument): 1
+     *  2013/03/01(this) and 2013/01/28(argument): 2
+     *  2013/03/01(this) and 2013/08/01(argument): 5
+     *  2013/03/01(this) and 2013/08/31(argument): 6
+     *  2013/03/01(this) and 2033/08/31(argument): 246
+     *  2013/01/01(this) and 3013/01/01(argument): 12000
+     *  2013/01/01(this) and 7013/01/01(argument): 60000
+     * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public int calculateMeasuredDistanceMonths(LocalDate date) {
+        return doCalculateMeasuredDistanceMonths(toDate(date));
+    }
+
+    /**
+     * Calculate measured distance of month between two date. <br />
+     * The distance might have margin of error.
+     * <pre>
+     * e.g.
+     *  2013/03/20(this) and 2013/04/03(argument): 0
+     *  2013/03/07(this) and 2013/04/03(argument): 1
+     *  2013/03/01(this) and 2013/01/28(argument): 2
+     *  2013/03/01(this) and 2013/08/01(argument): 5
+     *  2013/03/01(this) and 2013/08/31(argument): 6
+     *  2013/03/01(this) and 2033/08/31(argument): 246
+     *  2013/01/01(this) and 3013/01/01(argument): 12000
+     *  2013/01/01(this) and 7013/01/01(argument): 60000
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public int calculateMeasuredDistanceMonths(LocalDateTime date) {
+        return doCalculateMeasuredDistanceMonths(toDate(date));
     }
 
     /**
@@ -2790,6 +3184,10 @@ public class HandyDate implements Serializable {
      * @return The count of year as measured distance between the two date. (MinusAllowed)
      */
     public int calculateMeasuredDistanceMonths(Date date) {
+        return doCalculateMeasuredDistanceMonths(date);
+    }
+
+    protected int doCalculateMeasuredDistanceMonths(Date date) {
         final HandyDate copyInstance = createCopyInstance();
         final int months = calculateCalendarDistanceMonths(date);
         final int diffDays = copyInstance.addMonth(months).calculateCalendarDistanceDays(date);
@@ -2812,12 +3210,72 @@ public class HandyDate implements Serializable {
      *  2013/04/01 23:59:59(this) and 2013/04/02 00:00:00(argument): 0
      *  2013/04/01 10:00:00(this) and 2013/04/02 23:59:59(argument): 2
      * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public int calculateMeasuredDistanceDays(LocalDate date) {
+        return doCalculateMeasuredDistanceDays(toDate(date));
+    }
+
+    /**
+     * Calculate measured distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/04/01 23:59:59(this) and 2013/04/02 00:00:00(argument): 0
+     *  2013/04/01 10:00:00(this) and 2013/04/02 23:59:59(argument): 2
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public int calculateMeasuredDistanceDays(LocalDateTime date) {
+        return doCalculateMeasuredDistanceDays(toDate(date));
+    }
+
+    /**
+     * Calculate measured distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/04/01 23:59:59(this) and 2013/04/02 00:00:00(argument): 0
+     *  2013/04/01 10:00:00(this) and 2013/04/02 23:59:59(argument): 2
+     * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of year as measured distance between the two date. (MinusAllowed)
      */
     public int calculateMeasuredDistanceDays(Date date) {
+        return doCalculateMeasuredDistanceDays(date);
+    }
+
+    protected int doCalculateMeasuredDistanceDays(Date date) {
         final int hours = calculateMeasuredDistanceHours(date);
         return (hours / 24) + ((hours % 24) > 12 ? 1 : 0);
+    }
+
+    /**
+     * Calculate measured distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31 12:34:56(this) and 2013/12/31 13:00:00(argument): 0
+     *  2013/12/31 12:34:56(this) and 2013/12/31 14:10:00(argument): 2
+     * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public int calculateMeasuredDistanceHours(LocalDate date) {
+        return doCalculateMeasuredDistanceHours(toDate(date));
+    }
+
+    /**
+     * Calculate measured distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31 12:34:56(this) and 2013/12/31 13:00:00(argument): 0
+     *  2013/12/31 12:34:56(this) and 2013/12/31 14:10:00(argument): 2
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public int calculateMeasuredDistanceHours(LocalDateTime date) {
+        return doCalculateMeasuredDistanceHours(toDate(date));
     }
 
     /**
@@ -2831,8 +3289,40 @@ public class HandyDate implements Serializable {
      * @return The count of year as measured distance between the two date. (MinusAllowed)
      */
     public int calculateMeasuredDistanceHours(Date date) {
+        return doCalculateMeasuredDistanceHours(date);
+    }
+
+    protected int doCalculateMeasuredDistanceHours(Date date) {
         final long minutes = calculateMeasuredDistanceMinutes(date);
         return (int) (minutes / 60) + ((minutes % 60) > 30 ? 1 : 0); // to integer
+    }
+
+    /**
+     * Calculate measured distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31 12:34:56(this) and 2013/12/31 12:35:00(argument): 0
+     *  2013/12/31 12:34:56(this) and 2013/12/31 12:37:00(argument): 2
+     * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public long calculateMeasuredDistanceMinutes(LocalDate date) {
+        return doCalculateMeasuredDistanceMinutes(toDate(date));
+    }
+
+    /**
+     * Calculate measured distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31 12:34:56(this) and 2013/12/31 12:35:00(argument): 0
+     *  2013/12/31 12:34:56(this) and 2013/12/31 12:37:00(argument): 2
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public long calculateMeasuredDistanceMinutes(LocalDateTime date) {
+        return doCalculateMeasuredDistanceMinutes(toDate(date));
     }
 
     /**
@@ -2846,8 +3336,40 @@ public class HandyDate implements Serializable {
      * @return The count of year as measured distance between the two date. (MinusAllowed)
      */
     public long calculateMeasuredDistanceMinutes(Date date) {
+        return doCalculateMeasuredDistanceMinutes(date);
+    }
+
+    protected long doCalculateMeasuredDistanceMinutes(Date date) {
         final long seconds = calculateMeasuredDistanceSeconds(date);
         return (seconds / 60L) + ((seconds % 60L) > 30L ? 1L : 0L);
+    }
+
+    /**
+     * Calculate measured distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31 12:34:56.789(this) and 2013/12/31 12:34:57.000(argument): 0
+     *  2013/12/31 12:34:56.789(this) and 2013/12/31 12:34:58.333(argument): 2
+     * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public long calculateMeasuredDistanceSeconds(LocalDate date) {
+        return doCalculateMeasuredDistanceSeconds(toDate(date));
+    }
+
+    /**
+     * Calculate measured distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31 12:34:56.789(this) and 2013/12/31 12:34:57.000(argument): 0
+     *  2013/12/31 12:34:56.789(this) and 2013/12/31 12:34:58.333(argument): 2
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of year as measured distance between the two date. (MinusAllowed)
+     */
+    public long calculateMeasuredDistanceSeconds(LocalDateTime date) {
+        return doCalculateMeasuredDistanceSeconds(toDate(date));
     }
 
     /**
@@ -2861,6 +3383,10 @@ public class HandyDate implements Serializable {
      * @return The count of year as measured distance between the two date. (MinusAllowed)
      */
     public long calculateMeasuredDistanceSeconds(Date date) {
+        return doCalculateMeasuredDistanceSeconds(date);
+    }
+
+    protected long doCalculateMeasuredDistanceSeconds(Date date) {
         final long milliseconds = calculateCalendarDistanceMilliseconds(date);
         return (milliseconds / 1000L) + ((milliseconds % 1000L) > 500L ? 1L : 0L);
     }
@@ -2881,7 +3407,45 @@ public class HandyDate implements Serializable {
      * @param determiner The determiner of business day. (NotNull)
      * @return The count of weekday as size between the two date. (NotMinus)
      */
+    public int calculateSizeBusinessDays(LocalDate date, BusinessDayDeterminer determiner) {
+        return doCalculateSizeBusinessDays(toDate(date), determiner);
+    }
+
+    /**
+     * Calculate business-day size between two date.
+     * <pre>
+     * e.g. when Sunday and Saturday is false
+     *  2013/03/03(this) and 2013/03/07(argument): 4
+     *  2013/03/07(this) and 2013/03/13(argument): 5
+     *  2013/03/07(this) and 2013/03/16(argument): 7
+     *  2013/03/16(this) and 2013/03/07(argument): 7
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @param determiner The determiner of business day. (NotNull)
+     * @return The count of weekday as size between the two date. (NotMinus)
+     */
+    public int calculateSizeBusinessDays(LocalDateTime date, BusinessDayDeterminer determiner) {
+        return doCalculateSizeBusinessDays(toDate(date), determiner);
+    }
+
+    /**
+     * Calculate business-day size between two date.
+     * <pre>
+     * e.g. when Sunday and Saturday is false
+     *  2013/03/03(this) and 2013/03/07(argument): 4
+     *  2013/03/07(this) and 2013/03/13(argument): 5
+     *  2013/03/07(this) and 2013/03/16(argument): 7
+     *  2013/03/16(this) and 2013/03/07(argument): 7
+     * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @param determiner The determiner of business day. (NotNull)
+     * @return The count of weekday as size between the two date. (NotMinus)
+     */
     public int calculateSizeBusinessDays(Date date, BusinessDayDeterminer determiner) {
+        return doCalculateSizeBusinessDays(date, determiner);
+    }
+
+    protected int doCalculateSizeBusinessDays(Date date, BusinessDayDeterminer determiner) {
         assertArgumentNotNull("date", date);
         if (isDayOfDateSameAs(date)) {
             return 0;
@@ -2913,16 +3477,80 @@ public class HandyDate implements Serializable {
      *  2013/03/07(this) and 2013/03/16(argument): 7
      *  2013/03/16(this) and 2013/03/07(argument): 7
      * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of weekday as size between the two date. (NotMinus)
+     */
+    public int calculateSizeWeekdays(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return doCalculateSizeWeekdays(toDate(date));
+    }
+
+    /**
+     * Calculate weekday size between two date.
+     * <pre>
+     * e.g. 2013/03/03 is Sunday
+     *  2013/03/03(this) and 2013/03/07(argument): 4
+     *  2013/03/07(this) and 2013/03/13(argument): 5
+     *  2013/03/07(this) and 2013/03/16(argument): 7
+     *  2013/03/16(this) and 2013/03/07(argument): 7
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of weekday as size between the two date. (NotMinus)
+     */
+    public int calculateSizeWeekdays(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return doCalculateSizeWeekdays(toDate(date));
+    }
+
+    /**
+     * Calculate weekday size between two date.
+     * <pre>
+     * e.g. 2013/03/03 is Sunday
+     *  2013/03/03(this) and 2013/03/07(argument): 4
+     *  2013/03/07(this) and 2013/03/13(argument): 5
+     *  2013/03/07(this) and 2013/03/16(argument): 7
+     *  2013/03/16(this) and 2013/03/07(argument): 7
+     * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of weekday as size between the two date. (NotMinus)
      */
     public int calculateSizeWeekdays(Date date) {
         assertArgumentNotNull("date", date);
-        return calculateSizeBusinessDays(date, new BusinessDayDeterminer() {
-            public boolean isBusinessDay(HandyDate handyDate) {
-                return handyDate.isWeek_DayOfWeekWeekday();
-            }
-        });
+        return doCalculateSizeWeekdays(date);
+    }
+
+    protected int doCalculateSizeWeekdays(Date date) {
+        return calculateSizeBusinessDays(date, hd -> hd.isWeek_DayOfWeekWeekday());
+    }
+
+    /**
+     * Calculate weekend-day size between two date.
+     * <pre>
+     * e.g. 2013/03/03 is Sunday
+     *  2013/03/03(this) and 2013/03/07(argument): 1
+     *  2013/03/07(this) and 2013/03/13(argument): 2
+     * </pre>
+     * @param date The local date to calculate. (NotNull)
+     * @return The count of weekday as size between the two date. (NotMinus)
+     */
+    public int calculateSizeWeekendDays(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return doCalculateSizeWeekendDays(toDate(date));
+    }
+
+    /**
+     * Calculate weekend-day size between two date.
+     * <pre>
+     * e.g. 2013/03/03 is Sunday
+     *  2013/03/03(this) and 2013/03/07(argument): 1
+     *  2013/03/07(this) and 2013/03/13(argument): 2
+     * </pre>
+     * @param date The local date-time to calculate. (NotNull)
+     * @return The count of weekday as size between the two date. (NotMinus)
+     */
+    public int calculateSizeWeekendDays(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return doCalculateSizeWeekendDays(toDate(date));
     }
 
     /**
@@ -2937,16 +3565,49 @@ public class HandyDate implements Serializable {
      */
     public int calculateSizeWeekendDays(Date date) {
         assertArgumentNotNull("date", date);
-        return calculateSizeBusinessDays(date, new BusinessDayDeterminer() {
-            public boolean isBusinessDay(HandyDate handyDate) {
-                return handyDate.isWeek_DayOfWeekWeekend();
-            }
-        });
+        return doCalculateSizeWeekendDays(date);
+    }
+
+    protected int doCalculateSizeWeekendDays(Date date) {
+        return calculateSizeBusinessDays(date, hd -> hd.isWeek_DayOfWeekWeekend());
     }
 
     // ===================================================================================
     //                                                                        Choose Parts
     //                                                                        ============
+    // -----------------------------------------------------
+    //                                        Both-side Date
+    //                                        --------------
+    /**
+     * Choose the nearest date to this date. <br />
+     * If the same distance is found, it returns the future date.
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.chooseNearestDate(2011/11/24, 2011/11/26): 2011/11/26
+     *  date.chooseNearestDate(2011/11/25, 2011/11/28): 2011/11/28
+     * </pre>
+     * @param dates The array of comparison target local date. (NotNull)
+     * @return The nearest local date. (NotNull)
+     */
+    public LocalDate chooseNearestDate(LocalDate... dates) {
+        return toLocalDate(doChooseNearestDate(toDateArray(dates)));
+    }
+
+    /**
+     * Choose the nearest date to this date. <br />
+     * If the same distance is found, it returns the future date.
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.chooseNearestDate(2011/11/24, 2011/11/26): 2011/11/26
+     *  date.chooseNearestDate(2011/11/25, 2011/11/28): 2011/11/28
+     * </pre>
+     * @param dates The array of comparison target local date-time. (NotNull)
+     * @return The nearest local date-time. (NotNull)
+     */
+    public LocalDateTime chooseNearestDate(LocalDateTime... dates) {
+        return toLocalDateTime(doChooseNearestDate(toDateArray(dates)));
+    }
+
     /**
      * Choose the nearest date to this date. <br />
      * If the same distance is found, it returns the future date.
@@ -2956,9 +3617,13 @@ public class HandyDate implements Serializable {
      *  date.chooseNearestDate(2011/11/25, 2011/11/28): 2011/11/28
      * </pre>
      * @param dates The array of comparison target date. (NotNull)
-     * @return The determination, true or false.
+     * @return The nearest date. (NotNull)
      */
     public Date chooseNearestDate(Date... dates) {
+        return doChooseNearestDate(dates);
+    }
+
+    protected Date doChooseNearestDate(Date... dates) {
         assertCompareDateArrayValid(dates);
         Long nearestMillis = null;
         Date nearestDate = null;
@@ -2980,6 +3645,37 @@ public class HandyDate implements Serializable {
         return nearestDate;
     }
 
+    // -----------------------------------------------------
+    //                                           Future Date
+    //                                           -----------
+    /**
+     * Choose the nearest future date to this date.
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.chooseNearestFutureDate(2011/11/29, 2011/11/28): 2011/11/28
+     *  date.chooseNearestFutureDate(2011/11/26, 2011/11/29): 2011/11/29
+     * </pre>
+     * @param dates The array of comparison target local date. (NotNull)
+     * @return The nearest future local date. (NotNull)
+     */
+    public LocalDate chooseNearestFutureDate(LocalDate... dates) {
+        return toLocalDate(doChooseNearestFutureDate(toDateArray(dates)));
+    }
+
+    /**
+     * Choose the nearest future date to this date.
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.chooseNearestFutureDate(2011/11/29, 2011/11/28): 2011/11/28
+     *  date.chooseNearestFutureDate(2011/11/26, 2011/11/29): 2011/11/29
+     * </pre>
+     * @param dates The array of comparison target local date-time. (NotNull)
+     * @return The nearest future local date-time. (NotNull)
+     */
+    public LocalDateTime chooseNearestFutureDate(LocalDateTime... dates) {
+        return toLocalDateTime(doChooseNearestFutureDate(toDateArray(dates)));
+    }
+
     /**
      * Choose the nearest future date to this date.
      * <pre>
@@ -2988,9 +3684,13 @@ public class HandyDate implements Serializable {
      *  date.chooseNearestFutureDate(2011/11/26, 2011/11/29): 2011/11/29
      * </pre>
      * @param dates The array of comparison target date. (NotNull)
-     * @return The determination, true or false.
+     * @return The nearest future date. (NotNull)
      */
     public Date chooseNearestFutureDate(Date... dates) {
+        return doChooseNearestFutureDate(dates);
+    }
+
+    protected Date doChooseNearestFutureDate(Date... dates) {
         assertCompareDateArrayValid(dates);
         Long nearestMillis = null;
         Date nearestDate = null;
@@ -3008,6 +3708,37 @@ public class HandyDate implements Serializable {
         return nearestDate;
     }
 
+    // -----------------------------------------------------
+    //                                             Past Date
+    //                                             ---------
+    /**
+     * Choose the nearest past date to this date.
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.chooseNearestPastDate(2011/11/26, 2011/11/25): 2011/11/26
+     *  date.chooseNearestPastDate(2011/11/25, 2011/11/28): 2011/11/25
+     * </pre>
+     * @param dates The array of comparison target local date. (NotNull)
+     * @return The nearest past local date. (NotNull)
+     */
+    public LocalDate chooseNearestPastDate(LocalDate... dates) {
+        return toLocalDate(doChooseNearestPastDate(toDateArray(dates)));
+    }
+
+    /**
+     * Choose the nearest past date to this date.
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.chooseNearestPastDate(2011/11/26, 2011/11/25): 2011/11/26
+     *  date.chooseNearestPastDate(2011/11/25, 2011/11/28): 2011/11/25
+     * </pre>
+     * @param dates The array of comparison target local date-time. (NotNull)
+     * @return The nearest past local date-time. (NotNull)
+     */
+    public LocalDateTime chooseNearestPastDate(LocalDateTime... dates) {
+        return toLocalDateTime(doChooseNearestPastDate(toDateArray(dates)));
+    }
+
     /**
      * Choose the nearest past date to this date.
      * <pre>
@@ -3016,9 +3747,13 @@ public class HandyDate implements Serializable {
      *  date.chooseNearestPastDate(2011/11/25, 2011/11/28): 2011/11/25
      * </pre>
      * @param dates The array of comparison target date. (NotNull)
-     * @return The determination, true or false.
+     * @return The nearest past date. (NotNull)
      */
     public Date chooseNearestPastDate(Date... dates) {
+        return doChooseNearestPastDate(dates);
+    }
+
+    protected Date doChooseNearestPastDate(Date... dates) {
         assertCompareDateArrayValid(dates);
         Long nearestMillis = null;
         Date nearestDate = null;
@@ -3047,6 +3782,44 @@ public class HandyDate implements Serializable {
      * Begin year from the specified month. <br />
      * The date of argument is used as only the month part.
      * <pre>
+     * e.g. beginYear_Month(toLocalDate("2001/04/01"))
+     *  year is from 4th month to 3rd month of next year
+     *  (the 2011 year means 2011/04/01 to 2012/03/31)
+     * 
+     *  if the date is 2011/01/01, moveToYearJust() moves it to 2011/04/01
+     *  (means the date moves to just beginning of the 2011 year)
+     * </pre>
+     * @param yearBeginMonth The local date that has the month of year-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public HandyDate beginYear_Month(LocalDate yearBeginMonth) {
+        doBeginYear_Month(toDate(yearBeginMonth));
+        return this;
+    }
+
+    /**
+     * Begin year from the specified month. <br />
+     * The date of argument is used as only the month part.
+     * <pre>
+     * e.g. beginYear_Month(toLocalDate("2001/04/01"))
+     *  year is from 4th month to 3rd month of next year
+     *  (the 2011 year means 2011/04/01 to 2012/03/31)
+     * 
+     *  if the date is 2011/01/01, moveToYearJust() moves it to 2011/04/01
+     *  (means the date moves to just beginning of the 2011 year)
+     * </pre>
+     * @param yearBeginMonth The local date-time that has the month of year-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public HandyDate beginYear_Month(LocalDateTime yearBeginMonth) {
+        doBeginYear_Month(toDate(yearBeginMonth));
+        return this;
+    }
+
+    /**
+     * Begin year from the specified month. <br />
+     * The date of argument is used as only the month part.
+     * <pre>
      * e.g. beginYear_Month(toDate("2001/04/01"))
      *  year is from 4th month to 3rd month of next year
      *  (the 2011 year means 2011/04/01 to 2012/03/31)
@@ -3058,11 +3831,13 @@ public class HandyDate implements Serializable {
      * @return this. (NotNull)
      */
     public HandyDate beginYear_Month(Date yearBeginMonth) {
-        assertArgumentNotNull("yearBeginMonth", yearBeginMonth);
-        final Calendar cal = Calendar.getInstance();
-        cal.setTime(yearBeginMonth);
-        _yearBeginMonth = cal.get(Calendar.MONTH) + 1; // zero origin headache
+        doBeginYear_Month(yearBeginMonth);
         return this;
+    }
+
+    protected void doBeginYear_Month(Date yearBeginMonth) {
+        assertArgumentNotNull("yearBeginMonth", yearBeginMonth);
+        _yearBeginMonth = new HandyDate(yearBeginMonth).timeZone(getCalendarTimeZone()).getMonthAsOneOrigin();
     }
 
     /**
@@ -3218,6 +3993,44 @@ public class HandyDate implements Serializable {
      * Begin month from the specified day. <br />
      * The date of argument is used as only the day part.
      * <pre>
+     * e.g. beginMonth_Day(toLocalDate("2001/01/03"))
+     *  month is from 3 day to 2 day of next month
+     *  (the 2011/11 means 2011/11/03 to 2011/12/02)
+     * 
+     *  if the date is 2011/11/01, moveToMonthJust() moves it to 2011/11/03
+     *  (means the date moves to just beginning of 2011/11)
+     * </pre>
+     * @param monthBeginDay The local date that has the day of month-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public HandyDate beginMonth_Day(LocalDate monthBeginDay) {
+        doBeginMonth_Day(toDate(monthBeginDay));
+        return this;
+    }
+
+    /**
+     * Begin month from the specified day. <br />
+     * The date of argument is used as only the day part.
+     * <pre>
+     * e.g. beginMonth_Day(toLocalDateTime("2001/01/03"))
+     *  month is from 3 day to 2 day of next month
+     *  (the 2011/11 means 2011/11/03 to 2011/12/02)
+     * 
+     *  if the date is 2011/11/01, moveToMonthJust() moves it to 2011/11/03
+     *  (means the date moves to just beginning of 2011/11)
+     * </pre>
+     * @param monthBeginDay The local date-time that has the day of month-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public HandyDate beginMonth_Day(LocalDateTime monthBeginDay) {
+        doBeginMonth_Day(toDate(monthBeginDay));
+        return this;
+    }
+
+    /**
+     * Begin month from the specified day. <br />
+     * The date of argument is used as only the day part.
+     * <pre>
      * e.g. beginMonth_Day(toDate("2001/01/03"))
      *  month is from 3 day to 2 day of next month
      *  (the 2011/11 means 2011/11/03 to 2011/12/02)
@@ -3229,11 +4042,13 @@ public class HandyDate implements Serializable {
      * @return this. (NotNull)
      */
     public HandyDate beginMonth_Day(Date monthBeginDay) {
-        assertArgumentNotNull("monthBeginDay", monthBeginDay);
-        final Calendar cal = Calendar.getInstance();
-        cal.setTime(monthBeginDay);
-        _monthBeginDay = cal.get(Calendar.DAY_OF_MONTH);
+        doBeginMonth_Day(monthBeginDay);
         return this;
+    }
+
+    protected void doBeginMonth_Day(Date monthBeginDay) {
+        assertArgumentNotNull("monthBeginDay", monthBeginDay);
+        _monthBeginDay = new HandyDate(monthBeginDay).timeZone(getCalendarTimeZone()).getDay();
     }
 
     /**
@@ -3280,6 +4095,42 @@ public class HandyDate implements Serializable {
     /**
      * Begin day from the specified hour.
      * <pre>
+     * e.g. beginDay_Hour(toLocalDate("2001/01/01 06:00:00"))
+     *  day is from 06h to 05h of next day
+     *  (the 2011/11/27 means 2011/11/27 06h to 2011/11/28 05h)
+     * 
+     *  if the date is 2011/11/27 00:00:00, moveToDayJust() moves it to 2011/11/27 06:00:00
+     *  (means the date moves to just beginning of 2011/11/27)
+     * </pre>
+     * @param dayBeginHour The local date that has the hour of day-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public HandyDate beginDay_Hour(LocalDate dayBeginHour) {
+        doBeginDay_Hour(toDate(dayBeginHour));
+        return this;
+    }
+
+    /**
+     * Begin day from the specified hour.
+     * <pre>
+     * e.g. beginDay_Hour(toLocalDateTime("2001/01/01 06:00:00"))
+     *  day is from 06h to 05h of next day
+     *  (the 2011/11/27 means 2011/11/27 06h to 2011/11/28 05h)
+     * 
+     *  if the date is 2011/11/27 00:00:00, moveToDayJust() moves it to 2011/11/27 06:00:00
+     *  (means the date moves to just beginning of 2011/11/27)
+     * </pre>
+     * @param dayBeginHour The local date-time that has the hour of day-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public HandyDate beginDay_Hour(LocalDateTime dayBeginHour) {
+        doBeginDay_Hour(toDate(dayBeginHour));
+        return this;
+    }
+
+    /**
+     * Begin day from the specified hour.
+     * <pre>
      * e.g. beginDay_Hour(toDate("2001/01/01 06:00:00"))
      *  day is from 06h to 05h of next day
      *  (the 2011/11/27 means 2011/11/27 06h to 2011/11/28 05h)
@@ -3291,11 +4142,13 @@ public class HandyDate implements Serializable {
      * @return this. (NotNull)
      */
     public HandyDate beginDay_Hour(Date dayBeginHour) {
-        assertArgumentNotNull("dayBeginHour", dayBeginHour);
-        final Calendar cal = Calendar.getInstance();
-        cal.setTime(dayBeginHour);
-        _dayBeginHour = cal.get(Calendar.HOUR_OF_DAY);
+        doBeginDay_Hour(dayBeginHour);
         return this;
+    }
+
+    protected void doBeginDay_Hour(Date dayBeginHour) {
+        assertArgumentNotNull("dayBeginHour", dayBeginHour);
+        _dayBeginHour = new HandyDate(dayBeginHour).timeZone(getCalendarTimeZone()).getHour();
     }
 
     /**
@@ -3342,6 +4195,40 @@ public class HandyDate implements Serializable {
     /**
      * Begin week from the specified day of week.
      * <pre>
+     * e.g. beginWeek_DayOfWeek(toLocalDate("2011/11/28")) *means Monday
+     *  week starts Monday (the 2011/11/27 belongs the week, 2011/11/21 to 2011/11/27)
+     * 
+     *  if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/21
+     *  (means the date moves to just beginning of week containing 2011/11/27)
+     * </pre>
+     * @param weekBeginDayOfWeek The local date that has the day of day-of-week-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public HandyDate beginWeek_DayOfWeek(LocalDate weekBeginDayOfWeek) {
+        doBeginWeek_DayOfWeek(toDate(weekBeginDayOfWeek));
+        return this;
+    }
+
+    /**
+     * Begin week from the specified day of week.
+     * <pre>
+     * e.g. beginWeek_DayOfWeek(toLocalDateTime("2011/11/28")) *means Monday
+     *  week starts Monday (the 2011/11/27 belongs the week, 2011/11/21 to 2011/11/27)
+     * 
+     *  if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/21
+     *  (means the date moves to just beginning of week containing 2011/11/27)
+     * </pre>
+     * @param weekBeginDayOfWeek The local date-time that has the day of day-of-week-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public HandyDate beginWeek_DayOfWeek(LocalDateTime weekBeginDayOfWeek) {
+        doBeginWeek_DayOfWeek(toDate(weekBeginDayOfWeek));
+        return this;
+    }
+
+    /**
+     * Begin week from the specified day of week.
+     * <pre>
      * e.g. beginWeek_DayOfWeek(toDate("2011/11/28")) *means Monday
      *  week starts Monday (the 2011/11/27 belongs the week, 2011/11/21 to 2011/11/27)
      * 
@@ -3352,11 +4239,13 @@ public class HandyDate implements Serializable {
      * @return this. (NotNull)
      */
     public HandyDate beginWeek_DayOfWeek(Date weekBeginDayOfWeek) {
-        assertArgumentNotNull("weekBeginDayOfWeek", weekBeginDayOfWeek);
-        final Calendar cal = Calendar.getInstance();
-        cal.setTime(weekBeginDayOfWeek);
-        _weekBeginDay = cal.get(Calendar.DAY_OF_WEEK);
+        doBeginWeek_DayOfWeek(weekBeginDayOfWeek);
         return this;
+    }
+
+    protected void doBeginWeek_DayOfWeek(Date weekBeginDayOfWeek) {
+        assertArgumentNotNull("weekBeginDayOfWeek", weekBeginDayOfWeek);
+        _weekBeginDay = new HandyDate(weekBeginDayOfWeek).timeZone(getCalendarTimeZone()).getDayOfWeek();
     }
 
     /**
@@ -3445,7 +4334,7 @@ public class HandyDate implements Serializable {
      * @return The instance of local date. (NotNull)
      */
     public LocalDate getLocalDate() {
-        return DfTypeUtil.toLocalDate(getDate(), _cal.getTimeZone());
+        return DfTypeUtil.toLocalDate(getDate(), getCalendarTimeZone());
     }
 
     /**
@@ -3454,7 +4343,7 @@ public class HandyDate implements Serializable {
      * @return The instance of local date-time. (NotNull)
      */
     public LocalDateTime getLocalDateTime() {
-        return DfTypeUtil.toLocalDateTime(getDate(), _cal.getTimeZone());
+        return DfTypeUtil.toLocalDateTime(getDate(), getCalendarTimeZone());
     }
 
     /**
@@ -3471,6 +4360,22 @@ public class HandyDate implements Serializable {
      */
     public Timestamp getTimestamp() {
         return new Timestamp(_cal.getTimeInMillis());
+    }
+
+    /**
+     * Get time-zone used in the handy-date.
+     * @return The instance of time-zone. (NullAllowed: when no time-zone)
+     */
+    public TimeZone getTimeZone() {
+        return getCalendarTimeZone();
+    }
+
+    /**
+     * Get time-zone used in the handy-date.
+     * @return The instance of time-zone. (NullAllowed: when no time-zone)
+     */
+    protected TimeZone getCalendarTimeZone() {
+        return _cal.getTimeZone();
     }
 
     // ===================================================================================
@@ -3545,7 +4450,7 @@ public class HandyDate implements Serializable {
     public String toDisp(String pattern) {
         assertArgumentNotNull("pattern", pattern);
         final Date date = _cal.getTime();
-        final DateFormat dateFormat = createDateFormat(pattern, _cal.getTimeZone(), null);
+        final DateFormat dateFormat = createDateFormat(pattern, getCalendarTimeZone(), null);
         return dateFormat.format(date);
     }
 
@@ -3573,7 +4478,7 @@ public class HandyDate implements Serializable {
         assertArgumentNotNull("pattern", pattern);
         assertArgumentNotNull("locale", locale);
         final Date date = _cal.getTime();
-        final DateFormat dateFormat = createDateFormat(pattern, _cal.getTimeZone(), locale);
+        final DateFormat dateFormat = createDateFormat(pattern, getCalendarTimeZone(), locale);
         return dateFormat.format(date);
     }
 
@@ -3671,7 +4576,7 @@ public class HandyDate implements Serializable {
      * @return The new instance of this date. (NotNull)
      */
     protected HandyDate createCopyInstance(LocalDate date) {
-        final HandyDate copy = new HandyDate(date, _cal.getTimeZone());
+        final HandyDate copy = new HandyDate(date, getCalendarTimeZone());
         //inheritTimeZone(copy); already inherited
         inheritBeginAttribute(copy);
         return copy;
@@ -3683,7 +4588,7 @@ public class HandyDate implements Serializable {
      * @return The new instance of this date. (NotNull)
      */
     protected HandyDate createCopyInstance(LocalDateTime date) {
-        final HandyDate copy = new HandyDate(date, _cal.getTimeZone());
+        final HandyDate copy = new HandyDate(date, getCalendarTimeZone());
         //inheritTimeZone(copy); already inherited
         inheritBeginAttribute(copy);
         return copy;
@@ -3702,7 +4607,7 @@ public class HandyDate implements Serializable {
     }
 
     protected void inheritTimeZone(HandyDate copy) {
-        final TimeZone timeZone = _cal.getTimeZone();
+        final TimeZone timeZone = getCalendarTimeZone();
         if (timeZone != null) {
             copy.timeZone(timeZone);
         }
@@ -3715,15 +4620,54 @@ public class HandyDate implements Serializable {
         cloned._weekBeginDay = _weekBeginDay;
     }
 
-    protected HandyDate prepareCompareDate(LocalDate date) { // for internal compare logic
+    // ===================================================================================
+    //                                                                        Small Helper
+    //                                                                        ============
+    protected LocalDate toLocalDate(Date date) {
+        return DfTypeUtil.toLocalDate(date, getCalendarTimeZone());
+    }
+
+    protected LocalDateTime toLocalDateTime(Date date) {
+        return DfTypeUtil.toLocalDateTime(date, getCalendarTimeZone());
+    }
+
+    protected Date toDate(LocalDate date) {
+        return DfTypeUtil.toDate(date, getCalendarTimeZone());
+    }
+
+    protected Date toDate(LocalDateTime date) {
+        return DfTypeUtil.toDate(date, getCalendarTimeZone());
+    }
+
+    protected Date[] toDateArray(LocalDate... dates) {
+        final Date[] utilDates = new Date[dates.length];
+        int index = 0;
+        for (LocalDate localDate : dates) {
+            utilDates[index] = toDate(localDate);
+            ++index;
+        }
+        return utilDates;
+    }
+
+    protected Date[] toDateArray(LocalDateTime... dates) {
+        final Date[] utilDates = new Date[dates.length];
+        int index = 0;
+        for (LocalDateTime localDateTime : dates) {
+            utilDates[index] = toDate(localDateTime);
+            ++index;
+        }
+        return utilDates;
+    }
+
+    protected HandyDate prepareCompareDate(LocalDate date) {
         return createCopyInstance(date);
     }
 
-    protected HandyDate prepareCompareDate(LocalDateTime date) { // for internal compare logic
+    protected HandyDate prepareCompareDate(LocalDateTime date) {
         return createCopyInstance(date);
     }
 
-    protected HandyDate prepareCompareDate(Date date) { // for internal compare logic
+    protected HandyDate prepareCompareDate(Date date) {
         return createCopyInstance(date);
     }
 

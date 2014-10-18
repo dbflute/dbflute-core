@@ -755,25 +755,45 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                            Time API
     //                                                                            ========
-    // TODO jflute javadoc: toLocalDate()
+    // not implement default zone methods, use handy-date if you like
+    /**
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param timeZone The time-zone for the local date. (NotNull)
+     * @return The local date. (NullAllowed: when the argument is null)
+     */
     public static LocalDate toLocalDate(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalDate()", timeZone);
         final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);
         return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, timeZone).toLocalDate() : null;
     }
 
+    /**
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param timeZone The time-zone for the local date-time. (NotNull)
+     * @return The local date. (NullAllowed: when the argument is null)
+     */
     public static LocalDateTime toLocalDateTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalDateTime()", timeZone);
         final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);
         return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, timeZone).toLocalDateTime() : null;
     }
 
+    /**
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param timeZone The time-zone for the local time. (NotNull)
+     * @return The local time. (NullAllowed: when the argument is null)
+     */
     public static LocalTime toLocalTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalTime()", timeZone);
         final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);
         return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, timeZone).toLocalTime() : null;
     }
 
+    /**
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param timeZone The time-zone for the local date. (NotNull)
+     * @return The zoned date-time. (NullAllowed: when the argument is null)
+     */
     public static ZonedDateTime toZonedDateTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toZonedDateTime()", timeZone);
         if (obj == null) {
@@ -788,7 +808,6 @@ public final class DfTypeUtil {
     }
 
     protected static Date toZonedResourceDate(Object obj, TimeZone timeZone) {
-        assertTimeZoneNotNull("toZonedResourceDate()", timeZone);
         return toDate(obj, timeZone); // java.sql.Date does not support toInstant() so to pure date
     }
 
@@ -799,6 +818,11 @@ public final class DfTypeUtil {
         }
     }
 
+    /**
+     * Is the object local date or local date-time or local time?
+     * @param obj The object to be judged. (NotNull)
+     * @return The determination, true or false.
+     */
     public static boolean isAnyLocalDate(Object obj) {
         return obj instanceof LocalDate || obj instanceof LocalDateTime || obj instanceof LocalTime;
     }
@@ -1228,10 +1252,15 @@ public final class DfTypeUtil {
         return GMT_AD_ORIGIN_MILLISECOND - offset;
     }
 
+    // ===================================================================================
+    //                                                         Old Style Date Manipulation
+    //                                                         ===========================
+    // these mutable and only default time-zone methods are unsupported since 1.1
+    // but only change modifier to protected because many tests use
+    // you can use HandyDate instead of these methods, which can specify time-zone 
     // -----------------------------------------------------
     //                                              Add Date
     //                                              --------
-    // these
     protected static void addDateYear(Date date, int years) {
         final Calendar cal = toCalendar(date);
         addCalendarYear(cal, years);
@@ -1280,12 +1309,6 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
-    // ===================================================================================
-    //                                                         Old Style Date Manipulation
-    //                                                         ===========================
-    // these mutable and only default time-zone methods are unsupported since 1.1
-    // but only change modifier to protected because many tests use
-    // you can use HandyDate instead of these methods, which can specify time-zone 
     // -----------------------------------------------------
     //                                          Move-to Date
     //                                          ------------

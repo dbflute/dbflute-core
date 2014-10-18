@@ -83,11 +83,9 @@ public class HandyDateTest extends RuntimeTestCase {
         assertEquals(handy("2011/11/17 12:34:56.999"), handy(targetExp).moveToMillisecond(999));
 
         assertEquals(handy("2013/06/03 00:00:00.000"), handy("2013/06/15 23:59:59.999").moveToMonthFirstWeekdayJust());
-        assertEquals(handy("2013/03/29 23:59:59.999"), handy("2013/03/15 12:13:59.123")
-                .moveToMonthLastWeekdayTerminal());
+        assertEquals(handy("2013/03/29 23:59:59.999"), handy("2013/03/15 12:13:59.123").moveToMonthLastWeekdayTerminal());
         assertEquals(handy("2013/03/02 00:00:00.000"), handy("2013/03/13 23:59:59.999").moveToMonthFirstWeekendJust());
-        assertEquals(handy("2013/04/28 23:59:59.999"), handy("2013/04/13 12:13:59.123")
-                .moveToMonthLastWeekendTerminal());
+        assertEquals(handy("2013/04/28 23:59:59.999"), handy("2013/04/13 12:13:59.123").moveToMonthLastWeekendTerminal());
     }
 
     public void test_moveTo_begin() throws Exception {
@@ -532,23 +530,13 @@ public class HandyDateTest extends RuntimeTestCase {
         assertEquals(3, handy("2013/03/03 12:34:56").calculateCalendarDistanceSeconds(toDate("2013/03/03 12:34:59")));
         assertEquals(65, handy("2013/03/03 12:58:56").calculateCalendarDistanceSeconds(toDate("2013/03/03 13:00:01")));
         assertEquals(-6, handy("2013/03/03 12:34:56").calculateCalendarDistanceSeconds(toDate("2013/03/03 12:34:50")));
-        assertEquals(2,
-                handy("2013/03/03 07:13:25.999").calculateCalendarDistanceSeconds(toDate("2013/03/03 07:13:27.000")));
+        assertEquals(2, handy("2013/03/03 07:13:25.999").calculateCalendarDistanceSeconds(toDate("2013/03/03 07:13:27.000")));
     }
 
     public void test_calculateCalendarDistanceMilliseconds() throws Exception {
-        assertEquals(
-                1000,
-                handy("2013/03/03 12:34:56.000").calculateCalendarDistanceMilliseconds(
-                        toDate("2013/03/03 12:34:57.000")));
-        assertEquals(
-                877,
-                handy("2013/03/03 12:34:56.123").calculateCalendarDistanceMilliseconds(
-                        toDate("2013/03/03 12:34:57.000")));
-        assertEquals(
-                3040,
-                handy("2013/03/03 07:34:12.123").calculateCalendarDistanceMilliseconds(
-                        toDate("2013/03/03 07:34:15.163")));
+        assertEquals(1000, handy("2013/03/03 12:34:56.000").calculateCalendarDistanceMilliseconds(toDate("2013/03/03 12:34:57.000")));
+        assertEquals(877, handy("2013/03/03 12:34:56.123").calculateCalendarDistanceMilliseconds(toDate("2013/03/03 12:34:57.000")));
+        assertEquals(3040, handy("2013/03/03 07:34:12.123").calculateCalendarDistanceMilliseconds(toDate("2013/03/03 07:34:15.163")));
     }
 
     // -----------------------------------------------------
@@ -619,34 +607,29 @@ public class HandyDateTest extends RuntimeTestCase {
     }
 
     public void test_calculateDistanceSecondsRounded() throws Exception {
-        assertEquals(0,
-                handy("2013/12/31 12:34:56.789").calculateMeasuredDistanceSeconds(toDate("2013/12/31 12:34:57.000")));
-        assertEquals(2,
-                handy("2013/12/31 12:34:56.789").calculateMeasuredDistanceSeconds(toDate("2013/12/31 12:34:58.333")));
+        assertEquals(0, handy("2013/12/31 12:34:56.789").calculateMeasuredDistanceSeconds(toDate("2013/12/31 12:34:57.000")));
+        assertEquals(2, handy("2013/12/31 12:34:56.789").calculateMeasuredDistanceSeconds(toDate("2013/12/31 12:34:58.333")));
     }
 
     // -----------------------------------------------------
     //                                          Size of Days
     //                                          ------------
     public void test_calculateSizeBusinessDays() throws Exception {
-        assertEquals(5,
-                handy("2013/03/14").calculateSizeBusinessDays(toDate("2013/03/21"), new BusinessDayDeterminer() {
-                    public boolean isBusinessDay(HandyDate handyDate) {
-                        return handyDate.isWeek_DayOfWeekWeekday() && !handyDate.isDaySameAs(toDate("2013/03/20"));
-                    }
-                }));
-        assertEquals(4,
-                handy("2013/03/07").calculateSizeBusinessDays(toDate("2013/03/03"), new BusinessDayDeterminer() {
-                    public boolean isBusinessDay(HandyDate handyDate) {
-                        return handyDate.isWeek_DayOfWeekWeekday();
-                    }
-                }));
-        assertEquals(7,
-                handy("2013/03/07").calculateSizeBusinessDays(toDate("2013/03/16"), new BusinessDayDeterminer() {
-                    public boolean isBusinessDay(HandyDate handyDate) {
-                        return handyDate.isWeek_DayOfWeekWeekday();
-                    }
-                }));
+        assertEquals(5, handy("2013/03/14").calculateSizeBusinessDays(toDate("2013/03/21"), new BusinessDayDeterminer() {
+            public boolean isBusinessDay(HandyDate handyDate) {
+                return handyDate.isWeek_DayOfWeekWeekday() && !handyDate.isDaySameAs(toDate("2013/03/20"));
+            }
+        }));
+        assertEquals(4, handy("2013/03/07").calculateSizeBusinessDays(toDate("2013/03/03"), new BusinessDayDeterminer() {
+            public boolean isBusinessDay(HandyDate handyDate) {
+                return handyDate.isWeek_DayOfWeekWeekday();
+            }
+        }));
+        assertEquals(7, handy("2013/03/07").calculateSizeBusinessDays(toDate("2013/03/16"), new BusinessDayDeterminer() {
+            public boolean isBusinessDay(HandyDate handyDate) {
+                return handyDate.isWeek_DayOfWeekWeekday();
+            }
+        }));
     }
 
     public void test_calculateSizeWeekdays() throws Exception {
@@ -675,16 +658,38 @@ public class HandyDateTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                        Choose Parts
     //                                                                        ============
-    public void test_chooseNearestFDate() throws Exception {
+    public void test_chooseNearestLocalDate() throws Exception {
+        HandyDate date = handy("2013/03/03");
+        assertEquals(toLocalDate("2013/03/03"), date.chooseNearestDate(toLocalDate("2013/03/03"), toLocalDate("2013/03/04")));
+        assertEquals(toLocalDate("2013/03/04"), date.chooseNearestDate(toLocalDate("2013/03/02"), toLocalDate("2013/03/04")));
+        assertEquals(toLocalDate("2013/03/02"), date.chooseNearestDate(toLocalDate("2013/03/02"), toLocalDate("2013/03/06")));
+        assertEquals(toLocalDate("2013/03/05"), date.chooseNearestDate(toLocalDate("2013/03/06"), toLocalDate("2013/03/05")));
+        assertEquals(toLocalDate("2013/03/04 12:34:55"),
+                date.chooseNearestDate(toLocalDate("2013/03/04 12:34:56"), toLocalDate("2013/03/04 12:34:55")));
+        assertEquals(toLocalDate("2013/03/05"),
+                date.chooseNearestDate(toLocalDate("2013/03/05"), toLocalDate("2013/03/12"), toLocalDate("2013/03/01")));
+    }
+
+    public void test_chooseNearestLocalDateTime() throws Exception {
+        HandyDate date = handy("2013/03/03");
+        assertEquals(toLocalDateTime("2013/03/03"), date.chooseNearestDate(toLocalDateTime("2013/03/03"), toLocalDateTime("2013/03/04")));
+        assertEquals(toLocalDateTime("2013/03/04"), date.chooseNearestDate(toLocalDateTime("2013/03/02"), toLocalDateTime("2013/03/04")));
+        assertEquals(toLocalDateTime("2013/03/02"), date.chooseNearestDate(toLocalDateTime("2013/03/02"), toLocalDateTime("2013/03/06")));
+        assertEquals(toLocalDateTime("2013/03/05"), date.chooseNearestDate(toLocalDateTime("2013/03/06"), toLocalDateTime("2013/03/05")));
+        assertEquals(toLocalDateTime("2013/03/04 12:34:55"),
+                date.chooseNearestDate(toLocalDateTime("2013/03/04 12:34:56"), toLocalDateTime("2013/03/04 12:34:55")));
+        assertEquals(toLocalDateTime("2013/03/05"),
+                date.chooseNearestDate(toLocalDateTime("2013/03/05"), toLocalDateTime("2013/03/12"), toLocalDateTime("2013/03/01")));
+    }
+
+    public void test_chooseNearestDate() throws Exception {
         HandyDate date = handy("2013/03/03");
         assertEquals(toDate("2013/03/03"), date.chooseNearestDate(toDate("2013/03/03"), toDate("2013/03/04")));
         assertEquals(toDate("2013/03/04"), date.chooseNearestDate(toDate("2013/03/02"), toDate("2013/03/04")));
         assertEquals(toDate("2013/03/02"), date.chooseNearestDate(toDate("2013/03/02"), toDate("2013/03/06")));
         assertEquals(toDate("2013/03/05"), date.chooseNearestDate(toDate("2013/03/06"), toDate("2013/03/05")));
-        assertEquals(toDate("2013/03/04 12:34:55"),
-                date.chooseNearestDate(toDate("2013/03/04 12:34:56"), toDate("2013/03/04 12:34:55")));
-        assertEquals(toDate("2013/03/05"),
-                date.chooseNearestDate(toDate("2013/03/05"), toDate("2013/03/12"), toDate("2013/03/01")));
+        assertEquals(toDate("2013/03/04 12:34:55"), date.chooseNearestDate(toDate("2013/03/04 12:34:56"), toDate("2013/03/04 12:34:55")));
+        assertEquals(toDate("2013/03/05"), date.chooseNearestDate(toDate("2013/03/05"), toDate("2013/03/12"), toDate("2013/03/01")));
     }
 
     public void test_chooseNearestFutureDate() throws Exception {
@@ -695,8 +700,7 @@ public class HandyDateTest extends RuntimeTestCase {
         assertEquals(toDate("2013/03/05"), date.chooseNearestFutureDate(toDate("2013/03/06"), toDate("2013/03/05")));
         assertEquals(toDate("2013/03/04 12:34:55"),
                 date.chooseNearestFutureDate(toDate("2013/03/04 12:34:56"), toDate("2013/03/04 12:34:55")));
-        assertEquals(toDate("2013/03/05"),
-                date.chooseNearestFutureDate(toDate("2013/03/05"), toDate("2013/03/12"), toDate("2013/03/02")));
+        assertEquals(toDate("2013/03/05"), date.chooseNearestFutureDate(toDate("2013/03/05"), toDate("2013/03/12"), toDate("2013/03/02")));
 
     }
 
