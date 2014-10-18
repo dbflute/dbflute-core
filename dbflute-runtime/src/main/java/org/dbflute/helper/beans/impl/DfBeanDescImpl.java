@@ -50,6 +50,11 @@ public class DfBeanDescImpl implements DfBeanDesc {
     protected static final Object[] EMPTY_ARGS = new Object[] {};
     protected static final Class<?>[] EMPTY_PARAM_TYPES = new Class<?>[] {};
 
+    protected static final String PREFIX_GETTER = "get";
+    protected static final String PREFIX_CLOSET_GETTER = "xdfget";
+    protected static final String PREFIX_DETERMINER = "is";
+    protected static final String PREFIX_SETTER = "set";
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -218,24 +223,30 @@ public class DfBeanDescImpl implements DfBeanDesc {
                 continue;
             }
             final String methodName = method.getName();
-            if (methodName.startsWith("get")) {
+            if (methodName.startsWith(PREFIX_GETTER)) {
                 if (method.getParameterTypes().length != 0 || methodName.equals("getClass") || method.getReturnType() == void.class) {
                     continue;
                 }
-                final String propertyName = initBeansProp(methodName.substring(3));
+                final String propertyName = initBeansProp(methodName.substring(PREFIX_GETTER.length()));
                 setupReadMethod(method, propertyName);
-            } else if (methodName.startsWith("is")) {
+            } else if (methodName.startsWith(PREFIX_CLOSET_GETTER)) { // closet property
+                if (method.getParameterTypes().length != 0 || method.getReturnType() == void.class) {
+                    continue;
+                }
+                final String propertyName = initBeansProp(methodName.substring(PREFIX_CLOSET_GETTER.length()));
+                setupReadMethod(method, propertyName);
+            } else if (methodName.startsWith(PREFIX_DETERMINER)) {
                 if (method.getParameterTypes().length != 0 || !method.getReturnType().equals(Boolean.TYPE)
                         && !method.getReturnType().equals(Boolean.class)) {
                     continue;
                 }
-                final String propertyName = initBeansProp(methodName.substring(2));
+                final String propertyName = initBeansProp(methodName.substring(PREFIX_DETERMINER.length()));
                 setupReadMethod(method, propertyName);
-            } else if (methodName.startsWith("set")) {
+            } else if (methodName.startsWith(PREFIX_SETTER)) {
                 if (method.getParameterTypes().length != 1 || methodName.equals("setClass") || method.getReturnType() != void.class) {
                     continue;
                 }
-                final String propertyName = initBeansProp(methodName.substring(3));
+                final String propertyName = initBeansProp(methodName.substring(PREFIX_SETTER.length()));
                 setupWriteMethod(method, propertyName);
             } else {
                 if (coupleMethodMap != null) {
@@ -243,8 +254,8 @@ public class DfBeanDescImpl implements DfBeanDesc {
                 }
             }
         }
-        for (Iterator<String> i = _invalidPropertyNames.iterator(); i.hasNext();) {
-            _propertyDescMap.remove(i.next());
+        for (Iterator<String> ite = _invalidPropertyNames.iterator(); ite.hasNext();) {
+            _propertyDescMap.remove(ite.next());
         }
         _invalidPropertyNames.clear();
     }

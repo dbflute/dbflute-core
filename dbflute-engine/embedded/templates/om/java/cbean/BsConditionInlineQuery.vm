@@ -82,7 +82,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($tmpJavaName = "${col.JavaName}")
 #set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
 #set ($fk = $col.foreignKey)
-    protected ConditionValue getCValue${tmpJavaName}() { return _myCQ.get${tmpJavaName}(); }
+    protected ConditionValue xgetCValue${tmpJavaName}() { return _myCQ.xdfget${tmpJavaName}(); }
 #if (${col.isJavaNativeStringObject()})
 #foreach ($referrer in $col.existsReferrerReferrers)
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")

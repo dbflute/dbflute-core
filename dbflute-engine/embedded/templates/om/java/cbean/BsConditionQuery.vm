@@ -103,10 +103,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
 #set ($fk = $col.foreignKey)
     protected ConditionValue _${tmpUncapitalisedJavaName};
-    public ConditionValue get${tmpJavaName}()
+    public ConditionValue xdfget${tmpJavaName}()
     { if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = nCV(); }
       return _${tmpUncapitalisedJavaName}; }
-    protected ConditionValue getCValue${tmpJavaName}() { return get${tmpJavaName}(); }
+    protected ConditionValue xgetCValue${tmpJavaName}() { return xdfget${tmpJavaName}(); }
 
 #if (${col.isJavaNativeStringObject()})
 #foreach ($referrer in $col.existsReferrerReferrers)
@@ -119,7 +119,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
 
 #end
@@ -133,7 +133,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
 
 #end
@@ -143,7 +143,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
 
 #end
@@ -153,9 +153,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
-    public Map<String, Object> get${subQueryPropertyNameInitCap}Parameter() { return xgetSQuePmMap("${subQueryPropertyName}"); }
+    public Map<String, Object> xdfget${subQueryPropertyNameInitCap}Parameter() { return xgetSQuePmMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}Parameter(Object pm) { return xkeepSQuePm("${subQueryPropertyName}", pm); }
 
 #end
@@ -172,7 +172,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
 
 #end
@@ -188,7 +188,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
 
 #end
@@ -199,7 +199,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
 
 #end
@@ -209,9 +209,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
-    public Map<String, Object> get${subQueryPropertyNameInitCap}Parameter() { return xgetSQuePmMap("${subQueryPropertyName}"); }
+    public Map<String, Object> xdfget${subQueryPropertyNameInitCap}Parameter() { return xgetSQuePmMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}Parameter(Object pm) { return xkeepSQuePm("${subQueryPropertyName}", pm); }
 
 #end
@@ -283,8 +283,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #foreach ($fk in $table.joinableForeignKeyList)
         if (bq.hasConditionQuery${fk.foreignPropertyNameInitCap}()) {
 #if ($fk.hasDynamicFixedCondition())
-            uq.xsetParameterMap${fk.foreignPropertyNameInitCap}(bq.getParameterMap${fk.foreignPropertyNameInitCap}());
-            uq.getConditionQuery${fk.foreignPropertyNameInitCap}().reflectRelationOnUnionQuery(bq.getConditionQuery${fk.foreignPropertyNameInitCap}(), uq.getConditionQuery${fk.foreignPropertyNameInitCap}());
+            uq.xsetParameterMap${fk.foreignPropertyNameInitCap}(bq.xdfgetParameterMap${fk.foreignPropertyNameInitCap}());
+            uq.xdfgetConditionQuery${fk.foreignPropertyNameInitCap}().reflectRelationOnUnionQuery(bq.xdfgetConditionQuery${fk.foreignPropertyNameInitCap}(), uq.xdfgetConditionQuery${fk.foreignPropertyNameInitCap}());
 #else
             uq.query${fk.foreignPropertyNameInitCap}().reflectRelationOnUnionQuery(bq.query${fk.foreignPropertyNameInitCap}(), uq.query${fk.foreignPropertyNameInitCap}());
 #end
@@ -319,20 +319,20 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      */
     public ${foreignCQClassName} query${fk.foreignPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
 #if ($fk.hasDynamicFixedCondition())
-        Map<String, Object> parameterMap = getParameterMap${fk.foreignPropertyNameInitCap}();
+        Map<String, Object> parameterMap = xdfgetParameterMap${fk.foreignPropertyNameInitCap}();
         ${fk.dynamicFixedConditionParameterMapSetup}
         xassertFCDP("${fk.foreignPropertyName}", parameterMap);
 #end
-        return getConditionQuery${fk.foreignPropertyNameInitCap}();
+        return xdfgetConditionQuery${fk.foreignPropertyNameInitCap}();
     }
-    public ${foreignCQClassName} getConditionQuery${fk.foreignPropertyNameInitCap}() {
+    public ${foreignCQClassName} xdfgetConditionQuery${fk.foreignPropertyNameInitCap}() {
         String prop = "${fk.foreignPropertyName}";
         if (!xhasQueRlMap(prop)) { xregQueRl(prop, xcreateQuery${fk.foreignPropertyNameInitCap}()); xsetupOuterJoin${fk.foreignPropertyNameInitCap}(); }
         return xgetQueRlMap(prop);
     }
 #if ($fk.hasDynamicFixedCondition())
     protected Map<String, Object> _parameterMap${fk.foreignPropertyNameInitCap};
-    public Map<String, Object> getParameterMap${fk.foreignPropertyNameInitCap}()
+    public Map<String, Object> xdfgetParameterMap${fk.foreignPropertyNameInitCap}()
     { if (_parameterMap${fk.foreignPropertyNameInitCap} == null) { _parameterMap${fk.foreignPropertyNameInitCap} = newLinkedHashMapSized(4); }
       return _parameterMap${fk.foreignPropertyNameInitCap}; }
     public void xsetParameterMap${fk.foreignPropertyNameInitCap}(Map<String, Object> parameterMap)
@@ -356,8 +356,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @deprecated ${referrer.deprecated}
 #end
      */
-    public ${relatedCQClassName} query${referrer.referrerPropertyNameInitCapAsOne}() { return getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}(); }
-    public ${relatedCQClassName} getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}() {
+    public ${relatedCQClassName} query${referrer.referrerPropertyNameInitCapAsOne}() { return xdfgetConditionQuery${referrer.referrerPropertyNameInitCapAsOne}(); }
+    public ${relatedCQClassName} xdfgetConditionQuery${referrer.referrerPropertyNameInitCapAsOne}() {
         String prop = "${referrer.referrerPropertyNameAsOne}";
         if (!xhasQueRlMap(prop)) { xregQueRl(prop, xcreateQuery${referrer.referrerPropertyNameInitCapAsOne}()); xsetupOuterJoin${referrer.referrerPropertyNameInitCapAsOne}(); }
         return xgetQueRlMap(prop);
@@ -383,7 +383,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                     ScalarCondition
     //                                                                     ===============
-    public Map<String, ${myConditionQueryClassName}> getScalarCondition() { return xgetSQueMap("scalarCondition"); }
+    public Map<String, ${myConditionQueryClassName}> xdfgetScalarCondition() { return xgetSQueMap("scalarCondition"); }
     public String keepScalarCondition(${myConditionQueryClassName} sq) { return xkeepSQue("scalarCondition", sq); }
 
 #end
@@ -392,12 +392,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                       MyselfDerived
     //                                                                       =============
-    public Map<String, ${myConditionQueryClassName}> getSpecifyMyselfDerived() { return xgetSQueMap("specifyMyselfDerived"); }
+    public Map<String, ${myConditionQueryClassName}> xdfgetSpecifyMyselfDerived() { return xgetSQueMap("specifyMyselfDerived"); }
     public String keepSpecifyMyselfDerived(${myConditionQueryClassName} sq) { return xkeepSQue("specifyMyselfDerived", sq); }
 
-    public Map<String, ${myConditionQueryClassName}> getQueryMyselfDerived() { return xgetSQueMap("queryMyselfDerived"); }
+    public Map<String, ${myConditionQueryClassName}> xdfgetQueryMyselfDerived() { return xgetSQueMap("queryMyselfDerived"); }
     public String keepQueryMyselfDerived(${myConditionQueryClassName} sq) { return xkeepSQue("queryMyselfDerived", sq); }
-    public Map<String, Object> getQueryMyselfDerivedParameter() { return xgetSQuePmMap("queryMyselfDerived"); }
+    public Map<String, Object> xdfgetQueryMyselfDerivedParameter() { return xgetSQuePmMap("queryMyselfDerived"); }
     public String keepQueryMyselfDerivedParameter(Object pm) { return xkeepSQuePm("queryMyselfDerived", pm); }
 
 #end
@@ -406,7 +406,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                        MyselfExists
     //                                                                        ============
     protected Map<String, ${myConditionQueryClassName}> _myselfExistsMap;
-    public Map<String, ${myConditionQueryClassName}> getMyselfExists() { return xgetSQueMap("myselfExists"); }
+    public Map<String, ${myConditionQueryClassName}> xdfgetMyselfExists() { return xgetSQueMap("myselfExists"); }
     public String keepMyselfExists(${myConditionQueryClassName} sq) { return xkeepSQue("myselfExists", sq); }
 
 #end
@@ -414,7 +414,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                       MyselfInScope
     //                                                                       =============
-    public Map<String, ${myConditionQueryClassName}> getMyselfInScope() { return xgetSQueMap("myselfInScope"); }
+    public Map<String, ${myConditionQueryClassName}> xdfgetMyselfInScope() { return xgetSQueMap("myselfInScope"); }
     public String keepMyselfInScope(${myConditionQueryClassName} sq) { return xkeepSQue("myselfInScope", sq); }
 
 #end
@@ -452,7 +452,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         String pp = keep${subQueryPropertyNameInitCap}(cb.query());
         registerExistsReferrer(cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", pp, "${relationPropertyName}");
     }
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
 
 #end
@@ -485,7 +485,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         String pp = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotExistsReferrer(cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", pp, "${relationPropertyName}");
     }
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
 
 #end
@@ -518,7 +518,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         String pp = keep${subQueryPropertyNameInitCap}(cb.query());
         registerSpecifyDerivedReferrer(fn, cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", pp, "${relationPropertyName}", al, op);
     }
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
 
 #end
@@ -580,9 +580,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         String sqpp = keep${subQueryPropertyNameInitCap}(cb.query()); String prpp = keep${subQueryPropertyNameInitCap}Parameter(vl);
         registerQueryDerivedReferrer(fn, cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", sqpp, "${relationPropertyName}", rd, vl, prpp, op);
     }
-    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
+    public Map<${subQueryKeepMapGeneric}> xdfget${subQueryPropertyNameInitCap}() { return xgetSQueMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) { return xkeepSQue("${subQueryPropertyName}", sq); }
-    public Map<String, Object> get${subQueryPropertyNameInitCap}Parameter() { return xgetSQuePmMap("${subQueryPropertyName}"); }
+    public Map<String, Object> xdfget${subQueryPropertyNameInitCap}Parameter() { return xgetSQuePmMap("${subQueryPropertyName}"); }
     public String keep${subQueryPropertyNameInitCap}Parameter(Object pm) { return xkeepSQuePm("${subQueryPropertyName}", pm); }
 
 #end

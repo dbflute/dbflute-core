@@ -549,7 +549,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Get the map parameter-bean of union query. (for parameter comment) {Internal}
      * @return The instance of map parameter-bean. (NotNull)
      */
-    public SimpleMapPmb<ConditionQuery> getInternalUnionQueryMap() {
+    public SimpleMapPmb<ConditionQuery> xdfgetInternalUnionQueryMap() {
         if (_unionQueryMap == null) {
             _unionQueryMap = xcreateUnionMapPmb();
         }
@@ -561,7 +561,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @param unionQuery Union query. (NotNull)
      */
     public void xsetUnionQuery(ConditionQuery unionQuery) {
-        xsetupUnion(unionQuery, false, getInternalUnionQueryMap());
+        xsetupUnion(unionQuery, false, xdfgetInternalUnionQueryMap());
     }
 
     /** The map parameter-bean of union all query. */
@@ -571,7 +571,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Get the map parameter-bean of union all query. (for parameter comment) {Internal}
      * @return The instance of map parameter-bean. (NotNull)
      */
-    public SimpleMapPmb<ConditionQuery> getInternalUnionAllQueryMap() {
+    public SimpleMapPmb<ConditionQuery> xdfgetInternalUnionAllQueryMap() {
         if (_unionAllQueryMap == null) {
             _unionAllQueryMap = xcreateUnionMapPmb();
         }
@@ -587,7 +587,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @param unionAllQuery Union all query. (NotNull)
      */
     public void xsetUnionAllQuery(ConditionQuery unionAllQuery) {
-        xsetupUnion(unionAllQuery, true, getInternalUnionAllQueryMap());
+        xsetupUnion(unionAllQuery, true, xdfgetInternalUnionAllQueryMap());
     }
 
     protected void xsetupUnion(final ConditionQuery unionQuery, boolean unionAll, SimpleMapPmb<ConditionQuery> unionQueryMap) {
@@ -1978,7 +1978,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final DBMeta dbmeta = xgetLocalDBMeta();
         final String columnCapPropName = initCap(dbmeta.findColumnInfo(columnFlexibleName).getPropertyName());
-        final String methodName = "get" + columnCapPropName;
+        final String methodName = "xdfget" + columnCapPropName;
         final Method method = xhelpGettingCQMethod(this, methodName, (Class<?>[]) null);
         if (method == null) {
             throwConditionInvokingGetMethodNotFoundException(columnFlexibleName, methodName);
@@ -2741,7 +2741,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * The value is treated as Object type because this will be only called from parameter comment.
      * @return The instance of the map. (NullAllowed)
      */
-    public Map<String, Object> getColQyCBMap() {
+    public Map<String, Object> xdfgetColQyCBMap() {
         return xgetSqlClause().getColumnQueryObjectMap();
     }
 
@@ -2756,7 +2756,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Get the parameter map of ManualOrder for parameter comment. {Internal}.
      * @return The instance of the map. (NullAllowed)
      */
-    public Map<String, Object> getMnuOdrPrmMap() {
+    public Map<String, Object> xdfgetMnuOdrPrmMap() {
         return xgetSqlClause().getManualOrderParameterMap();
     }
 
@@ -2771,7 +2771,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Get the map of free parameter for parameter comment. {Internal}.
      * @return The instance of the map. (NullAllowed)
      */
-    public Map<String, Object> getFreePrmMap() {
+    public Map<String, Object> xdfgetFreePrmMap() {
         return xgetSqlClause().getFreeParameterMap();
     }
 
@@ -2874,7 +2874,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         option.acceptParameterKey(parameterKey, parameterMapPath);
     }
 
-    public Map<String, ParameterOption> getOptionParameterMap() { // for parameter comment
+    public Map<String, ParameterOption> xdfgetOptionParameterMap() { // for parameter comment
         return _parameterOptionMap;
     }
 
