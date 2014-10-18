@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
 
+import org.dbflute.FunCustodial;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
@@ -98,8 +99,7 @@ import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
-import org.dbflute.outsidesql.PmbCustodial;
-import org.dbflute.outsidesql.PmbCustodial.ShortCharHandlingMode;
+import org.dbflute.jdbc.ShortCharHandlingMode;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.pmbean.SimpleMapPmb;
 import org.dbflute.util.DfCollectionUtil;
@@ -2635,7 +2635,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             msg = msg + " columnName=" + columnName + " modeCode=" + modeCode;
             throw new IllegalStateException(msg);
         }
-        return PmbCustodial.handleShortChar(columnName, value, size, mode);
+        return FunCustodial.handleShortChar(columnName, value, size, mode);
     }
 
     // ===================================================================================

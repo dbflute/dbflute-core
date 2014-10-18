@@ -33,6 +33,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.dbflute.Entity;
+import org.dbflute.FunCustodial;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
@@ -166,7 +167,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (classification == null) {
             final String tableDbName = columnInfo.getDBMeta().getTableDbName();
             final String columnDbName = columnInfo.getColumnDbName();
-            Entity.FunCustodial.handleUndefinedClassificationCode(tableDbName, columnDbName, meta, code);
+            FunCustodial.handleUndefinedClassificationCode(tableDbName, columnDbName, meta, code);
         }
     }
 

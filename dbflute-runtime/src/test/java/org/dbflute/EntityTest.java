@@ -15,7 +15,6 @@
  */
 package org.dbflute;
 
-import org.dbflute.Entity.FunCustodial;
 import org.dbflute.unit.RuntimeTestCase;
 
 /**

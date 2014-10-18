@@ -93,15 +93,9 @@ public class ${myClassName} {
 #end
     protected List<${referrerEntityClassName}> _referrer${referrerMethodIdentityName};
     public ${loadMethodReturn} load${referrerMethodIdentityName}(${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> refCBLambda) {
-        myBhv().load${referrerMethodIdentityName}(_selectedList, refCBLambda).withNestedReferrer(new ReferrerListHandler<${referrerEntityClassName}>() {
-            public void handle(List<${referrerEntityClassName}> referrerList) { _referrer${referrerMethodIdentityName} = referrerList; }
-        });
+        myBhv().load${referrerMethodIdentityName}(_selectedList, refCBLambda).withNestedReferrer(refLs -> _referrer${referrerMethodIdentityName} = refLs);
 #if ($referrer.table.hasReferrerLoader())
-        return new NestedReferrerLoaderGateway<${referrerLoaderClassName}>() {
-            public void withNestedReferrer(ReferrerLoaderHandler<${referrerLoaderClassName}> handler) {
-                handler.handle(new ${referrerLoaderClassName}().ready(_referrer${referrerMethodIdentityName}, _selector));
-            }
-        };
+        return hd -> hd.handle(new ${referrerLoaderClassName}().ready(_referrer${referrerMethodIdentityName}, _selector));
 #end
     }
 
@@ -118,9 +112,8 @@ public class ${myClassName} {
 #set ($foreignLoaderVariableName = "_foreign${fk.foreignPropertyNameInitCap}Loader")
     protected ${foreignLoaderClassName} ${foreignLoaderVariableName};
     public ${foreignLoaderClassName} pullout${fk.foreignPropertyNameInitCap}() {
-        if (${foreignLoaderVariableName} != null) { return ${foreignLoaderVariableName}; }
-        List<${foreignEntityClassName}> pulledList = myBhv().pullout${fk.foreignPropertyNameInitCap}(_selectedList);
-        ${foreignLoaderVariableName} = new ${foreignLoaderClassName}().ready(pulledList, _selector);
+        if (${foreignLoaderVariableName} == null)
+        { ${foreignLoaderVariableName} = new ${foreignLoaderClassName}().ready(myBhv().pullout${fk.foreignPropertyNameInitCap}(_selectedList), _selector); }
         return ${foreignLoaderVariableName};
     }
 
@@ -133,9 +126,8 @@ public class ${myClassName} {
 #set ($referrerLoaderVariableName = "_foreign${referrer.referrerPropertyNameInitCapAsOne}Loader")
     protected ${referrerLoaderClassName} ${referrerLoaderVariableName};
     public ${referrerLoaderClassName} pullout${referrer.referrerPropertyNameInitCapAsOne}() {
-        if (${referrerLoaderVariableName} != null) { return ${referrerLoaderVariableName}; }
-        List<${referrerEntityClassName}> pulledList = myBhv().pullout${referrer.referrerPropertyNameInitCapAsOne}(_selectedList);
-        ${referrerLoaderVariableName} = new ${referrerLoaderClassName}().ready(pulledList, _selector);
+        if (${referrerLoaderVariableName} == null)
+        { ${referrerLoaderVariableName} = new ${referrerLoaderClassName}().ready(myBhv().pullout${referrer.referrerPropertyNameInitCapAsOne}(_selectedList), _selector); }
         return ${referrerLoaderVariableName};
     }
 

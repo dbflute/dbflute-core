@@ -504,6 +504,10 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).getPropertyRefLineDisp(propertyName, schemaData);
     }
 
+    public boolean hasPropertyRefColumnChar(String className, AppData schemaData) {
+        return findPmbMetaData(className).hasPropertyRefColumnChar(schemaData);
+    }
+
     public boolean isPropertyRefColumnChar(String className, String propertyName, AppData schemaData) {
         return findPmbMetaData(className).isPropertyRefColumnChar(propertyName, schemaData);
     }

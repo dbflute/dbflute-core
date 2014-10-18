@@ -28,6 +28,7 @@ import java.util.TimeZone;
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
 import org.dbflute.Entity;
 #end
+import org.dbflute.FunCustodial;
 import org.dbflute.dbmeta.DBMeta;
 #if ($table.needsMappingValueType())
 import org.dbflute.dbmeta.MappingValueType;
@@ -403,15 +404,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      */
     public ${foreignEntityClassName} get${fk.foreignJavaBeansRulePropertyNameInitCap}() {
 #if ($foreignTable.canBeRelationalNullObjectForeign())
-        if (${foreignVariableName} == null) {
-            ${foreignVariableName} = ${fk.relationalNullObjectProviderForeignExp};
-        }
+        if (${foreignVariableName} == null) { ${foreignVariableName} = ${fk.relationalNullObjectProviderForeignExp}; }
 #end
 #if ($fk.isForeignPropertyOptionalEntity())
-        if (${foreignVariableName} != null) { return ${foreignVariableName}; } else { return ${database.relationOptionalEntitySimpleName}.relationEmpty(this, "${fk.foreignJavaBeansRulePropertyName}"); }
-#else
-        return ${foreignVariableName};
+        if (${foreignVariableName} == null) { ${foreignVariableName} = ${database.relationOptionalEntitySimpleName}.relationEmpty(this, "${fk.foreignJavaBeansRulePropertyName}"); }
 #end
+        return ${foreignVariableName};
     }
 
     /**
@@ -441,15 +439,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      */
     public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
 #if ($referrerTable.canBeRelationalNullObjectForeign())
-        if (${referrerVariableName} == null) {
-            ${referrerVariableName} = ${referrer.relationalNullObjectProviderReferrerExp};
-        }
+        if (${referrerVariableName} == null) { ${referrerVariableName} = ${referrer.relationalNullObjectProviderReferrerExp}; }
 #end
 #if ($referrer.isReferrerPropertyOptionalEntityAsOne())
-        if (${referrerVariableName} != null) { return ${referrerVariableName}; } else { return ${database.relationOptionalEntitySimpleName}.relationEmpty(this, "${referrer.referrerJavaBeansRulePropertyNameAsOne}"); }
-#else
-        return ${referrerVariableName};
+        if (${referrerVariableName} == null) { ${referrerVariableName} = ${database.relationOptionalEntitySimpleName}.relationEmpty(this, "${referrer.referrerJavaBeansRulePropertyNameAsOne}"); }
 #end
+        return ${referrerVariableName};
     }
 
     /**
@@ -774,11 +769,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return FunCustodial.toStringDate(date, xgDP(), mytimeZone());
     }
     protected String xgDP() { // getDatePattern()
-#if ($database.isDatabaseOracle())
-        return "yyyy-MM-dd HH:mm:ss"; // time parts for Oracle only
-#else
-        return "yyyy-MM-dd";
-#end
+        return "${database.utilDateDisplayPattern}";
     }
     protected TimeZone mytimeZone() {
         return null; // as default

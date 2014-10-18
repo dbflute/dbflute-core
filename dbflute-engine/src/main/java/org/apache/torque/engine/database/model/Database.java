@@ -814,10 +814,6 @@ public class Database {
         return getPmbBasicHandler().hasPropertyOptionOriginalOnlyOneSetter(className, propertyName, _sql2entitySchemaData);
     }
 
-    public boolean hasPmbMetaDataPropertyUseOriginalException(String className) {
-        return hasPmbMetaDataPropertyOptionAnyLikeSearch(className) || hasPmbMetaDataPropertyOptionAnyFromTo(className);
-    }
-
     // -----------------------------------------------------
     //                                    Option LikeSeasrch
     //                                    ------------------
@@ -943,6 +939,10 @@ public class Database {
             _log.debug(msg, e);
             throw e;
         }
+    }
+
+    public boolean hasPmbMetaDataPropertyRefColumnChar(String className) {
+        return getPmbBasicHandler().hasPropertyRefColumnChar(className, _sql2entitySchemaData);
     }
 
     public boolean isPmbMetaDataPropertyRefColumnChar(String className, String propertyName) {
@@ -1578,6 +1578,10 @@ public class Database {
 
     public boolean hasCatalogAdditionalSchema() {
         return getDatabaseProperties().hasCatalogAdditionalSchema();
+    }
+
+    public String getUtilDateDisplayPattern() {
+        return isDatabaseOracle() ? "yyyy-MM-dd HH:mm:ss" : "yyyy-MM-dd";
     }
 
     // ===================================================================================

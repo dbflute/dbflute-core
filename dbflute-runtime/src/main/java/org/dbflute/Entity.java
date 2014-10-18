@@ -16,25 +16,14 @@
 package org.dbflute;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.exception.SpecifyDerivedReferrerUnknownAliasNameException;
-import org.dbflute.exception.UndefinedClassificationCodeException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.jdbc.Classification;
-import org.dbflute.jdbc.ClassificationMeta;
-import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
-import org.dbflute.system.DBFluteSystem;
-import org.dbflute.util.DfTypeUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The interface of entity. <br />
@@ -382,160 +371,4 @@ public interface Entity {
      * @return The display string for this entity. (NotNull)
      */
     String buildDisplayString(String name, boolean column, boolean relation);
-
-    // ===================================================================================
-    //                                                                      Internal Class
-    //                                                                      ==============
-    public static final class FunCustodial {
-
-        /** The instance of logging object for classification meta. (NotNull) */
-        private static final Logger _clsMetaLog = LoggerFactory.getLogger(ClassificationMeta.class);
-
-        @SuppressWarnings("unchecked")
-        public static <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) {
-            return (NUMBER) DfTypeUtil.toNumber(obj, type);
-        }
-
-        public static Boolean toBoolean(Object obj) {
-            return DfTypeUtil.toBoolean(obj);
-        }
-
-        public static boolean isSameValue(Object value1, Object value2) {
-            if (value1 == null && value2 == null) {
-                return true;
-            }
-            if (value1 == null || value2 == null) {
-                return false;
-            }
-            if (value1 instanceof byte[] && value2 instanceof byte[]) {
-                return isSameValueBytes((byte[]) value1, (byte[]) value2);
-            }
-            return value1.equals(value2);
-        }
-
-        public static boolean isSameValueBytes(byte[] bytes1, byte[] bytes2) {
-            if (bytes1 == null && bytes2 == null) {
-                return true;
-            }
-            if (bytes1 == null || bytes2 == null) {
-                return false;
-            }
-            if (bytes1.length != bytes2.length) {
-                return false;
-            }
-            for (int i = 0; i < bytes1.length; i++) {
-                if (bytes1[i] != bytes2[i]) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public static int calculateHashcode(int result, Object value) { // calculateHashcode()
-            if (value == null) {
-                return result;
-            }
-            return (31 * result) + (value instanceof byte[] ? ((byte[]) value).length : value.hashCode());
-        }
-
-        public static String convertEmptyToNull(String value) {
-            return (value != null && value.length() == 0) ? null : value;
-        }
-
-        public static String toClassTitle(Object entity) {
-            return DfTypeUtil.toClassTitle(entity);
-        }
-
-        public static String toStringDate(Date date, String pattern, TimeZone timeZone) {
-            if (date == null) {
-                return null;
-            }
-            final TimeZone realZone = timeZone != null ? timeZone : DBFluteSystem.getFinalTimeZone();
-            final String str = DfTypeUtil.toStringDate(date, pattern, realZone);
-            return (DfTypeUtil.isDateBC(date) ? "BC" : "") + str;
-        }
-
-        public static String toStringBytes(byte[] bytes) {
-            return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
-        }
-
-        public static void checkClassificationCode(Entity entity, String columnDbName, ClassificationMeta meta, Object code) {
-            if (code == null) {
-                return;
-            }
-            final ClassificationUndefinedHandlingType undefinedHandlingType = meta.undefinedHandlingType();
-            if (!undefinedHandlingType.isChecked()) { // basically no way (not called if no check)
-                return;
-            }
-            if (meta.codeOf(code) != null) {
-                return;
-            }
-            handleUndefinedClassificationCode(entity.getTableDbName(), columnDbName, meta, code);
-        }
-
-        public static void handleUndefinedClassificationCode(String tableDbName, String columnDbName, ClassificationMeta meta, Object code) {
-            final ClassificationUndefinedHandlingType undefinedHandlingType = meta.undefinedHandlingType();
-            if (ClassificationUndefinedHandlingType.EXCEPTION.equals(undefinedHandlingType)) {
-                throwUndefinedClassificationCodeException(tableDbName, columnDbName, meta, code);
-            } else if (ClassificationUndefinedHandlingType.LOGGING.equals(undefinedHandlingType)) {
-                showUndefinedClassificationCodeMessage(tableDbName, columnDbName, meta, code);
-            }
-            // else means ALLOWED
-        }
-
-        public static void throwUndefinedClassificationCodeException(String tableDbName, String columnDbName, ClassificationMeta meta,
-                Object code) {
-            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("Undefined classification code was set to the entity.");
-            br.addItem("Advice");
-            br.addElement("Confirm the value of the classication column on your database,");
-            br.addElement("or setting value to your entity.");
-            br.addElement("The code is NOT one of classification code defined on DBFlute.");
-            br.addElement("");
-            br.addElement("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-            br.addElement(" Use formal code!");
-            br.addElement("  Or add the code to classification definition.");
-            br.addElement("_/_/_/_/_/_/_/_/_/_/");
-            br.addElement("");
-            br.addElement("Or if you (reluctantly) need to allow it, change the option like this:");
-            br.addElement("but *Deprecated");
-            br.addElement("(classificationDefinitionMap.dfprop)");
-            br.addElement("    ; [classification-name] = list:{");
-            br.addElement("        ; map:{");
-            br.addElement("            ; topComment=...; codeType=...");
-            br.addElement("            ; undefinedHandlingType=ALLOWED");
-            br.addElement("        }");
-            br.addElement("        map:{...}");
-            br.addElement("    }");
-            br.addElement("*for your information, the default of undefinedHandlingType is LOGGING");
-            br.addItem("Table");
-            br.addElement(tableDbName);
-            br.addItem("Column");
-            br.addElement(columnDbName);
-            br.addItem("Classification");
-            br.addElement(meta.classificationName());
-            final List<Classification> listAll = meta.listAll();
-            final StringBuilder sb = new StringBuilder();
-            for (Classification cls : listAll) {
-                if (sb.length() > 0) {
-                    sb.append(", ");
-                }
-                sb.append(cls.name()).append("(").append(cls.code()).append(")");
-            }
-            br.addElement(sb.toString());
-            br.addItem("Undefined Code");
-            br.addElement(code);
-            final String msg = br.buildExceptionMessage();
-            throw new UndefinedClassificationCodeException(msg);
-        }
-
-        public static void showUndefinedClassificationCodeMessage(String tableDbName, String columnDbName, ClassificationMeta meta,
-                Object code) {
-            if (_clsMetaLog.isInfoEnabled()) {
-                final String classificationName = meta.classificationName();
-                final String exp = tableDbName + "." + columnDbName + "->" + classificationName + "." + code;
-                _clsMetaLog.info("*Undefined classification code was set: " + exp); // one line because of many called
-            }
-        }
-    }
 }

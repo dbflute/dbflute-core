@@ -775,6 +775,16 @@ public class DfPmbMetaData {
         return column != null ? "{" + column.getColumnDefinitionLineDisp() + "}" : "";
     }
 
+    public boolean hasPropertyRefColumnChar(AppData schemaData) {
+        final Set<String> propertyNameSet = getPropertyNameTypeMap().keySet();
+        for (String propertyName : propertyNameSet) {
+            if (isPropertyRefColumnChar(propertyName, schemaData)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isPropertyRefColumnChar(String propertyName, AppData schemaData) {
         final Column column = getPropertyOptionReferenceColumn(propertyName, schemaData);
         return column != null ? column.isJdbcTypeChar() : false;
