@@ -337,9 +337,9 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     /**
-     * Get the entity instance or null if not present.
+     * Get the entity instance or null if not present. <br />
+     * basically use ifPresent() if might be not present, this is for emergency
      * @return The object instance wrapped in this optional object or null. (NullAllowed: if not present)
-     * @deprecated basically use ifPresent() if might be not present, this is for emergency
      */
     public ENTITY orElseNull() {
         return directlyGetOrElse(null);

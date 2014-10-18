@@ -124,9 +124,41 @@ public class DBFluteSystem {
     //                                                                   System Adjustment
     //                                                                   =================
     // -----------------------------------------------------
-    //                                                  Lock
-    //                                                  ----
-    public static void xlock() {
+    //                                          Current Date
+    //                                          ------------
+    public static boolean hasCurrentDateProvider() {
+        return _currentDateProvider != null;
+    }
+
+    public static void setCurrentDateProvider(DfCurrentDateProvider currentDateProvider) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting currentDateProvider: " + currentDateProvider);
+        }
+        _currentDateProvider = currentDateProvider;
+        lock(); // auto-lock here, because of deep world
+    }
+
+    // -----------------------------------------------------
+    //                                        Final TimeZone
+    //                                        --------------
+    public static boolean hasFinalTimeZoneProvider() {
+        return _finalTimeZoneProvider != null;
+    }
+
+    public static void setFinalTimeZoneProvider(DfFinalTimeZoneProvider finalTimeZoneProvider) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting finalTimeZoneProvider: " + finalTimeZoneProvider);
+        }
+        _finalTimeZoneProvider = finalTimeZoneProvider;
+        lock(); // auto-lock here, because of deep world
+    }
+
+    // ===================================================================================
+    //                                                                         System Lock
+    //                                                                         ===========
+    public static void lock() {
         if (_locked) {
             return;
         }
@@ -136,7 +168,7 @@ public class DBFluteSystem {
         _locked = true;
     }
 
-    public static void xunlock() {
+    public static void unlock() {
         if (!_locked) {
             return;
         }
@@ -151,52 +183,9 @@ public class DBFluteSystem {
     }
 
     protected static void assertUnlocked() {
-        if (_locked) {
-            throw new IllegalStateException("*DBFluteSystem was locked.");
+        if (!isLocked()) {
+            return;
         }
-    }
-
-    // -----------------------------------------------------
-    //                                          Current Date
-    //                                          ------------
-    public static boolean hasCurrentDateProvider() {
-        return _currentDateProvider != null;
-    }
-
-    public DfCurrentDateProvider xgetCurrentDateProvider() {
-        return _currentDateProvider;
-    }
-
-    public static void xsetCurrentDateProvider(DfCurrentDateProvider currentDateProvider) {
-        assertUnlocked();
-        if (_log.isInfoEnabled()) {
-            _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-            _log.info("...Setting currentDateProvider: " + currentDateProvider);
-            _log.info("_/_/_/_/_/_/_/_/_/_/");
-        }
-        _currentDateProvider = currentDateProvider;
-        xlock();
-    }
-
-    // -----------------------------------------------------
-    //                                        Final TimeZone
-    //                                        --------------
-    public static boolean hasFinalTimeZoneProvider() {
-        return _finalTimeZoneProvider != null;
-    }
-
-    public DfFinalTimeZoneProvider xgetFinalTimeZoneProvider() {
-        return _finalTimeZoneProvider;
-    }
-
-    public static void xsetFinalTimeZoneProvider(DfFinalTimeZoneProvider finalTimeZoneProvider) {
-        assertUnlocked();
-        if (_log.isInfoEnabled()) {
-            _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-            _log.info("...Setting finalTimeZoneProvider: " + finalTimeZoneProvider);
-            _log.info("_/_/_/_/_/_/_/_/_/_/");
-        }
-        _finalTimeZoneProvider = finalTimeZoneProvider;
-        xlock();
+        throw new IllegalStateException("The DBFlute system is locked.");
     }
 }

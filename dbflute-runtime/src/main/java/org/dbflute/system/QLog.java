@@ -34,8 +34,8 @@ public class QLog {
     protected static boolean _locked = true;
 
     // ===================================================================================
-    //                                                                             Logging
-    //                                                                             =======
+    //                                                                       Query Logging
+    //                                                                       =============
     public static void log(String sql) { // very Internal
         if (_queryLogLevelInfo) {
             _log.info(sql);
@@ -55,16 +55,20 @@ public class QLog {
         }
     }
 
+    // ===================================================================================
+    //                                                                  Logging Adjustment
+    //                                                                  ==================
     protected static boolean isQueryLogLevelInfo() {
         return _queryLogLevelInfo;
     }
 
     public static void setQueryLogLevelInfo(boolean queryLogLevelInfo) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting queryLogLevelInfo: " + queryLogLevelInfo);
         }
         _queryLogLevelInfo = queryLogLevelInfo;
+        lock(); // auto-lock here, because of deep world
     }
 
     protected static boolean isLoggingInHolidayMood() {
@@ -72,16 +76,17 @@ public class QLog {
     }
 
     public static void setLoggingInHolidayMood(boolean loggingInHolidayMood) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting loggingInHolidayMood: " + loggingInHolidayMood);
         }
         _loggingInHolidayMood = loggingInHolidayMood;
+        lock(); // auto-lock here, because of deep world
     }
 
     // ===================================================================================
-    //                                                                                Lock
-    //                                                                                ====
+    //                                                                        Logging Lock
+    //                                                                        ============
     public static boolean isLocked() {
         return _locked;
     }
@@ -100,11 +105,10 @@ public class QLog {
         _locked = false;
     }
 
-    protected static void assertNotLocked() {
+    protected static void assertUnlocked() {
         if (!isLocked()) {
             return;
         }
-        String msg = "The QLog is locked! Don't access at this timing!";
-        throw new IllegalStateException(msg);
+        throw new IllegalStateException("The query log is locked.");
     }
 }

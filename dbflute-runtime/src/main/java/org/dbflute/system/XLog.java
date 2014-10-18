@@ -34,8 +34,8 @@ public class XLog {
     protected static boolean _locked = true;
 
     // ===================================================================================
-    //                                                                             Logging
-    //                                                                             =======
+    //                                                              Execute-Status Logging
+    //                                                              ======================
     public static void log(String msg) { // very internal
         if (_executeStatusLogLevelInfo) {
             _log.info(msg);
@@ -55,16 +55,20 @@ public class XLog {
         }
     }
 
+    // ===================================================================================
+    //                                                                  Logging Adjustment
+    //                                                                  ==================
     protected static boolean isExecuteStatusLogLevelInfo() {
         return _executeStatusLogLevelInfo;
     }
 
     public static void setExecuteStatusLogLevelInfo(boolean executeStatusLogLevelInfo) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting executeStatusLogLevelInfo: " + executeStatusLogLevelInfo);
         }
         _executeStatusLogLevelInfo = executeStatusLogLevelInfo;
+        lock(); // auto-lock here, because of deep world
     }
 
     protected static boolean isLoggingInHolidayMood() {
@@ -72,16 +76,17 @@ public class XLog {
     }
 
     public static void setLoggingInHolidayMood(boolean loggingInHolidayMood) {
-        assertNotLocked();
+        assertUnlocked();
         if (_log.isInfoEnabled()) {
             _log.info("...Setting loggingInHolidayMood: " + loggingInHolidayMood);
         }
         _loggingInHolidayMood = loggingInHolidayMood;
+        lock(); // auto-lock here, because of deep world
     }
 
     // ===================================================================================
-    //                                                                                Lock
-    //                                                                                ====
+    //                                                                        Logging Lock
+    //                                                                        ============
     public static boolean isLocked() {
         return _locked;
     }
@@ -100,11 +105,10 @@ public class XLog {
         _locked = false;
     }
 
-    protected static void assertNotLocked() {
+    protected static void assertUnlocked() {
         if (!isLocked()) {
             return;
         }
-        String msg = "The QLog is locked! Don't access at this timing!";
-        throw new IllegalStateException(msg);
+        throw new IllegalStateException("The execute-status log is locked.");
     }
 }

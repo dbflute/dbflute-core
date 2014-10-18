@@ -42,21 +42,21 @@ public class HandyDateZonedTest extends RuntimeTestCase {
     // almost copied from main test
     @Override
     protected void setUp() throws Exception {
-        DBFluteSystem.xunlock();
-        DBFluteSystem.xsetFinalTimeZoneProvider(new DfFinalTimeZoneProvider() {
+        DBFluteSystem.unlock();
+        DBFluteSystem.setFinalTimeZoneProvider(new DfFinalTimeZoneProvider() {
             public TimeZone provide() {
                 return TimeZone.getTimeZone("GMT");
             }
         });
-        DBFluteSystem.xlock();
+        DBFluteSystem.lock();
         super.setUp();
     }
 
     @Override
     protected void tearDown() throws Exception {
-        DBFluteSystem.xunlock();
-        DBFluteSystem.xsetFinalTimeZoneProvider(null);
-        DBFluteSystem.xlock();
+        DBFluteSystem.unlock();
+        DBFluteSystem.setFinalTimeZoneProvider(null);
+        DBFluteSystem.lock();
         super.tearDown();
     }
 

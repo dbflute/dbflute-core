@@ -296,7 +296,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * (DBFlute system's time-zone is used as default)
      * @param timeZone The time-zone for filtering. (NullAllowed: if null, default zone)
      */
-    public void zone(TimeZone timeZone) { _timeZone = timeZone;s }
+    public void zone(TimeZone timeZone) { _timeZone = timeZone; }
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
 

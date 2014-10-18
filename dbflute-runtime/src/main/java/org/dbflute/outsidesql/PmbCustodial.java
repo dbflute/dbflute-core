@@ -57,6 +57,9 @@ public class PmbCustodial {
      * @return The filtered value. (NullAllowed)
      */
     public static String handleShortChar(String parameterName, String value, Integer size, PmbShortCharHandlingMode mode) {
+        if (mode == null) {
+            throw new IllegalArgumentException("The argument 'mode' should not be null: " + parameterName);
+        }
         return FunCustodial.handleShortChar(parameterName, value, size, mode.toWrappedMode());
     }
 
