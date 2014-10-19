@@ -85,12 +85,12 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     /**
      * Map the entity list to the list of other object.
      * <pre>
-     * ListResultBean&lt;MemberWebBean&gt; beanList = memberList.<span style="color: #CC4747">mappingList</span>(member -&gt; {
-     *     MemberWebBean bean = new MemberWebBean();
-     *     bean.setMemberId(member.getMemberId());
-     *     bean.setMemberName(member.getMemberName());
+     * ListResultBean&lt;MemberWebBean&gt; beanList = memberList.<span style="color: #CC4747">mappingList</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     MemberWebBean <span style="color: #553000">bean</span> = new MemberWebBean();
+     *     <span style="color: #553000">bean</span>.setMemberId(member.getMemberId());
+     *     <span style="color: #553000">bean</span>.setMemberName(<span style="color: #553000">member</span>.getMemberName());
      *     ...
-     *     return bean;
+     *     return <span style="color: #553000">bean</span>;
      * });
      * </pre>
      * <p>This method needs the property 'selectedList' only.</p>
@@ -173,7 +173,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * This method needs the property 'selectedList' only.
      * <pre>
      * <span style="color: #3F7E5E">// e.g. grouping per initial character of MEMBER_NAME</span>
-     * Map&lt;String, ListResultBean&lt;Member&gt;&gt; groupingMap = memberList.<span style="color: #CC4747">groupingMap</span>(member -&gt; {
+     * Map&lt;String, ListResultBean&lt;Member&gt;&gt; groupingMap = memberList.<span style="color: #CC4747">groupingMap</span>(member <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     return member.getMemberName().substring(0, 1);
      * });
      * </pre>
@@ -200,7 +200,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     /**
      * Extract the value list of the column specified in extractor.
      * <pre>
-     * List&lt;Integer&gt; memberIdList = memberList.<span style="color: #CC4747">extractColumnList</span>(member -&gt; {
+     * List&lt;Integer&gt; memberIdList = memberList.<span style="color: #CC4747">extractColumnList</span>(member <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     return entity.getMemberId();
      * });
      * </pre>
@@ -223,7 +223,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     /**
      * Extract the value set of the column specified in extractor.
      * <pre>
-     * Set&lt;Integer&gt; memberIdList = memberList.<span style="color: #CC4747">extractColumnSet</span>(member -&gt; {
+     * Set&lt;Integer&gt; memberIdList = memberList.<span style="color: #CC4747">extractColumnSet</span>(member <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     return entity.getMemberId();
      * });
      * </pre>

@@ -697,7 +697,7 @@ public class ForeignKey implements Constraint {
     }
 
     public String getReferrerLambdaExampleCBName() {
-        return getTable().getLambdaShortName() + "CB";
+        return getReferrerLambdaShortName() + "CB";
     }
 
     public String getReferrerLambdaSubQueryCBName() {

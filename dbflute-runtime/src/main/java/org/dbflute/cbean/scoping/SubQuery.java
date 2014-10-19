@@ -20,10 +20,8 @@ import org.dbflute.cbean.ConditionBean;
 /**
  * The interface of sub-query.
  * <pre>
- * cb.query.existsSeaList(new SubQuery&lt;SeaCB&gt;() {
- *     public void query(SeaCB subCB) {
- *         subCB.query().setSea...
- *     }
+ * cb.query.existsPurchase(purchaseCB <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+ *     purchaseCB.query().set...
  * }
  * </pre>
  * @author jflute

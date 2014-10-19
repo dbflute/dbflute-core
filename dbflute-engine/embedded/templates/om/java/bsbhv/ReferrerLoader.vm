@@ -92,6 +92,41 @@ public class ${myClassName} {
 #set ($loadMethodReturn = "NestedReferrerLoaderGateway<${referrerLoaderClassName}>")
 #end
     protected List<${referrerEntityClassName}> _referrer${referrerMethodIdentityName};
+
+    /**
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br />
+     * ${referrer.referrerDispForJavaDoc}
+     * <pre>
+     * <span style="color: #0000C0">${myEntityVariableName}Bhv</span>.<span style="color: #994747">load</span>(<span style="color: #553000">${myEntityListVariableName}</span>, <span style="color: #553000">${table.lambdaShortName}Loader</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">${table.lambdaShortName}Loader</span>.<span style="color: #CC4747">load${referrerMethodIdentityName}</span>(<span style="color: #553000">${referrer.referrerLambdaExampleCBName}</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *         <span style="color: #553000">${referrer.referrerLambdaExampleCBName}</span>.setupSelect...
+     *         <span style="color: #553000">${referrer.referrerLambdaExampleCBName}</span>.query().set...
+     *         <span style="color: #553000">${referrer.referrerLambdaExampleCBName}</span>.query().addOrderBy...
+     *     }); <span style="color: #3F7E5E">// you can load nested referrer from here</span>
+     *     <span style="color: #3F7E5E">//}).withNestedReferrer(<span style="color: #553000">${referrer.referrerLambdaShortName}Loader</span> -&gt {</span>
+     *     <span style="color: #3F7E5E">//    ${referrer.referrerLambdaShortName}Loader.load...</span>
+     *     <span style="color: #3F7E5E">//});</span>
+     * });
+     * for (${myExtendedObjectClassName} ${myEntityVariableName} : <span style="color: #553000">${myEntityListVariableName}</span>) {
+     *     ... = ${myEntityVariableName}.<span style="color: #CC4747">get${referrer.referrerJavaBeansRulePropertyNameInitCap}()</span>;
+     * }
+     * </pre>
+     * About internal policy, the value of primary key (and others too) is treated as case-insensitive. <br />
+     * The condition-bean, which the set-upper provides, has settings before callback as follows:
+     * <pre>
+#if ($referrer.isSimpleKeyFK())
+     * cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+     * cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc();
+#else
+     * cb.query().set[ForeignKey]_InScope(pkList);
+     * cb.query().addOrderBy_[ForeignKey]_Asc();
+#end
+     * </pre>
+     * @param refCBLambda The callback to set up referrer condition-bean for loading referrer. (NotNull)
+#if ($referrer.table.hasReferrerLoader())
+     * @return The callback interface which you can load nested referrer by calling withNestedReferrer(). (NotNull)
+#end
+     */
     public ${loadMethodReturn} load${referrerMethodIdentityName}(${table.loadReferrerConditionSetupperName}<${referrerCBClassName}> refCBLambda) {
         myBhv().load${referrerMethodIdentityName}(_selectedList, refCBLambda).withNestedReferrer(refLs -> _referrer${referrerMethodIdentityName} = refLs);
 #if ($referrer.table.hasReferrerLoader())

@@ -323,7 +323,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * LikeSearch with various options. (versatile) {like '%xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
-     * <pre>e.g. set${tmpJavaName}_LikeSearch("xxx", op -&gt; op.<span style="color: #CC4747">likeContain()</span>);</pre>
+     * <pre>e.g. set${tmpJavaName}_LikeSearch("xxx", op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.<span style="color: #CC4747">likeContain()</span>);</pre>
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch. (NullAllowed: if null (or empty), no condition)
      * @param opLambda The callback for option of like-search. (NotNull)
      */
@@ -403,7 +403,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #CC4747">exists${relationMethodIdentityName}</span>(${referrer.referrerLambdaExampleCBName} -&gt; {
+     * cb.query().<span style="color: #CC4747">exists${relationMethodIdentityName}</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     ${referrer.referrerLambdaExampleCBName}.query().set...
      * });
      * </pre>
@@ -441,10 +441,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #CC4747">notExists${relationMethodIdentityName}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${relatedCBClassName} subCB) {
-     *         subCB.query().setXxx...
-     *     }
+     * cb.query().<span style="color: #CC4747">notExists${relationMethodIdentityName}</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ${referrer.referrerLambdaExampleCBName}.query().set...
      * });
      * </pre>
      * @param ${relatedLambdaName} The callback for sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
@@ -485,11 +483,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #CC4747">derived${relationMethodIdentityName}()</span>.<span style="color: #CC4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${relatedCBClassName} subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
+     * cb.query().<span style="color: #CC4747">derived${relationMethodIdentityName}()</span>.<span style="color: #CC4747">max</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ${referrer.referrerLambdaExampleCBName}.specify().<span style="color: #CC4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
+     *     ${referrer.referrerLambdaExampleCBName}.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// condition to derived column</span>
      * </pre>
      * @return The object to set up a function for referrer table. (NotNull)
@@ -786,7 +782,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #CC4747">exists${relationMethodIdentityName}</span>(${referrer.referrerLambdaExampleCBName} -&gt; {
+     * cb.query().<span style="color: #CC4747">exists${relationMethodIdentityName}</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     ${referrer.referrerLambdaExampleCBName}.query().set...
      * });
      * </pre>
@@ -824,10 +820,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #CC4747">notExists${relationMethodIdentityName}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${relatedCBClassName} subCB) {
-     *         subCB.query().setXxx...
-     *     }
+     * cb.query().<span style="color: #CC4747">notExists${relationMethodIdentityName}</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ${referrer.referrerLambdaExampleCBName}.query().set...
      * });
      * </pre>
      * @param ${relatedLambdaName} The callback for sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
@@ -868,7 +862,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #CC4747">derived${relationMethodIdentityName}()</span>.<span style="color: #CC4747">max</span>(${referrer.referrerLambdaExampleCBName} -&gt; {
+     * cb.query().<span style="color: #CC4747">derived${relationMethodIdentityName}()</span>.<span style="color: #CC4747">max</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     ${referrer.referrerLambdaExampleCBName}.specify().<span style="color: #CC4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
      *     ${referrer.referrerLambdaExampleCBName}.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// condition to derived column</span>
@@ -967,7 +961,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * FromTo with various options. (versatile) {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
      * And NullIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, op -&gt; op.<span style="color: #CC4747">compareAsDate()</span>);</pre>
+     * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.<span style="color: #CC4747">compareAsDate()</span>);</pre>
      * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param opLambda The callback for option of from-to. (NotNull)
