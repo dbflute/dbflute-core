@@ -59,9 +59,7 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
     // =====================================================================================
     //                                                                                Set up
     //                                                                                ======
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void handleCommonColumnOfInsertIfNeeds(Entity targetEntity) {
         final ${glEntityDefinedCommonColumn} entity = askIfEntitySetup(targetEntity);
         if (entity == null) {
@@ -94,9 +92,7 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
 #end
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void handleCommonColumnOfUpdateIfNeeds(Entity targetEntity) {
         final ${glEntityDefinedCommonColumn} entity = askIfEntitySetup(targetEntity);
         if (entity == null) {
@@ -136,19 +132,11 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
         if (!hasCommonColumn(targetEntity)) {
             return null;
         }
-        final ${glEntityDefinedCommonColumn} entity = downcastEntity(targetEntity);
-        if (!canCommonColumnAutoSetup(entity)) {
-            return null;
-        }
-        return entity;
+        return downcastEntity(targetEntity);
     }
 
     protected boolean hasCommonColumn(Entity targetEntity) {
         return targetEntity instanceof ${glEntityDefinedCommonColumn};
-    }
-
-    protected boolean canCommonColumnAutoSetup(${glEntityDefinedCommonColumn} entity) {
-        return entity.canCommonColumnAutoSetup();
     }
 
     protected ${glEntityDefinedCommonColumn} downcastEntity(Entity targetEntity) {
@@ -159,15 +147,11 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
     // =====================================================================================
     //                                                                                Set up
     //                                                                                ======
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void handleCommonColumnOfInsertIfNeeds(Entity targetEntity) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void handleCommonColumnOfUpdateIfNeeds(Entity targetEntity) {
     }
 #end

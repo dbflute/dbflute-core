@@ -131,12 +131,6 @@ namespace ${myExtendedEntityPackageName} {
         #region Classification Setting
 #foreach ($col in $table.columns)
 #if (${col.hasClassification()})
-#if ($database.isMakeEntityOldStyleClassify())
-        public void Classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
-            ${col.javaName}As${col.classificationName} = cls;
-        }
-
-#end
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
         /// <summary>
         /// Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}.
@@ -148,18 +142,6 @@ namespace ${myExtendedEntityPackageName} {
             ${col.javaName}As${col.classificationName} = ${glCDef}.${col.classificationName}.${classificationElement.name};
         }
 
-#if ($database.isMakeEntityOldStyleClassify())
-        /// <summary>
-        /// Same as Set${col.javaName}_${classificationElement.name}().
-        /// <![CDATA[
-        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
-        /// ]]>
-        /// </summary>
-        public void Classify${col.javaName}${classificationElement.name}() {
-            Set${col.javaName}_${classificationElement.name}();
-        }
-
-#end
 #end
 #end
 #end

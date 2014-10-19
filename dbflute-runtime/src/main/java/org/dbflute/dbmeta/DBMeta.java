@@ -85,13 +85,13 @@ public interface DBMeta {
     //                                                                          Table Info
     //                                                                          ==========
     /**
-     * Get the DB name of the table.
+     * Get the DB name of the table, can be identity of table.
      * @return The DB name of the table. (NotNull)
      */
     String getTableDbName();
 
     /**
-     * Get the property name(JavaBeansRule) of table.
+     * Get the property name (JavaBeansRule) of table.
      * @return The property name(JavaBeansRule) of table. (NotNull)
      */
     String getTablePropertyName();

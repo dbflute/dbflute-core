@@ -98,7 +98,7 @@ public class ${glDBFluteInitializer} {
             ${glDBFluteConfig}.getInstance().lock();
         }
         if (!DBFluteSystem.isLocked()) {
-            DBFluteSystem.xlock();
+            DBFluteSystem.lock();
         }
     }
 
@@ -158,7 +158,7 @@ public class ${glDBFluteInitializer} {
      */
     protected void adjustDBFluteSystem() {
 #if ($database.hasDBFluteSystemFinalTimeZone())
-        DBFluteSystem.xunlock();
+        DBFluteSystem.unlock();
         final TimeZone finalTimeZone = TimeZone.getTimeZone("${database.DBFluteSystemFinalTimeZone}");
         _log.info("...Setting final time-zone for DBFlute system: " + finalTimeZone);
         DBFluteSystem.setFinalTimeZoneProvider(() -> {

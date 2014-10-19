@@ -16,25 +16,16 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
-#if ($table.hasUtilDateColumn())
-import java.util.Date;
-import java.util.TimeZone;
-#end
 
-#if (!$table.hasAllCommonColumn() || $table.hasRelation())
+#if ($table.hasOptionalRelation())
 import org.dbflute.Entity;
 #end
-import org.dbflute.FunCustodial;
 import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.AbstractEntity;
 #if ($table.needsMappingValueType())
 import org.dbflute.dbmeta.MappingValueType;
-#end
-#if ($table.isEntityDerivedMappable())
-import org.dbflute.dbmeta.derived.DerivedMappable;
 #end
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
@@ -52,11 +43,11 @@ import ${myExtendedEntityPackageName}.*;
 #if ($table.isLoadableCustomizeEntity())
 import ${glPackageExtendedEntity}.*;
 #end
-#set ($myEntityInterfaceName = "")
+#set ($myEntityInterfaceDef = "")
 #if (${table.hasAllCommonColumn()})
-  #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumn})
+#set ($myEntityInterfaceDef = " implements ${glEntityDefinedCommonColumn}")
 #else
-  #set ($myEntityInterfaceName = "Entity")
+#set ($myEntityInterfaceDef = "")
 #end
 #if ($table.hasRelationalNullObjectProviderImport())
 import ${table.relationalNullObjectProviderPackage}.*;
@@ -107,7 +98,7 @@ import ${table.relationalNullObjectProviderPackage}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
-public abstract class $myClassName implements ${myEntityInterfaceName}, Serializable, Cloneable${table.derivedMappableDefinition} {
+public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -118,59 +109,29 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    // -----------------------------------------------------
-    //                                                Column
-    //                                                ------
 #foreach ($col in $table.columns)
     /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
     protected ${col.javaNative} _${col.uncapitalisedJavaName};
 
 #end
-    // -----------------------------------------------------
-    //                                              Internal
-    //                                              --------
-    /** The unique-driven properties for this entity. (NotNull) */
-    protected final EntityUniqueDrivenProperties __uniqueDrivenProperties = newUniqueDrivenProperties();
-
-    /** The modified properties for this entity. (NotNull) */
-    protected final EntityModifiedProperties __modifiedProperties = newModifiedProperties();
-#if ($table.isEntityDerivedMappable())
-
-    /** The map of derived value, key is alias name. (NullAllowed: lazy-loaded) */
-    protected EntityDerivedMap __derivedMap;
-#end
-#if ($table.hasAllCommonColumn())
-
-    /** Is common column auto set up effective? */
-    protected boolean __canCommonColumnAutoSetup = true;
-#end
-
-    /** Is the entity created by DBFlute select process? */
-    protected boolean __createdBySelect;
 
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String getTableDbName() {
         return "${table.tableDbName}";
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getTablePropertyName() { // according to Java Beans rule
+    /** {@inheritDoc} */
+    public String getTablePropertyName() {
         return "${table.javaBeansRulePropertyName}";
     }
 
     // ===================================================================================
     //                                                                              DBMeta
     //                                                                              ======
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public DBMeta getDBMeta() {
 #if ($isSql2Entity)
         return ${myDBMetaPackageName}.${myDBMetaClassName}.getInstance();
@@ -182,12 +143,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     // ===================================================================================
     //                                                                         Primary Key
     //                                                                         ===========
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean hasPrimaryKeyValue() {
 #foreach ($col in $table.primaryKey)
-        if (get${col.javaName}() == null) { return false; }
+        if (_${col.uncapitalisedJavaName} == null) { return false; }
 #end
         return ${table.hasPrimaryKey()};
     }
@@ -206,17 +165,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         ${uq.argsSetupString}
     }
 #end
-
-    /**
-     * {@inheritDoc}
-     */
-    public Set<String> myuniqueDrivenProperties() {
-        return __uniqueDrivenProperties.getPropertyNames();
-    }
-
-    protected EntityUniqueDrivenProperties newUniqueDrivenProperties() {
-        return new EntityUniqueDrivenProperties();
-    }
 
 #if ($table.hasClassification())
     // ===================================================================================
@@ -248,9 +196,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      */
     public void set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
 #if ($col.isJavaNativeNumberObject())
-        set${col.javaName}(cdef != null ? FunCustodial.toNumber(cdef.code(), ${col.javaNative}.class) : null);
+        set${col.javaName}(cdef != null ? toNumber(cdef.code(), ${col.javaNative}.class) : null);
 #elseif ($col.isJavaNativeBooleanObject())
-        set${col.javaName}(cdef != null ? FunCustodial.toBoolean(cdef.code()) : null);
+        set${col.javaName}(cdef != null ? toBoolean(cdef.code()) : null);
 #else
         set${col.javaName}(cdef != null ? cdef.code() : null);
 #end
@@ -287,26 +235,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
     public void set${col.javaName}_${classificationElement.name}() {
         set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
-    }
-
-#if ($database.isMakeEntityOldStyleClassify())
-    /**
-     * Same as set${col.javaName}_${classificationElement.name}. <br />
-     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
-     */
-    public void classify${col.javaName}${classificationElement.name}() {
-        set${col.javaName}_${classificationElement.name}();
-    }
-
-#end
-#end
-#if ($database.isMakeEntityOldStyleClassify())
-    /**
-     * Same as set${col.javaName}As${col.classificationName}(cdef). <br />
-     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed)
-     */
-    public void classify${col.javaName}(${glCDef}.${col.classificationName} cdef) {
-        set${col.javaName}As${col.classificationName}(cdef);
     }
 
 #end
@@ -539,173 +467,35 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     // ===================================================================================
-    //                                                                 Modified Properties
-    //                                                                 ===================
-    /**
-     * {@inheritDoc}
-     */
-    public Set<String> modifiedProperties() {
-        return __modifiedProperties.getPropertyNames();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void clearModifiedInfo() {
-        __modifiedProperties.clear();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean hasModification() {
-        return !__modifiedProperties.isEmpty();
-    }
-
-    protected EntityModifiedProperties newModifiedProperties() {
-        return new EntityModifiedProperties();
-    }
-
-    // ===================================================================================
-    //                                                                     Birthplace Mark
-    //                                                                     ===============
-    /**
-     * {@inheritDoc}
-     */
-    public void markAsSelect() {
-        __createdBySelect = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean createdBySelect() {
-        return __createdBySelect;
-    }
-#if (${table.hasAllCommonColumn()})
-
-    // ===================================================================================
-    //                                                                       Common Column
-    //                                                                       =============
-    /**
-     * {@inheritDoc}
-     */
-    public void enableCommonColumnAutoSetup() {
-        __canCommonColumnAutoSetup = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void disableCommonColumnAutoSetup() {
-        __canCommonColumnAutoSetup = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean canCommonColumnAutoSetup() {
-        return __canCommonColumnAutoSetup;
-    }
-#end
-#if ($table.isEntityDerivedMappable())
-
-    // ===================================================================================
-    //                                                                    Derived Mappable
-    //                                                                    ================
-    /**
-     * {@inheritDoc}
-     */
-    public void registerDerivedValue(String aliasName, Object selectedValue) {
-        if (__derivedMap == null) { __derivedMap = newDerivedMap(); }
-        __derivedMap.registerDerivedValue(aliasName, selectedValue);
-    }
-
-    /**
-     * Find the derived value from derived map.
-     * <pre>
-     * mapping type:
-     *  count()      : Integer
-     *  max(), min() : (same as property type of the column)
-     *  sum(), avg() : BigDecimal
-     *
-     * e.g. use count()
-     *  Integer loginCount = member.derived("$LOGIN_COUNT");
-     * </pre>
-     * @param <VALUE> The type of the value.
-     * @param aliasName The alias name of derived-referrer. (NotNull)
-     * @return The derived value found in the map. (NullAllowed: when null selected)
-     */
-    public <VALUE> VALUE derived(String aliasName) {
-        if (__derivedMap == null) { __derivedMap = newDerivedMap(); }
-        return __derivedMap.findDerivedValue(aliasName);
-    }
-
-    protected EntityDerivedMap newDerivedMap() {
-        return new EntityDerivedMap();
-    }
-#end
-
-    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
-    /**
-     * Determine the object is equal with this. <br />
-     * If primary-keys or columns of the other are same as this one, returns true.
-     * @param obj The object as other entity. (NullAllowed: if null, returns false fixedly)
-     * @return Comparing result.
-     */
-    public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof $myClassName)) { return false; }
-        $myClassName other = ($myClassName)obj;
+    @Override
+    protected boolean doEquals(Object obj) {
+        if (obj instanceof $myClassName) {
+            $myClassName other = ($myClassName)obj;
 #foreach ($col in $table.equalsHashcodeColumnList)
-        if (!xSV(get${col.javaName}(), other.get${col.javaName}())) { return false; }
+            if (!xSV(_${col.uncapitalisedJavaName}, other._${col.uncapitalisedJavaName})) { return false; }
 #end
-        return true;
-    }
-    protected boolean xSV(Object v1, Object v2) {
-        return FunCustodial.isSameValue(v1, v2);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    /**
-     * Calculate the hash-code from primary-keys or columns.
-     * @return The hash-code from primary-key or columns.
-     */
-    public int hashCode() {
-        int hs = 17;
+    @Override
+    protected int doHashCode(int initial) {
+        int hs = initial;
         hs = xCH(hs, getTableDbName());
 #foreach ($col in $table.equalsHashcodeColumnList)
-        hs = xCH(hs, get${col.JavaName}());
+        hs = xCH(hs, _${col.uncapitalisedJavaName});
 #end
         return hs;
     }
-    protected int xCH(int hs, Object vl) {
-        return FunCustodial.calculateHashcode(hs, vl);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    public int instanceHash() {
-        return super.hashCode();
-    }
-
-    /**
-     * Convert to display string of entity's data. (no relation data)
-     * @return The display string of all columns and relation existences. (NotNull)
-     */
-    public String toString() {
-        return buildDisplayString(FunCustodial.toClassTitle(this), true, true);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String toStringWithRelation() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(toString());
+    @Override
+    protected String doBuildStringWithRelation(String li) {
 #if ($table.hasRelation())
-        String li = "\n  ";
+        StringBuilder sb = new StringBuilder();
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
         if (${foreignVariableName} != null)
@@ -718,44 +508,30 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
-        if (${referrerVariableName} != null) { for (Entity et : ${referrerVariableName})
+        if (${referrerVariableName} != null) { for (${referrer.referrerTableExtendedEntityClassName} et : ${referrerVariableName})
         { if (et != null) { sb.append(li).append(xbRDS(et, "${referrer.referrerPropertyName}")); } } }
 #end
-#end
         return sb.toString();
-    }
-#if ($table.hasRelation())
-    protected String xbRDS(Entity et, String name) { // buildRelationDisplayString()
-        return et.buildDisplayString(name, true, true);
-    }
+#else
+        return "";
 #end
+    }
 #if ($table.hasOptionalRelation())
     protected <ET extends Entity> String xbRDS(${database.relationOptionalEntityClassName}<ET> et, String name) { // buildRelationDisplayString()
         return et.get().buildDisplayString(name, true, true);
     }
 #end
 
-    /**
-     * {@inheritDoc}
-     */
-    public String buildDisplayString(String name, boolean column, boolean relation) {
+    @Override
+    protected String doBuildColumnString(String dm) {
         StringBuilder sb = new StringBuilder();
-        if (name != null) { sb.append(name).append(column || relation ? ":" : ""); }
-        if (column) { sb.append(buildColumnString()); }
-        if (relation) { sb.append(buildRelationString()); }
-        sb.append("@").append(Integer.toHexString(hashCode()));
-        return sb.toString();
-    }
-    protected String buildColumnString() {
-        StringBuilder sb = new StringBuilder();
-        String dm = ", ";
 #foreach ($col in $table.columns)
 #if ($col.isJavaNativeUtilDate())
-        sb.append(dm).append(xfUD(get${col.javaName}()));
+        sb.append(dm).append(xfUD(_${col.uncapitalisedJavaName}));
 #elseif ($col.isJavaNativeByteArray())
-        sb.append(dm).append(xfBA(get${col.javaName}()));
+        sb.append(dm).append(xfBA(_${col.uncapitalisedJavaName}));
 #else
-        sb.append(dm).append(get${col.javaName}());
+        sb.append(dm).append(_${col.uncapitalisedJavaName});
 #end
 #end
         if (sb.length() > dm.length()) {
@@ -764,41 +540,26 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         sb.insert(0, "{").append("}");
         return sb.toString();
     }
-#if ($table.hasUtilDateColumn())
-    protected String xfUD(Date date) { // formatUtilDate()
-        return FunCustodial.toStringDate(date, xgDP(), mytimeZone());
-    }
-    protected String xgDP() { // getDatePattern()
-        return "${database.utilDateDisplayPattern}";
-    }
-    protected TimeZone mytimeZone() {
-        return null; // as default
-    }
-#end
-#if ($table.hasByteArrayColumn())
-    protected String xfBA(byte[] bytes) { // formatByteArray()
-        return FunCustodial.toStringBytes(bytes);
-    }
-#end
-    protected String buildRelationString() {
+
+    @Override
+    protected String doBuildRelationString(String dm) {
 #if ($table.hasRelation())
         StringBuilder sb = new StringBuilder();
-        String cm = ",";
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
-        if (${foreignVariableName} != null) { sb.append(cm).append("${fk.foreignPropertyName}"); }
+        if (${foreignVariableName} != null) { sb.append(dm).append("${fk.foreignPropertyName}"); }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-        if (${referrerVariableName} != null) { sb.append(cm).append("${referrer.referrerPropertyNameAsOne}"); }
+        if (${referrerVariableName} != null) { sb.append(dm).append("${referrer.referrerPropertyNameAsOne}"); }
 #end
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         if (${referrerVariableName} != null && !${referrerVariableName}.isEmpty())
-        { sb.append(cm).append("${referrer.referrerPropertyName}"); }
+        { sb.append(dm).append("${referrer.referrerPropertyName}"); }
 #end
-        if (sb.length() > cm.length()) {
-            sb.delete(0, cm.length()).insert(0, "(").append(")");
+        if (sb.length() > dm.length()) {
+            sb.delete(0, dm.length()).insert(0, "(").append(")");
         }
         return sb.toString();
 #else
@@ -806,16 +567,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
     }
 
-    /**
-     * Clone entity instance using super.clone(). (shallow copy) 
-     * @return The cloned instance of this entity. (NotNull)
-     */
+    @Override
     public ${myExtendedObjectClassName} clone() {
-        try {
-            return (${myExtendedObjectClassName})super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new IllegalStateException("Failed to clone the entity: " + toString(), e);
-        }
+        return (${myExtendedObjectClassName})super.clone();
     }
 
 #set ($propertyLoopIndex = 0)
@@ -912,17 +666,5 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         set${col.javaName}(${col.uncapitalisedJavaName});
     }
 #end
-#end
-#if ($table.hasEntityConvertEmptyStringToNull())
-
-    protected String convertEmptyToNull(String value) {
-        return FunCustodial.convertEmptyToNull(value);
-    }
-#end
-#if ($table.hasCheckClassificationCodeOnEntity())
-
-    protected void checkClassificationCode(String columnDbName, ${glCDef}.DefMeta meta, Object value) {
-        FunCustodial.checkClassificationCode(this, columnDbName, meta, value);
-    }
 #end
 }

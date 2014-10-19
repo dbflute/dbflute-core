@@ -19,9 +19,6 @@ namespace ${glPackageBaseCommon} {
 #set ($classificationTop = $database.getClassificationTop($classificationName))
 #foreach ($classificationElement in $classificationTop.classificationElementList)
         void Set${javaName}_${classificationElement.name}();
-#if ($database.isMakeEntityOldStyleClassify())
-        void Classify${javaName}${classificationElement.name}();
-#end
         bool Is${javaName}${classificationElement.name} { get; }
 #end
 #end

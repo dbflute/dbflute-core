@@ -33,19 +33,10 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 public interface Entity {
 
     // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
-    /**
-     * Get the target DB meta.
-     * @return The instance of DBMeta type. (NotNull)
-     */
-    DBMeta getDBMeta();
-
-    // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
     /**
-     * Get table DB name.
+     * Get table DB name, can be identity of table.
      * @return The string for name. (NotNull)
      */
     String getTableDbName();
@@ -55,6 +46,15 @@ public interface Entity {
      * @return The string for name. (NotNull)
      */
     String getTablePropertyName();
+
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    /**
+     * Get the target DB meta.
+     * @return The instance of DBMeta type. (NotNull)
+     */
+    DBMeta getDBMeta();
 
     // ===================================================================================
     //                                                                         Primary Key
