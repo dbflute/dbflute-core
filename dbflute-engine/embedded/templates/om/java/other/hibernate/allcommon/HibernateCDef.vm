@@ -131,11 +131,7 @@ public interface ${glCDef} {
             return new ArrayList<${classificationName}>(Arrays.asList(values()));
         }
 
-#if ($database.isCDefToStringReturnsName())
-        @Override public String toString() { return name(); }
-#else
         @Override public String toString() { return code(); }
-#end
     }
 #end
 }

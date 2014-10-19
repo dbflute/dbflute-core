@@ -1919,10 +1919,6 @@ public class Database {
         return getLittleAdjustmentProperties().isCDefToStringReturnsName();
     }
 
-    public boolean isMakeEntityOldStyleClassify() {
-        return getLittleAdjustmentProperties().isMakeEntityOldStyleClassify();
-    }
-
     public String getConditionQueryNotEqualDefinitionName() {
         return getLittleAdjustmentProperties().getConditionQueryNotEqualDefinitionName();
     }

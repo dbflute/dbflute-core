@@ -527,9 +527,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCDefToStringReturnsName", false);
     }
 
-    public boolean isMakeEntityOldStyleClassify() { // closet
-        return isProperty("isMakeEntityOldStyleClassify", false);
-    }
+    // unsupported since 1.1
+    //public boolean isMakeEntityOldStyleClassify() { // closet
+    //    return isProperty("isMakeEntityOldStyleClassify", false);
+    //}
 
     public boolean isSuppressTableClassificationDBAccessClass() { // closet
         return isProperty("isSuppressTableClassificationDBAccessClass", false);
@@ -538,18 +539,18 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                       Paging Select
     //                                                                       =============
-    public boolean isPagingCountLater() {
+    public boolean isPagingCountLater() { // closet since 1.1
         return isProperty("isPagingCountLater", true); // default true @since 0.9.9.0A
     }
 
-    public boolean isPagingCountLeastJoin() {
+    public boolean isPagingCountLeastJoin() { // closet since 1.1
         return isProperty("isPagingCountLeastJoin", true); // default true @since 0.9.9.0A
     }
 
     // ===================================================================================
     //                                                                          Inner Join
     //                                                                          ==========
-    public boolean isInnerJoinAutoDetect() {
+    public boolean isInnerJoinAutoDetect() { // closet since 1.1
         return isProperty("isInnerJoinAutoDetect", true); // default true @since 1.0.3
     }
 
