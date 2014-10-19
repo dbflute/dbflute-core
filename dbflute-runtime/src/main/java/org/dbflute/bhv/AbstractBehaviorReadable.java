@@ -68,7 +68,7 @@ import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.derived.DerivedMappable;
+import org.dbflute.dbmeta.accessory.DerivedMappable;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;

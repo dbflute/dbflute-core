@@ -68,7 +68,7 @@ public class TnRelationRowCreationResource {
     /** The suffix of base object. (NotNull, EmptyAllowed: empty means base relation is base point) */
     protected String _baseSuffix;
 
-    /** The suffix of relation no. (NotNull) */
+    /** The suffix of relation no, e.g. _0, _1_3. (NotNull) */
     protected String _relationNoSuffix;
 
     /** The limit of relation nest level. */
@@ -389,6 +389,22 @@ public class TnRelationRowCreationResource {
      */
     public boolean canUseRelationCache() {
         return _relSelector.canUseRelationCache(_relationNoSuffix);
+    }
+
+    /**
+     * Is the access to non-specified column allowed?
+     * @return The determination, true or false.
+     */
+    public boolean isNonSpecifiedColumnAccessAllowed() {
+        return _relSelector.isNonSpecifiedColumnAccessAllowed(_relationNoSuffix);
+    }
+
+    /**
+     * Does the relation use SpecifyColumn?
+     * @return The determination, true or false.
+     */
+    public boolean isUsingSpecifyColumnInRelation() {
+        return _relSelector.isUsingSpecifyColumnInRelation(_relationNoSuffix);
     }
 
     // ===================================================================================

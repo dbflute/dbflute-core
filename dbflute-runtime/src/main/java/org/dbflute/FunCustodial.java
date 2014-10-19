@@ -19,7 +19,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
 import org.dbflute.exception.CharParameterShortSizeException;
+import org.dbflute.exception.NonSpecifiedColumnAccessException;
 import org.dbflute.exception.UndefinedClassificationCodeException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
@@ -122,6 +124,70 @@ public class FunCustodial {
     }
 
     // ===================================================================================
+    //                                                                Specified Properties
+    //                                                                ====================
+    public static void checkSpecifiedProperty(Entity entity, String propertyName, EntityModifiedProperties specifiedProperties) {
+        if (specifiedProperties == null) { // means no need to check (e.g. all columns are selected)
+            return;
+        }
+        if (!entity.createdBySelect()) { // basically no way, selected when the properties exists but just in case
+            return;
+        }
+        // SpecifyColumn is used for the entity
+        if (specifiedProperties.isModifiedProperty(propertyName)) { // yes, setter is called when select mapping
+            return; // OK, OK
+        }
+        // no, you get the non-specified column, throws exception
+        throwNonSpecifiedColumnAccessException(entity.getTableDbName(), propertyName, specifiedProperties);
+    }
+
+    protected static void throwNonSpecifiedColumnAccessException(String tableDbName, String propertyName,
+            EntityModifiedProperties specifiedProperties) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Non-specified column was accessed.");
+        br.addItem("Advice");
+        br.addElement("To get non-specified column from entity is not allowd.");
+        br.addElement("Non-specified means using SpecifyColumn but the column is non-specified.");
+        br.addElement("Mistake? Or specify the column by your condition-bean if you need it.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    memberBhv.selectEntity(cb -> {");
+        br.addElement("        cb.setupSelect_MemberStatus();");
+        br.addElement("        cb.specify().columnMemberStatusName();");
+        br.addElement("        cb.query().set...");
+        br.addElement("    }).alwaysPresent(member -> {");
+        br.addElement("        member.getMemberStatus().alwaysPresent(status -> {");
+        br.addElement("            ... = status.getMemberStatusName(); // OK");
+        br.addElement("            ... = status.getDisplayOrder(); // *NG: exception");
+        br.addElement("        });");
+        br.addElement("    });");
+        br.addElement("  (o):");
+        br.addElement("    memberBhv.selectEntity(cb -> {");
+        br.addElement("        cb.setupSelect_MemberStatus();");
+        br.addElement("        cb.specify().columnMemberStatusName();");
+        br.addElement("        cb.specify().columnDisplayOrder(); // *Point");
+        br.addElement("        cb.query().set...");
+        br.addElement("    }).alwaysPresent(member -> {");
+        br.addElement("        member.getMemberStatus().alwaysPresent(status -> {");
+        br.addElement("            ... = status.getMemberStatusName(); // OK");
+        br.addElement("            ... = status.getDisplayOrder(); // OK");
+        br.addElement("        });");
+        br.addElement("    });");
+        br.addElement("");
+        br.addElement("While, reluctantly you need to get the column without change conditions,");
+        br.addElement("you can enable non-specified column access by the condition-bean option.");
+        br.addElement("The method is cb.enable...()");
+        br.addItem("Table");
+        br.addElement(tableDbName);
+        br.addItem("Non-Specified and Accessed");
+        br.addElement(propertyName);
+        br.addItem("Specified Column in the Table");
+        br.addElement(specifiedProperties);
+        final String msg = br.buildExceptionMessage();
+        throw new NonSpecifiedColumnAccessException(msg);
+    }
+
+    // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============
     public static void checkClassificationCode(Entity entity, String columnDbName, ClassificationMeta meta, Object code) {
@@ -148,7 +214,7 @@ public class FunCustodial {
         // else means ALLOWED
     }
 
-    public static void throwUndefinedClassificationCodeException(String tableDbName, String columnDbName, ClassificationMeta meta,
+    protected static void throwUndefinedClassificationCodeException(String tableDbName, String columnDbName, ClassificationMeta meta,
             Object code) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Undefined classification code was set to the entity.");

@@ -599,6 +599,7 @@ public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef}
     @MappingValueType(keyName = "bytesOidType")
 #end
     public ${col.javaNative} get${col.javaName}() {
+        checkSpecifiedProperty("${col.javaBeansRulePropertyName}");
 #if ($col.isEntityConvertEmptyStringToNull())
         return convertEmptyToNull(_${col.uncapitalisedJavaName});
 #else
@@ -621,7 +622,7 @@ public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef}
 #if ($col.hasCheckClassificationCodeOnEntity())
         checkClassificationCode("${col.name}", ${glCDef}.DefMeta.${col.classificationName}, ${col.uncapitalisedJavaName});
 #end
-        __modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
+        registerModifiedProperty("${col.javaBeansRulePropertyName}");
         _${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
     }
 #set ($propertyLoopIndex = $propertyLoopIndex + 1)

@@ -226,6 +226,20 @@ public interface SqlClause {
             String localRelationPath, String foreignRelationPath);
 
     /**
+     * Translate selected relation path (foreignRelationPath: relationNoSuffix) to relation property name (foreignPropertyName).
+     * @param foreignRelationPath The relation path of foreign property (relationNoSuffix). (NotNull)
+     * @return The name of foreign property, (foreignPropertyName). (NotNull)
+     */
+    String translateSelectedRelationPathToPropName(String foreignRelationPath);
+
+    /**
+     * Translate selected relation path (foreignRelationPath: relationNoSuffix) to foreign table alias name (foreignTableAliasName).
+     * @param foreignRelationPath The relation path of foreign property (relationNoSuffix). (NotNull)
+     * @return The alias name of foreign table (foreignTableAliasName). (NotNull)
+     */
+    String translateSelectedRelationPathToTableAlias(String foreignRelationPath);
+
+    /**
      * Get the count of selected relation.
      * @return The integer of count. (NotMinus)
      */
@@ -1038,7 +1052,7 @@ public interface SqlClause {
     //                                          Empty String
     //                                          ------------
     /**
-     * Enable empty string query. (default is disabled)
+     * Enable empty string query (means allowed). (default is disabled, means checked)
      */
     void enableEmptyStringQuery();
 
@@ -1048,16 +1062,16 @@ public interface SqlClause {
     void disableEmptyStringQuery();
 
     /**
-     * Is empty string checked?
+     * Is empty string allowed?
      * @return The determination, true or false.
      */
-    boolean isEmptyStringQueryEnabled();
+    boolean isEmptyStringQueryAllowed();
 
     // -----------------------------------------------------
     //                                      Overriding Query
     //                                      ----------------
     /**
-     * Enable overriding query. (default is disabled)
+     * Enable overriding query (means allowed). (default is disabled, means checked)
      */
     void enableOverridingQuery();
 
@@ -1067,10 +1081,10 @@ public interface SqlClause {
     void disableOverridingQuery();
 
     /**
-     * Is overriding query checked?
+     * Is overriding query allowed?
      * @return The determination, true or false.
      */
-    boolean isOverridingQueryEnabled();
+    boolean isOverridingQueryAllowed();
 
     // [DBFlute-0.8.6]
     // ===================================================================================

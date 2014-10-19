@@ -34,7 +34,7 @@ import org.dbflute.cbean.scoping.UnionQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.derived.DerivedTypeHandler;
+import org.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 
@@ -301,6 +301,16 @@ public class MockConditionBean implements ConditionBean {
     }
 
     public boolean canRelationMappingCache() {
+        return false;
+    }
+
+    public void enableNonSpecifiedColumnAccess() {
+    }
+
+    public void disableNonSpecifiedColumnAccess() {
+    }
+
+    public boolean isNonSpecifiedColumnAccessAllowed() {
         return false;
     }
 

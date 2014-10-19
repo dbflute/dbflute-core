@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.dbflute.bhv.core.context.ResourceContext;
+import org.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -131,12 +132,25 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
     }
 
     /**
-     * Adjust create row.
+     * Adjust created row for base-point table.
      * @param row The row of result list. (NotNull)
-     * @param bmd The bean meta data of the row. (NotNull)
+     * @param checkNonSp Does is use the check of access to non-specified column?
+     * @param basePointBmd The bean meta data of the row for base-point table. (NotNull)
      */
-    protected void adjustCreatedRow(final Object row, TnBeanMetaData bmd) {
-        TnRowCreatorExtension.adjustCreatedRow(row, bmd);
+    protected void adjustCreatedRow(final Object row, boolean checkNonSp, TnBeanMetaData basePointBmd) {
+        TnRowCreatorExtension.adjustCreatedRow(row, checkNonSp, basePointBmd);
+    }
+
+    /**
+     * Adjust created row for relation tables.
+     * @param relationRow The relation row of tables related to the base-point table. (NotNull)
+     * @param relationNoSuffix The suffix of relation no, e.g. _0, _1_3. (NotNull)
+     * @param relSelector The selector of relation, which has various determination. (NotNull)
+     * @param rpt The property type of the relation. (NotNull)
+     */
+    protected void adjustCreatedRelationRow(final Object relationRow, String relationNoSuffix, TnRelationSelector relSelector,
+            TnRelationPropertyType rpt) {
+        TnRelationRowCreatorExtension.adjustCreatedRelationRow(relationRow, relationNoSuffix, relSelector, rpt);
     }
 
     // ===================================================================================

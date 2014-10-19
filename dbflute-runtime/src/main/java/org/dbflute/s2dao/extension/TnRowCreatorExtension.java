@@ -30,8 +30,8 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.derived.DerivedMappable;
-import org.dbflute.dbmeta.derived.DerivedTypeHandler;
+import org.dbflute.dbmeta.accessory.DerivedMappable;
+import org.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.MappingClassCastException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -349,21 +349,33 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     // ===================================================================================
     //                                                                             Fix Row
     //                                                                             =======
-    // share with relation row
     /**
      * Adjust created row. (clearing modified info, ...)
      * @param row The row of result list. (NotNull)
-     * @param bmd The bean meta data of the row. (NotNull)
+     * @param checkNonSp Does is use the check of access to non-specified column?
+     * @param basePointBmd The bean meta data of the row for base-point table. (NotNull)
      */
-    public static void adjustCreatedRow(final Object row, TnBeanMetaData bmd) {
+    public static void adjustCreatedRow(final Object row, boolean checkNonSp, TnBeanMetaData basePointBmd) {
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // static for handler calling
+        // however no other callers now so unnecessary, exists once...
+        // only for uniformity with relation
+        //
+        // *similar implementation for relation row exists
+        // no refactoring because it needs high performance here,
+        // comment only to avoid wasted calculation and determination
+        // _/_/_/_/_/_/_/_/_/_/
         if (row instanceof Entity) {
             final Entity entity = (Entity) row;
+            if (checkNonSp) { // contains enabled by CB and using SpecifyColumn
+                entity.modifiedToSpecified();
+            }
             entity.clearModifiedInfo();
             entity.markAsSelect();
         } else { // not DBFlute entity
             // actually any bean meta data can be accepted
             // because only it gets modified properties
-            bmd.getModifiedPropertyNames(row).clear();
+            basePointBmd.getModifiedPropertyNames(row).clear();
         }
     }
 

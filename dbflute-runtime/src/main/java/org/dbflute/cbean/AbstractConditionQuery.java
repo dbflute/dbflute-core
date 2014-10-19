@@ -688,7 +688,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected boolean isOverrideQueryAllowed(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        return xgetSqlClause().isOverridingQueryEnabled();
+        return xgetSqlClause().isOverridingQueryAllowed();
     }
 
     protected void noticeRegistered(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
@@ -2453,7 +2453,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return The determination, true or false.
      */
     protected boolean isEmptyStringQueryAllowed() {
-        return xgetSqlClause().isEmptyStringQueryEnabled();
+        return xgetSqlClause().isEmptyStringQueryAllowed();
     }
 
     /**

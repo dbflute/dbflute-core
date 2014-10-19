@@ -135,7 +135,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
 
     protected static void throwNonSetupSelectRelationAccessException(Object entity, String relation) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("NON-setupSelect relation was accessed.");
+        br.addNotice("Non-setupSelect relation was accessed.");
         br.addItem("Advice");
         br.addElement("Confirm your access to the relation.");
         br.addElement("Call setupSelect or fix your access.");

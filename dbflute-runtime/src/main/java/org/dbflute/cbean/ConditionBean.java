@@ -30,7 +30,7 @@ import org.dbflute.cbean.scoping.OrQuery;
 import org.dbflute.cbean.scoping.UnionQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.derived.DerivedTypeHandler;
+import org.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.dbflute.exception.ConditionInvokingFailureException;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
@@ -390,10 +390,52 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //void disableRelationMappingCache();
 
     /**
-     * Can the relation mapping (entity instance) cache?
+     * Can the relation mapping (entity instance) be cached?
      * @return The determination, true or false.
      */
     boolean canRelationMappingCache();
+
+    /**
+     * Enable access to non-specified column. (default is disabled) <br />
+     * You can get columns of base-point or setup-select using SpecifyColumn but non-specified column.
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> -&gt; {
+     *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnMemberStatusName()</span>;
+     *     <span style="color: #553000">cb</span>.query().set...
+     * }).alwaysPresent(<span style="color: #553000">member</span> -&gt; {
+     *     <span style="color: #553000">member</span>.getMemberStatus().alwaysPresent(<span style="color: #553000">status</span> -&gt; {
+     *         ... = <span style="color: #553000">status</span>.getMemberStatusName(); <span style="color: #3F7E5E">// OK</span>
+     *         ... = <span style="color: #553000">status</span>.<span style="color: #CC4747">getDisplayOrder()</span>; <span style="color: #3F7E5E">// OK: allowed</span>
+     *     });
+     * });
+     * </pre>
+     */
+    void enableNonSpecifiedColumnAccess();
+
+    /**
+     * Disable the check of access to non-specified column. (back to default) <br />
+     * You cannot get columns of base-point or setup-select using SpecifyColumn but non-specified column.
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> -&gt; {
+     *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnMemberStatusName()</span>;
+     *     <span style="color: #553000">cb</span>.query().set...
+     * }).alwaysPresent(<span style="color: #553000">member</span> -&gt; {
+     *     <span style="color: #553000">member</span>.getMemberStatus().alwaysPresent(<span style="color: #553000">status</span> -&gt; {
+     *         ... = <span style="color: #553000">status</span>.getMemberStatusName(); <span style="color: #3F7E5E">// OK</span>
+     *         ... = <span style="color: #553000">status</span>.<span style="color: #CC4747">getDisplayOrder()</span>; <span style="color: #3F7E5E">// *NG: exception</span>
+     *     });
+     * });
+     * </pre>
+     */
+    void disableNonSpecifiedColumnAccess();
+
+    /**
+     * Is the access to non-specified column allowed?
+     * @return The determination, true or false.
+     */
+    boolean isNonSpecifiedColumnAccessAllowed();
 
     // ===================================================================================
     //                                                                         Display SQL

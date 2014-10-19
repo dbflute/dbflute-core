@@ -1947,6 +1947,10 @@ public class Database {
         return getLittleAdjustmentProperties().isOverridingQueryAllowed();
     }
 
+    public boolean isNonSpecifiedColumnAccessAllowed() {
+        return getLittleAdjustmentProperties().isNonSpecifiedColumnAccessAllowed();
+    }
+
     public boolean isAvailableDatabaseNativeJDBC() {
         return getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC();
     }

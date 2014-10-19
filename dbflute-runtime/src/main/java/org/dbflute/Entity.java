@@ -15,15 +15,9 @@
  */
 package org.dbflute;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.exception.SpecifyDerivedReferrerUnknownAliasNameException;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
 
 /**
  * The interface of entity. <br />
@@ -71,75 +65,6 @@ public interface Entity {
      */
     Set<String> myuniqueDrivenProperties(); // prefix 'my' not to show when uniqueBy() completion
 
-    /**
-     * The unique-driven properties of entity. (basically for Framework)
-     */
-    public static class EntityUniqueDrivenProperties implements Serializable {
-
-        /** The serial version UID for object serialization. (Default) */
-        private static final long serialVersionUID = 1L;
-
-        /** The set of property names. (NullAllowed: lazy-loaded) */
-        protected Set<String> _propertyNameSet;
-
-        /**
-         * Add property name. (according to Java Beans rule)
-         * @param propertyName The string for name. (NotNull)
-         */
-        public void addPropertyName(String propertyName) {
-            getPropertyNameSet().add(propertyName);
-        }
-
-        /**
-         * Get the set of properties.
-         * @return The set of properties. (NotNull)
-         */
-        public Set<String> getPropertyNames() {
-            return getPropertyNameSet();
-        }
-
-        /**
-         * Is the set of properties empty?
-         * @return The determination, true or false.
-         */
-        public boolean isEmpty() {
-            return getPropertyNameSet().isEmpty();
-        }
-
-        /**
-         * Clear the set of properties.
-         */
-        public void clear() {
-            getPropertyNameSet().clear();
-        }
-
-        /**
-         * Remove property name from the set. (according to Java Beans rule)
-         * @param propertyName The string for name. (NotNull)
-         */
-        public void remove(String propertyName) {
-            getPropertyNameSet().remove(propertyName);
-        }
-
-        /**
-         * Accept specified properties. (after clearing this properties)
-         * @param properties The properties as copy-resource. (NotNull)
-         */
-        public void accept(EntityModifiedProperties properties) {
-            clear();
-            for (String propertyName : properties.getPropertyNames()) {
-                addPropertyName(propertyName);
-            }
-        }
-
-        protected Set<String> getPropertyNameSet() {
-            if (_propertyNameSet == null) {
-                _propertyNameSet = new LinkedHashSet<String>(2);
-            }
-            return _propertyNameSet;
-        }
-    }
-
     // ===================================================================================
     //                                                                 Modified Properties
     //                                                                 ===================
@@ -148,7 +73,7 @@ public interface Entity {
      * The properties needs to be according to Java Beans rule.
      * @return The set of property name for modified columns. (NotNull)
      */
-    Set<String> modifiedProperties();
+    Set<String> modifiedProperties(); // TODO jflute impl: prefix my?
 
     /**
      * Clear the information of modified properties. (basically for Framework)
@@ -162,73 +87,12 @@ public interface Entity {
     boolean hasModification();
 
     /**
-     * The modified properties of entity. (basically for Framework)
+     * Copy to modified properties to specified properties. <br />
+     * It means non-specified columns are checked
      */
-    public static class EntityModifiedProperties implements Serializable {
-
-        /** The serial version UID for object serialization. (Default) */
-        private static final long serialVersionUID = 1L;
-
-        /** The set of property names. (NullAllowed: lazy-loaded) */
-        protected Set<String> _propertyNameSet;
-
-        /**
-         * Add property name. (according to Java Beans rule)
-         * @param propertyName The string for name. (NotNull)
-         */
-        public void addPropertyName(String propertyName) {
-            getPropertyNameSet().add(propertyName);
-        }
-
-        /**
-         * Get the set of properties.
-         * @return The set of properties. (NotNull)
-         */
-        public Set<String> getPropertyNames() {
-            return getPropertyNameSet();
-        }
-
-        /**
-         * Is the set of properties empty?
-         * @return The determination, true or false.
-         */
-        public boolean isEmpty() {
-            return getPropertyNameSet().isEmpty();
-        }
-
-        /**
-         * Clear the set of properties.
-         */
-        public void clear() {
-            getPropertyNameSet().clear();
-        }
-
-        /**
-         * Remove property name from the set. (according to Java Beans rule)
-         * @param propertyName The string for name. (NotNull)
-         */
-        public void remove(String propertyName) {
-            getPropertyNameSet().remove(propertyName);
-        }
-
-        /**
-         * Accept specified properties. (after clearing this properties)
-         * @param properties The properties as copy-resource. (NotNull)
-         */
-        public void accept(EntityModifiedProperties properties) {
-            clear();
-            for (String propertyName : properties.getPropertyNames()) {
-                addPropertyName(propertyName);
-            }
-        }
-
-        protected Set<String> getPropertyNameSet() {
-            if (_propertyNameSet == null) {
-                _propertyNameSet = new LinkedHashSet<String>();
-            }
-            return _propertyNameSet;
-        }
-    }
+    void modifiedToSpecified();
+    
+    // TODO jflute impl: myspecifiedProperties()? clearSpecifiedInfo()? suppressNonSpecifiedColumnAccessCheck()?
 
     // ===================================================================================
     //                                                                     Birthplace Mark
@@ -243,110 +107,6 @@ public interface Entity {
      * @return The determination, true or false.
      */
     boolean createdBySelect();
-
-    // ===================================================================================
-    //                                                                    Derived Mappable
-    //                                                                    ================
-    /**
-     * The derived map of entity. (basically for Framework)
-     */
-    public static class EntityDerivedMap implements Serializable {
-
-        /** The serial version UID for object serialization. (Default) */
-        private static final long serialVersionUID = 1L;
-
-        /** The map of derived value. map:{alias-name = value} (NullAllowed: lazy-loaded) */
-        protected Map<String, Object> _derivedMap;
-
-        /**
-         * Register the derived value to the map.
-         * @param aliasName The alias name of derived-referrer. (NotNull)
-         * @param selectedValue The derived value selected from database. (NullAllowed: when null selected)
-         */
-        public void registerDerivedValue(String aliasName, Object selectedValue) {
-            getDerivedMap().put(aliasName, selectedValue);
-        }
-
-        /**
-         * Find the derived value in the map.
-         * @param <VALUE> The type of derived value.
-         * @param aliasName The alias name of derived-referrer. (NotNull)
-         * @return The derived value found in the map. (NullAllowed: when null selected)
-         */
-        public <VALUE> VALUE findDerivedValue(String aliasName) {
-            if (aliasName == null) {
-                throw new IllegalArgumentException("The argument 'aliasName' should not be null.");
-            }
-            final Map<String, Object> derivedMap = getDerivedMap();
-            if (!derivedMap.containsKey(aliasName)) {
-                throwUnknownAliasNameException(aliasName, derivedMap);
-            }
-            @SuppressWarnings("unchecked")
-            final VALUE found = (VALUE) derivedMap.get(aliasName);
-            return found;
-        }
-
-        protected void throwUnknownAliasNameException(String aliasName, final Map<String, Object> derivedMap) {
-            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("Not found the alias name in the derived map");
-            br.addItem("Advice");
-            br.addElement("Make sure your alias name to find the derived value.");
-            br.addElement("You should specify the name specified as DerivedReferrer.");
-            br.addElement("For example:");
-            br.addElement("  (o):");
-            br.addElement("    MemberCB cb = new MemberCB();");
-            br.addElement("    cb.specify().derivedPurchaseList().max(purchaseCB -> {");
-            br.addElement("        purchaseCB.specify().columnPurchasePrice();");
-            br.addElement("    }, Member.ALIAS_highestPurchasePrice);");
-            br.addElement("    ...");
-            br.addElement("    Member member = ...");
-            br.addElement("    Integer price = member.derived(Member.ALIAS_dynamicPurchasePanther); // *NG");
-            br.addElement("  (o):");
-            br.addElement("    MemberCB cb = new MemberCB();");
-            br.addElement("    cb.specify().derivedPurchaseList().max(purchaseCB -> {");
-            br.addElement("        purchaseCB.specify().columnPurchasePrice();");
-            br.addElement("    }, Member.ALIAS_highestPurchasePrice);");
-            br.addElement("    ...");
-            br.addElement("    Member member = ...");
-            br.addElement("    Integer price = member.derived(Member.ALIAS_highestPurchasePrice); // OK");
-            br.addItem("Alias Name");
-            br.addElement(aliasName);
-            br.addItem("Derived Map");
-            br.addElement(derivedMap.keySet());
-            final String msg = br.buildExceptionMessage();
-            throw new SpecifyDerivedReferrerUnknownAliasNameException(msg);
-        }
-
-        /**
-         * Is the derived map empty?
-         * @return The determination, true or false.
-         */
-        public boolean isEmpty() {
-            return getDerivedMap().isEmpty();
-        }
-
-        /**
-         * Clear the derived map.
-         */
-        public void clear() {
-            getDerivedMap().clear();
-        }
-
-        /**
-         * Remove the derived value from the map.
-         * @param aliasName The alias name of derived-referrer. (NotNull)
-         */
-        public void remove(String aliasName) {
-            getDerivedMap().remove(aliasName);
-        }
-
-        protected Map<String, Object> getDerivedMap() {
-            if (_derivedMap == null) {
-                _derivedMap = new HashMap<String, Object>();
-            }
-            return _derivedMap;
-        }
-    }
 
     // ===================================================================================
     //                                                                    Extension Method

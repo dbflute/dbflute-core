@@ -85,6 +85,10 @@ public class InstanceKeyEntity implements Entity {
         return _actualEntity.modifiedProperties();
     }
 
+    public void modifiedToSpecified() {
+        _actualEntity.modifiedToSpecified();
+    }
+
     public void clearModifiedInfo() {
         _actualEntity.clearModifiedInfo();
     }

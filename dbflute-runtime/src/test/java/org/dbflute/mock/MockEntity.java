@@ -60,6 +60,9 @@ public class MockEntity implements Entity {
         return Collections.emptySet();
     }
 
+    public void modifiedToSpecified() {
+    }
+
     public void clearModifiedInfo() {
     }
 

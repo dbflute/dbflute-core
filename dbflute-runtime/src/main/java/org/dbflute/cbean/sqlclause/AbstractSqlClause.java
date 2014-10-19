@@ -124,13 +124,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // - - - - - - - - - -/
     /**
      * The basic map of selected relation. (NullAllowed: lazy-loaded) <br />
-     * map:{foreignRelationPath : foreignPropertyName}
+     * map:{foreignRelationPath: relationNoSuffix = foreignPropertyName}
      */
     protected Map<String, String> _selectedRelationBasicMap;
 
     /**
+     * The path-to-alias map of selected relation. (NullAllowed: lazy-loaded) <br />
+     * map:{foreignRelationPath: relationNoSuffix = foreignTableAliasName}
+     */
+    protected Map<String, String> _selectedRelationPathToTableAliasMap;
+
+    /**
      * The column map of selected relation. (NullAllowed: lazy-loaded) <br />
-     * map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}}
+     * map:{foreignTableAliasName = map:{columnName = selectedRelationColumn}}
      */
     protected Map<String, Map<String, SelectedRelationColumn>> _selectedRelationColumnMap;
 
@@ -139,13 +145,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     /**
      * Specified select column map. (NullAllowed: lazy-loaded) <br />
-     * map:{tableAliasName = map:{ columnName : specifiedInfo}}
+     * map:{tableAliasName = map:{ columnName = specifiedInfo}}
      */
     protected Map<String, Map<String, SpecifiedColumn>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
 
     /**
      * Specified select column map for backup. (NullAllowed: lazy-loaded) <br />
-     * map:{tableAliasName = map:{ columnName : specifiedInfo}}
+     * map:{tableAliasName = map:{ columnName = specifiedInfo}}
      */
     protected Map<String, Map<String, SpecifiedColumn>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
 
@@ -270,7 +276,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected boolean _emptyStringQueryEnabled;
 
     /** Does it allow overriding query? (save-only attribute) */
-    protected boolean _overridingQueryEnabled;
+    protected boolean _overridingQueryAllowed;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -1334,9 +1340,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                   Selected Relation
     //                                                                   =================
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void registerSelectedRelation(String foreignTableAliasName, String localTableDbName, String foreignPropertyName,
             String localRelationPath, String foreignRelationPath) {
         assertObjectNotNull("foreignTableAliasName", foreignTableAliasName);
@@ -1344,10 +1348,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("foreignRelationPath", foreignRelationPath);
         getSelectedRelationBasicMap().put(foreignRelationPath, foreignPropertyName);
+        getSelectedRelationPathToAliasMap().put(foreignRelationPath, foreignTableAliasName);
         final Map<String, SelectedRelationColumn> columnMap =
                 createSelectedSelectColumnInfo(foreignTableAliasName, localTableDbName, foreignPropertyName, localRelationPath);
         getSelectedRelationColumnMap().put(foreignTableAliasName, columnMap);
         analyzeSelectedNextConnectingRelation(foreignRelationPath);
+    }
+
+    /** {@inheritDoc} */
+    public String translateSelectedRelationPathToPropName(String foreignRelationPath) {
+        if (_selectedRelationBasicMap == null) {
+            return null;
+        }
+        return _selectedRelationBasicMap.get(foreignRelationPath);
     }
 
     protected Map<String, String> getSelectedRelationBasicMap() {
@@ -1355,6 +1368,21 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             _selectedRelationBasicMap = new LinkedHashMap<String, String>();
         }
         return _selectedRelationBasicMap;
+    }
+
+    /** {@inheritDoc} */
+    public String translateSelectedRelationPathToTableAlias(String foreignRelationPath) {
+        if (_selectedRelationPathToTableAliasMap == null) {
+            return null;
+        }
+        return _selectedRelationPathToTableAliasMap.get(foreignRelationPath);
+    }
+
+    protected Map<String, String> getSelectedRelationPathToAliasMap() {
+        if (_selectedRelationPathToTableAliasMap == null) {
+            _selectedRelationPathToTableAliasMap = new LinkedHashMap<String, String>();
+        }
+        return _selectedRelationPathToTableAliasMap;
     }
 
     protected Map<String, SelectedRelationColumn> createSelectedSelectColumnInfo(String foreignTableAliasName, String localTableDbName,
@@ -1393,30 +1421,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         getSelectedNextConnectingRelationSet().add(previousPath);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int getSelectedRelationCount() {
         return _selectedRelationBasicMap != null ? _selectedRelationBasicMap.size() : 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean isSelectedRelationEmpty() {
         return _selectedRelationBasicMap == null || _selectedRelationBasicMap.isEmpty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean hasSelectedRelation(String foreignRelationPath) {
         return _selectedRelationBasicMap != null && _selectedRelationBasicMap.containsKey(foreignRelationPath);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Map<String, Map<String, SelectedRelationColumn>> getSelectedRelationColumnMap() {
         if (_selectedRelationColumnMap == null) {
             _selectedRelationColumnMap = new LinkedHashMap<String, Map<String, SelectedRelationColumn>>();
@@ -1424,9 +1444,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _selectedRelationColumnMap;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean isSelectedNextConnectingRelation(String foreignRelationPath) {
         return _selectedNextConnectingRelationSet != null && _selectedNextConnectingRelationSet.contains(foreignRelationPath);
     }
@@ -2947,7 +2965,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _emptyStringQueryEnabled = false;
     }
 
-    public boolean isEmptyStringQueryEnabled() {
+    public boolean isEmptyStringQueryAllowed() {
         return _emptyStringQueryEnabled;
     }
 
@@ -2955,15 +2973,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                      Overriding Query
     //                                      ----------------
     public void enableOverridingQuery() {
-        _overridingQueryEnabled = true;
+        _overridingQueryAllowed = true;
     }
 
     public void disableOverridingQuery() {
-        _overridingQueryEnabled = false;
+        _overridingQueryAllowed = false;
     }
 
-    public boolean isOverridingQueryEnabled() {
-        return _overridingQueryEnabled;
+    public boolean isOverridingQueryAllowed() {
+        return _overridingQueryAllowed;
     }
 
     // ===================================================================================

@@ -62,6 +62,9 @@ public class ${myClassName} extends AbstractConditionBean {
         if (${glDBFluteConfig}.getInstance().isPagingCountLeastJoin()) {
             enablePagingCountLeastJoin();
         }
+        if (${glDBFluteConfig}.getInstance().isNonSpecifiedColumnAccessAllowed()) {
+            enableNonSpecifiedColumnAccess();
+        }
         if (${glDBFluteConfig}.getInstance().isQueryUpdateCountPreCheck()) {
             enableQueryUpdateCountPreCheck();
         }
@@ -270,11 +273,11 @@ public class ${myClassName} extends AbstractConditionBean {
      *     <span style="color: #553000">unionCB</span>.query().set...
      * });
      * </pre>
-     * @param unionQuery The query of 'union'. (NotNull)
+     * @param unionCBLambda The callback for query of 'union'. (NotNull)
      */
-    public void union(UnionQuery<${myConditionBeanClassName}> unionQuery) {
+    public void union(UnionQuery<${myConditionBeanClassName}> unionCBLambda) {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForUnion(this); xsyncUQ(cb); 
-        try { lock(); unionQuery.query(cb); } finally { unlock(); } xsaveUCB(cb);
+        try { lock(); unionCBLambda.query(cb); } finally { unlock(); } xsaveUCB(cb);
         final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionQuery(cq);
     }
 
@@ -287,11 +290,11 @@ public class ${myClassName} extends AbstractConditionBean {
      *     <span style="color: #553000">unionCB</span>.query().set...
      * });
      * </pre>
-     * @param unionQuery The query of 'union all'. (NotNull)
+     * @param unionCBLambda The callback for query of 'union all'. (NotNull)
      */
-    public void unionAll(UnionQuery<${myConditionBeanClassName}> unionQuery) {
+    public void unionAll(UnionQuery<${myConditionBeanClassName}> unionCBLambda) {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForUnion(this); xsyncUQ(cb);
-        try { lock(); unionQuery.query(cb); } finally { unlock(); } xsaveUCB(cb);
+        try { lock(); unionCBLambda.query(cb); } finally { unlock(); } xsaveUCB(cb);
         final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionAllQuery(cq);
     }
 #if ($database.isAvailableDatabaseDependency())

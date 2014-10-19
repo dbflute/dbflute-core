@@ -24,7 +24,10 @@ import java.util.TimeZone;
 
 import org.dbflute.Entity;
 import org.dbflute.FunCustodial;
-import org.dbflute.dbmeta.derived.DerivedMappable;
+import org.dbflute.dbmeta.accessory.DerivedMappable;
+import org.dbflute.dbmeta.accessory.EntityDerivedMap;
+import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
+import org.dbflute.dbmeta.accessory.EntityUniqueDrivenProperties;
 import org.dbflute.jdbc.ClassificationMeta;
 
 /**
@@ -52,6 +55,9 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     /** The modified properties for this entity. (NotNull) */
     protected final EntityModifiedProperties __modifiedProperties = newModifiedProperties();
 
+    /** The modified properties for this entity. (NullAllowed: normally null, created when specified-check) */
+    protected EntityModifiedProperties __specifiedProperties;
+
     /** The map of derived value, key is alias name. (NullAllowed: lazy-loaded) */
     protected EntityDerivedMap __derivedMap;
 
@@ -64,9 +70,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     // ===================================================================================
     //                                                                         Primary Key
     //                                                                         ===========
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Set<String> myuniqueDrivenProperties() {
         return __uniqueDrivenProperties.getPropertyNames();
     }
@@ -96,44 +100,55 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     // ===================================================================================
     //                                                                 Modified Properties
     //                                                                 ===================
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Set<String> modifiedProperties() {
         return __modifiedProperties.getPropertyNames();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void clearModifiedInfo() {
         __modifiedProperties.clear();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean hasModification() {
         return !__modifiedProperties.isEmpty();
+    }
+
+    /** {@inheritDoc} */
+    public void modifiedToSpecified() {
+        __specifiedProperties = newModifiedProperties();
+        __specifiedProperties.accept(__modifiedProperties);
     }
 
     protected EntityModifiedProperties newModifiedProperties() {
         return new EntityModifiedProperties();
     }
 
+    protected void checkSpecifiedProperty(String propertyName) {
+        FunCustodial.checkSpecifiedProperty(this, propertyName, __specifiedProperties);
+    }
+
+    protected void registerModifiedProperty(String propertyName) {
+        __modifiedProperties.addPropertyName(propertyName);
+        registerSpecifiedProperty(propertyName);
+    }
+
+    protected void registerSpecifiedProperty(String propertyName) { // basically called by modified property registration
+        if (__specifiedProperties != null) { // normally false, true if e.g. setting after selected
+            __specifiedProperties.addPropertyName(propertyName);
+        }
+    }
+
     // ===================================================================================
     //                                                                     Birthplace Mark
     //                                                                     ===============
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void markAsSelect() {
         __createdBySelect = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean createdBySelect() {
         return __createdBySelect;
     }
@@ -141,9 +156,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     // ===================================================================================
     //                                                                    Derived Mappable
     //                                                                    ================
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void registerDerivedValue(String aliasName, Object selectedValue) {
         if (__derivedMap == null) {
             __derivedMap = newDerivedMap();
@@ -151,11 +164,9 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
         __derivedMap.registerDerivedValue(aliasName, selectedValue);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public <VALUE> VALUE derived(String aliasName) {
-        // TODO jflute impl: derived soptional?
+        // TODO jflute impl: derived optional?
         if (__derivedMap == null) {
             __derivedMap = newDerivedMap();
         }

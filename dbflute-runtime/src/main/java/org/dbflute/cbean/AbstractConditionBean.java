@@ -60,7 +60,7 @@ import org.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
-import org.dbflute.dbmeta.derived.DerivedTypeHandler;
+import org.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
@@ -104,10 +104,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                Paging
     //                                                ------
     /** Is the count executed later? {Internal} */
-    protected boolean _pagingCountLater; // the default value is on the DBFlute generator (true @since 0.9...)
+    protected boolean _pagingCountLater; // the default is on the DBFlute generator (true @since 0.9...)
 
     /** Can the paging re-select? {Internal} */
-    protected boolean _pagingReSelect = true;
+    protected boolean _pagingReSelect = true; // fixedly true as default
 
     /** Does it split SQL execution as select and query? {Internal} */
     protected boolean _pagingSelectAndQuerySplit;
@@ -128,7 +128,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
 
     /** Is the condition-bean locked? e.g. true if in sub-query process */
-    protected boolean _locked = false;
+    protected boolean _locked;
 
     // -----------------------------------------------------
     //                                          Dream Cruise
@@ -160,8 +160,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** The configuration of statement. {Internal} (NullAllowed) */
     protected StatementConfig _statementConfig;
 
-    /** Does it cache of relation entity instance? {Internal} */
-    protected boolean _relationMappingCache = true;
+    /** Can the relation mapping (entity instance) be cached? {Internal} */
+    protected boolean _canRelationMappingCache = true; // fixedly true as default
+
+    /** Does it allow access to non-specified column? {Internal} */
+    protected boolean _nonSpecifiedColumnAccessAllowed; // the default is on the DBFlute generator (false @since 1.1)
 
     /** The option of cursor select. {Internal} (NullAllowed) */
     protected CursorSelectOption _cursorSelectOption; // set by sub-class
@@ -769,14 +772,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public void enableEmptyStringQuery(ModeQuery noArgLambda) {
         assertOptionThatBadTiming("enableEmptyStringQuery()");
         assertObjectNotNull("noArgLambda", noArgLambda);
-        final boolean originallyEnabled = getSqlClause().isEmptyStringQueryEnabled();
-        if (!originallyEnabled) {
+        final boolean originallyAllowed = getSqlClause().isEmptyStringQueryAllowed();
+        if (!originallyAllowed) {
             doEnableEmptyStringQuery();
         }
         try {
             noArgLambda.query();
         } finally {
-            if (!originallyEnabled) {
+            if (!originallyAllowed) {
                 disableEmptyStringQuery();
             }
         }
@@ -803,14 +806,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public void enableOverridingQuery(ModeQuery noArgLambda) {
         assertOptionThatBadTiming("enableOverridingQuery()");
         assertObjectNotNull("noArgLambda", noArgLambda);
-        final boolean originallyEnabled = getSqlClause().isOverridingQueryEnabled();
-        if (!originallyEnabled) {
+        final boolean originallyAllowed = getSqlClause().isOverridingQueryAllowed();
+        if (!originallyAllowed) {
             doEnableOverridingQuery();
         }
         try {
             noArgLambda.query();
         } finally {
-            if (!originallyEnabled) {
+            if (!originallyAllowed) {
                 disableOverridingQuery();
             }
         }
@@ -1352,14 +1355,27 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public void disableRelationMappingCache() {
         assertOptionThatBadTiming("disableRelationMappingCache()");
         // deprecated methods from the beginning are not defined as interface methods
-        _relationMappingCache = false;
+        _canRelationMappingCache = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean canRelationMappingCache() {
-        return _relationMappingCache;
+        return _canRelationMappingCache;
+    }
+
+    /** {@inheritDoc} */
+    public void enableNonSpecifiedColumnAccess() {
+        _nonSpecifiedColumnAccessAllowed = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableNonSpecifiedColumnAccess() {
+        _nonSpecifiedColumnAccessAllowed = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isNonSpecifiedColumnAccessAllowed() {
+        return _nonSpecifiedColumnAccessAllowed;
     }
 
     // ===================================================================================
@@ -1933,12 +1949,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
         } else {
             ignoreNullOrEmptyQuery();
         }
-        if (mainCQ.xgetSqlClause().isEmptyStringQueryEnabled()) {
+        if (mainCQ.xgetSqlClause().isEmptyStringQueryAllowed()) {
             doEnableEmptyStringQuery();
         } else {
             disableEmptyStringQuery();
         }
-        if (mainCQ.xgetSqlClause().isOverridingQueryEnabled()) {
+        if (mainCQ.xgetSqlClause().isOverridingQueryAllowed()) {
             doEnableOverridingQuery();
         } else {
             disableOverridingQuery();
