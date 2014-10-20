@@ -112,6 +112,21 @@ public abstract class $myClassName implements Serializable {
     public ${myClassName}() {
     }
 
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
+    public Set<String> mymodifiedProperties() {
+        return __modifiedProperties;
+    }
+
+    public void clearModifiedInfo() {
+        __modifiedProperties.clear();
+    }
+
+    public boolean hasModification() {
+        return !__modifiedProperties.isEmpty();
+    }
+
 #if ($database.isSimpleDtoClassificationDeployment() && $table.hasClassification())
     // ===================================================================================
     //                                                             Classification Property
@@ -248,21 +263,6 @@ public abstract class $myClassName implements Serializable {
     }
 
 #end
-    // ===================================================================================
-    //                                                                 Modified Properties
-    //                                                                 ===================
-    public Set<String> modifiedProperties() {
-        return __modifiedProperties;
-    }
-
-    public void clearModifiedInfo() {
-        __modifiedProperties.clear();
-    }
-
-    public boolean hasModification() {
-        return !__modifiedProperties.isEmpty();
-    }
-
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
