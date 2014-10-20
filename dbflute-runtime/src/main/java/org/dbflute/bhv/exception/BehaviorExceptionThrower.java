@@ -284,8 +284,7 @@ public class BehaviorExceptionThrower {
         br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
         br.addElement("Or if your process is insert(), you might expect identity.");
         br.addElement("Confirm the primary-key's identity setting.");
-        br.addItem("Entity");
-        br.addElement(entity);
+        setupEntityElement(br, entity);
         final String msg = br.buildExceptionMessage();
         throw new EntityPrimaryKeyNotFoundException(msg);
     }
@@ -312,8 +311,7 @@ public class BehaviorExceptionThrower {
         br.addElement("    entity.setFooDate(...);");
         br.addElement("    entity.uniqueByFooAccount(...);");
         br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
-        br.addItem("Entity");
-        br.addElement(entity);
+        setupEntityElement(br, entity);
         final String msg = br.buildExceptionMessage();
         throw new EntityUniqueKeyNotFoundException(msg);
     }

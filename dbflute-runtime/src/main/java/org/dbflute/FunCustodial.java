@@ -138,10 +138,10 @@ public class FunCustodial {
             return; // OK, OK
         }
         // no, you get the non-specified column, throws exception
-        throwNonSpecifiedColumnAccessException(entity.getTableDbName(), propertyName, specifiedProperties);
+        throwNonSpecifiedColumnAccessException(entity, propertyName, specifiedProperties);
     }
 
-    protected static void throwNonSpecifiedColumnAccessException(String tableDbName, String propertyName,
+    protected static void throwNonSpecifiedColumnAccessException(Entity entity, String propertyName,
             EntityModifiedProperties specifiedProperties) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Non-specified column was accessed.");
@@ -177,14 +177,24 @@ public class FunCustodial {
         br.addElement("While, reluctantly you need to get the column without change conditions,");
         br.addElement("you can enable non-specified column access by the condition-bean option.");
         br.addElement("The method is cb.enable...()");
-        br.addItem("Table");
-        br.addElement(tableDbName);
+        buildExceptionTableInfo(br, entity);
         br.addItem("Non-Specified and Accessed");
         br.addElement(propertyName);
         br.addItem("Specified Column in the Table");
         br.addElement(specifiedProperties);
         final String msg = br.buildExceptionMessage();
         throw new NonSpecifiedColumnAccessException(msg);
+    }
+
+    protected static void buildExceptionTableInfo(ExceptionMessageBuilder br, Entity entity) {
+        br.addItem("Table");
+        br.addElement(entity.getTableDbName());
+        try {
+            br.addElement(entity.getDBMeta().extractPrimaryKeyMap(entity));
+        } catch (RuntimeException continued) { // just in case
+            br.addElement("*Failed to get PK info:");
+            br.addElement(continued.getMessage());
+        }
     }
 
     // ===================================================================================

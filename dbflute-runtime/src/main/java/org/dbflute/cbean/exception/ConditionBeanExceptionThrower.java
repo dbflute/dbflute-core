@@ -97,7 +97,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("    });");
         br.addElement("  (o): (Normal Use)");
         br.addElement("    cb.setupSelect_MemberStatus(); // OK");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + purpose + ")");
         br.addItem("Setup Relation");
@@ -126,7 +126,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("        });");
         br.addElement("    });");
         Class<? extends ConditionBean> cbType = lockedCB.getClass();
-        br.addItem("Locked ConditionBean");
+        br.addItem("Locked ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(cbType.getName());
         br.addElement("(" + lockedCB.getPurpose() + ")");
         br.addItem("Your SetupSelect");
@@ -160,7 +160,7 @@ public class ConditionBeanExceptionThrower {
     //    br.addElement("            unionCB.query().setXxx...;");
     //    br.addElement("        }");
     //    br.addElement("    });");
-    //    br.addItem("ConditionBean");
+    //    br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
     //    br.addElement(baseCB.getClass().getName());
     //    br.addItem("Setup Relation");
     //    br.addElement(foreignPropertyName);
@@ -191,8 +191,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("    cb.query().existsPurchaseList(purchaseCB -> {");
         br.addElement("        purchaseCB.query().set...");
         br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         final String msg = br.buildExceptionMessage();
@@ -215,7 +214,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("        purchaseCB.specify().columnMemberId(); // OK");
         br.addElement("        purchaseCB.query().set...");
         br.addElement("    }, ...);");
-        br.addItem("Locked ConditionBean");
+        br.addItem("Locked ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(lockedCB.getClass().getName());
         br.addElement("(" + lockedCB.getPurpose() + ")");
         final String msg = br.buildExceptionMessage();
@@ -230,27 +229,20 @@ public class ConditionBeanExceptionThrower {
         br.addElement("Because the conditoin-bean is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (DerivedReferrer)");
-        br.addElement("    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB subCB) {");
-        br.addElement("            subCB.specify().columnPurchaseCount();");
-        br.addElement("            subCB.specify().columnPurchasePrice(); // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.specify().derivedPurchaseList().max(purchaseCB -> {");
+        br.addElement("        purchaseCB.specify().columnPurchaseCount();");
+        br.addElement("        purchaseCB.specify().columnPurchasePrice(); // *NG");
         br.addElement("    });");
         br.addElement("  (x): (ColumnQuery)");
-        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.specify().columnMemberName();");
-        br.addElement("            cb.specify().columnBirthdate(); // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.columnQuery(colCB -> {");
+        br.addElement("        colCB.specify().columnMemberName();");
+        br.addElement("        colCB.specify().columnBirthdate(); // *NG");
         br.addElement("    })...");
         br.addElement("  (o): (DerivedReferrer)");
-        br.addElement("    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB subCB) {");
-        br.addElement("            subCB.specify().columnPurchaseCount();");
-        br.addElement("        }");
+        br.addElement("    cb.specify().derivedPurchaseList().max(purchaseCB -> {");
+        br.addElement("        purchaseCB.specify().columnPurchaseCount();");
         br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Specified Column");
@@ -261,20 +253,20 @@ public class ConditionBeanExceptionThrower {
 
     public void throwSpecifyColumnNotSetupSelectColumnException(ConditionBean baseCB, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("You specified the column that had not been set up!");
+        br.addNotice("Lonely specify().column... was called. (without SetupSelect)");
         br.addItem("Advice");
-        br.addElement("You should call setupSelect_[ForeignTable]()");
-        br.addElement("before calling specify[ForeignTable]().column[TargetColumn]().");
+        br.addElement("SpecifyColumn needs SetupSelect for the table.");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.specify().specifyMemberStatus().columnMemberStatusName(); // *NG");
+        br.addElement("    memberBhv.selectEntity(cb -> {");
+        br.addElement("        cb.specify().specifyMemberStatus().columnMemberStatusName(); // *NG");
+        br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.setupSelect_MemberStatus(); // *Point");
-        br.addElement("    cb.specify().specifyMemberStatus().columnMemberStatusName();");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addElement("    memberBhv.selectEntity(cb -> {");
+        br.addElement("        cb.setupSelect_MemberStatus(); // *Point");
+        br.addElement("        cb.specify().specifyMemberStatus().columnMemberStatusName(); // OK");
+        br.addElement("    });");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Specified Column");
@@ -283,6 +275,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyColumnNotSetupSelectColumnException(msg);
     }
 
+    // TODO jflute exception: CB message
     public void throwSpecifyColumnWithDerivedReferrerException(HpCBPurpose purpose, ConditionBean baseCB, String columnName,
             String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -310,8 +303,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            cb.specify().derivedPurchaseList().max(...); // OK");
         br.addElement("        }");
         br.addElement("    }).greaterEqual(...);");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Specified Column");
@@ -860,8 +852,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            cb.orScopeQuery(...); // *NG");
         br.addElement("        }");
         br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + purpose + ")");
         final String msg = br.buildExceptionMessage();
@@ -987,8 +978,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            subCB.query().addOrderBy...; // *NG");
         br.addElement("        }");
         br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Order-By Column");
@@ -1033,7 +1023,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            cb.specify().columnFormalizedDatetime();");
         br.addElement("        }");
         br.addElement("    });");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         final String msg = br.buildExceptionMessage();
@@ -1083,7 +1073,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            });");
         br.addElement("        }");
         br.addElement("    });");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(cb.getClass().getName());
         br.addElement("(" + cb.getPurpose() + ")");
         final String msg = br.buildExceptionMessage();
@@ -1107,7 +1097,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            });");
         br.addElement("        }");
         br.addElement("    });");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(cb.getClass().getName());
         br.addElement("(" + cb.getPurpose() + ")");
         final String msg = br.buildExceptionMessage();
@@ -1319,7 +1309,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("    ManualOrderOption mob = new ManualOrderOption();");
         br.addElement("    mob.when_LessEqual(...);");
         br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(mob); // OK");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB != null ? baseCB.getClass().getName() : baseCB); // check just in case
         br.addItem("ManualOrderOption");
         br.addElement(moOp);
@@ -1349,7 +1339,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("    ManualOrderOption idMob = new ManualOrderOption();");
         br.addElement("    idMob.when_LessEqual(...);");
         br.addElement("    cb.query().addOrderBy_MemberId_Asc().withManualOrder(idMob); // OK");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB != null ? baseCB.getClass().getName() : baseCB); // check just in case
         br.addItem("Existing Option");
         br.addElement(existingMoOp);
@@ -1385,7 +1375,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("      purchaseCB.ignoreNullOrEmptyQuery(); // OK");
         br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
         br.addElement("  });");
-        br.addItem("Locked ConditionBean");
+        br.addItem("Locked ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(lockedCB.getClass().getName());
         br.addElement("(" + lockedCB.getPurpose() + ")");
         br.addItem("Called Option");
