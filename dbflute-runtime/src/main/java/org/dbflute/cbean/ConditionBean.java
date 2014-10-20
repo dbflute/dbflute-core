@@ -238,9 +238,9 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
      * (you can use an empty string as condition) <br />
      * You should call this before registrations of where clause and other queries. <br />
      * Union and SubQuery and other sub condition-bean inherit this.
-     * @param noArgLambda The callback for empty-string query. (NotNull)
+     * @param noArgInLambda The callback for empty-string query. (NotNull)
      */
-    void enableEmptyStringQuery(ModeQuery noArgLambda);
+    void enableEmptyStringQuery(ModeQuery noArgInLambda);
 
     /**
      * Disable empty string for query. (back to default) <br />
@@ -253,9 +253,9 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
      * (you can override existing value as condition) <br />
      * You should call this before registrations of where clause and other queries. <br />
      * Union and SubQuery and other sub condition-bean inherit this.
-     * @param noArgLambda The callback for overriding query. (NotNull)
+     * @param noArgInLambda The callback for overriding query. (NotNull)
      */
-    void enableOverridingQuery(ModeQuery noArgLambda);
+    void enableOverridingQuery(ModeQuery noArgInLambda);
 
     /**
      * Disable overriding query. (back to default) <br />
