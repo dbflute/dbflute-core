@@ -15,8 +15,8 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.dbflute.dbway.DBDef;
 
 /**
@@ -27,8 +27,8 @@ public class ${glDBCurrent} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(${glDBCurrent}.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(${glDBCurrent}.class);
 
     /** Singleton instance. */
     private static final ${glDBCurrent} _instance = new ${glDBCurrent}();

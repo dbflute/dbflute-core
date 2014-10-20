@@ -78,7 +78,7 @@ public abstract class $myClassName implements Serializable {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================
@@ -110,6 +110,21 @@ public abstract class $myClassName implements Serializable {
     //                                                                         Constructor
     //                                                                         ===========
     public ${myClassName}() {
+    }
+
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
+    public Set<String> mymodifiedProperties() {
+        return __modifiedProperties;
+    }
+
+    public void clearModifiedInfo() {
+        __modifiedProperties.clear();
+    }
+
+    public boolean hasModification() {
+        return !__modifiedProperties.isEmpty();
     }
 
 #if ($database.isSimpleDtoClassificationDeployment() && $table.hasClassification())
@@ -248,21 +263,6 @@ public abstract class $myClassName implements Serializable {
     }
 
 #end
-    // ===================================================================================
-    //                                                                 Modified Properties
-    //                                                                 ===================
-    public Set<String> modifiedProperties() {
-        return __modifiedProperties;
-    }
-
-    public void clearModifiedInfo() {
-        __modifiedProperties.clear();
-    }
-
-    public boolean hasModification() {
-        return !__modifiedProperties.isEmpty();
-    }
-
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============

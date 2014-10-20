@@ -137,14 +137,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.bhv.referrer.ConditionBeanSetupper;
 import org.dbflute.bhv.referrer.ReferrerConditionSetupper;
-import org.dbflute.dbmeta.derived.DerivedMappable;
+import org.dbflute.cbean.chelper.HpSDRFunction;
+import org.dbflute.cbean.chelper.dbms.HpSDRFunctionMySql;
+import org.dbflute.dbmeta.accessory.DerivedMappable;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;
@@ -171,6 +171,8 @@ import org.dbflute.properties.DfSimpleDtoProperties;
 import org.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
 /**
@@ -181,7 +183,7 @@ public class Table {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(Table.class);
+    private static final Logger _log = LoggerFactory.getLogger(Table.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -1287,38 +1289,34 @@ public class Table {
     // -----------------------------------------------------
     //                                  Existing Foreign Key
     //                                  --------------------
-    public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) { // no suffix
+    public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList) { // no suffix
         return doExistsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, null, false);
     }
 
-    public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList, String fixedSuffix) { // all
+    public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList,
+            String fixedSuffix) { // all
         return doExistsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, true);
     }
 
-    protected boolean doExistsForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList, String fixedSuffix, boolean compareSuffix) {
-        final ForeignKey fk = doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList,
-                fixedSuffix, compareSuffix, true);
+    protected boolean doExistsForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList,
+            String fixedSuffix, boolean compareSuffix) {
+        final ForeignKey fk =
+                doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, compareSuffix, true);
         return fk != null;
     }
 
-    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) { // no suffix
+    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList) { // no suffix
         return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, null, false, true);
     }
 
-    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> foreignColumnNameList,
-            String fixedSuffix) { // no local columns
+    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> foreignColumnNameList, String fixedSuffix) { // no local columns
         final List<String> emptyList = DfCollectionUtil.emptyList();
         return doFindExistingForeignKey(foreignTableName, emptyList, foreignColumnNameList, fixedSuffix, true, false);
     }
 
-    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList, String fixedSuffix) { // all
-        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix,
-                true, true);
+    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList,
+            String fixedSuffix) { // all
+        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, true, true);
     }
 
     protected ForeignKey doFindExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
@@ -2120,6 +2118,23 @@ public class Table {
      */
     public String getJavaBeansRulePropertyName() {
         return Srl.initBeansProp(getJavaName());
+    }
+
+    // -----------------------------------------------------
+    //                                     Lambda Short Name
+    //                                     -----------------
+    public String getLambdaShortName() { // e.g. memberLambda, securityLambda
+        final String name = getUnderscoreLastRearDbName();
+        if (Srl.isUpperCaseAll(name) || Srl.isLowerCaseAll(name)) { // e.g. MEMBER, purchase
+            return Srl.initUncap(Srl.camelize(name));
+        } else { // e.g. DB name is camel case or contains number (non case characters)
+            return "entity"; // unsupported here
+        }
+    }
+
+    protected String getUnderscoreLastRearDbName() {
+        final String dbName = getTableDbName();
+        return dbName.contains("_") ? Srl.substringLastRear(dbName, "_") : dbName;
     }
 
     // ===================================================================================
@@ -3479,6 +3494,10 @@ public class Table {
         return getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
+    public boolean needsBehaviorCBeanScopingCallbackImport() {
+        return isMakeBatchUpdateSpecifyColumn();
+    }
+
     // -----------------------------------------------------
     //                                         Select Entity
     //                                         -------------
@@ -3532,6 +3551,9 @@ public class Table {
         return prop.isCompatibleSelectByPKOldStyle() ? "Value" : "";
     }
 
+    // -----------------------------------------------------
+    //                                     Compatible Option
+    //                                     -----------------
     public boolean isMakeCallbackConditionBeanSetup() {
         return getLittleAdjustmentProperties().isMakeCallbackConditionBeanSetup();
     }
@@ -3541,12 +3563,17 @@ public class Table {
     }
 
     public boolean isMakeBatchUpdateSpecifyColumn() {
-        return getLittleAdjustmentProperties().isMakeBatchUpdateSpecifyColumn();
+        return isWritable() && getLittleAdjustmentProperties().isMakeBatchUpdateSpecifyColumn();
     }
 
     public boolean isCompatibleSelectByPKWithDeletedCheck() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.isCompatibleSelectByPKWithDeletedCheck();
+    }
+
+    public boolean isCompatibleOutsideSqlFacadeChainOldStyle() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleOutsideSqlFacadeChainOldStyle();
     }
 
     // -----------------------------------------------------
@@ -3651,6 +3678,30 @@ public class Table {
 
     public boolean isMakeDirectConditionManualOrder() {
         return getLittleAdjustmentProperties().isMakeDirectConditionManualOrder();
+    }
+
+    // -----------------------------------------------------
+    //                              DerivedReferrer Function
+    //                              ------------------------
+    // only (Specify)DerivedReferrer is here
+    // because this is base implementation for #future needs
+    public boolean needsSpecifyDerivedReferrerFunctionDBMSOverride() {
+        return chooseSpecifyDerivedReferrerFunctionDBMSClassName() != null;
+    }
+
+    public String getSpecifyDerivedReferrerFunctionClassName() {
+        final String dbmsClassName = chooseSpecifyDerivedReferrerFunctionDBMSClassName();
+        return dbmsClassName != null ? dbmsClassName : HpSDRFunction.class.getSimpleName();
+    }
+
+    protected String chooseSpecifyDerivedReferrerFunctionDBMSClassName() {
+        if (getLittleAdjustmentProperties().isAvailableDatabaseDependency()) {
+            // FQCN here because of no import in template
+            if (getBasicProperties().isDatabaseMySQL()) {
+                return HpSDRFunctionMySql.class.getName();
+            }
+        }
+        return null;
     }
 
     // ===================================================================================
@@ -4160,7 +4211,7 @@ public class Table {
             // as test cases), so we'll assume that we needn't add an
             // entry to the system name list for these.
         } catch (EngineException nameAlreadyInUse) {
-            _log.error(nameAlreadyInUse, nameAlreadyInUse);
+            _log.error("Failed to do naming: " + _name, nameAlreadyInUse);
         }
     }
 

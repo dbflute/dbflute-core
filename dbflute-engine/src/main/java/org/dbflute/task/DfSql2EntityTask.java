@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
@@ -65,6 +63,8 @@ import org.dbflute.task.bs.DfAbstractTexenTask;
 import org.dbflute.task.bs.assistant.DfSpecifiedSqlFile;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.IndexOfInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -74,8 +74,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfSql2EntityTask.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -294,7 +294,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             sb.append(ln()).append("  ").append(sqlFile.getPhysicalFile().getName());
         }
         sb.append(ln()).append("- - - - - - - - - -/");
-        _log.info(sb);
+        _log.info(sb.toString());
     }
 
     // ===================================================================================
@@ -426,8 +426,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return true;
     }
 
-    protected void throwPrimaryKeyNotFoundException(String entityName, StringKeyMap<String> pkMap,
-            Set<String> columnNameSet) {
+    protected void throwPrimaryKeyNotFoundException(String entityName, StringKeyMap<String> pkMap, Set<String> columnNameSet) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The primary keys were not found in selected columns.");
         br.addItem("Advice");
@@ -467,8 +466,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return null;
     }
 
-    protected void setupTorqueType(Map<String, DfColumnMeta> metaMap, String columnName, Column column,
-            boolean allCommonColumn) {
+    protected void setupTorqueType(Map<String, DfColumnMeta> metaMap, String columnName, Column column, boolean allCommonColumn) {
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // If the select columns have common columns, 
         // The types of common column are set up from common column properties.
@@ -591,18 +589,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return getDocumentProperties().isDbCommentOnAliasBasis();
     }
 
-    protected void setupSql2EntityElement(String entityName, Map<String, DfColumnMeta> metaMap, String columnName,
-            Column column, String pkRelatedTableName, StringBuilder logSb) {
-        final Table relatedTable = setupSql2EntityRelatedTable(entityName, metaMap, columnName, column,
-                pkRelatedTableName);
+    protected void setupSql2EntityElement(String entityName, Map<String, DfColumnMeta> metaMap, String columnName, Column column,
+            String pkRelatedTableName, StringBuilder logSb) {
+        final Table relatedTable = setupSql2EntityRelatedTable(entityName, metaMap, columnName, column, pkRelatedTableName);
         final Column relatedColumn = setupSql2EntityRelatedColumn(relatedTable, metaMap, columnName, column);
         final String forcedJavaNative = setupSql2EntityForcedJavaNative(metaMap, columnName, column);
 
         buildCustomizeEntityColumnInfo(logSb, columnName, column, relatedTable, relatedColumn, forcedJavaNative);
     }
 
-    protected Table setupSql2EntityRelatedTable(String entityName, Map<String, DfColumnMeta> metaMap,
-            String columnName, Column column, String pkRelatedTableName) {
+    protected Table setupSql2EntityRelatedTable(String entityName, Map<String, DfColumnMeta> metaMap, String columnName, Column column,
+            String pkRelatedTableName) {
         final DfColumnMeta columnMeta = metaMap.get(columnName);
         final String sql2EntityRelatedTableName = columnMeta.getSql2EntityRelatedTableName();
         Table relatedTable = getRelatedTable(sql2EntityRelatedTableName); // first attack
@@ -618,8 +615,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         } else {
             if (pkRelatedTableName != null) {
                 if (!Srl.equalsFlexible(sql2EntityRelatedTableName, pkRelatedTableName)) {
-                    throwTableRelatedPrimaryKeyDifferentException(entityName, sql2EntityRelatedTableName,
-                            pkRelatedTableName, columnName);
+                    throwTableRelatedPrimaryKeyDifferentException(entityName, sql2EntityRelatedTableName, pkRelatedTableName, columnName);
                 }
             }
         }
@@ -640,8 +636,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         throw new IllegalOutsideSqlOperationException(msg);
     }
 
-    protected void throwTableRelatedPrimaryKeyDifferentException(String entityName, String realTable,
-            String differentTable, String columnName) {
+    protected void throwTableRelatedPrimaryKeyDifferentException(String entityName, String realTable, String differentTable,
+            String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The table name related to the primary key is different.");
         br.addItem("Entity");
@@ -656,8 +652,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         throw new IllegalOutsideSqlOperationException(msg);
     }
 
-    protected Column setupSql2EntityRelatedColumn(Table relatedTable, Map<String, DfColumnMeta> metaMap,
-            String columnName, Column column) {
+    protected Column setupSql2EntityRelatedColumn(Table relatedTable, Map<String, DfColumnMeta> metaMap, String columnName, Column column) {
         if (relatedTable == null) {
             return null;
         }
@@ -679,8 +674,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return relatedTable;
     }
 
-    protected String setupSql2EntityForcedJavaNative(final Map<String, DfColumnMeta> metaMap, String columnName,
-            final Column column) {
+    protected String setupSql2EntityForcedJavaNative(final Map<String, DfColumnMeta> metaMap, String columnName, final Column column) {
         final DfColumnMeta metaInfo = metaMap.get(columnName);
         final String sql2EntityForcedJavaNative = metaInfo.getSql2EntityForcedJavaNative();
         column.setSql2EntityForcedJavaNative(sql2EntityForcedJavaNative);
@@ -852,8 +846,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         logSb.append(ln());
     }
 
-    protected void buildCustomizeEntityColumnInfo(StringBuilder logSb, String columnName, Column column,
-            Table relatedTable, Column relatedColumn, String forcedJavaNatice) {
+    protected void buildCustomizeEntityColumnInfo(StringBuilder logSb, String columnName, Column column, Table relatedTable,
+            Column relatedColumn, String forcedJavaNatice) {
         final StringBuilder sb = new StringBuilder();
         sb.append(" ").append(column.isPrimaryKey() ? "*" : " ");
         sb.append(columnName);
@@ -897,8 +891,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     logSb.append(" with customize-entity");
                 }
                 logSb.append(")").append(ln());
-                final Map<String, DfProcedureColumnMeta> propertyNameColumnInfoMap = pmbMetaData
-                        .getPropertyNameColumnInfoMap();
+                final Map<String, DfProcedureColumnMeta> propertyNameColumnInfoMap = pmbMetaData.getPropertyNameColumnInfoMap();
                 for (Entry<String, DfProcedureColumnMeta> columnEntry : propertyNameColumnInfoMap.entrySet()) {
                     final DfProcedureColumnMeta columnInfo = columnEntry.getValue();
                     logSb.append("  ").append(columnInfo.getColumnNameDisp());

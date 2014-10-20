@@ -15,7 +15,6 @@
  */
 package org.dbflute.hook;
 
-
 /**
  * The information of SQL fire ready.
  * @author jflute

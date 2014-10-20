@@ -19,11 +19,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.coption.ConditionOption;
@@ -31,6 +28,7 @@ import org.dbflute.cbean.coption.RangeOfOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.cvalue.ConditionValue.CallbackProcessor;
 import org.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.query.QueryClause;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.cbean.sqlclause.query.StringQueryClause;
@@ -50,15 +48,15 @@ public abstract class ConditionKey implements Serializable {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
-
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(ConditionKey.class);
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    // -----------------------------------------------------
+    //                                         Condition Key
+    //                                         -------------
     /** The condition key of equal. */
     public static final ConditionKey CK_EQUAL = new ConditionKeyEqual();
 
@@ -116,25 +114,22 @@ public abstract class ConditionKey implements Serializable {
     /** Dummy-object for IsNull and IsNotNull and so on... */
     protected static final Object DUMMY_OBJECT = new Object();
 
-    // TODO jflute nullable
-    /**
-     * Is the condition key null-able?
-     * @param key The condition key. (NotNull)
-     * @return The determination, true or false.
-     */
-    public static boolean isNullaleConditionKey(ConditionKey key) {
-        return CK_GREATER_EQUAL_OR_IS_NULL.equals(key) || CK_GREATER_THAN_OR_IS_NULL.equals(key)
-                || CK_LESS_EQUAL_OR_IS_NULL.equals(key) || CK_LESS_THAN_OR_IS_NULL.equals(key)
-                || CK_IS_NULL.equals(key) || CK_IS_NULL_OR_EMPTY.equals(key);
-    }
+    // -----------------------------------------------------
+    //                                        Prepare Result
+    //                                        --------------
+    protected static final ConditionKeyPrepareResult RESULT_NEW_QUERY = ConditionKeyPrepareResult.NEW_QUERY;
+    protected static final ConditionKeyPrepareResult RESULT_INVALID_QUERY = ConditionKeyPrepareResult.INVALID_QUERY;
+    protected static final ConditionKeyPrepareResult RESULT_OVERRIDING_QUERY = ConditionKeyPrepareResult.OVERRIDING_QUERY;
+    protected static final ConditionKeyPrepareResult RESULT_DUPLICATE_QUERY = ConditionKeyPrepareResult.DUPLICATE_QUERY;
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Condition-key. */
+    // not final because of no time of refactoring...
+    /** The key name of the condition. (NotNull: initialized in constructor of sub-class) */
     protected String _conditionKey;
 
-    /** Operand. */
+    /** The string of operand, used in SQL. (NotNull: initialized in constructor of sub-class) */
     protected String _operand;
 
     // ===================================================================================
@@ -145,14 +140,12 @@ public abstract class ConditionKey implements Serializable {
      * @param provider The provider of query mode. (NotNull)
      * @param cvalue The object of condition value. (NotNull)
      * @param value The value of the condition. (NotNull)
-     * @param callerName Caller's real name. (NotNull)
-     * @return Is the query valid?
+     * @return The result of the preparation for the condition key. (NotNull)
      */
-    public boolean prepareQuery(final QueryModeProvider provider, final ConditionValue cvalue, final Object value,
-            final ColumnRealName callerName) {
-        return cvalue.process(new CallbackProcessor<Boolean>() {
-            public Boolean process() {
-                return doPrepareQuery(cvalue, value, callerName);
+    public ConditionKeyPrepareResult prepareQuery(final QueryModeProvider provider, final ConditionValue cvalue, final Object value) {
+        return cvalue.process(new CallbackProcessor<ConditionKeyPrepareResult>() {
+            public ConditionKeyPrepareResult process() {
+                return doPrepareQuery(cvalue, value);
             }
 
             public QueryModeProvider getProvider() {
@@ -161,17 +154,45 @@ public abstract class ConditionKey implements Serializable {
         });
     }
 
-    protected abstract boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName);
+    protected abstract ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value);
+
+    // -----------------------------------------------------
+    //                                         Choose Result
+    //                                         -------------
+    protected ConditionKeyPrepareResult chooseResultAlreadyExists(boolean equalValue) {
+        return equalValue ? RESULT_DUPLICATE_QUERY : RESULT_OVERRIDING_QUERY;
+    }
+
+    protected ConditionKeyPrepareResult chooseResultNonValue(ConditionValue cvalue) {
+        return needsOverrideValue(cvalue) ? RESULT_DUPLICATE_QUERY : RESULT_NEW_QUERY;
+    }
+
+    protected ConditionKeyPrepareResult chooseResultNonFixedQuery(Object value) {
+        return isInvalidNonFixedQuery(value) ? RESULT_INVALID_QUERY : RESULT_NEW_QUERY;
+    }
+
+    protected boolean isInvalidNonFixedQuery(Object value) {
+        return value == null;
+    }
+
+    protected ConditionKeyPrepareResult chooseResultListQuery(Object value) {
+        return isInvalidListQuery(value) ? RESULT_INVALID_QUERY : RESULT_NEW_QUERY;
+    }
+
+    protected boolean isInvalidListQuery(Object value) {
+        return value == null || !(value instanceof List<?>) || ((List<?>) value).isEmpty();
+    }
 
     // ===================================================================================
     //                                                                      Override Check
     //                                                                      ==============
     /**
-     * Does it need to override the existing value to register the value?
+     * Does it need to override the existing value to register the value? <br />
+     * This should be called in CallbackProcessor for e.g. in-line query
      * @param cvalue The object of condition value. (NotNull)
      * @return The determination, true or false.
      */
-    public abstract boolean needsOverrideValue(ConditionValue cvalue);
+    protected abstract boolean needsOverrideValue(ConditionValue cvalue);
 
     // ===================================================================================
     //                                                                        Where Clause
@@ -208,8 +229,8 @@ public abstract class ConditionKey implements Serializable {
      * @param cipher The cipher of column by function. (NullAllowed)
      * @param option The option of condition. (NullAllowed)
      */
-    protected abstract void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue cvalue, ColumnFunctionCipher cipher, ConditionOption option);
+    protected abstract void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue cvalue,
+            ColumnFunctionCipher cipher, ConditionOption option);
 
     // ===================================================================================
     //                                                                     Condition Value
@@ -243,8 +264,7 @@ public abstract class ConditionKey implements Serializable {
      * @param location The location on parameter comment. (NotNull)
      * @param option The option of condition. (NullAllowed)
      */
-    protected abstract void doSetupConditionValue(ConditionValue cvalue, Object value, String location,
-            ConditionOption option);
+    protected abstract void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option);
 
     // ===================================================================================
     //                                                                         Bind Clause
@@ -273,15 +293,14 @@ public abstract class ConditionKey implements Serializable {
      * @param option The option of condition. (NullAllowed)
      * @return The query clause as bind clause. (NotNull)
      */
-    protected QueryClause buildBindClauseOrIsNull(ColumnRealName columnRealName, String location,
-            ColumnFunctionCipher cipher, ConditionOption option) {
+    protected QueryClause buildBindClauseOrIsNull(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
+            ConditionOption option) {
         final String mainQuery = doBuildBindClause(columnRealName, location, cipher, option);
         final String clause = "(" + mainQuery + " or " + columnRealName + " is null)";
         return new StringQueryClause(clause);
     }
 
-    protected String doBuildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
-            ConditionOption option) {
+    protected String doBuildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher, ConditionOption option) {
         final BindClauseResult result = resolveBindClause(columnRealName, location, cipher, option);
         return result.toBindClause();
     }
@@ -299,8 +318,8 @@ public abstract class ConditionKey implements Serializable {
     // -----------------------------------------------------
     //                                       Clause Resolver
     //                                       ---------------
-    protected BindClauseResult resolveBindClause(ColumnRealName columnRealName, String location,
-            ColumnFunctionCipher cipher, ConditionOption option) {
+    protected BindClauseResult resolveBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
+            ConditionOption option) {
         final String basicBindExp = buildBindVariableExp(location, option);
         final String bindExp;
         final ColumnRealName resolvedColumn;
@@ -427,10 +446,10 @@ public abstract class ConditionKey implements Serializable {
             String msg = "The option should have string connector when compound column is specified: " + option;
             throw new IllegalConditionBeanOperationException(msg);
         }
-        final List<HpSpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
+        final List<SpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
         final List<ColumnRealName> realNameList = new ArrayList<ColumnRealName>();
         realNameList.add(baseRealName); // already cipher
-        for (HpSpecifiedColumn specifiedColumn : compoundColumnList) {
+        for (SpecifiedColumn specifiedColumn : compoundColumnList) {
             realNameList.add(doResolveCompoundColumn(option, specifiedColumn));
         }
         final OnQueryStringConnector stringConnector = option.getStringConnector();
@@ -438,7 +457,7 @@ public abstract class ConditionKey implements Serializable {
         return ColumnRealName.create(null, new ColumnSqlName(connected));
     }
 
-    protected ColumnRealName doResolveCompoundColumn(ConditionOption option, HpSpecifiedColumn specifiedColumn) {
+    protected ColumnRealName doResolveCompoundColumn(ConditionOption option, SpecifiedColumn specifiedColumn) {
         final GearedCipherManager cipherManager = option.getGearedCipherManager();
         final ColumnRealName specifiedName = specifiedColumn.toColumnRealName();
         if (cipherManager != null && !specifiedColumn.isDerived()) {
@@ -507,14 +526,13 @@ public abstract class ConditionKey implements Serializable {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
+    //                                                                       Null-able Key
     //                                                                       =============
-    protected void noticeRegistered(ColumnRealName callerName, Object value) {
-        if (_log.isDebugEnabled()) {
-            final String target = callerName + "." + _conditionKey;
-            _log.debug("*Found the duplicate query: target=" + target + " value=" + value);
-        }
-    }
+    /**
+     * Is the condition key null-able? (basically for join determination)
+     * @return The determination, true or false.
+     */
+    public abstract boolean isNullaleKey();
 
     // ===================================================================================
     //                                                                      Basic Override

@@ -21,7 +21,6 @@ import java.util.Map;
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
@@ -29,7 +28,8 @@ import org.dbflute.cbean.coption.ConditionOption;
 import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.ordering.ManualOrderBean;
+import org.dbflute.cbean.dream.SpecifiedColumn;
+import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.dbflute.cbean.sqlclause.join.FixedConditionLazyChecker;
@@ -226,6 +226,20 @@ public interface SqlClause {
             String localRelationPath, String foreignRelationPath);
 
     /**
+     * Translate selected relation path (foreignRelationPath: relationNoSuffix) to relation property name (foreignPropertyName).
+     * @param foreignRelationPath The relation path of foreign property (relationNoSuffix). (NotNull)
+     * @return The name of foreign property, (foreignPropertyName). (NotNull)
+     */
+    String translateSelectedRelationPathToPropName(String foreignRelationPath);
+
+    /**
+     * Translate selected relation path (foreignRelationPath: relationNoSuffix) to foreign table alias name (foreignTableAliasName).
+     * @param foreignRelationPath The relation path of foreign property (relationNoSuffix). (NotNull)
+     * @return The alias name of foreign table (foreignTableAliasName). (NotNull)
+     */
+    String translateSelectedRelationPathToTableAlias(String foreignRelationPath);
+
+    /**
      * Get the count of selected relation.
      * @return The integer of count. (NotMinus)
      */
@@ -277,9 +291,9 @@ public interface SqlClause {
      * @param fixedCondition The fixed condition on on-clause. (NullAllowed: if null, means no fixed condition)
      * @param fixedConditionResolver The resolver for variables on fixed-condition. (NullAllowed) 
      */
-    void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
-            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver);
+    void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName, String localTableDbName,
+            Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath, ForeignInfo foreignInfo, String fixedCondition,
+            FixedConditionResolver fixedConditionResolver);
 
     /**
      * Register outer-join using in-line view for fixed-conditions. <br />
@@ -294,9 +308,9 @@ public interface SqlClause {
      * @param fixedCondition The fixed condition on in-line view. (NullAllowed: if null, means no fixed condition)
      * @param fixedConditionResolver The resolver for variables on fixed-condition. (NullAllowed) 
      */
-    void registerOuterJoinFixedInline(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath,
-            ForeignInfo foreignInfo, String fixedCondition, FixedConditionResolver fixedConditionResolver);
+    void registerOuterJoinFixedInline(String foreignAliasName, String foreignTableDbName, String localAliasName, String localTableDbName,
+            Map<ColumnRealName, ColumnRealName> joinOnMap, String relationPath, ForeignInfo foreignInfo, String fixedCondition,
+            FixedConditionResolver fixedConditionResolver);
 
     /**
      * Register the lazy checker for the fixed condition. <br />
@@ -421,8 +435,8 @@ public interface SqlClause {
      * @param option The option of condition. (NullAllowed)
      * @param usedAliasName The alias name of table used on the where clause. (NotNull)
      */
-    void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value,
-            ColumnFunctionCipher cipher, ConditionOption option, String usedAliasName);
+    void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value, ColumnFunctionCipher cipher,
+            ConditionOption option, String usedAliasName);
 
     /**
      * Register 'where' clause. <br />
@@ -510,8 +524,8 @@ public interface SqlClause {
     // -----------------------------------------------------
     //                                In-line for Outer Join
     //                                ----------------------
-    void registerOuterJoinInlineWhereClause(String foreignAliasName, ColumnSqlName columnSqlName, ConditionKey key,
-            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option, boolean onClause);
+    void registerOuterJoinInlineWhereClause(String foreignAliasName, ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value,
+            ColumnFunctionCipher cipher, ConditionOption option, boolean onClause);
 
     void registerOuterJoinInlineWhereClause(String foreignAliasName, String clause, boolean onClause);
 
@@ -601,7 +615,7 @@ public interface SqlClause {
 
     void addNullsLastToPreviousOrderBy();
 
-    void addManualOrderToPreviousOrderByElement(ManualOrderBean manualOrderBean);
+    void addManualOrderToPreviousOrderByElement(ManualOrderOption manualOrderOption);
 
     /**
      * Does it have order-by clauses? <br />
@@ -833,7 +847,7 @@ public interface SqlClause {
      * It is overridden when the specified column has already been specified.
      * @param specifiedColumn The info about column specification. (NotNull)
      */
-    void specifySelectColumn(HpSpecifiedColumn specifiedColumn);
+    void specifySelectColumn(SpecifiedColumn specifiedColumn);
 
     /**
      * Does it have specified select columns?
@@ -881,7 +895,7 @@ public interface SqlClause {
      * Get the only one specified column.
      * @return The instance as specified column. (NullAllowed: if not found or duplicated, returns null)
      */
-    HpSpecifiedColumn getSpecifiedColumnAsOne();
+    SpecifiedColumn getSpecifiedColumnAsOne();
 
     /**
      * Get the DB name of only one specified column.
@@ -963,7 +977,7 @@ public interface SqlClause {
      * Get the specified column for specified deriving sub-query as specified one.
      * @return The instance as specified column. (NullAlowed: if not found or not one)
      */
-    HpSpecifiedColumn getSpecifiedDerivingColumnAsOne();
+    SpecifiedColumn getSpecifiedDerivingColumnAsOne();
 
     /**
      * Get the info of column for specified deriving sub-query as specified one.
@@ -1038,7 +1052,7 @@ public interface SqlClause {
     //                                          Empty String
     //                                          ------------
     /**
-     * Enable empty string query. (default is disabled)
+     * Enable empty string query (means allowed). (default is disabled, means checked)
      */
     void enableEmptyStringQuery();
 
@@ -1048,16 +1062,16 @@ public interface SqlClause {
     void disableEmptyStringQuery();
 
     /**
-     * Is empty string checked?
+     * Is empty string allowed?
      * @return The determination, true or false.
      */
-    boolean isEmptyStringQueryEnabled();
+    boolean isEmptyStringQueryAllowed();
 
     // -----------------------------------------------------
     //                                      Overriding Query
     //                                      ----------------
     /**
-     * Enable overriding query. (default is disabled)
+     * Enable overriding query (means allowed). (default is disabled, means checked)
      */
     void enableOverridingQuery();
 
@@ -1067,10 +1081,10 @@ public interface SqlClause {
     void disableOverridingQuery();
 
     /**
-     * Is overriding query checked?
+     * Is overriding query allowed?
      * @return The determination, true or false.
      */
-    boolean isOverridingQueryEnabled();
+    boolean isOverridingQueryAllowed();
 
     // [DBFlute-0.8.6]
     // ===================================================================================
@@ -1327,7 +1341,7 @@ public interface SqlClause {
      * Java8 cannot use the same name as lambda argument with already existing name in the scope.
      * <pre>
      * cb.query().existsPurchaseList(subCB -&gt; {
-     *     subCB.query().existsPurchaseDetailList(<span style="color: #DD4747">subCB</span> -&gt; { <span style="color: #3F7E5E">// *NG</span>
+     *     subCB.query().existsPurchaseDetailList(<span style="color: #CC4747">subCB</span> -&gt; { <span style="color: #3F7E5E">// *NG</span>
      *     });
      * });
      * </pre>
@@ -1397,6 +1411,21 @@ public interface SqlClause {
      * @return The determination, true or false.
      */
     boolean isCursorSelectByPagingAllowed();
+
+    // [DBFlute-1.1.0]
+    // ===================================================================================
+    //                                                                  ExistsReferrer Way
+    //                                                                  ==================
+    /**
+     * Use in-scope sub-query for exists-referrer. (save-only attribute)
+     */
+    void useInScopeSubQueryForExistsReferrer();
+
+    /**
+     * Does it use in-scope sub-query for exists-referrer?
+     * @return The determination, true or false.
+     */
+    boolean isUseInScopeSubQueryForExistsReferrer();
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================

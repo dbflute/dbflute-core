@@ -35,12 +35,12 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import org.dbflute.jdbc.ManualThreadDataSourceHandler;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class ManualThreadDataSourceTest extends PlainTestCase {
+public class ManualThreadDataSourceTest extends RuntimeTestCase {
 
     public void test_thread() throws Exception {
         final Set<ManualThreadDataSourceHandler> handlerSet = Collections

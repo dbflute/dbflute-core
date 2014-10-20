@@ -27,8 +27,7 @@ public class DfLReverseExistingXlsInfo {
     protected final Map<File, List<String>> _existingXlsTableListMap;
     protected final Map<String, File> _tableExistingXlsMap;
 
-    public DfLReverseExistingXlsInfo(Map<File, List<String>> existingXlsTableListMap,
-            Map<String, File> tableExistingXlsMap) {
+    public DfLReverseExistingXlsInfo(Map<File, List<String>> existingXlsTableListMap, Map<String, File> tableExistingXlsMap) {
         _existingXlsTableListMap = existingXlsTableListMap;
         _tableExistingXlsMap = tableExistingXlsMap;
     }

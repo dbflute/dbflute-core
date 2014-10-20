@@ -163,8 +163,7 @@ public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
         }
     }
 
-    protected void assertDiffTypeExists(String sequenceUniqueName, Map<String, Object> sequenceDiffMap,
-            DfDiffType diffType) {
+    protected void assertDiffTypeExists(String sequenceUniqueName, Map<String, Object> sequenceDiffMap, DfDiffType diffType) {
         if (diffType == null) { // basically no way
             String msg = "The diffType is required in sequence diff-map:";
             msg = msg + " sequence=" + sequenceUniqueName + " sequenceDiffMap=" + sequenceDiffMap;

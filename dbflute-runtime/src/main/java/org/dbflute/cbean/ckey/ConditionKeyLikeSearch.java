@@ -33,7 +33,7 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================
@@ -56,8 +56,8 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     //                                                                       Prepare Query
     //                                                                       =============
     @Override
-    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
-        return value != null;
+    protected ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value) {
+        return chooseResultNonFixedQuery(value);
     }
 
     // ===================================================================================
@@ -72,8 +72,8 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     //                                                                        Where Clause
     //                                                                        ============
     @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value,
+            ColumnFunctionCipher cipher, ConditionOption option) {
         assertLikeSearchOption(columnRealName, value, option);
         conditionList.add(buildBindClause(columnRealName, getLocation(value), cipher, option));
     }
@@ -110,5 +110,13 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     @Override
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupLikeSearch((String) value, (LikeSearchOption) option, location);
+    }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return false;
     }
 }

@@ -28,7 +28,7 @@ public class ConditionKeyNotLikeSearch extends ConditionKeyLikeSearch {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================
@@ -65,8 +65,15 @@ public class ConditionKeyNotLikeSearch extends ConditionKeyLikeSearch {
     //                                                                     Condition Value
     //                                                                     ===============
     @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
-            ConditionOption option) {
+    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location, ConditionOption option) {
         conditionValue.setupNotLikeSearch((String) value, (LikeSearchOption) option, location);
+    }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return false;
     }
 }

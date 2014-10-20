@@ -150,8 +150,7 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         return doPrepareSequenceCache(sql, sequenceCache, incrementSize, cacheSize);
     }
 
-    protected String doPrepareSequenceCache(String sql, SequenceCache sequenceCache, Integer incrementSize,
-            Integer cacheSize) {
+    protected String doPrepareSequenceCache(String sql, SequenceCache sequenceCache, Integer incrementSize, Integer cacheSize) {
         if (sequenceCache != null) {
             final DBMeta dbmeta = _dbmeta;
             if (incrementSize != null) {
@@ -187,10 +186,8 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         return doFindSequenceCache(tableName, sequenceName, cacheSize, incrementSize);
     }
 
-    protected SequenceCache doFindSequenceCache(String tableName, String sequenceName, Integer cacheSize,
-            Integer incrementSize) {
-        return _sequenceCacheHandler.findSequenceCache(tableName, sequenceName, _dataSource, _resultType, cacheSize,
-                incrementSize);
+    protected SequenceCache doFindSequenceCache(String tableName, String sequenceName, Integer cacheSize, Integer incrementSize) {
+        return _sequenceCacheHandler.findSequenceCache(tableName, sequenceName, _dataSource, _resultType, cacheSize, incrementSize);
     }
 
     protected void assertIncrementSizeNotMinusAndNotZero(Integer incrementSize, DBMeta dbmeta) { // precondition: not null
@@ -203,8 +200,7 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         }
     }
 
-    protected SelectNextValExecution createSequenceExecution(TnResultSetHandler handler, String sql,
-            final SequenceCache sequenceCache) {
+    protected SelectNextValExecution createSequenceExecution(TnResultSetHandler handler, String sql, final SequenceCache sequenceCache) {
         final Map<String, Class<?>> argNameTypeMap = newArgNameTypeMap();
         return newSelectNextValExecution(argNameTypeMap, sql, handler, sequenceCache);
     }

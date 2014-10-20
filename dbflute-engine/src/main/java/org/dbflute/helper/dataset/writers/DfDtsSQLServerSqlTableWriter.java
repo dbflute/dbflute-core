@@ -22,10 +22,10 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.dataset.DfDataTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author modified by jflute (originated in Seasar2)
@@ -36,8 +36,8 @@ public class DfDtsSQLServerSqlTableWriter extends DfDtsSqlTableWriter {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfDtsSQLServerSqlTableWriter.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfDtsSQLServerSqlTableWriter.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -84,8 +84,7 @@ public class DfDtsSQLServerSqlTableWriter extends DfDtsSqlTableWriter {
                 if (stmt != null) {
                     try {
                         stmt.close();
-                    } catch (SQLException ignored) {
-                    }
+                    } catch (SQLException ignored) {}
                 }
             }
         } finally {
@@ -112,20 +111,17 @@ public class DfDtsSQLServerSqlTableWriter extends DfDtsSqlTableWriter {
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (stmt != null) {
                 try {
                     stmt.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }

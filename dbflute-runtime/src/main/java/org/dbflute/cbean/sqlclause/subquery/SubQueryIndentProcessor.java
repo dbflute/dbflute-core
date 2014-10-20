@@ -31,7 +31,7 @@ public class SubQueryIndentProcessor implements Serializable {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     public static final String BEGIN_MARK_PREFIX = "--#df:sqbegin#";
@@ -152,8 +152,7 @@ public class SubQueryIndentProcessor implements Serializable {
         return true;
     }
 
-    protected void throwSubQueryNotFoundEndMarkException(String subQueryIdentity, String sql, String filteredSql,
-            String originalSql) {
+    protected void throwSubQueryNotFoundEndMarkException(String subQueryIdentity, String sql, String filteredSql, String originalSql) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the end mark for sub-query.");
         br.addItem("SubQueryIdentity");
@@ -168,8 +167,7 @@ public class SubQueryIndentProcessor implements Serializable {
         throw new SubQueryIndentFailureException(msg);
     }
 
-    protected void throwSubQueryAnyBeginMarkNotHandledException(String subQueryIdentity, String sql,
-            String filteredSql, String originalSql) {
+    protected void throwSubQueryAnyBeginMarkNotHandledException(String subQueryIdentity, String sql, String filteredSql, String originalSql) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Any begin marks are not handled.");
         br.addItem("SubQueryIdentity");

@@ -17,11 +17,12 @@ package org.dbflute.properties;
 
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.dbflute.util.DfStringUtil;
 
 /**
+ * The properties of behavior filter. <br />
+ * Basically closet properties.
  * @author jflute
  */
 public final class DfBehaviorFilterProperties extends DfAbstractHelperProperties {
@@ -201,8 +202,7 @@ public final class DfBehaviorFilterProperties extends DfAbstractHelperProperties
     //                                                ------
     protected void filterCommonColumnSetupValue(Map<String, Object> map) {
         final String baseCommonPackage = getBasicProperties().getBaseCommonPackage();
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
+        for (String key : map.keySet()) {
             String value = (String) map.get(key);
             if (value != null && value.contains("$$allcommon$$")) {
                 value = DfStringUtil.replace(value, "$$allcommon$$", baseCommonPackage);

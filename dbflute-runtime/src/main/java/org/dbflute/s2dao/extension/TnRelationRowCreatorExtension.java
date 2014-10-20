@@ -33,6 +33,7 @@ import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationKey;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCache;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreationResource;
+import org.dbflute.s2dao.rowcreator.TnRelationSelector;
 import org.dbflute.s2dao.rowcreator.impl.TnRelationRowCreatorImpl;
 import org.dbflute.s2dao.rshandler.TnBeanListResultSetHandler;
 import org.dbflute.util.DfReflectionUtil;
@@ -172,8 +173,8 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         }
     }
 
-    protected void setupNextRelationRowElement(TnRelationRowCreationResource res, Object row,
-            TnRelationPropertyType nextRpt) throws SQLException {
+    protected void setupNextRelationRowElement(TnRelationRowCreationResource res, Object row, TnRelationPropertyType nextRpt)
+            throws SQLException {
         res.prepareNextRelationProperty(nextRpt);
         try {
             mappingNextRelation(res, row);
@@ -208,7 +209,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             if (relationRow == null) { // when no cache
                 relationRow = createRelationRow(res);
                 if (relationRow != null) { // is new created relation row
-                    adjustCreatedRow(relationRow, rpt);
+                    adjustCreatedRelationRow(relationRow, res.getRelationNoSuffix(), res.getRelationSelector(), rpt);
                     if (canUseRelationCache) {
                         relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
                     }
@@ -223,8 +224,30 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         }
     }
 
-    protected void adjustCreatedRow(Object relationRow, TnRelationPropertyType rpt) {
-        TnRowCreatorExtension.adjustCreatedRow(relationRow, rpt.getYourBeanMetaData());
+    /**
+     * Adjust created row for relation tables.
+     * @param relationRow The relation row of tables related to the base-point table. (NotNull)
+     * @param relationNoSuffix The suffix of relation no, e.g. _0, _1_3. (NotNull)
+     * @param relSelector The selector of relation, which has various determination. (NotNull)
+     * @param rpt The property type of the relation. (NotNull)
+     */
+    public static void adjustCreatedRelationRow(Object relationRow, String relationNoSuffix, TnRelationSelector relSelector,
+            TnRelationPropertyType rpt) {
+        // static for also handler calling
+        // *similar implementation for base-point row exists, see it for the details
+        if (relationRow instanceof Entity) {
+            final Entity entity = (Entity) relationRow;
+            if (!relSelector.isNonSpecifiedColumnAccessAllowed(relationNoSuffix) // not allowed
+                    && relSelector.isUsingSpecifyColumnInRelation(relationNoSuffix)) { // and use SpecifyColumn
+                entity.modifiedToSpecified(); // so check it
+            }
+            entity.clearModifiedInfo();
+            entity.markAsSelect();
+        } else { // not DBFlute entity
+            // actually any bean meta data can be accepted
+            // because only it gets modified properties
+            rpt.getYourBeanMetaData().getModifiedPropertyNames(relationRow).clear();
+        }
     }
 
     // ===================================================================================
@@ -262,16 +285,14 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     // -----------------------------------------------------
     //                                         Next Relation
     //                                         -------------
-    protected void setupNextPropertyCache(TnRelationRowCreationResource res, TnBeanMetaData nextBmd)
-            throws SQLException {
+    protected void setupNextPropertyCache(TnRelationRowCreationResource res, TnBeanMetaData nextBmd) throws SQLException {
         final List<TnRelationPropertyType> nextRptList = nextBmd.getRelationPropertyTypeList();
         for (TnRelationPropertyType nextRpt : nextRptList) {
             setupNextPropertyCacheElement(res, nextRpt);
         }
     }
 
-    protected void setupNextPropertyCacheElement(TnRelationRowCreationResource res, TnRelationPropertyType nextRpt)
-            throws SQLException {
+    protected void setupNextPropertyCacheElement(TnRelationRowCreationResource res, TnRelationPropertyType nextRpt) throws SQLException {
         res.prepareNextRelationProperty(nextRpt);
         try {
             setupPropertyCache(res); // recursive call

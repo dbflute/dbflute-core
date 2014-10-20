@@ -26,13 +26,13 @@ import org.dbflute.hook.SqlLogInfo;
 import org.dbflute.hook.SqlResultHandler;
 import org.dbflute.hook.SqlResultInfo;
 import org.dbflute.mock.MockBehaviorCommand;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.5.1 (2009/06/19 Friday)
  */
-public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
+public class TnAbstractBasicSqlHandlerTest extends RuntimeTestCase {
 
     public void test_logSql_whitebox_nothing() {
         // ## Arrange ##

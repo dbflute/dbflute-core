@@ -37,9 +37,8 @@ public class SelectNextValExecution extends SelectSimpleExecution {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SelectNextValExecution(DataSource dataSource, StatementFactory statementFactory,
-            Map<String, Class<?>> argNameTypeMap, String twoWaySql, TnResultSetHandler resultSetHandler,
-            SequenceCache sequenceCache) {
+    public SelectNextValExecution(DataSource dataSource, StatementFactory statementFactory, Map<String, Class<?>> argNameTypeMap,
+            String twoWaySql, TnResultSetHandler resultSetHandler, SequenceCache sequenceCache) {
         super(dataSource, statementFactory, argNameTypeMap, twoWaySql, resultSetHandler);
         _sequenceCache = sequenceCache;
     }

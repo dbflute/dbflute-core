@@ -16,6 +16,7 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.dream.ColumnCalculator;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 
 /**
@@ -29,5 +30,5 @@ public interface HpColQyHandler<CB extends ConditionBean> {
      * @param operand The operand for column comparison. (NotNull)
      * @return The calculator for right column. (NotNull)
      */
-    HpCalculator handle(SpecifyQuery<CB> rightSp, String operand);
+    ColumnCalculator handle(SpecifyQuery<CB> rightSp, String operand);
 }

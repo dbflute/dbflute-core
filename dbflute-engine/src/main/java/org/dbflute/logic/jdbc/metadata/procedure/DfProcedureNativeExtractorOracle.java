@@ -22,13 +22,13 @@ import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureArgumentInfo;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -39,7 +39,7 @@ public class DfProcedureNativeExtractorOracle {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfProcedureNativeExtractorOracle.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfProcedureNativeExtractorOracle.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -199,21 +199,20 @@ public class DfProcedureNativeExtractorOracle {
     //                                                                       Argument Info
     //                                                                       =============
     protected Map<String, List<DfProcedureArgumentInfo>> selectProcedureArgumentInfoMap(UnifiedSchema unifiedSchema) {
-        final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(
-                _dataSource, _suppressLogging);
+        final DfProcedureParameterNativeExtractorOracle extractor =
+                new DfProcedureParameterNativeExtractorOracle(_dataSource, _suppressLogging);
         final List<DfProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
         return arrangeProcedureArgumentInfoMap(allArgList);
     }
 
     protected Map<String, List<DfProcedureArgumentInfo>> selectDBLinkProcedureArgumentInfoMap(String dbLinkName) {
-        final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(
-                _dataSource, _suppressLogging);
+        final DfProcedureParameterNativeExtractorOracle extractor =
+                new DfProcedureParameterNativeExtractorOracle(_dataSource, _suppressLogging);
         final List<DfProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoToDBLinkList(dbLinkName);
         return arrangeProcedureArgumentInfoMap(allArgList);
     }
 
-    protected Map<String, List<DfProcedureArgumentInfo>> arrangeProcedureArgumentInfoMap(
-            List<DfProcedureArgumentInfo> allArgList) {
+    protected Map<String, List<DfProcedureArgumentInfo>> arrangeProcedureArgumentInfoMap(List<DfProcedureArgumentInfo> allArgList) {
         final Map<String, List<DfProcedureArgumentInfo>> map = DfCollectionUtil.newLinkedHashMap();
         for (DfProcedureArgumentInfo currentArgInfo : allArgList) {
             final String packageName = currentArgInfo.getPackageName();

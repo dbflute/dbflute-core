@@ -22,8 +22,6 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.bhv.core.context.FetchAssistContext;
 import org.dbflute.bhv.exception.SQLExceptionResource;
 import org.dbflute.cbean.paging.FetchNarrowingBean;
@@ -33,6 +31,8 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.jdbc.TnFetchAssistResultSet;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author modified by jflute (originated in S2Dao)
@@ -43,7 +43,7 @@ public class TnBasicSelectHandler extends TnBasicParameterHandler {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance for internal debug. (XLog is used instead for execute-status log) */
-    private static final Log _log = LogFactory.getLog(TnBasicSelectHandler.class);
+    private static final Logger _log = LoggerFactory.getLogger(TnBasicSelectHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -53,8 +53,7 @@ public class TnBasicSelectHandler extends TnBasicParameterHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBasicSelectHandler(DataSource dataSource, String sql, TnResultSetHandler resultSetHandler,
-            StatementFactory statementFactory) {
+    public TnBasicSelectHandler(DataSource dataSource, String sql, TnResultSetHandler resultSetHandler, StatementFactory statementFactory) {
         super(dataSource, statementFactory, sql);
         _resultSetHandler = resultSetHandler;
     }
@@ -147,8 +146,7 @@ public class TnBasicSelectHandler extends TnBasicParameterHandler {
         return false;
     }
 
-    protected TnFetchAssistResultSet createFunctionalResultSet(ResultSet rs, FetchBean fcbean, boolean offset,
-            boolean limit) {
+    protected TnFetchAssistResultSet createFunctionalResultSet(ResultSet rs, FetchBean fcbean, boolean offset, boolean limit) {
         return new TnFetchAssistResultSet(rs, fcbean, offset, limit);
     }
 }

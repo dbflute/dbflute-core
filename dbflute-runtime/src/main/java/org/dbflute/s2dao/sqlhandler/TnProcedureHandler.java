@@ -46,8 +46,8 @@ public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnProcedureHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
-            TnProcedureMetaData procedureMetaData, TnProcedureResultSetHandlerProvider resultSetHandlerProvider) {
+    public TnProcedureHandler(DataSource dataSource, StatementFactory statementFactory, String sql, TnProcedureMetaData procedureMetaData,
+            TnProcedureResultSetHandlerProvider resultSetHandlerProvider) {
         super(dataSource, statementFactory, sql);
         assertObjectNotNull("procedureMetaData", procedureMetaData);
         assertObjectNotNull("resultSetHandlerProvider", resultSetHandlerProvider);
@@ -138,8 +138,7 @@ public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
      * @throws SQLException
      */
     @SuppressWarnings("resource")
-    protected void handleNotParamResult(Connection conn, CallableStatement cs, Object pmb, boolean executed)
-            throws SQLException {
+    protected void handleNotParamResult(Connection conn, CallableStatement cs, Object pmb, boolean executed) throws SQLException {
         if (pmb == null) {
             return;
         }
@@ -179,8 +178,7 @@ public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
      * @param executed The return value of execute() that means whether the first result is a result set.
      * @throws SQLException
      */
-    protected void handleOutParameter(Connection conn, CallableStatement cs, Object pmb, boolean executed)
-            throws SQLException {
+    protected void handleOutParameter(Connection conn, CallableStatement cs, Object pmb, boolean executed) throws SQLException {
         if (pmb == null) {
             return;
         }

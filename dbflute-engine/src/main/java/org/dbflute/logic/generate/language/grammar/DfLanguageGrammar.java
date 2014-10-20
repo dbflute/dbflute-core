@@ -186,8 +186,7 @@ public interface DfLanguageGrammar {
      * @param toBoolean Does it convert to boolean?
      * @return The CDef element value. e.g. CDef.MemberStatus.Formalized.code() (NotNull)
      */
-    String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber,
-            boolean toBoolean);
+    String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber, boolean toBoolean);
 
     /**
      * @return The new expression of list with elements as one liner. (NotNull)

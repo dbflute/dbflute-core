@@ -359,8 +359,7 @@ public class SqlAnalyzer {
     }
 
     protected boolean isLoopVariableComment(String comment) {
-        return comment.startsWith(LoopFirstNode.MARK) || comment.startsWith(LoopNextNode.MARK)
-                || comment.startsWith(LoopLastNode.MARK);
+        return comment.startsWith(LoopFirstNode.MARK) || comment.startsWith(LoopNextNode.MARK) || comment.startsWith(LoopLastNode.MARK);
     }
 
     protected void parseLoopVariable() { // should be in FOR comment scope
@@ -476,17 +475,14 @@ public class SqlAnalyzer {
         return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, tracerFactory);
     }
 
-    protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly,
-            boolean terminalDot) {
+    protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly, boolean terminalDot) {
         researchIfNeeds(_researchEmbeddedVariableCommentList, expr); // for research
         return newEmbeddedVariableNode(expr, testValue, replaceOnly, terminalDot);
     }
 
-    protected EmbeddedVariableNode newEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly,
-            boolean terminalDot) {
+    protected EmbeddedVariableNode newEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly, boolean terminalDot) {
         final NodeAdviceFactory tracerFactory = getNodeAdviceFactory();
-        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, tracerFactory,
-                replaceOnly, terminalDot);
+        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, tracerFactory, replaceOnly, terminalDot);
     }
 
     // ===================================================================================
@@ -616,8 +612,8 @@ public class SqlAnalyzer {
         return convertTwoWaySql2DisplaySql(factory, twoWaySql, argNames, argTypes, args, dateDisplayStyle);
     }
 
-    public static String convertTwoWaySql2DisplaySql(SqlAnalyzerFactory factory, String twoWaySql, String[] argNames,
-            Class<?>[] argTypes, Object[] args, BoundDateDisplayStyle dateDisplayStyle) {
+    public static String convertTwoWaySql2DisplaySql(SqlAnalyzerFactory factory, String twoWaySql, String[] argNames, Class<?>[] argTypes,
+            Object[] args, BoundDateDisplayStyle dateDisplayStyle) {
         final CommandContext context;
         {
             final SqlAnalyzer parser = createSqlAnalyzer4DisplaySql(factory, twoWaySql);

@@ -380,9 +380,8 @@ public class UnifiedSchema {
 
     @Override
     public String toString() {
-        return "{" + getIdentifiedSchema() + " as " + (isMainSchema() ? "main" : "")
-                + (isAdditionalSchema() ? "additional" : "") + (isCatalogAdditionalSchema() ? "(catalog)" : "")
-                + (isUnknownSchema() ? "unknown" : "") + "}";
+        return "{" + getIdentifiedSchema() + " as " + (isMainSchema() ? "main" : "") + (isAdditionalSchema() ? "additional" : "")
+                + (isCatalogAdditionalSchema() ? "(catalog)" : "") + (isUnknownSchema() ? "unknown" : "") + "}";
     }
 
     // ===================================================================================

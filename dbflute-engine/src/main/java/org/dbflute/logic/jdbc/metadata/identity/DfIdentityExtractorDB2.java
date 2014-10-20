@@ -64,8 +64,7 @@ public class DfIdentityExtractorDB2 implements DfIdentityExtractor {
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }

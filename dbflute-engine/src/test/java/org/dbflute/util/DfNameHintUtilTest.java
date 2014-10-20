@@ -19,12 +19,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.dbflute.util.DfNameHintUtil;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  */
-public class DfNameHintUtilTest extends PlainTestCase {
+public class DfNameHintUtilTest extends EngineTestCase {
 
     public DfNameHintUtilTest() {
     }

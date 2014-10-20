@@ -182,8 +182,7 @@ public class DfProcedureDiff extends DfAbstractDiff implements DfNestDiff {
         }
     }
 
-    protected void assertDiffTypeExists(String procedureUniqueName, Map<String, Object> procedureDiffMap,
-            DfDiffType diffType) {
+    protected void assertDiffTypeExists(String procedureUniqueName, Map<String, Object> procedureDiffMap, DfDiffType diffType) {
         if (diffType == null) { // basically no way
             String msg = "The diffType is required in procedure diff-map:";
             msg = msg + " procedure=" + procedureUniqueName + " procedureDiffMap=" + procedureDiffMap;

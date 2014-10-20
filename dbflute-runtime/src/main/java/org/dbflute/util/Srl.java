@@ -18,6 +18,7 @@ package org.dbflute.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,9 +33,9 @@ public class Srl {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final String HARF_LOWER_ALPHABET = "abcdefghijklmnopqrstuvwxyz";
-    private static final String HARF_NUMBER = "0123456789";
-    private static final Set<Character> _alphabetHarfCharSet;
+    protected static final String HARF_LOWER_ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+    protected static final String HARF_NUMBER = "0123456789";
+    protected static final Set<Character> _alphabetHarfCharSet;
     static {
         final Set<Character> setupSet = DfCollectionUtil.newHashSet();
         final StringBuilder sb = new StringBuilder();
@@ -46,7 +47,7 @@ public class Srl {
         }
         _alphabetHarfCharSet = Collections.unmodifiableSet(setupSet);
     }
-    private static final Set<Character> _alphabetHarfLowerCharSet;
+    protected static final Set<Character> _alphabetHarfLowerCharSet;
     static {
         final Set<Character> setupSet = DfCollectionUtil.newHashSet();
         final StringBuilder sb = new StringBuilder();
@@ -57,7 +58,7 @@ public class Srl {
         }
         _alphabetHarfLowerCharSet = Collections.unmodifiableSet(setupSet);
     }
-    private static final Set<Character> _alphabetHarfUpperCharSet;
+    protected static final Set<Character> _alphabetHarfUpperCharSet;
     static {
         final Set<Character> setupSet = DfCollectionUtil.newHashSet();
         final StringBuilder sb = new StringBuilder();
@@ -68,7 +69,7 @@ public class Srl {
         }
         _alphabetHarfUpperCharSet = Collections.unmodifiableSet(setupSet);
     }
-    private static final Set<Character> _numberHarfCharSet;
+    protected static final Set<Character> _numberHarfCharSet;
     static {
         final Set<Character> setupSet = DfCollectionUtil.newHashSet();
         final String chStr = HARF_NUMBER;
@@ -77,6 +78,27 @@ public class Srl {
             setupSet.add(ch);
         }
         _numberHarfCharSet = Collections.unmodifiableSet(setupSet);
+    }
+    protected static final Set<Character> _alphabetHarfNumberHarfCharSet;
+    static {
+        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        setupSet.addAll(_alphabetHarfCharSet);
+        setupSet.addAll(_numberHarfCharSet);
+        _alphabetHarfNumberHarfCharSet = Collections.unmodifiableSet(setupSet);
+    }
+    protected static final Set<Character> _alphabetNumberHarfLowerCharSet;
+    static {
+        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        setupSet.addAll(_alphabetHarfLowerCharSet);
+        setupSet.addAll(_numberHarfCharSet);
+        _alphabetNumberHarfLowerCharSet = Collections.unmodifiableSet(setupSet);
+    }
+    protected static final Set<Character> _alphabetNumberHarfUpperCharSet;
+    static {
+        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        setupSet.addAll(_alphabetHarfUpperCharSet);
+        setupSet.addAll(_numberHarfCharSet);
+        _alphabetNumberHarfUpperCharSet = Collections.unmodifiableSet(setupSet);
     }
 
     // ===================================================================================
@@ -273,8 +295,7 @@ public class Srl {
         return scopeList.get(0).replaceContentOnBaseString(fromStr, toStr);
     }
 
-    public static String replaceScopeInterspace(String str, String fromStr, String toStr, String beginMark,
-            String endMark) {
+    public static String replaceScopeInterspace(String str, String fromStr, String toStr, String beginMark, String endMark) {
         final List<ScopeInfo> scopeList = extractScopeList(str, beginMark, endMark);
         if (scopeList.isEmpty()) {
             return str;
@@ -387,8 +408,7 @@ public class Srl {
         return doIndexOf(ignoreCase, true, str, delimiters);
     }
 
-    protected static IndexOfInfo doIndexOf(final boolean ignoreCase, final boolean last, final String str,
-            final String... delimiters) {
+    protected static IndexOfInfo doIndexOf(final boolean ignoreCase, final boolean last, final String str, final String... delimiters) {
         final String filteredStr;
         if (ignoreCase) {
             filteredStr = str.toLowerCase();
@@ -692,8 +712,8 @@ public class Srl {
         return doSubstringFirstRear(true, true, true, str, delimiters);
     }
 
-    protected static final String doSubstringFirstRear(final boolean last, final boolean rear,
-            final boolean ignoreCase, final String str, String... delimiters) {
+    protected static final String doSubstringFirstRear(final boolean last, final boolean rear, final boolean ignoreCase, final String str,
+            String... delimiters) {
         assertStringNotNull(str);
         final IndexOfInfo info;
         if (ignoreCase) {
@@ -784,6 +804,36 @@ public class Srl {
         return false;
     }
 
+    public static boolean containsOrderedAll(String str, String... keywords) {
+        return doContainsOrderedAll(false, str, keywords);
+    }
+
+    public static boolean containsOrderedAllIgnoreCase(String str, String... keywords) {
+        return doContainsOrderedAll(true, str, keywords);
+    }
+
+    protected static boolean doContainsOrderedAll(boolean ignoreCase, String str, String... keywords) {
+        assertStringNotNull(str);
+        if (keywords == null || keywords.length == 0) {
+            return false;
+        }
+        if (ignoreCase) {
+            str = str.toLowerCase();
+        }
+        String current = str;
+        for (String keyword : keywords) {
+            if (ignoreCase) {
+                keyword = keyword != null ? keyword.toLowerCase() : null;
+            }
+            if (keyword != null && current.contains(keyword)) {
+                current = substringFirstRear(current, keyword);
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
     // -----------------------------------------------------
     //                                          List Element
     //                                          ------------
@@ -823,8 +873,8 @@ public class Srl {
         return doContainsElement(false, ignoreCase, ListElementContainsType.EQUAL, strList, elements);
     }
 
-    protected static boolean doContainsElement(boolean all, boolean ignoreCase, ListElementContainsType type,
-            Collection<String> strList, String... elements) {
+    protected static boolean doContainsElement(boolean all, boolean ignoreCase, ListElementContainsType type, Collection<String> strList,
+            String... elements) {
         assertStringListNotNull(strList);
         assertElementVaryingNotNull(elements);
         if (elements.length == 0) {
@@ -1081,8 +1131,7 @@ public class Srl {
         return doHasKeyword(false, ignoreCase, KeywordType.CONTAIN, keyword, strs);
     }
 
-    protected static final boolean doHasKeyword(boolean all, boolean ignoreCase, KeywordType type, String keyword,
-            final String... strs) {
+    protected static final boolean doHasKeyword(boolean all, boolean ignoreCase, KeywordType type, String keyword, final String... strs) {
         assertKeywordNotNull(keyword);
         if (strs == null || strs.length == 0) {
             return false;
@@ -1588,8 +1637,8 @@ public class Srl {
         return scopeList != null ? scopeList : new ArrayList<ScopeInfo>();
     }
 
-    protected static final List<ScopeInfo> doExtractScopeList(final String str, final String beginMark,
-            final String endMark, final boolean firstOnly) {
+    protected static final List<ScopeInfo> doExtractScopeList(final String str, final String beginMark, final String endMark,
+            final boolean firstOnly) {
         assertStringNotNull(str);
         assertBeginMarkNotNull(beginMark);
         assertEndMarkNotNull(endMark);
@@ -1678,6 +1727,21 @@ public class Srl {
 
         public boolean isInScope(int index) {
             return index >= _beginIndex && index <= _endIndex;
+        }
+
+        public String replaceContentOnBaseString(String toStr) {
+            final List<ScopeInfo> scopeList = takeScopeList();
+            final StringBuilder sb = new StringBuilder();
+            for (ScopeInfo scope : scopeList) {
+                sb.append(scope.substringInterspaceToPrevious());
+                sb.append(scope.getBeginMark());
+                sb.append(toStr);
+                sb.append(scope.getEndMark());
+                if (scope.getNext() == null) { // last
+                    sb.append(scope.substringInterspaceToNext());
+                }
+            }
+            return sb.toString();
         }
 
         public String replaceContentOnBaseString(String fromStr, String toStr) {
@@ -1966,22 +2030,6 @@ public class Srl {
         return initUncap(capitalizedName);
     }
 
-    public static boolean isInitUpperCase(String str) {
-        assertStringNotNull(str);
-        if (is_Null_or_Empty(str)) {
-            return false;
-        }
-        return isUpperCase(str.charAt(0));
-    }
-
-    public static boolean isInitTwoUpperCase(String str) {
-        assertStringNotNull(str);
-        if (str.length() < 2) {
-            return false;
-        }
-        return isUpperCase(str.charAt(0), str.charAt(1));
-    }
-
     public static boolean isInitLowerCase(String str) {
         assertStringNotNull(str);
         if (is_Null_or_Empty(str)) {
@@ -1996,6 +2044,22 @@ public class Srl {
             return false;
         }
         return isLowerCase(str.charAt(0), str.charAt(1));
+    }
+
+    public static boolean isInitUpperCase(String str) {
+        assertStringNotNull(str);
+        if (is_Null_or_Empty(str)) {
+            return false;
+        }
+        return isUpperCase(str.charAt(0));
+    }
+
+    public static boolean isInitTwoUpperCase(String str) {
+        assertStringNotNull(str);
+        if (str.length() < 2) {
+            return false;
+        }
+        return isUpperCase(str.charAt(0), str.charAt(1));
     }
 
     // ===================================================================================
@@ -2174,23 +2238,43 @@ public class Srl {
     // ===================================================================================
     //                                                                  Character Handling
     //                                                                  ==================
-    public static boolean isAlphabetHarf(String str) {
-        return isAnyChar(str, _alphabetHarfCharSet);
+    public static boolean isAlphabetHarfAll(String str) {
+        return isAnyCharAll(str, _alphabetHarfCharSet);
     }
 
-    public static boolean isAlphabetHarfLower(String str) {
-        return isAnyChar(str, _alphabetHarfLowerCharSet);
+    public static boolean isAlphabetHarfLowerAll(String str) {
+        return isAnyCharAll(str, _alphabetHarfLowerCharSet);
     }
 
-    public static boolean isAlphabetHarfUpper(String str) {
-        return isAnyChar(str, _alphabetHarfUpperCharSet);
+    public static boolean isAlphabetHarfUpperAll(String str) {
+        return isAnyCharAll(str, _alphabetHarfUpperCharSet);
     }
 
-    public static boolean isNumberHarf(String str) {
-        return isAnyChar(str, _numberHarfCharSet);
+    public static boolean isNumberHarfAll(String str) {
+        return isAnyCharAll(str, _numberHarfCharSet);
     }
 
-    protected static boolean isAnyChar(String str, Set<Character> charSet) {
+    public static boolean isAlphabetNumberHarfAll(String str) {
+        return isAnyCharAll(str, _alphabetHarfNumberHarfCharSet);
+    }
+
+    public static boolean isAlphabetNumberHarfAllOr(String str, Character... addedChars) {
+        final Set<Character> charSet = new HashSet<Character>(_alphabetHarfNumberHarfCharSet);
+        for (Character ch : addedChars) {
+            charSet.add(ch);
+        }
+        return isAnyCharAll(str, charSet);
+    }
+
+    public static boolean isAlphabetNumberHarfLowerAll(String str) {
+        return isAnyCharAll(str, _alphabetNumberHarfLowerCharSet);
+    }
+
+    public static boolean isAlphabetNumberHarfUpperAll(String str) {
+        return isAnyCharAll(str, _alphabetNumberHarfUpperCharSet);
+    }
+
+    protected static boolean isAnyCharAll(String str, Set<Character> charSet) {
         if (is_Null_or_Empty(str)) {
             return false;
         }
@@ -2204,20 +2288,82 @@ public class Srl {
         return true;
     }
 
-    protected static boolean isUpperCase(char c) {
-        return Character.isUpperCase(c);
+    // -----------------------------------------------------
+    //                                            Lower Case
+    //                                            ----------
+    protected static boolean isLowerCase(char ch) {
+        return Character.isLowerCase(ch);
     }
 
-    protected static boolean isUpperCase(char c1, char c2) {
-        return isUpperCase(c1) && isUpperCase(c2);
+    protected static boolean isLowerCase(char ch1, char ch2) {
+        return isLowerCase(ch1) && isLowerCase(ch2);
     }
 
-    protected static boolean isLowerCase(char c) {
-        return Character.isLowerCase(c);
+    public static boolean isLowerCaseAll(String str) {
+        assertStringNotNull(str);
+        final int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        for (int i = 0; i < length; ++i) {
+            if (!isLowerCase(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    protected static boolean isLowerCase(char c1, char c2) {
-        return isLowerCase(c1) && isLowerCase(c2);
+    public static boolean isLowerCaseAny(String str) {
+        assertStringNotNull(str);
+        final int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        for (int i = 0; i < length; ++i) {
+            if (isLowerCase(str.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // -----------------------------------------------------
+    //                                            Upper Case
+    //                                            ----------
+    protected static boolean isUpperCase(char ch) {
+        return Character.isUpperCase(ch);
+    }
+
+    protected static boolean isUpperCase(char ch1, char ch2) {
+        return isUpperCase(ch1) && isUpperCase(ch2);
+    }
+
+    public static boolean isUpperCaseAll(String str) {
+        assertStringNotNull(str);
+        final int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        for (int i = 0; i < length; ++i) {
+            if (!isUpperCase(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isUpperCaseAny(String str) {
+        assertStringNotNull(str);
+        final int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        for (int i = 0; i < length; ++i) {
+            if (isUpperCase(str.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================

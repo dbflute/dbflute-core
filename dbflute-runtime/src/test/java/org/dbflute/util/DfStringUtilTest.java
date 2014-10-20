@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.Srl.DelimiterInfo;
 import org.dbflute.util.Srl.IndexOfInfo;
 import org.dbflute.util.Srl.ScopeInfo;
@@ -30,7 +30,7 @@ import org.dbflute.util.Srl.ScopeInfo;
  * @author jflute
  * @since 0.9.5 (2009/04/10 Friday)
  */
-public class DfStringUtilTest extends PlainTestCase {
+public class DfStringUtilTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                        Null & Empty
@@ -445,6 +445,32 @@ public class DfStringUtilTest extends PlainTestCase {
         assertTrue(containsAnyIgnoreCase("foobar", "Foo", "qux"));
         assertFalse(containsAnyIgnoreCase("foobar", new String[] {}));
         assertTrue(containsAnyIgnoreCase("foobar", null, "foo", null));
+    }
+
+    public void test_containsOrderedAll_basic() {
+        assertTrue(containsOrderedAll("foobar", "foo"));
+        assertTrue(containsOrderedAll("foobar", "foo", "bar"));
+        assertTrue(containsOrderedAll("foobar", "foo", "ba"));
+        assertFalse(containsOrderedAll("foobar", "foo", "Bar"));
+        assertFalse(containsOrderedAll("foobar", "bar", "foo"));
+        assertFalse(containsOrderedAll("foobar", "foo", "ob"));
+        assertFalse(containsOrderedAll("foobar", "foo", "baz"));
+        assertFalse(containsOrderedAll("foobar", "Foo", "qux"));
+        assertFalse(containsOrderedAll("foobar", new String[] {}));
+        assertFalse(containsOrderedAll("foobar", null, "foo", null));
+    }
+
+    public void test_containsOrderedAllIgnoreCase_basic() {
+        assertTrue(containsOrderedAllIgnoreCase("foobar", "foo"));
+        assertTrue(containsOrderedAllIgnoreCase("foobar", "foo", "bar"));
+        assertTrue(containsOrderedAllIgnoreCase("foobar", "foo", "ba"));
+        assertTrue(containsOrderedAllIgnoreCase("foobar", "foo", "Bar"));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", "bar", "foo"));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", "foo", "ob"));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", "foo", "baz"));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", "Foo", "qux"));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", new String[] {}));
+        assertFalse(containsOrderedAllIgnoreCase("foobar", null, "foo", null));
     }
 
     // -----------------------------------------------------
@@ -1171,6 +1197,34 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("@foo@", extractScopeFirst("@foo@-get@bar@", "@", "@").getScope());
     }
 
+    public void test_extractScopeFirst_various() {
+        ScopeInfo scope = extractScopeFirst("FOObeginBARendDODO", "begin", "end");
+        log("baseString: " + scope.getBaseString());
+        log("scope: " + scope.getScope());
+        log("content: " + scope.getContent());
+        log("previous: " + scope.getPrevious());
+        log("next: " + scope.getNext());
+        log("substringInterspaceToPrevious(): " + scope.substringInterspaceToPrevious());
+        log("substringInterspaceToNext(): " + scope.substringInterspaceToNext());
+        log("substringScopeToPrevious(): " + scope.substringScopeToPrevious());
+        log("substringScopeToNext(): " + scope.substringScopeToNext());
+        log("replaceContentOnBaseString(): " + scope.replaceContentOnBaseString("SEA"));
+        log("replaceContentOnBaseString(): " + scope.replaceContentOnBaseString("A", "B"));
+        log("replaceInterspaceOnBaseString(): " + scope.replaceInterspaceOnBaseString("O", "R"));
+        assertEquals("FOObeginBARendDODO", scope.getBaseString());
+        assertEquals("beginBARend", scope.getScope());
+        assertEquals("BAR", scope.getContent());
+        assertNull(scope.getPrevious());
+        assertNull(scope.getNext());
+        assertEquals("FOO", scope.substringInterspaceToPrevious());
+        assertEquals("DODO", scope.substringInterspaceToNext());
+        assertEquals("FOObeginBARend", scope.substringScopeToPrevious());
+        assertEquals("beginBARendDODO", scope.substringScopeToNext());
+        assertEquals("FOObeginSEAendDODO", scope.replaceContentOnBaseString("SEA"));
+        assertEquals("FOObeginBBRendDODO", scope.replaceContentOnBaseString("A", "B"));
+        assertEquals("FRRbeginBARendDRDR", scope.replaceInterspaceOnBaseString("O", "R"));
+    }
+
     public void test_extractScopeList_basic() {
         // ## Arrange ##
         String str = "baz/*BEGIN*/where /*FOR pmb*/ /*FIRST 'foo'*/member.../*END FOR*//* END */bar";
@@ -1481,57 +1535,193 @@ public class DfStringUtilTest extends PlainTestCase {
     // ===================================================================================
     //                                                                  Character Handling
     //                                                                  ==================
-    public void test_isAlphabetHarf_basic() throws Exception {
-        assertTrue(isAlphabetHarf("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
-        assertTrue(isAlphabetHarf("A"));
-        assertTrue(isAlphabetHarf("BL"));
-        assertTrue(isAlphabetHarf("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
-        assertTrue(isAlphabetHarf("a"));
-        assertTrue(isAlphabetHarf("bbbOoo"));
-        assertFalse(isAlphabetHarf("ab2"));
-        assertFalse(isAlphabetHarf("-ab"));
-        assertFalse(isAlphabetHarf(""));
-        assertFalse(isAlphabetHarf(" "));
-        assertFalse(isAlphabetHarf(" Ab"));
+    public void test_isAlphabetHarfAll_basic() throws Exception {
+        assertTrue(isAlphabetHarfAll("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
+        assertTrue(isAlphabetHarfAll("A"));
+        assertTrue(isAlphabetHarfAll("BL"));
+        assertTrue(isAlphabetHarfAll("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
+        assertTrue(isAlphabetHarfAll("a"));
+        assertTrue(isAlphabetHarfAll("bbbOoo"));
+        assertFalse(isAlphabetHarfAll("ab2"));
+        assertFalse(isAlphabetHarfAll("-ab"));
+        assertFalse(isAlphabetHarfAll(""));
+        assertFalse(isAlphabetHarfAll(" "));
+        assertFalse(isAlphabetHarfAll(" Ab"));
     }
 
-    public void test_isAlphabetHarfLower_basic() throws Exception {
-        assertFalse(isAlphabetHarfLower("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
-        assertFalse(isAlphabetHarfLower("A"));
-        assertFalse(isAlphabetHarfLower("BL"));
-        assertTrue(isAlphabetHarfLower("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
-        assertTrue(isAlphabetHarfLower("a"));
-        assertFalse(isAlphabetHarfLower("bbbOoo"));
-        assertFalse(isAlphabetHarfLower("ab2"));
-        assertFalse(isAlphabetHarfLower("-ab"));
-        assertFalse(isAlphabetHarfLower(""));
-        assertFalse(isAlphabetHarfLower(" "));
-        assertFalse(isAlphabetHarfLower(" a"));
+    public void test_isAlphabetHarfLowerAll_basic() throws Exception {
+        assertFalse(isAlphabetHarfLowerAll("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
+        assertFalse(isAlphabetHarfLowerAll("A"));
+        assertFalse(isAlphabetHarfLowerAll("BL"));
+        assertTrue(isAlphabetHarfLowerAll("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
+        assertTrue(isAlphabetHarfLowerAll("a"));
+        assertFalse(isAlphabetHarfLowerAll("bbbOoo"));
+        assertFalse(isAlphabetHarfLowerAll("ab2"));
+        assertFalse(isAlphabetHarfLowerAll("-ab"));
+        assertFalse(isAlphabetHarfLowerAll(""));
+        assertFalse(isAlphabetHarfLowerAll(" "));
+        assertFalse(isAlphabetHarfLowerAll(" a"));
     }
 
-    public void test_isAlphabetHarfUpper_basic() throws Exception {
-        assertTrue(isAlphabetHarfUpper("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
-        assertTrue(isAlphabetHarfUpper("A"));
-        assertTrue(isAlphabetHarfUpper("BL"));
-        assertFalse(isAlphabetHarfUpper("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
-        assertFalse(isAlphabetHarfUpper("a"));
-        assertFalse(isAlphabetHarfUpper("bbbOoo"));
-        assertFalse(isAlphabetHarfUpper("ab2"));
-        assertFalse(isAlphabetHarfUpper("-ab"));
-        assertFalse(isAlphabetHarfUpper(""));
-        assertFalse(isAlphabetHarfUpper(" "));
-        assertFalse(isAlphabetHarfUpper(" A"));
+    public void test_isAlphabetHarfUpperAll_basic() throws Exception {
+        assertTrue(isAlphabetHarfUpperAll("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
+        assertTrue(isAlphabetHarfUpperAll("A"));
+        assertTrue(isAlphabetHarfUpperAll("BL"));
+        assertFalse(isAlphabetHarfUpperAll("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
+        assertFalse(isAlphabetHarfUpperAll("a"));
+        assertFalse(isAlphabetHarfUpperAll("bbbOoo"));
+        assertFalse(isAlphabetHarfUpperAll("ab2"));
+        assertFalse(isAlphabetHarfUpperAll("-ab"));
+        assertFalse(isAlphabetHarfUpperAll(""));
+        assertFalse(isAlphabetHarfUpperAll(" "));
+        assertFalse(isAlphabetHarfUpperAll(" A"));
     }
 
-    public void test_isNumberHarf_basic() throws Exception {
-        assertTrue(isNumberHarf("0123456789"));
-        assertTrue(isNumberHarf("0"));
-        assertTrue(isNumberHarf("99"));
-        assertFalse(isNumberHarf("9a9"));
-        assertFalse(isNumberHarf("-1"));
-        assertFalse(isNumberHarf("1.1"));
-        assertFalse(isNumberHarf(""));
-        assertFalse(isNumberHarf(" "));
-        assertFalse(isNumberHarf(" 1"));
+    public void test_isNumberHarfAll_basic() throws Exception {
+        assertTrue(isNumberHarfAll("0123456789"));
+        assertTrue(isNumberHarfAll("0"));
+        assertTrue(isNumberHarfAll("99"));
+        assertFalse(isNumberHarfAll("9a9"));
+        assertFalse(isNumberHarfAll("-1"));
+        assertFalse(isNumberHarfAll("1.1"));
+        assertFalse(isNumberHarfAll(""));
+        assertFalse(isNumberHarfAll(" "));
+        assertFalse(isNumberHarfAll(" 1"));
+    }
+
+    public void test_isAlphabetNumberHarfAll_basic() throws Exception {
+        assertTrue(isAlphabetNumberHarfAll("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
+        assertTrue(isAlphabetNumberHarfAll("A"));
+        assertTrue(isAlphabetNumberHarfAll("BL"));
+        assertTrue(isAlphabetNumberHarfAll("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
+        assertTrue(isAlphabetNumberHarfAll("a"));
+        assertTrue(isAlphabetNumberHarfAll("bbbOoo"));
+        assertTrue(isAlphabetNumberHarfAll("ab2"));
+        assertTrue(isAlphabetNumberHarfAll("234789"));
+        assertTrue(isAlphabetNumberHarfAll("23A4789"));
+        assertTrue(isAlphabetNumberHarfAll("23A47a89"));
+        assertFalse(isAlphabetNumberHarfAll("-ab"));
+        assertFalse(isAlphabetNumberHarfAll(""));
+        assertFalse(isAlphabetNumberHarfAll(" "));
+        assertFalse(isAlphabetNumberHarfAll(" a"));
+    }
+
+    public void test_isAlphabetNumberHarfAllOr_basic() throws Exception {
+        assertTrue(isAlphabetNumberHarfAllOr("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
+        assertTrue(isAlphabetNumberHarfAllOr("A"));
+        assertTrue(isAlphabetNumberHarfAllOr("BL"));
+        assertTrue(isAlphabetNumberHarfAllOr("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
+        assertTrue(isAlphabetNumberHarfAllOr("a"));
+        assertTrue(isAlphabetNumberHarfAllOr("bbbOoo"));
+        assertTrue(isAlphabetNumberHarfAllOr("ab2"));
+        assertTrue(isAlphabetNumberHarfAllOr("234789"));
+        assertTrue(isAlphabetNumberHarfAllOr("23A4789"));
+        assertTrue(isAlphabetNumberHarfAllOr("23A47a89"));
+        assertFalse(isAlphabetNumberHarfAllOr("-ab"));
+        assertFalse(isAlphabetNumberHarfAllOr(""));
+        assertFalse(isAlphabetNumberHarfAllOr(" "));
+        assertFalse(isAlphabetNumberHarfAllOr(" a"));
+        assertTrue(isAlphabetNumberHarfAllOr("-ab", '-'));
+        assertTrue(isAlphabetNumberHarfAllOr(" b", ' '));
+        assertFalse(isAlphabetNumberHarfAllOr("=ab", '-'));
+    }
+
+    public void test_isAlphabetNumberHarfLowerAll_basic() throws Exception {
+        assertFalse(isAlphabetNumberHarfLowerAll("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
+        assertFalse(isAlphabetNumberHarfLowerAll("A"));
+        assertFalse(isAlphabetNumberHarfLowerAll("BL"));
+        assertTrue(isAlphabetNumberHarfLowerAll("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
+        assertTrue(isAlphabetNumberHarfLowerAll("a"));
+        assertFalse(isAlphabetNumberHarfLowerAll("bbbOoo"));
+        assertTrue(isAlphabetNumberHarfLowerAll("ab2"));
+        assertTrue(isAlphabetNumberHarfLowerAll("234789"));
+        assertFalse(isAlphabetNumberHarfLowerAll("23A4789"));
+        assertFalse(isAlphabetNumberHarfLowerAll("-ab"));
+        assertFalse(isAlphabetNumberHarfLowerAll(""));
+        assertFalse(isAlphabetNumberHarfLowerAll(" "));
+        assertFalse(isAlphabetNumberHarfLowerAll(" a"));
+    }
+
+    public void test_isAlphabetNumberHarfUpperAll_basic() throws Exception {
+        assertTrue(isAlphabetNumberHarfUpperAll("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
+        assertTrue(isAlphabetNumberHarfUpperAll("A"));
+        assertTrue(isAlphabetNumberHarfUpperAll("BL"));
+        assertFalse(isAlphabetNumberHarfUpperAll("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
+        assertFalse(isAlphabetNumberHarfUpperAll("a"));
+        assertFalse(isAlphabetNumberHarfUpperAll("bbbOoo"));
+        assertTrue(isAlphabetNumberHarfUpperAll("AB2"));
+        assertTrue(isAlphabetNumberHarfUpperAll("234789"));
+        assertFalse(isAlphabetNumberHarfUpperAll("234a789"));
+        assertFalse(isAlphabetNumberHarfUpperAll("-ab"));
+        assertFalse(isAlphabetNumberHarfUpperAll(""));
+        assertFalse(isAlphabetNumberHarfUpperAll(" "));
+        assertFalse(isAlphabetNumberHarfUpperAll(" A"));
+    }
+
+    // -----------------------------------------------------
+    //                                            Lower Case
+    //                                            ----------
+    public void test_isLowerCaseAll_basic() throws Exception {
+        assertTrue(isLowerCaseAll("member"));
+        assertTrue(isLowerCaseAll("purchase"));
+        assertFalse(isLowerCaseAll("Member"));
+        assertFalse(isLowerCaseAll("MeMBER"));
+        assertFalse(isLowerCaseAll("mEMBER"));
+        assertFalse(isLowerCaseAll("membeR"));
+        assertFalse(isLowerCaseAll("MEMBER"));
+        assertFalse(isLowerCaseAll("member1"));
+        assertFalse(isLowerCaseAll("member_status"));
+        assertFalse(isLowerCaseAll("member$status"));
+        assertFalse(isLowerCaseAll(""));
+        assertFalse(isLowerCaseAll("   "));
+    }
+
+    public void test_isLowerCaseAny_basic() throws Exception {
+        assertTrue(isLowerCaseAny("member"));
+        assertTrue(isLowerCaseAny("purchase"));
+        assertTrue(isLowerCaseAny("Member"));
+        assertTrue(isLowerCaseAny("MeMBER"));
+        assertTrue(isLowerCaseAny("mEMBER"));
+        assertTrue(isLowerCaseAny("membeR"));
+        assertFalse(isLowerCaseAny("MEMBER"));
+        assertTrue(isLowerCaseAny("member1"));
+        assertTrue(isLowerCaseAny("member_status"));
+        assertTrue(isLowerCaseAny("member$status"));
+        assertFalse(isLowerCaseAny(""));
+        assertFalse(isLowerCaseAny("   "));
+    }
+
+    // -----------------------------------------------------
+    //                                            Upper Case
+    //                                            ----------
+    public void test_isUpperCaseAll_basic() throws Exception {
+        assertTrue(isUpperCaseAll("MEMBER"));
+        assertTrue(isUpperCaseAll("PURCHASE"));
+        assertFalse(isUpperCaseAll("Member"));
+        assertFalse(isUpperCaseAll("MeMBER"));
+        assertFalse(isUpperCaseAll("mEMBER"));
+        assertFalse(isUpperCaseAll("MEMBEr"));
+        assertFalse(isUpperCaseAll("member"));
+        assertFalse(isUpperCaseAll("MEMBER1"));
+        assertFalse(isUpperCaseAll("MEMBER_STATUS"));
+        assertFalse(isUpperCaseAll("MEMBER$STATUS"));
+        assertFalse(isUpperCaseAll(""));
+        assertFalse(isUpperCaseAll("   "));
+    }
+
+    public void test_isUpperCaseAny_basic() throws Exception {
+        assertTrue(isUpperCaseAny("MEMBER"));
+        assertTrue(isUpperCaseAny("PURCHASE"));
+        assertTrue(isUpperCaseAny("Member"));
+        assertTrue(isUpperCaseAny("MeMBER"));
+        assertTrue(isUpperCaseAny("mEMBER"));
+        assertTrue(isUpperCaseAny("MEMBEr"));
+        assertTrue(isUpperCaseAny("membeR"));
+        assertFalse(isUpperCaseAny("member"));
+        assertTrue(isUpperCaseAny("MEMBER1"));
+        assertTrue(isUpperCaseAny("MEMBER_STATUS"));
+        assertTrue(isUpperCaseAny("MEMBER$STATUS"));
+        assertFalse(isUpperCaseAny(""));
+        assertFalse(isUpperCaseAny("   "));
     }
 }

@@ -19,13 +19,13 @@ import org.dbflute.twowaysql.SqlAnalyzer;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.exception.IfCommentNotFoundPropertyException;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.7.0 (2010/05/29 Saturday)
  */
-public class BeginNodeTest extends PlainTestCase {
+public class BeginNodeTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                               Basic

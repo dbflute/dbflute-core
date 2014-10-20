@@ -32,7 +32,7 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================
@@ -49,20 +49,15 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
     //                                                                       Prepare Query
     //                                                                       =============
     @Override
-    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+    protected ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value) {
         if (value == null) {
-            return false;
+            return RESULT_INVALID_QUERY;
         }
         if (needsOverrideValue(cvalue)) {
-            if (cvalue.equalNotEqual(value)) {
-                noticeRegistered(callerName, value);
-                return false;
-            } else {
-                cvalue.overrideNotEqual(value);
-                return false;
-            }
+            cvalue.overrideNotEqual(value);
+            return chooseResultAlreadyExists(cvalue.equalNotEqual(value));
         }
-        return true;
+        return RESULT_NEW_QUERY;
     }
 
     // ===================================================================================
@@ -77,8 +72,8 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
     //                                                                        Where Clause
     //                                                                        ============
     @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value,
+            ColumnFunctionCipher cipher, ConditionOption option) {
         conditionList.add(buildBindClause(columnRealName, value.getNotEqualLatestLocation(), cipher, option));
     }
 
@@ -96,5 +91,13 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
     @Override
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupNotEqual(value, location);
+    }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return false;
     }
 }

@@ -215,8 +215,8 @@ public class DfProcedureMeta {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _procedureFullQualifiedName + ", " + _procedureType + ", " + _procedureComment + ", "
-                + _procedureColumnList + ", notParamResult=" + _notParamResultList.size() + "}";
+        return "{" + _procedureFullQualifiedName + ", " + _procedureType + ", " + _procedureComment + ", " + _procedureColumnList
+                + ", notParamResult=" + _notParamResultList.size() + "}";
     }
 
     // ===================================================================================

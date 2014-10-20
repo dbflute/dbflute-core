@@ -25,14 +25,14 @@ import org.dbflute.twowaysql.exception.BindVariableCommentNotFoundPropertyExcept
 import org.dbflute.twowaysql.exception.ForCommentNotFoundPropertyException;
 import org.dbflute.twowaysql.exception.ForCommentPropertyReadFailureException;
 import org.dbflute.twowaysql.pmbean.SimpleMapPmb;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class BoundValueTracerTest extends PlainTestCase {
+public class BoundValueTracerTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                                Bean

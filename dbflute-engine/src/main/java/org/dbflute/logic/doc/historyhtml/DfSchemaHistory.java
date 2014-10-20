@@ -145,8 +145,7 @@ public class DfSchemaHistory {
             if (fis != null) {
                 try {
                     fis.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
         try {

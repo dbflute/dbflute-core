@@ -26,8 +26,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.collections.ExtendedProperties;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.apache.velocity.app.Velocity;
@@ -56,6 +54,8 @@ import org.dbflute.task.bs.assistant.DfTaskBasicController;
 import org.dbflute.task.bs.assistant.DfTaskControlCallback;
 import org.dbflute.task.bs.assistant.DfTaskControlLogic;
 import org.dbflute.task.bs.assistant.DfTaskDatabaseResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The abstract class of texen task.
@@ -66,8 +66,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfAbstractTexenTask.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfAbstractTexenTask.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -408,8 +408,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 if (fr != null) {
                     try {
                         fr.close();
-                    } catch (IOException ignored) {
-                    }
+                    } catch (IOException ignored) {}
                 }
             }
         }
@@ -430,7 +429,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         if (!skipGenerateIfSameFile) {
             sb.append(ln()).append("All class files have been generated. (overrided)");
             sb.append(ln()).append("- - - - - - - - - -/");
-            _log.info(sb);
+            _log.info(sb.toString());
             return;
         }
         final List<String> parseFileNameList = DfGenerator.getInstance().getParseFileNameList();

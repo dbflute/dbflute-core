@@ -27,8 +27,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.StringSet;
@@ -41,6 +39,8 @@ import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The schema initializer with JDBC.
@@ -51,7 +51,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSchemaInitializerJdbc.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfSchemaInitializerJdbc.class);
     protected static final List<String> EMPTY_LIST = DfCollectionUtil.emptyList();
 
     // ===================================================================================
@@ -227,8 +227,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         public String buildTruncateTableSql(DfTableMeta metaInfo);
     }
 
-    protected void callbackTruncateTableByJdbc(Connection conn, List<DfTableMeta> tableMetaInfoList,
-            DfTruncateTableByJdbcCallback callback) {
+    protected void callbackTruncateTableByJdbc(Connection conn, List<DfTableMeta> tableMetaInfoList, DfTruncateTableByJdbcCallback callback) {
         for (DfTableMeta metaInfo : tableMetaInfoList) {
             final String truncateTableSql = callback.buildTruncateTableSql(metaInfo);
             Statement st = null;
@@ -265,8 +264,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         public String buildDropForeignKeySql(DfForeignKeyMeta metaInfo);
     }
 
-    protected void callbackDropForeignKeyByJdbc(Connection conn, List<DfTableMeta> tableMetaList,
-            DfDropForeignKeyByJdbcCallback callback) {
+    protected void callbackDropForeignKeyByJdbc(Connection conn, List<DfTableMeta> tableMetaList, DfDropForeignKeyByJdbcCallback callback) {
         Statement st = null;
         try {
             st = conn.createStatement();
@@ -278,8 +276,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 extractor.suppressExceptTarget();
 
                 final DatabaseMetaData dbMetaData = conn.getMetaData();
-                final Map<String, DfForeignKeyMeta> foreignKeyMetaInfoMap = extractor.getForeignKeyMap(dbMetaData,
-                        tableMeta);
+                final Map<String, DfForeignKeyMeta> foreignKeyMetaInfoMap = extractor.getForeignKeyMap(dbMetaData, tableMeta);
                 final Set<String> keySet = foreignKeyMetaInfoMap.keySet();
                 for (String foreignKeyName : keySet) {
                     final DfForeignKeyMeta foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);
@@ -336,8 +333,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         });
     }
 
-    protected List<DfTableMeta> prepareSortedTableList(Connection conn, List<DfTableMeta> viewList,
-            List<DfTableMeta> otherList) {
+    protected List<DfTableMeta> prepareSortedTableList(Connection conn, List<DfTableMeta> viewList, List<DfTableMeta> otherList) {
         final List<DfTableMeta> sortedList = new ArrayList<DfTableMeta>();
         sortedList.addAll(viewList); // should be before dropping reference table
         sortedList.addAll(otherList);
@@ -359,8 +355,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         public String buildDropMaterializedViewSql(DfTableMeta metaInfo);
     }
 
-    protected void callbackDropTableByJdbc(Connection conn, List<DfTableMeta> tableMetaList,
-            DfDropTableByJdbcCallback callback) {
+    protected void callbackDropTableByJdbc(Connection conn, List<DfTableMeta> tableMetaList, DfDropTableByJdbcCallback callback) {
         String currentSql = null;
         Statement st = null;
         try {
@@ -383,8 +378,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
     }
 
-    protected void handleDroppingRetry(DfDropTableByJdbcCallback callback, Statement st, DfTableMeta tableMeta,
-            SQLException e) throws SQLException {
+    protected void handleDroppingRetry(DfDropTableByJdbcCallback callback, Statement st, DfTableMeta tableMeta, SQLException e)
+            throws SQLException {
         final String dropMaterializedViewSql = callback.buildDropMaterializedViewSql(tableMeta);
         try {
             st.execute(dropMaterializedViewSql);

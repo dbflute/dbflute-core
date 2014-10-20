@@ -24,8 +24,8 @@ public class DfReplaceSchemaFinalInfo {
     protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
 
-    public DfReplaceSchemaFinalInfo(DfCreateSchemaFinalInfo createSchemaFinalInfo,
-            DfLoadDataFinalInfo loadDataFinalInfo, DfTakeFinallyFinalInfo takeFinallyFinalInfo) {
+    public DfReplaceSchemaFinalInfo(DfCreateSchemaFinalInfo createSchemaFinalInfo, DfLoadDataFinalInfo loadDataFinalInfo,
+            DfTakeFinallyFinalInfo takeFinallyFinalInfo) {
         _createSchemaFinalInfo = createSchemaFinalInfo;
         _loadDataFinalInfo = loadDataFinalInfo;
         _takeFinallyFinalInfo = takeFinallyFinalInfo;

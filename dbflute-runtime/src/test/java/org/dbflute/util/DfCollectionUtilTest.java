@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil.AccordingToOrderIdExtractor;
 import org.dbflute.util.DfCollectionUtil.AccordingToOrderResource;
 import org.dbflute.util.DfCollectionUtil.OrderDiff;
@@ -31,7 +31,7 @@ import org.dbflute.util.DfCollectionUtil.OrderDiffDetail;
  * @author jflute
  * @since 0.9.4 (2009/03/20 Friday)
  */
-public class DfCollectionUtilTest extends PlainTestCase {
+public class DfCollectionUtilTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                                List

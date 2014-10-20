@@ -15,9 +15,10 @@
  */
 package org.dbflute.hook;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.bhv.core.BehaviorCommandHook;
+import org.dbflute.util.DfTypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The context of callback in DBFlute deep logic.
@@ -28,8 +29,8 @@ public class CallbackContext {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(CallbackContext.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(CallbackContext.class);
 
     // ===================================================================================
     //                                                                        Thread Local
@@ -433,6 +434,23 @@ public class CallbackContext {
         return _behaviorCommandHook != null || _sqlFireHook != null // hook
                 || _sqlLogHandler != null || _sqlResultHandler != null // handler
                 || _sqlStringFilter != null; // filter
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        final String title = DfTypeUtil.toClassTitle(this);
+        final StringBuilder sb = new StringBuilder();
+        sb.append(title);
+        sb.append(":{behaviorCommandHook=").append(_behaviorCommandHook);
+        sb.append(", sqlFireHook=").append(_sqlFireHook);
+        sb.append(", sqlLogHandler=").append(_sqlLogHandler);
+        sb.append(", sqlResultHandler=").append(_sqlResultHandler);
+        sb.append(", sqlStringFilter=").append(_sqlStringFilter);
+        sb.append("}");
+        return sb.toString();
     }
 
     // ===================================================================================

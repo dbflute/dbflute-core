@@ -22,12 +22,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.AccessContextNoValueException;
 import org.dbflute.exception.AccessContextNotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.system.DBFluteSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The context of DB access. (basically for CommonColumnAutoSetup)
@@ -38,8 +38,8 @@ public class AccessContext {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(AccessContext.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(AccessContext.class);
 
     // ===================================================================================
     //                                                                        Thread Local
@@ -506,8 +506,8 @@ public class AccessContext {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _accessDate + ", " + _accessTimestamp + ", " + _accessUser + ", " + _accessProcess + ", "
-                + _accessModule + ", " + _accessValueMap + "}";
+        return "{" + _accessDate + ", " + _accessTimestamp + ", " + _accessUser + ", " + _accessProcess + ", " + _accessModule + ", "
+                + _accessValueMap + "}";
     }
 
     // ===================================================================================

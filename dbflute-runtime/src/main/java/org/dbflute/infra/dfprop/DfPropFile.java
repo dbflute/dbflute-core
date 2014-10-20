@@ -215,8 +215,7 @@ public class DfPropFile {
         });
     }
 
-    protected Map<String, List<String>> actuallyReadMapAsStringListValue(String path) throws FileNotFoundException,
-            IOException {
+    protected Map<String, List<String>> actuallyReadMapAsStringListValue(String path) throws FileNotFoundException, IOException {
         try {
             return createMapListFileStructural().readMapAsStringListValue(createInputStream(path));
         } catch (MapListStringDuplicateEntryException e) {
@@ -254,8 +253,7 @@ public class DfPropFile {
         });
     }
 
-    protected Map<String, Map<String, String>> actuallyReadMapAsStringMapValue(String path)
-            throws FileNotFoundException, IOException {
+    protected Map<String, Map<String, String>> actuallyReadMapAsStringMapValue(String path) throws FileNotFoundException, IOException {
         try {
             return createMapListFileStructural().readMapAsStringMapValue(createInputStream(path));
         } catch (MapListStringDuplicateEntryException e) {
@@ -336,8 +334,7 @@ public class DfPropFile {
     // -----------------------------------------------------
     //                                                   Map
     //                                                   ---
-    protected <ELEMENT> Map<String, ELEMENT> doReadMap(String dfpropPath, String envType,
-            DfPropReadingMapHandler<ELEMENT> handler) {
+    protected <ELEMENT> Map<String, ELEMENT> doReadMap(String dfpropPath, String envType, DfPropReadingMapHandler<ELEMENT> handler) {
         // *see the JavaDoc of readMap() for the detail
         Map<String, ELEMENT> map = null;
         if (envType != null) {
@@ -391,8 +388,7 @@ public class DfPropFile {
         }
     }
 
-    protected <ELEMENT> boolean resolveOutsidePropInheritMap(DfPropReadingMapHandler<ELEMENT> handler, String path,
-            Map<String, ELEMENT> map) {
+    protected <ELEMENT> boolean resolveOutsidePropInheritMap(DfPropReadingMapHandler<ELEMENT> handler, String path, Map<String, ELEMENT> map) {
         if (map == null) { // no parent
             return false;
         }
@@ -411,8 +407,7 @@ public class DfPropFile {
     // -----------------------------------------------------
     //                                                  List
     //                                                  ----
-    protected <ELEMENT> List<ELEMENT> doReadList(String dfpropPath, String envType,
-            DfPropReadingListHandler<ELEMENT> handler) {
+    protected <ELEMENT> List<ELEMENT> doReadList(String dfpropPath, String envType, DfPropReadingListHandler<ELEMENT> handler) {
         // extended list is not supported
         List<ELEMENT> list = null;
         if (envType != null) {

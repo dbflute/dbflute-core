@@ -16,6 +16,7 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.coption.ColumnConversionOption;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 
 /**
  * @author jflute
@@ -27,7 +28,7 @@ public class HpCalcElement {
     //                                                                           =========
     protected CalculationType _calculationType;
     protected Number _calculationValue;
-    protected HpSpecifiedColumn _calculationColumn;
+    protected SpecifiedColumn _calculationColumn;
     protected ColumnConversionOption _columnConversionOption;
     protected boolean _preparedConvOption;
 
@@ -74,7 +75,7 @@ public class HpCalcElement {
     }
 
     public void setCalculationType(CalculationType calculationType) {
-        this._calculationType = calculationType;
+        _calculationType = calculationType;
     }
 
     public Number getCalculationValue() {
@@ -82,15 +83,15 @@ public class HpCalcElement {
     }
 
     public void setCalculationValue(Number calculationValue) {
-        this._calculationValue = calculationValue;
+        _calculationValue = calculationValue;
     }
 
-    public HpSpecifiedColumn getCalculationColumn() {
+    public SpecifiedColumn getCalculationColumn() {
         return _calculationColumn;
     }
 
-    public void setCalculationColumn(HpSpecifiedColumn calculationColumn) {
-        this._calculationColumn = calculationColumn;
+    public void setCalculationColumn(SpecifiedColumn calculationColumn) {
+        _calculationColumn = calculationColumn;
     }
 
     public ColumnConversionOption getColumnConversionOption() {
@@ -98,7 +99,7 @@ public class HpCalcElement {
     }
 
     public void setColumnConversionOption(ColumnConversionOption columnConversionOption) {
-        this._columnConversionOption = columnConversionOption;
+        _columnConversionOption = columnConversionOption;
     }
 
     public boolean isPreparedConvOption() {
@@ -106,6 +107,6 @@ public class HpCalcElement {
     }
 
     public void setPreparedConvOption(boolean preparedConvOption) {
-        this._preparedConvOption = preparedConvOption;
+        _preparedConvOption = preparedConvOption;
     }
 }

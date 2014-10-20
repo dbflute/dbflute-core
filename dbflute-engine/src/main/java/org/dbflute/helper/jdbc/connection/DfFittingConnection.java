@@ -75,8 +75,7 @@ public class DfFittingConnection implements Connection {
         return _realConnection.createStatement();
     }
 
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
-            throws SQLException {
+    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         return _realConnection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
@@ -124,8 +123,8 @@ public class DfFittingConnection implements Connection {
         return _realConnection.nativeSQL(sql);
     }
 
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
-            int resultSetHoldability) throws SQLException {
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)
+            throws SQLException {
         return _realConnection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
@@ -137,13 +136,12 @@ public class DfFittingConnection implements Connection {
         return _realConnection.prepareCall(sql);
     }
 
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency,
-            int resultSetHoldability) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)
+            throws SQLException {
         return _realConnection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
-            throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         return _realConnection.prepareStatement(sql, resultSetType, resultSetConcurrency);
     }
 

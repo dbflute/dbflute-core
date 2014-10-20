@@ -17,6 +17,8 @@ package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
+import org.dbflute.cbean.coption.DerivedReferrerOptionFactory;
+import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 import org.dbflute.cbean.scoping.SubQuery;
 
 /**
@@ -30,12 +32,14 @@ public class HpQDRFunction<CB extends ConditionBean> {
     //                                                                           Attribute
     //                                                                           =========
     protected final HpQDRSetupper<CB> _setupper;
+    protected final DerivedReferrerOptionFactory _derivedReferrerOptionFactory;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpQDRFunction(HpQDRSetupper<CB> setupper) {
+    public HpQDRFunction(HpQDRSetupper<CB> setupper, DerivedReferrerOptionFactory derivedReferrerOptionFactory) {
         _setupper = setupper;
+        _derivedReferrerOptionFactory = derivedReferrerOptionFactory;
     }
 
     // ===================================================================================
@@ -44,36 +48,38 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'count'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Integer> count(SubQuery<CB> subQuery) {
-        return doCount(subQuery, null);
+    public HpQDRParameter<CB, Integer> count(SubQuery<CB> derivedCBLambda) {
+        return doCount(derivedCBLambda, null);
     }
 
     /**
      * An overload method for count(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Integer> count(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        assertDerivedReferrerOption(option);
-        return doCount(subQuery, option);
+    public HpQDRParameter<CB, Integer> count(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        assertDerivedReferrerOption(opLambda);
+        final DerivedReferrerOption option = createDerivedReferrerOption();
+        opLambda.callback(option);
+        return doCount(derivedCBLambda, option);
     }
 
     protected HpQDRParameter<CB, Integer> doCount(SubQuery<CB> subQuery, DerivedReferrerOption option) {
@@ -84,36 +90,38 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'count(with distinct)'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> subQuery) {
-        return doCountDistinct(subQuery, null);
+    public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> derivedCBLambda) {
+        return doCountDistinct(derivedCBLambda, null);
     }
 
     /**
      * An overload method for countDistinct(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        assertDerivedReferrerOption(option);
-        return doCountDistinct(subQuery, option);
+    public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        assertDerivedReferrerOption(opLambda);
+        final DerivedReferrerOption option = createDerivedReferrerOption();
+        opLambda.callback(option);
+        return doCountDistinct(derivedCBLambda, option);
     }
 
     protected HpQDRParameter<CB, Integer> doCountDistinct(SubQuery<CB> subQuery, DerivedReferrerOption option) {
@@ -124,36 +132,38 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'max'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Object> max(SubQuery<CB> subQuery) {
-        return doMax(subQuery, null);
+    public HpQDRParameter<CB, Object> max(SubQuery<CB> derivedCBLambda) {
+        return doMax(derivedCBLambda, null);
     }
 
     /**
      * An overload method for max(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Object> max(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        assertDerivedReferrerOption(option);
-        return doMax(subQuery, option);
+    public HpQDRParameter<CB, Object> max(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        assertDerivedReferrerOption(opLambda);
+        final DerivedReferrerOption option = createDerivedReferrerOption();
+        opLambda.callback(option);
+        return doMax(derivedCBLambda, option);
     }
 
     protected HpQDRParameter<CB, Object> doMax(SubQuery<CB> subQuery, DerivedReferrerOption option) {
@@ -164,35 +174,38 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'min'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Object> min(SubQuery<CB> subQuery) {
-        return doMin(subQuery, null);
+    public HpQDRParameter<CB, Object> min(SubQuery<CB> derivedCBLambda) {
+        return doMin(derivedCBLambda, null);
     }
 
     /**
      * An overload method for min(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Object> min(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        return doMin(subQuery, option);
+    public HpQDRParameter<CB, Object> min(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        assertDerivedReferrerOption(opLambda);
+        final DerivedReferrerOption option = createDerivedReferrerOption();
+        opLambda.callback(option);
+        return doMin(derivedCBLambda, option);
     }
 
     protected HpQDRParameter<CB, Object> doMin(SubQuery<CB> subQuery, DerivedReferrerOption option) {
@@ -203,36 +216,38 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'sum'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Number> sum(SubQuery<CB> subQuery) {
-        return doSum(subQuery, null);
+    public HpQDRParameter<CB, Number> sum(SubQuery<CB> derivedCBLambda) {
+        return doSum(derivedCBLambda, null);
     }
 
     /**
      * An overload method for sum(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Number> sum(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        assertDerivedReferrerOption(option);
-        return doSum(subQuery, option);
+    public HpQDRParameter<CB, Number> sum(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        assertDerivedReferrerOption(opLambda);
+        final DerivedReferrerOption option = createDerivedReferrerOption();
+        opLambda.callback(option);
+        return doSum(derivedCBLambda, option);
     }
 
     protected HpQDRParameter<CB, Number> doSum(SubQuery<CB> subQuery, DerivedReferrerOption option) {
@@ -243,35 +258,38 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'avg'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Number> avg(SubQuery<CB> subQuery) {
-        return doAvg(subQuery, null);
+    public HpQDRParameter<CB, Number> avg(SubQuery<CB> derivedCBLambda) {
+        return doAvg(derivedCBLambda, null);
     }
 
     /**
      * An overload method for avg(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #DD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Number> avg(SubQuery<CB> subQuery, DerivedReferrerOption option) {
-        return doAvg(subQuery, option);
+    public HpQDRParameter<CB, Number> avg(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        assertDerivedReferrerOption(opLambda);
+        final DerivedReferrerOption option = createDerivedReferrerOption();
+        opLambda.callback(option);
+        return doAvg(derivedCBLambda, option);
     }
 
     protected HpQDRParameter<CB, Number> doAvg(SubQuery<CB> subQuery, DerivedReferrerOption option) {
@@ -282,6 +300,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected DerivedReferrerOption createDerivedReferrerOption() {
+        return _derivedReferrerOptionFactory.create();
+    }
+
     protected <PARAMETER> HpQDRParameter<CB, PARAMETER> createQDRParameter(String fuction, SubQuery<CB> subQuery,
             DerivedReferrerOption option) {
         return new HpQDRParameter<CB, PARAMETER>(fuction, subQuery, option, _setupper);
@@ -294,9 +316,9 @@ public class HpQDRFunction<CB extends ConditionBean> {
         }
     }
 
-    protected void assertDerivedReferrerOption(DerivedReferrerOption option) {
-        if (option == null) {
-            String msg = "The argument 'option' for DerivedReferrer should not be null.";
+    protected void assertDerivedReferrerOption(FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        if (opLambda == null) {
+            String msg = "The argument 'opLambda' for DerivedReferrer should not be null.";
             throw new IllegalArgumentException(msg);
         }
     }

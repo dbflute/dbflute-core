@@ -41,11 +41,11 @@ public class ScalarCondition extends AbstractSubQuery {
     //                                                                         Constructor
     //                                                                         ===========
     public ScalarCondition(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
-            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
-            String subQueryIdentity, DBMeta subQueryDBMeta, GearedCipherManager cipherManager,
-            String mainSubQueryIdentity, String operand, PartitionByProvider partitionByProvider) {
-        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
-                subQueryIdentity, subQueryDBMeta, cipherManager);
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause, String subQueryIdentity,
+            DBMeta subQueryDBMeta, GearedCipherManager cipherManager, String mainSubQueryIdentity, String operand,
+            PartitionByProvider partitionByProvider) {
+        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause, subQueryIdentity,
+                subQueryDBMeta, cipherManager);
         _mainSubQueryIdentity = mainSubQueryIdentity;
         _operand = operand;
         _partitionByProvider = partitionByProvider;
@@ -108,14 +108,15 @@ public class ScalarCondition extends AbstractSubQuery {
         }
         final String subQueryClause;
         if (_subQuerySqlClause.hasUnionQuery()) {
-            subQueryClause = getUnionSubQuerySql(function, tableAliasName, derivedColumnSqlName, derivedColumnRealName,
-                    partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName);
+            subQueryClause =
+                    getUnionSubQuerySql(function, tableAliasName, derivedColumnSqlName, derivedColumnRealName,
+                            partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName);
         } else {
             final ColumnInfo columnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
             final String specifiedExp = decrypt(columnInfo, derivedColumnRealName.toString());
             final String selectClause = "select " + function + "(" + specifiedExp + ")";
-            final String fromWhereClause = buildFromWhereClause(selectClause, tableAliasName,
-                    partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName);
+            final String fromWhereClause =
+                    buildFromWhereClause(selectClause, tableAliasName, partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName);
             subQueryClause = selectClause + " " + fromWhereClause;
         }
         return resolveSubQueryLevelVariable(subQueryClause);
@@ -139,8 +140,8 @@ public class ScalarCondition extends AbstractSubQuery {
             final ColumnSqlName pkSqlName = _subQueryDBMeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
             final ColumnRealName pkRealName = ColumnRealName.create(tableAliasName, pkSqlName);
             final String selectClause = "select " + pkRealName + ", " + derivedColumnRealName;
-            final String fromWhereClause = buildFromWhereClause(selectClause, tableAliasName,
-                    partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName);
+            final String fromWhereClause =
+                    buildFromWhereClause(selectClause, tableAliasName, partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName);
             mainSql = selectClause + " " + fromWhereClause;
         }
         final String mainAlias = buildSubQueryMainAliasName();
@@ -151,12 +152,13 @@ public class ScalarCondition extends AbstractSubQuery {
                 + "  from (" + beginMark + mainSql + ln() + "       ) " + mainAlias + endMark; // from
     }
 
-    protected String buildFromWhereClause(String selectClause, String tableAliasName,
-            ColumnRealName partitionByCorrelatedColumnRealName, ColumnSqlName partitionByRelatedColumnSqlName) {
+    protected String buildFromWhereClause(String selectClause, String tableAliasName, ColumnRealName partitionByCorrelatedColumnRealName,
+            ColumnSqlName partitionByRelatedColumnSqlName) {
         final String fromWhereClause;
         if (partitionByCorrelatedColumnRealName != null) {
-            fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
-                    partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName, null);
+            fromWhereClause =
+                    buildCorrelationFromWhereClause(selectClause, tableAliasName, partitionByCorrelatedColumnRealName,
+                            partitionByRelatedColumnSqlName, null);
         } else {
             fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, null);
         }
@@ -181,9 +183,7 @@ public class ScalarCondition extends AbstractSubQuery {
         }
     }
 
-    protected void throwScalarConditionUnmatchedColumnTypeException(String function, String derivedColumnDbName,
-            Class<?> derivedColumnType) {
-        createCBExThrower().throwScalarConditionUnmatchedColumnTypeException(function, derivedColumnDbName,
-                derivedColumnType);
+    protected void throwScalarConditionUnmatchedColumnTypeException(String function, String derivedColumnDbName, Class<?> derivedColumnType) {
+        createCBExThrower().throwScalarConditionUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
     }
 }

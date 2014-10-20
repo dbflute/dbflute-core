@@ -30,8 +30,7 @@ import org.dbflute.util.Srl;
  * @param <KEY> The type of constraint key.
  * @param <DIFF> The type of constraint diff.
  */
-public abstract class DfBasicConstraintKeyDiffer<KEY, DIFF extends DfConstraintDiff> implements
-        DfConstraintKeyDiffer<KEY, DIFF> {
+public abstract class DfBasicConstraintKeyDiffer<KEY, DIFF extends DfConstraintDiff> implements DfConstraintKeyDiffer<KEY, DIFF> {
 
     // ===================================================================================
     //                                                                           Attribute

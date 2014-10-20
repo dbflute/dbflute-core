@@ -136,8 +136,7 @@ public class DfTableMeta {
                 comment = _tableComment;
             }
         }
-        return getTableFullQualifiedName() + "(" + _tableType + ")"
-                + (comment.trim().length() > 0 ? " // " + comment : "");
+        return getTableFullQualifiedName() + "(" + _tableType + ")" + (comment.trim().length() > 0 ? " // " + comment : "");
     }
 
     // ===================================================================================

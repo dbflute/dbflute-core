@@ -19,16 +19,18 @@ import java.util.Map;
 
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpColumnSpHandler;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.dream.SpecifiedColumn;
+import org.dbflute.cbean.dream.WelcomeToDreamCruise;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.scoping.AndQuery;
+import org.dbflute.cbean.scoping.ModeQuery;
 import org.dbflute.cbean.scoping.OrQuery;
 import org.dbflute.cbean.scoping.UnionQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.derived.DerivedTypeHandler;
+import org.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.dbflute.exception.ConditionInvokingFailureException;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
@@ -37,7 +39,7 @@ import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
  * The bean for condition.
  * @author jflute
  */
-public interface ConditionBean extends PagingBean {
+public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
 
     // ===================================================================================
     //                                                                          Table Name
@@ -131,40 +133,11 @@ public interface ConditionBean extends PagingBean {
     //                                                                        Dream Cruise
     //                                                                        ============
     /**
-     * DBFlute Dreams.
-     * <pre>
-     * e.g. member that purchases products only purchased by the member
-     *  MemberCB cb = new MemberCB();
-     *  cb.specify().columnBirthdate();
-     *  final MemberCB dreamCruiseCB = cb.<span style="color: #DD4747">dreamCruiseCB()</span>;
-     *  cb.query().existsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
-     *      public void query(PurchaseCB subCB) {
-     *          subCB.query().queryProduct().notExistsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
-     *              public void query(PurchaseCB subCB) {
-     *                  subCB.columnQuery(new SpecifyQuery&lt;PurchaseCB&gt;() {
-     *                      public void specify(PurchaseCB cb) {
-     *                          cb.specify().columnMemberId();
-     *                      }
-     *                  }).notEqual(new SpecifyQuery&lt;PurchaseCB&gt;() {
-     *                      public void specify(PurchaseCB cb) {
-     *                          cb.<span style="color: #DD4747">overTheWaves</span>(dreamCruiseCB.specify().columnMemberId());
-     *                      }
-     *                  });
-     *              }
-     *          });
-     *      }
-     *  });
-     * </pre>
-     * @param dreamCruiseTicket The ticket column specified by your Dream Cruise. (NotNull)
-     */
-    void overTheWaves(HpSpecifiedColumn dreamCruiseTicket);
-
-    /**
      * Invite the derived column to dream cruise. (returns the ticket)
      * @param derivedAlias The alias name for derived column. (NotNull)
      * @return The ticket column specified by your Dream Cruise. (NotNull)
      */
-    HpSpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias);
+    SpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias); // user interface
 
     /**
      * Create condition-bean for dream cruise.
@@ -208,7 +181,7 @@ public interface ConditionBean extends PagingBean {
      * (get the specified column by Dream Cruise)
      * @return The information of specified column. (NullAllowed)
      */
-    HpSpecifiedColumn xshowDreamCruiseTicket();
+    SpecifiedColumn xshowDreamCruiseTicket();
 
     /**
      * Keep journey log-book of Dream Cruise. <br /> 
@@ -228,26 +201,6 @@ public interface ConditionBean extends PagingBean {
     void xsetupSelectDreamCruiseJourneyLogBookIfUnionExists();
 
     /**
-     * DBFlute Dreams.
-     * <pre>
-     * e.g. ColumnQuery: ... > '2015/04/05' + (PURCHASE_COUNT days)
-     *  PurchaseCB cb = new PurchaseCB();
-     *  cb.columnQuery(new SpecifyQuery() {
-     *      public void specify(Purchase cb) {
-     *          cb.column...();
-     *      }
-     *  }).greaterThan(new SpecifyQuery() {
-     *      public void specify(Purchase cb) {
-     *          cb.<span style="color: #DD4747">mysticRhythms</span>(toDate("2015/04/05"));
-     *      }
-     *  }).convert(new ColumnConversionOption()
-     *          .<span style="color: #DD4747">addDay</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
-     * </pre>
-     * @param mysticBinding
-     */
-    void mysticRhythms(Object mysticBinding);
-
-    /**
      * Get the value of mystic binding.
      * @return The object value for mystic binding. (NullAllowed: if null, no mystic)  
      */
@@ -257,6 +210,22 @@ public interface ConditionBean extends PagingBean {
     //                                                                       Invalid Query
     //                                                                       =============
     /**
+     * Ignore null-or-empty check for query when query is set. (default is checked) <br />
+     * (no condition if set query is invalid)
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.selectList(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.<span style="color: #CC4747">ignoreNullOrEmptyQuery()</span>;
+     *     <span style="color: #553000">cb</span>.query().<span style="color: #994747">setMemberName_Equal</span>(null); <span style="color: #3F7E5E">// no condition (ignored)</span>
+     *     <span style="color: #553000">cb</span>.query().<span style="color: #994747">setMemberName_Equal</span>("");   <span style="color: #3F7E5E">// no condition (ignored)</span>
+     *     <span style="color: #553000">cb</span>.query().setMemberName_Equal(" ");  <span style="color: #3F7E5E">// valid (MEMBER_NAME = ' ')</span>
+     * });
+     * </pre>
+     * You should call this before registrations of where clause and other queries. <br />
+     * And Union and SubQuery and other sub condition-bean inherit this.
+     */
+    void ignoreNullOrEmptyQuery(); // no mode-query because of high use and wide scope
+
+    /**
      * Check null or empty value for query when query is set. (back to default) <br />
      * (it throws exception if set query is invalid, e.g. null, empty string, empty list) <br />
      * You should call this before registrations of where clause and other queries. <br />
@@ -265,26 +234,13 @@ public interface ConditionBean extends PagingBean {
     void checkNullOrEmptyQuery();
 
     /**
-     * Ignore null-or-empty check for query when query is set. (default is checked) <br />
-     * (no condition if set query is invalid)
-     * <pre>
-     * MemberCB cb = new MemberCB();
-     * cb.ignoreNullOrEmptyQuery();
-     * cb.query().setMemberName_PrefixSearch(null); // no condition
-     * cb.query().setMemberName_PrefixSearch(""); // no condition
-     * </pre>
-     * You should call this before registrations of where clause and other queries. <br />
-     * And Union and SubQuery and other sub condition-bean inherit this.
-     */
-    void ignoreNullOrEmptyQuery();
-
-    /**
      * Enable empty string for query. (default is disabled) <br />
      * (you can use an empty string as condition) <br />
      * You should call this before registrations of where clause and other queries. <br />
      * Union and SubQuery and other sub condition-bean inherit this.
+     * @param noArgInLambda The callback for empty-string query. (NotNull)
      */
-    void enableEmptyStringQuery();
+    void enableEmptyStringQuery(ModeQuery noArgInLambda);
 
     /**
      * Disable empty string for query. (back to default) <br />
@@ -297,8 +253,9 @@ public interface ConditionBean extends PagingBean {
      * (you can override existing value as condition) <br />
      * You should call this before registrations of where clause and other queries. <br />
      * Union and SubQuery and other sub condition-bean inherit this.
+     * @param noArgInLambda The callback for overriding query. (NotNull)
      */
-    void enableOverridingQuery();
+    void enableOverridingQuery(ModeQuery noArgInLambda);
 
     /**
      * Disable overriding query. (back to default) <br />
@@ -433,10 +390,52 @@ public interface ConditionBean extends PagingBean {
     //void disableRelationMappingCache();
 
     /**
-     * Can the relation mapping (entity instance) cache?
+     * Can the relation mapping (entity instance) be cached?
      * @return The determination, true or false.
      */
     boolean canRelationMappingCache();
+
+    /**
+     * Enable access to non-specified column. (default is disabled) <br />
+     * You can get columns of base-point or setup-select using SpecifyColumn but non-specified column.
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> -&gt; {
+     *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnMemberStatusName()</span>;
+     *     <span style="color: #553000">cb</span>.query().set...
+     * }).alwaysPresent(<span style="color: #553000">member</span> -&gt; {
+     *     <span style="color: #553000">member</span>.getMemberStatus().alwaysPresent(<span style="color: #553000">status</span> -&gt; {
+     *         ... = <span style="color: #553000">status</span>.getMemberStatusName(); <span style="color: #3F7E5E">// OK</span>
+     *         ... = <span style="color: #553000">status</span>.<span style="color: #CC4747">getDisplayOrder()</span>; <span style="color: #3F7E5E">// OK: allowed</span>
+     *     });
+     * });
+     * </pre>
+     */
+    void enableNonSpecifiedColumnAccess();
+
+    /**
+     * Disable the check of access to non-specified column. (back to default) <br />
+     * You cannot get columns of base-point or setup-select using SpecifyColumn but non-specified column.
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> -&gt; {
+     *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnMemberStatusName()</span>;
+     *     <span style="color: #553000">cb</span>.query().set...
+     * }).alwaysPresent(<span style="color: #553000">member</span> -&gt; {
+     *     <span style="color: #553000">member</span>.getMemberStatus().alwaysPresent(<span style="color: #553000">status</span> -&gt; {
+     *         ... = <span style="color: #553000">status</span>.getMemberStatusName(); <span style="color: #3F7E5E">// OK</span>
+     *         ... = <span style="color: #553000">status</span>.<span style="color: #CC4747">getDisplayOrder()</span>; <span style="color: #3F7E5E">// *NG: exception</span>
+     *     });
+     * });
+     * </pre>
+     */
+    void disableNonSpecifiedColumnAccess();
+
+    /**
+     * Is the access to non-specified column allowed?
+     * @return The determination, true or false.
+     */
+    boolean isNonSpecifiedColumnAccessAllowed();
 
     // ===================================================================================
     //                                                                         Display SQL
@@ -534,7 +533,7 @@ public interface ConditionBean extends PagingBean {
      * @return The info of specified column. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
-    HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath);
+    SpecifiedColumn invokeSpecifyColumn(String columnNamePath);
 
     /**
      * Invoke the method 'orScopeQuery()' by the query callback. <br />

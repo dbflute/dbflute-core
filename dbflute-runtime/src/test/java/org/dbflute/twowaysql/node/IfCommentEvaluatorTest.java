@@ -37,7 +37,7 @@ import org.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;
 import org.dbflute.twowaysql.exception.IfCommentUnsupportedTypeComparisonException;
 import org.dbflute.twowaysql.pmbean.ParameterBean;
 import org.dbflute.twowaysql.pmbean.SimpleMapPmb;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.dbflute.util.DfTypeUtil;
@@ -46,7 +46,7 @@ import org.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.9.5.5 (2009/10/01 Thursday)
  */
-public class IfCommentEvaluatorTest extends PlainTestCase {
+public class IfCommentEvaluatorTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                             Literal

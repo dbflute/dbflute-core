@@ -30,8 +30,8 @@ import org.dbflute.cbean.ConditionBean;
  *     }
  * });
  * </pre>
- * @author jflute
  * @param <CB> The type of condition-bean for specification.
+ * @author jflute
  */
 @FunctionalInterface
 public interface SpecifyQuery<CB extends ConditionBean> {

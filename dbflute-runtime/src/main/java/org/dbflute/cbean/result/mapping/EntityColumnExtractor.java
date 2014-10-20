@@ -21,6 +21,7 @@ package org.dbflute.cbean.result.mapping;
  * @param <COLUMN> The type of column.
  * @author jflute
  */
+@FunctionalInterface
 public interface EntityColumnExtractor<ENTITY, COLUMN> {
 
     /**

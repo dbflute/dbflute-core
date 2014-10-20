@@ -18,9 +18,9 @@ package org.dbflute.mock;
 import java.lang.reflect.Method;
 
 import org.dbflute.dbmeta.DBMeta.OptimisticLockType;
-import org.dbflute.dbmeta.PropertyGateway;
-import org.dbflute.dbmeta.PropertyMethodFinder;
 import org.dbflute.dbmeta.info.ColumnInfo;
+import org.dbflute.dbmeta.property.PropertyGateway;
+import org.dbflute.dbmeta.property.PropertyMethodFinder;
 
 /**
  * @author jflute

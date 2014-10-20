@@ -44,7 +44,7 @@ public class DfPropPublicMap {
     protected static final String DBFLUTE_DOWNLOAD_URL = "dbflute.download.url";
     protected static final String INTRO_DOWNLOAD_URL = "intro.download.url";
 
-    protected static final String DEFAULT_DFPROP_URL = "http://dbflute.seasar.org/meta/publicMap.dfprop";
+    protected static final String DEFAULT_DFPROP_URL = "http://dbflute.org/meta/publicMap.dfprop";
     protected static final String VERSION_SUFFIX_VARIABLE = "$$versionSuffix$$";
 
     // ===================================================================================
@@ -70,8 +70,7 @@ public class DfPropPublicMap {
             if (ins != null) {
                 try {
                     ins.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

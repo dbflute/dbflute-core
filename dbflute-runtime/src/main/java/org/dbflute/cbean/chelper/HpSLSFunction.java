@@ -15,13 +15,16 @@
  */
 package org.dbflute.cbean.chelper;
 
+import org.dbflute.bhv.exception.BehaviorExceptionThrower;
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 import org.dbflute.cbean.coption.ScalarSelectOption;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.scoping.ScalarQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.dbflute.dbmeta.info.ColumnInfo;
+import org.dbflute.optional.OptionalThing;
 
 /**
  * The function for scalar select. 
@@ -64,33 +67,35 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * Select the count value. <br />
      * You can also get same result by selectCount(cb) method.
      * <pre>
-     * memberBhv.scalarSelect(Integer.class).<span style="color: #DD4747">count</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">count</span>(new ScalarQuery(MemberCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
      * @return The count value calculated by function. (NotNull)
      */
-    public RESULT count(ScalarQuery<CB> scalarQuery) {
-        return doCount(scalarQuery, null);
+    public RESULT count(ScalarQuery<CB> cbLambda) {
+        return doCount(cbLambda, null);
     }
 
     /**
      * Select the count value with function conversion option.
      * <pre>
-     * memberBhv.scalarSelect(Integer.class).<span style="color: #DD4747">count</span>(new ScalarQuery(MemberCB cb) {
+     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">count</span>(new ScalarQuery(MemberCB cb) {
      *     cb.specify().columnMemberId(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @param option The option for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
      * @return The count value calculated by function. (NotNull)
      */
-    public RESULT count(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public RESULT count(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doCount(scalarQuery, option);
+        return doCount(cbLambda, option);
     }
 
     protected RESULT doCount(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -102,33 +107,35 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * Select the count-distinct value. <br />
      * You can also get same result by selectCount(cb) method.
      * <pre>
-     * memberBhv.scalarSelect(Integer.class).<span style="color: #DD4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
      * @return The count-distinct value calculated by function. (NotNull)
      */
-    public RESULT countDistinct(ScalarQuery<CB> scalarQuery) {
-        return doCountDistinct(scalarQuery, null);
+    public RESULT countDistinct(ScalarQuery<CB> cbLambda) {
+        return doCountDistinct(cbLambda, null);
     }
 
     /**
      * Select the count-distinct value with function conversion option.
      * <pre>
-     * memberBhv.scalarSelect(Integer.class).<span style="color: #DD4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
+     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
      *     cb.specify().columnMemberId(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @param option The option for scalar select. (NotNull)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
      * @return The count-distinct value calculated by function. (NotNull)
      */
-    public RESULT countDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public RESULT countDistinct(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doCountDistinct(scalarQuery, option);
+        return doCountDistinct(cbLambda, option);
     }
 
     protected RESULT doCountDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -139,149 +146,167 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     /**
      * Select the maximum value.
      * <pre>
-     * memberBhv.scalarSelect(Date.class).<span style="color: #DD4747">max</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">max</span>(new ScalarQuery(MemberCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @return The maximum value calculated by function. (NullAllowed)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @return The optional thing for maximum value calculated by function. (NullAllowed)
      */
-    public RESULT max(ScalarQuery<CB> scalarQuery) {
-        return doMax(scalarQuery, null);
+    public OptionalThing<RESULT> max(ScalarQuery<CB> cbLambda) {
+        return doMax(cbLambda, null);
     }
 
     /**
      * Select the maximum value with function conversion option.
      * <pre>
-     * memberBhv.scalarSelect(Date.class).<span style="color: #DD4747">max</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">max</span>(new ScalarQuery(MemberCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @param option The option for scalar select. (NotNull)
-     * @return The maximum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
+     * @return The optional thing for maximum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public RESULT max(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public OptionalThing<RESULT> max(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doMax(scalarQuery, option);
+        return doMax(cbLambda, option);
     }
 
-    protected RESULT doMax(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    protected OptionalThing<RESULT> doMax(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
         assertScalarQuery(scalarQuery);
-        return exec(scalarQuery, SelectClauseType.MAX, option);
+        return optionalOf("max", exec(scalarQuery, SelectClauseType.MAX, option));
     }
 
     /**
      * Select the minimum value.
      * <pre>
-     * memberBhv.scalarSelect(Date.class).<span style="color: #DD4747">min</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">min</span>(new ScalarQuery(MemberCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @return The minimum value calculated by function. (NullAllowed)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @return The optional thing for minimum value calculated by function. (NullAllowed)
      */
-    public RESULT min(ScalarQuery<CB> scalarQuery) {
-        return doMin(scalarQuery, null);
+    public OptionalThing<RESULT> min(ScalarQuery<CB> cbLambda) {
+        return doMin(cbLambda, null);
     }
 
     /**
      * Select the minimum value with function conversion option.
      * <pre>
-     * memberBhv.scalarSelect(Date.class).<span style="color: #DD4747">min</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">min</span>(new ScalarQuery(MemberCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @param option The option for scalar select. (NotNull)
-     * @return The minimum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
+     * @return The optional thing for minimum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public RESULT min(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public OptionalThing<RESULT> min(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doMin(scalarQuery, option);
+        return doMin(cbLambda, option);
     }
 
-    protected RESULT doMin(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    protected OptionalThing<RESULT> doMin(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
         assertScalarQuery(scalarQuery);
-        return exec(scalarQuery, SelectClauseType.MIN, option);
+        return optionalOf("min", exec(scalarQuery, SelectClauseType.MIN, option));
     }
 
     /**
      * Select the summary value.
      * <pre>
-     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #DD4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @return The summary value calculated by function. (NullAllowed)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @return The optional thing for summary value calculated by function. (NullAllowed)
      */
-    public RESULT sum(ScalarQuery<CB> scalarQuery) {
-        return doSum(scalarQuery, null);
+    public OptionalThing<RESULT> sum(ScalarQuery<CB> cbLambda) {
+        return doSum(cbLambda, null);
     }
 
     /**
      * Select the summary value with function conversion option.
      * <pre>
-     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #DD4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar select. (NotNull)
-     * @param option The option for scalar select. (NotNull)
-     * @return The summary value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
+     * @return The optional thing for summary value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public RESULT sum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public OptionalThing<RESULT> sum(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doSum(scalarQuery, option);
+        return doSum(cbLambda, option);
     }
 
-    protected RESULT doSum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    protected OptionalThing<RESULT> doSum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
         assertScalarQuery(scalarQuery);
-        return exec(scalarQuery, SelectClauseType.SUM, option);
+        return optionalOf("sum", exec(scalarQuery, SelectClauseType.SUM, option));
     }
 
     /**
      * Select the average value.
      * <pre>
-     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #DD4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
-     * @return The average value calculated by function. (NullAllowed)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @return The optional thing for average value calculated by function. (NullAllowed)
      */
-    public RESULT avg(ScalarQuery<CB> scalarQuery) {
-        return doAvg(scalarQuery, null);
+    public OptionalThing<RESULT> avg(ScalarQuery<CB> cbLambda) {
+        return doAvg(cbLambda, null);
     }
 
     /**
      * Select the average value.
      * <pre>
-     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #DD4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
-     *     cb.specify().<span style="color: #DD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
+     *     cb.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
      *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
-     * @param scalarQuery The query for scalar. (NotNull)
-     * @param option The option for scalar. (NotNull)
-     * @return The average value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
+     * @param cbLambda The callback to select scalar value. (NotNull)
+     * @param opLambda The callback for option of scalar. (NotNull)
+     * @return The optional thing for average value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public RESULT avg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    public OptionalThing<RESULT> avg(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
         assertScalarSelectOption(option);
-        return doAvg(scalarQuery, option);
+        return doAvg(cbLambda, option);
     }
 
-    protected RESULT doAvg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    protected OptionalThing<RESULT> doAvg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
         assertScalarQuery(scalarQuery);
-        return exec(scalarQuery, SelectClauseType.AVG, option);
+        return optionalOf("avg", exec(scalarQuery, SelectClauseType.AVG, option));
+    }
+
+    protected OptionalThing<RESULT> optionalOf(String title, RESULT result) {
+        return OptionalThing.ofNullable(result, () -> {
+            throwScalarSelectValueNotFoundException(title);
+        });
+    }
+
+    protected void throwScalarSelectValueNotFoundException(String title) {
+        createBhvExThrower().throwScalarSelectValueNotFoundException(title, _conditionBean, _resultType);
     }
 
     // ===================================================================================
@@ -311,9 +336,6 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
         option.xsetTargetColumnInfo(columnInfo);
     }
 
-    // ===================================================================================
-    //                                                                       Assert Helper
-    //                                                                       =============
     protected void setupScalarSelectOption(ScalarSelectOption option) {
         if (option != null) {
             _conditionBean.xacceptScalarSelectOption(option);
@@ -333,6 +355,21 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
 
     protected void throwScalarSelectInvalidColumnSpecificationException() {
         createCBExThrower().throwScalarSelectInvalidColumnSpecificationException(_conditionBean, _resultType);
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected ScalarSelectOption createScalarSelectOption() {
+        return newScalarSelectOption();
+    }
+
+    protected ScalarSelectOption newScalarSelectOption() {
+        return new ScalarSelectOption();
+    }
+
+    protected BehaviorExceptionThrower createBhvExThrower() {
+        return new BehaviorExceptionThrower();
     }
 
     protected ConditionBeanExceptionThrower createCBExThrower() {

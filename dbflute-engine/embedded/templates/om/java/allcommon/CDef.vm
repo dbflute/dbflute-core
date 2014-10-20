@@ -188,11 +188,7 @@ public interface ${glCDef} extends Classification {
             return new ArrayList<${classificationName}>(4);
         }
 
-#if ($database.isCDefToStringReturnsName())
-        @Override public String toString() { return name(); }
-#else
         @Override public String toString() { return code(); }
-#end
     }
 
 #end

@@ -29,8 +29,7 @@ public class DfBeanMethodNotFoundException extends RuntimeException {
     private Class<?>[] methodArgClasses;
 
     public DfBeanMethodNotFoundException(Class<?> targetClass, String methodName, Object[] methodArgs) {
-        super("The method was not found: class=" + targetClass.getName() + " method=" + methodName + " args="
-                + getSignature(methodArgs));
+        super("The method was not found: class=" + targetClass.getName() + " method=" + methodName + " args=" + getSignature(methodArgs));
         this.targetClass = targetClass;
         this.methodName = methodName;
         if (methodArgs != null) {

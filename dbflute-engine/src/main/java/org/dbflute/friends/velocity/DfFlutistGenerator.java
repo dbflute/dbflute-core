@@ -193,8 +193,8 @@ public class DfFlutistGenerator extends DfGenerator {
      * @param object object to be placed in the context
      * @return String generated output from velocity
      */
-    public String parse(String inputTemplate, String specifiedInputEncoding, String outputFile,
-            String specifiedOutputEncoding, String objectID, Object object) throws Exception {
+    public String parse(String inputTemplate, String specifiedInputEncoding, String outputFile, String specifiedOutputEncoding,
+            String objectID, Object object) throws Exception {
         if (inputTemplate == null) {
             String msg = "The argument 'inputTemplate' should not be null: outputFile=" + outputFile;
             throw new IllegalArgumentException(msg);
@@ -592,7 +592,6 @@ public class DfFlutistGenerator extends DfGenerator {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "outputEncoding=" + outputEncoding + ", inputEncoding=" + inputEncoding + " skipFileNameList="
-                + skipFileNameList;
+        return "outputEncoding=" + outputEncoding + ", inputEncoding=" + inputEncoding + " skipFileNameList=" + skipFileNameList;
     }
 }

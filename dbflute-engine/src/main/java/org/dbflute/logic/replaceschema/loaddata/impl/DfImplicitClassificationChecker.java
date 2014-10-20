@@ -23,14 +23,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfLoadDataIllegalImplicitClassificationValueException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -38,7 +38,7 @@ import org.dbflute.properties.assistant.classification.DfClassificationTop;
  */
 public class DfImplicitClassificationChecker {
 
-    private static final Log _log = LogFactory.getLog(DfImplicitClassificationChecker.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfImplicitClassificationChecker.class);
 
     public void check(File file, String tableDbName, String columnDbName, Connection conn) throws SQLException {
         final DfClassificationProperties prop = getClassificationProperties();
@@ -74,8 +74,8 @@ public class DfImplicitClassificationChecker {
                 illegalCodeList.add(rs.getString(1));
             }
             if (!illegalCodeList.isEmpty()) {
-                handleLoadDataIllegalImplicitClassificationValueException(file, tableDbName, columnDbName,
-                        classificationName, codeList, illegalCodeList, undefinedHandlingType);
+                handleLoadDataIllegalImplicitClassificationValueException(file, tableDbName, columnDbName, classificationName, codeList,
+                        illegalCodeList, undefinedHandlingType);
             }
         } finally {
             if (rs != null) {
@@ -104,8 +104,8 @@ public class DfImplicitClassificationChecker {
         return sb.toString();
     }
 
-    protected void handleLoadDataIllegalImplicitClassificationValueException(File file, String tableDbName,
-            String columnDbName, String classificationName, List<String> codeList, List<String> illegalCodeList,
+    protected void handleLoadDataIllegalImplicitClassificationValueException(File file, String tableDbName, String columnDbName,
+            String classificationName, List<String> codeList, List<String> illegalCodeList,
             ClassificationUndefinedHandlingType undefinedHandlingType) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Undefined classification code was found.");

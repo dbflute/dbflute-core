@@ -20,8 +20,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
@@ -35,6 +33,8 @@ import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -45,8 +45,8 @@ public class DfSchemaSyncChecker {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static Log _log = LogFactory.getLog(DfSchemaSyncChecker.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfSchemaSyncChecker.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -191,8 +191,7 @@ public class DfSchemaSyncChecker {
     protected DfSchemaXmlSerializer doCreateSerializer(DfSchemaSource dataSource) {
         final String historyFile = getDiffMapFile();
         final String schemaXml = getSchemaXml();
-        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(dataSource, schemaXml,
-                historyFile);
+        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(dataSource, schemaXml, historyFile);
         final String craftMetaDir = getSchemaSyncCheckCraftMetaDir();
         if (!getDocumentProperties().isSchemaSyncCheckSuppressCraftDiff()) {
             serializer.enableCraftDiff(dataSource, craftMetaDir, DfCraftDiffAssertDirection.ROLLING_NEXT);

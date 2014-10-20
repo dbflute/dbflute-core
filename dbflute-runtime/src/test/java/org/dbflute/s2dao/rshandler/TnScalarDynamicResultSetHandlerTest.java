@@ -25,13 +25,13 @@ import java.util.Set;
 
 import org.dbflute.mock.MockResultSet;
 import org.dbflute.mock.MockValueType;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.6.4 (2010/01/22 Friday)
  */
-public class TnScalarDynamicResultSetHandlerTest extends PlainTestCase {
+public class TnScalarDynamicResultSetHandlerTest extends RuntimeTestCase {
 
     public void test_handle_scalar() throws SQLException {
         // ## Arrange ##

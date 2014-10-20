@@ -60,8 +60,8 @@ public abstract class AbstractSubQuery {
      * @param cipherManager The manager of geared cipher. (NullAllowed)
      */
     public AbstractSubQuery(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
-            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
-            String subQueryIdentity, DBMeta subQueryDBMeta, GearedCipherManager cipherManager) {
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause, String subQueryIdentity,
+            DBMeta subQueryDBMeta, GearedCipherManager cipherManager) {
         _subQueryPath = subQueryPath;
         _localRealNameProvider = localRealNameProvider;
         _subQuerySqlNameProvider = subQuerySqlNameProvider;
@@ -97,8 +97,7 @@ public abstract class AbstractSubQuery {
      * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause string of plain sub-query. (NotNull)
      */
-    protected String buildPlainFromWhereClause(String selectClause, String localAliasName,
-            String correlatedFixedCondition) {
+    protected String buildPlainFromWhereClause(String selectClause, String localAliasName, String correlatedFixedCondition) {
         final SubQueryClause clause = createSubQueryClause(selectClause, localAliasName);
         return clause.buildPlainSubQueryFromWhereClause(correlatedFixedCondition);
     }
@@ -112,11 +111,10 @@ public abstract class AbstractSubQuery {
      * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause string of correlation sub-query. (NotNull)
      */
-    protected String buildCorrelationFromWhereClause(String selectClause, String localAliasName,
-            ColumnRealName correlatedColumnRealName, ColumnSqlName relatedColumnSqlName, String correlatedFixedCondition) {
+    protected String buildCorrelationFromWhereClause(String selectClause, String localAliasName, ColumnRealName correlatedColumnRealName,
+            ColumnSqlName relatedColumnSqlName, String correlatedFixedCondition) {
         final SubQueryClause clause = createSubQueryClause(selectClause, localAliasName);
-        return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealName, relatedColumnSqlName,
-                correlatedFixedCondition);
+        return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealName, relatedColumnSqlName, correlatedFixedCondition);
     }
 
     /**
@@ -129,11 +127,9 @@ public abstract class AbstractSubQuery {
      * @return The clause string of correlation sub-query. (NotNull)
      */
     protected String buildCorrelationFromWhereClause(String selectClause, String localAliasName,
-            ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames,
-            String correlatedFixedCondition) {
+            ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames, String correlatedFixedCondition) {
         final SubQueryClause clause = createSubQueryClause(selectClause, localAliasName);
-        return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealNames, relatedColumnSqlNames,
-                correlatedFixedCondition);
+        return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealNames, relatedColumnSqlNames, correlatedFixedCondition);
     }
 
     protected SubQueryClause createSubQueryClause(String selectClause, String localAliasName) {

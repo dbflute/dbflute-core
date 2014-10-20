@@ -4,19 +4,20 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.dbflute</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>1.1-pilot1-SNAPSHOT</version>
+	<version>1.1-pilot6-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>DBFlute Runtime</name>
 	<description>The runtime library of DBFlute</description>
+	<url>https://github.com/dbflute</url>
+	<inceptionYear>2014</inceptionYear>
 
 	<properties>
+		<slf4j.version>1.7.7</slf4j.version>
 		<commons.logging.version>1.1.1</commons.logging.version>
 		<junit.version>4.8.2</junit.version>
 	</properties>
 
-	<url>http://dbflute.seasar.org/</url>
-	<inceptionYear>2006</inceptionYear>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -37,12 +38,12 @@
 	</developers>
 
 	<issueManagement>
-		<system>JIRA</system>
-		<url>https://www.seasar.org/issues/browse/DBFLUTE</url>
+		<system>Github</system>
+		<url>https://github.com/dbflute-test/dbflute-test-option-compatible10x/issues</url>
 	</issueManagement>
 	<mailingLists>
 		<mailingList>
-			<name>dbflute-user</name>
+			<name>DBFlute-users</name>
 			<subscribe>https://groups.google.com/forum/#!forum/dbflute</subscribe>
 			<unsubscribe>https://groups.google.com/forum/#!forum/dbflute</unsubscribe>
 			<post>dbflute@googlegroups.com</post>
@@ -51,9 +52,9 @@
 	</mailingLists>
 
 	<scm>
-		<url>https://github.com/seasarorg/dbflute</url>
-		<connection>scm:git:https://github.com/seasarorg/dbflute.git</connection>
-		<developerConnection>scm:git:https://github.com/seasarorg/dbflute.git</developerConnection>
+		<url>https://github.com/dbflute</url>
+		<connection>scm:git:https://github.com/dbflute/dbflute-core.git</connection>
+		<developerConnection>scm:git:https://github.com/dbflute/dbflute-core.git</developerConnection>
 	</scm>
 
 	<build>
@@ -176,42 +177,20 @@
 		<!-- |   compile   | -->
 		<!-- =============== -->
 		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>${commons.logging.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>avalon-framework</artifactId>
-					<groupId>avalon-framework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>logkit</artifactId>
-					<groupId>logkit</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>log4j</artifactId>
-					<groupId>log4j</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>servlet-api</artifactId>
-					<groupId>javax.servlet</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- =============== -->
-		<!-- |   runtime   | -->
-		<!-- =============== -->
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
-			<scope>runtime</scope>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 		<!-- ============ -->
 		<!-- |   test   | -->
 		<!-- ============ -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

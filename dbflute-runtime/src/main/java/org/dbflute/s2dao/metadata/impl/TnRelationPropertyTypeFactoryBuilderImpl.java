@@ -35,9 +35,9 @@ public class TnRelationPropertyTypeFactoryBuilderImpl implements TnRelationPrope
     }
 
     public TnRelationPropertyTypeFactory build(Class<?> localBeanClass, TnBeanMetaData localBeanMetaData,
-            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData, int relationNestLevel,
-            boolean stopRelationCreation, Class<?> optionalEntityType) {
-        return new TnRelationPropertyTypeFactoryImpl(localBeanClass, localBeanMetaData, beanAnnotationReader,
-                _beanMetaDataFactory, dbMetaData, relationNestLevel, stopRelationCreation, optionalEntityType);
+            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation,
+            Class<?> optionalEntityType) {
+        return new TnRelationPropertyTypeFactoryImpl(localBeanClass, localBeanMetaData, beanAnnotationReader, _beanMetaDataFactory,
+                dbMetaData, relationNestLevel, stopRelationCreation, optionalEntityType);
     }
 }

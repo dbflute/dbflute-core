@@ -48,8 +48,7 @@ public class BehaviorInvokePathBuilder {
     // ===================================================================================
     //                                                                    Build InvokePath
     //                                                                    ================
-    public BehaviorInvokePathResult buildInvokePath(StackTraceElement[] stackTrace,
-            BehaviorInvokeNameResult behaviorInvokeNameResult) {
+    public BehaviorInvokePathResult buildInvokePath(StackTraceElement[] stackTrace, BehaviorInvokeNameResult behaviorInvokeNameResult) {
         final InvokeNameResult behaviorHeadResult = behaviorInvokeNameResult.getInvokeNameHeadResult();
         final int bhvNextIndex = behaviorHeadResult != null ? behaviorHeadResult.getNextStartIndex() : -1;
 
@@ -61,8 +60,7 @@ public class BehaviorInvokePathBuilder {
         // extract by-pass result
         final int clientFirstIndex = headClientResult != null ? headClientResult.getFoundFirstIndex() : -1;
         final int byPassLoopSize = clientFirstIndex - bhvNextIndex;
-        final ByPassInvokeNameResult byPassInvokeNameResult = extractByPassInvoke(stackTrace, bhvNextIndex,
-                byPassLoopSize);
+        final ByPassInvokeNameResult byPassInvokeNameResult = extractByPassInvoke(stackTrace, bhvNextIndex, byPassLoopSize);
         final List<InvokeNameResult> byPassResultList = byPassInvokeNameResult.getInvokeNameResultList();
         final InvokeNameResult headByPassResult = findHeadInvokeResult(byPassResultList);
 
@@ -112,8 +110,7 @@ public class BehaviorInvokePathBuilder {
         return extractor.extractByPassInvoke(stackTrace);
     }
 
-    protected ByPassInvokeNameExtractor createByPassInvokeNameExtractor(List<String> suffixList, int startIndex,
-            int loopSize) {
+    protected ByPassInvokeNameExtractor createByPassInvokeNameExtractor(List<String> suffixList, int startIndex, int loopSize) {
         return new ByPassInvokeNameExtractor(suffixList, startIndex, loopSize);
     }
 

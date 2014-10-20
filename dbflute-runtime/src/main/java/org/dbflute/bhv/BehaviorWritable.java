@@ -153,8 +153,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @param option The option of update. (NullAllowed: if null, same as queryUpdate())
      * @return Modified count.
      */
-    int rangeCreate(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> setupper,
-            InsertOption<? extends ConditionBean> option);
+    int rangeCreate(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> setupper, InsertOption<? extends ConditionBean> option);
 
     /**
      * Range-modify entities. <br />

@@ -92,7 +92,7 @@ map:{
     #  The handling type when undefined classification is found.
     #
     #   EXCEPTION - throws exception when found
-    #   LOGGING   - logging only when found
+    #   LOGGING   - logging only when found (exception if ReplaceSchema)
     #   ALLOWED   - no action
     #
     #; classificationUndefinedHandlingType = LOGGING

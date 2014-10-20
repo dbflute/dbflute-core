@@ -47,8 +47,7 @@ public class JavaPropertiesResult {
      * @param propertyList The list of property merged with extends-properties. (NotNull)
      * @param duplicateKeyList The list of duplicate property keys. (NotNull)
      */
-    public JavaPropertiesResult(Properties plainProp, List<JavaPropertiesProperty> propertyList,
-            List<String> duplicateKeyList) {
+    public JavaPropertiesResult(Properties plainProp, List<JavaPropertiesProperty> propertyList, List<String> duplicateKeyList) {
         this(plainProp, propertyList, duplicateKeyList, null);
     }
 
@@ -58,8 +57,8 @@ public class JavaPropertiesResult {
      * @param duplicateKeyList The list of duplicate property keys. (NotNull)
      * @param extendsPropResult The result for extends-properties. (NullAllowed: if null, no extends)
      */
-    public JavaPropertiesResult(Properties plainProp, List<JavaPropertiesProperty> propertyList,
-            List<String> duplicateKeyList, JavaPropertiesResult extendsPropResult) {
+    public JavaPropertiesResult(Properties plainProp, List<JavaPropertiesProperty> propertyList, List<String> duplicateKeyList,
+            JavaPropertiesResult extendsPropResult) {
         _plainProp = plainProp;
         _propertyList = propertyList;
         _propertyMap = DfCollectionUtil.newLinkedHashMapSized(propertyList.size());

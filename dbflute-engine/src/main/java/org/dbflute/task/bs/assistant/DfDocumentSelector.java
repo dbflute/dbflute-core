@@ -17,8 +17,6 @@ package org.dbflute.task.bs.assistant;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.dbflute.logic.doc.prophtml.DfPropHtmlManager;
@@ -26,6 +24,8 @@ import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -35,8 +35,8 @@ public class DfDocumentSelector {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfDocumentSelector.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfDocumentSelector.class);
 
     // ===================================================================================
     //                                                                           Attribute

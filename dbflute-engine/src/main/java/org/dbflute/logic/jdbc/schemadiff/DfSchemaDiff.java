@@ -569,8 +569,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             return mainList;
         }
 
-        protected void filterCompareColumnList(Table next, Table previous, List<String> nextList,
-                List<String> previousList) {
+        protected void filterCompareColumnList(Table next, Table previous, List<String> nextList, List<String> previousList) {
             final List<String> removedNextList = DfCollectionUtil.newArrayList();
             final List<String> removedPreviousList = DfCollectionUtil.newArrayList();
             for (int i = 0; i < nextList.size(); i++) {
@@ -589,8 +588,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
         }
 
-        protected Map<String, Object> findColumnDefOrder(Table next, Table previous, List<String> nextList,
-                List<String> previousList) {
+        protected Map<String, Object> findColumnDefOrder(Table next, Table previous, List<String> nextList, List<String> previousList) {
             Map<String, Object> resultMap = null;
             for (int i = 0; i < nextList.size(); i++) {
                 final String nextName = nextList.get(i);
@@ -625,8 +623,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         });
     }
 
-    protected <TYPE> void diffNextPrevious(Table next, Table previous, DfTableDiff diff,
-            NextPreviousDiffer<Table, DfTableDiff, TYPE> differ) {
+    protected <TYPE> void diffNextPrevious(Table next, Table previous, DfTableDiff diff, NextPreviousDiffer<Table, DfTableDiff, TYPE> differ) {
         final TYPE nextValue = differ.provide(next);
         final TYPE previousValue = differ.provide(previous);
         if (!differ.isMatch(nextValue, previousValue)) {
@@ -996,8 +993,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
         processDeletedConstraintKey(previousTable, differ, previousNextMap);
     }
 
-    protected <KEY, DIFF extends DfConstraintDiff> void processChangedConstraintKeyDiff(KEY nextKey, KEY previousKey,
-            String nextName, String previousName, DfConstraintKeyDiffer<KEY, DIFF> differ) {
+    protected <KEY, DIFF extends DfConstraintDiff> void processChangedConstraintKeyDiff(KEY nextKey, KEY previousKey, String nextName,
+            String previousName, DfConstraintKeyDiffer<KEY, DIFF> differ) {
         if (differ.isSameConstraintName(nextName, previousName)) { // same name, different structure
             final String nextColumn = differ.column(nextKey);
             final String previousColumn = differ.column(previousKey);
@@ -1016,8 +1013,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    protected <KEY, DIFF extends DfConstraintDiff> void processAddedConstraintKey(Table nextTable,
-            DfConstraintKeyDiffer<KEY, DIFF> differ, Map<String, KEY> nextPreviousMap) {
+    protected <KEY, DIFF extends DfConstraintDiff> void processAddedConstraintKey(Table nextTable, DfConstraintKeyDiffer<KEY, DIFF> differ,
+            Map<String, KEY> nextPreviousMap) {
         final List<KEY> keyList = differ.keyList(nextTable);
         for (KEY nextKey : keyList) {
             final String nextName = differ.constraintName(nextKey);
@@ -1312,8 +1309,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         });
     }
 
-    protected abstract class ProcedureSourceNextPreviousDiffer extends
-            StringNextPreviousDiffer<Procedure, DfProcedureDiff> {
+    protected abstract class ProcedureSourceNextPreviousDiffer extends StringNextPreviousDiffer<Procedure, DfProcedureDiff> {
         @Override
         public boolean isMatch(String next, String previous) {
             if (isNullMeta(next, previous)) {
@@ -1465,8 +1461,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    protected void assertTableCountExists(String key, DfNextPreviousDiff nextPreviousDiff,
-            Map<String, Object> schemaDiffMap) {
+    protected void assertTableCountExists(String key, DfNextPreviousDiff nextPreviousDiff, Map<String, Object> schemaDiffMap) {
         if (nextPreviousDiff == null) { // basically no way
             String msg = "The table count of diff-map is required:";
             msg = msg + " key=" + key + " schemaDiffMap=" + schemaDiffMap;
@@ -1482,8 +1477,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    protected void assertPreviousTableCountExists(String key, String previousTableCount,
-            Map<String, Object> schemaDiffMap) {
+    protected void assertPreviousTableCountExists(String key, String previousTableCount, Map<String, Object> schemaDiffMap) {
         if (previousTableCount == null) { // basically no way
             String msg = "The previous table count of diff-map is required:";
             msg = msg + " key=" + key + " schemaDiffMap=" + schemaDiffMap;

@@ -85,8 +85,7 @@ public class ForNode extends ScopeNode implements SqlConnectorAdjustable, LoopAc
         doAccept(ctx, value, clazz, parentLoop, false);
     }
 
-    public void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo parentLoop,
-            boolean inheritLoop) {
+    public void doAccept(CommandContext ctx, Object firstValue, Class<?> firstType, LoopInfo parentLoop, boolean inheritLoop) {
         if (firstValue == null) {
             return; // if base object is null, do nothing at FOR comment
         }

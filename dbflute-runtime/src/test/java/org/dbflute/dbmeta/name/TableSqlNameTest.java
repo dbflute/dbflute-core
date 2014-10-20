@@ -15,12 +15,12 @@
  */
 package org.dbflute.dbmeta.name;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class TableSqlNameTest extends PlainTestCase {
+public class TableSqlNameTest extends RuntimeTestCase {
 
     public void test_basic() throws Exception {
         TableSqlName tableSqlName = new TableSqlName("FOO_SQL", "BAR_DB");

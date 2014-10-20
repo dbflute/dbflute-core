@@ -26,6 +26,5 @@ import org.dbflute.outsidesql.typed.EntityHandlingPmb;
  * @author jflute
  * @since 1.0.5J (2014/06/15 Sunday)
  */
-public interface ImmutableEntityHandlingPmb<BEHAVIOR, IMMU, DBLE extends DBableEntity<IMMU>> extends
-        EntityHandlingPmb<BEHAVIOR, DBLE> {
+public interface ImmutableEntityHandlingPmb<BEHAVIOR, IMMU, DBLE extends DBableEntity<IMMU>> extends EntityHandlingPmb<BEHAVIOR, DBLE> {
 }

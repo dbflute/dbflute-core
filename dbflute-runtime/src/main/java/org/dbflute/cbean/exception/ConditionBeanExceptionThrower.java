@@ -22,16 +22,17 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.cvalue.ConditionValue;
-import org.dbflute.cbean.ordering.ManualOrderBean;
+import org.dbflute.cbean.dream.SpecifiedColumn;
+import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;
 import org.dbflute.exception.FixedConditionParameterNotFoundException;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.InvalidQueryRegisteredException;
+import org.dbflute.exception.OptionThatsBadTimingException;
 import org.dbflute.exception.OrScopeQueryAndPartAlreadySetupException;
 import org.dbflute.exception.OrScopeQueryAndPartNotOrScopeException;
 import org.dbflute.exception.OrderByIllegalPurposeException;
@@ -79,30 +80,24 @@ public class ConditionBeanExceptionThrower {
     // ===================================================================================
     //                                                                       Set up Select
     //                                                                       =============
-    public void throwSetupSelectIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
-            String foreignPropertyName) {
+    public void throwSetupSelectIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String foreignPropertyName) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The purpose was illegal for SetupSelect.");
+        br.addNotice("Bad location to call SetupSelect.");
         br.addItem("Advice");
-        br.addElement("This condition-bean is not allowed to set up select.");
+        br.addElement("The condition-bean is not allowed to set up select.");
         br.addElement("Because this is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (ExistsReferrer)");
-        br.addElement("    cb.query().existsXxxList(new SubQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB subCB) {");
-        br.addElement("            subCB.setupSelect_Product(); // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.query().existsPurchase(purchaseCB -> {");
+        br.addElement("        purchaseCB.setupSelect_Product(); // *NG");
         br.addElement("    });");
         br.addElement("  (x): (Union)");
-        br.addElement("    cb.union(new UnionQuery<MemberCB>() {");
-        br.addElement("        public void query(MemberCB unionCB) {");
-        br.addElement("            unionCB.setupSelect_MemberStatus(); // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.union(unionCB -> {");
+        br.addElement("        unionCB.setupSelect_MemberStatus(); // *NG");
         br.addElement("    });");
         br.addElement("  (o): (Normal Use)");
-        br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    cb.setupSelect_MemberStatus(); // OK");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + purpose + ")");
         br.addItem("Setup Relation");
@@ -117,22 +112,21 @@ public class ConditionBeanExceptionThrower {
         br.addItem("Advice");
         br.addElement("The condition-bean was locked in the timing.");
         br.addElement("For example:");
-        br.addElement("(x):");
-        br.addElement("  MemberCB cb = new MemberCB()");
-        br.addElement("  cb.setupSelect_MemberStatus();");
-        br.addElement("  ListResultBean<Member> memberList = memberBhv.selectList(cb);");
-        br.addElement("  memberBhv.loadPurchaseList(cb, referrerCB -> {");
-        br.addElement("      cb.setupSelect_MemberStatus(); // *NG");
-        br.addElement("  });");
-        br.addElement("(o):");
-        br.addElement("  MemberCB cb = new MemberCB()");
-        br.addElement("  cb.setupSelect_MemberStatus();");
-        br.addElement("  ListResultBean<Member> memberList = memberBhv.selectList(cb);");
-        br.addElement("  memberBhv.loadPurchaseList(cb, referrerCB -> {");
-        br.addElement("      referrerCB.setupSelect_Product(); // OK");
-        br.addElement("  });");
+        br.addElement("  (x):");
+        br.addElement("    ListResultBean<Member> memberList = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.query().existsPurchase(purchaseCB -> {");
+        br.addElement("            cb.setupSelect_MemberStatus(); // *NG");
+        br.addElement("        });");
+        br.addElement("    });");
+        br.addElement("  (o):");
+        br.addElement("    cb.setupSelect_MemberStatus(); // OK");
+        br.addElement("    ListResultBean<Member> memberList = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.query().existsPurchase(purchaseCB -> {");
+        br.addElement("            purchaseCB.query().set... // you can use only purchaseCB here");
+        br.addElement("        });");
+        br.addElement("    });");
         Class<? extends ConditionBean> cbType = lockedCB.getClass();
-        br.addItem("Locked ConditionBean");
+        br.addItem("Locked ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(cbType.getName());
         br.addElement("(" + lockedCB.getPurpose() + ")");
         br.addItem("Your SetupSelect");
@@ -166,7 +160,7 @@ public class ConditionBeanExceptionThrower {
     //    br.addElement("            unionCB.query().setXxx...;");
     //    br.addElement("        }");
     //    br.addElement("    });");
-    //    br.addItem("ConditionBean");
+    //    br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
     //    br.addElement(baseCB.getClass().getName());
     //    br.addItem("Setup Relation");
     //    br.addElement(foreignPropertyName);
@@ -179,31 +173,25 @@ public class ConditionBeanExceptionThrower {
     //                                                                             =======
     public void throwSpecifyIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The purpose was illegal to specify.");
+        br.addNotice("Bad location to call specify().");
         br.addItem("Advice");
-        br.addElement("This condition-bean is not allowed to specify.");
+        br.addElement("The condition-bean is not allowed to specify() there.");
         br.addElement("Because this is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (ExistsReferrer)");
-        br.addElement("    cb.query().existsPurchaseList(new SubQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB subCB) {");
-        br.addElement("            subCB.specify()... // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("        purchaseCB.specify()... // *NG");
         br.addElement("    });");
         br.addElement("  (x): (Union)");
-        br.addElement("    cb.union(new UnionQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB unionCB) {");
-        br.addElement("            unionCB.specify()... // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.union(unionCB -> {");
+        br.addElement("        unionCB.specify()... // *NG");
         br.addElement("    });");
         br.addElement("  (o): (ExistsReferrer)");
-        br.addElement("    cb.query().existsPurchaseList(new SubQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB subCB) {");
-        br.addElement("            subCB.query().setPurchaseCount_GreaterEqual(3); // OK");
-        br.addElement("        }");
+        br.addElement("    cb.specify()... // OK");
+        br.addElement("    cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("        purchaseCB.query().set...");
         br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         final String msg = br.buildExceptionMessage();
@@ -216,19 +204,17 @@ public class ConditionBeanExceptionThrower {
         br.addItem("Advice");
         br.addElement("The condition-bean was locked in the timing.");
         br.addElement("For example:");
-        br.addElement("(x):");
-        br.addElement("  MemberCB cb = new MemberCB()");
-        br.addElement("  cb.specify().derivedPurchaseList().max(subCB -> {");
-        br.addElement("      cb.specify().columnMemberId(); // *NG");
-        br.addElement("      subCB.query().setPurchasePrice_GreaterThan(2000);");
-        br.addElement("  }, ...);");
-        br.addElement("(o):");
-        br.addElement("  MemberCB cb = new MemberCB()");
-        br.addElement("  cb.specify().derivedPurchaseList().max(subCB -> {");
-        br.addElement("      subCB.specify().columnMemberId(); // *OK");
-        br.addElement("      subCB.query().setPurchasePrice_GreaterThan(2000);");
-        br.addElement("  }, ...);");
-        br.addItem("Locked ConditionBean");
+        br.addElement("  (x):");
+        br.addElement("    cb.specify().derivedPurchaseList().max(purchaseCB -> {");
+        br.addElement("        cb.specify().columnMemberId(); // *NG");
+        br.addElement("        purchaseCB.query().set...");
+        br.addElement("    }, ...);");
+        br.addElement("  (o):");
+        br.addElement("    cb.specify().derivedPurchaseList().max(purchaseCB -> {");
+        br.addElement("        purchaseCB.specify().columnMemberId(); // OK");
+        br.addElement("        purchaseCB.query().set...");
+        br.addElement("    }, ...);");
+        br.addItem("Locked ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(lockedCB.getClass().getName());
         br.addElement("(" + lockedCB.getPurpose() + ")");
         final String msg = br.buildExceptionMessage();
@@ -239,31 +225,24 @@ public class ConditionBeanExceptionThrower {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("You specified two or more columns!");
         br.addItem("Advice");
-        br.addElement("This condition-bean is not allowed to specify two or more columns.");
+        br.addElement("The condition-bean is not allowed to specify two or more columns.");
         br.addElement("Because the conditoin-bean is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (DerivedReferrer)");
-        br.addElement("    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB subCB) {");
-        br.addElement("            subCB.specify().columnPurchaseCount();");
-        br.addElement("            subCB.specify().columnPurchasePrice(); // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.specify().derivedPurchaseList().max(purchaseCB -> {");
+        br.addElement("        purchaseCB.specify().columnPurchaseCount();");
+        br.addElement("        purchaseCB.specify().columnPurchasePrice(); // *NG");
         br.addElement("    });");
         br.addElement("  (x): (ColumnQuery)");
-        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.specify().columnMemberName();");
-        br.addElement("            cb.specify().columnBirthdate(); // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.columnQuery(colCB -> {");
+        br.addElement("        colCB.specify().columnMemberName();");
+        br.addElement("        colCB.specify().columnBirthdate(); // *NG");
         br.addElement("    })...");
         br.addElement("  (o): (DerivedReferrer)");
-        br.addElement("    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB subCB) {");
-        br.addElement("            subCB.specify().columnPurchaseCount();");
-        br.addElement("        }");
+        br.addElement("    cb.specify().derivedPurchaseList().max(purchaseCB -> {");
+        br.addElement("        purchaseCB.specify().columnPurchaseCount();");
         br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Specified Column");
@@ -274,20 +253,20 @@ public class ConditionBeanExceptionThrower {
 
     public void throwSpecifyColumnNotSetupSelectColumnException(ConditionBean baseCB, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("You specified the column that had not been set up!");
+        br.addNotice("Lonely specify().column... was called. (without SetupSelect)");
         br.addItem("Advice");
-        br.addElement("You should call setupSelect_[ForeignTable]()");
-        br.addElement("before calling specify[ForeignTable]().column[TargetColumn]().");
+        br.addElement("SpecifyColumn needs SetupSelect for the table.");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.specify().specifyMemberStatus().columnMemberStatusName(); // *NG");
+        br.addElement("    memberBhv.selectEntity(cb -> {");
+        br.addElement("        cb.specify().specifyMemberStatus().columnMemberStatusName(); // *NG");
+        br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.setupSelect_MemberStatus(); // *Point");
-        br.addElement("    cb.specify().specifyMemberStatus().columnMemberStatusName();");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addElement("    memberBhv.selectEntity(cb -> {");
+        br.addElement("        cb.setupSelect_MemberStatus(); // *Point");
+        br.addElement("        cb.specify().specifyMemberStatus().columnMemberStatusName(); // OK");
+        br.addElement("    });");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Specified Column");
@@ -296,12 +275,13 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyColumnNotSetupSelectColumnException(msg);
     }
 
-    public void throwSpecifyColumnWithDerivedReferrerException(HpCBPurpose purpose, ConditionBean baseCB,
-            String columnName, String referrerName) {
+    // TODO jflute exception: CB message
+    public void throwSpecifyColumnWithDerivedReferrerException(HpCBPurpose purpose, ConditionBean baseCB, String columnName,
+            String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("You specified both SpecifyColumn and (Specify)DerivedReferrer!");
         br.addItem("Advice");
-        br.addElement("This condition-bean is not allowed to specify both functions.");
+        br.addElement("The condition-bean is not allowed to specify both functions.");
         br.addElement("Because the conditoin-bean is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (ColumnQuery)");
@@ -323,8 +303,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            cb.specify().derivedPurchaseList().max(...); // OK");
         br.addElement("        }");
         br.addElement("    }).greaterEqual(...);");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Specified Column");
@@ -386,8 +365,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyColumnAlreadySpecifiedExceptColumnException(msg);
     }
 
-    public void throwSpecifyEveryColumnAlreadySpecifiedColumnException(String tableDbName,
-            Map<String, HpSpecifiedColumn> specifiedColumnMap) {
+    public void throwSpecifyEveryColumnAlreadySpecifiedColumnException(String tableDbName, Map<String, SpecifiedColumn> specifiedColumnMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SpecifyEveryColumn is specified after SpecifyColumn.");
         br.addItem("Advice");
@@ -410,8 +388,8 @@ public class ConditionBeanExceptionThrower {
         br.addElement(tableDbName);
         if (specifiedColumnMap != null) { // basically true
             br.addItem("Specified Column");
-            final Collection<HpSpecifiedColumn> columnList = specifiedColumnMap.values();
-            for (HpSpecifiedColumn column : columnList) {
+            final Collection<SpecifiedColumn> columnList = specifiedColumnMap.values();
+            for (SpecifiedColumn column : columnList) {
                 br.addElement(column);
             }
         }
@@ -419,8 +397,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyEveryColumnAlreadySpecifiedColumnException(msg);
     }
 
-    public void throwSpecifyExceptColumnAlreadySpecifiedColumnException(String tableDbName,
-            Map<String, HpSpecifiedColumn> specifiedColumnMap) {
+    public void throwSpecifyExceptColumnAlreadySpecifiedColumnException(String tableDbName, Map<String, SpecifiedColumn> specifiedColumnMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SpecifyExceptColumn is specified after SpecifyColumn.");
         br.addItem("Advice");
@@ -440,8 +417,8 @@ public class ConditionBeanExceptionThrower {
         br.addElement(tableDbName);
         if (specifiedColumnMap != null) { // basically true
             br.addItem("Specified Column");
-            final Collection<HpSpecifiedColumn> columnList = specifiedColumnMap.values();
-            for (HpSpecifiedColumn column : columnList) {
+            final Collection<SpecifiedColumn> columnList = specifiedColumnMap.values();
+            for (SpecifiedColumn column : columnList) {
                 br.addElement(column);
             }
         }
@@ -449,37 +426,28 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyExceptColumnAlreadySpecifiedColumnException(msg);
     }
 
-    public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
-            String relationName) {
+    public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String relationName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("You specified the relation in the purpose that is not allowed to do it.");
+        br.addNotice("Bad location to call specify() for relation.");
         br.addItem("Advice");
-        br.addElement("This condition-bean is not allowed to specify a relation.");
+        br.addElement("The condition-bean is not allowed to specify() for relation.");
         br.addElement("Because this is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (ScalarSelect)");
-        br.addElement("    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {");
-        br.addElement("        public void query(MemberCB cb) {");
-        br.addElement("            cb.specify().specifyMemberStatus().col.. // *NG");
-        br.addElement("        }");
+        br.addElement("    memberBhv.scalarSelect(Date.class).max(cb -> {");
+        br.addElement("        cb.specify().specifyMemberStatus().col.. // *NG");
         br.addElement("    });");
         br.addElement("  (x): (ScalarCondition)");
-        br.addElement("    cb.query().scalar_Equal().max(Date.class).max(new SubQuery<MemberCB>() {");
-        br.addElement("        public void query(MemberCB subCB) {");
-        br.addElement("            subCB.specify().specifyMemberStatusName().col..; // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.query().scalar_Equal().max(Date.class).max(scalarCB -> {");
+        br.addElement("        scalarCB.specify().specifyMemberStatusName().col..; // *NG");
         br.addElement("    });");
         br.addElement("  (x): (VaryingUpdate)");
-        br.addElement("    UpdateOption option = new UpdateOption().self(new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.specify().specifyMemberStatus().col.. // *NG");
-        br.addElement("        }");
+        br.addElement("    UpdateOption option = new UpdateOption().self(colCB -> {");
+        br.addElement("        colCB.specify().specifyMemberStatus().col.. // *NG");
         br.addElement("    });");
         br.addElement("  (o): (ScalarSelect)");
-        br.addElement("    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {");
-        br.addElement("        public void query(MemberCB cb) {");
-        br.addElement("            cb.specify().columnBirthdate(); // OK");
-        br.addElement("        }");
+        br.addElement("    memberBhv.scalarSelect(Date.class).max(scalarCB -> {");
+        br.addElement("        scalarCB.specify().columnBirthdate(); // OK");
         br.addElement("    });");
         // don't use displaySql because of illegal CB's state
         br.addItem("ConditionBean");
@@ -491,25 +459,20 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyRelationIllegalPurposeException(msg);
     }
 
-    public void throwSpecifyDerivedReferrerIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,
-            String referrerName) {
+    public void throwSpecifyDerivedReferrerIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The purpose was illegal for derived-referrer specification.");
+        br.addNotice("Bad location to call (Specify)DerivedReferrer.");
         br.addItem("Advice");
-        br.addElement("This condition-bean is not allowed to specify a derived referrer.");
+        br.addElement("The condition-bean is not allowed to specify derived-referrer.");
         br.addElement("Because this is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (ScalaCondition)");
-        br.addElement("    cb.query().scalar_Equal().max(new SubQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB subCB) {");
-        br.addElement("            subCB.specify().derivedPurchaseList()...; // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.query().scalar_Equal().max(scalarCB -> {");
+        br.addElement("        scalarCB.specify().derivedPurchaseList()...; // *NG");
         br.addElement("    });");
         br.addElement("  (o): (ScalaCondition)");
-        br.addElement("    cb.query().scalar_Equal().max(new SubQuery<PurchaseCB>() {");
-        br.addElement("        public void query(PurchaseCB subCB) {");
-        br.addElement("            subCB.specify().columnPurchaseCount(); // OK");
-        br.addElement("        }");
+        br.addElement("    cb.query().scalar_Equal().max(scalarCB -> {");
+        br.addElement("        scalarCB.specify().columnPurchaseCount(); // OK");
         br.addElement("    });");
         // don't use displaySql because of illegal CB's state
         br.addItem("ConditionBean");
@@ -521,12 +484,11 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyDerivedReferrerIllegalPurposeException(msg);
     }
 
-    public void throwSpecifyDerivedReferrerTwoOrMoreException(HpCBPurpose purpose, ConditionBean baseCB,
-            String referrerName) {
+    public void throwSpecifyDerivedReferrerTwoOrMoreException(HpCBPurpose purpose, ConditionBean baseCB, String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The two-or-more derived-referrers was specifed.");
         br.addItem("Advice");
-        br.addElement("This condition-bean is not allowed to specify two-or-more derived referrers.");
+        br.addElement("The condition-bean is not allowed to specify two-or-more derived referrers.");
         br.addElement("Because this is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (ColumnQuery)");
@@ -654,15 +616,15 @@ public class ConditionBeanExceptionThrower {
         br.addElement("For example:");
         br.addElement("  (ConditionBean and Entity handling):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    String key = \"$highestPurchasePrice\"; // OK");
+        br.addElement("    String highestAlias = \"$HIGHEST_PURCHASE_PRICE\"; // OK");
         br.addElement("    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {");
         br.addElement("        public void query(PurchaseCB subCB) {");
         br.addElement("            subCB.specify().columnPurchasePrice();");
         br.addElement("        }");
-        br.addElement("    }, key);");
+        br.addElement("    }, highestAlias);");
         br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
         br.addElement("    for (Member member ; memberList) {");
-        br.addElement("        Integer highestPurchasePrice = member.derived(key);");
+        br.addElement("        ... = member.derived(highestAlias, Integer.class);");
         br.addElement("    }");
         br.addItem("Alias Name");
         br.addElement(aliasName);
@@ -735,8 +697,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyDerivedReferrerUnmatchedColumnTypeException(msg);
     }
 
-    public void throwSpecifyDerivedReferrerSelectAllPossibleException(String function, ConditionQuery subQuery,
-            String aliasName) {
+    public void throwSpecifyDerivedReferrerSelectAllPossibleException(String function, ConditionQuery subQuery, String aliasName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The specify derived-referrer might select all.");
         br.addItem("Advice");
@@ -869,9 +830,9 @@ public class ConditionBeanExceptionThrower {
     //                                                                               =====
     public void throwQueryIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The purpose was illegal for query.");
+        br.addNotice("Bad location to call query().");
         br.addItem("Advice");
-        br.addElement("This condition-bean is not allowed to set query.");
+        br.addElement("The condition-bean is not allowed to set query.");
         br.addElement("(contains OrScopeQuery and ColumnQuery)");
         br.addElement("Because this is for " + purpose + ".");
         br.addElement("For example:");
@@ -891,8 +852,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            cb.orScopeQuery(...); // *NG");
         br.addElement("        }");
         br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + purpose + ")");
         final String msg = br.buildExceptionMessage();
@@ -907,14 +867,14 @@ public class ConditionBeanExceptionThrower {
         br.addElement("For example:");
         br.addElement("(x):");
         br.addElement("  MemberCB cb = new MemberCB()");
-        br.addElement("  cb.query().existsPurchaseList(subCB -> {");
-        br.addElement("      subCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
         br.addElement("      cb.query().setBirthdate_GreaterThan(currentDate()); // *NG");
         br.addElement("  });");
         br.addElement("(o):");
         br.addElement("  MemberCB cb = new MemberCB()");
-        br.addElement("  cb.query().existsPurchaseList(subCB -> {");
-        br.addElement("      subCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
         br.addElement("  });");
         br.addElement("  cb.query().setBirthdate_GreaterThan(currentDate()); // OK");
         br.addItem("Locked ConditionBean");
@@ -924,38 +884,34 @@ public class ConditionBeanExceptionThrower {
         throw new QueryThatsBadTimingException(msg);
     }
 
-    public void throwQueryAlreadyRegisteredException(ConditionKey key, Object value, ConditionValue cvalue,
-            String columnDbName) {
+    public void throwQueryAlreadyRegisteredException(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The query has been already registered. (cannot override it)");
+        br.addNotice("Already registered the query. (cannot override it)");
         br.addItem("Advice");
         br.addElement("Overriding query is not allowed as default setting.");
         br.addElement("Mistake? Or do you really want to override it?");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    cb.query().setMemberId_Equal(3);");
         br.addElement("    cb.query().setMemberId_Equal(4); // *NG");
         br.addElement("  (x):");
-        br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    cb.query().setMemberId_Equal(3);");
         br.addElement("    cb.query().setMemberId_Equal(3); // *NG");
         br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    cb.query().setMemberId_Equal(3);");
         br.addElement("    cb.query().setMemberAccount_Equal(\"Pixy\"); // OK");
         br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.enableOverridingQuery();");
         br.addElement("    cb.query().setMemberId_Equal(3); // overridden");
-        br.addElement("    cb.query().setMemberId_Equal(4); // OK");
+        br.addElement("    cb.enableOverridingQuery(() -> {");
+        br.addElement("        cb.query().setMemberId_Equal(4); // OK (overrides it)");
+        br.addElement("    });");
         br.addItem("Column Name");
         br.addElement(columnDbName);
         br.addItem("Condition Key");
         br.addElement(key);
+        br.addItem("Already Registered");
+        br.addElement(cvalue);
         br.addItem("New Value");
-        br.addElement(value);
-        br.addItem("Condition Value");
         br.addElement(value);
         final String msg = br.buildExceptionMessage();
         throw new QueryAlreadyRegisteredException(msg);
@@ -963,19 +919,16 @@ public class ConditionBeanExceptionThrower {
 
     public void throwInvalidQueryRegisteredException(HpInvalidQueryInfo... invalidQueryInfoAry) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The invalid query was registered. (check is working)");
+        br.addNotice("Registered the invalid query. (null or empty)");
         br.addItem("Advice");
-        br.addElement("You should not set null or empty to query.");
+        br.addElement("The value of null or empty is not allowed to query as default.");
         br.addElement("For example: (when checked by default)");
         br.addElement("  (x):");
-        br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    cb.query().setMemberName_Equal(null); // exception");
         br.addElement("    cb.query().setMemberName_Equal(\"\"); // exception");
         br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    cb.query().setMemberName_Equal(\"Pixy\"); // normal query");
         br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
         br.addElement("    cb.ignoreNullOrEmptyQuery();");
         br.addElement("    cb.query().setMemberName_Equal(null); // no condition");
         br.addElement("    cb.query().setMemberName_Equal(\"\"); // no condition");
@@ -990,7 +943,7 @@ public class ConditionBeanExceptionThrower {
     public void throwLikeSearchOptionNotFoundException(String colName, String value, DBMeta dbmeta) {
         final String capPropName = initCap(dbmeta.findColumnInfo(colName).getPropertyName());
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The likeSearchOption was not found! (should not be null)");
+        br.addNotice("Not found the likeSearchOption. (should not be null)");
         br.addItem("Advice");
         br.addElement("Please confirm your method call:");
         final String beanName = DfTypeUtil.toClassTitle(this);
@@ -1000,12 +953,11 @@ public class ConditionBeanExceptionThrower {
         throw new RequiredOptionNotFoundException(msg);
     }
 
-    public void throwOrderByIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String tableDbName,
-            String columnName) {
+    public void throwOrderByIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String tableDbName, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The purpose was illegal for order-by.");
+        br.addNotice("Bad location to call order-by.");
         br.addItem("Advice");
-        br.addElement("This condition-bean is not allowed to order.");
+        br.addElement("The condition-bean is not allowed to order.");
         br.addElement("Because this is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (ExistsReferrer)");
@@ -1026,8 +978,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            subCB.query().addOrderBy...; // *NG");
         br.addElement("        }");
         br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Order-By Column");
@@ -1072,7 +1023,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            cb.specify().columnFormalizedDatetime();");
         br.addElement("        }");
         br.addElement("    });");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         final String msg = br.buildExceptionMessage();
@@ -1122,7 +1073,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            });");
         br.addElement("        }");
         br.addElement("    });");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(cb.getClass().getName());
         br.addElement("(" + cb.getPurpose() + ")");
         final String msg = br.buildExceptionMessage();
@@ -1146,7 +1097,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("            });");
         br.addElement("        }");
         br.addElement("    });");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(cb.getClass().getName());
         br.addElement("(" + cb.getPurpose() + ")");
         final String msg = br.buildExceptionMessage();
@@ -1243,8 +1194,7 @@ public class ConditionBeanExceptionThrower {
         throw new ScalarConditionInvalidColumnSpecificationException(msg);
     }
 
-    public void throwScalarConditionUnmatchedColumnTypeException(String function, String deriveColumnName,
-            Class<?> deriveColumnType) {
+    public void throwScalarConditionUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The type of the specified the column unmatched with the function.");
         br.addItem("Advice");
@@ -1288,8 +1238,8 @@ public class ConditionBeanExceptionThrower {
     // ===================================================================================
     //                                                                      FixedCondition
     //                                                                      ==============
-    public void throwFixedConditionParameterNotFoundException(String tableDbName, String property,
-            String fixedCondition, Map<String, Object> parameterMap) {
+    public void throwFixedConditionParameterNotFoundException(String tableDbName, String property, String fixedCondition,
+            Map<String, Object> parameterMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the required parameter for the fixed condition.");
         br.addItem("Advice");
@@ -1343,7 +1293,7 @@ public class ConditionBeanExceptionThrower {
     // ===================================================================================
     //                                                                        Manual Order
     //                                                                        ============
-    public void throwManualOrderNotFoundOrderByException(ConditionBean baseCB, ManualOrderBean mob) {
+    public void throwManualOrderNotFoundOrderByException(ConditionBean baseCB, ManualOrderOption moOp) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found order-by element for the ManualOrder.");
         br.addItem("Advice");
@@ -1351,54 +1301,87 @@ public class ConditionBeanExceptionThrower {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    ManualOrderOption mob = new ManualOrderOption();");
         br.addElement("    mob.when_LessEqual(...);");
         br.addElement("    cb.query().withManualOrder(mob); // *NG");
         br.addElement("  (o):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    ManualOrderOption mob = new ManualOrderOption();");
         br.addElement("    mob.when_LessEqual(...);");
         br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(mob); // OK");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB != null ? baseCB.getClass().getName() : baseCB); // check just in case
-        br.addItem("ManualOrderBean");
-        br.addElement(mob);
+        br.addItem("ManualOrderOption");
+        br.addElement(moOp);
         final String msg = br.buildExceptionMessage();
         throw new IllegalConditionBeanOperationException(msg);
     }
 
-    public void throwManualOrderSameBeanAlreadyExistsException(ConditionBean baseCB, ManualOrderBean existingMob,
-            OrderByElement existingOrder, ManualOrderBean specifiedMob, OrderByElement specifiedOrder) {
+    public void throwManualOrderSameBeanAlreadyExistsException(ConditionBean baseCB, ManualOrderOption existingMoOp,
+            OrderByElement existingOrder, ManualOrderOption specifiedMob, OrderByElement specifiedOrder) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The same manual-order-bean with other columns was registered.");
+        br.addNotice("The same manual-order option with other columns was registered.");
         br.addItem("Advice");
         br.addElement("You can use manual-order-bean one time.");
         br.addElement("Make sure your implementation:");
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    ManualOrderOption mob = new ManualOrderOption();");
         br.addElement("    mob.when_LessEqual(...);");
         br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(mob);");
         br.addElement("    cb.query().addOrderBy_MemberId_Asc().withManualOrder(mob); // *NG");
         br.addElement("  (o):");
         br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    ManualOrderBean birthMob = new ManualOrderBean();");
+        br.addElement("    ManualOrderOption birthMob = new ManualOrderOption();");
         br.addElement("    birthMob.when_LessEqual(...);");
         br.addElement("    cb.query().addOrderBy_Birthdate_Asc().withManualOrder(birthMob);");
-        br.addElement("    ManualOrderBean idMob = new ManualOrderBean();");
+        br.addElement("    ManualOrderOption idMob = new ManualOrderOption();");
         br.addElement("    idMob.when_LessEqual(...);");
         br.addElement("    cb.query().addOrderBy_MemberId_Asc().withManualOrder(idMob); // OK");
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB != null ? baseCB.getClass().getName() : baseCB); // check just in case
-        br.addItem("Existing Bean");
-        br.addElement(existingMob);
+        br.addItem("Existing Option");
+        br.addElement(existingMoOp);
         br.addElement(existingOrder);
         br.addItem("Specified Bean");
         br.addElement(specifiedMob);
         br.addElement(specifiedOrder);
         final String msg = br.buildExceptionMessage();
         throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public void throwOptionThatsBadTimingException(ConditionBean lockedCB, String optionName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("That's bad timing for Option.");
+        br.addItem("Advice");
+        br.addElement("The condition-bean was locked in the timing.");
+        br.addElement("For example:");
+        br.addElement("(x):");
+        br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("      cb.ignoreNullOrEmptyQuery(); // *NG");
+        br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  });");
+        br.addElement("(o):");
+        br.addElement("  cb.ignoreNullOrEmptyQuery(); // OK");
+        br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  });");
+        br.addElement("(o):");
+        br.addElement("  cb.query().existsPurchaseList(purchaseCB -> {");
+        br.addElement("      purchaseCB.ignoreNullOrEmptyQuery(); // OK");
+        br.addElement("      purchaseCB.query().setPurchasePrice_GreaterThan(2000);");
+        br.addElement("  });");
+        br.addItem("Locked ConditionBean"); // don't use displaySql because of illegal CB's state
+        br.addElement(lockedCB.getClass().getName());
+        br.addElement("(" + lockedCB.getPurpose() + ")");
+        br.addItem("Called Option");
+        br.addElement(optionName);
+        final String msg = br.buildExceptionMessage();
+        throw new OptionThatsBadTimingException(msg);
     }
 
     // ===================================================================================

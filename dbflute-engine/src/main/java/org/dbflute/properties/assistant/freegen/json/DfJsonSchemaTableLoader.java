@@ -195,8 +195,8 @@ public class DfJsonSchemaTableLoader {
     // -----------------------------------------------------
     //                                           Column Bean
     //                                           -----------
-    protected Map<String, Object> prepareColumnBeanMap(final Map<String, Map<String, Object>> schemaMap,
-            final String tableName, String columnName, Map<String, Object> columnAttrMap) {
+    protected Map<String, Object> prepareColumnBeanMap(final Map<String, Map<String, Object>> schemaMap, final String tableName,
+            String columnName, Map<String, Object> columnAttrMap) {
         final Map<String, Object> columnBeanMap = DfCollectionUtil.newLinkedHashMap();
         final boolean refColumn = isRefColumn(columnAttrMap);
         if (refColumn) {
@@ -217,8 +217,8 @@ public class DfJsonSchemaTableLoader {
         return "ref".equals(type);
     }
 
-    protected void prepareRefColumn(final Map<String, Map<String, Object>> schemaMap, final String tableName,
-            String columnName, Map<String, Object> columnAttrMap, final Map<String, Object> columnBeanMap) {
+    protected void prepareRefColumn(final Map<String, Map<String, Object>> schemaMap, final String tableName, String columnName,
+            Map<String, Object> columnAttrMap, final Map<String, Object> columnBeanMap) {
         final String refTableName = columnName; // same as column name
         addLazyReflector(new DfFreeGenLazyReflector() {
             public void reflect() {
@@ -238,8 +238,7 @@ public class DfJsonSchemaTableLoader {
         convertByMethod(columnBeanMap, "uncapCamelName", "df:uncapCamel(name)");
     }
 
-    protected void prepareAttrValue(String columnName, Map<String, Object> columnBeanMap, String attrKey,
-            Object attrValue) {
+    protected void prepareAttrValue(String columnName, Map<String, Object> columnBeanMap, String attrKey, Object attrValue) {
         if (attrValue instanceof String) {
             if (convertByMethod(columnBeanMap, attrKey, (String) attrValue)) {
                 return;

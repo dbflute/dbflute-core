@@ -23,9 +23,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.dbflute.XLog;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.exception.SQLExceptionResource;
 import org.dbflute.dbway.DBDef;
@@ -36,6 +33,9 @@ import org.dbflute.hook.SqlLogInfo;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
+import org.dbflute.system.XLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author modified by jflute (originated in S2Dao)
@@ -45,8 +45,8 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(TnAbstractBatchHandler.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(TnAbstractBatchHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -61,8 +61,8 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractBatchHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
-            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+    public TnAbstractBatchHandler(DataSource dataSource, StatementFactory statementFactory, String sql, TnBeanMetaData beanMetaData,
+            TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory, sql, beanMetaData, boundPropTypes);
     }
 
@@ -154,8 +154,8 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     protected abstract Integer getBatchLoggingLimit();
 
     @Override
-    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled,
-            boolean hasSqlFireHook, boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
+    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlFireHook,
+            boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
         if (_batchLoggingSb == null) {
             _batchLoggingSb = new StringBuilder(1000);
         }

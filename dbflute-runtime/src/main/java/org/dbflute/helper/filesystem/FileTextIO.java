@@ -314,8 +314,7 @@ public class FileTextIO {
             if (ins != null) {
                 try {
                     ins.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }
@@ -347,8 +346,7 @@ public class FileTextIO {
         if (reader != null) {
             try {
                 reader.close();
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
     }
 
@@ -356,8 +354,7 @@ public class FileTextIO {
         if (writer != null) {
             try {
                 writer.close();
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
     }
 

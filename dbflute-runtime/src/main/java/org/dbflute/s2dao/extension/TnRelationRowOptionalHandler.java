@@ -17,8 +17,6 @@ package org.dbflute.s2dao.extension;
 
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.cbean.ConditionBean;
@@ -26,10 +24,12 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.exception.RelationEntityNotFoundException;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.optional.OptionalObjectExceptionThrower;
+import org.dbflute.optional.OptionalThingExceptionThrower;
 import org.dbflute.optional.RelationOptionalFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -40,7 +40,7 @@ public class TnRelationRowOptionalHandler {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(TnRelationRowOptionalHandler.class);
+    private static final Logger _log = LoggerFactory.getLogger(TnRelationRowOptionalHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -91,7 +91,7 @@ public class TnRelationRowOptionalHandler {
         return _relationOptionalFactory.createOptionalNullEntity(createOptionalNullableThrower(row, rpt));
     }
 
-    protected OptionalObjectExceptionThrower createOptionalNullableThrower(final Object row, TnRelationPropertyType rpt) {
+    protected OptionalThingExceptionThrower createOptionalNullableThrower(final Object row, TnRelationPropertyType rpt) {
         final String propertyName = rpt.getPropertyDesc().getPropertyName();
         final DBMeta localDBMeta = rpt.getMyBeanMetaData().getDBMeta();
         final ConditionBean cb;
@@ -110,15 +110,15 @@ public class TnRelationRowOptionalHandler {
             outsideSqlPath = null;
             parameterBean = null;
         }
-        return new OptionalObjectExceptionThrower() {
+        return new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
                 throwRelationEntityNotFoundException(row, propertyName, localDBMeta, cb, outsideSqlPath, parameterBean);
             }
         };
     }
 
-    protected void throwRelationEntityNotFoundException(Object row, String propertyName, DBMeta localDBMeta,
-            ConditionBean cb, String outsideSqlPath, Object parameterBean) {
+    protected void throwRelationEntityNotFoundException(Object row, String propertyName, DBMeta localDBMeta, ConditionBean cb,
+            String outsideSqlPath, Object parameterBean) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The relation entity was NOT found.");
         br.addItem("Advice");

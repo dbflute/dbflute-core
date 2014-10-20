@@ -37,34 +37,10 @@ import org.dbflute.outsidesql.factory.OutsideSqlContextFactory;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.dbflute.outsidesql.typed.ExecuteHandlingPmb;
 import org.dbflute.outsidesql.typed.ListHandlingPmb;
+import org.dbflute.outsidesql.typed.TypedParameterBean;
 
 /**
- * The executor of outside-SQL.
- * <pre>
- * {Basic}
- *   o selectList()
- *   o execute()
- *   o call()
- *
- * {Entity}
- *   o entityHandling().selectEntity()
- *   o entityHandling().selectEntityWithDeletedCheck()
- *
- * {Paging}
- *   o autoPaging().selectList()
- *   o autoPaging().selectPage()
- *   o manualPaging().selectList()
- *   o manualPaging().selectPage()
- *
- * {Cursor}
- *   o cursorHandling().selectCursor()
- *
- * {Option}
- *   o dynamicBinding().selectList()
- *   o removeBlockComment().selectList()
- *   o removeLineComment().selectList()
- *   o formatSql().selectList()
- * </pre>
+ * The basic executor of outside-SQL.
  * @param <BEHAVIOR> The type of behavior.
  * @author jflute
  */
@@ -103,10 +79,9 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlBasicExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption,
-            OutsideSqlContextFactory outsideSqlContextFactory, OutsideSqlFilter outsideSqlFilter,
-            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+    public OutsideSqlBasicExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption, OutsideSqlContextFactory outsideSqlContextFactory,
+            OutsideSqlFilter outsideSqlFilter, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
         _tableDbName = tableDbName;
         _currentDBDef = currentDBDef;
@@ -123,8 +98,8 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     // ===================================================================================
-    //                                                                              Select
-    //                                                                              ======
+    //                                                                         List Select
+    //                                                                         ===========
     /**
      * Select the list of the entity by the outsideSql. <span style="color: #AD4747">{Typed Interface}</span><br />
      * You can call this method by only a typed parameter-bean
@@ -133,7 +108,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectList</span>(pmb);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectList</span>(pmb);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -154,10 +129,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(ListHandlingPmb<BEHAVIOR, ENTITY> pmb) {
-        if (pmb == null) {
-            String msg = "The argument 'pmb' (typed parameter-bean) should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
+        assertTypedPmbNotNull(pmb);
         return doSelectList(pmb.getOutsideSqlPath(), pmb, pmb.getEntityType());
     }
 
@@ -170,7 +142,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * pmb.setMemberName_PrefixSearch("S");
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectList</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectList</span>(path, pmb, entityType);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -237,17 +209,14 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
-     * int count = memberBhv.outsideSql().<span style="color: #DD4747">execute</span>(pmb);
+     * int count = memberBhv.outsideSql().<span style="color: #CC4747">execute</span>(pmb);
      * </pre>
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @return The count of execution.
      * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
      */
     public int execute(ExecuteHandlingPmb<BEHAVIOR> pmb) {
-        if (pmb == null) {
-            String msg = "The argument 'pmb' (typed parameter-bean) should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
+        assertTypedPmbNotNull(pmb);
         return doExecute(pmb.getOutsideSqlPath(), pmb);
     }
 
@@ -258,7 +227,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * String path = MemberBhv.PATH_selectSimpleMember;
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
-     * int count = memberBhv.outsideSql().<span style="color: #DD4747">execute</span>(path, pmb);
+     * int count = memberBhv.outsideSql().<span style="color: #CC4747">execute</span>(path, pmb);
      * </pre>
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
@@ -287,7 +256,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * SpInOutParameterPmb pmb = new SpInOutParameterPmb();
      * pmb.setVInVarchar("foo");
      * pmb.setVInOutVarchar("bar");
-     * memberBhv.outsideSql().<span style="color: #DD4747">call</span>(pmb);
+     * memberBhv.outsideSql().<span style="color: #CC4747">call</span>(pmb);
      * String outVar = pmb.getVOutVarchar();
      * </pre>
      * It needs to use parameter-bean for procedure (ProcedurePmb).
@@ -308,8 +277,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, Object pmb,
-            Class<ENTITY> entityType) {
+    protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, Object pmb, Class<ENTITY> entityType) {
         final OutsideSqlSelectListCommand<ENTITY> cmd;
         {
             final OutsideSqlSelectListCommand<ENTITY> newed = newOutsideSqlSelectListCommand();
@@ -362,12 +330,15 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     // ===================================================================================
-    //                                                                              Entity
-    //                                                                              ======
+    //                                                                      Executor Chain
+    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                       Entity Handling
+    //                                       ---------------
     /**
      * Prepare entity handling.
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #DD4747">entityHandling()</span>.selectEntityWithDeletedCheck(pmb);
+     * memberBhv.outsideSql().<span style="color: #CC4747">entityHandling()</span>.selectEntityWithDeletedCheck(pmb);
      * </pre>
      * @return The cursor executor of outsideSql. (NotNull)
      */
@@ -376,17 +347,17 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     protected OutsideSqlEntityExecutor<BEHAVIOR> createOutsideSqlEntityExecutor() {
-        return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
-                _defaultStatementConfig, _outsideSqlOption);
+        return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _defaultStatementConfig,
+                _outsideSqlOption);
     }
 
-    // ===================================================================================
-    //                                                                              Paging
-    //                                                                              ======
+    // -----------------------------------------------------
+    //                                       Paging Handling
+    //                                       ---------------
     /**
      * Prepare the paging as manual-paging.
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #DD4747">manualPaging()</span>.selectPage(pmb);
+     * memberBhv.outsideSql().<span style="color: #CC4747">manualPaging()</span>.selectPage(pmb);
      * </pre>
      * If you call this, you need to write paging condition on your SQL.
      * <pre>
@@ -405,14 +376,14 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     protected OutsideSqlManualPagingExecutor<BEHAVIOR> createOutsideSqlManualPagingExecutor() {
-        return _outsideSqlExecutorFactory.createManualPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
-                _defaultStatementConfig, _outsideSqlOption);
+        return _outsideSqlExecutorFactory.createManualPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _defaultStatementConfig,
+                _outsideSqlOption);
     }
 
     /**
      * Prepare the paging as auto-paging.
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #DD4747">autoPaging()</span>.selectPage(pmb);
+     * memberBhv.outsideSql().<span style="color: #CC4747">autoPaging()</span>.selectPage(pmb);
      * </pre>
      * If you call this, you don't need to write paging condition on your SQL.
      * <pre>
@@ -431,17 +402,17 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     protected OutsideSqlAutoPagingExecutor<BEHAVIOR> createOutsideSqlAutoPagingExecutor() {
-        return _outsideSqlExecutorFactory.createAutoPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
-                _defaultStatementConfig, _outsideSqlOption);
+        return _outsideSqlExecutorFactory.createAutoPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _defaultStatementConfig,
+                _outsideSqlOption);
     }
 
-    // ===================================================================================
-    //                                                                              Cursor
-    //                                                                              ======
+    // -----------------------------------------------------
+    //                                       Cursor Handling
+    //                                       ---------------
     /**
      * Prepare cursor handling.
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #DD4747">cursorHandling()</span>.selectCursor(pmb);
+     * memberBhv.outsideSql().<span style="color: #CC4747">cursorHandling()</span>.selectCursor(pmb);
      * </pre>
      * @return The cursor executor of outsideSql. (NotNull)
      */
@@ -450,8 +421,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     protected OutsideSqlCursorExecutor<BEHAVIOR> createOutsideSqlCursorExecutor() {
-        return _outsideSqlExecutorFactory.createCursor(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
-                _outsideSqlOption);
+        return _outsideSqlExecutorFactory.createCursor(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _outsideSqlOption);
     }
 
     // ===================================================================================
@@ -496,10 +466,13 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     //                                       ---------------
     /**
      * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
-     * @param statementConfig The configuration of statement. (NullAllowed)
+     * @param statementConfig The configuration of statement. (NotNull)
      * @return this. (NotNull)
      */
     public OutsideSqlBasicExecutor<BEHAVIOR> configure(StatementConfig statementConfig) {
+        if (statementConfig == null) {
+            throw new IllegalArgumentException("The argument 'statementConfig' should not be null.");
+        }
         _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }
@@ -507,7 +480,17 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     // ===================================================================================
     //                                                                    Exception Helper
     //                                                                    ================
-    protected BehaviorExceptionThrower createBhvExThrower() {
+    public BehaviorExceptionThrower createBhvExThrower() { // public for facade
         return _behaviorCommandInvoker.createBehaviorExceptionThrower();
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected <ENTITY> void assertTypedPmbNotNull(TypedParameterBean<BEHAVIOR> pmb) {
+        if (pmb == null) {
+            String msg = "The argument 'pmb' (typed parameter-bean) should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
     }
 }

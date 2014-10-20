@@ -196,8 +196,7 @@ public class DfProcedureColumnMeta {
                 || isSQLServerTableReturnValue()) { // pinpoint patch
             return false;
         }
-        if (DfProcedureColumnType.procedureColumnIn.equals(columnType)
-                || DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
+        if (DfProcedureColumnType.procedureColumnIn.equals(columnType) || DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
             return true;
         }
         return false;
@@ -297,16 +296,16 @@ public class DfProcedureColumnMeta {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _columnName + ", " + _procedureColumnType + ", " + _jdbcDefType + ", " + _dbTypeName + "("
-                + _columnSize + ", " + _decimalDigits + ")" + _columnComment + "}";
+        return "{" + _columnName + ", " + _procedureColumnType + ", " + _jdbcDefType + ", " + _dbTypeName + "(" + _columnSize + ", "
+                + _decimalDigits + ")" + _columnComment + "}";
     }
 
     // ===================================================================================
     //                                                                      Procedure Type
     //                                                                      ==============
     public enum DfProcedureColumnType {
-        procedureColumnUnknown("Unknown"), procedureColumnIn("In"), procedureColumnInOut("InOut"), procedureColumnOut(
-                "Out"), procedureColumnReturn("Return"), procedureColumnResult("Result");
+        procedureColumnUnknown("Unknown"), procedureColumnIn("In"), procedureColumnInOut("InOut"), procedureColumnOut("Out"), procedureColumnReturn(
+                "Return"), procedureColumnResult("Result");
         private final String _alias;
 
         private DfProcedureColumnType(String alias) {

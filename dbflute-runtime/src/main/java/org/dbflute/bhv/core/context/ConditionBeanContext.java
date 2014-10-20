@@ -15,12 +15,12 @@
  */
 package org.dbflute.bhv.core.context;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.Entity;
 import org.dbflute.bhv.readable.EntityRowHandler;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.system.DBFluteSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The context of condition-bean.
@@ -31,8 +31,8 @@ public class ConditionBeanContext {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(ConditionBeanContext.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(ConditionBeanContext.class);
 
     // ===================================================================================
     //                                                             ConditionBean on Thread
@@ -79,7 +79,8 @@ public class ConditionBeanContext {
     //                                                          EntityRowHandler on Thread
     //                                                          ==========================
     /** The thread-local for entity row handler. */
-    private static final ThreadLocal<EntityRowHandler<? extends Entity>> _entityRowHandlerLocal = new ThreadLocal<EntityRowHandler<? extends Entity>>();
+    private static final ThreadLocal<EntityRowHandler<? extends Entity>> _entityRowHandlerLocal =
+            new ThreadLocal<EntityRowHandler<? extends Entity>>();
 
     /**
      * Get the handler of entity row. on thread.
@@ -128,8 +129,7 @@ public class ConditionBeanContext {
         {
             final Class<?> clazz = org.dbflute.outsidesql.paging.SimplePagingBean.class;
             if (debugEnabled) {
-                sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass())
-                        .append(ln());
+                sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(ln());
             }
         }
         {
@@ -142,8 +142,8 @@ public class ConditionBeanContext {
             loadClass(org.dbflute.cbean.result.grouping.GroupingRowEndDeterminer.class);
             loadClass(org.dbflute.cbean.result.grouping.GroupingRowResource.class);
             loadClass(org.dbflute.cbean.result.grouping.GroupingRowSetupper.class);
-            loadClass(org.dbflute.cbean.paging.PageNumberLink.class);
-            loadClass(org.dbflute.cbean.paging.PageNumberLinkSetupper.class);
+            loadClass(org.dbflute.cbean.paging.numberlink.PageNumberLink.class);
+            loadClass(org.dbflute.cbean.paging.numberlink.PageNumberLinkSetupper.class);
             loadClass(org.dbflute.jdbc.CursorHandler.class);
             if (debugEnabled) {
                 sb.append("  ...Loading class of ...and so on");

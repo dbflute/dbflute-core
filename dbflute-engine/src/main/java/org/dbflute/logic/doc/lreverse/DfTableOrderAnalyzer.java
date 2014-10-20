@@ -87,8 +87,8 @@ public class DfTableOrderAnalyzer {
      * @param outputOrderedList The ordered list of table for output. (NotNull)
      * @return The list of unregistered table. (NotNull)
      */
-    protected List<Table> doAnalyzeOrder(List<Table> tableList, Set<String> alreadyRegisteredSet,
-            List<List<Table>> outputOrderedList, final int level) {
+    protected List<Table> doAnalyzeOrder(List<Table> tableList, Set<String> alreadyRegisteredSet, List<List<Table>> outputOrderedList,
+            final int level) {
         final List<Table> unregisteredTableList = new ArrayList<Table>();
         final List<Table> elementList = new ArrayList<Table>();
         for (Table table : tableList) {

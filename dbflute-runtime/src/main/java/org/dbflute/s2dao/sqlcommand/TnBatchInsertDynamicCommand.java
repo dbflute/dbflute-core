@@ -43,8 +43,7 @@ public class TnBatchInsertDynamicCommand extends TnInsertEntityDynamicCommand {
     //                                                                             Execute
     //                                                                             =======
     @Override
-    protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,
-            InsertOption<ConditionBean> option) {
+    protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql, InsertOption<ConditionBean> option) {
         final List<?> beanList = extractBeanListFromBeanChecked(bean);
         final TnBatchInsertHandler handler = createBatchInsertHandler(propertyTypes, sql, option);
         // because the variable is set when exception occurs if batch 
@@ -70,8 +69,7 @@ public class TnBatchInsertDynamicCommand extends TnInsertEntityDynamicCommand {
     // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
-    protected TnBatchInsertHandler createBatchInsertHandler(TnPropertyType[] boundPropTypes, String sql,
-            InsertOption<ConditionBean> option) {
+    protected TnBatchInsertHandler createBatchInsertHandler(TnPropertyType[] boundPropTypes, String sql, InsertOption<ConditionBean> option) {
         final TnBatchInsertHandler handler = newBatchInsertHandler(boundPropTypes, sql);
         handler.setInsertOption(option);
         return handler;

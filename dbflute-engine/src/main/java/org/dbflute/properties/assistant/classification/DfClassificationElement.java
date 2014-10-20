@@ -66,8 +66,8 @@ public class DfClassificationElement {
         doAcceptBasicItemMap(elementMap, KEY_CODE, KEY_NAME, KEY_ALIAS, KEY_COMMENT, KEY_SISTER_CODE, KEY_SUB_ITEM_MAP);
     }
 
-    protected void doAcceptBasicItemMap(Map<?, ?> elementMap, String codeKey, String nameKey, String aliasKey,
-            String commentKey, String sisterCodeKey, String subItemMapKey) {
+    protected void doAcceptBasicItemMap(Map<?, ?> elementMap, String codeKey, String nameKey, String aliasKey, String commentKey,
+            String sisterCodeKey, String subItemMapKey) {
         final String code = (String) elementMap.get(codeKey);
         if (code == null) {
             throwClassificationRequiredAttributeNotFoundException(elementMap);
@@ -240,8 +240,7 @@ public class DfClassificationElement {
     //                                                                      ==============
     @Override
     public String toString() {
-        return _classificationName + ":{" + _table + ", " + _code + ", " + _name + ", " + _alias + ", " + _comment
-                + "}";
+        return _classificationName + ":{" + _table + ", " + _code + ", " + _name + ", " + _alias + ", " + _comment + "}";
     }
 
     // ===================================================================================

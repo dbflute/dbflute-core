@@ -105,11 +105,7 @@ object ${glCDef} {
             return false;
         }
 
-#if ($database.isCDefToStringReturnsName())
-        override def toString(): String = { return name; }
-#else
         override def toString(): String = { return code; }
-#end
     }
 
 #if ($classificationTop.hasTopComment())

@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.helper.StringSet;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
@@ -32,13 +30,15 @@ import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
  */
 public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
 
-    private static final Log _log = LogFactory.getLog(DfSchemaInitializerPostgreSQL.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfSchemaInitializerPostgreSQL.class);
 
     // ===================================================================================
     //                                                                    Drop Foreign Key
@@ -65,8 +65,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     //                                                                          Drop Table
     //                                                                          ==========
     @Override
-    protected List<DfTableMeta> prepareSortedTableList(Connection conn, List<DfTableMeta> viewList,
-            List<DfTableMeta> otherList) {
+    protected List<DfTableMeta> prepareSortedTableList(Connection conn, List<DfTableMeta> viewList, List<DfTableMeta> otherList) {
         // order for inherit tables
         final List<Map<String, String>> resultList = selectInheritList(conn);
         final Set<String> childSet = StringSet.createAsCaseInsensitive();

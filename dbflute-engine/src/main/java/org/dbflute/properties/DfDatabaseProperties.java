@@ -25,8 +25,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
@@ -39,6 +37,8 @@ import org.dbflute.properties.assistant.DfConnectionProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -48,7 +48,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfDatabaseProperties.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfDatabaseProperties.class);
     public static final String NO_NAME_SCHEMA = "$$NoNameSchema$$"; // basically for MySQL
 
     // ===================================================================================
@@ -295,8 +295,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return _tableExceptGenOnlyList;
     }
 
-    protected void setupTableOrColumnExceptList(List<String> plainList, List<String> exceptList,
-            List<String> exceptGenOnlyList) {
+    protected void setupTableOrColumnExceptList(List<String> plainList, List<String> exceptList, List<String> exceptGenOnlyList) {
         final String genOnlySuffix = "@gen";
         for (String element : plainList) {
             if (Srl.endsWithIgnoreCase(element, genOnlySuffix)) {
@@ -752,8 +751,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             final StringBuilder sb = new StringBuilder();
             final Set<String> keySet = _databaseInfoMap.keySet();
             for (String key : keySet) {
-                if (equalsKeys(key, KEY_DRIVER, KEY_URL, KEY_CATALOG, KEY_SCHEMA, KEY_USER, KEY_PASSWORD,
-                        KEY_PROPERTIES_MAP, KEY_VARIOUS_MAP)) {
+                if (equalsKeys(key, KEY_DRIVER, KEY_URL, KEY_CATALOG, KEY_SCHEMA, KEY_USER, KEY_PASSWORD, KEY_PROPERTIES_MAP,
+                        KEY_VARIOUS_MAP)) {
                     continue;
                 }
                 final Object value = _databaseInfoMap.get(key);

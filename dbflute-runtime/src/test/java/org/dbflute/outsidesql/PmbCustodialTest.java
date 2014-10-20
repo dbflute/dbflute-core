@@ -16,15 +16,14 @@
 package org.dbflute.outsidesql;
 
 import org.dbflute.exception.CharParameterShortSizeException;
-import org.dbflute.outsidesql.PmbCustodial;
-import org.dbflute.outsidesql.PmbCustodial.ShortCharHandlingMode;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.outsidesql.PmbCustodial.PmbShortCharHandlingMode;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.6.1 (2009/11/17 Tuesday)
  */
-public class PmbCustodialTest extends PlainTestCase {
+public class PmbCustodialTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                       Empty to Null
@@ -46,7 +45,7 @@ public class PmbCustodialTest extends PlainTestCase {
         String parameterName = null;
         String value = "AB";
         Integer size = 3;
-        ShortCharHandlingMode mode = ShortCharHandlingMode.EXCEPTION;
+        PmbShortCharHandlingMode mode = PmbShortCharHandlingMode.EXCEPTION;
 
         // ## Act ##
         try {
@@ -65,7 +64,7 @@ public class PmbCustodialTest extends PlainTestCase {
         String parameterName = "testParameter";
         String value = null;
         Integer size = 3;
-        ShortCharHandlingMode mode = ShortCharHandlingMode.EXCEPTION;
+        PmbShortCharHandlingMode mode = PmbShortCharHandlingMode.EXCEPTION;
 
         // ## Act ##
         String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
@@ -79,7 +78,7 @@ public class PmbCustodialTest extends PlainTestCase {
         String parameterName = "testParameter";
         String value = "AB";
         Integer size = null;
-        ShortCharHandlingMode mode = ShortCharHandlingMode.EXCEPTION;
+        PmbShortCharHandlingMode mode = PmbShortCharHandlingMode.EXCEPTION;
 
         // ## Act ##
         String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
@@ -93,7 +92,7 @@ public class PmbCustodialTest extends PlainTestCase {
         String parameterName = "testParameter";
         String value = "AB";
         Integer size = 3;
-        ShortCharHandlingMode mode = null;
+        PmbShortCharHandlingMode mode = null;
 
         // ## Act ##
         try {
@@ -115,7 +114,7 @@ public class PmbCustodialTest extends PlainTestCase {
         String parameterName = "testParameter";
         String value = "AB";
         Integer size = 3;
-        ShortCharHandlingMode mode = ShortCharHandlingMode.EXCEPTION;
+        PmbShortCharHandlingMode mode = PmbShortCharHandlingMode.EXCEPTION;
 
         // ## Act ##
         try {
@@ -134,7 +133,7 @@ public class PmbCustodialTest extends PlainTestCase {
         String parameterName = "testParameter";
         String value = "ABC";
         Integer size = 3;
-        ShortCharHandlingMode mode = ShortCharHandlingMode.EXCEPTION;
+        PmbShortCharHandlingMode mode = PmbShortCharHandlingMode.EXCEPTION;
 
         // ## Act ##
         String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
@@ -148,7 +147,7 @@ public class PmbCustodialTest extends PlainTestCase {
         String parameterName = "testParameter";
         String value = "ABCD";
         Integer size = 3;
-        ShortCharHandlingMode mode = ShortCharHandlingMode.EXCEPTION;
+        PmbShortCharHandlingMode mode = PmbShortCharHandlingMode.EXCEPTION;
 
         // ## Act ##
         String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
@@ -167,7 +166,7 @@ public class PmbCustodialTest extends PlainTestCase {
         String parameterName = "testParameter";
         String value = "AB";
         Integer size = 3;
-        ShortCharHandlingMode mode = ShortCharHandlingMode.RFILL;
+        PmbShortCharHandlingMode mode = PmbShortCharHandlingMode.RFILL;
 
         // ## Act ##
         String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
@@ -181,7 +180,7 @@ public class PmbCustodialTest extends PlainTestCase {
         String parameterName = "testParameter";
         String value = "AB";
         Integer size = 3;
-        ShortCharHandlingMode mode = ShortCharHandlingMode.RFILL;
+        PmbShortCharHandlingMode mode = PmbShortCharHandlingMode.RFILL;
 
         // ## Act ##
         String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
@@ -198,7 +197,7 @@ public class PmbCustodialTest extends PlainTestCase {
         String parameterName = "testParameter";
         String value = "AB";
         Integer size = 3;
-        ShortCharHandlingMode mode = ShortCharHandlingMode.LFILL;
+        PmbShortCharHandlingMode mode = PmbShortCharHandlingMode.LFILL;
 
         // ## Act ##
         String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);
@@ -212,7 +211,7 @@ public class PmbCustodialTest extends PlainTestCase {
         String parameterName = "testParameter";
         String value = "AB";
         Integer size = 3;
-        ShortCharHandlingMode mode = ShortCharHandlingMode.LFILL;
+        PmbShortCharHandlingMode mode = PmbShortCharHandlingMode.LFILL;
 
         // ## Act ##
         String actual = PmbCustodial.handleShortChar(parameterName, value, size, mode);

@@ -258,8 +258,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return adjustedMap;
     }
 
-    protected Map<String, Map<String, List<String>>> prepareElementMap(String propType,
-            Map<String, Map<String, List<String>>> queryMap) {
+    protected Map<String, Map<String, List<String>>> prepareElementMap(String propType, Map<String, Map<String, List<String>>> queryMap) {
         final Map<String, Map<String, List<String>>> elementMap = newLinkedHashMap();
         for (Entry<String, Map<String, List<String>>> entry : queryMap.entrySet()) {
             final String ckey = entry.getKey();
@@ -308,8 +307,8 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                       Column Driven
     //                                                                       =============
-    protected void mergeColumnDriven(Map<String, Map<String, Map<String, List<String>>>> columnDrivenTargetMap,
-            String propType, Map<String, Map<String, List<String>>> ckeyColumnMap) {
+    protected void mergeColumnDriven(Map<String, Map<String, Map<String, List<String>>>> columnDrivenTargetMap, String propType,
+            Map<String, Map<String, List<String>>> ckeyColumnMap) {
         final Map<String, Map<String, List<String>>> columnDrivenQueryMap = columnDrivenTargetMap.get(propType);
         if (columnDrivenQueryMap == null || columnDrivenQueryMap.isEmpty()) {
             return;
@@ -341,8 +340,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         }
     }
 
-    protected Map<String, Map<String, Map<String, List<String>>>> extractColumnDrivenTranslatedMap(
-            Map<String, Object> plainMap) {
+    protected Map<String, Map<String, Map<String, List<String>>>> extractColumnDrivenTranslatedMap(Map<String, Object> plainMap) {
         final Map<String, Map<String, List<String>>> interfaceMap = extractColumnDrivenInterfaceMap(plainMap);
         final Map<String, Map<String, Map<String, List<String>>>> translatedMap = newLinkedHashMap();
         for (Entry<String, Map<String, List<String>>> tableEntry : interfaceMap.entrySet()) {
@@ -731,8 +729,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return false;
     }
 
-    protected void assertQueryMap(String propType, String ckey,
-            Map<String, Map<String, Map<String, List<String>>>> queryMap) {
+    protected void assertQueryMap(String propType, String ckey, Map<String, Map<String, Map<String, List<String>>>> queryMap) {
         if (queryMap.get(propType) == null) {
             String msg = "The propType[" + propType + "] should have the value of queryMap: " + queryMap;
             throw new IllegalStateException(msg);
@@ -743,8 +740,8 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         }
     }
 
-    protected Set<String> gatherColumnSet(String propType, String ckey,
-            Map<String, Map<String, Map<String, List<String>>>> queryMap, final String tableDbName) {
+    protected Set<String> gatherColumnSet(String propType, String ckey, Map<String, Map<String, Map<String, List<String>>>> queryMap,
+            final String tableDbName) {
         final Map<String, List<String>> tableColumnMap = queryMap.get(propType).get(ckey);
         Set<String> columnSet = null;
         for (Entry<String, List<String>> entry : tableColumnMap.entrySet()) {

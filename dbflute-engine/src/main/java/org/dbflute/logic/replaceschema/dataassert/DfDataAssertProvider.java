@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureCountNotExistsException;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureCountNotZeroException;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureListNotExistsException;
@@ -37,6 +35,8 @@ import org.dbflute.exception.DfTakeFinallyAssertionInvalidMarkException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -47,8 +47,8 @@ public class DfDataAssertProvider {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static Log _log = LogFactory.getLog(DfDataAssertProvider.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfDataAssertProvider.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -278,8 +278,7 @@ public class DfDataAssertProvider {
         throw new DfTakeFinallyAssertionFailureCountNotExistsException(msg);
     }
 
-    protected void throwAssertionFailureListNotZeroException(File sqlFile, String sql, int resultCount,
-            List<Map<String, String>> resultList) {
+    protected void throwAssertionFailureListNotZeroException(File sqlFile, String sql, int resultCount, List<Map<String, String>> resultList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SQL expects ZERO but the result was NOT ZERO.");
         br.addItem("Advice");

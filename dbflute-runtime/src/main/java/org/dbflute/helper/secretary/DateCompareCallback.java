@@ -20,6 +20,7 @@ import java.util.Date;
 /**
  * @author jflute
  */
+@FunctionalInterface
 public interface DateCompareCallback {
 
     boolean isTarget(Date current, Date date);

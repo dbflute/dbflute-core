@@ -40,13 +40,13 @@ import org.dbflute.mock.MockBehaviorCommand;
 import org.dbflute.mock.MockConditionBean;
 import org.dbflute.mock.MockOutsideSqlContext;
 import org.dbflute.outsidesql.OutsideSqlContext;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.1 (2009/02/03 Tuesday)
  */
-public class BehaviorCommandInvokerTest extends PlainTestCase {
+public class BehaviorCommandInvokerTest extends RuntimeTestCase {
 
     public void test_dispatchInvoking_whitebox_logEnabled() {
         // ## Arrange ##

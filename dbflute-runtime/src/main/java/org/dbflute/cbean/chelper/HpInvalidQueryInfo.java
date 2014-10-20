@@ -38,8 +38,7 @@ public class HpInvalidQueryInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpInvalidQueryInfo(String locationBase, ColumnInfo targetColumn, ConditionKey conditionKey,
-            Object invalidValue) {
+    public HpInvalidQueryInfo(String locationBase, ColumnInfo targetColumn, ConditionKey conditionKey, Object invalidValue) {
         assertObjectNotNull("locationBase", locationBase);
         assertObjectNotNull("targetColumn", targetColumn);
         assertObjectNotNull("conditionKey", conditionKey);

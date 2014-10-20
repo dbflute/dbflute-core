@@ -15,13 +15,13 @@
  */
 package org.dbflute.helper.filesystem;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 1.0.5K (2014/08/16 Saturday)
  */
-public class FileTextIOTest extends PlainTestCase {
+public class FileTextIOTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                      filterAsLine()

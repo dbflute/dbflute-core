@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.join.InnerJoinNoWaySpeaker;
@@ -31,8 +32,8 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.system.DBFluteSystem;
 
 /**
- * @author jflute
  * @param <CQ> The type of condition-query.
+ * @author jflute
  */
 public abstract class HpAbstractSpecification<CQ extends ConditionQuery> implements HpColumnSpHandler {
 
@@ -44,9 +45,10 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     protected HpSpQyCall<CQ> _syncQyCall;
     protected final HpCBPurpose _purpose;
     protected final DBMetaProvider _dbmetaProvider;
+    protected final HpSDRFunctionFactory _sdrFuncFactory;
     protected CQ _query; // lazy-loaded
     protected boolean _alreadySpecifiedRequiredColumn; // also means specification existence
-    protected Map<String, HpSpecifiedColumn> _specifiedColumnMap; // saves specified columns (lazy-loaded)
+    protected Map<String, SpecifiedColumn> _specifiedColumnMap; // saves specified columns (lazy-loaded)
     protected boolean _alreadySpecifiedEveryColumn;
     protected boolean _alreadySpecifiedExceptColumn;
 
@@ -58,23 +60,25 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
      * @param qyCall The call-back for condition-query. (NotNull)
      * @param purpose The purpose of condition-bean. (NotNull)
      * @param dbmetaProvider The provider of DB meta. (NotNull)
+     * @param sdrFuncFactory The factory of (specify) derived-referrer function. (NotNull)
      */
-    protected HpAbstractSpecification(ConditionBean baseCB, HpSpQyCall<CQ> qyCall, HpCBPurpose purpose,
-            DBMetaProvider dbmetaProvider) {
+    protected HpAbstractSpecification(ConditionBean baseCB, HpSpQyCall<CQ> qyCall, HpCBPurpose purpose, DBMetaProvider dbmetaProvider,
+            HpSDRFunctionFactory sdrFuncFactory) {
         _baseCB = baseCB;
         _qyCall = qyCall;
         _purpose = purpose;
         _dbmetaProvider = dbmetaProvider;
+        _sdrFuncFactory = sdrFuncFactory;
     }
 
     // ===================================================================================
     //                                                                Column Specification
     //                                                                ====================
-    public HpSpecifiedColumn xspecifyColumn(String columnName) { // for interface
+    public SpecifiedColumn xspecifyColumn(String columnName) { // for interface
         return doColumn(columnName);
     }
 
-    protected HpSpecifiedColumn doColumn(String columnName) { // for extended class
+    protected SpecifiedColumn doColumn(String columnName) { // for extended class
         checkSpecifiedThemeColumnStatus(columnName);
         if (isSpecifiedColumn(columnName)) {
             // returns the same instance as the specified before
@@ -97,7 +101,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
             keepDreamCruiseJourneyLogBookIfNeeds(relationPath, tableAliasName);
             reflectDreamCruiseWhereUsedToJoin(relationPath, tableAliasName);
         }
-        final HpSpecifiedColumn specifiedColumn = createSpecifiedColumn(columnName, tableAliasName);
+        final SpecifiedColumn specifiedColumn = createSpecifiedColumn(columnName, tableAliasName);
         sqlClause.specifySelectColumn(specifiedColumn);
         saveSpecifiedColumn(columnName, specifiedColumn);
         return specifiedColumn;
@@ -139,16 +143,16 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
 
     protected abstract String getTableDbName();
 
-    protected HpSpecifiedColumn createSpecifiedColumn(String columnName, String tableAliasName) {
+    protected SpecifiedColumn createSpecifiedColumn(String columnName, String tableAliasName) {
         final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(_query.getTableDbName());
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnName);
-        return new HpSpecifiedColumn(tableAliasName, columnInfo, _baseCB);
+        return new SpecifiedColumn(tableAliasName, columnInfo, _baseCB);
     }
 
     // -----------------------------------------------------
     //                             Specified Column Handling
     //                             -------------------------
-    public HpSpecifiedColumn getSpecifiedColumn(String columnName) {
+    public SpecifiedColumn getSpecifiedColumn(String columnName) {
         return _specifiedColumnMap != null ? _specifiedColumnMap.get(columnName) : null;
     }
 
@@ -160,9 +164,9 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
         return _specifiedColumnMap != null && _specifiedColumnMap.containsKey(columnName);
     }
 
-    protected void saveSpecifiedColumn(String columnName, HpSpecifiedColumn specifiedColumn) {
+    protected void saveSpecifiedColumn(String columnName, SpecifiedColumn specifiedColumn) {
         if (_specifiedColumnMap == null) {
-            _specifiedColumnMap = new LinkedHashMap<String, HpSpecifiedColumn>();
+            _specifiedColumnMap = new LinkedHashMap<String, SpecifiedColumn>();
         }
         _specifiedColumnMap.put(columnName, specifiedColumn);
     }
@@ -378,6 +382,27 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
 
     protected void throwSpecifyDerivedReferrerTwoOrMoreException(String referrerName) {
         createCBExThrower().throwSpecifyDerivedReferrerTwoOrMoreException(_purpose, _baseCB, referrerName);
+    }
+
+    // ===================================================================================
+    //                                                                    Derived Referrer
+    //                                                                    ================
+    // creator for sub-class
+    @SuppressWarnings("unchecked")
+    protected <FUNC extends HpSDRFunction<REFERRER_CB, LOCAL_CQ>, REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> FUNC cHSDRF(
+            ConditionBean baseCB, LOCAL_CQ localCQ, HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper, DBMetaProvider dbmetaProvider) {
+        // might be database dependency so cast it
+        return (FUNC) newSDRFunction(baseCB, localCQ, querySetupper, dbmetaProvider, _sdrFuncFactory);
+    }
+
+    protected <REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> HpSDRFunction<REFERRER_CB, LOCAL_CQ> newSDRFunction(
+            ConditionBean baseCB, LOCAL_CQ localCQ, HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper, DBMetaProvider dbmetaProvider,
+            HpSDRFunctionFactory sdrOpFactory) {
+        return _sdrFuncFactory.create(baseCB, localCQ, querySetupper, dbmetaProvider);
+    }
+
+    public HpSDRFunctionFactory xgetSDRFnFc() { // to put to relation specification 
+        return _sdrFuncFactory;
     }
 
     // ===================================================================================

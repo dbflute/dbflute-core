@@ -188,7 +188,7 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
     protected String buildQueryInsertTwoWaySql(Entity entity, ConditionBean intoCB, ConditionBean resourceCB,
             InsertOption<ConditionBean> option, List<TnPropertyType> boundPropTypeList) {
         final StringKeyMap<String> fixedValueQueryExpMap = StringKeyMap.createAsFlexibleOrdered();
-        final Set<String> modifiedProperties = entity.modifiedProperties();
+        final Set<String> modifiedProperties = entity.mymodifiedProperties();
         final DBMeta dbmeta = entity.getDBMeta();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {

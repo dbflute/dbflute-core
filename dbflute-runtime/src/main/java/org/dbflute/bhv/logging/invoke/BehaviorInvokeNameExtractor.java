@@ -206,8 +206,7 @@ public class BehaviorInvokeNameExtractor {
      * @param stackTrace Stack log. (NotNull)
      * @return The list of result of invoke name. (NotNull: If not found, returns empty string.)
      */
-    protected List<InvokeNameResult> extractInvokeName(InvokeNameExtractingResource resource,
-            StackTraceElement[] stackTrace) {
+    protected List<InvokeNameResult> extractInvokeName(InvokeNameExtractingResource resource, StackTraceElement[] stackTrace) {
         return _coinLogic.extractInvokeName(resource, stackTrace);
     }
 
@@ -249,19 +248,25 @@ public class BehaviorInvokeNameExtractor {
         if (_outsideSqlResultType != null) {
             final String behaviorClassName = findBehaviorClassNameFromDBMeta();
             final String outsideSqlCall = behaviorClassName + ".outsideSql()";
-            if (invokeClassName.contains("Entity")) {
-                resolved = outsideSqlCall + ".entityHandling()";
-            } else if (invokeClassName.contains("Paging")) {
-                if (_outsideSqlAutoPaging) {
-                    resolved = outsideSqlCall + ".autoPaging()";
-                } else {
-                    resolved = outsideSqlCall + ".manualPaging()";
-                }
-            } else if (invokeClassName.contains("Cursor")) {
-                resolved = outsideSqlCall + ".cursorHandling()";
+            if (invokeClassName.contains("Traditional")) {
+                resolved = ".traditionalStyle()";
             } else {
                 resolved = outsideSqlCall;
             }
+            // old style
+            //if (invokeClassName.contains("Entity")) {
+            //    resolved = outsideSqlCall + ".entityHandling()";
+            //} else if (invokeClassName.contains("Paging")) {
+            //    if (_outsideSqlAutoPaging) {
+            //        resolved = outsideSqlCall + ".autoPaging()";
+            //    } else {
+            //        resolved = outsideSqlCall + ".manualPaging()";
+            //    }
+            //} else if (invokeClassName.contains("Cursor")) {
+            //    resolved = outsideSqlCall + ".cursorHandling()";
+            //} else {
+            //    resolved = outsideSqlCall;
+            //}
         } else {
             resolved = "OutsideSql";
         }

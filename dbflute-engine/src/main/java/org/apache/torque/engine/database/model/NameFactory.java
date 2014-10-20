@@ -178,8 +178,7 @@ public class NameFactory {
                 try {
                     algorithm = (NameGenerator) Class.forName(name).newInstance();
                 } catch (InstantiationException e) {
-                    throw new EngineException("Unable to instantiate class " + name
-                            + ": Make sure it's in your run-time classpath", e);
+                    throw new EngineException("Unable to instantiate class " + name + ": Make sure it's in your run-time classpath", e);
                 } catch (Exception e) {
                     throw new EngineException(e);
                 }

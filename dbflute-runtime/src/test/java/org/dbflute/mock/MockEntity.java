@@ -48,15 +48,7 @@ public class MockEntity implements Entity {
         return "Member";
     }
 
-    public boolean hasPrimaryKeyValue() {
-        return _memberId != null;
-    }
-
-    public Set<String> myuniqueDrivenProperties() {
-        return Collections.emptySet();
-    }
-
-    public Set<String> modifiedProperties() {
+    public Set<String> mymodifiedProperties() {
         return Collections.emptySet();
     }
 
@@ -65,6 +57,24 @@ public class MockEntity implements Entity {
 
     public boolean hasModification() {
         return false;
+    }
+
+    public void modifiedToSpecified() {
+    }
+
+    public Set<String> myspecifiedProperties() {
+        return null;
+    }
+
+    public void clearSpecifiedInfo() {
+    }
+
+    public boolean hasPrimaryKeyValue() {
+        return _memberId != null;
+    }
+
+    public Set<String> myuniqueDrivenProperties() {
+        return Collections.emptySet();
     }
 
     public void markAsSelect() {

@@ -256,8 +256,7 @@ public class XmlToAppData extends DefaultHandler {
             if (br != null) {
                 try {
                     br.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
         _firstPass = false;

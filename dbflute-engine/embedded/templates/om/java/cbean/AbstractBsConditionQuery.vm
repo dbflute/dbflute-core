@@ -27,12 +27,6 @@ import org.dbflute.cbean.ordering.*;
 import org.dbflute.cbean.scoping.*;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMetaProvider;
-#if ($database.isAvailableJodaTimeLocalDateEntity())
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-#end
 import ${glPackageBaseCommon}.*;
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
@@ -289,8 +283,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #end
 
-    public void doSet${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
-        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+    protected void doSet${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), xgetCValue${tmpJavaName}(), "${col.name}");
     }
 #end
 #if (${col.isAvailableStringNotInScope()})
@@ -319,8 +313,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #end
 
-    public void doSet${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
-        regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+    protected void doSet${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+        regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), xgetCValue${tmpJavaName}(), "${col.name}");
     }
 #end
 #if (${col.isAvailableStringLikeSearch()})
@@ -329,25 +323,24 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * LikeSearch with various options. (versatile) {like '%xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
-     * <pre>e.g. set${tmpJavaName}_LikeSearch("xxx", new <span style="color: #DD4747">LikeSearchOption</span>().likeContain());</pre>
+     * <pre>e.g. set${tmpJavaName}_LikeSearch("xxx", op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.<span style="color: #CC4747">likeContain()</span>);</pre>
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch. (NullAllowed: if null (or empty), no condition)
      * @param opLambda The callback for option of like-search. (NotNull)
      */
-    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, COptionCall<LikeSearchOption> opLambda) {
-        LikeSearchOption op = cLSOP(); opLambda.callback(op);
-        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, op);
+    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ConditionOptionCall<LikeSearchOption> opLambda) {
+        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, xcLSOP(opLambda));
     }
 #end
 
     /**
      * LikeSearch with various options. (versatile) {like '%xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
-     * <pre>e.g. set${tmpJavaName}_LikeSearch("xxx", new <span style="color: #DD4747">LikeSearchOption</span>().likeContain());</pre>
+     * <pre>e.g. set${tmpJavaName}_LikeSearch("xxx", new <span style="color: #CC4747">LikeSearchOption</span>().likeContain());</pre>
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch. (NullAllowed: if null (or empty), no condition)
      * @param likeSearchOption The option of like-search. (NotNull)
      */
     ${table.directConditionOptionMethodModifier} void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
-        regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
+        regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), xgetCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
     }
 #end
 #if (${col.isAvailableStringNotLikeSearch()})
@@ -360,9 +353,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch. (NullAllowed: if null (or empty), no condition)
      * @param opLambda The callback for option of like-search. (NotNull)
      */
-    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, COptionCall<LikeSearchOption> opLambda) {
-        LikeSearchOption op = cLSOP(); opLambda.callback(op);
-        set${tmpJavaName}_NotLikeSearch(${tmpUncapitalisedJavaName}, op);
+    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ConditionOptionCall<LikeSearchOption> opLambda) {
+        set${tmpJavaName}_NotLikeSearch(${tmpUncapitalisedJavaName}, xcLSOP(opLambda));
     }
 #end
 
@@ -374,7 +366,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
     ${table.directConditionOptionMethodModifier} void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
-        regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
+        regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), xgetCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
     }
 #end
 #if (${col.isAvailableStringPrefixSearch()})
@@ -385,20 +377,23 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch. (NullAllowed: if null (or empty), no condition)
      */
     public void set${tmpJavaName}_PrefixSearch(${col.javaNative} ${tmpUncapitalisedJavaName}) {
-        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, cLSOP().likePrefix());
+        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, xcLSOPPre());
     }
 #end
 #foreach ($referrer in $col.existsReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${referrer.referrerLambdaSubQueryCBName}")
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($relationMethodIdentityName = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
 #set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
@@ -408,18 +403,16 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${relatedCBClassName} subCB) {
-     *         subCB.query().setXxx...
-     *     }
+     * cb.query().<span style="color: #CC4747">exists${relationMethodIdentityName}</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ${referrer.referrerLambdaExampleCBName}.query().set...
      * });
      * </pre>
-     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
+     * @param ${relatedLambdaName} The callback for sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
+    public void exists${relationMethodIdentityName}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
         String pp = keep${subQueryPropertyNameInitCap}(cb.query());
         registerExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
@@ -428,14 +421,17 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($referrer in $col.existsReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${referrer.referrerLambdaSubQueryCBName}")
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($relationMethodIdentityName = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
 #set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
@@ -445,122 +441,18 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${relatedCBClassName} subCB) {
-     *         subCB.query().setXxx...
-     *     }
+     * cb.query().<span style="color: #CC4747">notExists${relationMethodIdentityName}</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ${referrer.referrerLambdaExampleCBName}.query().set...
      * });
      * </pre>
-     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
+     * @param ${relatedLambdaName} The callback for sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
      */
-    public void notExists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
+    public void notExists${relationMethodIdentityName}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
         String pp = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotExistsReferrer(cb.query(), "${col.name}", "${referrer.FirstLocalColumnName}", pp, "${relationPropertyName}");
-    }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
-#end
-#if (${col.isInScopeRelationAllowedForeignKey()})
-#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
-
-    /**
-     * Set up InScopeRelation (sub-query). <br />
-     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
-     * ${fk.foreignDispForJavaDoc}
-     * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
-     */
-    public void inScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
-        registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
-    }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
-#end
-#foreach ($referrer in $col.inScopeRelationReferrers)
-#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#if (${referrer.isOneToOne()})
-#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($relationPropertyName = "${referrer.referrerPropertyName}")
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
-#end
-
-    /**
-     * Set up InScopeRelation (sub-query). <br />
-     * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
-     * ${referrer.referrerDispAsOneForJavaDoc}
-     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
-     */
-    public void inScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
-        registerInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
-    }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
-#end
-#if (${col.isInScopeRelationAllowedForeignKey()})
-#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
-
-    /**
-     * Set up NotInScopeRelation (sub-query). <br />
-     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
-     * ${fk.foreignDispForJavaDoc}
-     * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
-     */
-    public void notInScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
-        registerNotInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
-    }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
-#end
-#foreach ($referrer in $col.inScopeRelationReferrers)
-#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#if (${referrer.isOneToOne()})
-#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($relationPropertyName = "${referrer.referrerPropertyName}")
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
-#end
-
-    /**
-     * Set up NotInScopeRelation (sub-query). <br />
-     * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
-     * ${referrer.referrerDispAsOneForJavaDoc}
-     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
-     */
-    public void notInScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
-        registerNotInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
 #end
@@ -582,6 +474,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($referrer in $col.derivedReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
@@ -590,20 +483,18 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">derived${referrer.referrerPropertyNameInitCap}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${relatedCBClassName} subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// condition to derived column</span>
+     * cb.query().<span style="color: #CC4747">derived${relationMethodIdentityName}()</span>.<span style="color: #CC4747">max</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ${referrer.referrerLambdaExampleCBName}.specify().<span style="color: #CC4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
+     *     ${referrer.referrerLambdaExampleCBName}.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// condition to derived column</span>
      * </pre>
      * @return The object to set up a function for referrer table. (NotNull)
      */
-    public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+    public HpQDRFunction<${relatedCBClassName}> derived${relationMethodIdentityName}() {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
-        return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
+        return xcQDRFunc(new HpQDRSetupper<${relatedCBClassName}>() {
             public void setup(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
                 xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
             }
@@ -774,9 +665,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param maxNumber The max number of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param opLambda The callback for option of range-of. (NotNull)
      */
-    public void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, COptionCall<RangeOfOption> opLambda) {
-        RangeOfOption op = cROOP(); opLambda.callback(op);
-        set${tmpJavaName}_RangeOf(minNumber, maxNumber, op);
+    public void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, ConditionOptionCall<RangeOfOption> opLambda) {
+        set${tmpJavaName}_RangeOf(minNumber, maxNumber, xcROOP(opLambda));
     }
 #end
 
@@ -790,7 +680,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param rangeOfOption The option of range-of. (NotNull)
      */
     ${table.directConditionOptionMethodModifier} void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, RangeOfOption rangeOfOption) {
-        regROO(minNumber, maxNumber, getCValue${tmpJavaName}(), "${col.name}", rangeOfOption);
+        regROO(minNumber, maxNumber, xgetCValue${tmpJavaName}(), "${col.name}", rangeOfOption);
     }
 #end
 #if (${col.isAvailableNumberInScope()})
@@ -836,7 +726,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     protected void doSet${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
-        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), xgetCValue${tmpJavaName}(), "${col.name}");
     }
 #end
 #if (${col.isAvailableNumberNotInScope()})
@@ -866,20 +756,23 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     protected void doSet${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
-        regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+        regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), xgetCValue${tmpJavaName}(), "${col.name}");
     }
 #end
 #foreach ($referrer in $col.existsReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${referrer.referrerLambdaSubQueryCBName}")
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($relationMethodIdentityName = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
 #set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
@@ -889,18 +782,16 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${relatedCBClassName} subCB) {
-     *         subCB.query().setXxx...
-     *     }
+     * cb.query().<span style="color: #CC4747">exists${relationMethodIdentityName}</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ${referrer.referrerLambdaExampleCBName}.query().set...
      * });
      * </pre>
-     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
+     * @param ${relatedLambdaName} The callback for sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
+    public void exists${relationMethodIdentityName}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
         String pp = keep${subQueryPropertyNameInitCap}(cb.query());
         registerExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
@@ -909,14 +800,17 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($referrer in $col.existsReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${referrer.referrerLambdaSubQueryCBName}")
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($relationMethodIdentityName = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
 #set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
@@ -926,122 +820,18 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${relatedCBClassName} subCB) {
-     *         subCB.query().setXxx...
-     *     }
+     * cb.query().<span style="color: #CC4747">notExists${relationMethodIdentityName}</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ${referrer.referrerLambdaExampleCBName}.query().set...
      * });
      * </pre>
-     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
+     * @param ${relatedLambdaName} The callback for sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
      */
-    public void notExists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
+    public void notExists${relationMethodIdentityName}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
         String pp = keep${subQueryPropertyNameInitCap}(cb.query());
         registerNotExistsReferrer(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
-    }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
-#end
-#if (${col.isInScopeRelationAllowedForeignKey()})
-#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
-
-    /**
-     * Set up InScopeRelation (sub-query). <br />
-     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
-     * ${fk.foreignDispForJavaDoc}
-     * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
-     */
-    public void inScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
-        registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
-    }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
-#end
-#foreach ($referrer in $col.inScopeRelationReferrers)
-#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#if (${referrer.isOneToOne()})
-#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($relationPropertyName = "${referrer.referrerPropertyName}")
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
-#end
-
-    /**
-     * Set up InScopeRelation (sub-query). <br />
-     * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
-     * ${referrer.referrerDispAsOneForJavaDoc}
-     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
-     */
-    public void inScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
-        registerInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
-    }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
-#end
-#if (${col.isInScopeRelationAllowedForeignKey()})
-#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
-
-    /**
-     * Set up NotInScopeRelation (sub-query). <br />
-     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
-     * ${fk.foreignDispForJavaDoc}
-     * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
-     */
-    public void notInScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
-        registerNotInScopeRelation(cb.query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", pp, "${fk.foreignPropertyName}");
-    }
-    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
-#end
-#foreach ($referrer in $col.inScopeRelationReferrers)
-#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
-#if (${referrer.isOneToOne()})
-#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCapAsOne}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCapAsOne}")
-#else
-#set ($relationPropertyName = "${referrer.referrerPropertyName}")
-#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${referrer.referrerPropertyNameInitCap}")
-#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${referrer.ReferrerPropertyNameInitCap}")
-#end
-
-    /**
-     * Set up NotInScopeRelation (sub-query). <br />
-     * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
-     * ${referrer.referrerDispAsOneForJavaDoc}
-     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
-     */
-    public void notInScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
-        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
-        registerNotInScopeRelation(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", pp, "${relationPropertyName}");
     }
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
 #end
@@ -1063,6 +853,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($referrer in $col.derivedReferrerReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
@@ -1071,20 +862,18 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #DD4747">derived${referrer.referrerPropertyNameInitCap}()</span>.<span style="color: #DD4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${relatedCBClassName} subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
-     * }).<span style="color: #DD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// condition to derived column</span>
+     * cb.query().<span style="color: #CC4747">derived${relationMethodIdentityName}()</span>.<span style="color: #CC4747">max</span>(${referrer.referrerLambdaExampleCBName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ${referrer.referrerLambdaExampleCBName}.specify().<span style="color: #CC4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
+     *     ${referrer.referrerLambdaExampleCBName}.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
+     * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// condition to derived column</span>
      * </pre>
      * @return The object to set up a function for referrer table. (NotNull)
      */
-    public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+    public HpQDRFunction<${relatedCBClassName}> derived${relationMethodIdentityName}() {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
-        return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
+        return xcQDRFunc(new HpQDRSetupper<${relatedCBClassName}>() {
             public void setup(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
                 xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
             }
@@ -1172,14 +961,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * FromTo with various options. (versatile) {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
      * And NullIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, new <span style="color: #DD4747">FromToOption</span>().compareAsDate());</pre>
+     * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.<span style="color: #CC4747">compareAsDate()</span>);</pre>
      * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param opLambda The callback for option of from-to. (NotNull)
      */
-    public void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, COptionCall<FromToOption> opLambda) {
-        FromToOption op = cFTOP(); opLambda.callback(op);
-        set${tmpJavaName}_FromTo(fromDatetime, toDatetime, op);
+    public void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, ConditionOptionCall<FromToOption> opLambda) {
+        set${tmpJavaName}_FromTo(fromDatetime, toDatetime, xcFTOP(opLambda));
     }
 #end
 
@@ -1187,19 +975,19 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * FromTo with various options. (versatile) {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
      * And NullIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, new <span style="color: #DD4747">FromToOption</span>().compareAsDate());</pre>
+     * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, new <span style="color: #CC4747">FromToOption</span>().compareAsDate());</pre>
      * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param fromToOption The option of from-to. (NotNull)
      */
     ${table.directConditionOptionMethodModifier} void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, FromToOption fromToOption) {
 #if ($col.isJavaNativeUtilDate())
-        regFTQ(fCTPD(fromDatetime), fCTPD(toDatetime), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
+        regFTQ(fCTPD(fromDatetime), fCTPD(toDatetime), xgetCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #elseif ($col.isJavaNativeNextTimeLocal())
         String nm = "${col.name}"; FromToOption op = fromToOption;
-        regFTQ(xfFTHD(fromDatetime, nm, op), xfFTHD(toDatetime, nm, op), getCValue${tmpJavaName}(), nm, op);
+        regFTQ(xfFTHD(fromDatetime, nm, op), xfFTHD(toDatetime, nm, op), xgetCValue${tmpJavaName}(), nm, op);
 #else
-        regFTQ((fromDatetime != null ? new ${col.javaNative}(fromDatetime.getTime()) : null), (toDatetime != null ? new ${col.javaNative}(toDatetime.getTime()) : null), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
+        regFTQ((fromDatetime != null ? new ${col.javaNative}(fromDatetime.getTime()) : null), (toDatetime != null ? new ${col.javaNative}(toDatetime.getTime()) : null), xgetCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #end
     }
 #end
@@ -1211,13 +999,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * <pre>
      * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
-     *  column &gt;= '2007/04/10 00:00:00' and column <span style="color: #DD4747">&lt; '2007/04/17 00:00:00'</span>
+     *  column &gt;= '2007/04/10 00:00:00' and column <span style="color: #CC4747">&lt; '2007/04/17 00:00:00'</span>
      * </pre>
      * @param fromDate The from-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
      * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      */
     public void set${tmpJavaName}_DateFromTo(${col.fromToJavaNativeDate} fromDate, ${col.fromToJavaNativeDate} toDate) {
-        set${tmpJavaName}_FromTo(fromDate, toDate, cFTOP().compareAsDate());
+        set${tmpJavaName}_FromTo(fromDate, toDate, xcDFTOP());
     }
 #end
 #if (${col.isAvailableDateInScope()})
@@ -1232,7 +1020,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 
     protected void doSet${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
-        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), xgetCValue${tmpJavaName}(), "${col.name}");
     }
 #end
 #if (${col.isAvailableDateNotInScope()})
@@ -1247,7 +1035,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 
     protected void doSet${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
-        regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+        regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), xgetCValue${tmpJavaName}(), "${col.name}");
     }
 #end
 #end
@@ -1293,7 +1081,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
      */
     public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
-        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), xgetCValue${tmpJavaName}(), "${col.name}");
     }
 #end
 #end
@@ -1326,8 +1114,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #end
 
-    protected void reg${tmpJavaName}(ConditionKey ky, Object vl) { regQ(ky, vl, getCValue${tmpJavaName}(), "${col.name}"); }
-    protected abstract ConditionValue getCValue${tmpJavaName}();
+    protected void reg${tmpJavaName}(ConditionKey ky, Object vl) { regQ(ky, vl, xgetCValue${tmpJavaName}(), "${col.name}"); }
+    protected abstract ConditionValue xgetCValue${tmpJavaName}();
 #set ($columnLoopIndex = $columnLoopIndex + 1)
 #end
 #if ($table.isAvailableMyselfScalarCondition())
@@ -1339,7 +1127,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Prepare ScalarCondition as equal. <br />
      * {where FOO = (select max(BAR) from ...)
      * <pre>
-     * cb.query().<span style="color: #DD4747">scalar_Equal()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     * cb.query().<span style="color: #CC4747">scalar_Equal()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
      *         subCB.specify().setXxx... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setYyy...
@@ -1356,7 +1144,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Prepare ScalarCondition as equal. <br />
      * {where FOO &lt;&gt; (select max(BAR) from ...)
      * <pre>
-     * cb.query().<span style="color: #DD4747">scalar_NotEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     * cb.query().<span style="color: #CC4747">scalar_NotEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
      *         subCB.specify().setXxx... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setYyy...
@@ -1373,7 +1161,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Prepare ScalarCondition as greaterThan. <br />
      * {where FOO &gt; (select max(BAR) from ...)
      * <pre>
-     * cb.query().<span style="color: #DD4747">scalar_GreaterThan()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     * cb.query().<span style="color: #CC4747">scalar_GreaterThan()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
      *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setBar...
@@ -1390,7 +1178,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Prepare ScalarCondition as lessThan. <br />
      * {where FOO &lt; (select max(BAR) from ...)
      * <pre>
-     * cb.query().<span style="color: #DD4747">scalar_LessThan()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     * cb.query().<span style="color: #CC4747">scalar_LessThan()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
      *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setBar...
@@ -1407,7 +1195,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Prepare ScalarCondition as greaterEqual. <br />
      * {where FOO &gt;= (select max(BAR) from ...)
      * <pre>
-     * cb.query().<span style="color: #DD4747">scalar_GreaterEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     * cb.query().<span style="color: #CC4747">scalar_GreaterEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
      *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setBar...
@@ -1424,7 +1212,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Prepare ScalarCondition as lessEqual. <br />
      * {where FOO &lt;= (select max(BAR) from ...)
      * <pre>
-     * cb.query().<span style="color: #DD4747">scalar_LessEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
+     * cb.query().<span style="color: #CC4747">scalar_LessEqual()</span>.max(new SubQuery&lt;${myConditionBeanClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
      *         subCB.specify().setFoo... <span style="color: #3F7E5E">// derived column for function</span>
      *         subCB.query().setBar...
@@ -1497,34 +1285,16 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     //                                                                        ============
     /**
      * Prepare for MyselfExists (correlated sub-query).
-     * @param subQuery The implementation of sub-query. (NotNull)
+     * @param subCBLambda The implementation of sub-query. (NotNull)
      */
-    public void myselfExists(SubQuery<${myConditionBeanClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
+    public void myselfExists(SubQuery<${myConditionBeanClassName}> subCBLambda) {
+        assertObjectNotNull("subCBLambda", subCBLambda);
         ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForMyselfExists(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
+        try { lock(); subCBLambda.query(cb); } finally { unlock(); }
         String pp = keepMyselfExists(cb.query());
         registerMyselfExists(cb.query(), pp);
     }
     public abstract String keepMyselfExists(${myConditionQueryClassName} sq);
-#end
-#if ($table.isAvailableMyselfMyselfInScope())
-
-    // ===================================================================================
-    //                                                                       MyselfInScope
-    //                                                                       =============
-    /**
-     * Prepare for MyselfInScope (sub-query).
-     * @param subQuery The implementation of sub-query. (NotNull)
-     */
-    public void myselfInScope(SubQuery<${myConditionBeanClassName}> subQuery) {
-        assertObjectNotNull("subQuery", subQuery);
-        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForMyselfInScope(this);
-        try { lock(); subQuery.query(cb); } finally { unlock(); }
-        String pp = keepMyselfInScope(cb.query());
-        registerMyselfInScope(cb.query(), pp);
-    }
-    public abstract String keepMyselfInScope(${myConditionQueryClassName} sq);
 #end
 #end
 #if ($database.isAvailableDatabaseDependency())
@@ -1645,8 +1415,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * <pre>
      * MemberCB cb = new MemberCB();
      * ManualOrderBean mob = new ManualOrderBean();
-     * mob.<span style="color: #DD4747">when_GreaterEqual</span>(priorityDate); <span style="color: #3F7E5E">// e.g. 2000/01/01</span>
-     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+     * mob.<span style="color: #CC4747">when_GreaterEqual</span>(priorityDate); <span style="color: #3F7E5E">// e.g. 2000/01/01</span>
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #CC4747">withManualOrder(mob)</span>;
      * <span style="color: #3F7E5E">// order by </span>
      * <span style="color: #3F7E5E">//   case</span>
      * <span style="color: #3F7E5E">//     when BIRTHDATE &gt;= '2000/01/01' then 0</span>
@@ -1655,10 +1425,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      *
      * MemberCB cb = new MemberCB();
      * ManualOrderBean mob = new ManualOrderBean();
-     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Withdrawal);
-     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Formalized);
-     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Provisional);
-     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+     * mob.<span style="color: #CC4747">when_Equal</span>(CDef.MemberStatus.Withdrawal);
+     * mob.<span style="color: #CC4747">when_Equal</span>(CDef.MemberStatus.Formalized);
+     * mob.<span style="color: #CC4747">when_Equal</span>(CDef.MemberStatus.Provisional);
+     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #CC4747">withManualOrder(mob)</span>;
      * <span style="color: #3F7E5E">// order by </span>
      * <span style="color: #3F7E5E">//   case</span>
      * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>
@@ -1669,11 +1439,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * <p>This function with Union is unsupported!</p>
      * <p>The order values are bound (treated as bind parameter).</p>
-     * @param mobLambda The callback for bean of manual order containing order values. (NotNull)
+     * @param opLambda The callback for option of manual-order containing order values. (NotNull)
      */
-    public void withManualOrder(MOrderCall mobLambda) { // is user public!
-        ManualOrderBean mob = cMOB(); mobLambda.callback(mob);
-        xdoWithManualOrder(mob);
+    public void withManualOrder(ManualOrderOptionCall opLambda) { // is user public!
+        xdoWithManualOrder(cMOO(opLambda));
     }
 
 #end
@@ -1683,8 +1452,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * <pre>
      * MemberCB cb = new MemberCB();
      * ManualOrderBean mob = new ManualOrderBean();
-     * mob.<span style="color: #DD4747">when_GreaterEqual</span>(priorityDate); <span style="color: #3F7E5E">// e.g. 2000/01/01</span>
-     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+     * mob.<span style="color: #CC4747">when_GreaterEqual</span>(priorityDate); <span style="color: #3F7E5E">// e.g. 2000/01/01</span>
+     * cb.query().addOrderBy_Birthdate_Asc().<span style="color: #CC4747">withManualOrder(mob)</span>;
      * <span style="color: #3F7E5E">// order by </span>
      * <span style="color: #3F7E5E">//   case</span>
      * <span style="color: #3F7E5E">//     when BIRTHDATE &gt;= '2000/01/01' then 0</span>
@@ -1693,10 +1462,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      *
      * MemberCB cb = new MemberCB();
      * ManualOrderBean mob = new ManualOrderBean();
-     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Withdrawal);
-     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Formalized);
-     * mob.<span style="color: #DD4747">when_Equal</span>(CDef.MemberStatus.Provisional);
-     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #DD4747">withManualOrder(mob)</span>;
+     * mob.<span style="color: #CC4747">when_Equal</span>(CDef.MemberStatus.Withdrawal);
+     * mob.<span style="color: #CC4747">when_Equal</span>(CDef.MemberStatus.Formalized);
+     * mob.<span style="color: #CC4747">when_Equal</span>(CDef.MemberStatus.Provisional);
+     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #CC4747">withManualOrder(mob)</span>;
      * <span style="color: #3F7E5E">// order by </span>
      * <span style="color: #3F7E5E">//   case</span>
      * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>
@@ -1707,10 +1476,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * </pre>
      * <p>This function with Union is unsupported!</p>
      * <p>The order values are bound (treated as bind parameter).</p>
-     * @param mob The bean of manual order containing order values. (NotNull)
+     * @param option The option of manual-order containing order values. (NotNull)
      */
-    public void withManualOrder(ManualOrderBean mob) { // is user public!
-        xdoWithManualOrder(mob);
+    public void withManualOrder(ManualOrderOption option) { // is user public!
+        xdoWithManualOrder(option);
     }
 
 #end
@@ -1728,7 +1497,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * orderValueList.add(CDef.MemberStatus.Withdrawal);
      * orderValueList.add(CDef.MemberStatus.Formalized);
      * orderValueList.add(CDef.MemberStatus.Provisional);
-     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #DD4747">withManualOrder(orderValueList)</span>;
+     * cb.query().addOrderBy_MemberStatusCode_Asc().<span style="color: #CC4747">withManualOrder(orderValueList)</span>;
      * <span style="color: #3F7E5E">// order by </span>
      * <span style="color: #3F7E5E">//   case</span>
      * <span style="color: #3F7E5E">//     when MEMBER_STATUS_CODE = 'WDL' then 0</span>
@@ -1754,48 +1523,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 
 #end
-#if ($database.isAvailableJodaTimeLocalDateEntity())
-    @Override
-    protected Date xtoFromToUtilDate(Object date, String columnDbName, FromToOption option) {
-        if (date != null && date instanceof ReadablePartial) {
-            return new java.sql.Timestamp(((ReadablePartial) date).toDateTime(null).getMillis());
-        } else if (date != null && date instanceof ReadableInstant) {
-            return new java.sql.Timestamp(((ReadableInstant) date).getMillis());
-        }
-        return DfTypeUtil.toTimestamp(date);
-    }
-
-    @Override
-    protected Timestamp xtoFromToTimestamp(Object date, String columnDbName, FromToOption option) {
-        if (date != null && date instanceof ReadablePartial) {
-            return new java.sql.Timestamp(((ReadablePartial) date).toDateTime(null).getMillis());
-        } else if (date != null && date instanceof ReadableInstant) {
-            return new java.sql.Timestamp(((ReadableInstant) date).getMillis());
-        }
-        return DfTypeUtil.toTimestamp(date);
-    }
-
-    @Override
-    protected Object xtoFromToLocalDate(Object date, String columnDbName, FromToOption option) {
-        return LocalDate.fromDateFields(date);
-    }
-
-    @Override
-    protected Object xtoFromToLocalDateTime(Object date, String columnDbName, FromToOption option) {
-        return LocalDateTime.fromDateFields(date);
-    }
-
-    @Override
-    protected boolean xisNextTimeLocalDate(Class<?> nativeType) {
-        return LocalDate.class.isAssignableFrom(nativeType);
-    }
-
-    @Override
-    protected boolean xisNextTimeLocalDateTime(Class<?> nativeType) {
-        return LocalDateTime.class.isAssignableFrom(nativeType);
-    }
-
-#end
     // ===================================================================================
     //                                                                       Very Internal
     //                                                                       =============
@@ -1807,6 +1534,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     protected String xabCQ() { return ${myConditionQueryClassName}.class.getName(); }
     protected String xabLSO() { return LikeSearchOption.class.getName(); }
     protected String xabSSQS() { return HpSSQSetupper.class.getName(); }
+    protected String xabSCP() { return SubQuery.class.getName(); }
 #if ($database.isDatabaseMSAccess())
     @Override
     protected boolean xsuppressEscape() { return true; } // bacause MS-Access does not support escape

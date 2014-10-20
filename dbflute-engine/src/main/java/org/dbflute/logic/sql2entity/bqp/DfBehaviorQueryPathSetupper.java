@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfBehaviorNotFoundException;
 import org.dbflute.helper.StringKeyMap;
@@ -45,6 +43,8 @@ import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -54,8 +54,8 @@ public class DfBehaviorQueryPathSetupper {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfBehaviorQueryPathSetupper.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfBehaviorQueryPathSetupper.class);
 
     public static final String KEY_PATH = "path";
     public static final String KEY_SUB_DIRECTORY_PATH = "subDirectoryPath";
@@ -156,8 +156,7 @@ public class DfBehaviorQueryPathSetupper {
      * @param behaviorQueryPathMap The empty map of behavior query path. (NotNull)
      * @param outsideSqlPack The pack object for outside-SQL file. (NotNull)
      */
-    protected void gatherBehaviorQueryPathInfo(Map<String, Map<String, String>> behaviorQueryPathMap,
-            DfOutsideSqlPack outsideSqlPack) {
+    protected void gatherBehaviorQueryPathInfo(Map<String, Map<String, String>> behaviorQueryPathMap, DfOutsideSqlPack outsideSqlPack) {
         for (DfOutsideSqlFile outsideSqlFile : outsideSqlPack.getOutsideSqlFileList()) {
             final DfBqpOutsideSqlFile bqpOutsideSqlFile = new DfBqpOutsideSqlFile(outsideSqlFile);
             if (!bqpOutsideSqlFile.isBqp()) {
@@ -235,8 +234,7 @@ public class DfBehaviorQueryPathSetupper {
      * @return The map of table resource. (NotNull)
      * @throws DfBehaviorNotFoundException When the behavior is not found.
      */
-    protected Map<File, Map<String, Map<String, String>>> createTableResourceMap(
-            Map<String, Map<String, String>> behaviorQueryPathMap) {
+    protected Map<File, Map<String, Map<String, String>>> createTableResourceMap(Map<String, Map<String, String>> behaviorQueryPathMap) {
         return doCreateBhvFileResourceMap(behaviorQueryPathMap, false);
     }
 
@@ -245,8 +243,7 @@ public class DfBehaviorQueryPathSetupper {
      * @return The map of reflect resource. (NotNull)
      * @throws DfBehaviorNotFoundException When the behavior is not found.
      */
-    protected Map<File, Map<String, Map<String, String>>> createReflectResourceMap(
-            Map<String, Map<String, String>> behaviorQueryPathMap) {
+    protected Map<File, Map<String, Map<String, String>>> createReflectResourceMap(Map<String, Map<String, String>> behaviorQueryPathMap) {
         return doCreateBhvFileResourceMap(behaviorQueryPathMap, true);
     }
 
@@ -255,8 +252,8 @@ public class DfBehaviorQueryPathSetupper {
      * @return The map of base behavior resource. (NotNull)
      * @throws DfBehaviorNotFoundException When the behavior is not found.
      */
-    protected Map<File, Map<String, Map<String, String>>> doCreateBhvFileResourceMap(
-            Map<String, Map<String, String>> behaviorQueryPathMap, boolean reflectOnly) {
+    protected Map<File, Map<String, Map<String, String>>> doCreateBhvFileResourceMap(Map<String, Map<String, String>> behaviorQueryPathMap,
+            boolean reflectOnly) {
         if (behaviorQueryPathMap.isEmpty()) {
             return new HashMap<File, Map<String, Map<String, String>>>();
         }
@@ -323,8 +320,7 @@ public class DfBehaviorQueryPathSetupper {
     }
 
     protected Map<String, File> createBsBhvFileMap(File bsbhvDir) {
-        final String classFileExtension = getBasicProperties().getLanguageDependency().getLanguageGrammar()
-                .getClassFileExtension();
+        final String classFileExtension = getBasicProperties().getLanguageDependency().getLanguageGrammar().getClassFileExtension();
         final FileFilter filefilter = new FileFilter() {
             public boolean accept(File file) {
                 final String path = file.getPath();
@@ -354,8 +350,8 @@ public class DfBehaviorQueryPathSetupper {
         return bsbhvFileMap;
     }
 
-    protected void throwBehaviorNotFoundException(Map<String, File> bsbhvFileMap,
-            Map<String, String> behaviorQueryElementMap, String bsbhvPathBase) {
+    protected void throwBehaviorNotFoundException(Map<String, File> bsbhvFileMap, Map<String, String> behaviorQueryElementMap,
+            String bsbhvPathBase) {
         final String path = behaviorQueryElementMap.get(KEY_PATH);
         final String behaviorName = behaviorQueryElementMap.get(KEY_BEHAVIOR_NAME);
         String msg = "Look! Read the message below." + ln();

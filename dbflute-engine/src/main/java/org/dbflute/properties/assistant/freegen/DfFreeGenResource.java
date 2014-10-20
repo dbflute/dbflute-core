@@ -34,8 +34,7 @@ public class DfFreeGenResource {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenResource(String baseDir, DfFreeGenerateResourceType resourceType, String resourceFile,
-            String encoding) {
+    public DfFreeGenResource(String baseDir, DfFreeGenerateResourceType resourceType, String resourceFile, String encoding) {
         _baseDir = baseDir;
         _resourceType = resourceType;
         _resourceFile = resolveBaseDir(resourceFile);

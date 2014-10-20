@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -50,6 +48,8 @@ import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author modified by jflute (originated in Seasar2)
@@ -59,7 +59,7 @@ public class DfTableXlsReader {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfTableXlsReader.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfTableXlsReader.class);
     public static final String LDATA_SHEET_NAME = "df$LARGE_DATA";
     public static final String LDATA_KEY_DELIMITER = "(df:delimiter)";
     public static final String LDATA_QUOTE_BEGIN = "{";
@@ -236,8 +236,7 @@ public class DfTableXlsReader {
         throw new DfXlsReaderReadFailureException(msg);
     }
 
-    protected void throwLargeDataInvalidManagedDataException(String sheetName, String columnTitle, DfDataRow row,
-            String value) {
+    protected void throwLargeDataInvalidManagedDataException(String sheetName, String columnTitle, DfDataRow row, String value) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Invalid managed large data.");
         br.addItem("Advice");
@@ -390,8 +389,8 @@ public class DfTableXlsReader {
         }
     }
 
-    protected void throwCellValueHandlingException(DfDataTable table, DfDataColumn column, HSSFRow row, HSSFCell cell,
-            Object value, RuntimeException cause) {
+    protected void throwCellValueHandlingException(DfDataTable table, DfDataColumn column, HSSFRow row, HSSFCell cell, Object value,
+            RuntimeException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to handle the cell value on the xls file.");
         br.addItem("Advice");
@@ -534,8 +533,7 @@ public class DfTableXlsReader {
         return str;
     }
 
-    protected void throwLargeDataReferenceDataNotFoundException(DfDataTable table, int columnIndex, HSSFRow row,
-            String str, String dataKey) {
+    protected void throwLargeDataReferenceDataNotFoundException(DfDataTable table, int columnIndex, HSSFRow row, String str, String dataKey) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the reference data of large data for the column.");
         br.addItem("Xls File");

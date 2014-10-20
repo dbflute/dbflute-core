@@ -15,6 +15,8 @@
  */
 package org.dbflute.cbean.chelper;
 
+import org.dbflute.cbean.dream.SpecifiedColumn;
+
 /**
  * @author jflute
  */
@@ -23,7 +25,7 @@ public interface HpColumnSpHandler {
     // ===================================================================================
     //                                                                Column Specification
     //                                                                ====================
-    HpSpecifiedColumn xspecifyColumn(String columnName); // internal
+    SpecifiedColumn xspecifyColumn(String columnName); // internal
 
     boolean hasSpecifiedColumn();
 

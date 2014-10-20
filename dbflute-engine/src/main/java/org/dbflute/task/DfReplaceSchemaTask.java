@@ -23,8 +23,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
@@ -51,6 +49,8 @@ import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTexenTask;
 import org.dbflute.task.bs.assistant.DfDocumentSelector;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -61,8 +61,8 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfReplaceSchemaTask.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfReplaceSchemaTask.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -364,8 +364,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
             if (br != null) {
                 try {
                     br.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

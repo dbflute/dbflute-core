@@ -36,14 +36,14 @@ import javax.sql.DataSource;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
  * @since 0.9.6.4 (2010/01/15 Friday)
  */
-public class SequenceCacheHandlerTest extends PlainTestCase {
+public class SequenceCacheHandlerTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                 findSequenceCache()

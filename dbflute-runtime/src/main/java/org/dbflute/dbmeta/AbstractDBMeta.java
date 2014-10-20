@@ -29,15 +29,19 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.dbflute.Entity;
+import org.dbflute.FunCustodial;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
 import org.dbflute.dbmeta.info.UniqueInfo;
+import org.dbflute.dbmeta.property.PropertyGateway;
+import org.dbflute.dbmeta.property.PropertyMethodFinder;
 import org.dbflute.exception.DBMetaNotFoundException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -117,8 +121,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     // -----------------------------------------------------
     //                                       Column Property
     //                                       ---------------
-    protected void setupEpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway,
-            String propertyName) {
+    protected void setupEpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway, String propertyName) {
         propertyGatewayMap.put(propertyName, gateway); // the map should be plain map for performance
     }
 
@@ -126,16 +129,14 @@ public abstract class AbstractDBMeta implements DBMeta {
         return null; // should be overridden
     }
 
-    protected <ENTITY extends Entity> PropertyGateway doFindEpg(Map<String, PropertyGateway> propertyGatewayMap,
-            String propertyName) {
+    protected <ENTITY extends Entity> PropertyGateway doFindEpg(Map<String, PropertyGateway> propertyGatewayMap, String propertyName) {
         return propertyGatewayMap.get(propertyName);
     }
 
     // -----------------------------------------------------
     //                                      Foreign Property
     //                                      ----------------
-    protected void setupEfpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway,
-            String foreignPropertyName) {
+    protected void setupEfpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway, String foreignPropertyName) {
         propertyGatewayMap.put(foreignPropertyName, gateway); // the map should be plain map for performance
     }
 
@@ -143,8 +144,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         return null; // might be overridden
     }
 
-    protected <ENTITY extends Entity> PropertyGateway doFindEfpg(Map<String, PropertyGateway> propertyGatewayMap,
-            String foreignPropertyName) {
+    protected <ENTITY extends Entity> PropertyGateway doFindEfpg(Map<String, PropertyGateway> propertyGatewayMap, String foreignPropertyName) {
         return propertyGatewayMap.get(foreignPropertyName);
     }
 
@@ -170,7 +170,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (classification == null) {
             final String tableDbName = columnInfo.getDBMeta().getTableDbName();
             final String columnDbName = columnInfo.getColumnDbName();
-            Entity.FunCustodial.handleUndefinedClassificationCode(tableDbName, columnDbName, meta, code);
+            FunCustodial.handleUndefinedClassificationCode(tableDbName, columnDbName, meta, code);
         }
     }
 
@@ -295,14 +295,12 @@ public abstract class AbstractDBMeta implements DBMeta {
             referrerPropList = splitListTrimmed(referrerListExp, delimiter);
         }
         final PropertyMethodFinder propertyMethodFinder = createColumnPropertyMethodFinder();
-        return new ColumnInfo(this, columnDbName, columnSqlName, columnSynonym, columnAlias, objectNativeType,
-                propertyName, realPt, primary, autoIncrement, notNull, columnDbType, columnSize, decimalDigits,
-                defaultValue, commonColumn, optimisticLockType, columnComment, foreignPropList, referrerPropList,
-                classificationMeta, propertyMethodFinder);
+        return new ColumnInfo(this, columnDbName, columnSqlName, columnSynonym, columnAlias, objectNativeType, propertyName, realPt,
+                primary, autoIncrement, notNull, columnDbType, columnSize, decimalDigits, defaultValue, commonColumn, optimisticLockType,
+                columnComment, foreignPropList, referrerPropList, classificationMeta, propertyMethodFinder);
     }
 
-    protected Class<?> chooseColumnPropertyAccessType(Class<?> objectNativeType, String propertyName,
-            Class<?> propertyAccessType) {
+    protected Class<?> chooseColumnPropertyAccessType(Class<?> objectNativeType, String propertyName, Class<?> propertyAccessType) {
         return propertyAccessType != null ? propertyAccessType : objectNativeType;
     }
 
@@ -428,8 +426,7 @@ public abstract class AbstractDBMeta implements DBMeta {
      */
     public RelationInfo findRelationInfo(String relationPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
-        return hasForeign(relationPropertyName) ? findForeignInfo(relationPropertyName)
-                : findReferrerInfo(relationPropertyName);
+        return hasForeign(relationPropertyName) ? findForeignInfo(relationPropertyName) : findReferrerInfo(relationPropertyName);
     }
 
     // -----------------------------------------------------
@@ -482,9 +479,9 @@ public abstract class AbstractDBMeta implements DBMeta {
     ) { // createForeignInfo()
         final Class<?> realPt = chooseForeignPropertyAccessType(foreignDbm, propertyAccessType);
         final PropertyMethodFinder propertyMethodFinder = createForeignPropertyMethodFinder();
-        return new ForeignInfo(constraintName, foreignPropertyName, localDbm, foreignDbm, localForeignColumnInfoMap,
-                relationNo, realPt, oneToOne, bizOneToOne, referrerAsOne, additionalFK, fixedCondition,
-                dynamicParameterList, fixedInline, reversePropertyName, propertyMethodFinder);
+        return new ForeignInfo(constraintName, foreignPropertyName, localDbm, foreignDbm, localForeignColumnInfoMap, relationNo, realPt,
+                oneToOne, bizOneToOne, referrerAsOne, additionalFK, fixedCondition, dynamicParameterList, fixedInline, reversePropertyName,
+                propertyMethodFinder);
     }
 
     protected Class<?> chooseForeignPropertyAccessType(DBMeta foreignDbm, Class<?> specifiedType) {
@@ -607,8 +604,8 @@ public abstract class AbstractDBMeta implements DBMeta {
     ) { // createReferrerInfo()
         final Class<?> propertyAccessType = chooseReferrerPropertyAccessType(referrerDbm, oneToOne);
         final PropertyMethodFinder propertyMethodFinder = createReferrerPropertyMethodFinder();
-        return new ReferrerInfo(constraintName, referrerPropertyName, localDbm, referrerDbm,
-                localReferrerColumnInfoMap, propertyAccessType, oneToOne, reversePropertyName, propertyMethodFinder);
+        return new ReferrerInfo(constraintName, referrerPropertyName, localDbm, referrerDbm, localReferrerColumnInfoMap,
+                propertyAccessType, oneToOne, reversePropertyName, propertyMethodFinder);
     }
 
     protected Class<?> chooseReferrerPropertyAccessType(DBMeta referrerDbm, boolean oneToOne) {
@@ -865,8 +862,7 @@ public abstract class AbstractDBMeta implements DBMeta {
 
         // It uses column before table because column is used much more than table.
         // This is the same consideration at other methods.
-        return getColumnInfoFlexibleMap().containsKey(flexibleName)
-                || getTableDbNameFlexibleMap().containsKey(flexibleName);
+        return getColumnInfoFlexibleMap().containsKey(flexibleName) || getTableDbNameFlexibleMap().containsKey(flexibleName);
     }
 
     /**
@@ -909,8 +905,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     // -----------------------------------------------------
     //                                                Accept
     //                                                ------
-    protected <ENTITY extends Entity> void doAcceptPrimaryKeyMap(ENTITY entity,
-            Map<String, ? extends Object> primaryKeyMap) {
+    protected <ENTITY extends Entity> void doAcceptPrimaryKeyMap(ENTITY entity, Map<String, ? extends Object> primaryKeyMap) {
         if (primaryKeyMap == null || primaryKeyMap.isEmpty()) {
             String msg = "The argument 'primaryKeyMap' should not be null or empty:";
             msg = msg + " primaryKeyMap=" + primaryKeyMap;
@@ -920,8 +915,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         doConvertToEntity(entity, primaryKeyMap, uniqueColumnList);
     }
 
-    protected <ENTITY extends Entity> void doAcceptAllColumnMap(ENTITY entity,
-            Map<String, ? extends Object> allColumnMap) {
+    protected <ENTITY extends Entity> void doAcceptAllColumnMap(ENTITY entity, Map<String, ? extends Object> allColumnMap) {
         if (allColumnMap == null || allColumnMap.isEmpty()) {
             String msg = "The argument 'allColumnMap' should not be null or empty:";
             msg = msg + " allColumnMap=" + allColumnMap;
@@ -967,25 +961,32 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                               -------
     protected Map<String, Object> doExtractPrimaryKeyMap(Entity entity) {
         assertObjectNotNull("entity", entity);
-        return doConvertToColumnValueMap(entity, true);
+        return doConvertToColumnValueMap(entity, true, 4);
     }
 
     protected Map<String, Object> doExtractAllColumnMap(Entity entity) {
         assertObjectNotNull("entity", entity);
-        return doConvertToColumnValueMap(entity, false);
+        return doConvertToColumnValueMap(entity, false, 10);
     }
 
-    protected Map<String, Object> doConvertToColumnValueMap(Entity entity, boolean pkOnly) {
-        final Map<String, Object> valueMap = newLinkedHashMap();
+    protected Map<String, Object> doConvertToColumnValueMap(Entity entity, boolean pkOnly, int sized) {
+        final Map<String, Object> valueMap = newLinkedHashMapSized(sized);
         final List<ColumnInfo> columnInfoList;
         if (pkOnly) {
             columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
         } else {
             columnInfoList = getColumnInfoList();
         }
+        final Set<String> specifiedProperties = entity.myspecifiedProperties();
+        final boolean nonSpChecked = !specifiedProperties.isEmpty();
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnName = columnInfo.getColumnDbName();
-            final Object value = columnInfo.read(entity);
+            final Object value;
+            if (nonSpChecked && !specifiedProperties.contains(columnInfo.getPropertyName())) { // non-specified column
+                value = null; // to avoid non-specified check
+            } else {
+                value = columnInfo.read(entity);
+            }
             valueMap.put(columnName, value);
         }
         return valueMap;

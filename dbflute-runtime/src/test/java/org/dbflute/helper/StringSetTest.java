@@ -20,14 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  * @since 0.9.5.1 (2009/06/26 Friday)
  */
-public class StringSetTest extends PlainTestCase {
+public class StringSetTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                    Case Insensitive

@@ -64,8 +64,8 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractEntityHandler(DataSource dataSource, StatementFactory statementFactory, String sql,
-            TnBeanMetaData beanMetaData, TnPropertyType[] boundPropTypes) {
+    public TnAbstractEntityHandler(DataSource dataSource, StatementFactory statementFactory, String sql, TnBeanMetaData beanMetaData,
+            TnPropertyType[] boundPropTypes) {
         super(dataSource, statementFactory, sql);
         assertObjectNotNull("beanMetaData", beanMetaData);
         assertObjectNotNull("boundPropTypes", boundPropTypes); // not null but empty allowed
@@ -246,8 +246,7 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
         }
     }
 
-    protected void doRegisterUpdateWhereBindVariable(List<Object> varList, List<ValueType> varValueTypeList,
-            Object bean, TnPropertyType pt) {
+    protected void doRegisterUpdateWhereBindVariable(List<Object> varList, List<ValueType> varValueTypeList, Object bean, TnPropertyType pt) {
         final DfPropertyDesc pd = pt.getPropertyDesc();
         varList.add(pd.getValue(bean));
         varValueTypeList.add(pt.getValueType());
@@ -314,14 +313,12 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
     }
 
     // "public static" for recycle, in an act of desperation
-    public static void delegateDisableIdentityGeneration(String tableDbName, DataSource dataSource,
-            StatementFactory statementFactory) {
+    public static void delegateDisableIdentityGeneration(String tableDbName, DataSource dataSource, StatementFactory statementFactory) {
         final TnIdentityGenerationHandler handler = newIdentityGenerationHandler();
         handler.disableIdentityGeneration(tableDbName, dataSource, statementFactory);
     }
 
-    public static void delegateEnableIdentityGeneration(String tableDbName, DataSource dataSource,
-            StatementFactory statementFactory) {
+    public static void delegateEnableIdentityGeneration(String tableDbName, DataSource dataSource, StatementFactory statementFactory) {
         final TnIdentityGenerationHandler handler = newIdentityGenerationHandler();
         handler.enableIdentityGeneration(tableDbName, dataSource, statementFactory);
     }

@@ -27,8 +27,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.StringSet;
 import org.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
@@ -36,6 +34,8 @@ import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -46,7 +46,7 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSequenceHandlerPostgreSQL.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfSequenceHandlerPostgreSQL.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -141,8 +141,7 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                 callSequenceLoop(st, sequenceSqlName, actualValue);
             }
         } catch (SQLException e) {
-            throwSerialTypeSequenceHandlingFailureException(tableInfo, pkInfo, sequenceName, tableSqlName, actualValue,
-                    sequenceSqlName, e);
+            throwSerialTypeSequenceHandlingFailureException(tableInfo, pkInfo, sequenceName, tableSqlName, actualValue, sequenceSqlName, e);
         } finally {
             if (st != null) {
                 try {
@@ -161,8 +160,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
         }
     }
 
-    protected void throwSerialTypeSequenceHandlingFailureException(DfTableMeta tableInfo, DfPrimaryKeyMeta pkInfo,
-            String sequenceName, String tableSqlName, Integer actualValue, String sequenceSqlName, SQLException e) {
+    protected void throwSerialTypeSequenceHandlingFailureException(DfTableMeta tableInfo, DfPrimaryKeyMeta pkInfo, String sequenceName,
+            String tableSqlName, Integer actualValue, String sequenceSqlName, SQLException e) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "Failed to handle serial type sequence!" + ln();

@@ -46,8 +46,7 @@ public class BytesType extends TnAbstractValueType {
         this.trait = trait;
     }
 
-    public void bindValue(Connection conn, PreparedStatement ps, final int index, final Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, final int index, final Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else if (value instanceof byte[]) {
@@ -57,8 +56,7 @@ public class BytesType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(Connection conn, CallableStatement cs, final String parameterName, final Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, final String parameterName, final Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else if (value instanceof byte[]) {

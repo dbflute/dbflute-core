@@ -25,9 +25,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.dbflute.QLog;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.ResourceContext;
@@ -52,9 +49,12 @@ import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.system.QLog;
 import org.dbflute.twowaysql.DisplaySqlBuilder;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 import org.dbflute.twowaysql.style.BoundDateDisplayTimeZoneProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The basic handler to execute SQL. <br />
@@ -68,7 +68,7 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance for internal debug. (QLog should be used instead for query log) */
-    private static final Log _log = LogFactory.getLog(TnAbstractBasicSqlHandler.class);
+    private static final Logger _log = LoggerFactory.getLogger(TnAbstractBasicSqlHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -198,25 +198,24 @@ public abstract class TnAbstractBasicSqlHandler {
 
         if (logEnabled || hasSqlFireHook || hasSqlLog || hasSqlResult || hasRegistry) {
             if (isInternalDebugEnabled()) {
-                final String determination = logEnabled + ", " + hasSqlFireHook + ", " + hasSqlLog + ", "
-                        + hasSqlResult + ", " + hasRegistry;
+                final String determination =
+                        logEnabled + ", " + hasSqlFireHook + ", " + hasSqlLog + ", " + hasSqlResult + ", " + hasRegistry;
                 _log.debug("...Logging SQL by " + determination);
             }
-            if (processBeforeLogging(args, argTypes, logEnabled, hasSqlFireHook, hasSqlLog, hasSqlResult,
-                    sqlLogRegistry)) {
+            if (processBeforeLogging(args, argTypes, logEnabled, hasSqlFireHook, hasSqlLog, hasSqlResult, sqlLogRegistry)) {
                 return; // processed by anyone
             }
             doLogSql(args, argTypes, logEnabled, hasSqlFireHook, hasSqlLog, hasSqlResult, sqlLogRegistry);
         }
     }
 
-    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled,
-            boolean hasSqlFireHook, boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
+    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlFireHook,
+            boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
         return false;
     }
 
-    protected void doLogSql(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlFireHook,
-            boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
+    protected void doLogSql(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlFireHook, boolean hasSqlLog,
+            boolean hasSqlResult, Object sqlLogRegistry) {
         final boolean hasRegistry = sqlLogRegistry != null;
         final String firstDisplaySql;
         if (logEnabled || hasRegistry) { // build at once
@@ -235,8 +234,7 @@ public abstract class TnAbstractBasicSqlHandler {
         }
         if (hasSqlFireHook || hasSqlLog || hasSqlResult) { // build lazily
             if (isInternalDebugEnabled()) {
-                _log.debug("...Handling SqlFireHook or SqlLog or SqlResult by " + hasSqlFireHook + ", " + hasSqlLog
-                        + ", " + hasSqlResult);
+                _log.debug("...Handling SqlFireHook or SqlLog or SqlResult by " + hasSqlFireHook + ", " + hasSqlLog + ", " + hasSqlResult);
             }
             final SqlLogInfo sqlLogInfo = prepareSqlLogInfo(args, argTypes, firstDisplaySql);
             if (sqlLogInfo != null) { // basically true (except override)
@@ -391,8 +389,7 @@ public abstract class TnAbstractBasicSqlHandler {
         return TnSqlLogRegistry.findContainerSqlLogRegistry();
     }
 
-    protected void pushToSqlLogRegistry(Object[] args, Class<?>[] argTypes, String firstDisplaySql,
-            Object sqlLogRegistry) {
+    protected void pushToSqlLogRegistry(Object[] args, Class<?>[] argTypes, String firstDisplaySql, Object sqlLogRegistry) {
         TnSqlLogRegistry.push(_sql, firstDisplaySql, args, argTypes, sqlLogRegistry);
     }
 

@@ -32,7 +32,7 @@ public class ConditionKeyGreaterEqual extends ConditionKey {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================
@@ -55,20 +55,15 @@ public class ConditionKeyGreaterEqual extends ConditionKey {
     //                                                                       Prepare Query
     //                                                                       =============
     @Override
-    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
+    protected ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value) {
         if (value == null) {
-            return false;
+            return RESULT_INVALID_QUERY;
         }
         if (needsOverrideValue(cvalue)) {
-            if (cvalue.equalGreaterEqual(value)) {
-                noticeRegistered(callerName, value);
-                return false;
-            } else {
-                cvalue.overrideGreaterEqual(value);
-                return false;
-            }
+            cvalue.overrideGreaterEqual(value);
+            return chooseResultAlreadyExists(cvalue.equalGreaterEqual(value));
         }
-        return true;
+        return RESULT_NEW_QUERY;
     }
 
     // ===================================================================================
@@ -83,8 +78,8 @@ public class ConditionKeyGreaterEqual extends ConditionKey {
     //                                                                        Where Clause
     //                                                                        ============
     @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value,
+            ColumnFunctionCipher cipher, ConditionOption option) {
         conditionList.add(buildBindClause(columnRealName, value.getGreaterEqualLatestLocation(), cipher, option));
     }
 
@@ -94,5 +89,13 @@ public class ConditionKeyGreaterEqual extends ConditionKey {
     @Override
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupGreaterEqual(value, location);
+    }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return false;
     }
 }

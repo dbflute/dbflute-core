@@ -18,8 +18,6 @@ package org.dbflute.task.manage;
 import java.io.File;
 import java.io.FileFilter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.helper.filesystem.FileTextIO;
 import org.dbflute.helper.filesystem.FileTextLineFilter;
 import org.dbflute.helper.io.compress.DfZipArchiver;
@@ -28,6 +26,8 @@ import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTask;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -38,7 +38,7 @@ public class DfUpgradeTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfUpgradeTask.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfUpgradeTask.class);
     protected static final String DEFAULT_LOCATION_PATH = "../mydbflute/";
 
     // ===================================================================================
@@ -124,7 +124,8 @@ public class DfUpgradeTask extends DfAbstractTask {
         if (isVersionSpecified()) {
             return _version;
         }
-        final String latestVersion = dfprop.getDBFluteLatestVersion();
+        // TODO jflute setting: formal version after release
+        final String latestVersion = dfprop.getDBFluteLatestSnapshotVersion();
         if (latestVersion == null) {
             String msg = "Not found the latest version for DBFlute in publicMap.";
             throw new IllegalStateException(msg);
@@ -172,8 +173,7 @@ public class DfUpgradeTask extends DfAbstractTask {
         doReplaceVersionScript(upgradeVersion, textIO, "./_project.sh", "/dbflute-");
     }
 
-    protected void doReplaceVersionScript(final String upgradeVersion, FileTextIO textIO, String scriptPath,
-            final String versionKeyword) {
+    protected void doReplaceVersionScript(final String upgradeVersion, FileTextIO textIO, String scriptPath, final String versionKeyword) {
         final File versionScript = new File(scriptPath);
         if (versionScript.exists()) { // basically true (just in case)
             _log.info("...Replacing version script: " + scriptPath);
@@ -195,6 +195,18 @@ public class DfUpgradeTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
+    @Override
+    protected void showFinalMessage(long before, long after, boolean abort) {
+        super.showFinalMessage(before, after, abort);
+        waitAfterFinalMessage();
+    }
+
+    protected void waitAfterFinalMessage() {
+        try {
+            Thread.sleep(3000L); // to get runtime version notification looked at
+        } catch (InterruptedException ignored) {}
+    }
+
     @Override
     protected String getFinalInformation() {
         return buildFinalMessage();

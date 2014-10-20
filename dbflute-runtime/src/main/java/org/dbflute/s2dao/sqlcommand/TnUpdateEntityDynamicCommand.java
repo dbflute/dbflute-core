@@ -23,7 +23,6 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.dbflute.Entity;
-import org.dbflute.XLog;
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.writable.UpdateOption;
 import org.dbflute.cbean.ConditionBean;
@@ -34,6 +33,7 @@ import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.sqlhandler.TnUpdateEntityHandler;
+import org.dbflute.system.XLog;
 
 /**
  * @author modified by jflute (originated in S2Dao)
@@ -95,8 +95,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         }
     }
 
-    protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,
-            UpdateOption<ConditionBean> option) {
+    protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql, UpdateOption<ConditionBean> option) {
         final TnUpdateEntityHandler handler = createUpdateEntityHandler(propertyTypes, sql, option);
         final Object[] realArgs = new Object[] { bean };
         handler.setExceptionMessageSqlArgs(realArgs);
@@ -205,8 +204,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         return sb.toString();
     }
 
-    protected void throwUniqueDrivenColumnUpdateStatementException(String tableDbName, String columnDbName,
-            Set<String> uniqueDrivenPropSet) {
+    protected void throwUniqueDrivenColumnUpdateStatementException(String tableDbName, String columnDbName, Set<String> uniqueDrivenPropSet) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Cannot use the column specified as unique driven as update statement.");
         br.addItem("Table");
@@ -235,8 +233,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         return handler;
     }
 
-    protected TnUpdateEntityHandler newUpdateEntityHandler(TnPropertyType[] boundPropTypes, String sql,
-            UpdateOption<ConditionBean> option) {
+    protected TnUpdateEntityHandler newUpdateEntityHandler(TnPropertyType[] boundPropTypes, String sql, UpdateOption<ConditionBean> option) {
         return new TnUpdateEntityHandler(_dataSource, _statementFactory, sql, _beanMetaData, boundPropTypes);
     }
 

@@ -131,8 +131,7 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
         return col.getUncapitalisedJavaName();
     }
 
-    public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber,
-            boolean toBoolean) {
+    public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber, boolean toBoolean) {
         throw new UnsupportedOperationException("Unsupported at Php");
     }
 

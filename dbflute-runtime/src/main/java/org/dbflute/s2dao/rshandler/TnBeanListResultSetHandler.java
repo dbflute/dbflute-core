@@ -24,6 +24,7 @@ import java.util.Map;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -48,8 +49,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
      * @param rowCreator Row creator. (NotNull)
      * @param relationRowCreator Relation row creator. (NotNul)
      */
-    public TnBeanListResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
-            TnRelationRowCreator relationRowCreator) {
+    public TnBeanListResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator, TnRelationRowCreator relationRowCreator) {
         super(beanMetaData, rowCreator, relationRowCreator);
     }
 
@@ -83,6 +83,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
 
         final TnBeanMetaData basePointBmd = getBeanMetaData();
         final boolean hasCB = hasConditionBean();
+        final boolean checkNonSp = hasCB && checkNonSpecifiedColumnAccess();
         final boolean skipRelationLoop;
         {
             final boolean emptyRelationCB = hasCB && isSelectedRelationEmpty();
@@ -107,7 +108,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             final Object row = createRow(rs, selectIndexMap, propertyCache);
 
             if (skipRelationLoop) {
-                adjustCreatedRow(row, basePointBmd);
+                adjustCreatedRow(row, checkNonSp, basePointBmd);
                 handler.handle(row);
                 continue;
             }
@@ -126,17 +127,16 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 if (relSelector.isNonSelectedRelation(rpt.getRelationNoSuffixPart())) {
                     continue;
                 }
-                mappingFirstRelation(rs, row, rpt, selectColumnMap, selectIndexMap, relPropCache, relRowCache,
-                        relSelector);
+                mappingFirstRelation(rs, row, rpt, selectColumnMap, selectIndexMap, relPropCache, relRowCache, relSelector);
             }
-            adjustCreatedRow(row, basePointBmd);
+            adjustCreatedRow(row, checkNonSp, basePointBmd);
             handler.handle(row);
         }
     }
 
     /**
      * Create the selector of relation.
-     * @param hasCB Does the select have condition-bean? 
+     * @param hasCB Does the select use condition-bean? 
      * @return The created selector instance. (NotNull)
      */
     protected TnRelationSelector createRelationSelector(final boolean hasCB) {
@@ -157,12 +157,28 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             public boolean canUseRelationCache(String relationNoSuffix) {
                 return cb != null && cb.getSqlClause().canUseRelationCache(relationNoSuffix);
             }
+
+            public boolean isNonSpecifiedColumnAccessAllowed(String relationNoSuffix) {
+                return cb != null && cb.isNonSpecifiedColumnAccessAllowed();
+            }
+
+            public boolean isUsingSpecifyColumnInRelation(String relationNoSuffix) {
+                if (cb == null) {
+                    return false;
+                }
+                final SqlClause sqlClause = cb.getSqlClause();
+                final String tableAlias = sqlClause.translateSelectedRelationPathToTableAlias(relationNoSuffix);
+                if (tableAlias == null) { // no way but just in case
+                    return false;
+                }
+                return sqlClause.hasSpecifiedSelectColumn(tableAlias);
+            }
         };
     }
 
     /**
      * Create the cache of relation row.
-     * @param hasCB Does the select have condition-bean?
+     * @param hasCB Does the select use condition-bean?
      * @return The cache of relation row. (NotNull)
      */
     protected TnRelationRowCache createRelationRowCache(boolean hasCB) {
@@ -203,10 +219,9 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
      * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
      * @throws SQLException
      */
-    protected void mappingFirstRelation(ResultSet rs, Object row, TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
-            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
-            TnRelationSelector relSelector) throws SQLException {
+    protected void mappingFirstRelation(ResultSet rs, Object row, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
+            Map<String, Map<String, Integer>> selectIndexMap, Map<String, Map<String, TnPropertyMapping>> relPropCache,
+            TnRelationRowCache relRowCache, TnRelationSelector relSelector) throws SQLException {
         final String relationNoSuffix = getFirstLevelRelationPath(rpt);
         final TnRelationKey relKey = relRowCache.createRelationKey(rs, rpt // basic resource
                 , selectColumnMap, selectIndexMap // select resource
@@ -222,7 +237,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                         , selectColumnMap, selectIndexMap // select resource
                         , relKey, relPropCache, relRowCache, relSelector); // relation resource
                 if (relationRow != null) { // is new created relation row
-                    adjustCreatedRow(relationRow, rpt.getYourBeanMetaData());
+                    adjustCreatedRelationRow(relationRow, relationNoSuffix, relSelector, rpt);
                     if (canUseRelationCache) {
                         relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
                     }
@@ -258,8 +273,8 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     }
 
     /**
-     * Is the selected relation empty?
-     * You should call {@link #hasConditionBean()} hasConditionBean() before calling this!
+     * Is the selected relation empty? <br />
+     * You should call {@link #hasConditionBean()} before calling this.
      * @return The determination, true or false.
      */
     protected boolean isSelectedRelationEmpty() {
@@ -268,7 +283,8 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     }
 
     /**
-     * Get the count of selected relation.
+     * Get the count of selected relation. <br />
+     * You should call {@link #hasConditionBean()} before calling this.
      * @return The integer of the count. (NotMinus)
      */
     protected int getSelectedRelationCount() {
@@ -277,12 +293,27 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     }
 
     /**
-     * Can the relation mapping (entity instance) cache?
+     * Can the relation mapping (entity instance) cache? <br />
+     * You should call {@link #hasConditionBean()} before calling this.
      * @return The determination, true or false.
      */
     protected boolean canRelationMappingCache() {
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
         return cb.canRelationMappingCache();
+    }
+
+    /**
+     * Does it check access to non-specified column? <br />
+     * You should call {@link #hasConditionBean()} before calling this.
+     * @return The determination, true or false.
+     */
+    protected boolean checkNonSpecifiedColumnAccess() {
+        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+        if (cb.isNonSpecifiedColumnAccessAllowed()) {
+            return false;
+        }
+        final String aliasName = cb.getSqlClause().getBasePointAliasName();
+        return cb.getSqlClause().hasSpecifiedSelectColumn(aliasName);
     }
 
     // ===================================================================================

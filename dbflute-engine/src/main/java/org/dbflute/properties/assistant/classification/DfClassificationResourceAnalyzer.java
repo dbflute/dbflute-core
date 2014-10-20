@@ -25,8 +25,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.token.line.LineToken;
 import org.dbflute.helper.token.line.LineTokenizingOption;
@@ -35,6 +33,8 @@ import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -45,7 +45,7 @@ public class DfClassificationResourceAnalyzer {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfClassificationResourceAnalyzer.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfClassificationResourceAnalyzer.class);
 
     protected static final String DEFAULT_ENCODING = "UTF-8";
     protected static final String LN_MARK_PLAIN = "\\n";
@@ -124,9 +124,8 @@ public class DfClassificationResourceAnalyzer {
             if (!classificationTopList.isEmpty()) {
                 for (DfClassificationTop top : classificationTopList) {
                     _log.info("    " + top.getClassificationName() + ", " + top.getTopCommentDisp() + ", "
-                            + top.isCheckClassificationCode() + ", " + top.getUndefinedHandlingType() + ", "
-                            + top.isCheckImplicitSet() + ", " + top.isCheckSelectedClassification() + ", "
-                            + top.isForceClassificationSetting());
+                            + top.isCheckClassificationCode() + ", " + top.getUndefinedHandlingType() + ", " + top.isCheckImplicitSet()
+                            + ", " + top.isCheckSelectedClassification() + ", " + top.isForceClassificationSetting());
                 }
             } else {
                 _log.info(" -> no classification in resource file");

@@ -25,7 +25,7 @@ import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.dbflute.outsidesql.typed.AutoPagingHandlingPmb;
 
 /**
- * The auto-paging executor of outside-SQL.
+ * The auto-paging (cursor-skip) executor of outside-SQL.
  * @param <BEHAVIOR> The type of behavior.
  * @author jflute
  */
@@ -34,11 +34,9 @@ public class OutsideSqlAutoPagingExecutor<BEHAVIOR> extends AbstractOutsideSqlPa
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlAutoPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption,
-            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
-        super(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig, outsideSqlOption,
-                outsideSqlExecutorFactory);
+    public OutsideSqlAutoPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+        super(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig, outsideSqlOption, outsideSqlExecutorFactory);
     }
 
     // ===================================================================================
@@ -54,7 +52,7 @@ public class OutsideSqlAutoPagingExecutor<BEHAVIOR> extends AbstractOutsideSqlPa
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * PagingResultBean&lt;SimpleMember&gt; page
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #DD4747">selectPage</span>(pmb);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectPage</span>(pmb);
      * int allRecordCount = page.getAllRecordCount();
      * int allPageCount = page.getAllPageCount();
      * boolean isExistPrePage = page.isExistPrePage();
@@ -126,7 +124,7 @@ public class OutsideSqlAutoPagingExecutor<BEHAVIOR> extends AbstractOutsideSqlPa
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #DD4747">selectList</span>(pmb);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectList</span>(pmb);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }

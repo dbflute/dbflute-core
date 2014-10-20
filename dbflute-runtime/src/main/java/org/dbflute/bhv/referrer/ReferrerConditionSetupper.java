@@ -20,7 +20,7 @@ import org.dbflute.cbean.ConditionBean;
 /**
  * The set-upper of condition-bean for referrer.
  * <pre>
- * loader.<span style="color: #DD4747">loadPurchaseList</span>(memberList, referrerCB -&gt; {
+ * loader.<span style="color: #CC4747">loadPurchaseList</span>(memberList, referrerCB -&gt; {
  *     cb.setupSelect_Product();
  *     cb.query().setPurchasePrice_GreaterEqual(2000);
  *     cb.query().addOrderBy_PurchaseDatetime_Desc();
@@ -30,7 +30,7 @@ import org.dbflute.cbean.ConditionBean;
  * <span style="color: #3F7E5E">//    purchaseLoader.loadPurchasePaymentList(...);</span>
  * <span style="color: #3F7E5E">//});</span>
  * for (Member member : memberList) {
- *     List&lt;Purchase&gt; purchaseList = member.<span style="color: #DD4747">getPurchaseList()</span>;
+ *     List&lt;Purchase&gt; purchaseList = member.<span style="color: #CC4747">getPurchaseList()</span>;
  *     for (Purchase purchase : purchaseList) {
  *         ...
  *     }
@@ -48,7 +48,7 @@ public interface ReferrerConditionSetupper<CB extends ConditionBean> {
      * You can call SetupSelect, Query, OrderBy... <br />
      * Ordering by FK is already set up so you should add next order condition here.
      * <pre>
-     * loader.<span style="color: #DD4747">loadPurchaseList</span>(memberList, referrerCB -&gt; {
+     * loader.<span style="color: #CC4747">loadPurchaseList</span>(memberList, referrerCB -&gt; {
      *     cb.setupSelect_Product();
      *     cb.query().setPurchasePrice_GreaterEqual(2000);
      *     cb.query().addOrderBy_PurchaseDatetime_Desc();
@@ -58,7 +58,7 @@ public interface ReferrerConditionSetupper<CB extends ConditionBean> {
      * <span style="color: #3F7E5E">//    purchaseLoader.loadPurchasePaymentList(...);</span>
      * <span style="color: #3F7E5E">//});</span>
      * for (Member member : memberList) {
-     *     List&lt;Purchase&gt; purchaseList = member.<span style="color: #DD4747">getPurchaseList()</span>;
+     *     List&lt;Purchase&gt; purchaseList = member.<span style="color: #CC4747">getPurchaseList()</span>;
      *     for (Purchase purchase : purchaseList) {
      *         ...
      *     }

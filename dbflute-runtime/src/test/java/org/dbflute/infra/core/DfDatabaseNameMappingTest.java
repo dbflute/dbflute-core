@@ -18,12 +18,12 @@ package org.dbflute.infra.core;
 import java.util.Map;
 import java.util.Set;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class DfDatabaseNameMappingTest extends PlainTestCase {
+public class DfDatabaseNameMappingTest extends RuntimeTestCase {
 
     public void test_getDatabaseBaseInfo() {
         final DfDatabaseNameMapping config = DfDatabaseNameMapping.getInstance();

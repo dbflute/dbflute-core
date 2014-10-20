@@ -15,12 +15,12 @@
  */
 package org.dbflute.jdbc;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class StatementConfigTest extends PlainTestCase {
+public class StatementConfigTest extends RuntimeTestCase {
 
     public void test_buildResultSetTypeDisp_basic() throws Exception {
         StatementConfig config = new StatementConfig();

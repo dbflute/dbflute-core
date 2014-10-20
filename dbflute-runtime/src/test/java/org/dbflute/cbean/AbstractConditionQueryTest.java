@@ -16,13 +16,13 @@
 package org.dbflute.cbean;
 
 import org.dbflute.cbean.ckey.ConditionKey;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.5 (2009/04/08 Wednesday)
  */
-public class AbstractConditionQueryTest extends PlainTestCase {
+public class AbstractConditionQueryTest extends RuntimeTestCase {
 
     public void test_isConditionKeyInScope() throws Exception {
         // ## Arrange & Act & Assert ##

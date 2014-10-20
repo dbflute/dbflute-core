@@ -18,13 +18,13 @@ package org.dbflute.cbean.coption;
 import java.util.Date;
 
 import org.dbflute.cbean.ckey.ConditionKey;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
  */
-public class FromToOptionTest extends PlainTestCase {
+public class FromToOptionTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                  Comparison Pattern

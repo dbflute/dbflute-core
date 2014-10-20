@@ -31,8 +31,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
@@ -56,6 +54,8 @@ import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -66,8 +66,8 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfLReverseProcess.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfLReverseProcess.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -254,8 +254,7 @@ public class DfLReverseProcess {
     // -----------------------------------------------------
     //                                      Override Reverse
     //                                      ----------------
-    protected Map<File, DfLReverseOutputResource> toOverrideReverseOrderedMap(List<List<Table>> orderedList,
-            File baseDir) {
+    protected Map<File, DfLReverseOutputResource> toOverrideReverseOrderedMap(List<List<Table>> orderedList, File baseDir) {
         final DfLReverseExistingXlsInfo existingXlsInfo = extractExistingXlsInfo(baseDir);
         final Map<File, DfLReverseOutputResource> orderedMap = createOrderedMap();
         final Map<String, File> existingXlsMap = existingXlsInfo.getTableExistingXlsMap();
@@ -296,23 +295,19 @@ public class DfLReverseProcess {
         return new File(getReverseXlsDataDir() + "/" + getLoadDataReverseFileTitle() + "-99-added-table.xls");
     }
 
-    protected DfLReverseOutputResource createOutputResource(File xlsFile, List<Table> tableList, int sectionNo,
-            String mainName) {
+    protected DfLReverseOutputResource createOutputResource(File xlsFile, List<Table> tableList, int sectionNo, String mainName) {
         return new DfLReverseOutputResource(xlsFile, tableList, sectionNo, mainName);
     }
 
-    protected void registerAddedTableIfExists(Map<File, DfLReverseOutputResource> orderedMap,
-            List<Table> addedTableList, int sectionNo) {
+    protected void registerAddedTableIfExists(Map<File, DfLReverseOutputResource> orderedMap, List<Table> addedTableList, int sectionNo) {
         if (!addedTableList.isEmpty()) {
             final String mainName = extractMainName(addedTableList);
             final File addedTableXlsFile = createAddedTableXlsFile();
-            orderedMap.put(addedTableXlsFile,
-                    createOutputResource(addedTableXlsFile, addedTableList, sectionNo, mainName));
+            orderedMap.put(addedTableXlsFile, createOutputResource(addedTableXlsFile, addedTableList, sectionNo, mainName));
         }
     }
 
-    protected void orderTableByExistingOrder(Map<File, DfLReverseOutputResource> orderedMap,
-            DfLReverseExistingXlsInfo existingXlsInfo) {
+    protected void orderTableByExistingOrder(Map<File, DfLReverseOutputResource> orderedMap, DfLReverseExistingXlsInfo existingXlsInfo) {
         final Map<File, List<String>> existingXlsTableListMap = existingXlsInfo.getExistingXlsTableListMap();
         for (Entry<File, DfLReverseOutputResource> entry : orderedMap.entrySet()) {
             final File existingXls = entry.getKey();
@@ -347,8 +342,7 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                       Reverse Table
     //                                                                       =============
-    protected void reverseTableData(Map<File, DfLReverseOutputResource> orderedMap, File baseDir,
-            List<String> sectionInfoList) {
+    protected void reverseTableData(Map<File, DfLReverseOutputResource> orderedMap, File baseDir, List<String> sectionInfoList) {
         deletePreviousDataFile(baseDir);
         final Integer limit = getLoadDataReverseRecordLimit();
         for (Entry<File, DfLReverseOutputResource> entry : orderedMap.entrySet()) {
@@ -562,8 +556,7 @@ public class DfLReverseProcess {
             if (bw != null) {
                 try {
                     bw.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

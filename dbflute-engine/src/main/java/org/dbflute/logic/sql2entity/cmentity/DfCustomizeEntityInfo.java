@@ -69,8 +69,7 @@ public class DfCustomizeEntityInfo {
         this(tableDbName, columnMap, null);
     }
 
-    public DfCustomizeEntityInfo(String tableDbName, Map<String, DfColumnMeta> columnMap,
-            DfTypeStructInfo typeStructInfo) {
+    public DfCustomizeEntityInfo(String tableDbName, Map<String, DfColumnMeta> columnMap, DfTypeStructInfo typeStructInfo) {
         _tableDbName = tableDbName;
         _columnMap = columnMap;
         _typeStructInfo = typeStructInfo;

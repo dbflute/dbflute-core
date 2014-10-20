@@ -18,12 +18,12 @@ package org.dbflute.bhv.exception;
 import org.dbflute.bhv.exception.BehaviorExceptionThrower;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class BehaviorExceptionThrowerTest extends PlainTestCase {
+public class BehaviorExceptionThrowerTest extends RuntimeTestCase {
 
     public void test_throwEntityAlreadyDeletedException() {
         try {

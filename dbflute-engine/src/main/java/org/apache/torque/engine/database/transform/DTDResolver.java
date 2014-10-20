@@ -131,8 +131,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -145,11 +145,11 @@ public class DTDResolver implements EntityResolver {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Logging class from commons.logging */
-    private static Log log = LogFactory.getLog(DTDResolver.class);
+    private static final Logger _log = LoggerFactory.getLogger(DTDResolver.class);
 
+    // TODO jflute setting: DTD web-site
     /** URL the DTD is located on the web. */
-    public static final String WEB_SITE_DTD = "http://dbflute.sandbox.seasar.org/meta/database.dtd";
+    public static final String WEB_SITE_DTD = "http://dbflute.seasar.org/meta/database.dtd";
     // at the future, remove sandbox when DBFlute becomes product
 
     // ===================================================================================
@@ -174,7 +174,7 @@ public class DTDResolver implements EntityResolver {
             if (dtdStream != null) {
                 databaseDTD = new InputSource(dtdStream);
             } else {
-                log.warn("Could not locate the database.dtd");
+                _log.warn("Could not locate the database.dtd");
             }
         } catch (Exception ex) {
             throw new SAXException("Could not get stream for database.dtd", ex);
@@ -194,13 +194,13 @@ public class DTDResolver implements EntityResolver {
      */
     public InputSource resolveEntity(String publicId, String systemId) throws IOException {
         if (databaseDTD != null && WEB_SITE_DTD.equals(systemId)) {
-            log.info("...Resolving XML by database.dtd in same package");
+            _log.info("...Resolving XML by database.dtd in same package");
             return databaseDTD;
         } else if (systemId == null || "".equals(systemId.trim())) {
-            log.info("...Resolving XML by '" + WEB_SITE_DTD + '\'');
+            _log.info("...Resolving XML by '" + WEB_SITE_DTD + '\'');
             return getInputSource(WEB_SITE_DTD);
         } else {
-            log.info("...Resolving XML by '" + systemId + '\'');
+            _log.info("...Resolving XML by '" + systemId + '\'');
             return getInputSource(systemId);
         }
     }

@@ -86,8 +86,7 @@ public class ClientInvokeNameExtractor {
      * @param stackTrace Stack log. (NotNull)
      * @return The list of result of invoke name. (NotNull: If not found, returns empty string.)
      */
-    protected List<InvokeNameResult> extractInvokeName(InvokeNameExtractingResource resource,
-            StackTraceElement[] stackTrace) {
+    protected List<InvokeNameResult> extractInvokeName(InvokeNameExtractingResource resource, StackTraceElement[] stackTrace) {
         return _coinLogic.extractInvokeName(resource, stackTrace);
     }
 

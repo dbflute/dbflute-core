@@ -173,13 +173,14 @@ public class DfParameterBeanResolver {
     }
 
     protected void resolveSuperClassSimplePagingBean(DfPmbMetaData pmbMetaData) {
-        final String superClassName = pmbMetaData.getSuperClassName();
-        if (Srl.endsWithIgnoreCase(superClassName, "Paging") // main
-                || Srl.equalsIgnoreCase(superClassName, "SPB")) { // an old style for compatibility before 0.9.7.5
-            pmbMetaData.setSuperClassName("SimplePagingBean");
-            if (Srl.equalsIgnoreCase(superClassName, "ManualPaging")) {
+        final String superExp = pmbMetaData.getSuperClassName();
+        if (Srl.endsWithIgnoreCase(superExp, "Paging") // main
+                || Srl.equalsIgnoreCase(superExp, "SPB")) { // an old style for compatibility before 0.9.7.5
+            final String superClassName = SimplePagingBean.class.getSimpleName();
+            pmbMetaData.setSuperClassName(superClassName);
+            if (Srl.equalsIgnoreCase(superClassName, "Paging", "SqlSkipPaging", "ManualPaging")) {
                 pmbMetaData.setPagingType(DfPagingType.MANUAL);
-            } else if (Srl.equalsIgnoreCase(superClassName, "AutoPaging")) {
+            } else if (Srl.equalsIgnoreCase(superClassName, "CursorSkipPaging", "AutoPaging")) {
                 pmbMetaData.setPagingType(DfPagingType.AUTO);
             } else {
                 pmbMetaData.setPagingType(DfPagingType.UNKNOWN);
@@ -286,21 +287,20 @@ public class DfParameterBeanResolver {
     // -----------------------------------------------------
     //                                                  Core
     //                                                  ----
-    protected void processAutoDetect(String sql, Map<String, String> propertyNameTypeMap,
-            Map<String, String> propertyNameOptionMap, Set<String> autoDetectedPropertyNameSet) {
+    protected void processAutoDetect(String sql, Map<String, String> propertyNameTypeMap, Map<String, String> propertyNameOptionMap,
+            Set<String> autoDetectedPropertyNameSet) {
         final SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
         final Node rootNode = analyzer.analyze();
         doProcessAutoDetect(sql, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet, rootNode);
     }
 
-    protected void doProcessAutoDetect(String sql, Map<String, String> propertyNameTypeMap,
-            Map<String, String> propertyNameOptionMap, Set<String> autoDetectedPropertyNameSet, Node node) {
+    protected void doProcessAutoDetect(String sql, Map<String, String> propertyNameTypeMap, Map<String, String> propertyNameOptionMap,
+            Set<String> autoDetectedPropertyNameSet, Node node) {
         // only bind variable comment is supported
         // because simple specification is very important here
         if (node instanceof BindVariableNode) {
             final BindVariableNode bindNode = (BindVariableNode) node;
-            processAutoDetectBindNode(sql, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet,
-                    bindNode);
+            processAutoDetectBindNode(sql, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet, bindNode);
         } else if (node instanceof IfNode) {
             final IfNode ifNode = (IfNode) node;
             doProcessAutoDetectIfNode(sql, propertyNameTypeMap, propertyNameOptionMap, ifNode);
@@ -324,8 +324,7 @@ public class DfParameterBeanResolver {
     //                                         Bind Variable
     //                                         -------------
     protected void processAutoDetectBindNode(String sql, Map<String, String> propertyNameTypeMap,
-            Map<String, String> propertyNameOptionMap, Set<String> autoDetectedPropertyNameSet,
-            BindVariableNode variableNode) {
+            Map<String, String> propertyNameOptionMap, Set<String> autoDetectedPropertyNameSet, BindVariableNode variableNode) {
         final String expression = variableNode.getExpression();
         final String testValue = variableNode.getTestValue();
         if (testValue == null) {
@@ -392,8 +391,7 @@ public class DfParameterBeanResolver {
                 } catch (ParseTimestampException ignored) {
                     try {
                         time = DfTypeUtil.toTime(unquoted);
-                    } catch (ParseTimeException andIgnored) {
-                    }
+                    } catch (ParseTimeException andIgnored) {}
                 }
                 if (timestamp != null) {
                     final String timeParts = DfTypeUtil.toString(timestamp, "HH:mm:ss.SSS");
@@ -435,8 +433,7 @@ public class DfParameterBeanResolver {
             BigDecimal decimalValue = null;
             try {
                 decimalValue = DfTypeUtil.toBigDecimal(testValue);
-            } catch (NumberFormatException ignored) {
-            }
+            } catch (NumberFormatException ignored) {}
             if (decimalValue != null) {
                 plainTypeName = "BigDecimal";
             } else { // means unknown type
@@ -446,8 +443,7 @@ public class DfParameterBeanResolver {
             Long longValue = null;
             try {
                 longValue = DfTypeUtil.toLong(testValue);
-            } catch (NumberFormatException ignored) {
-            }
+            } catch (NumberFormatException ignored) {}
             if (longValue != null) {
                 if (longValue > Long.valueOf(Integer.MAX_VALUE)) {
                     plainTypeName = "Long";
@@ -544,8 +540,7 @@ public class DfParameterBeanResolver {
 
     protected void doProcessAlternateBooleanMethodIfNode(String sql, IfNode ifNode) {
         final String expression = ifNode.getExpression().trim(); // trim it just in case
-        if (Srl.containsAny(expression, getIfCommentConnectors())
-                || Srl.containsAny(expression, getIfCommentOperands())) {
+        if (Srl.containsAny(expression, getIfCommentConnectors()) || Srl.containsAny(expression, getIfCommentOperands())) {
             return; // unknown (type)
         }
         if (isPmCommentNestedProperty(expression) || !isPmCommentMethodCall(expression)) {

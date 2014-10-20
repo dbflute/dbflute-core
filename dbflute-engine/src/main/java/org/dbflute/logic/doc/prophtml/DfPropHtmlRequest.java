@@ -50,8 +50,8 @@ public class DfPropHtmlRequest {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPropHtmlRequest(String requestName, List<String> diffIgnoredKeyList, List<String> maskedKeyList,
-            boolean envOnlyFloatLeft, String extendsPropRequest, boolean checkImplicitOverride) {
+    public DfPropHtmlRequest(String requestName, List<String> diffIgnoredKeyList, List<String> maskedKeyList, boolean envOnlyFloatLeft,
+            String extendsPropRequest, boolean checkImplicitOverride) {
         _requestName = requestName;
         addDiffIgnoredKeyAll(diffIgnoredKeyList);
         addMaskedKeyAll(maskedKeyList);
@@ -112,8 +112,8 @@ public class DfPropHtmlRequest {
         doAddProperty(propertyKey, envType, langType, propertyValue, comment, override, secure);
     }
 
-    protected void doAddProperty(String propertyKey, String envType, String langType, String propertyValue,
-            String comment, boolean override, boolean secure) {
+    protected void doAddProperty(String propertyKey, String envType, String langType, String propertyValue, String comment,
+            boolean override, boolean secure) {
         final DfPropHtmlProperty property = prepareManagedProperty(propertyKey);
         final String registeredValue = filterRegisteredValue(propertyKey, propertyValue, secure);
         property.setPropertyValue(envType, langType, registeredValue, comment, override, secure);

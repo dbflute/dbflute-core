@@ -25,8 +25,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -48,6 +46,8 @@ import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterce
 import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSybase;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -57,8 +57,8 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfLoadDataProcess.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfLoadDataProcess.class);
 
     protected static final String COMMON_LOAD_TYPE = DfLoadedDataInfo.COMMON_LOAD_TYPE;
     protected static final String FIRSTXLS_FILE_TYPE = DfLoadedDataInfo.FIRSTXLS_FILE_TYPE;
@@ -371,8 +371,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         lazyCheckLoadedClassifiaction(_dataSource, _loadedDataInfo.getImplicitClassificationLazyChecker());
     }
 
-    protected void lazyCheckLoadedClassifiaction(DataSource dataSource,
-            List<DfLoadedClassificationLazyChecker> checkerList) {
+    protected void lazyCheckLoadedClassifiaction(DataSource dataSource, List<DfLoadedClassificationLazyChecker> checkerList) {
         if (checkerList.isEmpty()) {
             return;
         }
@@ -395,8 +394,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }
@@ -437,8 +435,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void setupDetailMessage(List<String> detailMessageList) {
-        final Map<String, Map<String, List<DfLoadedFile>>> hierarchyMap = _loadedDataInfo
-                .getLoadedFileListHierarchyMap();
+        final Map<String, Map<String, List<DfLoadedFile>>> hierarchyMap = _loadedDataInfo.getLoadedFileListHierarchyMap();
 
         // order according to registration
         doSetupDetailMessageEnvType(detailMessageList, COMMON_LOAD_TYPE, hierarchyMap.get(COMMON_LOAD_TYPE));
@@ -464,8 +461,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(XLS_FILE_TYPE), 10);
     }
 
-    protected void doSetupDetailMessageFileType(List<String> detailMessageList, List<DfLoadedFile> loadedFileList,
-            int limit) {
+    protected void doSetupDetailMessageFileType(List<String> detailMessageList, List<DfLoadedFile> loadedFileList, int limit) {
         if (loadedFileList == null || loadedFileList.isEmpty()) {
             return; // means no files for the file type
         }

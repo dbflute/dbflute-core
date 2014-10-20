@@ -37,20 +37,11 @@ import org.dbflute.cbean.coption.LikeSearchOption;
 #if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
 import org.dbflute.cbean.coption.FromToOption;
 #end
-#if ($database.hasPmbMetaDataPropertyUseOriginalException($pmbClassName))
-import org.dbflute.exception.*;
-#end
 import org.dbflute.outsidesql.PmbCustodial;
-import org.dbflute.outsidesql.PmbCustodial.ShortCharHandlingMode;
+#if ($database.isShortCharHandlingValid() && $database.hasPmbMetaDataPropertyRefColumnChar($pmbClassName))
+import org.dbflute.outsidesql.PmbCustodial.PmbShortCharHandlingMode;
+#end
 import org.dbflute.util.DfTypeUtil;
-#if ($database.isAvailableJodaTimeEntity())
-#if ($database.isAvailableJodaTimeLocalDateEntity())
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-#end
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-#end
 import ${glPackageBaseCommon}.*;
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
 #if ($database.isApplicationBehaviorProject())
@@ -206,18 +197,14 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     /**
      * {@inheritDoc}
      */
-    public String getOutsideSqlPath() {
-        return "${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}";
-    }
+    public String getOutsideSqlPath() { return "${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}"; }
 
 #if ($database.isPmbMetaDataTypedSelectPmb($pmbClassName))
     /**
      * Get the type of an entity for result. (implementation)
      * @return The type instance of an entity, ${database.getPmbMetaDataCustomizeEntityLineDisp($pmbClassName)}. (NotNull)
      */
-    public Class<${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}> getEntityType() {
-        return ${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}.class;
-    }
+    public Class<${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}> getEntityType() { return ${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}.class; }
 
 #end
 #end
@@ -228,23 +215,17 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     /**
      * {@inheritDoc}
      */
-    public String getProcedureName() {
-        return "${database.getPmbMetaDataProcedureName($pmbClassName)}";
-    }
+    public String getProcedureName() { return "${database.getPmbMetaDataProcedureName($pmbClassName)}"; }
 
     /**
      * {@inheritDoc}
      */
-     public boolean isEscapeStatement() {
-         return true; // as default
-     }
+     public boolean isEscapeStatement() { return true; } // as default
 
     /**
      * {@inheritDoc}
      */
-     public boolean isCalledBySelect() {
-         return ${database.isPmbMetaDataProcedureCalledBySelect($pmbClassName)}; // resolved by generator
-     }
+     public boolean isCalledBySelect() { return ${database.isPmbMetaDataProcedureCalledBySelect($pmbClassName)}; } // resolved by generator
 
 #end
 #if (!$database.hasPmbMetaDataCheckSafetyResult($pmbClassName))
@@ -285,97 +266,29 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     // -----------------------------------------------------
     //                                                String
     //                                                ------
-    protected String filterStringParameter(String value) {
-        return isEmptyStringParameterAllowed() ? value : convertEmptyToNull(value);
-    }
+    protected String filterStringParameter(String value) { return isEmptyStringParameterAllowed() ? value : convertEmptyToNull(value); }
+    protected boolean isEmptyStringParameterAllowed() { return ${glDBFluteConfig}.getInstance().isEmptyStringParameterAllowed(); }
+    protected String convertEmptyToNull(String value) { return PmbCustodial.convertEmptyToNull(value); }
+    
+#if ($database.isShortCharHandlingValid() && $database.hasPmbMetaDataPropertyRefColumnChar($pmbClassName))
+    protected String handleShortChar(String propertyName, String value, Integer size)
+    { return PmbCustodial.handleShortChar(propertyName, value, size, chooseShortCharHandlingMode(propertyName, value, size)); }
 
-    protected boolean isEmptyStringParameterAllowed() {
-	    return ${glDBFluteConfig}.getInstance().isEmptyStringParameterAllowed();
-    }
+    protected PmbShortCharHandlingMode chooseShortCharHandlingMode(String propertyName, String value, Integer size)
+    { return PmbShortCharHandlingMode.${database.shortCharHandlingMode}; }
 
-    protected String convertEmptyToNull(String value) {
-	    return PmbCustodial.convertEmptyToNull(value);
-    }
-
-    protected String handleShortChar(String propertyName, String value, Integer size) {
-        ShortCharHandlingMode mode = chooseShortCharHandlingMode(propertyName, value, size);
-        return PmbCustodial.handleShortChar(propertyName, value, size, mode);
-    }
-
-    protected ShortCharHandlingMode chooseShortCharHandlingMode(String propertyName, String value, Integer size) {
-        return ShortCharHandlingMode.${database.shortCharHandlingMode};
-    }
-
+#end
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
-    protected void assertLikeSearchOptionValid(String name, LikeSearchOption option) {
-        if (option == null) {
-            String msg = "The like-search option is required!";
-            throw new RequiredOptionNotFoundException(msg);
-        }
-        if (option.isSplit()) {
-            String msg = "The split of like-search is NOT available on parameter-bean.";
-            msg = msg + " Don't use splitByXxx(): " + option;
-            throw new IllegalOutsideSqlOperationException(msg);
-        }
-    }
+    protected void assertLikeSearchOptionValid(String name, LikeSearchOption option) { PmbCustodial.assertLikeSearchOptionValid(name, option); }
 
 #end
     // -----------------------------------------------------
     //                                                  Date
     //                                                  ----
-#if ($database.isAvailableJodaTimeEntity())
-    protected Date toUtilDate(Object date) {
-        if (date != null && date instanceof ReadablePartial) {
-            return new Date(((ReadablePartial) date).toDateTime(null).getMillis());
-        } else if (date != null && date instanceof ReadableInstant) {
-            return new Date(((ReadableInstant) date).getMillis());
-        }
-#else
-    protected Date toUtilDate(Object date) {
-#end
-        return PmbCustodial.toUtilDate(date, _timeZone);
-    }
+    protected Date toUtilDate(Object date) { return PmbCustodial.toUtilDate(date, _timeZone); }
 #if ($database.isAvailableJava8TimeLocalDateEntity())
-
-    protected <DATE> DATE toLocalDate(Date date, Class<DATE> localType) {
-        return PmbCustodial.toLocalDate(date, localType, chooseRealTimeZone());
-    }
-#end
-#if ($database.isAvailableJodaTimeLocalDateEntity())
-
-    @SuppressWarnings("unchecked")
-    protected <DATE> DATE toLocalDate(Date date, Class<DATE> localType) {
-        if (LocalDate.class.isAssignableFrom(localType)) {
-            return (DATE)LocalDate.fromDateFields(date);
-        } else if (LocalDateTime.class.isAssignableFrom(localType)) {
-            return (DATE)LocalDateTime.fromDateFields(date);
-        }
-        return null; // unreachable
-    }
-#end
-
-    protected String formatUtilDate(Date date) {
-#if ($database.isDatabaseOracle())
-        String pattern = "yyyy-MM-dd HH:mm:ss"; // for Oracle
-#else
-        String pattern = "yyyy-MM-dd";
-#end
-        return PmbCustodial.formatUtilDate(date, pattern, _timeZone);
-    }
-
-#if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
-    protected void assertFromToOptionValid(String name, FromToOption option) {
-        PmbCustodial.assertFromToOptionValid(name, option);
-    }
-
-    protected FromToOption createFromToOption() {
-        return PmbCustodial.createFromToOption(_timeZone);
-    }
-
-#end
-    protected TimeZone chooseRealTimeZone() {
-        return PmbCustodial.chooseRealTimeZone(_timeZone);
-    }
+    protected <DATE> DATE toLocalDate(Date date, Class<DATE> localType) { return PmbCustodial.toLocalDate(date, localType, chooseRealTimeZone()); }
+    protected TimeZone chooseRealTimeZone() { return PmbCustodial.chooseRealTimeZone(_timeZone); }
 
     /**
      * Set time-zone, basically for LocalDate conversion. <br />
@@ -383,29 +296,22 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * (DBFlute system's time-zone is used as default)
      * @param timeZone The time-zone for filtering. (NullAllowed: if null, default zone)
      */
-    public void zone(TimeZone timeZone) {
-        _timeZone = timeZone;
-    }
+    public void zone(TimeZone timeZone) { _timeZone = timeZone; }
+#end
+#if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
+
+    protected void assertFromToOptionValid(String name, FromToOption option) { PmbCustodial.assertFromToOptionValid(name, option); }
+    protected FromToOption createFromToOption() { return PmbCustodial.createFromToOption(_timeZone); }
+#end
 
     // -----------------------------------------------------
-    //                                               Various
-    //                                               -------
-    protected <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) { // might be called by option handling
-        return PmbCustodial.toNumber(obj, type);
-    }
-
-    protected Boolean toBoolean(Object obj) {
-        return PmbCustodial.toBoolean(obj);
-    }
-
-    protected String formatByteArray(byte[] bytes) {
-        return PmbCustodial.formatByteArray(bytes);
-    }
-
+    //                                    by Option Handling
+    //                                    ------------------
+    // might be called by option handling
+    protected <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) { return PmbCustodial.toNumber(obj, type); }
+    protected Boolean toBoolean(Object obj) { return PmbCustodial.toBoolean(obj); }
     @SuppressWarnings("unchecked")
-    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) { // might be called by option handling
-        return PmbCustodial.newArrayList(elements);
-    }
+    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) { return PmbCustodial.newArrayList(elements); }
 
     // ===================================================================================
     //                                                                      Basic Override
@@ -427,9 +333,9 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($propertyType.equals("Date") || $propertyType.equals("java.util.Date"))
-        sb.append(dm).append(formatUtilDate(${variableName}));
+        sb.append(dm).append(PmbCustodial.formatUtilDate(${variableName}, "${database.utilDateDisplayPattern}", _timeZone));
 #elseif ($propertyType.equals("byte[]"))
-        sb.append(dm).append(formatByteArray(${variableName}));
+        sb.append(dm).append(PmbCustodial.formatByteArray(${variableName}));
 #else
         sb.append(dm).append(${variableName});
 #end

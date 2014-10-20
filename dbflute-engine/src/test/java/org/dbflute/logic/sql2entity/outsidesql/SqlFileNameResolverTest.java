@@ -16,13 +16,13 @@
 package org.dbflute.logic.sql2entity.outsidesql;
 
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlNameResolver;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  * @since 0.9.5 (2009/04/10 Friday)
  */
-public class SqlFileNameResolverTest extends PlainTestCase {
+public class SqlFileNameResolverTest extends EngineTestCase {
 
     // ===================================================================================
     //                                                                              Entity

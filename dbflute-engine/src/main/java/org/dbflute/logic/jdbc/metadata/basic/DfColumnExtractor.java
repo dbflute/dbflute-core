@@ -22,8 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.StringSet;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
@@ -33,6 +31,8 @@ import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.DfTypeMappingProperties;
 import org.dbflute.util.DfCollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -42,7 +42,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfColumnExtractor.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfColumnExtractor.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -71,8 +71,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param tableName The name of table. (NotNull, CaseInsensitiveByOption)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
-            throws SQLException {
+    public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName) throws SQLException {
         final String translatedName = translateTableCaseName(tableName);
         List<DfColumnMeta> ls = doGetColumnList(metaData, unifiedSchema, translatedName, false);
         if (isRetryCaseInsensitiveColumn()) {
@@ -86,8 +85,8 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
         return ls;
     }
 
-    protected List<DfColumnMeta> doGetColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, boolean retry) throws SQLException {
+    protected List<DfColumnMeta> doGetColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName, boolean retry)
+            throws SQLException {
         final List<DfColumnMeta> columnList = DfCollectionUtil.newArrayList();
 
         // Column names for duplicate check
@@ -169,8 +168,8 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
         return columnList;
     }
 
-    protected ResultSet extractColumnMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
-            boolean retry) throws SQLException {
+    protected ResultSet extractColumnMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName, boolean retry)
+            throws SQLException {
         final String catalogName = unifiedSchema.getPureCatalog();
         final String schemaName = unifiedSchema.getPureSchema();
         try {

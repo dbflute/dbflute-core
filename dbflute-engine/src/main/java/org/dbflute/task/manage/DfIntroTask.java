@@ -17,13 +17,13 @@ package org.dbflute.task.manage;
 
 import java.io.File;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.infra.dfprop.DfPropPublicMap;
 import org.dbflute.properties.DfInfraProperties;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -34,7 +34,7 @@ public class DfIntroTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfIntroTask.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfIntroTask.class);
     protected static final String DEFAULT_LOCATION_PATH = "../dbflute-intro.jar";
 
     // ===================================================================================

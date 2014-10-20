@@ -53,8 +53,8 @@ public abstract class AbstractOutsideSqlExecution extends AbstractFixedSqlExecut
      * @param argNameTypeMap The map of names and types for arguments. (NotNull)
      * @param twoWaySql The SQL string as 2Way-SQL. (NotNull)
      */
-    public AbstractOutsideSqlExecution(DataSource dataSource, StatementFactory statementFactory,
-            Map<String, Class<?>> argNameTypeMap, String twoWaySql) {
+    public AbstractOutsideSqlExecution(DataSource dataSource, StatementFactory statementFactory, Map<String, Class<?>> argNameTypeMap,
+            String twoWaySql) {
         super(dataSource, statementFactory, argNameTypeMap, twoWaySql);
     }
 

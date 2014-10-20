@@ -35,23 +35,22 @@ public class MelodicNodeAdviceFactory implements NodeAdviceFactory {
         return newMelodicBoundValueTracer(nameList, expression, specifiedSql, commentType);
     }
 
-    protected MelodicBoundValueTracer newMelodicBoundValueTracer(List<String> nameList, String expression,
-            String specifiedSql, ParameterCommentType commentType) {
+    protected MelodicBoundValueTracer newMelodicBoundValueTracer(List<String> nameList, String expression, String specifiedSql,
+            ParameterCommentType commentType) {
         return new MelodicBoundValueTracer(nameList, expression, specifiedSql, commentType);
     }
 
     @Override
-    public FilteringBindOption createInLoopLikeSearchOption(String likeDirection) {
+    public FilteringBindOption createInLoopLikeSearchOption(String mightBeLikeDirection) {
         final LikeSearchOption option = newLikeSearchOption();
-        if (likeDirection.equals(INLOOP_LIKE_PREFIX)) {
+        if (mightBeLikeDirection.equals(INLOOP_LIKE_PREFIX)) {
             return option.likePrefix();
-        } else if (likeDirection.equals(INLOOP_LIKE_SUFFIX)) {
+        } else if (mightBeLikeDirection.equals(INLOOP_LIKE_SUFFIX)) {
             return option.likeSuffix();
-        } else if (likeDirection.equals(INLOOP_LIKE_CONTAIN)) {
+        } else if (mightBeLikeDirection.equals(INLOOP_LIKE_CONTAIN)) {
             return option.likeContain();
-        } else { // basically no way
-            String msg = "Unknown direction of like-search: " + likeDirection;
-            throw new IllegalStateException(msg);
+        } else { // other options e.g. cls(...)
+            return null;
         }
     }
 

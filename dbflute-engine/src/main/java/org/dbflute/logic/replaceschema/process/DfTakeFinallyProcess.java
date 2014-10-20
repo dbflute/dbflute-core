@@ -24,8 +24,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.dbflute.exception.DfTakeFinallyNonAssertionSqlFoundException;
@@ -51,6 +49,8 @@ import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -61,8 +61,8 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfTakeFinallyProcess.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfTakeFinallyProcess.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -111,8 +111,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     public static DfTakeFinallyProcess createAsTakeAssert(String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
         final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null);
-        return process.suppressSequenceIncrement().skipIfNonAssetionSql().rollbackTransaction()
-                .continueIfAssetionFailure();
+        return process.suppressSequenceIncrement().skipIfNonAssetionSql().rollbackTransaction().continueIfAssetionFailure();
     }
 
     public static DfTakeFinallyProcess createAsAlterCheck(final String sqlRootDir, DataSource dataSource) {
@@ -177,8 +176,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         return finalInfo;
     }
 
-    protected DfSqlFileFireResult createFailureFireResult(DfTakeFinallyAssertionFailureException e,
-            DfSqlFileFireResult originalResult) {
+    protected DfSqlFileFireResult createFailureFireResult(DfTakeFinallyAssertionFailureException e, DfSqlFileFireResult originalResult) {
         final DfSqlFileFireResult fireResult = new DfSqlFileFireResult();
         fireResult.setExistsError(true);
         fireResult.setResultMessage("{Take Finally}: *asserted");
@@ -361,8 +359,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
-    protected DfTakeFinallyFinalInfo createFinalInfo(DfSqlFileFireResult fireResult,
-            DfTakeFinallyAssertionFailureException assertionEx) {
+    protected DfTakeFinallyFinalInfo createFinalInfo(DfSqlFileFireResult fireResult, DfTakeFinallyAssertionFailureException assertionEx) {
         final DfTakeFinallyFinalInfo finalInfo = new DfTakeFinallyFinalInfo();
         finalInfo.addTakeFinallySqlFileAll(_executedSqlFileList);
         if (fireResult != null) {

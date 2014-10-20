@@ -121,8 +121,8 @@ public abstract class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory
         bmd.setPropertyTypeFactory(createPropertyTypeFactory(beanClass, beanAnnotationReader, dbMetaData));
 
         final boolean stopRelationCreation = isLimitRelationNestLevel(relationNestLevel);
-        bmd.setRelationPropertyTypeFactory(createRelationPropertyTypeFactory(beanClass, bmd, beanAnnotationReader,
-                dbMetaData, relationNestLevel, stopRelationCreation));
+        bmd.setRelationPropertyTypeFactory(createRelationPropertyTypeFactory(beanClass, bmd, beanAnnotationReader, dbMetaData,
+                relationNestLevel, stopRelationCreation));
 
         bmd.setModifiedPropertySupport(createModifiedPropertySupport());
         bmd.initialize();
@@ -154,8 +154,8 @@ public abstract class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory
     // ===================================================================================
     //                                                                       Property Type
     //                                                                       =============
-    protected TnPropertyTypeFactory createPropertyTypeFactory(Class<?> beanClass,
-            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData) {
+    protected TnPropertyTypeFactory createPropertyTypeFactory(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader,
+            DatabaseMetaData dbMetaData) {
         return createPropertyTypeFactoryBuilder(dbMetaData).build(beanClass, beanAnnotationReader);
     }
 
@@ -164,8 +164,8 @@ public abstract class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory
     }
 
     protected abstract TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> beanClass,
-            TnBeanMetaDataImpl localBeanMetaData, TnBeanAnnotationReader beanAnnotationReader,
-            DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation);
+            TnBeanMetaDataImpl localBeanMetaData, TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData,
+            int relationNestLevel, boolean stopRelationCreation);
 
     // ===================================================================================
     //                                                                 Relation Next Level

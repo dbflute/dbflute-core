@@ -139,8 +139,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.apache.velocity.texen.util.FileUtil;
@@ -183,6 +181,8 @@ import org.dbflute.properties.initializer.DfAdditionalUniqueKeyInitializer;
 import org.dbflute.properties.initializer.DfIncludeQueryInitializer;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
 /**
@@ -195,8 +195,8 @@ public class Database {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(Database.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(Database.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -771,8 +771,7 @@ public class Database {
         return getPmbBasicHandler().needsFixedLengthStringHandling(className, propertyName);
     }
 
-    public boolean needsPmbMetaDataProcedureParameterObjectBindingBigDecimalHandling(String className,
-            String propertyName) {
+    public boolean needsPmbMetaDataProcedureParameterObjectBindingBigDecimalHandling(String className, String propertyName) {
         return getPmbBasicHandler().needsObjectBindingBigDecimalHandling(className, propertyName);
     }
 
@@ -792,10 +791,8 @@ public class Database {
         return getPmbBasicHandler().getProcedureParameterOracleArrayElementJavaNative(className, propertyName);
     }
 
-    public String getPmbMetaDataProcedureParameterOracleArrayElementJavaNativeTypeLiteral(String className,
-            String propertyName) {
-        return getPmbBasicHandler().getProcedureParameterOracleArrayElementJavaNativeTypeLiteral(className,
-                propertyName);
+    public String getPmbMetaDataProcedureParameterOracleArrayElementJavaNativeTypeLiteral(String className, String propertyName) {
+        return getPmbBasicHandler().getProcedureParameterOracleArrayElementJavaNativeTypeLiteral(className, propertyName);
     }
 
     public String getPmbMetaDataProcedureParameterOracleStructTypeName(String className, String propertyName) {
@@ -806,8 +803,7 @@ public class Database {
         return getPmbBasicHandler().getProcedureParameterOracleStructEntityType(className, propertyName);
     }
 
-    public String getPmbMetaDataProcedureParameterOracleStructEntityTypeTypeLiteral(String className,
-            String propertyName) {
+    public String getPmbMetaDataProcedureParameterOracleStructEntityTypeTypeLiteral(String className, String propertyName) {
         return getPmbBasicHandler().getProcedureParameterOracleStructEntityTypeTypeLiteral(className, propertyName);
     }
 
@@ -815,12 +811,7 @@ public class Database {
     //                                                Option
     //                                                ------
     public boolean hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter(String className, String propertyName) {
-        return getPmbBasicHandler().hasPropertyOptionOriginalOnlyOneSetter(className, propertyName,
-                _sql2entitySchemaData);
-    }
-
-    public boolean hasPmbMetaDataPropertyUseOriginalException(String className) {
-        return hasPmbMetaDataPropertyOptionAnyLikeSearch(className) || hasPmbMetaDataPropertyOptionAnyFromTo(className);
+        return getPmbBasicHandler().hasPropertyOptionOriginalOnlyOneSetter(className, propertyName, _sql2entitySchemaData);
     }
 
     // -----------------------------------------------------
@@ -885,8 +876,7 @@ public class Database {
     }
 
     public boolean isPmbMetaDataPropertyOptionClassificationSetter(String className, String propertyName) {
-        return getPmbBasicHandler()
-                .isPropertyOptionClassificationSetter(className, propertyName, _sql2entitySchemaData);
+        return getPmbBasicHandler().isPropertyOptionClassificationSetter(className, propertyName, _sql2entitySchemaData);
     }
 
     public boolean isPmbMetaDataPropertyOptionClassificationFixedElement(String className, String propertyName) {
@@ -909,10 +899,9 @@ public class Database {
         return getPmbBasicHandler().getPropertyOptionClassificationTop(className, propertyName, _sql2entitySchemaData);
     }
 
-    public String getPmbMetaDataPropertyOptionClassificationSettingElementValueExp(String className,
-            String propertyName, String element) {
-        return getPmbBasicHandler().getPropertyOptionClassificationSettingElementValueExp(className, propertyName,
-                element, _sql2entitySchemaData);
+    public String getPmbMetaDataPropertyOptionClassificationSettingElementValueExp(String className, String propertyName, String element) {
+        return getPmbBasicHandler().getPropertyOptionClassificationSettingElementValueExp(className, propertyName, element,
+                _sql2entitySchemaData);
     }
 
     // -----------------------------------------------------
@@ -950,6 +939,10 @@ public class Database {
             _log.debug(msg, e);
             throw e;
         }
+    }
+
+    public boolean hasPmbMetaDataPropertyRefColumnChar(String className) {
+        return getPmbBasicHandler().hasPropertyRefColumnChar(className, _sql2entitySchemaData);
     }
 
     public boolean isPmbMetaDataPropertyRefColumnChar(String className, String propertyName) {
@@ -1587,6 +1580,10 @@ public class Database {
         return getDatabaseProperties().hasCatalogAdditionalSchema();
     }
 
+    public String getUtilDateDisplayPattern() {
+        return isDatabaseOracle() ? "yyyy-MM-dd HH:mm:ss" : "yyyy-MM-dd";
+    }
+
     // ===================================================================================
     //                                                                Dependency Injection
     //                                                                ====================
@@ -1606,8 +1603,7 @@ public class Database {
         }
 
         // for compatibility and default value
-        final List<String> diconPackageNameList = getProperties().getDependencyInjectionProperties()
-                .getDBFluteDiconPackageNameList();
+        final List<String> diconPackageNameList = getProperties().getDependencyInjectionProperties().getDBFluteDiconPackageNameList();
         if (diconPackageNameList != null && !diconPackageNameList.isEmpty()) {
             return diconPackageNameList;
         } else {
@@ -1664,8 +1660,7 @@ public class Database {
         }
 
         // for compatibility and default value
-        final List<String> diconPackageNameList = getProperties().getDependencyInjectionProperties()
-                .getDBFluteBeansPackageNameList();
+        final List<String> diconPackageNameList = getProperties().getDependencyInjectionProperties().getDBFluteBeansPackageNameList();
         if (diconPackageNameList != null && !diconPackageNameList.isEmpty()) {
             return diconPackageNameList;
         } else {
@@ -1924,10 +1919,6 @@ public class Database {
         return getLittleAdjustmentProperties().isCDefToStringReturnsName();
     }
 
-    public boolean isMakeEntityOldStyleClassify() {
-        return getLittleAdjustmentProperties().isMakeEntityOldStyleClassify();
-    }
-
     public String getConditionQueryNotEqualDefinitionName() {
         return getLittleAdjustmentProperties().getConditionQueryNotEqualDefinitionName();
     }
@@ -1954,6 +1945,10 @@ public class Database {
 
     public boolean isOverridingQueryAllowed() {
         return getLittleAdjustmentProperties().isOverridingQueryAllowed();
+    }
+
+    public boolean isNonSpecifiedColumnAccessAllowed() {
+        return getLittleAdjustmentProperties().isNonSpecifiedColumnAccessAllowed();
     }
 
     public boolean isAvailableDatabaseNativeJDBC() {
@@ -2528,8 +2523,7 @@ public class Database {
         try {
             return TypeMap.findJavaNativeByJdbcType(jdbcType, null, null);
         } catch (RuntimeException e) {
-            _log.warn("TypeMap.findJavaNativeTypeString(jdbcType, null, null) threw the exception: jdbcType="
-                    + jdbcType, e);
+            _log.warn("TypeMap.findJavaNativeTypeString(jdbcType, null, null) threw the exception: jdbcType=" + jdbcType, e);
             throw e;
         }
     }

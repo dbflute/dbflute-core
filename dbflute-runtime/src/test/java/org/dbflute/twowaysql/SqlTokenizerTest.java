@@ -16,13 +16,13 @@
 package org.dbflute.twowaysql;
 
 import org.dbflute.exception.CommentTerminatorNotFoundException;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.5 (2009/04/08 Wednesday)
  */
-public class SqlTokenizerTest extends PlainTestCase {
+public class SqlTokenizerTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                                Skip

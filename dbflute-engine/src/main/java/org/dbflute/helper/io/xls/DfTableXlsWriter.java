@@ -269,8 +269,7 @@ public class DfTableXlsWriter implements DfDataSetConstants {
     // ===================================================================================
     //                                                                 Cell Value Handling
     //                                                                 ===================
-    protected void setupCellValueOfTableSheet(DfDataTable table, int columnIndex, HSSFRow row, HSSFCell cell,
-            Object value) {
+    protected void setupCellValueOfTableSheet(DfDataTable table, int columnIndex, HSSFRow row, HSSFCell cell, Object value) {
         doSetupCellValue(table, columnIndex, row, cell, value);
     }
 

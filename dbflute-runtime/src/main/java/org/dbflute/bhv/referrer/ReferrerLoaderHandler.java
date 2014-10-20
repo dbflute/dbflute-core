@@ -21,8 +21,8 @@ package org.dbflute.bhv.referrer;
  * MemberCB cb = new MemberCB();
  * cb.query().set...
  * List&lt;Member&gt; memberList = memberBhv.selectList(cb);
- * memberBhv.<span style="color: #DD4747">load</span>(memberList, loader -&gt; {
- *     loader.<span style="color: #DD4747">loadPurchaseList</span>(purchaseCB -&gt; {
+ * memberBhv.<span style="color: #CC4747">load</span>(memberList, loader -&gt; {
+ *     loader.<span style="color: #CC4747">loadPurchaseList</span>(purchaseCB -&gt; {
  *         purchaseCB.query().set...
  *         purchaseCB.query().addOrderBy_PurchasePrice_Desc();
  *     }); <span style="color: #3F7E5E">// you can also load nested referrer from here</span>
@@ -35,7 +35,7 @@ package org.dbflute.bhv.referrer;
  *     <span style="color: #3F7E5E">//loader.pulloutMemberStatus().loadMemberLoginList(...)</span>
  * }
  * for (Member member : memberList) {
- *     List&lt;Purchase&gt; purchaseList = member.<span style="color: #DD4747">getPurchaseList()</span>;
+ *     List&lt;Purchase&gt; purchaseList = member.<span style="color: #CC4747">getPurchaseList()</span>;
  *     for (Purchase purchase : purchaseList) {
  *         ...
  *     }
@@ -54,8 +54,8 @@ public interface ReferrerLoaderHandler<LOADER> {
      * MemberCB cb = new MemberCB();
      * cb.query().set...
      * List&lt;Member&gt; memberList = memberBhv.selectList(cb);
-     * memberBhv.<span style="color: #DD4747">load</span>(memberList, loader -&gt; {
-     *     loader.<span style="color: #DD4747">loadPurchaseList</span>(purchaseCB -&gt; {
+     * memberBhv.<span style="color: #CC4747">load</span>(memberList, loader -&gt; {
+     *     loader.<span style="color: #CC4747">loadPurchaseList</span>(purchaseCB -&gt; {
      *         purchaseCB.query().set...
      *         purchaseCB.query().addOrderBy_PurchasePrice_Desc();
      *     }); <span style="color: #3F7E5E">// you can also load nested referrer from here</span>
@@ -68,7 +68,7 @@ public interface ReferrerLoaderHandler<LOADER> {
      *     <span style="color: #3F7E5E">//loader.pulloutMemberStatus().loadMemberLoginList(...)</span>
      * }
      * for (Member member : memberList) {
-     *     List&lt;Purchase&gt; purchaseList = member.<span style="color: #DD4747">getPurchaseList()</span>;
+     *     List&lt;Purchase&gt; purchaseList = member.<span style="color: #CC4747">getPurchaseList()</span>;
      *     for (Purchase purchase : purchaseList) {
      *         ...
      *     }

@@ -181,8 +181,7 @@ public class DfDataTable {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected Map<String, DfColumnMeta> extractColumnMetaMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
-            throws SQLException {
+    protected Map<String, DfColumnMeta> extractColumnMetaMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) throws SQLException {
         final List<DfColumnMeta> metaList = _columnExtractor.getColumnList(metaData, unifiedSchema, _tableDbName);
         final Map<String, DfColumnMeta> metaMap = new HashMap<String, DfColumnMeta>();
         for (DfColumnMeta metaInfo : metaList) {

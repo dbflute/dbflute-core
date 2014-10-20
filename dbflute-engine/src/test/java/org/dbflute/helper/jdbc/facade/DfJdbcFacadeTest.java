@@ -21,12 +21,12 @@ import javax.sql.DataSource;
 
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.exception.SQLFailureException;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  */
-public class DfJdbcFacadeTest extends PlainTestCase {
+public class DfJdbcFacadeTest extends EngineTestCase {
 
     public void test_handleSQLException() throws Exception {
         // ## Arrange ##

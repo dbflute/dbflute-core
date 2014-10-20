@@ -34,6 +34,7 @@ import org.dbflute.exception.NonQueryDeleteNotAllowedException;
 import org.dbflute.exception.NonQueryUpdateNotAllowedException;
 import org.dbflute.exception.OptimisticLockColumnValueNullException;
 import org.dbflute.exception.PagingCountSelectNotCountException;
+import org.dbflute.exception.ScalarSelectValueNotFoundException;
 import org.dbflute.exception.SelectEntityConditionNotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.FetchBean;
@@ -51,7 +52,7 @@ public class BehaviorExceptionThrower {
     //                                                                              ======
     public void throwSelectEntityAlreadyDeletedException(Object searchKey) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The selected entity was NOT found! It has already been deleted.");
+        br.addNotice("Not found the entity by the condition. (might be deleted?)");
         br.addItem("Advice");
         br.addElement("Please confirm the existence of your target record on your database.");
         br.addElement("Does the target record really created before this operation?");
@@ -64,7 +65,7 @@ public class BehaviorExceptionThrower {
 
     public void throwSelectEntityDuplicatedException(String resultCountExp, Object searchKey, Throwable cause) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The selected entity was duplicated! It should be the only one.");
+        br.addNotice("Duplicate entity by the condition. (should be the only one)");
         br.addItem("Advice");
         br.addElement("Confirm your search condition. Does it really select the only one?");
         br.addElement("And confirm your database. Does it really exist the only one?");
@@ -193,8 +194,8 @@ public class BehaviorExceptionThrower {
         br.addElement(cb.toDisplaySql());
     }
 
-    public <ENTITY> void throwPagingCountSelectNotCountException(String tableDbName, String path, PagingBean pmb,
-            Class<ENTITY> entityType, EntityDuplicatedException e) { // for OutsideSql
+    public <ENTITY> void throwPagingCountSelectNotCountException(String tableDbName, String path, PagingBean pmb, Class<ENTITY> entityType,
+            EntityDuplicatedException e) { // for OutsideSql
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The count select for paging could not get a count.");
         br.addItem("Advice");
@@ -223,6 +224,41 @@ public class BehaviorExceptionThrower {
         throw new PagingCountSelectNotCountException(msg, e);
     }
 
+    public void throwScalarSelectValueNotFoundException(String title, ConditionBean cb, Class<?> resultType) {
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("Not found the selected scalar value by the condition.");
+        br.addItem("Advice");
+        br.addElement("No hit by the search condition or null-only column data.");
+        br.addElement("e.g. max(), min(), sun(), avg() can return null.");
+        br.addElement("");
+        br.addElement("So check the existence of your optional value.");
+        br.addElement("  (o):");
+        br.addElement("    memberBhv.scalarSelect(LocalDate.class).max(cb -> {");
+        br.addElement("        cb.specify().columnBirthdate();");
+        br.addElement("        cb.query()...");
+        br.addElement("    }).ifPresent(birthdate -> {");
+        br.addElement("        // birthdate is not null here");
+        br.addElement("    }).orElse(() -> {");
+        br.addElement("        // null birthdate");
+        br.addElement("    });");
+        br.addElement("");
+        br.addElement("And you can also set default value by coalesce() like this:");
+        br.addElement("  (o):");
+        br.addElement("    purchaseBhv.scalarSelect(Integer.class).avg(cb -> {");
+        br.addElement("        cb.specify().columnPurchasePrice();");
+        br.addElement("        cb.query()...");
+        br.addElement("    }, op -> op.coalesce(0)).alwaysPresent(price -> {");
+        br.addElement("        // price is not null here");
+        br.addElement("    });");
+        br.addItem("Function");
+        br.addElement(title);
+        br.addItem("Result Type");
+        br.addElement(resultType.getName());
+        setupDisplaySqlElement(br, cb);
+        final String msg = br.buildExceptionMessage();
+        throw new ScalarSelectValueNotFoundException(msg);
+    }
+
     // ===================================================================================
     //                                                                              Update
     //                                                                              ======
@@ -248,8 +284,7 @@ public class BehaviorExceptionThrower {
         br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
         br.addElement("Or if your process is insert(), you might expect identity.");
         br.addElement("Confirm the primary-key's identity setting.");
-        br.addItem("Entity");
-        br.addElement(entity);
+        setupEntityElement(br, entity);
         final String msg = br.buildExceptionMessage();
         throw new EntityPrimaryKeyNotFoundException(msg);
     }
@@ -276,8 +311,7 @@ public class BehaviorExceptionThrower {
         br.addElement("    entity.setFooDate(...);");
         br.addElement("    entity.uniqueByFooAccount(...);");
         br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
-        br.addItem("Entity");
-        br.addElement(entity);
+        setupEntityElement(br, entity);
         final String msg = br.buildExceptionMessage();
         throw new EntityUniqueKeyNotFoundException(msg);
     }

@@ -20,6 +20,7 @@ import org.dbflute.helper.HandyDate;
 /**
  * @author jflute
  */
+@FunctionalInterface
 public interface BusinessDayDeterminer {
 
     /**

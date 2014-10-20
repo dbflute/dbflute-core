@@ -23,13 +23,13 @@ import java.util.Map;
 
 import org.dbflute.exception.MapListStringDuplicateEntryException;
 import org.dbflute.exception.MapListStringParseFailureException;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.6.0 (2008/01/17 Thursday)
  */
-public class MapListStringTest extends PlainTestCase {
+public class MapListStringTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                               Build

@@ -19,12 +19,12 @@ import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class DfPropertyDescImplTest extends PlainTestCase {
+public class DfPropertyDescImplTest extends RuntimeTestCase {
 
     public void test_getValue_illegalProperty() throws Exception {
         // ## Arrange ##

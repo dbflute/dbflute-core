@@ -15,13 +15,13 @@
  */
 package org.dbflute.util;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.5.1 (2009/06/20 Saturday)
  */
-public class DfTraceViewUtilTest extends PlainTestCase {
+public class DfTraceViewUtilTest extends RuntimeTestCase {
 
     public void test_convertToPerformanceView_millis_basic() throws Exception {
         // ## Arrange & Act ##

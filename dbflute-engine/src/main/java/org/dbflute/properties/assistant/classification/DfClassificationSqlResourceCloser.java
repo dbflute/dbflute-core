@@ -20,9 +20,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.properties.DfClassificationProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -33,7 +33,7 @@ public class DfClassificationSqlResourceCloser {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfClassificationProperties.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfClassificationProperties.class);
 
     // ===================================================================================
     //                                                                               Close

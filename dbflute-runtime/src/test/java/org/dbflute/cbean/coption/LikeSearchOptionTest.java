@@ -18,14 +18,14 @@ package org.dbflute.cbean.coption;
 import java.util.Arrays;
 import java.util.List;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  * @since 0.5.9 (2007/12/20 Thursday)
  */
-public class LikeSearchOptionTest extends PlainTestCase {
+public class LikeSearchOptionTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                         Rear Option

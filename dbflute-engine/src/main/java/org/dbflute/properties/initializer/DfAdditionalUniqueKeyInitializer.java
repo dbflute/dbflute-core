@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.Unique;
@@ -29,6 +27,8 @@ import org.dbflute.exception.DfPropertySettingColumnNotFoundException;
 import org.dbflute.exception.DfPropertySettingTableNotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfAdditionalUniqueKeyProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The initializer of additional unique key.
@@ -40,8 +40,8 @@ public class DfAdditionalUniqueKeyInitializer {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfAdditionalUniqueKeyInitializer.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfAdditionalUniqueKeyInitializer.class);
 
     // ===================================================================================
     //                                                                           Attribute

@@ -15,8 +15,6 @@
  */
 package org.dbflute.friends.velocity;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -31,12 +29,6 @@ import org.dbflute.util.DfTypeUtil;
  * @since 0.9.5.1 (2009/06/23 Tuesday)
  */
 public class DfFlutistLog4JLogSystem extends Log4JLogChute {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance for DBFlute log. */
-    private static final Log _log = LogFactory.getLog(DfFlutistLog4JLogSystem.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -63,7 +55,8 @@ public class DfFlutistLog4JLogSystem extends Log4JLogChute {
             log(0, ""); // as begin mark.
             log(0, DfTypeUtil.toClassTitle(this) + " initialized using logfile '" + logfile + "'");
         } catch (Exception e) {
-            _log.warn("PANIC : error configuring " + DfTypeUtil.toClassTitle(this) + " : ", e);
+            System.out.println("PANIC : error configuring " + DfTypeUtil.toClassTitle(this));
+            e.printStackTrace();
         }
     }
 

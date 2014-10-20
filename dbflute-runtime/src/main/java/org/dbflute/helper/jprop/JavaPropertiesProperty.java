@@ -68,8 +68,7 @@ public class JavaPropertiesProperty {
             try {
                 DfTypeUtil.toInteger(_propertyValue);
                 return true;
-            } catch (NumberFormatException ignored) {
-            }
+            } catch (NumberFormatException ignored) {}
         }
         return false;
     }
@@ -79,8 +78,7 @@ public class JavaPropertiesProperty {
             try {
                 DfTypeUtil.toLong(_propertyValue);
                 return true;
-            } catch (NumberFormatException ignored) {
-            }
+            } catch (NumberFormatException ignored) {}
         }
         return false;
     }
@@ -90,8 +88,7 @@ public class JavaPropertiesProperty {
             try {
                 DfTypeUtil.toBigDecimal(_propertyValue);
                 return true;
-            } catch (NumberFormatException ignored) {
-            }
+            } catch (NumberFormatException ignored) {}
         }
         return false;
     }
@@ -101,8 +98,7 @@ public class JavaPropertiesProperty {
             try {
                 DfTypeUtil.toDate(_propertyValue);
                 return true;
-            } catch (RuntimeException ignored) {
-            }
+            } catch (RuntimeException ignored) {}
         }
         return false;
     }

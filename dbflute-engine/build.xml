@@ -6,9 +6,9 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1" />
-	<property name="build.version" value="${version}-pilot1-SNAPSHOT" />
+	<property name="build.version" value="${version}-pilot6-SNAPSHOT" />
 	<property name="runtime.version" value="1.1" />
-	<property name="runtime.build.version" value="${runtime.version}-pilot1-SNAPSHOT" />
+	<property name="runtime.build.version" value="${runtime.version}-pilot6-SNAPSHOT" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
@@ -16,6 +16,8 @@
 	<property name="dbflute.base" value="${workspace.base}/dbflute-core" />
 	<property name="dbflute.www.base" value="${workspace.base}/dbflute-www" />
 	<property name="test.active.stage.base" value="${workspace.base}" />
+	<property name="test.dbms.stage.base" value="${workspace.base}" />
+	<property name="test.option.stage.base" value="${workspace.base}" />
 	<property name="example.container.base" value="${workspace.base}/dbflute-example-container" />
 	<property name="example.database.base" value="${workspace.base}/dbflute-example-database" />
 	<property name="example.multipledb.base" value="${workspace.base}/dbflute-example-multipledb" />
@@ -45,6 +47,13 @@
 	<!-- Test: Active Stage -->
 	<property name="test.active.dockside.dir" value="${test.active.stage.base}/dbflute-test-active-dockside" />
 	<property name="test.active.hanger.dir" value="${test.active.stage.base}/dbflute-test-active-hanger" />
+
+	<!-- Test: DBMS Stage -->
+	<property name="test.dbms.mysql.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-mysql" />
+	<property name="test.dbms.postgresql.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-postgresql" />
+
+	<!-- Test: Option Stage -->
+	<property name="test.option.compatible10x.dir" value="${test.option.stage.base}/dbflute-test-option-compatible10x" />
 
 	<!-- Database Examples -->
 	<property name="mysql.example.dir" value="${example.database.base}/dbflute-mysql-example" />
@@ -180,6 +189,9 @@
 			<zipfileset prefix="etc/logprop" dir="${embedded}/etc/logprop">
 				<include name="log4j.properties" />
 			</zipfileset>
+			<zipfileset prefix="etc/friends/eclipse" dir="${embedded}/etc/friends/eclipse">
+				<include name="*.xml" />
+			</zipfileset>
 			<zipfileset prefix="lib" dir="${embedded}/lib">
 				<include name="*.jar" />
 				<include name="*.zip" />
@@ -239,17 +251,18 @@
 	</target>
 
 	<!-- ============================================================================= -->
-	<!--                                                        E X A M P L E  T A S K -->
-	<!--                                                        ====================== -->
+	<!--                                                              T E S T  T A S K -->
+	<!--                                                              ================ -->
 
-	<!-- for example projects -->
+	<!-- for test projects -->
 	<target name="prepare-reflection">
 		<delete dir="${extraction.dir}" />
 		<unzip src="${dist}/${module.zip}" dest="${extraction.dir}" />
 		<chmod dir="${extraction.dir}/ant/bin" perm="ugo+rx" includes="**/*" />
 	</target>
 
-	<target name="reflect-to-test-active-dockside" depends="prepare-reflection" description="==> reflect to test active dockside">
+	<target name="reflect-to-test-active-dockside" depends="prepare-reflection"
+			description="==> reflect to test as active dockside">
 		<delete dir="${test.active.dockside.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${test.active.dockside.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
@@ -257,9 +270,37 @@
 		<delete dir="${extraction.dir}" />
 	</target>
 
-	<target name="reflect-to-test-active-hanger" depends="prepare-reflection" description="==> reflect to test active hanger">
+	<target name="reflect-to-test-active-hanger" depends="prepare-reflection"
+			description="==> reflect to test as active hanger">
 		<delete dir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-test-dbms-mysql" depends="prepare-reflection"
+			description="==> reflect to test of DBMS MySQL">
+		<delete dir="${test.dbms.mysql.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.dbms.mysql.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-test-dbms-postgresql" depends="prepare-reflection"
+			description="==> reflect to test of DBMS PostgreSQL">
+		<delete dir="${test.dbms.postgresql.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.dbms.postgresql.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-test-option-compatible10x" depends="prepare-reflection"
+			description="==> reflect to test of option for compatible10x">
+		<delete dir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />

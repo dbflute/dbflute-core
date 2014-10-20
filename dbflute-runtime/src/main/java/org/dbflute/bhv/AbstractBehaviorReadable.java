@@ -40,6 +40,7 @@ import org.dbflute.bhv.core.command.SelectNextValCommand;
 import org.dbflute.bhv.core.command.SelectNextValSubCommand;
 import org.dbflute.bhv.core.command.SelectScalarCBCommand;
 import org.dbflute.bhv.exception.BehaviorExceptionThrower;
+import org.dbflute.bhv.readable.CBCall;
 import org.dbflute.bhv.readable.EntityRowHandler;
 import org.dbflute.bhv.referrer.LoadReferrerOption;
 import org.dbflute.bhv.referrer.NestedReferrerListGateway;
@@ -67,7 +68,7 @@ import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.derived.DerivedMappable;
+import org.dbflute.dbmeta.accessory.DerivedMappable;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
@@ -82,9 +83,9 @@ import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.optional.OptionalEntity;
-import org.dbflute.optional.OptionalObjectExceptionThrower;
+import org.dbflute.optional.OptionalThingExceptionThrower;
 import org.dbflute.optional.RelationOptionalFactory;
-import org.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
+import org.dbflute.outsidesql.executor.OutsideSqlAllFacadeExecutor;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfReflectionUtil;
@@ -97,8 +98,7 @@ import org.dbflute.util.Srl;
  * @param <CB> The type of condition-bean handled by this behavior.
  * @author jflute
  */
-public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends ConditionBean> implements
-        BehaviorReadable {
+public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends ConditionBean> implements BehaviorReadable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -135,6 +135,13 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     @SuppressWarnings("unchecked")
     public ENTITY newEntity() {
         return (ENTITY) getDBMeta().newEntity();
+    }
+
+    protected CB createCB(CBCall<CB> cbCall) { // CB from callback
+        assertCBCallNotNull(cbCall);
+        final CB cb = newConditionBean();
+        cbCall.callback(cb);
+        return cb;
     }
 
     /** {@inheritDoc} */
@@ -221,8 +228,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return (RESULT) ls.get(0);
     }
 
-    protected <RESULT extends ENTITY> RESULT helpSelectEntityWithDeletedCheckInternally(CB cb,
-            Class<? extends RESULT> entityType) {
+    protected <RESULT extends ENTITY> RESULT helpSelectEntityWithDeletedCheckInternally(CB cb, Class<? extends RESULT> entityType) {
         final RESULT entity = helpSelectEntityInternally(cb, entityType);
         assertEntityNotDeleted(entity, cb);
         return entity;
@@ -307,7 +313,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     protected abstract Entity doReadEntity(ConditionBean cb);
 
     protected <RESULT> OptionalEntity<RESULT> createOptionalEntity(RESULT entity, final Object... searchKey) {
-        return new OptionalEntity<RESULT>(entity, new OptionalObjectExceptionThrower() {
+        return new OptionalEntity<RESULT>(entity, new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
                 throwSelectEntityAlreadyDeletedException(searchKey);
             }
@@ -343,8 +349,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                       Internal Helper
     //                                       ---------------
-    protected <RESULT extends ENTITY> ListResultBean<RESULT> helpSelectListInternally(CB cb,
-            Class<? extends RESULT> entityType) {
+    protected <RESULT extends ENTITY> ListResultBean<RESULT> helpSelectListInternally(CB cb, Class<? extends RESULT> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
         try {
             final List<RESULT> selectedList = delegateSelectList(cb, entityType);
@@ -355,8 +360,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected <RESULT extends Entity> ListResultBean<RESULT> createListResultBean(ConditionBean cb,
-            List<RESULT> selectedList) {
+    protected <RESULT extends Entity> ListResultBean<RESULT> createListResultBean(ConditionBean cb, List<RESULT> selectedList) {
         return new ResultBeanBuilder<RESULT>(getTableDbName()).buildListResultBean(cb, selectedList);
     }
 
@@ -402,8 +406,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return helpSelectPageInternally(cb, entityType);
     }
 
-    protected <RESULT extends ENTITY> PagingResultBean<RESULT> helpSelectPageInternally(CB cb,
-            Class<? extends RESULT> entityType) {
+    protected <RESULT extends ENTITY> PagingResultBean<RESULT> helpSelectPageInternally(CB cb, Class<? extends RESULT> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
         try {
             final PagingHandler<RESULT> handler = createPagingHandler(cb, entityType);
@@ -415,8 +418,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected <RESULT extends ENTITY> PagingHandler<RESULT> createPagingHandler(final CB cb,
-            final Class<? extends RESULT> entityType) {
+    protected <RESULT extends ENTITY> PagingHandler<RESULT> createPagingHandler(final CB cb, final Class<? extends RESULT> entityType) {
         return new PagingHandler<RESULT>() {
             public PagingBean getPagingBean() {
                 return cb;
@@ -473,8 +475,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         doSelectCursor(cb, entityRowHandler, typeOfSelectedEntity());
     }
 
-    protected <RESULT extends ENTITY> void doSelectCursor(CB cb, EntityRowHandler<RESULT> handler,
-            Class<? extends RESULT> entityType) {
+    protected <RESULT extends ENTITY> void doSelectCursor(CB cb, EntityRowHandler<RESULT> handler, Class<? extends RESULT> entityType) {
         assertCBStateValid(cb);
         assertObjectNotNull("entityRowHandler", handler);
         assertObjectNotNull("entityType", entityType);
@@ -497,8 +498,8 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected <RESULT extends ENTITY> void helpSelectCursorHandlingByPaging(CB cb,
-            EntityRowHandler<RESULT> entityRowHandler, Class<? extends RESULT> entityType, CursorSelectOption option) {
+    protected <RESULT extends ENTITY> void helpSelectCursorHandlingByPaging(CB cb, EntityRowHandler<RESULT> entityRowHandler,
+            Class<? extends RESULT> entityType, CursorSelectOption option) {
         helpSelectCursorCheckingByPagingAllowed(cb, option);
         helpSelectCursorCheckingOrderByPK(cb, option);
         final int pageSize = option.getPageSize();
@@ -561,8 +562,11 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         };
     }
 
-    protected <RESULT> HpSLSFunction<CB, RESULT> createSLSFunction(CB cb, Class<RESULT> resultType,
-            HpSLSExecutor<CB, RESULT> exec) {
+    protected <RESULT> HpSLSFunction<CB, RESULT> createSLSFunction(CB cb, Class<RESULT> resultType, HpSLSExecutor<CB, RESULT> exec) {
+        return newSLSFunction(cb, resultType, exec);
+    }
+
+    protected <RESULT> HpSLSFunction<CB, RESULT> newSLSFunction(CB cb, Class<RESULT> resultType, HpSLSExecutor<CB, RESULT> exec) {
         return new HpSLSFunction<CB, RESULT>(cb, resultType, exec);
     }
 
@@ -588,7 +592,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     /**
      * {@inheritDoc}
      */
-    public <BEHAVIOR extends BehaviorReadable> OutsideSqlBasicExecutor<BEHAVIOR> readyOutsideSql() {
+    public <BEHAVIOR extends BehaviorReadable> OutsideSqlAllFacadeExecutor<BEHAVIOR> readyOutsideSql() {
         return doOutsideSql();
     }
 
@@ -596,11 +600,11 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      * Prepare an outside-SQL execution by returning an instance of the executor for outside-SQL. <br />
      * It's an extension point for your adding original customization to outside-SQL executions.
      * @param <BEHAVIOR> The type of behavior.
-     * @return The basic executor for outside-SQL. (NotNull) 
+     * @return The facade for outside-SQL. (NotNull)
      */
-    protected <BEHAVIOR extends BehaviorReadable> OutsideSqlBasicExecutor<BEHAVIOR> doOutsideSql() {
+    protected <BEHAVIOR extends BehaviorReadable> OutsideSqlAllFacadeExecutor<BEHAVIOR> doOutsideSql() {
         assertBehaviorCommandInvoker("outsideSql");
-        return _behaviorCommandInvoker.createOutsideSqlBasicExecutor(getTableDbName());
+        return _behaviorCommandInvoker.createOutsideSqlAllFacadeExecutor(getTableDbName());
     }
 
     // ===================================================================================
@@ -654,8 +658,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             callback = xcreateLoadReferrerCallback(referrerProperty, dbmeta, referrerInfo, referrerBhv, pkCol, fkCol);
         } else { // compound key
             final Set<ColumnInfo> fkColSet = mappingColMap.keySet();
-            callback = xcreateLoadReferrerCallback(referrerProperty, dbmeta, referrerInfo, referrerBhv, pkColSet,
-                    fkColSet, mappingColMap);
+            callback = xcreateLoadReferrerCallback(referrerProperty, dbmeta, referrerInfo, referrerBhv, pkColSet, fkColSet, mappingColMap);
         }
         return helpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
     }
@@ -820,8 +823,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     }
 
     @SuppressWarnings("unchecked")
-    protected <KEY> KEY xconvertFK2PKImplicitly(String referrerProperty, Class<?> fkType, Class<?> pkType,
-            Object fkValue) {
+    protected <KEY> KEY xconvertFK2PKImplicitly(String referrerProperty, Class<?> fkType, Class<?> pkType, Object fkValue) {
         // DB-able entity does not support optional for property
         // only supported in immutable entity
         final KEY realValue;
@@ -1110,8 +1112,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         assertObjectNotNull("LoadReferrer's handler", handler);
     }
 
-    protected void xassLRArg(List<? extends Entity> entityList,
-            ReferrerConditionSetupper<? extends ConditionBean> setupper) {
+    protected void xassLRArg(List<? extends Entity> entityList, ReferrerConditionSetupper<? extends ConditionBean> setupper) {
         assertObjectNotNull("LoadReferrer's entityList", entityList);
         assertObjectNotNull("LoadReferrer's setupper", setupper);
     }
@@ -1127,8 +1128,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         assertObjectNotNull("LoadReferrer's loadReferrerOption", loadReferrerOption);
     }
 
-    protected void xassLRArg(Entity entity,
-            LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
+    protected void xassLRArg(Entity entity, LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
         assertObjectNotNull("LoadReferrer's entity", entity);
         assertObjectNotNull("LoadReferrer's loadReferrerOption", loadReferrerOption);
     }
@@ -1178,8 +1178,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         Map<Integer, List<FOREIGN_ENTITY>> foreignCollisionMap = null; // lazy-loaded
         final Map<FOREIGN_ENTITY, List<LOCAL_ENTITY>> foreignReferrerMap = new LinkedHashMap<FOREIGN_ENTITY, List<LOCAL_ENTITY>>();
         for (LOCAL_ENTITY localEntity : localEntityList) {
-            final FOREIGN_ENTITY foreignEntity = xextractPulloutForeignEntity(foreignInfo, reverseInfo,
-                    optionalFactory, localEntity);
+            final FOREIGN_ENTITY foreignEntity = xextractPulloutForeignEntity(foreignInfo, reverseInfo, optionalFactory, localEntity);
             if (foreignEntity == null) {
                 continue;
             }
@@ -1214,8 +1213,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             for (Entry<FOREIGN_ENTITY, List<LOCAL_ENTITY>> entry : foreignReferrerMap.entrySet()) {
                 final FOREIGN_ENTITY foreignEntity = entry.getKey();
                 final List<LOCAL_ENTITY> mappedLocalList = entry.getValue();
-                final Object writtenObj = xextractPulloutReverseWrittenObject(foreignInfo, reverseInfo,
-                        optionalFactory, mappedLocalList);
+                final Object writtenObj = xextractPulloutReverseWrittenObject(foreignInfo, reverseInfo, optionalFactory, mappedLocalList);
                 reverseInfo.write(foreignEntity, writtenObj);
             }
         }
@@ -1224,8 +1222,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
 
     @SuppressWarnings("unchecked")
     protected <LOCAL_ENTITY extends Entity, FOREIGN_ENTITY extends Entity> FOREIGN_ENTITY xextractPulloutForeignEntity(
-            ForeignInfo foreignInfo, RelationInfo reverseInfo, RelationOptionalFactory optionalFactory,
-            LOCAL_ENTITY localEntity) {
+            ForeignInfo foreignInfo, RelationInfo reverseInfo, RelationOptionalFactory optionalFactory, LOCAL_ENTITY localEntity) {
         final Object mightBeOptional = foreignInfo.read(localEntity); // non-reflection
         final FOREIGN_ENTITY foreignEntity;
         if (optionalFactory.isOptional(mightBeOptional)) {
@@ -1287,8 +1284,8 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return foreignCollisionMap;
     }
 
-    protected <LOCAL_ENTITY extends Entity> Object xextractPulloutReverseWrittenObject(ForeignInfo foreignInfo,
-            RelationInfo reverseInfo, RelationOptionalFactory optionalFactory, List<LOCAL_ENTITY> mappedLocalList) {
+    protected <LOCAL_ENTITY extends Entity> Object xextractPulloutReverseWrittenObject(ForeignInfo foreignInfo, RelationInfo reverseInfo,
+            RelationOptionalFactory optionalFactory, List<LOCAL_ENTITY> mappedLocalList) {
         final Object writtenObj;
         if (foreignInfo.isOneToOne()) {
             if (mappedLocalList != null && !mappedLocalList.isEmpty()) { // should have only one element
@@ -1307,8 +1304,8 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return writtenObj;
     }
 
-    protected <FOREIGN_ENTITY extends Entity> List<FOREIGN_ENTITY> xpreparePulloutResultList(
-            Map<Integer, FOREIGN_ENTITY> foreignBasicMap, Map<Integer, List<FOREIGN_ENTITY>> foreignCollisionMap) {
+    protected <FOREIGN_ENTITY extends Entity> List<FOREIGN_ENTITY> xpreparePulloutResultList(Map<Integer, FOREIGN_ENTITY> foreignBasicMap,
+            Map<Integer, List<FOREIGN_ENTITY>> foreignCollisionMap) {
         final List<FOREIGN_ENTITY> resultList = new ArrayList<FOREIGN_ENTITY>(foreignBasicMap.size() + 1); // + collision
         for (Entry<Integer, FOREIGN_ENTITY> entry : foreignBasicMap.entrySet()) {
             final FOREIGN_ENTITY foreignEntity = entry.getValue();
@@ -1342,16 +1339,16 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // ===================================================================================
     //                                                                      Extract Column
     //                                                                      ==============
-    protected <LOCAL_ENTITY extends Entity, COLUMN> List<COLUMN> helpExtractListInternally(
-            List<LOCAL_ENTITY> localEntityList, String propertyName) {
+    protected <LOCAL_ENTITY extends Entity, COLUMN> List<COLUMN> helpExtractListInternally(List<LOCAL_ENTITY> localEntityList,
+            String propertyName) {
         assertObjectNotNull("localEntityList", localEntityList);
         assertObjectNotNull("propertyName", propertyName);
         final List<COLUMN> valueList = new ArrayList<COLUMN>();
         return xdoHelpExtractSetInternally(localEntityList, propertyName, valueList);
     }
 
-    protected <LOCAL_ENTITY extends Entity, COLUMN> Set<COLUMN> helpExtractSetInternally(
-            List<LOCAL_ENTITY> localEntityList, String propertyName) {
+    protected <LOCAL_ENTITY extends Entity, COLUMN> Set<COLUMN> helpExtractSetInternally(List<LOCAL_ENTITY> localEntityList,
+            String propertyName) {
         assertObjectNotNull("localEntityList", localEntityList);
         assertObjectNotNull("propertyName", propertyName);
         final Set<COLUMN> valueSet = new LinkedHashSet<COLUMN>();
@@ -1400,8 +1397,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         invoke(createSelectCursorCBCommand(cb, handler, entityType));
     }
 
-    protected <RESULT extends ENTITY> List<RESULT> delegateSelectList(ConditionBean cb,
-            Class<? extends RESULT> entityType) {
+    protected <RESULT extends ENTITY> List<RESULT> delegateSelectList(ConditionBean cb, Class<? extends RESULT> entityType) {
         return invoke(createSelectListCBCommand(cb, entityType));
     }
 
@@ -1409,8 +1405,8 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return invoke(createSelectNextValCommand(resultType));
     }
 
-    protected <RESULT> RESULT delegateSelectNextValSub(Class<RESULT> resultType, String columnDbName,
-            String sequenceName, Integer incrementSize, Integer cacheSize) {
+    protected <RESULT> RESULT delegateSelectNextValSub(Class<RESULT> resultType, String columnDbName, String sequenceName,
+            Integer incrementSize, Integer cacheSize) {
         return invoke(createSelectNextValSubCommand(resultType, columnDbName, sequenceName, incrementSize, cacheSize));
     }
 
@@ -1506,8 +1502,8 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return new SelectNextValCommand<RESULT>();
     }
 
-    protected <RESULT> SelectNextValCommand<RESULT> createSelectNextValSubCommand(Class<RESULT> resultType,
-            String columnDbName, String sequenceName, Integer incrementSize, Integer cacheSize) {
+    protected <RESULT> SelectNextValCommand<RESULT> createSelectNextValSubCommand(Class<RESULT> resultType, String columnDbName,
+            String sequenceName, Integer incrementSize, Integer cacheSize) {
         assertBehaviorCommandInvoker("createSelectNextValCommand");
         final SelectNextValSubCommand<RESULT> cmd = newSelectNextValSubCommand();
         xsetupSelectCommand(cmd);
@@ -1525,8 +1521,8 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return new SelectNextValSubCommand<RESULT>();
     }
 
-    protected <RESULT> SelectScalarCBCommand<RESULT> createSelectScalarCBCommand(ConditionBean cb,
-            Class<RESULT> resultType, SelectClauseType selectClauseType) {
+    protected <RESULT> SelectScalarCBCommand<RESULT> createSelectScalarCBCommand(ConditionBean cb, Class<RESULT> resultType,
+            SelectClauseType selectClauseType) {
         assertBehaviorCommandInvoker("createSelectScalarCBCommand");
         final SelectScalarCBCommand<RESULT> cmd = newSelectScalarCBCommand();
         xsetupSelectCommand(cmd);
@@ -1636,7 +1632,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         if (relationRow != null) {
             result = factory.createOptionalPresentEntity(relationRow);
         } else {
-            result = factory.createOptionalNullEntity(new OptionalObjectExceptionThrower() {
+            result = factory.createOptionalNullEntity(new OptionalThingExceptionThrower() {
                 public void throwNotFoundException() {
                     String msg = "Not found the relation row for: " + relationTitle;
                     throw new EntityAlreadyDeletedException(msg);
@@ -1796,6 +1792,14 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     }
 
     /**
+     * Assert that the callback of condition-bean is not null.
+     * @param cbCall The interface of condition-bean to be checked. (NotNull)
+     */
+    protected void assertCBCallNotNull(CBCall<CB> cbCall) {
+        assertObjectNotNull("cbLambda", cbCall);
+    }
+
+    /**
      * Assert that the condition-bean is not null.
      * @param cb The instance of condition-bean to be checked. (NotNull)
      */
@@ -1832,8 +1836,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         assertSpecifyDerivedReferrerEntityProperty(cb, entityType);
     }
 
-    protected <RESULT extends ENTITY> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb,
-            Class<RESULT> entityType) {
+    protected <RESULT extends ENTITY> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb, Class<RESULT> entityType) {
         final List<String> aliasList = cb.getSqlClause().getSpecifiedDerivingAliasList();
         if (aliasList.isEmpty()) {
             return;

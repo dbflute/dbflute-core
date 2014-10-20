@@ -39,8 +39,7 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param primaryKeyColumnInfo The meta information of primary-key column.
      * @return The determination, true or false.
      */
-    public boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableInfo, DfColumnMeta primaryKeyColumnInfo)
-            throws SQLException {
+    public boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableInfo, DfColumnMeta primaryKeyColumnInfo) throws SQLException {
         if (analyzeByDatabaseDependencyMeta(tableInfo, primaryKeyColumnInfo)) {
             return true;
         }
@@ -63,13 +62,11 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param primaryKeyColumnName The name of primary-key column.
      * @return The determination, true or false.
      */
-    public boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName)
-            throws SQLException {
+    public boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName) throws SQLException {
         return analyzeByResultSetMeta(conn, tableInfo, primaryKeyColumnName);
     }
 
-    protected boolean analyzeByResultSetMeta(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName)
-            throws SQLException {
+    protected boolean analyzeByResultSetMeta(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName) throws SQLException {
         final String tableSqlName = tableInfo.getTableSqlName();
         final String sql = buildMetaDataSql(primaryKeyColumnName, tableSqlName);
         Statement st = null;
@@ -108,14 +105,12 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
             if (st != null) {
                 try {
                     st.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }

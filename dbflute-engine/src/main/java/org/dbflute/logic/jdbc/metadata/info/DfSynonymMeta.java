@@ -98,12 +98,11 @@ public class DfSynonymMeta {
         }
         final String synonymSchema = _synonymOwner != null ? _synonymOwner.getPureSchema() : "";
         final String tableSchema = _tableOwner != null ? _tableOwner.getPureSchema() : "";
-        return synonymSchema + "." + _synonymName + ":{" + (_dbLinkName != null ? _dbLinkName : tableSchema) + "."
-                + _tableName + columns + ", PK=" + _primaryKey + (_autoIncrement ? ", ID" : "") + ", "
+        return synonymSchema + "." + _synonymName + ":{" + (_dbLinkName != null ? _dbLinkName : tableSchema) + "." + _tableName + columns
+                + ", PK=" + _primaryKey + (_autoIncrement ? ", ID" : "") + ", "
                 + (_uniqueKeyMap != null ? "UQ=" + _uniqueKeyMap.size() : null) + ", "
-                + (_foreignKeyMap != null ? "FK=" + _foreignKeyMap.size() : null) + ", "
-                + (_selectable ? "selectable" : "unselectable") + "}"
-                + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
+                + (_foreignKeyMap != null ? "FK=" + _foreignKeyMap.size() : null) + ", " + (_selectable ? "selectable" : "unselectable")
+                + "}" + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
     }
 
     // ===================================================================================

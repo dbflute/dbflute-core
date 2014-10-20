@@ -27,8 +27,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.DfBuildProperties;
@@ -46,6 +44,8 @@ import org.dbflute.helper.token.file.FileMakingRowWriter;
 import org.dbflute.helper.token.file.FileToken;
 import org.dbflute.properties.DfAdditionalTableProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -56,8 +56,8 @@ public class DfLReverseOutputHandler {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfLReverseOutputHandler.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfLReverseOutputHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -117,8 +117,8 @@ public class DfLReverseOutputHandler {
      * @param xlsFile The file of XLS. (NotNull)
      * @param sectionInfoList The list of section info. (NotNull)
      */
-    protected void transferToXls(Map<String, Table> tableMap, Map<String, DfLReverseDataResult> loadDataMap, int limit,
-            File xlsFile, List<String> sectionInfoList) {
+    protected void transferToXls(Map<String, Table> tableMap, Map<String, DfLReverseDataResult> loadDataMap, int limit, File xlsFile,
+            List<String> sectionInfoList) {
         final DfDataSet dataSet = new DfDataSet();
         int index = 0;
         for (Entry<String, Table> entry : tableMap.entrySet()) {
@@ -141,8 +141,8 @@ public class DfLReverseOutputHandler {
     // ===================================================================================
     //                                                                            Xls Data
     //                                                                            ========
-    protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList,
-            int index, List<String> sectionInfoList) {
+    protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList, int index,
+            List<String> sectionInfoList) {
         final List<Map<String, String>> recordList;
         {
             final String tableInfo = "  " + table.getTableDispName() + " (" + extractedList.size() + ")";

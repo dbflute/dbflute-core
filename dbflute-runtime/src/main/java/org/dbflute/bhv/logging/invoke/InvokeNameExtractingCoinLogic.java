@@ -35,8 +35,7 @@ public class InvokeNameExtractingCoinLogic {
      * @param stackTrace Stack log. (NotNull)
      * @return The list of result of invoke name. (NotNull: If not found, returns empty string.)
      */
-    public List<InvokeNameResult> extractInvokeName(InvokeNameExtractingResource resource,
-            StackTraceElement[] stackTrace) {
+    public List<InvokeNameResult> extractInvokeName(InvokeNameExtractingResource resource, StackTraceElement[] stackTrace) {
         final InvokeNameExtractor extractor = createInvokeNameExtractor(stackTrace);
         return extractor.extractInvokeName(resource);
     }

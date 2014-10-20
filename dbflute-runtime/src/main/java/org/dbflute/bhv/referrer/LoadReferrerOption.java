@@ -58,7 +58,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
      * });
      * 
      * <span style="color: #3F7E5E">// PURCHASE_DETAIL (second level referrer from PURCHASE)</span>
-     * option.<span style="color: #DD4747">setEntityListSetupper</span>(new EntityListSetupper&lt;Purchase&gt;() {
+     * option.<span style="color: #CC4747">setEntityListSetupper</span>(new EntityListSetupper&lt;Purchase&gt;() {
      *     public void setup(List&lt;Purchase&gt; entityList) {
      *         purchaseBhv.loadPurchaseDetailList(entityList, new ConditionBeanSetupper&lt;PurchaseDetailCB&gt;() {
      *             public void setup(PurchaseDetailCB cb) {
@@ -74,14 +74,12 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
     public LoadReferrerOption() {
     }
 
-    public LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> xinit(
-            ReferrerConditionSetupper<REFERRER_CB> referrerConditionSetupper) { // internal
+    public LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> xinit(ReferrerConditionSetupper<REFERRER_CB> referrerConditionSetupper) { // internal
         setReferrerConditionSetupper(referrerConditionSetupper);
         return this;
     }
 
-    public LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> xinit(
-            ConditionBeanSetupper<REFERRER_CB> conditionBeanSetupper) { // internal
+    public LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> xinit(ConditionBeanSetupper<REFERRER_CB> conditionBeanSetupper) { // internal
         setConditionBeanSetupper(conditionBeanSetupper);
         return this;
     }
@@ -116,7 +114,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
      * LoadReferrerOption option = new LoadReferrerOption();
      * 
      * <span style="color: #3F7E5E">// PURCHASE (first level referrer from MEMBER)</span>
-     * option.<span style="color: #DD4747">setReferrerConditionSetupper</span>(new ReferrerConditionSetupper&lt;PurchaseCB&gt;() {
+     * option.<span style="color: #CC4747">setReferrerConditionSetupper</span>(new ReferrerConditionSetupper&lt;PurchaseCB&gt;() {
      *     public void setup(PurchaseCB cb) {
      *         cb.query().addOrderBy_PurchaseDatetime_Desc();
      *     }
@@ -139,7 +137,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
      * LoadReferrerOption option = new LoadReferrerOption();
      * 
      * <span style="color: #3F7E5E">// PURCHASE (first level referrer from MEMBER)</span>
-     * option.<span style="color: #DD4747">setConditionBeanSetupper</span>(new ConditionBeanSetupper&lt;PurchaseCB&gt;() {
+     * option.<span style="color: #CC4747">setConditionBeanSetupper</span>(new ConditionBeanSetupper&lt;PurchaseCB&gt;() {
      *     public void setup(PurchaseCB cb) {
      *         cb.query().addOrderBy_PurchaseDatetime_Desc();
      *     }
@@ -162,7 +160,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
      * LoadReferrerOption loadReferrerOption = new LoadReferrerOption();
      * ...
      * <span style="color: #3F7E5E">// PURCHASE (second level referrer)</span>
-     * loadReferrerOption.<span style="color: #DD4747">setEntityListSetupper</span>(new EntityListSetupper&lt;Member&gt;() {
+     * loadReferrerOption.<span style="color: #CC4747">setEntityListSetupper</span>(new EntityListSetupper&lt;Member&gt;() {
      *     public void setup(List&lt;Member&gt; entityList) {
      *         memberBhv.loadPurchaseList(entityList, new ConditionBeanSetupper&lt;PurchaseCB&gt;() {
      *             public void setup(PurchaseCB cb) {

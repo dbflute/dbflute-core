@@ -24,13 +24,13 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.dbway.WayOfSQLServer;
 import org.dbflute.helper.StringSet;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -40,8 +40,8 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfDataWritingInterceptorSQLServer.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfDataWritingInterceptorSQLServer.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -84,8 +84,7 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
     // ===================================================================================
     //                                                                            Identity
     //                                                                            ========
-    protected boolean hasIdentityColumn(DataSource dataSource, String tableSqlName,
-            Map<String, DfColumnMeta> columnInfoMap) {
+    protected boolean hasIdentityColumn(DataSource dataSource, String tableSqlName, Map<String, DfColumnMeta> columnInfoMap) {
         final String sql = "select ident_current ('" + tableSqlName + "') as IDENT_CURRENT";
         final Connection conn = getConnection(dataSource);
         Statement stmt = null;
@@ -104,20 +103,17 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (stmt != null) {
                 try {
                     stmt.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }
@@ -147,8 +143,7 @@ public class DfDataWritingInterceptorSQLServer implements DfDataWritingIntercept
                 if (stmt != null) {
                     try {
                         stmt.close();
-                    } catch (SQLException ignored) {
-                    }
+                    } catch (SQLException ignored) {}
                 }
             }
         } finally {

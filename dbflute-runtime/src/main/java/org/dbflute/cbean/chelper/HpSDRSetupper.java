@@ -36,6 +36,5 @@ public interface HpSDRSetupper<REFERRER_CB extends ConditionBean, LOCAL_CQ exten
      * @param aliasName The alias name to set the derived value to entity. (NotNull)
      * @param option The option of DerivedReferrer. (NotNull)
      */
-    void setup(String function, SubQuery<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName,
-            DerivedReferrerOption option);
+    void setup(String function, SubQuery<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName, DerivedReferrerOption option);
 }

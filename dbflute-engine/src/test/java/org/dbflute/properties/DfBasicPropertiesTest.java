@@ -18,12 +18,12 @@ package org.dbflute.properties;
 import java.util.Properties;
 
 import org.dbflute.properties.DfBasicProperties;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  */
-public class DfBasicPropertiesTest extends PlainTestCase {
+public class DfBasicPropertiesTest extends EngineTestCase {
 
     public void test_conditionBeanPackage() {
         // ## Arrange ##

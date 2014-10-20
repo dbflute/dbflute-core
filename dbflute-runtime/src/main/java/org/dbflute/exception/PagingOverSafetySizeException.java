@@ -21,7 +21,7 @@ package org.dbflute.exception;
  */
 public class PagingOverSafetySizeException extends RuntimeException {
 
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     /** The max size of safety result. */

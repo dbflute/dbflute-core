@@ -60,8 +60,8 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
      * @param argNameTypeMap The map of names and types for arguments. (NotNull)
      * @param resultSetHandler The handler of result set. (NotNull)
      */
-    public SelectCBExecution(DataSource dataSource, StatementFactory statementFactory,
-            Map<String, Class<?>> argNameTypeMap, TnResultSetHandler resultSetHandler) {
+    public SelectCBExecution(DataSource dataSource, StatementFactory statementFactory, Map<String, Class<?>> argNameTypeMap,
+            TnResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory, argNameTypeMap);
         assertObjectNotNull("resultSetHandler", resultSetHandler);
         _resultSetHandler = resultSetHandler;
@@ -171,8 +171,7 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
         }
     }
 
-    protected Object doSplitSelectSecond(Object[] args, ConditionBean cb, ColumnInfo pkColumn, SqlClause sqlClause,
-            List<Object> pkList) {
+    protected Object doSplitSelectSecond(Object[] args, ConditionBean cb, ColumnInfo pkColumn, SqlClause sqlClause, List<Object> pkList) {
         final int fetchSize = sqlClause.getFetchSize();
         final int fetchPageNumber = sqlClause.getFetchPageNumber();
         try {

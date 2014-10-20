@@ -60,22 +60,22 @@ public final class DfTypeUtil {
     //                                                                          Definition
     //                                                                          ==========
     protected static final String NULL = "null";
-    protected static final long AD_ORIGIN_MILLISECOND;
+    protected static final long GMT_AD_ORIGIN_MILLISECOND;
     static {
         final Calendar cal = Calendar.getInstance();
         cal.clear();
+        cal.setTimeZone(TimeZone.getTimeZone("GMT"));
         cal.set(1, 0, 1, 0, 0, 0);
         cal.set(Calendar.MILLISECOND, 0);
         // AD0001/01/01 00:00:00.000
-        AD_ORIGIN_MILLISECOND = cal.getTimeInMillis();
+        GMT_AD_ORIGIN_MILLISECOND = cal.getTimeInMillis();
 
         // *the value of millisecond may depend on JDK implementation
     }
 
-    private static final char[] ENCODE_TABLE = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-            'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-            'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
-            '4', '5', '6', '7', '8', '9', '+', '/' };
+    private static final char[] ENCODE_TABLE = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+            'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/' };
 
     private static final char PAD = '=';
 
@@ -165,8 +165,7 @@ public final class DfTypeUtil {
             if (sw != null) {
                 try {
                     sw.close();
-                } catch (IOException e) {
-                }
+                } catch (IOException e) {}
             }
         }
     }
@@ -756,33 +755,59 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                            Time API
     //                                                                            ========
-    // TODO jflute toLocalDate() javadoc
+    // not implement default zone methods, use handy-date if you like
+    /**
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param timeZone The time-zone for the local date. (NotNull)
+     * @return The local date. (NullAllowed: when the argument is null)
+     */
     public static LocalDate toLocalDate(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalDate()", timeZone);
-        return obj != null ? toZonedDateTime(toZonedResourceDate(obj, timeZone), timeZone).toLocalDate() : null;
+        final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);
+        return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, timeZone).toLocalDate() : null;
     }
 
+    /**
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param timeZone The time-zone for the local date-time. (NotNull)
+     * @return The local date. (NullAllowed: when the argument is null)
+     */
     public static LocalDateTime toLocalDateTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalDateTime()", timeZone);
-        return obj != null ? toZonedDateTime(toZonedResourceDate(obj, timeZone), timeZone).toLocalDateTime() : null;
+        final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);
+        return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, timeZone).toLocalDateTime() : null;
     }
 
+    /**
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param timeZone The time-zone for the local time. (NotNull)
+     * @return The local time. (NullAllowed: when the argument is null)
+     */
     public static LocalTime toLocalTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalTime()", timeZone);
-        return obj != null ? toZonedDateTime(toZonedResourceDate(obj, timeZone), timeZone).toLocalTime() : null;
+        final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);
+        return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, timeZone).toLocalTime() : null;
     }
 
+    /**
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param timeZone The time-zone for the local date. (NotNull)
+     * @return The zoned date-time. (NullAllowed: when the argument is null)
+     */
     public static ZonedDateTime toZonedDateTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toZonedDateTime()", timeZone);
         if (obj == null) {
             return null;
         }
+        final Date zonedResourceDate = toZonedResourceDate(obj, timeZone);
+        if (zonedResourceDate == null) {
+            return null;
+        }
         final ZoneId zoneId = ZoneId.of(timeZone.getID());
-        return ZonedDateTime.ofInstant(toZonedResourceDate(obj, timeZone).toInstant(), zoneId);
+        return ZonedDateTime.ofInstant(zonedResourceDate.toInstant(), zoneId);
     }
 
     protected static Date toZonedResourceDate(Object obj, TimeZone timeZone) {
-        assertTimeZoneNotNull("toZonedResourceDate()", timeZone);
         return toDate(obj, timeZone); // java.sql.Date does not support toInstant() so to pure date
     }
 
@@ -793,6 +818,11 @@ public final class DfTypeUtil {
         }
     }
 
+    /**
+     * Is the object local date or local date-time or local time?
+     * @param obj The object to be judged. (NotNull)
+     * @return The determination, true or false.
+     */
     public static boolean isAnyLocalDate(Object obj) {
         return obj instanceof LocalDate || obj instanceof LocalDateTime || obj instanceof LocalTime;
     }
@@ -1166,7 +1196,8 @@ public final class DfTypeUtil {
         if (localDateTime == null) {
             return null;
         }
-        final ZoneId zoneId = timeZone != null ? ZoneId.of(timeZone.getID()) : ZoneId.systemDefault();
+        final TimeZone realZone = chooseRealZone(timeZone);
+        final ZoneId zoneId = timeZone != null ? ZoneId.of(realZone.getID()) : ZoneId.systemDefault();
         return Date.from(localDateTime.toInstant(zoneId.getRules().getOffset(localDateTime)));
     }
 
@@ -1182,7 +1213,8 @@ public final class DfTypeUtil {
         if (localDateTime == null) {
             return null;
         }
-        final ZoneId zoneId = timeZone != null ? ZoneId.of(timeZone.getID()) : ZoneId.systemDefault();
+        final TimeZone realZone = chooseRealZone(timeZone);
+        final ZoneId zoneId = timeZone != null ? ZoneId.of(realZone.getID()) : ZoneId.systemDefault();
         return Timestamp.from(localDateTime.toInstant(zoneId.getRules().getOffset(localDateTime)));
     }
 
@@ -1190,59 +1222,88 @@ public final class DfTypeUtil {
     //                                         Determination
     //                                         -------------
     public static boolean isDateAD(Date date) {
-        return date.getTime() >= AD_ORIGIN_MILLISECOND;
+        return doJudgeDateAD(date, null);
+    }
+
+    public static boolean isDateAD(Date date, TimeZone timeZone) {
+        assertTimeZoneNotNull("isDateAD()", timeZone);
+        return doJudgeDateAD(date, timeZone);
+    }
+
+    protected static boolean doJudgeDateAD(Date date, TimeZone timeZone) {
+        return date.getTime() >= getTimeZonedADOriginMillis(timeZone);
     }
 
     public static boolean isDateBC(Date date) {
-        return date.getTime() < AD_ORIGIN_MILLISECOND;
+        return doJudgeDateBC(date, null);
     }
 
+    public static boolean isDateBC(Date date, TimeZone timeZone) {
+        assertTimeZoneNotNull("isDateBC()", timeZone);
+        return doJudgeDateBC(date, timeZone);
+    }
+
+    protected static boolean doJudgeDateBC(Date date, TimeZone timeZone) {
+        return date.getTime() < getTimeZonedADOriginMillis(timeZone);
+    }
+
+    protected static long getTimeZonedADOriginMillis(TimeZone timeZone) {
+        final int offset = chooseRealZone(timeZone).getOffset(GMT_AD_ORIGIN_MILLISECOND);
+        return GMT_AD_ORIGIN_MILLISECOND - offset;
+    }
+
+    // ===================================================================================
+    //                                                         Old Style Date Manipulation
+    //                                                         ===========================
+    // these mutable and only default time-zone methods are unsupported since 1.1
+    // but only change modifier to protected because many tests use
+    // you can use HandyDate instead of these methods, which can specify time-zone 
     // -----------------------------------------------------
     //                                              Add Date
     //                                              --------
-    public static void addDateYear(Date date, int years) {
+    protected static void addDateYear(Date date, int years) {
         final Calendar cal = toCalendar(date);
         addCalendarYear(cal, years);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void addDateMonth(Date date, int months) {
+    protected static void addDateMonth(Date date, int months) {
         final Calendar cal = toCalendar(date);
         addCalendarMonth(cal, months);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void addDateDay(Date date, int days) {
+    protected static void addDateDay(Date date, int days) {
         final Calendar cal = toCalendar(date);
         addCalendarDay(cal, days);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void addDateHour(Date date, int hours) {
+    protected static void addDateHour(Date date, int hours) {
         final Calendar cal = toCalendar(date);
         addCalendarHour(cal, hours);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void addDateMinute(Date date, int minutes) {
+    protected static void addDateMinute(Date date, int minutes) {
         final Calendar cal = toCalendar(date);
         addCalendarMinute(cal, minutes);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void addDateSecond(Date date, int seconds) {
+    protected static void addDateSecond(Date date, int seconds) {
         final Calendar cal = toCalendar(date);
         addCalendarSecond(cal, seconds);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void addDateMillisecond(Date date, int milliseconds) {
+    protected static void addDateMillisecond(Date date, int milliseconds) {
         final Calendar cal = toCalendar(date);
         addCalendarMillisecond(cal, milliseconds);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void addDateWeekOfMonth(Date date, int weeksOfMonth) {
+    protected static void addDateWeekOfMonth(Date date, int weeksOfMonth) {
         final Calendar cal = toCalendar(date);
         addCalendarWeek(cal, weeksOfMonth);
         date.setTime(cal.getTimeInMillis());
@@ -1254,362 +1315,362 @@ public final class DfTypeUtil {
     // not all methods are supported
     // because you should use calendar's methods basically
     // - - - - - - - - - - - - - - - - - - - - - - - -[Year]
-    public static void moveToDateYear(Date date, int year) {
+    protected static void moveToDateYear(Date date, int year) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYear(cal, year);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateYearJust(Date date) {
+    protected static void moveToDateYearJust(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYearJust(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateYearJust(Date date, int yearBeginMonth) {
+    protected static void moveToDateYearJust(Date date, int yearBeginMonth) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYearJust(cal, yearBeginMonth);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateYearJustAdded(Date date, int year) {
+    protected static void moveToDateYearJustAdded(Date date, int year) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYearJustAdded(cal, year);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateYearJustFor(Date date, int year) {
+    protected static void moveToDateYearJustFor(Date date, int year) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYearJustFor(cal, year);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateYearTerminal(Date date) {
+    protected static void moveToDateYearTerminal(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYearTerminal(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateYearTerminal(Date date, int yearBeginMonth) {
+    protected static void moveToDateYearTerminal(Date date, int yearBeginMonth) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYearTerminal(cal, yearBeginMonth);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateYearTerminalAdded(Date date, int year) {
+    protected static void moveToDateYearTerminalAdded(Date date, int year) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYearTerminalAdded(cal, year);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateYearTerminalFor(Date date, int year) {
+    protected static void moveToDateYearTerminalFor(Date date, int year) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYearTerminalFor(cal, year);
         date.setTime(cal.getTimeInMillis());
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - [Month]
-    public static void moveToDateMonth(Date date, int month) {
+    protected static void moveToDateMonth(Date date, int month) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMonth(cal, month);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMonthJust(Date date) {
+    protected static void moveToDateMonthJust(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMonthJust(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMonthJust(Date date, int monthBeginDay) {
+    protected static void moveToDateMonthJust(Date date, int monthBeginDay) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMonthJust(cal, monthBeginDay);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMonthAdded(Date date, int month) {
+    protected static void moveToDateMonthAdded(Date date, int month) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMonthJustAdded(cal, month);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMonthFor(Date date, int month) {
+    protected static void moveToDateMonthFor(Date date, int month) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMonthJustFor(cal, month);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMonthTerminal(Date date) {
+    protected static void moveToDateMonthTerminal(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMonthTerminal(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMonthTerminal(Date date, int monthBeginDay) {
+    protected static void moveToDateMonthTerminal(Date date, int monthBeginDay) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMonthTerminal(cal, monthBeginDay);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMonthTerminalAdded(Date date, int month) {
+    protected static void moveToDateMonthTerminalAdded(Date date, int month) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMonthTerminalAdded(cal, month);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMonthTerminalFor(Date date, int month) {
+    protected static void moveToDateMonthTerminalFor(Date date, int month) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMonthTerminalFor(cal, month);
         date.setTime(cal.getTimeInMillis());
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - [Day]
-    public static void moveToDateDay(Date date, int day) {
+    protected static void moveToDateDay(Date date, int day) {
         final Calendar cal = toCalendar(date);
         moveToCalendarDay(cal, day);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateDayJust(Date date) {
+    protected static void moveToDateDayJust(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarDayJust(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateDayJust(Date date, int dayBeginHour) {
+    protected static void moveToDateDayJust(Date date, int dayBeginHour) {
         final Calendar cal = toCalendar(date);
         moveToCalendarDayJust(cal, dayBeginHour);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateDayJustAdded(Date date, int day) {
+    protected static void moveToDateDayJustAdded(Date date, int day) {
         final Calendar cal = toCalendar(date);
         moveToCalendarDayJustAdded(cal, day);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateDayJustFor(Date date, int day) {
+    protected static void moveToDateDayJustFor(Date date, int day) {
         final Calendar cal = toCalendar(date);
         moveToCalendarDayJustFor(cal, day);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateDayTerminal(Date date) {
+    protected static void moveToDateDayTerminal(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarDayTerminal(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateDayTerminal(Date date, int dayBeginHour) {
+    protected static void moveToDateDayTerminal(Date date, int dayBeginHour) {
         final Calendar cal = toCalendar(date);
         moveToCalendarDayTerminal(cal, dayBeginHour);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateDayTerminalAdded(Date date, int day) {
+    protected static void moveToDateDayTerminalAdded(Date date, int day) {
         final Calendar cal = toCalendar(date);
         moveToCalendarDayTerminalAdded(cal, day);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateDayTerminalFor(Date date, int day) {
+    protected static void moveToDateDayTerminalFor(Date date, int day) {
         final Calendar cal = toCalendar(date);
         moveToCalendarDayTerminalFor(cal, day);
         date.setTime(cal.getTimeInMillis());
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - -[Hour]
-    public static void moveToDateHour(Date date, int hour) {
+    protected static void moveToDateHour(Date date, int hour) {
         final Calendar cal = toCalendar(date);
         moveToCalendarHour(cal, hour);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourJust(Date date) {
+    protected static void moveToDateHourJust(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarHourJust(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourJustAdded(Date date, int hour) {
+    protected static void moveToDateHourJustAdded(Date date, int hour) {
         final Calendar cal = toCalendar(date);
         moveToCalendarHourJustAdded(cal, hour);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourJustFor(Date date, int hour) {
+    protected static void moveToDateHourJustFor(Date date, int hour) {
         final Calendar cal = toCalendar(date);
         moveToCalendarHourJustFor(cal, hour);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourJustNoon(Date date) {
+    protected static void moveToDateHourJustNoon(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarHourJustNoon(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourTerminal(Date date) {
+    protected static void moveToDateHourTerminal(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarHourTerminal(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourTerminalAdded(Date date, int hour) {
+    protected static void moveToDateHourTerminalAdded(Date date, int hour) {
         final Calendar cal = toCalendar(date);
         moveToCalendarHourTerminalAdded(cal, hour);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourTerminalFor(Date date, int hour) {
+    protected static void moveToDateHourTerminalFor(Date date, int hour) {
         final Calendar cal = toCalendar(date);
         moveToCalendarHourTerminalFor(cal, hour);
         date.setTime(cal.getTimeInMillis());
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - -[Minute]
-    public static void moveToDateMinute(Date date, int minute) {
+    protected static void moveToDateMinute(Date date, int minute) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMinute(cal, minute);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMinuteJust(Date date) {
+    protected static void moveToDateMinuteJust(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMinuteJust(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMinuteJustAdded(Date date, int minute) {
+    protected static void moveToDateMinuteJustAdded(Date date, int minute) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMinuteJustAdded(cal, minute);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMinuteJustFor(Date date, int minute) {
+    protected static void moveToDateMinuteJustFor(Date date, int minute) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMinuteJustFor(cal, minute);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMinuteTerminal(Date date) {
+    protected static void moveToDateMinuteTerminal(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMinuteTerminal(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMinuteTerminalAdded(Date date, int minute) {
+    protected static void moveToDateMinuteTerminalAdded(Date date, int minute) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMinuteTerminalAdded(cal, minute);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMinuteTerminalFor(Date date, int minute) {
+    protected static void moveToDateMinuteTerminalFor(Date date, int minute) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMinuteTerminalFor(cal, minute);
         date.setTime(cal.getTimeInMillis());
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - -[Second]
-    public static void moveToDateSecond(Date date, int second) {
+    protected static void moveToDateSecond(Date date, int second) {
         final Calendar cal = toCalendar(date);
         moveToCalendarSecond(cal, second);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateSecondJust(Date date) {
+    protected static void moveToDateSecondJust(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarSecondJust(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateSecondJustAdded(Date date, int second) {
+    protected static void moveToDateSecondJustAdded(Date date, int second) {
         final Calendar cal = toCalendar(date);
         moveToCalendarSecondJustAdded(cal, second);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateSecondJustFor(Date date, int second) {
+    protected static void moveToDateSecondJustFor(Date date, int second) {
         final Calendar cal = toCalendar(date);
         moveToCalendarSecondJustFor(cal, second);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateSecondTerminal(Date date) {
+    protected static void moveToDateSecondTerminal(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarSecondTerminal(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateSecondTerminalAdded(Date date, int second) {
+    protected static void moveToDateSecondTerminalAdded(Date date, int second) {
         final Calendar cal = toCalendar(date);
         moveToCalendarSecondTerminalAdded(cal, second);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateSecondTerminalFor(Date date, int second) {
+    protected static void moveToDateSecondTerminalFor(Date date, int second) {
         final Calendar cal = toCalendar(date);
         moveToCalendarSecondTerminalFor(cal, second);
         date.setTime(cal.getTimeInMillis());
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - -[Week]
-    public static void moveToDateWeekJust(Date date, int weekStartDay) {
+    protected static void moveToDateWeekJust(Date date, int weekStartDay) {
         final Calendar cal = toCalendar(date);
         moveToCalendarWeekJust(cal, weekStartDay);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateWeekTerminal(Date date, int weekStartDay) {
+    protected static void moveToDateWeekTerminal(Date date, int weekStartDay) {
         final Calendar cal = toCalendar(date);
         moveToCalendarWeekTerminal(cal, weekStartDay);
         date.setTime(cal.getTimeInMillis());
     }
 
     // - - - - - - - - - - - - - - - - - - [Quarter of Year]
-    public static void moveToDateQuarterOfYearJust(Date date) {
+    protected static void moveToDateQuarterOfYearJust(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarQuarterOfYearJust(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateQuarterOfYearJust(Date date, int yearBeginMonth) {
+    protected static void moveToDateQuarterOfYearJust(Date date, int yearBeginMonth) {
         final Calendar cal = toCalendar(date);
         moveToCalendarQuarterOfYearJust(cal, yearBeginMonth);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateQuarterOfYearJustFor(Date date, int quarterOfYear) {
+    protected static void moveToDateQuarterOfYearJustFor(Date date, int quarterOfYear) {
         final Calendar cal = toCalendar(date);
         moveToCalendarQuarterOfYearJustFor(cal, quarterOfYear);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateQuarterOfYearJustFor(Date date, int quarterOfYear, int yearBeginMonth) {
+    protected static void moveToDateQuarterOfYearJustFor(Date date, int quarterOfYear, int yearBeginMonth) {
         final Calendar cal = toCalendar(date);
         moveToCalendarQuarterOfYearJustFor(cal, quarterOfYear, yearBeginMonth);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateQuarterOfYearTerminal(Date date) {
+    protected static void moveToDateQuarterOfYearTerminal(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarQuarterOfYearTerminal(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateQuarterOfYearTerminal(Date date, int yearBeginMonth) {
+    protected static void moveToDateQuarterOfYearTerminal(Date date, int yearBeginMonth) {
         final Calendar cal = toCalendar(date);
         moveToCalendarQuarterOfYearTerminal(cal, yearBeginMonth);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateQuarterOfYearTerminalFor(Date date, int quarterOfYear) {
+    protected static void moveToDateQuarterOfYearTerminalFor(Date date, int quarterOfYear) {
         final Calendar cal = toCalendar(date);
         moveToCalendarQuarterOfYearTerminalFor(cal, quarterOfYear);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateQuarterOfYearTerminalFor(Date date, int quarterOfYear, int yearBeginMonth) {
+    protected static void moveToDateQuarterOfYearTerminalFor(Date date, int quarterOfYear, int yearBeginMonth) {
         final Calendar cal = toCalendar(date);
         moveToCalendarQuarterOfYearTerminalFor(cal, quarterOfYear, yearBeginMonth);
         date.setTime(cal.getTimeInMillis());
@@ -1618,25 +1679,25 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                            Clear Date
     //                                            ----------
-    public static void clearDateTimeParts(Date date) {
+    protected static void clearDateTimeParts(Date date) {
         final Calendar cal = toCalendar(date);
         clearCalendarTimeParts(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void clearDateMinuteWithRear(Date date) {
+    protected static void clearDateMinuteWithRear(Date date) {
         final Calendar cal = toCalendar(date);
         clearCalendarMinuteWithRear(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void clearDateSecondWithRear(Date date) {
+    protected static void clearDateSecondWithRear(Date date) {
         final Calendar cal = toCalendar(date);
         clearCalendarSecondWithRear(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void clearDateMillisecond(Date date) {
+    protected static void clearDateMillisecond(Date date) {
         final Calendar cal = toCalendar(date);
         clearCalendarMillisecond(cal);
         date.setTime(cal.getTimeInMillis());
@@ -2206,6 +2267,7 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                          Add Calendar
     //                                          ------------
+    // HandydDate uses these methods
     public static void addCalendarYear(Calendar cal, int years) {
         cal.add(Calendar.YEAR, years);
     }
@@ -2245,6 +2307,7 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                      Move-to Calendar
     //                                      ----------------
+    // HandydDate uses these methods
     // - - - - - - - - - - - - - - - - - - - - - - - -[Year]
     public static void moveToCalendarYear(Calendar cal, int year) {
         assertArgumentNotZeroInteger("year", year);
@@ -2642,6 +2705,7 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                           Clear Parts
     //                                           -----------
+    // HandydDate uses these methods
     public static void clearCalendarTimeParts(Calendar cal) {
         cal.set(Calendar.HOUR_OF_DAY, cal.getActualMinimum(Calendar.HOUR_OF_DAY));
         clearCalendarMinuteWithRear(cal);
@@ -2664,14 +2728,13 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                              Localize
     //                                              --------
-
-    public static Calendar localize(Calendar calendar) {
-        if (calendar == null) {
-            return calendar;
+    public static Calendar localize(Calendar cal) {
+        if (cal == null) {
+            return cal;
         }
-        final Calendar localCalendar = Calendar.getInstance();
-        localCalendar.setTimeInMillis(calendar.getTimeInMillis());
-        return localCalendar;
+        final Calendar localCal = Calendar.getInstance();
+        localCal.setTimeInMillis(cal.getTimeInMillis());
+        return localCal;
     }
 
     // ===================================================================================

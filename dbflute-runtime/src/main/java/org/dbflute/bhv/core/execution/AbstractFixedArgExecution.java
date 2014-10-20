@@ -44,8 +44,7 @@ public abstract class AbstractFixedArgExecution extends TnAbstractTwoWaySqlComma
      * @param statementFactory The factory of statement. (NotNull)
      * @param argNameTypeMap The map of names and types for arguments. (NotNull)
      */
-    public AbstractFixedArgExecution(DataSource dataSource, StatementFactory statementFactory,
-            Map<String, Class<?>> argNameTypeMap) {
+    public AbstractFixedArgExecution(DataSource dataSource, StatementFactory statementFactory, Map<String, Class<?>> argNameTypeMap) {
         super(dataSource, statementFactory);
         assertObjectNotNull("argNameTypeMap", argNameTypeMap);
         _argNames = argNameTypeMap.keySet().toArray(new String[] {});

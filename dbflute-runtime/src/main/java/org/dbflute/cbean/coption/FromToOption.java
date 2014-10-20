@@ -21,9 +21,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbway.ExtensionOperand;
 import org.dbflute.dbway.OnQueryStringConnector;
@@ -116,7 +116,7 @@ public class FromToOption implements ConditionOption {
     protected Integer _moveToScope;
     protected boolean _usePattern;
     protected boolean _orIsNull;
-    
+
     /** Does it allow one-side only from-to? */
     protected boolean _oneSideAllowed;
 
@@ -131,7 +131,7 @@ public class FromToOption implements ConditionOption {
      * The year part of the date is only used.
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007</span>/04/10 08:24:53} to:{<span style="color: #DD4747">2008</span>/08/16 14:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007</span>/04/10 08:24:53} to:{<span style="color: #CC4747">2008</span>/08/16 14:36:29}
      * 
      *   new FromToOption().compareAsYear();
      *     --&gt; column &gt;= '2007/01/01 00:00:00'
@@ -157,7 +157,7 @@ public class FromToOption implements ConditionOption {
      * The year and month parts of the date are only used. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007/04</span>/10 08:24:53} to:{<span style="color: #DD4747">2008/08</span>/16 14:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007/04</span>/10 08:24:53} to:{<span style="color: #CC4747">2008/08</span>/16 14:36:29}
      * 
      *   new FromToOption().compareAsMonth();
      *     --&gt; column &gt;= '2007/04/01 00:00:00'
@@ -183,7 +183,7 @@ public class FromToOption implements ConditionOption {
      * The year, month, day parts of the date are only used. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007/04/10</span> 08:24:53} to:{<span style="color: #DD4747">2007/04/16</span> 14:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007/04/10</span> 08:24:53} to:{<span style="color: #CC4747">2007/04/16</span> 14:36:29}
      * 
      *   new FromToOption().compareAsDate();
      *     --&gt; column &gt;= '2007/04/10 00:00:00'
@@ -209,7 +209,7 @@ public class FromToOption implements ConditionOption {
      * The year, month, day, hour parts of the date are only used. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007/04/10 08</span>:24:53} to:{<span style="color: #DD4747">2007/04/16 14</span>:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007/04/10 08</span>:24:53} to:{<span style="color: #CC4747">2007/04/16 14</span>:36:29}
      * 
      *   new FromToOption().compareAsHour();
      *     --&gt; column &gt;= '2007/04/10 08:00:00'
@@ -232,7 +232,7 @@ public class FromToOption implements ConditionOption {
      * This method ignores operand adjustments and other patterns. <br />
      * The default beginning day of week is Sunday, but you can change it by beginWeek_DayOfWeek...() methods.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007/04/10</span> 08:24:53} to:{<span style="color: #DD4747">2007/04/16</span> 14:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007/04/10</span> 08:24:53} to:{<span style="color: #CC4747">2007/04/16</span> 14:36:29}
      * 
      *   new FromToOption().compareAsWeek().beginWeek_DayOfWeek1st_Sunday();
      *     --&gt; column &gt;= '2007/04/08 00:00:00'
@@ -255,7 +255,7 @@ public class FromToOption implements ConditionOption {
      * This method ignores operand adjustments and other patterns. <br />
      * The default beginning of quarter of year is 1st month, but you can change it by beginYear_Month...() methods.
      * <pre>
-     * e.g. from:{<span style="color: #DD4747">2007/04</span>/10 08:24:53} to:{<span style="color: #DD4747">2008/08</span>/16 14:36:29}
+     * e.g. from:{<span style="color: #CC4747">2007/04</span>/10 08:24:53} to:{<span style="color: #CC4747">2008/08</span>/16 14:36:29}
      * 
      *   new FromToOption().compareAsQuarterOfYear();
      *     --&gt; column &gt;= '2007/04/01 00:00:00'
@@ -988,6 +988,7 @@ public class FromToOption implements ConditionOption {
 
     /**
      * Filter the date as From. It requires this method is called before getFromDateConditionKey().
+     * @param <DATE> The type of (util)Date.
      * @param fromDate The date as From. (NullAllowed: If the value is null, it returns null)
      * @return The filtered date as From. (NullAllowed)
      */
@@ -1033,6 +1034,7 @@ public class FromToOption implements ConditionOption {
 
     /**
      * Filter the date as To. It requires this method is called before getToDateConditionKey().
+     * @param <DATE> The type of sub-class for java.util.Date.
      * @param toDate The date as To. (NullAllowed: If the value is null, it returns null)
      * @return The filtered date as To. (NullAllowed)
      */
@@ -1320,7 +1322,7 @@ public class FromToOption implements ConditionOption {
         return false;
     }
 
-    public List<HpSpecifiedColumn> getCompoundColumnList() {
+    public List<SpecifiedColumn> getCompoundColumnList() {
         return DfCollectionUtil.emptyList();
     }
 
@@ -1389,7 +1391,9 @@ public class FromToOption implements ConditionOption {
         sb.append(title);
         sb.append(":{usePattern=").append(_usePattern);
         sb.append(", greaterThan=").append(_greaterThan).append(", lessThan=").append(_lessThan);
-        sb.append(", orIsNull=").append(_orIsNull).append("}");
+        sb.append(", orIsNull=").append(_orIsNull);
+        sb.append(", oneSideAllowed=").append(_oneSideAllowed);
+        sb.append("}");
         return sb.toString();
     }
 }

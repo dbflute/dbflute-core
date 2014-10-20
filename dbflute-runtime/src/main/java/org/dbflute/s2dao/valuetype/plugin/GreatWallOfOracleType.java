@@ -100,8 +100,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
         return doMappingOracleArrayToList(array, firstValue, elementType);
     }
 
-    protected List<Object> doMappingOracleArrayToList(Object[] array, Object firstValue, Object elementType)
-            throws SQLException {
+    protected List<Object> doMappingOracleArrayToList(Object[] array, Object firstValue, Object elementType) throws SQLException {
         if (firstValue == null) { // means empty array
             return DfCollectionUtil.newArrayList();
         }
@@ -193,8 +192,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
         }
     }
 
-    protected void throwStructAttributeSizeUnmatchedException(Entity entity, Object[] attrs,
-            List<ColumnInfo> columnInfoList) {
+    protected void throwStructAttributeSizeUnmatchedException(Entity entity, Object[] attrs, List<ColumnInfo> columnInfoList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The size of struct attributes does not match with column list of entity.");
         br.addItem(getTitleName());
@@ -220,8 +218,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
         }
     }
 
-    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
@@ -231,8 +228,8 @@ public abstract class GreatWallOfOracleType implements ValueType {
 
     protected abstract Object toBindValue(Connection conn, Object paramExp, Object value) throws SQLException;
 
-    protected Object mappingListToOracleArray(Connection conn, Object paramExp, List<?> valueList,
-            String arrayTypeName, Class<?> elementType) throws SQLException {
+    protected Object mappingListToOracleArray(Connection conn, Object paramExp, List<?> valueList, String arrayTypeName,
+            Class<?> elementType) throws SQLException {
         final Object[] array = valueList.toArray();
         if (array.length == 0) {
             return array;
@@ -322,8 +319,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
      * @return The mapped value for SQL. (NullAllowed)
      * @throws SQLException 
      */
-    protected Object mappingScalarToSqlValue(Connection conn, Object paramExp, Object value, ColumnInfo columnInfo)
-            throws SQLException {
+    protected Object mappingScalarToSqlValue(Connection conn, Object paramExp, Object value, ColumnInfo columnInfo) throws SQLException {
         if (value == null) {
             return null;
         }
@@ -334,15 +330,14 @@ public abstract class GreatWallOfOracleType implements ValueType {
         return value;
     }
 
-    protected void assertArrayElementValueStructEntity(Object paramExp, Object element, String arrayTypeName,
-            Class<?> elementType) {
+    protected void assertArrayElementValueStructEntity(Object paramExp, Object element, String arrayTypeName, Class<?> elementType) {
         if (!(element instanceof Entity)) {
             throwArrayElementValueNotStructEntityException(paramExp, element, arrayTypeName, elementType);
         }
     }
 
-    protected void throwArrayElementValueNotStructEntityException(Object parameterExp, Object element,
-            String arrayTypeName, Class<?> elementType) {
+    protected void throwArrayElementValueNotStructEntityException(Object parameterExp, Object element, String arrayTypeName,
+            Class<?> elementType) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The element value of array for struct should be entity type:");
         br.addItem(getTitleName());

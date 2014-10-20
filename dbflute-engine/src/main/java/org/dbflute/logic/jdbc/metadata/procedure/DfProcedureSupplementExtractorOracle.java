@@ -207,13 +207,12 @@ public class DfProcedureSupplementExtractorOracle extends DfProcedureSupplementE
         return _arrayInfoMapMap.get(unifiedSchema);
     }
 
-    protected void processArrayNestedElement(UnifiedSchema unifiedSchema,
-            final StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap, DfTypeArrayInfo arrayInfo) {
+    protected void processArrayNestedElement(UnifiedSchema unifiedSchema, final StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap,
+            DfTypeArrayInfo arrayInfo) {
         // ARRAY element
         final DfTypeArrayInfo foundInfo = flatArrayInfoMap.get(arrayInfo.getElementType());
         if (foundInfo != null) {
-            final DfTypeArrayInfo nestedInfo = new DfTypeArrayInfo(foundInfo.getUnifiedSchema(),
-                    foundInfo.getTypeName());
+            final DfTypeArrayInfo nestedInfo = new DfTypeArrayInfo(foundInfo.getUnifiedSchema(), foundInfo.getTypeName());
             nestedInfo.setElementType(foundInfo.getElementType());
             arrayInfo.setNestedArrayInfo(nestedInfo);
             processArrayNestedElement(unifiedSchema, flatArrayInfoMap, nestedInfo); // recursive call
@@ -277,17 +276,15 @@ public class DfProcedureSupplementExtractorOracle extends DfProcedureSupplementE
         }
     }
 
-    protected void doResolveStructAttributeInfo(UnifiedSchema unifiedSchema,
-            StringKeyMap<DfTypeStructInfo> structInfoMap, StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap,
-            DfTypeStructInfo structInfo) {
+    protected void doResolveStructAttributeInfo(UnifiedSchema unifiedSchema, StringKeyMap<DfTypeStructInfo> structInfoMap,
+            StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap, DfTypeStructInfo structInfo) {
         for (DfColumnMeta columnInfo : structInfo.getAttributeInfoMap().values()) {
             doResolveStructAttributeInfo(unifiedSchema, structInfoMap, flatArrayInfoMap, structInfo, columnInfo);
         }
     }
 
-    protected void doResolveStructAttributeInfo(UnifiedSchema unifiedSchema,
-            StringKeyMap<DfTypeStructInfo> structInfoMap, StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap,
-            DfTypeStructInfo structInfo, DfColumnMeta columnInfo) {
+    protected void doResolveStructAttributeInfo(UnifiedSchema unifiedSchema, StringKeyMap<DfTypeStructInfo> structInfoMap,
+            StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap, DfTypeStructInfo structInfo, DfColumnMeta columnInfo) {
         final String attrTypeName = columnInfo.getDbTypeName();
         final DfTypeArrayInfo arrayInfo = doResolveStructAttributeArray(structInfoMap, flatArrayInfoMap, attrTypeName);
         if (arrayInfo != null) { // array attribute
@@ -310,8 +307,7 @@ public class DfProcedureSupplementExtractorOracle extends DfProcedureSupplementE
         final String elementType = foundInfo.getElementType();
         typeArrayInfo.setElementType(elementType);
         if (flatArrayInfoMap.containsKey(elementType)) { // array in array in ...
-            final DfTypeArrayInfo nestedArrayInfo = doResolveStructAttributeArray(structInfoMap, flatArrayInfoMap,
-                    elementType); // recursive call
+            final DfTypeArrayInfo nestedArrayInfo = doResolveStructAttributeArray(structInfoMap, flatArrayInfoMap, elementType); // recursive call
             typeArrayInfo.setNestedArrayInfo(nestedArrayInfo);
         } else if (structInfoMap.containsKey(elementType)) { // struct in array in ...
             final DfTypeStructInfo elementStructInfo = structInfoMap.get(elementType);
@@ -325,8 +321,7 @@ public class DfProcedureSupplementExtractorOracle extends DfProcedureSupplementE
     //                                                                       =============
     @Override
     public String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName) {
-        return DfProcedureParameterNativeExtractorOracle.generateParameterInfoMapKey(catalog, procedureName,
-                parameterName);
+        return DfProcedureParameterNativeExtractorOracle.generateParameterInfoMapKey(catalog, procedureName, parameterName);
     }
 
     // ===================================================================================
@@ -413,8 +408,7 @@ public class DfProcedureSupplementExtractorOracle extends DfProcedureSupplementE
         return plainName + "." + packageBodyName;
     }
 
-    protected void setupProcedureSourceInfo(Map<String, DfProcedureSourceInfo> resultMap, String procedureName,
-            String sourceCode, int line) {
+    protected void setupProcedureSourceInfo(Map<String, DfProcedureSourceInfo> resultMap, String procedureName, String sourceCode, int line) {
         final DfProcedureSourceInfo sourceInfo = new DfProcedureSourceInfo();
         sourceInfo.setSourceCode(sourceCode.trim());
         sourceInfo.setSourceLine(line);

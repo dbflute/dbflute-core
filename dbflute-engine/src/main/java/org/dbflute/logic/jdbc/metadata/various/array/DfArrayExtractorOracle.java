@@ -21,8 +21,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;
@@ -32,6 +30,8 @@ import org.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -42,7 +42,7 @@ public class DfArrayExtractorOracle {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfArrayExtractorOracle.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfArrayExtractorOracle.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -154,8 +154,8 @@ public class DfArrayExtractorOracle {
         return flatArrayInfoMap;
     }
 
-    protected void setupFlatArrayInfo(StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap,
-            List<DfProcedureArgumentInfo> argInfoList, DfProcedureArgumentInfo argInfo, int index) {
+    protected void setupFlatArrayInfo(StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap, List<DfProcedureArgumentInfo> argInfoList,
+            DfProcedureArgumentInfo argInfo, int index) {
         final UnifiedSchema owner = UnifiedSchema.createAsDynamicSchema(null, argInfo.getTypeOwner());
         final String realTypeName = buildArrayTypeName(argInfo);
         final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo(owner, realTypeName);
@@ -168,8 +168,7 @@ public class DfArrayExtractorOracle {
         }
     }
 
-    protected boolean reflectArrayElementType(List<DfProcedureArgumentInfo> argInfoList, int i,
-            DfTypeArrayInfo arrayInfo) {
+    protected boolean reflectArrayElementType(List<DfProcedureArgumentInfo> argInfoList, int i, DfTypeArrayInfo arrayInfo) {
         boolean nestedArray = false;
         final int nextIndex = (i + 1);
         if (argInfoList.size() > nextIndex) { // element type is in data type of next record

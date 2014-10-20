@@ -26,14 +26,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.util.DfCollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -43,7 +43,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfUniqueKeyExtractor.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfUniqueKeyExtractor.class);
 
     // ===================================================================================
     //                                                                         Primary Key
@@ -69,8 +69,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The meta information of primary keys. (NotNull)
      * @throws SQLException
      */
-    public DfPrimaryKeyMeta getPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
-            throws SQLException {
+    public DfPrimaryKeyMeta getPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName) throws SQLException {
         final String translatedName = translateTableCaseName(tableName);
         DfPrimaryKeyMeta info = doGetPrimaryKey(metaData, unifiedSchema, translatedName, false);
         if (isRetryCaseInsensitivePrimaryKey()) {
@@ -84,8 +83,8 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         return info;
     }
 
-    protected DfPrimaryKeyMeta doGetPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, boolean retry) throws SQLException {
+    protected DfPrimaryKeyMeta doGetPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName, boolean retry)
+            throws SQLException {
         final DfPrimaryKeyMeta info = new DfPrimaryKeyMeta();
         if (isPrimaryKeyExtractingUnsupported()) {
             if (isDatabaseMsAccess()) {
@@ -142,8 +141,8 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         _log.warn(msg);
     }
 
-    protected ResultSet extractPrimaryKeyMetaData(DatabaseMetaData dbMeta, UnifiedSchema unifiedSchema,
-            String tableName, boolean retry) throws SQLException {
+    protected ResultSet extractPrimaryKeyMetaData(DatabaseMetaData dbMeta, UnifiedSchema unifiedSchema, String tableName, boolean retry)
+            throws SQLException {
         try {
             final String catalogName = unifiedSchema.getPureCatalog();
             final String schemaName = unifiedSchema.getPureSchema();
@@ -179,8 +178,8 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The meta information of primary key. (NotNull)
      * @throws SQLException
      */
-    protected DfPrimaryKeyMeta processMSAccess(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, DfPrimaryKeyMeta info) throws SQLException {
+    protected DfPrimaryKeyMeta processMSAccess(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
+            DfPrimaryKeyMeta info) throws SQLException {
         // it can get from unique key from JDBC of MS Access
         final List<String> emptyList = DfCollectionUtil.emptyList();
         final Map<String, Map<Integer, String>> uqMap = getUniqueKeyMap(metaData, unifiedSchema, tableName, emptyList);
@@ -207,8 +206,8 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The meta information map of unique keys. The key is unique key name. (NotNull)
      * @throws SQLException
      */
-    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo,
-            DfPrimaryKeyMeta pkInfo) throws SQLException { // Non Primary Key Only
+    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo, DfPrimaryKeyMeta pkInfo)
+            throws SQLException { // Non Primary Key Only
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
         if (tableInfo.isTableTypeView()) {
@@ -225,11 +224,10 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The meta information map of unique keys. The key is unique key name. (NotNull)
      * @throws SQLException
      */
-    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, List<String> pkList) throws SQLException { // non primary key only
+    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
+            List<String> pkList) throws SQLException { // non primary key only
         final String translatedName = translateTableCaseName(tableName);
-        Map<String, Map<Integer, String>> map = doGetUniqueKeyMap(metaData, unifiedSchema, translatedName, pkList,
-                false);
+        Map<String, Map<Integer, String>> map = doGetUniqueKeyMap(metaData, unifiedSchema, translatedName, pkList, false);
         if (isRetryCaseInsensitiveUniqueKey()) {
             if (map.isEmpty() && !translatedName.equals(translatedName.toLowerCase())) { // retry by lower case
                 map = doGetUniqueKeyMap(metaData, unifiedSchema, translatedName.toLowerCase(), pkList, true);
@@ -241,8 +239,8 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         return map;
     }
 
-    protected Map<String, Map<Integer, String>> doGetUniqueKeyMap(DatabaseMetaData metaData,
-            UnifiedSchema unifiedSchema, String tableName, List<String> pkList, boolean retry) throws SQLException { // non primary key only
+    protected Map<String, Map<Integer, String>> doGetUniqueKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
+            List<String> pkList, boolean retry) throws SQLException { // non primary key only
         final Map<String, Map<Integer, String>> uniqueKeyMap = newTableConstraintMap();
         ResultSet rs = null;
         try {
@@ -323,12 +321,11 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         return uniqueKeyMap;
     }
 
-    protected ResultSet extractUniqueKeyMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, boolean retry) throws SQLException {
+    protected ResultSet extractUniqueKeyMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName, boolean retry)
+            throws SQLException {
         final boolean uniqueKeyOnly = true;
         final DfDatabaseTypeFacadeProp prop = getDatabaseTypeFacadeProp();
-        return DfIndexExtractor.delegateExtractIndexInfoMetaData(metaData, unifiedSchema, tableName, uniqueKeyOnly,
-                retry, prop);
+        return DfIndexExtractor.delegateExtractIndexInfoMetaData(metaData, unifiedSchema, tableName, uniqueKeyOnly, retry, prop);
     }
 
     protected void assertUQColumnNotExcepted(UnifiedSchema unifiedSchema, String tableName, String columnName) {
@@ -341,8 +338,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    protected void removePkMatchUniqueKey(String tableName, List<String> pkList,
-            Map<String, Map<Integer, String>> uniqueKeyMap) {
+    protected void removePkMatchUniqueKey(String tableName, List<String> pkList, Map<String, Map<Integer, String>> uniqueKeyMap) {
         // PK's unique constraint may be returned so remove it if it exists
         // and the pkList should be ordered formal order ()
         final List<String> pkMatchIndexList = new ArrayList<String>();

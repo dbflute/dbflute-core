@@ -17,12 +17,12 @@ package org.dbflute.logic.jdbc.urlanalyzer;
 
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerDB2;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  */
-public class DfUrlAnalyzerDB2Test extends PlainTestCase {
+public class DfUrlAnalyzerDB2Test extends EngineTestCase {
 
     public void test_extractCatalog_basic() throws Exception {
         // ## Arrange ##

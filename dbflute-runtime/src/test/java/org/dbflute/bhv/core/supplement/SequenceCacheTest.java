@@ -28,14 +28,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.dbflute.bhv.core.supplement.SequenceCache.SequenceRealExecutor;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
  * @since 0.9.6.4 (2010/01/15 Friday)
  */
-public class SequenceCacheTest extends PlainTestCase {
+public class SequenceCacheTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                               Basic

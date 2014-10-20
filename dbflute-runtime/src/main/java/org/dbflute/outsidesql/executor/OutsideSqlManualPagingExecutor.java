@@ -34,11 +34,9 @@ public class OutsideSqlManualPagingExecutor<BEHAVIOR> extends AbstractOutsideSql
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlManualPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption,
-            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
-        super(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig, outsideSqlOption,
-                outsideSqlExecutorFactory);
+    public OutsideSqlManualPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+        super(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig, outsideSqlOption, outsideSqlExecutorFactory);
     }
 
     // ===================================================================================
@@ -54,7 +52,7 @@ public class OutsideSqlManualPagingExecutor<BEHAVIOR> extends AbstractOutsideSql
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * PagingResultBean&lt;SimpleMember&gt; page
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #DD4747">selectPage</span>(pmb);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectPage</span>(pmb);
      * int allRecordCount = page.getAllRecordCount();
      * int allPageCount = page.getAllPageCount();
      * boolean isExistPrePage = page.isExistPrePage();
@@ -99,7 +97,7 @@ public class OutsideSqlManualPagingExecutor<BEHAVIOR> extends AbstractOutsideSql
      *  order by member.UPDATE_DATETIME desc
      *  <span style="color: #3F7E5E">/*END&#42;/</span>
      *  <span style="color: #3F7E5E">/*IF pmb.isPaging()&#42;/</span>
-     *  limit <span style="color: #3F7E5E">/*$pmb.pageStartIndex&#42;/</span>80, <span style="color: #3F7E5E">/*$pmb.fetchSize&#42;/</span>20
+     *  limit <span style="color: #3F7E5E">/*pmb.pageStartIndex&#42;/</span>80, <span style="color: #3F7E5E">/*pmb.fetchSize&#42;/</span>20
      *  <span style="color: #3F7E5E">/*END&#42;/</span>
      * </pre>
      * @param <ENTITY> The type of entity.
@@ -126,7 +124,7 @@ public class OutsideSqlManualPagingExecutor<BEHAVIOR> extends AbstractOutsideSql
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #DD4747">selectList</span>(pmb);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectList</span>(pmb);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -157,7 +155,7 @@ public class OutsideSqlManualPagingExecutor<BEHAVIOR> extends AbstractOutsideSql
      *    <span style="color: #3F7E5E">/*END&#42;/</span>
      *  <span style="color: #3F7E5E">/*END&#42;/</span>
      *  order by member.UPDATE_DATETIME desc
-     *  limit <span style="color: #3F7E5E">/*$pmb.pageStartIndex&#42;/</span>80, <span style="color: #3F7E5E">/*$pmb.fetchSize&#42;/</span>20
+     *  limit <span style="color: #3F7E5E">/*pmb.pageStartIndex&#42;/</span>80, <span style="color: #3F7E5E">/*pmb.fetchSize&#42;/</span>20
      * </pre>
      * @param <ENTITY> The type of entity.
      * @param pmb The typed parameter-bean for manual-paging handling. (NotNull)

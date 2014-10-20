@@ -36,10 +36,10 @@ public class ExistsReferrer extends AbstractSubQuery {
     //                                                                         Constructor
     //                                                                         ===========
     public ExistsReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
-            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
-            String subQueryIdentity, DBMeta subQueryDBMeta, GearedCipherManager cipherManager) {
-        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
-                subQueryIdentity, subQueryDBMeta, cipherManager);
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause, String subQueryIdentity,
+            DBMeta subQueryDBMeta, GearedCipherManager cipherManager) {
+        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause, subQueryIdentity,
+                subQueryDBMeta, cipherManager);
     }
 
     // ===================================================================================
@@ -53,15 +53,14 @@ public class ExistsReferrer extends AbstractSubQuery {
      * @param existsOption The option of ExistsReferrer. (basically for NotExistsReferrer) (NullAllowed: if null, means ExistsReferrer)
      * @return The clause of sub-query. (NotNull)
      */
-    public String buildExistsReferrer(String correlatedColumnDbName, String relatedColumnDbName,
-            String correlatedFixedCondition, String existsOption) {
+    public String buildExistsReferrer(String correlatedColumnDbName, String relatedColumnDbName, String correlatedFixedCondition,
+            String existsOption) {
         existsOption = existsOption != null ? existsOption + " " : "";
         final String subQueryClause;
         if (isSinglePrimaryKey(correlatedColumnDbName, relatedColumnDbName)) {
             final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
             final ColumnRealName correlatedColumnRealName = _localRealNameProvider.provide(correlatedColumnDbName);
-            subQueryClause = buildSubQueryClause(correlatedColumnRealName, relatedColumnSqlName,
-                    correlatedFixedCondition);
+            subQueryClause = buildSubQueryClause(correlatedColumnRealName, relatedColumnSqlName, correlatedFixedCondition);
         } else { // compound primary keys
             final List<String> columnDbNameSplit = Srl.splitListTrimmed(correlatedColumnDbName, ",");
             final ColumnRealName[] correlatedColumnRealNames = new ColumnRealName[columnDbNameSplit.size()];
@@ -73,8 +72,7 @@ public class ExistsReferrer extends AbstractSubQuery {
             for (int i = 0; i < relatedColumnSplit.size(); i++) {
                 relatedColumnSqlNames[i] = _subQuerySqlNameProvider.provide(relatedColumnSplit.get(i));
             }
-            subQueryClause = buildSubQueryClause(correlatedColumnRealNames, relatedColumnSqlNames,
-                    correlatedFixedCondition);
+            subQueryClause = buildSubQueryClause(correlatedColumnRealNames, relatedColumnSqlNames, correlatedFixedCondition);
         }
         final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
         final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
@@ -96,8 +94,9 @@ public class ExistsReferrer extends AbstractSubQuery {
             String correlatedFixedCondition) {
         final String localAliasName = getSubQueryLocalAliasName();
         final String selectClause = "select " + ColumnRealName.create(localAliasName, relatedColumnSqlName);
-        final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, localAliasName,
-                correlatedColumnRealName, relatedColumnSqlName, correlatedFixedCondition);
+        final String fromWhereClause =
+                buildCorrelationFromWhereClause(selectClause, localAliasName, correlatedColumnRealName, relatedColumnSqlName,
+                        correlatedFixedCondition);
         return doBuildSubQueryClause(selectClause, fromWhereClause);
     }
 
@@ -108,14 +107,15 @@ public class ExistsReferrer extends AbstractSubQuery {
      * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause of sub-query. (NotNull)
      */
-    protected String buildSubQueryClause(ColumnRealName[] correlatedColumnRealNames,
-            ColumnSqlName[] relatedColumnSqlNames, String correlatedFixedCondition) {
+    protected String buildSubQueryClause(ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames,
+            String correlatedFixedCondition) {
         // only single column allowed (no problem because of select clause for exists)
         final ColumnSqlName firstSqlName = relatedColumnSqlNames[0];
         final String localAliasName = getSubQueryLocalAliasName();
         final String selectClause = "select " + ColumnRealName.create(localAliasName, firstSqlName);
-        final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, localAliasName,
-                correlatedColumnRealNames, relatedColumnSqlNames, correlatedFixedCondition);
+        final String fromWhereClause =
+                buildCorrelationFromWhereClause(selectClause, localAliasName, correlatedColumnRealNames, relatedColumnSqlNames,
+                        correlatedFixedCondition);
         return doBuildSubQueryClause(selectClause, fromWhereClause);
     }
 

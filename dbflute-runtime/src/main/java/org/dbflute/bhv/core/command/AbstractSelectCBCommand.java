@@ -75,8 +75,7 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
         return _tableDbName + ":" + getCommandName() + "(" + cbName + ")";
     }
 
-    protected SelectCBExecution createSelectCBExecution(Class<? extends ConditionBean> cbType,
-            TnResultSetHandler handler) {
+    protected SelectCBExecution createSelectCBExecution(Class<? extends ConditionBean> cbType, TnResultSetHandler handler) {
         return newSelectCBExecution(createBeanArgNameTypeMap(cbType), handler);
     }
 

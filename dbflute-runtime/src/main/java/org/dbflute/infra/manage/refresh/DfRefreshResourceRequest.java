@@ -94,8 +94,7 @@ public class DfRefreshResourceRequest {
             if (ins != null) {
                 try {
                     ins.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

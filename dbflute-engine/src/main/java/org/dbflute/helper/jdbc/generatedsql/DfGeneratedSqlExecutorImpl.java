@@ -24,8 +24,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -35,8 +35,8 @@ public class DfGeneratedSqlExecutorImpl implements DfGeneratedSqlExecutor {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static Log _log = LogFactory.getLog(DfGeneratedSqlExecutorImpl.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfGeneratedSqlExecutorImpl.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -88,8 +88,8 @@ public class DfGeneratedSqlExecutorImpl implements DfGeneratedSqlExecutor {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("DfGeneratedSqlExecutorImpl.execute() threw the exception: baseSql=" + sql
-                    + " generatedSql=" + currentGeneratedSql, e);
+            throw new RuntimeException("DfGeneratedSqlExecutorImpl.execute() threw the exception: baseSql=" + sql + " generatedSql="
+                    + currentGeneratedSql, e);
         } finally {
             try {
                 if (rs != null) {

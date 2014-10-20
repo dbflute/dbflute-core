@@ -28,7 +28,7 @@ public class WayOfOracle implements DBWay, Serializable {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     protected static final List<String> ORIGNAL_WILD_CARD_LIST = Arrays.asList("\uff05", "\uff3f");

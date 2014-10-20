@@ -37,8 +37,8 @@ public class DfSequenceMeta {
     //                                                                      ==============
     @Override
     public String toString() {
-        return (sequenceCatalog != null ? sequenceCatalog + "." : "") + sequenceSchema + "." + sequenceName + ":{"
-                + minimumValue + " to " + maximumValue + ", increment " + incrementSize + "}";
+        return (sequenceCatalog != null ? sequenceCatalog + "." : "") + sequenceSchema + "." + sequenceName + ":{" + minimumValue + " to "
+                + maximumValue + ", increment " + incrementSize + "}";
     }
 
     // ===================================================================================

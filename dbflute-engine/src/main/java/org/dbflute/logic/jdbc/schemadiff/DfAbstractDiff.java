@@ -146,8 +146,7 @@ public abstract class DfAbstractDiff {
     //    }
     //}
 
-    protected abstract class BooleanNextPreviousDiffer<OBJECT, DIFF> implements
-            NextPreviousDiffer<OBJECT, DIFF, Boolean> {
+    protected abstract class BooleanNextPreviousDiffer<OBJECT, DIFF> implements NextPreviousDiffer<OBJECT, DIFF, Boolean> {
         public boolean isMatch(Boolean next, Boolean previous) {
             return isSame(next, previous);
         }

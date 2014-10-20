@@ -74,8 +74,7 @@ public class TnIdentityGenerationHandler {
     }
 
     protected void doExecuteIdentityAdjustment(String sql, DataSource dataSource, StatementFactory statementFactory) {
-        final TnIdentityAdjustmentSqlHandler handler = createIdentityAdjustmentSqlHandler(sql, dataSource,
-                statementFactory);
+        final TnIdentityAdjustmentSqlHandler handler = createIdentityAdjustmentSqlHandler(sql, dataSource, statementFactory);
         handler.execute(new Object[] {}); // SQL for identity adjustment does not have a bind-variable
     }
 

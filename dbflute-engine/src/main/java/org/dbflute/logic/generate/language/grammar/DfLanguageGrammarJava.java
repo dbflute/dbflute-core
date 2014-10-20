@@ -36,9 +36,9 @@ public class DfLanguageGrammarJava implements DfLanguageGrammar {
     static {
         // likely words only (and only can be checked at examples)
         final StringSet stringSet = StringSet.createAsCaseInsensitive();
-        final List<String> list = DfCollectionUtil.newArrayList("class", "case", "package", "default", "new", "native",
-                "void", "public", "protected", "private", "interface", "abstract", "final", "finally", "return",
-                "double", "float", "short");
+        final List<String> list =
+                DfCollectionUtil.newArrayList("class", "case", "package", "default", "new", "native", "void", "public", "protected",
+                        "private", "interface", "abstract", "final", "finally", "return", "double", "float", "short");
         stringSet.addAll(list);
         _pgReservColumnSet = stringSet;
     }
@@ -156,8 +156,7 @@ public class DfLanguageGrammarJava implements DfLanguageGrammar {
         return col.getJavaBeansRulePropertyName();
     }
 
-    public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber,
-            boolean toBoolean) {
+    public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber, boolean toBoolean) {
         final String cdefCode = cdefBase + ".code()";
         if (toNumber) {
             return "toNumber(" + cdefCode + ", " + valueType + ".class)";

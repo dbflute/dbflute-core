@@ -131,14 +131,14 @@ import java.sql.Types;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class that maps JDBC types to their corresponding
@@ -186,8 +186,8 @@ public class TypeMap {
     // ===================================================================================
     //                                                                                 Log
     //                                                                                 ===
-    /** Log instance. */
-    public static final Log _log = LogFactory.getLog(TypeMap.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(TypeMap.class);
 
     // ===================================================================================
     //                                                                           JDBC Type
@@ -511,8 +511,7 @@ public class TypeMap {
         return javaType;
     }
 
-    protected static String processAutoMappingNumber(String jdbcType, Integer columnSize, Integer decimalDigits,
-            String javaType) {
+    protected static String processAutoMappingNumber(String jdbcType, Integer columnSize, Integer decimalDigits, String javaType) {
         if (needsAutoMappingNumber(jdbcType, javaType)) {
             final String defaultJavaNativeType;
             if (NUMERIC.equalsIgnoreCase(jdbcType)) {

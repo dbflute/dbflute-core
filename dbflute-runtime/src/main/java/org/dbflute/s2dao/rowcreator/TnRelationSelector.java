@@ -46,4 +46,18 @@ public interface TnRelationSelector {
      * @return The determination, true or false.
      */
     boolean canUseRelationCache(String relationNoSuffix); // sorry, emergency implementation
+
+    /**
+     * Can the access to non-specified column be checked?
+     * @param relationNoSuffix The suffix of relation no. e.g. _1_3 (NotNull)
+     * @return The determination, true or false.
+     */
+    boolean isNonSpecifiedColumnAccessAllowed(String relationNoSuffix); // sorry, though see the emergency implementation...
+
+    /**
+     * Does the relation use SpecifyColumn?
+     * @param relationNoSuffix The suffix of relation No, same as foreign relation path. (NotNull)  
+     * @return The determination, true or false.
+     */
+    boolean isUsingSpecifyColumnInRelation(String relationNoSuffix);
 }

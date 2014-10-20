@@ -38,16 +38,16 @@ public enum HpCBPurpose {
     , SCALAR_SELECT(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
             .noSpecifyDerivedReferrerTwoOrMore().noSpecifyRelation().noOrderBy()) // ScalarSelect
 
-    , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
-            .noSpecifyDerivedReferrer().noOrderBy().subQuery()) // ScalarCondition
+    , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation().noSpecifyDerivedReferrer().noOrderBy()
+            .subQuery()) // ScalarCondition
 
-    , SCALAR_CONDITION_PARTITION_BY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
-            .noSpecifyDerivedReferrer().noQuery().noOrderBy().subQuery()) // ScalarConditionPartitionBy
+    , SCALAR_CONDITION_PARTITION_BY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation().noSpecifyDerivedReferrer()
+            .noQuery().noOrderBy().subQuery()) // ScalarConditionPartitionBy
 
-    , MYSELF_EXISTS(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore()
-            .noSpecifyColumnWithDerivedReferrer().noOrderBy().subQuery()) // MyselfExists
-    , MYSELF_IN_SCOPE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore()
-            .noSpecifyColumnWithDerivedReferrer().noOrderBy().subQuery()) // MyselfInScope
+    , MYSELF_EXISTS(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
+            .noOrderBy().subQuery()) // MyselfExists
+    , MYSELF_IN_SCOPE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
+            .noOrderBy().subQuery()) // MyselfInScope
 
     // A purpose that can specify but not allowed to query
     // needs to switch condition-bean used in specification
@@ -58,11 +58,9 @@ public enum HpCBPurpose {
 
     , OR_SCOPE_QUERY(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // OrScopeQuery
 
-    , DREAM_CRUISE(new HpSpec().noSetupSelect().noSpecifyColumnWithDerivedReferrer()
-            .noSpecifyDerivedReferrerTwoOrMore().noQuery()) // DreamCruise
+    , DREAM_CRUISE(new HpSpec().noSetupSelect().noSpecifyColumnWithDerivedReferrer().noSpecifyDerivedReferrerTwoOrMore().noQuery()) // DreamCruise
 
-    , VARYING_UPDATE(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
-            .noSpecifyDerivedReferrer().noQuery()) // VaryingUpdate
+    , VARYING_UPDATE(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation().noSpecifyDerivedReferrer().noQuery()) // VaryingUpdate
 
     , SPECIFIED_UPDATE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyDerivedReferrer().noQuery()) // SpecifiedUpdate
 

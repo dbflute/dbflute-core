@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  */
-public class DfUniqueKeyExtractorTest extends PlainTestCase {
+public class DfUniqueKeyExtractorTest extends EngineTestCase {
 
     public void test_removePkMatchUniqueKey_simple() throws Exception {
         // ## Arrange ##

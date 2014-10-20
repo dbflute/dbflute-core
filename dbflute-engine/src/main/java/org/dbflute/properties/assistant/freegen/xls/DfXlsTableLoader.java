@@ -141,9 +141,9 @@ public class DfXlsTableLoader {
         return new DfFreeGenTable(tableMap, sheetName, rowList);
     }
 
-    protected boolean processColumnValue(final String requestName, final Map<String, String> columnMap,
-            final HSSFRow row, final Map<String, Object> beanMap, final String key, final String value,
-            List<DfFreeGenLazyReflector> reflectorList, Map<String, Map<String, String>> mappingMap) {
+    protected boolean processColumnValue(final String requestName, final Map<String, String> columnMap, final HSSFRow row,
+            final Map<String, Object> beanMap, final String key, final String value, List<DfFreeGenLazyReflector> reflectorList,
+            Map<String, Map<String, String>> mappingMap) {
         if (convertByMethod(requestName, beanMap, key, value, reflectorList)) {
             return false;
         }
@@ -185,8 +185,8 @@ public class DfXlsTableLoader {
         convertByMethod(requestName, beanMap, "uncapCamelName", "df:uncapCamel(name)", reflectorList);
     }
 
-    protected boolean convertByMethod(final String requestName, final Map<String, Object> beanMap, final String key,
-            final String value, List<DfFreeGenLazyReflector> reflectorList) {
+    protected boolean convertByMethod(final String requestName, final Map<String, Object> beanMap, final String key, final String value,
+            List<DfFreeGenLazyReflector> reflectorList) {
         return _methodConverter.processConvertMethod(requestName, beanMap, key, value, reflectorList);
     }
 }

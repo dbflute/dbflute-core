@@ -32,7 +32,7 @@ public class ConditionKeyInScope extends ConditionKey {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================
@@ -47,8 +47,8 @@ public class ConditionKeyInScope extends ConditionKey {
     //                                                                       Prepare Query
     //                                                                       =============
     @Override
-    protected boolean doPrepareQuery(ConditionValue cvalue, Object value, ColumnRealName callerName) {
-        return value != null && value instanceof List<?> && !((List<?>) value).isEmpty();
+    protected ConditionKeyPrepareResult doPrepareQuery(ConditionValue cvalue, Object value) {
+        return chooseResultListQuery(value);
     }
 
     // ===================================================================================
@@ -63,8 +63,8 @@ public class ConditionKeyInScope extends ConditionKey {
     //                                                                        Where Clause
     //                                                                        ============
     @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value,
+            ColumnFunctionCipher cipher, ConditionOption option) {
         conditionList.add(buildBindClause(columnRealName, value.getInScopeLatestLocation(), cipher, option));
     }
 
@@ -82,5 +82,13 @@ public class ConditionKeyInScope extends ConditionKey {
     @Override
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupInScope(value, location);
+    }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return false;
     }
 }

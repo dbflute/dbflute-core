@@ -18,13 +18,13 @@ package org.dbflute.logic.sql2entity.analyzer;
 import java.util.Map;
 
 import org.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  * @since 0.9.6 (2009/10/26 Monday)
  */
-public class DfSql2EntityMarkAnalyzerTest extends PlainTestCase {
+public class DfSql2EntityMarkAnalyzerTest extends EngineTestCase {
 
     // ===================================================================================
     //                                                                   Title/Description

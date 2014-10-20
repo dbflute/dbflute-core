@@ -111,8 +111,7 @@ public class InvokeNameExtractor {
         return resultList;
     }
 
-    private InvokeNameResult createResult(String simpleClassName, String methodName, int lineNumber, int foundIndex,
-            int foundFirstIndex) {
+    private InvokeNameResult createResult(String simpleClassName, String methodName, int lineNumber, int foundIndex, int foundFirstIndex) {
         final InvokeNameResult result = new InvokeNameResult();
         result.setSimpleClassName(simpleClassName);
         result.setMethodName(methodName);

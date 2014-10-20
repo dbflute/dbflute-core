@@ -43,80 +43,80 @@ public class HpSSQFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of myself for the scalar 'max'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
      * </pre> 
-     * @param subQuery The sub query of myself. (NotNull)
+     * @param scalarCBLambda The callback for sub-query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
-    public HpSSQDecorator<CB> max(SubQuery<CB> subQuery) {
-        assertSubQuery(subQuery);
+    public HpSSQDecorator<CB> max(SubQuery<CB> scalarCBLambda) {
+        assertSubQuery(scalarCBLambda);
         final HpSSQOption<CB> option = createOption();
-        _setupper.setup("max", subQuery, option);
+        _setupper.setup("max", scalarCBLambda, option);
         return createDecorator(option);
     }
 
     /**
      * Set up the sub query of myself for the scalar 'min'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
      * </pre> 
-     * @param subQuery The sub query of myself. (NotNull)
+     * @param scalarCBLambda The callback for sub-query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
-    public HpSSQDecorator<CB> min(SubQuery<CB> subQuery) {
-        assertSubQuery(subQuery);
+    public HpSSQDecorator<CB> min(SubQuery<CB> scalarCBLambda) {
+        assertSubQuery(scalarCBLambda);
         final HpSSQOption<CB> option = createOption();
-        _setupper.setup("min", subQuery, option);
+        _setupper.setup("min", scalarCBLambda, option);
         return createDecorator(option);
     }
 
     /**
      * Set up the sub query of myself for the scalar 'sum'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
      * </pre> 
-     * @param subQuery The sub query of myself. (NotNull)
+     * @param scalarCBLambda The callback for sub-query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
-    public HpSSQDecorator<CB> sum(SubQuery<CB> subQuery) {
-        assertSubQuery(subQuery);
+    public HpSSQDecorator<CB> sum(SubQuery<CB> scalarCBLambda) {
+        assertSubQuery(scalarCBLambda);
         final HpSSQOption<CB> option = createOption();
-        _setupper.setup("sum", subQuery, option);
+        _setupper.setup("sum", scalarCBLambda, option);
         return createDecorator(option);
     }
 
     /**
      * Set up the sub query of myself for the scalar 'avg'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #DD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
      * </pre> 
-     * @param subQuery The sub query of myself. (NotNull)
+     * @param scalarCBLambda The callback for sub-query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
-    public HpSSQDecorator<CB> avg(SubQuery<CB> subQuery) {
-        assertSubQuery(subQuery);
+    public HpSSQDecorator<CB> avg(SubQuery<CB> scalarCBLambda) {
+        assertSubQuery(scalarCBLambda);
         final HpSSQOption<CB> option = createOption();
-        _setupper.setup("avg", subQuery, option);
+        _setupper.setup("avg", scalarCBLambda, option);
         return createDecorator(option);
     }
 
@@ -131,9 +131,9 @@ public class HpSSQFunction<CB extends ConditionBean> {
         return new HpSSQDecorator<CB>(option);
     }
 
-    protected void assertSubQuery(SubQuery<?> subQuery) {
-        if (subQuery == null) {
-            String msg = "The argument 'subQuery' for ScalarCondition should not be null.";
+    protected void assertSubQuery(SubQuery<?> scalarCBLambda) {
+        if (scalarCBLambda == null) {
+            String msg = "The argument 'scalarCBLambda' for ScalarCondition should not be null.";
             throw new IllegalArgumentException(msg);
         }
     }

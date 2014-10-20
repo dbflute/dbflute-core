@@ -23,8 +23,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.AppData;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.dbway.DBDef;
@@ -47,6 +45,8 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -56,8 +56,8 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfOutsideSqlAnalyzer.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfOutsideSqlAnalyzer.class);
 
     // ===================================================================================
     //                                                                           Attribute

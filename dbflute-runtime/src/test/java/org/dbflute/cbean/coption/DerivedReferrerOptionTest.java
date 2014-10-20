@@ -16,14 +16,14 @@
 package org.dbflute.cbean.coption;
 
 import org.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  * @since 0.9.7.7 (2010/12/04 Saturday)
  */
-public class DerivedReferrerOptionTest extends PlainTestCase {
+public class DerivedReferrerOptionTest extends RuntimeTestCase {
 
     public void test_processSimpleFunction_basic() throws Exception {
         // ## Arrange ##

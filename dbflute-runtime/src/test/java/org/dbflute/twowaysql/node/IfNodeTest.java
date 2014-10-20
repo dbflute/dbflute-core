@@ -21,13 +21,13 @@ import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
 import org.dbflute.twowaysql.exception.EndCommentNotFoundException;
 import org.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.7.0 (2010/05/29 Saturday)
  */
-public class IfNodeTest extends PlainTestCase {
+public class IfNodeTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                               Basic

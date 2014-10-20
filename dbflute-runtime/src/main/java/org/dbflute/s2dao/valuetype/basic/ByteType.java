@@ -50,8 +50,7 @@ public class ByteType extends TnAbstractValueType {
         return DfTypeUtil.toByte(cs.getObject(parameterName));
     }
 
-    public void bindValue(Connection conn, PreparedStatement ps, final int index, final Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, final int index, final Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
@@ -59,8 +58,7 @@ public class ByteType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(Connection conn, CallableStatement cs, final String parameterName, final Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, final String parameterName, final Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {

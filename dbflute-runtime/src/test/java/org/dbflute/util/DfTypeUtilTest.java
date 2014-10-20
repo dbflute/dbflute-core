@@ -15,11 +15,7 @@
  */
 package org.dbflute.util;
 
-import static org.dbflute.util.DfTypeUtil.AD_ORIGIN_MILLISECOND;
-import static org.dbflute.util.DfTypeUtil.toClassTitle;
-import static org.dbflute.util.DfTypeUtil.toDate;
-import static org.dbflute.util.DfTypeUtil.toTime;
-import static org.dbflute.util.DfTypeUtil.toTimestamp;
+import static org.dbflute.util.DfTypeUtil.*;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -30,6 +26,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -57,7 +54,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance for sub class. */
-    private final Logger _logger = Logger.getLogger(getClass());
+    private final static Logger _logger = Logger.getLogger(DfTypeUtilTest.class);
 
     // ===================================================================================
     //                                                                          Convert To
@@ -111,7 +108,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertNull(DfTypeUtil.toInteger(null));
         assertNull(DfTypeUtil.toInteger(""));
         assertNull(DfTypeUtil.toInteger(" "));
-        assertEquals(Integer.valueOf(3), DfTypeUtil.toInteger("3"));
+        assertEquals(Integer.valueOf(3), toInteger("3"));
         assertEquals(Integer.valueOf(-3), DfTypeUtil.toInteger("-3"));
         assertEquals(Integer.valueOf(3), DfTypeUtil.toInteger("+3"));
         assertEquals(Integer.valueOf(33333), DfTypeUtil.toInteger("33333"));
@@ -140,13 +137,12 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertNull(DfTypeUtil.toBigInteger(null));
         assertNull(DfTypeUtil.toBigInteger(""));
         assertNull(DfTypeUtil.toBigInteger(" "));
-        assertEquals(BigInteger.valueOf(3), DfTypeUtil.toBigInteger("3"));
+        assertEquals(BigInteger.valueOf(3), toBigInteger("3"));
         assertEquals(BigInteger.valueOf(33333), DfTypeUtil.toBigInteger("33333"));
         assertEquals(BigInteger.valueOf(-33333), DfTypeUtil.toBigInteger("-33333"));
         assertEquals(BigInteger.valueOf(33333), DfTypeUtil.toBigInteger("33,333"));
         assertEquals(new BigInteger("18446744073709551615"), DfTypeUtil.toBigInteger("18446744073709551615"));
-        assertEquals(new BigInteger("18446744073709551615"),
-                DfTypeUtil.toBigInteger(new BigDecimal("18446744073709551615")));
+        assertEquals(new BigInteger("18446744073709551615"), DfTypeUtil.toBigInteger(new BigDecimal("18446744073709551615")));
         assertEquals(new BigInteger("123456789123456"), DfTypeUtil.toBigInteger("123456789123456"));
         assertEquals(new BigInteger("18446744073709551615"), new BigInteger("18446744073709551615") {
             private static final long serialVersionUID = 1L;
@@ -163,15 +159,35 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     public void test_toLocalDate_basic() {
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
         Date pureDate = toDate("2009-12-13 01:23:45.123", gmt2hour);
-        LocalDate localDate = DfTypeUtil.toLocalDate(pureDate, gmt2hour);
+        LocalDate localDate = toLocalDate(pureDate, gmt2hour);
         assertEquals("2009-12-13", localDate.format(DateTimeFormatter.ISO_DATE));
     }
 
     public void test_toLocalDate_gmt9hour() {
         TimeZone gmt9hour = TimeZone.getTimeZone("GMT+9");
         Date pureDate = toDate("2009-12-13 01:23:45.123", gmt9hour);
-        LocalDate localDate = DfTypeUtil.toLocalDate(pureDate, gmt9hour);
+        LocalDate localDate = toLocalDate(pureDate, gmt9hour);
         assertEquals("2009-12-13", localDate.format(DateTimeFormatter.ISO_DATE));
+    }
+
+    public void test_toLocalDate_illegal() {
+        TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        assertNotNull(toLocalDate("2009-12-13 01:23:45.123", gmt2hour));
+        try {
+            assertNull(DfTypeUtil.toLocalDate("2009-12-13 01:23:45.123", null));
+            fail();
+        } catch (IllegalArgumentException e) {
+            log(e.getMessage());
+        }
+        assertNull(DfTypeUtil.toLocalDate(null, gmt2hour));
+        assertNull(DfTypeUtil.toLocalDate("", gmt2hour));
+        assertNull(DfTypeUtil.toLocalDate(" ", gmt2hour));
+        try {
+            assertNull(DfTypeUtil.toLocalDate("a", gmt2hour));
+            fail();
+        } catch (ParseDateException e) {
+            log(e.getMessage());
+        }
     }
 
     // -----------------------------------------------------
@@ -180,7 +196,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     public void test_toLocalDateTime_fromUtilDate_timeZone() {
         TimeZone gmt3Hour = TimeZone.getTimeZone("GMT+3");
         Date pureDate = toDate("2009-12-13 12:34:56.123", gmt3Hour);
-        LocalDateTime localDate = DfTypeUtil.toLocalDateTime(pureDate, gmt3Hour);
+        LocalDateTime localDate = toLocalDateTime(pureDate, gmt3Hour);
         assertEquals("2009-12-13T12:34:56.123", localDate.format(DateTimeFormatter.ISO_DATE_TIME));
     }
 
@@ -190,7 +206,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
         // ## Act ##
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
-        LocalDateTime ldt = DfTypeUtil.toLocalDateTime(strDate, gmt2hour);
+        LocalDateTime ldt = toLocalDateTime(strDate, gmt2hour);
 
         // ## Assert ##
         String converted = ldt.format(DateTimeFormatter.ISO_DATE_TIME);
@@ -204,9 +220,39 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals("1970/01/01 09:00:06.789", reversedStrDate);
 
         TimeZone gmtZone = TimeZone.getTimeZone("GMT");
-        Date gmt7hour = DfTypeUtil.toDate("1970/01/01 07:00:06.789", gmtZone);
-        log("emg7hour  : " + DfTypeUtil.toStringDate(gmt7hour, "yyyy/MM/dd HH:mm:ss.SSS", gmtZone));
+        Date gmt7hour = toDate("1970/01/01 07:00:06.789", gmtZone);
+        log("emg7hour  : " + toStringDate(gmt7hour, "yyyy/MM/dd HH:mm:ss.SSS", gmtZone));
         assertEquals(gmt7hour.getTime(), reversedDate.getTime());
+    }
+
+    public void test_toLocalDateTime_illegal() {
+        TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        assertNotNull(DfTypeUtil.toLocalDateTime("2009-12-13 01:23:45.123", gmt2hour));
+        try {
+            assertNull(toLocalDateTime("2009-12-13 01:23:45.123", null));
+            fail();
+        } catch (IllegalArgumentException e) {
+            log(e.getMessage());
+        }
+        assertNull(DfTypeUtil.toLocalDateTime(null, gmt2hour));
+        assertNull(DfTypeUtil.toLocalDateTime("", gmt2hour));
+        assertNull(DfTypeUtil.toLocalDateTime(" ", gmt2hour));
+        try {
+            assertNull(DfTypeUtil.toLocalDateTime("a", gmt2hour));
+            fail();
+        } catch (ParseDateException e) {
+            log(e.getMessage());
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                            Local Time
+    //                                            ----------
+    public void test_toLocalTime_fromUtilDate_timeZone() {
+        TimeZone gmt3Hour = TimeZone.getTimeZone("GMT+3");
+        Date pureDate = toDate("2009-12-13 12:34:56.123", gmt3Hour);
+        LocalTime localDate = DfTypeUtil.toLocalTime(pureDate, gmt3Hour);
+        assertEquals("12:34:56.123", localDate.format(DateTimeFormatter.ISO_TIME));
     }
 
     // ===================================================================================
@@ -228,8 +274,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_toDate_subClass() {
         // ## Arrange ##
-        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");
-        Timestamp timestamp = Timestamp.valueOf("2009-12-13 12:34:56.123");
+        DateFormat df = createDateFormat("yyyy/MM/dd HH:mm:ss");
+        Timestamp timestamp = toTimestamp("2009-12-13 12:34:56.123");
 
         // ## Act ##
         Date date = toDate(timestamp);
@@ -270,14 +316,15 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");
         DateFormat dfmil = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         DateFormat gdf = DfTypeUtil.createDateFormat("Gyyyy/MM/dd HH:mm:ss.SSS");
+        long timeZonedADJustTimeMillis = getTimeZonedADOriginMillis(null);
 
         // ## Act & Assert ##
         log(gdf.format(DfTypeUtil.toDate("A.D.2008-9-1")));
-        assertTrue(DfTypeUtil.toDate("A.D.1-1-1 00:00:00.000").getTime() >= AD_ORIGIN_MILLISECOND);
-        assertEquals(AD_ORIGIN_MILLISECOND, DfTypeUtil.toDate("A.D.1-1-1 00:00:00.000").getTime());
-        assertTrue(DfTypeUtil.toDate("2008-10-21 12:34:56").getTime() >= AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("AD8-9-1 12:34:56").getTime() >= AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("A.D.8-9-1 12:34:56").getTime() >= AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toDate("A.D.1-1-1 00:00:00.000").getTime() >= timeZonedADJustTimeMillis);
+        assertEquals(timeZonedADJustTimeMillis, DfTypeUtil.toDate("A.D.1-1-1 00:00:00.000").getTime());
+        assertTrue(DfTypeUtil.toDate("2008-10-21 12:34:56").getTime() >= timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("AD8-9-1 12:34:56").getTime() >= timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("A.D.8-9-1 12:34:56").getTime() >= timeZonedADJustTimeMillis);
         assertEquals("0008/09/01 12:34:56", df.format(DfTypeUtil.toDate("AD8-9-1 12:34:56")));
         assertEquals("2008/09/01 00:00:00", df.format(DfTypeUtil.toDate("A.D.2008-9-1")));
         assertEquals("0001/01/01 00:00:00.000", dfmil.format(DfTypeUtil.toDate("AD1-1-1 00:00:00.000")));
@@ -287,25 +334,26 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_toDate_string_BC() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");
         SimpleDateFormat fullDf = new SimpleDateFormat("Gyyyy/MM/dd HH:mm:ss.SSS");
+        long timeZonedADJustTimeMillis = getTimeZonedADOriginMillis(null);
 
         // ## Act & Assert ##
         log(fullDf.format(DfTypeUtil.toDate("-2008-09-01 02:04:06")));
-        assertTrue(DfTypeUtil.toDate("B.C.0001-12-31 23:59:59.999").getTime() < AD_ORIGIN_MILLISECOND);
-        assertEquals(AD_ORIGIN_MILLISECOND - 1L, DfTypeUtil.toDate("B.C.0001-12-31 23:59:59.999").getTime());
-        assertTrue(DfTypeUtil.toDate("-8-9-1").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("-1-9-1").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("-8-9-1 2:4:6").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("date -80901").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("-2008-09-01 02:04:06").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("-2008-13-01 02:04:06").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("BC8-9-1 2:4:6").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("BC2008-09-01 02:04:06").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("BC2008-13-01 02:04:06").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("B.C.8-9-1 2:4:6").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("B.C.2008-09-01 02:04:06").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toDate("B.C.2008-13-01 02:04:06").getTime() < AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toDate("B.C.0001-12-31 23:59:59.999").getTime() < timeZonedADJustTimeMillis);
+        assertEquals(timeZonedADJustTimeMillis - 1L, DfTypeUtil.toDate("B.C.0001-12-31 23:59:59.999").getTime());
+        assertTrue(DfTypeUtil.toDate("-8-9-1").getTime() < timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("-1-9-1").getTime() < timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("-8-9-1 2:4:6").getTime() < timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("date -80901").getTime() < timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("-2008-09-01 02:04:06").getTime() < timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("-2008-13-01 02:04:06").getTime() < timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("BC8-9-1 2:4:6").getTime() < timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("BC2008-09-01 02:04:06").getTime() < timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("BC2008-13-01 02:04:06").getTime() < timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("B.C.8-9-1 2:4:6").getTime() < timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("B.C.2008-09-01 02:04:06").getTime() < timeZonedADJustTimeMillis);
+        assertTrue(DfTypeUtil.toDate("B.C.2008-13-01 02:04:06").getTime() < timeZonedADJustTimeMillis);
         assertEquals("2008/11/01 02:04:06", df.format(DfTypeUtil.toDate("-2008-11-01 02:04:06")));
         assertEquals("0008/09/01 00:00:00", df.format(DfTypeUtil.toDate("date -80901")));
 
@@ -475,33 +523,53 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_toDate_isDateAD() {
         // ## Arrange & Act & Assert ##
-        assertTrue(DfTypeUtil.isDateAD(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
-        Date before = DfTypeUtil.toDate("BC0001-12-31 23:59:59.999");
-        Date after = DfTypeUtil.toDate("0001-01-01 00:00:00.000");
-        log("before time = " + before.getTime());
-        log("after  time = " + after.getTime());
-        assertFalse(DfTypeUtil.isDateAD(before));
-        assertTrue(DfTypeUtil.isDateAD(after));
-        assertEquals(GregorianCalendar.BC, DfTypeUtil.toCalendar(before).get(Calendar.ERA));
-        assertEquals(GregorianCalendar.AD, DfTypeUtil.toCalendar(after).get(Calendar.ERA));
-
-        // extra
-        DfTypeUtil.addDateDay(before, 1);
-        DfTypeUtil.clearDateTimeParts(before);
-        assertEquals(after, before);
-    }
-
-    public void test_toDate_isDateBC() {
-        // ## Arrange & Act & Assert ##
-        assertFalse(DfTypeUtil.isDateBC(toDate("2008-12-30 12:34:56.789")));
+        assertTrue(isDateAD(toDate("2008-12-30 12:34:56.789")));
         Date before = toDate("BC0001-12-31 23:59:59.999");
         Date after = toDate("0001-01-01 00:00:00.000");
         log("before time = " + before.getTime());
         log("after  time = " + after.getTime());
-        assertTrue(DfTypeUtil.isDateBC(before));
-        assertFalse(DfTypeUtil.isDateBC(after));
-        assertEquals(GregorianCalendar.BC, DfTypeUtil.toCalendar(before).get(Calendar.ERA));
-        assertEquals(GregorianCalendar.AD, DfTypeUtil.toCalendar(after).get(Calendar.ERA));
+        assertFalse(isDateAD(before));
+        assertTrue(isDateAD(after));
+        assertEquals(GregorianCalendar.BC, toCalendar(before).get(Calendar.ERA));
+        assertEquals(GregorianCalendar.AD, toCalendar(after).get(Calendar.ERA));
+
+        // extra
+        addDateDay(before, 1);
+        clearDateTimeParts(before);
+        assertEquals(after, before);
+    }
+
+    public void test_toDate_isDateAD_timeZone() {
+        // ## Arrange & Act & Assert ##
+        TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        assertTrue(isDateAD(toDate("2008-12-30 12:34:56.789", gmt2hour)));
+        Date before = toDate("BC0001-12-31 23:59:59.999", gmt2hour);
+        Date after = toDate("0001-01-01 00:00:00.000", gmt2hour);
+        log("before time = " + before.getTime());
+        log("after  time = " + after.getTime());
+        assertFalse(isDateAD(before, gmt2hour));
+        assertTrue(isDateAD(after, gmt2hour));
+        Calendar beforeCal = toCalendar(before, gmt2hour);
+        assertEquals(GregorianCalendar.BC, beforeCal.get(Calendar.ERA));
+        assertEquals(GregorianCalendar.AD, toCalendar(after, gmt2hour).get(Calendar.ERA));
+
+        // extra
+        addCalendarDay(beforeCal, 1);
+        clearCalendarTimeParts(beforeCal);
+        assertEquals(after, beforeCal.getTime());
+    }
+
+    public void test_toDate_isDateBC() {
+        // ## Arrange & Act & Assert ##
+        assertFalse(isDateBC(toDate("2008-12-30 12:34:56.789")));
+        Date before = toDate("BC0001-12-31 23:59:59.999");
+        Date after = toDate("0001-01-01 00:00:00.000");
+        log("before time = " + before.getTime());
+        log("after  time = " + after.getTime());
+        assertTrue(isDateBC(before));
+        assertFalse(isDateBC(after));
+        assertEquals(GregorianCalendar.BC, toCalendar(before).get(Calendar.ERA));
+        assertEquals(GregorianCalendar.AD, toCalendar(after).get(Calendar.ERA));
     }
 
     public void test_toDate_fromString_timeZone() {
@@ -513,7 +581,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         Date actual = toDate(strDate, timeZone); // expects 7 hour for GMT
 
         // ## Assert ##
-        String reversed = DfTypeUtil.toStringDate(actual, "yyyy/MM/dd HH:mm:ss.SSS", timeZone);
+        String reversed = toStringDate(actual, "yyyy/MM/dd HH:mm:ss.SSS", timeZone);
         Date gmt7hour = toDate("1970-01-01 07:00:06.789", TimeZone.getTimeZone("GMT"));
         log(reversed + ", " + actual.getTime() + ", " + gmt7hour.getTime());
         assertEquals(gmt7hour.getTime(), actual.getTime());
@@ -527,21 +595,21 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         Date date = toDate("2008-12-30 12:34:56.789");
 
         // ## Act & Assert ##
-        DfTypeUtil.addDateYear(date, 1);
+        addDateYear(date, 1);
         assertEquals(toDate("2009-12-30 12:34:56.789"), date);
-        DfTypeUtil.addDateMonth(date, 1);
+        addDateMonth(date, 1);
         assertEquals(toDate("2010-01-30 12:34:56.789"), date);
-        DfTypeUtil.addDateDay(date, 1);
+        addDateDay(date, 1);
         assertEquals(toDate("2010-01-31 12:34:56.789"), date);
-        DfTypeUtil.addDateHour(date, 1);
+        addDateHour(date, 1);
         assertEquals(toDate("2010-01-31 13:34:56.789"), date);
-        DfTypeUtil.addDateMinute(date, 1);
+        addDateMinute(date, 1);
         assertEquals(toDate("2010-01-31 13:35:56.789"), date);
-        DfTypeUtil.addDateSecond(date, 1);
+        addDateSecond(date, 1);
         assertEquals(toDate("2010-01-31 13:35:57.789"), date);
-        DfTypeUtil.addDateMillisecond(date, 1);
+        addDateMillisecond(date, 1);
         assertEquals(toDate("2010-01-31 13:35:57.790"), date);
-        DfTypeUtil.addDateWeekOfMonth(date, 1);
+        addDateWeekOfMonth(date, 1);
         assertEquals(toDate("2010-02-07 13:35:57.790"), date);
     }
 
@@ -551,8 +619,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     // here is only for basic tests, detail tests are implemented HandyDateTest
     public void test_Date_moveToDateYearJust() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
+        DateFormat df = createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
         DfTypeUtil.moveToDateYearJust(date);
@@ -563,8 +631,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateYearTerminal() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
+        DateFormat df = createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
         DfTypeUtil.moveToDateYearTerminal(date);
@@ -575,8 +643,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateMonthJust() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
+        DateFormat df = createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
         DfTypeUtil.moveToDateMonthJust(date);
@@ -587,8 +655,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateMonthTerminal() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        Date date = DfTypeUtil.toDate("2008-02-06 12:34:56.789");
+        DateFormat df = createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = toDate("2008-02-06 12:34:56.789");
 
         // ## Act ##
         DfTypeUtil.moveToDateMonthTerminal(date);
@@ -599,7 +667,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateDayJust() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
@@ -611,7 +679,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateDayTerminal() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-02-06 12:34:56.789");
 
         // ## Act ##
@@ -623,7 +691,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateHourJust() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
@@ -635,7 +703,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateHourTerminal() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-02-06 12:34:56.789");
 
         // ## Act ##
@@ -647,7 +715,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateWeekJust_basic() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
 
         // ## Act ##
@@ -659,7 +727,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateWeekJust_just_day() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
 
         // ## Act ##
@@ -671,7 +739,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateWeekJust_Friday() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-20 12:34:56.789"); // Sunday
 
         // ## Act ##
@@ -683,7 +751,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateWeekTerminal_basic() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
 
         // ## Act ##
@@ -695,7 +763,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateWeekTerminal_just_day() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
 
         // ## Act ##
@@ -707,7 +775,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateWeekTerminal_Friday() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-20 12:34:56.789"); // Sunday
 
         // ## Act ##
@@ -719,7 +787,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateQuarterOfYearJust_basic() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-20 12:34:56.789");
 
         // ## Act ##
@@ -731,7 +799,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateQuarterOfYearJust_over() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2012-01-20 12:34:56.789");
 
         // ## Act ##
@@ -743,7 +811,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateQuarterOfYearTerminal_basic() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-20 12:34:56.789");
 
         // ## Act ##
@@ -755,7 +823,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_Date_moveToDateQuarterOfYearTerminal_over() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2012-01-20 12:34:56.789");
 
         // ## Act ##
@@ -770,7 +838,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     //                                            ----------
     public void test_clearDateTimeParts() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
@@ -782,7 +850,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_clearDateMillisecond() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
@@ -797,7 +865,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     //                                             ---------
     public void test_1mp_various() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
         // ## Act & Assert ##
         assertNull(DfTypeUtil.toTimestamp(null));
@@ -834,23 +902,23 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_toTimestamp_various_BC() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         SimpleDateFormat fullDf = new SimpleDateFormat("Gyyyy/MM/dd HH:mm:ss.SSS");
 
         // ## Act & Assert ##
         log(fullDf.format(toTimestamp("-2008-09-01 02:04:06.123")));
-        assertTrue(DfTypeUtil.toTimestamp("-8-9-1").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toTimestamp("-1-9-1").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toTimestamp("-8-9-1 2:4:6").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toTimestamp("date -80901").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toTimestamp("-2008-09-01 02:04:06.123").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toTimestamp("-2008-13-01 02:04:06").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toTimestamp("BC8-9-1 2:4:6").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toTimestamp("BC2008-09-01 02:04:06").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toTimestamp("BC2008-13-01 02:04:06.123").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toTimestamp("B.C.8-9-1 2:4:6").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toTimestamp("B.C.2008-09-01 02:04:06.123").getTime() < AD_ORIGIN_MILLISECOND);
-        assertTrue(DfTypeUtil.toTimestamp("B.C.2008-13-01 02:04:06").getTime() < AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("-8-9-1").getTime() < GMT_AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("-1-9-1").getTime() < GMT_AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("-8-9-1 2:4:6").getTime() < GMT_AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("date -80901").getTime() < GMT_AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("-2008-09-01 02:04:06.123").getTime() < GMT_AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("-2008-13-01 02:04:06").getTime() < GMT_AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("BC8-9-1 2:4:6").getTime() < GMT_AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("BC2008-09-01 02:04:06").getTime() < GMT_AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("BC2008-13-01 02:04:06.123").getTime() < GMT_AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("B.C.8-9-1 2:4:6").getTime() < GMT_AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("B.C.2008-09-01 02:04:06.123").getTime() < GMT_AD_ORIGIN_MILLISECOND);
+        assertTrue(DfTypeUtil.toTimestamp("B.C.2008-13-01 02:04:06").getTime() < GMT_AD_ORIGIN_MILLISECOND);
         assertEquals("2008/11/01 02:04:06.123", df.format(toTimestamp("-2008-11-01 02:04:06.123")));
         assertEquals("0008/09/01 00:00:00.000", df.format(toTimestamp("date -80901")));
 
@@ -872,7 +940,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_toTimestamp_illegal() {
         try {
-            DfTypeUtil.toTimestamp("2009-12");
+            toTimestamp("2009-12");
 
             fail();
         } catch (ParseTimestampException e) {
@@ -967,7 +1035,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     //                                                  ----
     public void test_toTime_timestamp() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789");
 
         // ## Act & Assert ##
@@ -990,13 +1058,13 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
     public void test_toTime_various() {
         // ## Arrange ##
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-        SimpleDateFormat fullDf = new SimpleDateFormat("HH:mm:ss.SSS");
+        DateFormat df = createDateFormat("HH:mm:ss");
+        DateFormat fullDf = createDateFormat("HH:mm:ss.SSS");
 
         // ## Act & Assert ##
         assertNull(DfTypeUtil.toTime(null));
         assertNull(DfTypeUtil.toTime(""));
-        assertEquals("12:34:56", df.format(DfTypeUtil.toTime("2009/12/12 12:34:56")));
+        assertEquals("12:34:56", df.format(toTime("2009/12/12 12:34:56")));
         assertEquals("12:34:56", df.format(DfTypeUtil.toTime("12:34:56")));
         assertEquals("02:04:06", df.format(DfTypeUtil.toTime("02:04:06")));
         assertEquals("02:04:06", df.format(DfTypeUtil.toTime("2:4:6")));
@@ -1048,7 +1116,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals("2008/12/30", f.format(DfTypeUtil.toSqlDate("2008-12-30")));
         assertEquals("2008/12/30", f.format(DfTypeUtil.toSqlDate("2008-12-30 12:34:56")));
         assertEquals("2008/12/30", f.format(DfTypeUtil.toSqlDate("2008-12-30 12:34:56.789")));
-        assertEquals("2008/09/30", f.format(DfTypeUtil.toSqlDate("2008-09-30 12:34:56")));
+        assertEquals("2008/09/30", f.format(toSqlDate("2008-09-30 12:34:56")));
         assertEquals("2008/09/30", f.format(DfTypeUtil.toSqlDate("2008-9-30 12:34:56")));
         assertEquals("2008/09/01", f.format(DfTypeUtil.toSqlDate("2008-9-1 12:34:56")));
         assertEquals("0008/09/01", f.format(DfTypeUtil.toSqlDate("8-9-1 12:34:56")));
@@ -1076,7 +1144,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     public void test_toBinary_basic() {
         // ## Arrange & Act & Assert ##
         assertNull(DfTypeUtil.toBinary(null));
-        assertNotNull(DfTypeUtil.toBinary(""));
+        assertNotNull(toBinary(""));
     }
 
     public void test_toBinary_byteArray() throws UnsupportedEncodingException {
@@ -1084,7 +1152,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         final byte[] bytes = "foo".getBytes("UTF-8");
 
         // ## Act & Assert ##
-        assertEquals(bytes.length, DfTypeUtil.toBinary(bytes).length);
+        assertEquals(bytes.length, toBinary(bytes).length);
         assertTrue(bytes instanceof Serializable); // confirmation
     }
 

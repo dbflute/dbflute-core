@@ -20,13 +20,13 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.dbflute.util.DfCollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -37,7 +37,7 @@ public abstract class DfSequenceExtractorBase extends DfAbstractMetaDataExtracto
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSequenceExtractorBase.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfSequenceExtractorBase.class);
 
     // ===================================================================================
     //                                                                           Attribute

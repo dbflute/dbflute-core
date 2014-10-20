@@ -19,13 +19,13 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.DfAlterCheckAlterScriptSQLException;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
 import org.dbflute.helper.token.line.LineToken;
 import org.dbflute.helper.token.line.LineTokenizingOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -35,8 +35,8 @@ public class DfSqlFileFireMan {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static Log _log = LogFactory.getLog(DfSqlFileFireMan.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfSqlFileFireMan.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -94,8 +94,8 @@ public class DfSqlFileFireMan {
         return fireResult;
     }
 
-    protected void buildResultMessage(List<File> sqlFileList, final DfSqlFileFireResult fireResult, int goodSqlCount,
-            int totalSqlCount, final String title) {
+    protected void buildResultMessage(List<File> sqlFileList, final DfSqlFileFireResult fireResult, int goodSqlCount, int totalSqlCount,
+            final String title) {
         final StringBuilder resultSb = new StringBuilder();
         resultSb.append("{").append(title).append("}: success=").append(goodSqlCount);
         if (fireResult.getBreakCause() != null) {

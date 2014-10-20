@@ -76,8 +76,7 @@ public abstract class TnAbstractQueryDynamicCommand extends TnAbstractBasicSqlCo
     // ===================================================================================
     //                                                                      CommandContext
     //                                                                      ==============
-    protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes,
-            Object[] args) {
+    protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
         final CommandContext ctx;
         {
             final SqlAnalyzer analyzer = createSqlAnalyzer(twoWaySql);

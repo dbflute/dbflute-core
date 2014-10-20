@@ -117,8 +117,7 @@ public class DfCollectionUtil {
     // -----------------------------------------------------
     //                                               Advance
     //                                               -------
-    public static <ELEMENT> OrderDiff<ELEMENT> analyzeOrderDiff(List<ELEMENT> beforeUniqueList,
-            List<ELEMENT> afterUniqueList) {
+    public static <ELEMENT> OrderDiff<ELEMENT> analyzeOrderDiff(List<ELEMENT> beforeUniqueList, List<ELEMENT> afterUniqueList) {
         final LinkedHashSet<ELEMENT> linkedBeforeSet = newLinkedHashSet(beforeUniqueList);
         if (beforeUniqueList.size() != linkedBeforeSet.size()) {
             String msg = "The argument 'beforeList' should be unique: " + beforeUniqueList;
@@ -158,8 +157,8 @@ public class DfCollectionUtil {
         return orderDiff;
     }
 
-    protected static <ELEMENT> void doAnalyzeOrderChange(List<ELEMENT> beforeRemainingList,
-            List<ELEMENT> afterRemainingList, Map<ELEMENT, OrderDiffDetail<ELEMENT>> movedMap) {
+    protected static <ELEMENT> void doAnalyzeOrderChange(List<ELEMENT> beforeRemainingList, List<ELEMENT> afterRemainingList,
+            Map<ELEMENT, OrderDiffDetail<ELEMENT>> movedMap) {
         ELEMENT movedElement = null;
         ELEMENT previousElement = null;
         for (int i = 0; i < beforeRemainingList.size(); i++) {
@@ -323,8 +322,7 @@ public class DfCollectionUtil {
         return map;
     }
 
-    public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(KEY key1, VALUE value1, KEY key2,
-            VALUE value2) {
+    public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(KEY key1, VALUE value1, KEY key2, VALUE value2) {
         final ConcurrentHashMap<KEY, VALUE> map = newConcurrentHashMapSized(2);
         map.put(key1, value1);
         map.put(key2, value2);

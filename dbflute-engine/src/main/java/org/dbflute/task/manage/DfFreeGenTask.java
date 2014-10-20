@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.dbflute.friends.velocity.DfVelocityContextFactory;
@@ -32,6 +30,8 @@ import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTexenTask;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -42,7 +42,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfFreeGenTask.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfFreeGenTask.class);
 
     // ===================================================================================
     //                                                                           Attribute

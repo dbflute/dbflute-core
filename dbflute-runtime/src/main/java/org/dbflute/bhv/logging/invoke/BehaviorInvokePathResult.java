@@ -26,8 +26,8 @@ public class BehaviorInvokePathResult {
     protected final String _clientInvokeName;
     protected final String _byPassInvokeName;
 
-    public BehaviorInvokePathResult(String invokePath, BehaviorInvokeNameResult behaviorInvokeNameResult,
-            String clientInvokeName, String byPassInvokeName) {
+    public BehaviorInvokePathResult(String invokePath, BehaviorInvokeNameResult behaviorInvokeNameResult, String clientInvokeName,
+            String byPassInvokeName) {
         _invokePath = invokePath;
         _behaviorInvokeNameResult = behaviorInvokeNameResult;
         _clientInvokeName = clientInvokeName;

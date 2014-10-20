@@ -16,13 +16,13 @@
 package org.dbflute.twowaysql;
 
 import org.dbflute.twowaysql.node.SqlPartsNode;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.5 (2009/04/08 Wednesday)
  */
-public class SqlAnalyzerTest extends PlainTestCase {
+public class SqlAnalyzerTest extends RuntimeTestCase {
 
     public void test_createSqlNode() {
         // ## Arrange ##

@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.MappingValueType;
+import org.dbflute.dbmeta.accessory.MappingValueType;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.helper.beans.DfBeanDesc;
@@ -76,8 +76,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
 
     protected boolean isSimpleType(Class<?> clazz) {
         return clazz == String.class || clazz.isPrimitive() || clazz == Boolean.class || clazz == Character.class
-                || Number.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz)
-                || Calendar.class.isAssignableFrom(clazz);
+                || Number.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz) || Calendar.class.isAssignableFrom(clazz);
     }
 
     // ===================================================================================

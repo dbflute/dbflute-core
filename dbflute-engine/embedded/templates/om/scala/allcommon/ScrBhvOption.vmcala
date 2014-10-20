@@ -50,8 +50,8 @@ class ScrInsertOption[CB <: ConditionBean](option: InsertOption[CB]) {
  */
 class ScrUpdateOption[CB <: ConditionBean](option: UpdateOption[CB]) {
 
-    def self(specCall: (CB) => Unit): ScrHpCalculator = {
-        return new ScrHpCalculator(option.self(new SpecifyQuery[CB]() { def specify(cb: CB): Unit = { specCall(cb) } }));
+    def self(specCall: (CB) => Unit): ScrColumnCalculator = {
+        return new ScrColumnCalculator(option.self(new SpecifyQuery[CB]() { def specify(cb: CB): Unit = { specCall(cb) } }));
     }
     def specify(specCall: (CB) => Unit): Unit = {
         option.specify(new SpecifyQuery[CB]() { def specify(cb: CB): Unit = { specCall(cb) } });

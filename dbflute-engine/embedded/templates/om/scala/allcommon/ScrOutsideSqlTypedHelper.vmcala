@@ -85,7 +85,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
      * OptionalEntity&lt;SimpleMember&gt; member
-     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectEntity</span>(pmb);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectEntity</span>(pmb);
      * if (member.isPresent()) {
      *     ... = member.get...();
      * } else {
@@ -113,7 +113,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectList</span>(pmb);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectList</span>(pmb);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -146,7 +146,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
      * pmb.setMemberName_PrefixSearch("S");
      * Class&lt;SimpleMember&gt; entityType = SimpleMember.class;
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectList</span>(path, pmb, entityType);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectList</span>(path, pmb, entityType);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -185,7 +185,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * PagingResultBean&lt;SimpleMember&gt; page
-     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectPage</span>(pmb);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectPage</span>(pmb);
      * int allRecordCount = page.getAllRecordCount();
      * int allPageCount = page.getAllPageCount();
      * boolean isExistPrePage = page.isExistPrePage();
@@ -254,7 +254,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().<span style="color: #DD4747">selectPagingListOnly</span>(pmb);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectPagingListOnly</span>(pmb);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -301,7 +301,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
      * Prepare paging by cursor-skip. <br />
      * Basically you should use paging limited by SQL like this:
      * <pre>
-     * memberBhv.outsideSql().<span style="color: #DD4747">selectPage</span>(pmb);
+     * memberBhv.outsideSql().<span style="color: #CC4747">selectPage</span>(pmb);
      * </pre>
      * However if you have the reason why it cannot use paging limited by SQL-skip,
      * use this paging limited by cursor-skip.
@@ -325,7 +325,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
-     * memberBhv.outsideSql().<span style="color: #DD4747">selectCursor</span>(pmb, new PurchaseSummaryMemberCursorHandler() {
+     * memberBhv.outsideSql().<span style="color: #CC4747">selectCursor</span>(pmb, new PurchaseSummaryMemberCursorHandler() {
      *     protected Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
      *         while (cursor.next()) {
      *             Integer memberId = cursor.getMemberId();
@@ -362,7 +362,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
-     * int count = memberBhv.outsideSql().<span style="color: #DD4747">execute</span>(pmb);
+     * int count = memberBhv.outsideSql().<span style="color: #CC4747">execute</span>(pmb);
      * </pre>
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @return The count of execution.
@@ -382,7 +382,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
      * SpInOutParameterPmb pmb = new SpInOutParameterPmb();
      * pmb.setVInVarchar("foo");
      * pmb.setVInOutVarchar("bar");
-     * memberBhv.outsideSql().<span style="color: #DD4747">call</span>(pmb);
+     * memberBhv.outsideSql().<span style="color: #CC4747">call</span>(pmb);
      * String outVar = pmb.getVOutVarchar();
      * </pre>
      * It needs to use parameter-bean for procedure (ProcedurePmb).
@@ -489,7 +489,7 @@ class ScrOutsideSqlTypedAutoPagingExecutor[BEHAVIOR](executor: OutsideSqlAutoPag
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * PagingResultBean&lt;SimpleMember&gt; page
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #DD4747">selectPage</span>(pmb);
+     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectPage</span>(pmb);
      * int allRecordCount = page.getAllRecordCount();
      * int allPageCount = page.getAllPageCount();
      * boolean isExistPrePage = page.isExistPrePage();
@@ -558,7 +558,7 @@ class ScrOutsideSqlTypedAutoPagingExecutor[BEHAVIOR](executor: OutsideSqlAutoPag
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().pagingByCursorSkip().<span style="color: #DD4747">selectPagingListOnly</span>(pmb);
+     *     = memberBhv.outsideSql().pagingByCursorSkip().<span style="color: #CC4747">selectPagingListOnly</span>(pmb);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }

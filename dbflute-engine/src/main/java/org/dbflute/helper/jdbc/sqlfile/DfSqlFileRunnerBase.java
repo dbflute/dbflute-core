@@ -31,14 +31,14 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.jdbc.DfRunnerInformation;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -48,8 +48,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static Log _log = LogFactory.getLog(DfSqlFileRunnerBase.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfSqlFileRunnerBase.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -138,8 +138,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         } finally {
             try {
                 rollback();
-            } catch (SQLException ignored) {
-            }
+            } catch (SQLException ignored) {}
             closeStatement();
             closeConnection();
             closeReader(br);
@@ -217,20 +216,17 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             if (_currentConnection != null) {
                 _currentConnection.rollback();
             }
-        } catch (SQLException ignored) {
-        }
+        } catch (SQLException ignored) {}
         try {
             if (_beginTransaction) {
                 _currentConnection.setAutoCommit(true);
             }
-        } catch (SQLException ignored) {
-        }
+        } catch (SQLException ignored) {}
         try {
             if (_currentConnection != null) {
                 _currentConnection.close();
             }
-        } catch (SQLException ignored) {
-        } finally {
+        } catch (SQLException ignored) {} finally {
             _currentConnection = null;
         }
     }
@@ -316,8 +312,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             if (_currentStatement != null) {
                 _currentStatement.close();
             }
-        } catch (SQLException ignored) {
-        } finally {
+        } catch (SQLException ignored) {} finally {
             _currentStatement = null;
         }
     }
@@ -327,8 +322,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             if (reader != null) {
                 reader.close();
             }
-        } catch (IOException ignored) {
-        } finally {
+        } catch (IOException ignored) {} finally {
             reader = null;
         }
     }
@@ -353,8 +347,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 if (!inGroup && isSqlTrimAndRemoveLineSeparator()) {
                     line = line.trim();
                 }
-                if (!alwaysNeedsLineSeparator && isSqlTrimAndRemoveLineSeparator()
-                        && isHandlingCommentOnLineSeparator()) {
+                if (!alwaysNeedsLineSeparator && isSqlTrimAndRemoveLineSeparator() && isHandlingCommentOnLineSeparator()) {
                     if (isDbCommentLine(line)) {
                         alwaysNeedsLineSeparator = true;
                     }

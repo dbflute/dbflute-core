@@ -19,13 +19,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TimeZone;
 
+import org.dbflute.FunCustodial;
 import org.dbflute.cbean.coption.FromToOption;
-import org.dbflute.exception.CharParameterShortSizeException;
+import org.dbflute.cbean.coption.LikeSearchOption;
+import org.dbflute.exception.IllegalOutsideSqlOperationException;
 import org.dbflute.exception.RequiredOptionNotFoundException;
+import org.dbflute.jdbc.ShortCharHandlingMode;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
@@ -33,6 +34,7 @@ import org.dbflute.util.Srl;
 
 /**
  * @author jflute
+ * @since 1.1.0 (2014/10/02 Thursday)
  */
 public class PmbCustodial {
 
@@ -54,66 +56,41 @@ public class PmbCustodial {
      * @param mode The handling mode. (NotNull)
      * @return The filtered value. (NullAllowed)
      */
-    public static String handleShortChar(String parameterName, String value, Integer size, ShortCharHandlingMode mode) {
-        if (parameterName == null || parameterName.trim().length() == 0) {
-            String msg = "The argument 'parameterName' should not be null or empty:";
-            msg = msg + " value=" + value + " size=" + size + " mode=" + mode;
-            throw new IllegalArgumentException(msg);
-        }
+    public static String handleShortChar(String parameterName, String value, Integer size, PmbShortCharHandlingMode mode) {
         if (mode == null) {
-            String msg = "The argument 'mode' should not be null:";
-            msg = msg + " parameterName=" + parameterName + " value=" + value + " size=" + size;
-            throw new IllegalArgumentException(msg);
+            throw new IllegalArgumentException("The argument 'mode' should not be null: " + parameterName);
         }
-        if (value == null) {
-            return null;
+        return FunCustodial.handleShortChar(parameterName, value, size, mode.toWrappedMode());
+    }
+
+    public static enum PmbShortCharHandlingMode {
+        RFILL(ShortCharHandlingMode.RFILL) //
+        , LFILL(ShortCharHandlingMode.LFILL) //
+        , EXCEPTION(ShortCharHandlingMode.EXCEPTION) //
+        , NONE(ShortCharHandlingMode.NONE);
+        protected final ShortCharHandlingMode _mode;
+
+        private PmbShortCharHandlingMode(ShortCharHandlingMode mode) {
+            _mode = mode;
         }
-        if (size == null) {
-            return value;
-        }
-        if (value.length() >= size) {
-            return value;
-        }
-        if (mode.equals(ShortCharHandlingMode.RFILL)) {
-            return Srl.rfill(value, size);
-        } else if (mode.equals(ShortCharHandlingMode.LFILL)) {
-            return Srl.lfill(value, size);
-        } else if (mode.equals(ShortCharHandlingMode.EXCEPTION)) {
-            String msg = "The size of the parameter '" + parameterName + "' should be " + size + ":";
-            msg = msg + " value=[" + value + "] size=" + value.length();
-            throw new CharParameterShortSizeException(msg);
-        } else {
-            return value;
+
+        public ShortCharHandlingMode toWrappedMode() {
+            return _mode;
         }
     }
 
-    public static enum ShortCharHandlingMode {
-        RFILL("R"), LFILL("L"), EXCEPTION("E"), NONE("N");
-        private static final Map<String, ShortCharHandlingMode> _codeValueMap = new HashMap<String, ShortCharHandlingMode>();
-        static {
-            for (ShortCharHandlingMode value : values()) {
-                _codeValueMap.put(value.code().toLowerCase(), value);
-            }
+    public static void assertLikeSearchOptionValid(String name, LikeSearchOption option) {
+        if (option == null) {
+            throw new RequiredOptionNotFoundException("The like-search option is required: " + name);
         }
-        protected final String _code;
+        if (option.isSplit()) {
+            String msg = "The split of like-search is NOT available on parameter-bean: " + name + ", " + option;
+            throw new IllegalOutsideSqlOperationException(msg);
+        }
+    }
 
-        private ShortCharHandlingMode(String code) {
-            _code = code;
-        }
-
-        public static ShortCharHandlingMode codeOf(Object code) {
-            if (code == null) {
-                return null;
-            }
-            if (code instanceof ShortCharHandlingMode) {
-                return (ShortCharHandlingMode) code;
-            }
-            return _codeValueMap.get(code.toString().toLowerCase());
-        }
-
-        public String code() {
-            return _code;
-        }
+    public static String formatByteArray(byte[] bytes) {
+        return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
     }
 
     // ===================================================================================
@@ -154,8 +131,8 @@ public class PmbCustodial {
     }
 
     // ===================================================================================
-    //                                                                             Various
-    //                                                                             =======
+    //                                                                  by Option Handling
+    //                                                                  ==================
     @SuppressWarnings("unchecked")
     public static <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) { // might be called by option handling
         return (NUMBER) DfTypeUtil.toNumber(obj, type);
@@ -163,10 +140,6 @@ public class PmbCustodial {
 
     public static Boolean toBoolean(Object obj) {
         return DfTypeUtil.toBoolean(obj);
-    }
-
-    public static String formatByteArray(byte[] bytes) {
-        return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
     }
 
     @SuppressWarnings("unchecked")

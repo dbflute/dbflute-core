@@ -130,25 +130,21 @@ public class TnRelationRowCache {
         return relKey;
     }
 
-    protected TnRelationKey doCreateRelationKeySimple(ResultSet rs, TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
-            String relationNoSuffix) throws SQLException {
+    protected TnRelationKey doCreateRelationKeySimple(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
+            Map<String, Map<String, Integer>> selectIndexMap, String relationNoSuffix) throws SQLException {
         final TnPropertyType pt = rpt.getSimpleUniquePropertyType();
         final String columnKeyName = buildColumnKeyName(pt, relationNoSuffix);
-        final Object keyValue = setupKeyElement(rs, rpt, selectColumnMap, selectIndexMap, columnKeyName, pt,
-                relationNoSuffix);
+        final Object keyValue = setupKeyElement(rs, rpt, selectColumnMap, selectIndexMap, columnKeyName, pt, relationNoSuffix);
         return keyValue != null ? new TnRelationKeySimple(columnKeyName, keyValue) : null;
     }
 
-    protected TnRelationKey doCreateRelationKeyCompound(ResultSet rs, TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
-            String relationNoSuffix) throws SQLException {
+    protected TnRelationKey doCreateRelationKeyCompound(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
+            Map<String, Map<String, Integer>> selectIndexMap, String relationNoSuffix) throws SQLException {
         final List<TnPropertyType> uniquePropertyTypeList = rpt.getUniquePropertyTypeList();
         Map<String, Object> relKeyValues = null;
         for (TnPropertyType pt : uniquePropertyTypeList) {
             final String columnKeyName = buildColumnKeyName(pt, relationNoSuffix);
-            final Object keyValue = setupKeyElement(rs, rpt, selectColumnMap, selectIndexMap, columnKeyName, pt,
-                    relationNoSuffix);
+            final Object keyValue = setupKeyElement(rs, rpt, selectColumnMap, selectIndexMap, columnKeyName, pt, relationNoSuffix);
             if (keyValue == null) {
                 if (relKeyValues != null) {
                     relKeyValues.clear();
@@ -168,8 +164,8 @@ public class TnRelationRowCache {
     }
 
     protected Object setupKeyElement(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
-            Map<String, Map<String, Integer>> selectIndexMap, String columnKeyName, TnPropertyType pt,
-            String relationNoSuffix) throws SQLException {
+            Map<String, Map<String, Integer>> selectIndexMap, String columnKeyName, TnPropertyType pt, String relationNoSuffix)
+            throws SQLException {
         if (isOutOfRelationSelectIndex(relationNoSuffix, columnKeyName, selectIndexMap)) {
             // basically unreachable, same reason with next if statement, check just in case
             return null;

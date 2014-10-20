@@ -18,12 +18,12 @@ package org.dbflute.s2dao.jdbc;
 import java.sql.ResultSet;
 
 import org.dbflute.jdbc.StatementConfig;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class TnStatementFactoryImplTest extends PlainTestCase {
+public class TnStatementFactoryImplTest extends RuntimeTestCase {
 
     // ===================================================================================
     //                                                                               Basic

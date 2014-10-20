@@ -33,7 +33,7 @@ public class ConditionValue implements Serializable {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     public static final String FIXED_KEY_QUERY = "query";

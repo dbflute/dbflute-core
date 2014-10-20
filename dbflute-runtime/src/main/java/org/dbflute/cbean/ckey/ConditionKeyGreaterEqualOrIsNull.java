@@ -30,7 +30,7 @@ public class ConditionKeyGreaterEqualOrIsNull extends ConditionKeyGreaterEqual {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================
@@ -48,5 +48,13 @@ public class ConditionKeyGreaterEqualOrIsNull extends ConditionKeyGreaterEqual {
     protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
             ConditionOption option) {
         return buildBindClauseOrIsNull(columnRealName, location, cipher, option);
+    }
+
+    // ===================================================================================
+    //                                                                       Null-able Key
+    //                                                                       =============
+    @Override
+    public boolean isNullaleKey() {
+        return true;
     }
 }

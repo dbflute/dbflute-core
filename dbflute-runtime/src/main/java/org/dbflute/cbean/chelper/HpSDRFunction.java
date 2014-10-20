@@ -18,9 +18,12 @@ package org.dbflute.cbean.chelper;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
+import org.dbflute.cbean.coption.DerivedReferrerOptionFactory;
+import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.scoping.SubQuery;
 import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.dbflute.util.Srl;
 
@@ -39,55 +42,59 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     protected final LOCAL_CQ _localCQ;
     protected final HpSDRSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
     protected final DBMetaProvider _dbmetaProvider;
+    protected final DerivedReferrerOptionFactory _sdrOpFactory;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public HpSDRFunction(ConditionBean baseCB, LOCAL_CQ localCQ, HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper,
-            DBMetaProvider dbmetaProvider) {
+            DBMetaProvider dbmetaProvider, DerivedReferrerOptionFactory sdrOpFactory) {
         _baseCB = baseCB;
         _localCQ = localCQ;
         _querySetupper = querySetupper;
         _dbmetaProvider = dbmetaProvider;
+        _sdrOpFactory = sdrOpFactory;
     }
 
     // ===================================================================================
     //                                                                            Function
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Count
+    //                                                 -----
     /**
      * Set up the sub query of referrer for the scalar 'count'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_purchaseCount</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_purchaseCount</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void count(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doCount(subQuery, aliasName, null);
+    public void count(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doCount(derivedCBLambda, aliasName, null);
     }
 
     /**
      * An overload method for count() with an option. So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_purchaseCount</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }, Member.<span style="color: #CC4747">ALIAS_purchaseCount</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void count(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
-        assertDerivedReferrerOption(option);
-        doCount(subQuery, aliasName, option);
+    public void count(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        doCount(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doCount(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -96,40 +103,43 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _querySetupper.setup("count", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
+    // -----------------------------------------------------
+    //                                        Count Distinct
+    //                                        --------------
     /**
      * Set up the sub query of referrer for the scalar 'count-distinct'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_productKindCount</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_productKindCount</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doCountDistinct(subQuery, aliasName, null);
+    public void countDistinct(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doCountDistinct(derivedCBLambda, aliasName, null);
     }
 
     /**
      * An overload method for count() with an option. So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_productKindCount</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }, Member.<span style="color: #CC4747">ALIAS_productKindCount</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
-        assertDerivedReferrerOption(option);
-        doCountDistinct(subQuery, aliasName, option);
+    public void countDistinct(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName,
+            FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        doCountDistinct(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doCountDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -138,40 +148,42 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _querySetupper.setup("count(distinct", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
+    // -----------------------------------------------------
+    //                                                  Max
+    //                                                 -----
     /**
      * Set up the sub query of referrer for the scalar 'max'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_latestPurchaseDatetime</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_latestPurchaseDatetime</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void max(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doMax(subQuery, aliasName, null);
+    public void max(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doMax(derivedCBLambda, aliasName, null);
     }
 
     /**
      * An overload method for max() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_latestPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>("2011-06-07"));
+     * }, Member.<span style="color: #CC4747">ALIAS_latestPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>("2011-06-07"));
      * </pre>
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void max(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
-        assertDerivedReferrerOption(option);
-        doMax(subQuery, aliasName, option);
+    public void max(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        doMax(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doMax(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -180,40 +192,42 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _querySetupper.setup("max", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
+    // -----------------------------------------------------
+    //                                                  Min
+    //                                                 -----
     /**
      * Set up the sub query of referrer for the scalar 'min'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_firstPurchaseDatetime</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_firstPurchaseDatetime</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void min(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doMin(subQuery, aliasName, null);
+    public void min(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doMin(derivedCBLambda, aliasName, null);
     }
 
     /**
      * An overload method for min() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_firstPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>("2011-06-07"));
+     * }, Member.<span style="color: #CC4747">ALIAS_firstPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>("2011-06-07"));
      * </pre>
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void min(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
-        assertDerivedReferrerOption(option);
-        doMin(subQuery, aliasName, option);
+    public void min(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        doMin(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doMin(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -222,40 +236,42 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _querySetupper.setup("min", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
+    // -----------------------------------------------------
+    //                                                  Sum
+    //                                                 -----
     /**
      * Set up the sub query of referrer for the scalar 'sum'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceSummary</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceSummary</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doSum(subQuery, aliasName, null);
+    public void sum(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doSum(derivedCBLambda, aliasName, null);
     }
 
     /**
      * An overload method for sum() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceSummary</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceSummary</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
-        assertDerivedReferrerOption(option);
-        doSum(subQuery, aliasName, option);
+    public void sum(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        doSum(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doSum(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
@@ -264,51 +280,91 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _querySetupper.setup("sum", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
+    // -----------------------------------------------------
+    //                                               Average
+    //                                               -------
     /**
      * Set up the sub query of referrer for the scalar 'avg'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceAverage</span>);
+     * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceAverage</span>);
      * </pre> 
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
-    public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        doAvg(subQuery, aliasName, null);
+    public void avg(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName) {
+        doAvg(derivedCBLambda, aliasName, null);
     }
 
     /**
      * An overload method for avg() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #DD4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #DD4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
-     * }, Member.<span style="color: #DD4747">ALIAS_purchasePriceAverage</span>, new DerivedReferrerOption().<span style="color: #DD4747">coalesce</span>(0));
+     * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceAverage</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
-     * @param subQuery The sub query of referrer. (NotNull)
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      */
-    public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
-        assertDerivedReferrerOption(option);
-        doAvg(subQuery, aliasName, option);
+    public void avg(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        doAvg(derivedCBLambda, aliasName, createDerivedReferrerOption(opLambda));
     }
 
     protected void doAvg(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        doSetupQuery("avg", subQuery, aliasName, option);
+    }
+
+    protected void doSetupQuery(String function, SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
         assertSubQuery(subQuery);
         assertAliasName(aliasName);
-        _querySetupper.setup("avg", subQuery, _localCQ, filterAliasName(aliasName), option);
+        _querySetupper.setup(function, subQuery, _localCQ, filterAliasName(aliasName), option);
+    }
+
+    // -----------------------------------------------------
+    //                                       User Definition
+    //                                       ---------------
+    /**
+     * Basically for database dependency (DBMS sub-class). {Internal} <br />
+     * Not public because of condition-bean policy: cannot input SQL string.
+     * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
+     * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
+     * @param function The function expression e.g. sum, max (NotNull)
+     * @param opLambda The callback for option of DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
+     */
+    protected void userDef(SubQuery<REFERRER_CB> derivedCBLambda, String aliasName, String function,
+            FunctionFilterOptionCall<DerivedReferrerOption> opLambda) { // closet
+        doUserDef(derivedCBLambda, aliasName, function, createDerivedReferrerOption(opLambda));
+    }
+
+    protected void doUserDef(SubQuery<REFERRER_CB> subQuery, String aliasName, String function, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
+        assertAliasName(aliasName);
+        assertUserDefFunction(aliasName, function);
+        _querySetupper.setup(function, subQuery, _localCQ, filterAliasName(aliasName), option);
     }
 
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected DerivedReferrerOption createDerivedReferrerOption(FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        assertDerivedReferrerOption(opLambda);
+        final DerivedReferrerOption option = newDerivedReferrerOption();
+        opLambda.callback(option);
+        return option;
+    }
+
+    protected DerivedReferrerOption newDerivedReferrerOption() {
+        return _sdrOpFactory.create();
+    }
+
     protected void assertSubQuery(SubQuery<?> subQuery) {
         if (subQuery == null) {
             String msg = "The argument 'subQuery' for DerivedReferrer should not be null.";
@@ -357,9 +413,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         createCBExThrower().throwSpecifyDerivedReferrerInvalidAliasNameException(_localCQ);
     }
 
-    protected void assertDerivedReferrerOption(DerivedReferrerOption option) {
-        if (option == null) {
-            String msg = "The argument 'option' for DerivedReferrer should not be null.";
+    protected void assertDerivedReferrerOption(FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        if (opLambda == null) {
+            String msg = "The argument 'opLambda' for DerivedReferrer should not be null.";
             throw new IllegalArgumentException(msg);
         }
     }
@@ -388,6 +444,14 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
             } else { // basically no way because of checked before
                 return null;
             }
+        }
+    }
+
+    protected void assertUserDefFunction(String aliasName, String function) {
+        if (!Srl.isAlphabetNumberHarfAllOr(function, '_')) { // e.g. ')', ';' are NG
+            String msg = "Illegal function, only alphabet or number can be allowed:";
+            msg = msg + " aliasName=" + aliasName + ", function=" + function;
+            throw new IllegalConditionBeanOperationException(msg);
         }
     }
 

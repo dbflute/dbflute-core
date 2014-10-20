@@ -27,8 +27,8 @@ import org.dbflute.util.Srl.ScopeInfo;
  */
 public class DfFreeGenMethodConverter {
 
-    public boolean processConvertMethod(final String requestName, final Map<String, Object> resultMap,
-            final String key, final String value, List<DfFreeGenLazyReflector> reflectorList) {
+    public boolean processConvertMethod(final String requestName, final Map<String, Object> resultMap, final String key,
+            final String value, List<DfFreeGenLazyReflector> reflectorList) {
         {
             final ScopeInfo camelizeScope = Srl.extractScopeFirst(value, "df:camelize(", ")");
             if (camelizeScope != null) {
@@ -102,8 +102,7 @@ public class DfFreeGenMethodConverter {
         return false;
     }
 
-    protected void assertColumnRefValueExists(String content, String refValue, String requestName, final String key,
-            final String value) {
+    protected void assertColumnRefValueExists(String content, String refValue, String requestName, final String key, final String value) {
         if (refValue == null) {
             String msg = "Not found the reference value of the key in FreeGen " + requestName + ":";
             msg = msg + " key=" + key + " ref=" + content;

@@ -140,8 +140,7 @@ public class TnSqlLogRegistry {
         }
     }
 
-    public static void push(String rawSql, String completeSql, Object[] bindArgs, Class<?>[] bindArgTypes,
-            Object sqlLogRegistry) {
+    public static void push(String rawSql, String completeSql, Object[] bindArgs, Class<?>[] bindArgTypes, Object sqlLogRegistry) {
         if (!exists) {
             return;
         }
@@ -175,8 +174,7 @@ public class TnSqlLogRegistry {
         }
     }
 
-    protected static Object createContainerSqlLogImpl(String rawSql, String completeSql, Object[] bindArgs,
-            Class<?>[] bindArgTypes) {
+    protected static Object createContainerSqlLogImpl(String rawSql, String completeSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
         try {
             final Class<?>[] argTypes = new Class[] { String.class, String.class, Object[].class, Class[].class };
             final Constructor<?> constructor = sqlLogImplType.getConstructor(argTypes);

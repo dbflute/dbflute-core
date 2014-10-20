@@ -21,19 +21,20 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpColumnSpHandler;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.ordering.OrderByBean;
 import org.dbflute.cbean.paging.PagingBean;
 import org.dbflute.cbean.paging.PagingInvoker;
 import org.dbflute.cbean.scoping.AndQuery;
+import org.dbflute.cbean.scoping.ModeQuery;
 import org.dbflute.cbean.scoping.OrQuery;
 import org.dbflute.cbean.scoping.UnionQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.derived.DerivedTypeHandler;
+import org.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 
@@ -150,11 +151,11 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public PagingBean fetchPage(int fetchPageNumber) {
+    public PagingBean xfetchPage(int fetchPageNumber) {
         return null;
     }
 
-    public PagingBean fetchScope(int fetchStartIndex, int fetchSize) {
+    public PagingBean xfetchScope(int fetchStartIndex, int fetchSize) {
         return null;
     }
 
@@ -256,7 +257,7 @@ public class MockConditionBean implements ConditionBean {
     public void invokeSetupSelect(String foreignPropertyNamePath) {
     }
 
-    public HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath) {
+    public SpecifiedColumn invokeSpecifyColumn(String columnNamePath) {
         return null;
     }
 
@@ -275,13 +276,13 @@ public class MockConditionBean implements ConditionBean {
     public void ignoreNullOrEmptyQuery() {
     }
 
-    public void enableEmptyStringQuery() {
+    public void enableEmptyStringQuery(ModeQuery modeQuery) {
     }
 
     public void disableEmptyStringQuery() {
     }
 
-    public void enableOverridingQuery() {
+    public void enableOverridingQuery(ModeQuery modeQuery) {
     }
 
     public void disableOverridingQuery() {
@@ -303,6 +304,16 @@ public class MockConditionBean implements ConditionBean {
         return false;
     }
 
+    public void enableNonSpecifiedColumnAccess() {
+    }
+
+    public void disableNonSpecifiedColumnAccess() {
+    }
+
+    public boolean isNonSpecifiedColumnAccessAllowed() {
+        return false;
+    }
+
     public boolean hasWhereClauseOnBaseQuery() {
         return false;
     }
@@ -318,10 +329,10 @@ public class MockConditionBean implements ConditionBean {
         return false;
     }
 
-    public void overTheWaves(HpSpecifiedColumn dreamCruiseTicket) {
+    public void overTheWaves(SpecifiedColumn dreamCruiseTicket) {
     }
 
-    public HpSpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias) {
+    public SpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias) {
         return null;
     }
 
@@ -344,7 +355,7 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public HpSpecifiedColumn xshowDreamCruiseTicket() {
+    public SpecifiedColumn xshowDreamCruiseTicket() {
         return null;
     }
 

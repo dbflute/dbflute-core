@@ -46,8 +46,8 @@ public class SelectSimpleExecution extends AbstractFixedSqlExecution {
      * @param twoWaySql The SQL string as 2Way-SQL. (NotNull)
      * @param resultSetHandler The handler of result set. (NotNull)
      */
-    public SelectSimpleExecution(DataSource dataSource, StatementFactory statementFactory,
-            Map<String, Class<?>> argNameTypeMap, String twoWaySql, TnResultSetHandler resultSetHandler) {
+    public SelectSimpleExecution(DataSource dataSource, StatementFactory statementFactory, Map<String, Class<?>> argNameTypeMap,
+            String twoWaySql, TnResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory, argNameTypeMap, twoWaySql);
         assertObjectNotNull("resultSetHandler", resultSetHandler);
         _resultSetHandler = resultSetHandler;

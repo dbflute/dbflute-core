@@ -101,7 +101,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object> {
             throwPagingPageSizeNotPlusException(pageSize, pageNumber);
         }
         fetchFirst(pageSize);
-        fetchPage(pageNumber);
+        xfetchPage(pageNumber);
     }
 
     protected void throwPagingPageSizeNotPlusException(int pageSize, int pageNumber) {
@@ -176,7 +176,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object> {
     /**
      * {@inheritDoc}
      */
-    public PagingBean fetchScope(int fetchStartIndex, int fetchSize) {
+    public PagingBean xfetchScope(int fetchStartIndex, int fetchSize) {
         getSqlClause().fetchScope(fetchStartIndex, fetchSize);
         return this;
     }
@@ -184,7 +184,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object> {
     /**
      * {@inheritDoc}
      */
-    public PagingBean fetchPage(int fetchPageNumber) {
+    public PagingBean xfetchPage(int fetchPageNumber) {
         getSqlClause().fetchPage(fetchPageNumber);
         return this;
     }

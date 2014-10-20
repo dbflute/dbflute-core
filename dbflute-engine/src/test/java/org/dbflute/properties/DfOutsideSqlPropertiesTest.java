@@ -18,13 +18,13 @@ package org.dbflute.properties;
 import java.util.Properties;
 
 import org.dbflute.properties.DfOutsideSqlProperties;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  * @since 0.8.3 (2008/11/17 Monday)
  */
-public class DfOutsideSqlPropertiesTest extends PlainTestCase {
+public class DfOutsideSqlPropertiesTest extends EngineTestCase {
 
     public void test_resolveSqlPackageFileSeparatorWithFlatDirectory_contains() {
         // ## Arrange ##

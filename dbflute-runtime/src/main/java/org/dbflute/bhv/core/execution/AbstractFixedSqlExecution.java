@@ -43,8 +43,8 @@ public abstract class AbstractFixedSqlExecution extends AbstractFixedArgExecutio
      * @param argNameTypeMap The map of names and types for arguments. (NotNull)
      * @param twoWaySql The SQL string as 2Way-SQL. (NotNull)
      */
-    public AbstractFixedSqlExecution(DataSource dataSource, StatementFactory statementFactory,
-            Map<String, Class<?>> argNameTypeMap, String twoWaySql) {
+    public AbstractFixedSqlExecution(DataSource dataSource, StatementFactory statementFactory, Map<String, Class<?>> argNameTypeMap,
+            String twoWaySql) {
         super(dataSource, statementFactory, argNameTypeMap);
         assertObjectNotNull("twoWaySql", twoWaySql);
         _rootNode = analyzeTwoWaySql(twoWaySql);

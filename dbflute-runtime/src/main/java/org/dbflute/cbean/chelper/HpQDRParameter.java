@@ -44,8 +44,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpQDRParameter(String function, SubQuery<CB> subQuery, DerivedReferrerOption option,
-            HpQDRSetupper<CB> setupper) {
+    public HpQDRParameter(String function, SubQuery<CB> subQuery, DerivedReferrerOption option, HpQDRSetupper<CB> setupper) {
         _function = function;
         _subQuery = subQuery;
         _option = option;

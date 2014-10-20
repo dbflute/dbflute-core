@@ -201,8 +201,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isDatabaseAsMainSupported() {
-        if (isDatabaseMySQL() || isDatabasePostgreSQL() || isDatabaseOracle() || isDatabaseDB2()
-                || isDatabaseSQLServer() || isDatabaseH2() || isDatabaseDerby()) {
+        if (isDatabaseMySQL() || isDatabasePostgreSQL() || isDatabaseOracle() || isDatabaseDB2() || isDatabaseSQLServer() || isDatabaseH2()
+                || isDatabaseDerby()) {
             return true;
         }
         return false;
@@ -441,8 +441,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getExtendedBehaviorPackage() {
-        final String packageString = getProperty("extendedBehaviorPackage", getPackageInfo()
-                .getExtendedBehaviorPackage());
+        final String packageString = getProperty("extendedBehaviorPackage", getPackageInfo().getExtendedBehaviorPackage());
         return filterPackageBaseForExtended(packageString);
     }
 

@@ -17,8 +17,8 @@ package org.dbflute.cbean.coption;
 
 import java.util.List;
 
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbway.ExtensionOperand;
 import org.dbflute.dbway.OnQueryStringConnector;
@@ -45,7 +45,7 @@ public interface ConditionOption {
      * Get the list of compound columns.
      * @return The list of specified column. (NotNull, EmptyAllowed)
      */
-    List<HpSpecifiedColumn> getCompoundColumnList();
+    List<SpecifiedColumn> getCompoundColumnList();
 
     /**
      * Does the option have string connector basically for compound columns?

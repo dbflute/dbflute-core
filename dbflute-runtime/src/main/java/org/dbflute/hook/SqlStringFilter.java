@@ -17,7 +17,6 @@ package org.dbflute.hook;
 
 import org.dbflute.bhv.core.BehaviorCommandMeta;
 
-
 /**
  * The filter of SQL string. <br />
  * This filter is called back before executing the SQL.

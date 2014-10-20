@@ -61,9 +61,9 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlCursorExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, OutsideSqlOption outsideSqlOption, OutsideSqlContextFactory outsideSqlContextFactory,
-            OutsideSqlFilter outsideSqlFilter, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+    public OutsideSqlCursorExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
+            OutsideSqlOption outsideSqlOption, OutsideSqlContextFactory outsideSqlContextFactory, OutsideSqlFilter outsideSqlFilter,
+            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
         _tableDbName = tableDbName;
         _currentDBDef = currentDBDef;
@@ -84,7 +84,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * memberBhv.outsideSql().cursorHandling()
-     *         .<span style="color: #DD4747">selectCursor</span>(pmb, new PurchaseSummaryMemberCursorHandler() {
+     *         .<span style="color: #CC4747">selectCursor</span>(pmb, new PurchaseSummaryMemberCursorHandler() {
      *     protected Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
      *         while (cursor.next()) {
      *             Integer memberId = cursor.getMemberId();
@@ -123,7 +123,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
      * memberBhv.outsideSql().cursorHandling()
-     *         .<span style="color: #DD4747">selectCursor</span>(path, pmb, new PurchaseSummaryMemberCursorHandler() {
+     *         .<span style="color: #CC4747">selectCursor</span>(path, pmb, new PurchaseSummaryMemberCursorHandler() {
      *     protected Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
      *         while (cursor.next()) {
      *             Integer memberId = cursor.getMemberId();
@@ -173,8 +173,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
         return new OutsideSqlSelectCursorCommand();
     }
 
-    protected OutsideSqlSelectCursorCommand xsetupCommand(OutsideSqlSelectCursorCommand cmd, String path, Object pmb,
-            CursorHandler handler) {
+    protected OutsideSqlSelectCursorCommand xsetupCommand(OutsideSqlSelectCursorCommand cmd, String path, Object pmb, CursorHandler handler) {
         cmd.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setOutsideSqlPath(path);

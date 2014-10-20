@@ -17,8 +17,6 @@ package org.dbflute.friends.velocity;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.context.Context;
 
 /**
@@ -30,9 +28,6 @@ public abstract class DfGenerator {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    public static final Log _log = LogFactory.getLog(DfGenerator.class);
-
     /** The implementation instance of generator. (Singleton) */
     private static volatile DfGenerator _instance;
 
@@ -73,8 +68,7 @@ public abstract class DfGenerator {
 
     public abstract void setTemplatePath(String templatePath);
 
-    public abstract String parse(String inputTemplate, String outputFile, String objectID, Object object)
-            throws Exception;
+    public abstract String parse(String inputTemplate, String outputFile, String objectID, Object object) throws Exception;
 
     public abstract String parse(String controlTemplate, Context controlContext) throws Exception;
 

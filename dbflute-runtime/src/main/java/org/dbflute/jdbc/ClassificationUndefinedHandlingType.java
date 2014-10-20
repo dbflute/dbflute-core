@@ -35,7 +35,8 @@ public enum ClassificationUndefinedHandlingType {
     /** do nothing */
     ALLOWED("ALLOWED", false, true);
 
-    private static final Map<String, ClassificationUndefinedHandlingType> _codeValueMap = new HashMap<String, ClassificationUndefinedHandlingType>();
+    private static final Map<String, ClassificationUndefinedHandlingType> _codeValueMap =
+            new HashMap<String, ClassificationUndefinedHandlingType>();
     static {
         for (ClassificationUndefinedHandlingType value : values()) {
             _codeValueMap.put(value.code().toLowerCase(), value);

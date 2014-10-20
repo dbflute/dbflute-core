@@ -49,8 +49,7 @@ public class DfPmbPropertyOptionClassification {
     //                                                                         Constructor
     //                                                                         ===========
     public DfPmbPropertyOptionClassification(DfPmbMetaData pmbMetaData, String propertyName,
-            DfClassificationProperties classificationProperties,
-            DfPmbPropertyOptionFinder pmbMetaDataPropertyOptionFinder) {
+            DfClassificationProperties classificationProperties, DfPmbPropertyOptionFinder pmbMetaDataPropertyOptionFinder) {
         _pmbMetaData = pmbMetaData;
         _propertyName = propertyName;
         _classificationProperties = classificationProperties;
@@ -91,8 +90,7 @@ public class DfPmbPropertyOptionClassification {
 
     public DfClassificationTop getPropertyOptionClassificationTop() {
         final String classificationName = extractClassificationNameFromOption(true);
-        final DfClassificationTop classificationTop = _classificationProperties
-                .getClassificationTop(classificationName);
+        final DfClassificationTop classificationTop = _classificationProperties.getClassificationTop(classificationName);
         if (classificationTop == null) {
             throwClassificationNotFoundException(classificationName);
         }

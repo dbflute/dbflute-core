@@ -19,12 +19,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  */
-public class TableTest extends PlainTestCase {
+public class TableTest extends EngineTestCase {
 
     public void test_Table_extractMinimumRelationIndex() throws Exception {
         final Table table = new Table();

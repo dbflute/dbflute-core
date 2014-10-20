@@ -18,8 +18,8 @@ package org.dbflute.dbway;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The definition of database.
@@ -46,7 +46,7 @@ public enum DBDef {
     // ===================================================================================
     //                                                                    Static Reference
     //                                                                    ================
-    private static final Log _log = LogFactory.getLog(DBDef.class);
+    private static final Logger _log = LoggerFactory.getLogger(DBDef.class);
 
     // -----------------------------------------------------
     //                                            Code Value
@@ -136,47 +136,8 @@ public enum DBDef {
     }
 
     // ===================================================================================
-    //                                                                          Management
+    //                                                                          Switch Way
     //                                                                          ==========
-    /**
-     * Is this singleton world locked?
-     * @return The determination, true or false.
-     */
-    public boolean isLocked() {
-        return _locked;
-    }
-
-    /**
-     * Lock this singleton world, e.g. not to set the DB-way.
-     */
-    public void lock() {
-        if (_log.isInfoEnabled()) {
-            _log.info("...Locking the singleton world of the DB definition!");
-        }
-        _locked = true;
-    }
-
-    /**
-     * Unlock this singleton world, e.g. to set the DB-way.
-     */
-    public void unlock() {
-        if (_log.isInfoEnabled()) {
-            _log.info("...Unlocking the singleton world of the DB definition!");
-        }
-        _locked = false;
-    }
-
-    /**
-     * Assert this is not locked.
-     */
-    protected void assertNotLocked() {
-        if (!isLocked()) {
-            return;
-        }
-        String msg = "The DB definition is locked! Don't access at this timing!";
-        throw new IllegalStateException(msg);
-    }
-
     /**
      * Switch from the old DB-way to the specified DB-way for the DB. (automatically locked after setting) <br />
      * You should call this in application initialization if it needs.
@@ -187,12 +148,59 @@ public enum DBDef {
             String msg = "The argument 'dbway' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        assertNotLocked();
+        assertUnlocked();
         final String oldName = _dbway.getClass().getSimpleName();
         if (_log.isInfoEnabled()) {
             _log.info("...Switching DB way from " + oldName + " to " + dbway);
         }
         _dbway = dbway;
+        lock(); // auto-lock here, because of deep world
+    }
+
+    // ===================================================================================
+    //                                                                     Definition Lock
+    //                                                                     ===============
+    /**
+     * Lock this singleton world, e.g. not to set the DB-way.
+     */
+    public void lock() {
+        if (_locked) {
+            return;
+        }
+        if (_log.isInfoEnabled()) {
+            _log.info("...Locking the singleton world of the DB definition!");
+        }
         _locked = true;
+    }
+
+    /**
+     * Unlock this singleton world, e.g. to set the DB-way.
+     */
+    public void unlock() {
+        if (!_locked) {
+            return;
+        }
+        if (_log.isInfoEnabled()) {
+            _log.info("...Unlocking the singleton world of the DB definition!");
+        }
+        _locked = false;
+    }
+
+    /**
+     * Is this singleton world locked?
+     * @return The determination, true or false.
+     */
+    public boolean isLocked() {
+        return _locked;
+    }
+
+    /**
+     * Assert this is not locked.
+     */
+    protected void assertUnlocked() {
+        if (!isLocked()) {
+            return;
+        }
+        throw new IllegalStateException("The DB definition is locked.");
     }
 }

@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbway.ExtensionOperand;
 import org.dbflute.dbway.OnQueryStringConnector;
@@ -53,7 +53,7 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     protected String _escape;
     protected boolean _asOrSplit;
     protected List<String> _originalWildCardList;
-    protected List<HpSpecifiedColumn> _compoundColumnList;
+    protected List<SpecifiedColumn> _compoundColumnList;
     protected List<Integer> _compoundColumnSizeList;
     protected OnQueryStringConnector _stringConnector;
     protected GearedCipherManager _cipherManager;;
@@ -180,14 +180,14 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
      * <pre>
      * e.g. 'and' condition
      * LikeSearchOption option = new LikeSearchOption();
-     * option.likeContain().<span style="color: #DD4747">splitByBlank()</span>;
+     * option.likeContain().<span style="color: #CC4747">splitByBlank()</span>;
      * cb.query().setFoo_ContainSearch("ab g kl", option);
      * <span style="color: #3F7E5E">// FOO like '%ab%' and FOO like '%g%' and FOO like '%kl%'</span>
      * <span style="color: #3F7E5E">// (all conditions have escape statements)</span>
      * 
      * e.g. 'or' condition
      * LikeSearchOption option = new LikeSearchOption();
-     * option.likeContain().splitByBlank().<span style="color: #DD4747">asOrSplit()</span>;
+     * option.likeContain().splitByBlank().<span style="color: #CC4747">asOrSplit()</span>;
      * cb.query().setFoo_ContainSearch("ab g kl", option);
      * <span style="color: #3F7E5E">// FOO like '%ab%' or FOO like '%g%' or FOO like '%kl%'</span>
      * <span style="color: #3F7E5E">// (conditions have escape statements)</span>
@@ -320,30 +320,30 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
      * e.g. LikeSearch: MEMBER_NAME || MEMBER_ACCOUNT like ...
      *  MemberCB cb = new MemberCB();
      *  LikeSearchOption option = new LikeSearchOption().likeContain()
-     *      .<span style="color: #DD4747">addCompoundColumn</span>(cb.<span style="color: #DD4747">dreamCruiseCB()</span>.specify().columnMemberAccount());
+     *      .<span style="color: #CC4747">addCompoundColumn</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnMemberAccount());
      *  cb.query().setMemberName_LikeSearch("S", option);
      * </pre>
      * @param compoundColumn The compound column specified by Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
-    public LikeSearchOption addCompoundColumn(HpSpecifiedColumn compoundColumn) {
+    public LikeSearchOption addCompoundColumn(SpecifiedColumn compoundColumn) {
         assertCompoundColumnPrecondition(compoundColumn);
         assertCompoundColumnSpecifiedColumn(compoundColumn);
         if (_compoundColumnList == null) {
-            _compoundColumnList = new ArrayList<HpSpecifiedColumn>();
+            _compoundColumnList = new ArrayList<SpecifiedColumn>();
         }
         _compoundColumnList.add(compoundColumn);
         return this;
     }
 
-    protected void assertCompoundColumnPrecondition(HpSpecifiedColumn compoundColumn) {
+    protected void assertCompoundColumnPrecondition(SpecifiedColumn compoundColumn) {
         if (isSplit()) {
             String msg = "The CompoundColumn of LikeSearch is unsupported with Split: " + compoundColumn;
             throw new IllegalStateException(msg);
         }
     }
 
-    protected void assertCompoundColumnSpecifiedColumn(HpSpecifiedColumn compoundColumn) {
+    protected void assertCompoundColumnSpecifiedColumn(SpecifiedColumn compoundColumn) {
         if (compoundColumn == null) {
             String msg = "The argument 'compoundColumn' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -360,7 +360,7 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     }
 
     @Override
-    public List<HpSpecifiedColumn> getCompoundColumnList() {
+    public List<SpecifiedColumn> getCompoundColumnList() {
         return _compoundColumnList;
     }
 
@@ -493,7 +493,7 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
             copy._originalWildCardList = new ArrayList<String>(_originalWildCardList);
         }
         if (_compoundColumnList != null) {
-            copy._compoundColumnList = new ArrayList<HpSpecifiedColumn>(_compoundColumnList);
+            copy._compoundColumnList = new ArrayList<SpecifiedColumn>(_compoundColumnList);
         }
         if (_compoundColumnSizeList != null) {
             copy._compoundColumnSizeList = new ArrayList<Integer>(_compoundColumnSizeList);

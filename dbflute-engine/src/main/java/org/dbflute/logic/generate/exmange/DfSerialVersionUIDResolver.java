@@ -40,7 +40,7 @@ public class DfSerialVersionUIDResolver {
     }
 
     public void reflectAllExSerialUID(String path) {
-        final String serialComment = "/** Serial version UID. (Default) */";
+        final String serialComment = "/** The serial version UID for object serialization. (Default) */";
         final String serialDefinition = "private static final long serialVersionUID = 1L;";
         final File exfile = new File(path);
         final String encoding = _sourceEncoding;
@@ -71,8 +71,7 @@ public class DfSerialVersionUIDResolver {
         } finally {
             try {
                 br.close();
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
         BufferedWriter bw = null;
         try {
@@ -92,8 +91,7 @@ public class DfSerialVersionUIDResolver {
             if (bw != null) {
                 try {
                     bw.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

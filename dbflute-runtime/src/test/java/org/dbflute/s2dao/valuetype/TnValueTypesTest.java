@@ -45,14 +45,14 @@ import org.dbflute.s2dao.valuetype.basic.LongType;
 import org.dbflute.s2dao.valuetype.basic.ObjectType;
 import org.dbflute.s2dao.valuetype.basic.SqlDateType;
 import org.dbflute.s2dao.valuetype.basic.StringType;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  * @since 0.9.6.4 (2010/01/22 Friday)
  */
-public class TnValueTypesTest extends PlainTestCase {
+public class TnValueTypesTest extends RuntimeTestCase {
 
     private final DBDef _currentDBDef = DBDef.MySQL;
 

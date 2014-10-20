@@ -18,14 +18,14 @@ package org.dbflute.helper.filesystem;
 import java.io.File;
 import java.util.List;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfResourceUtil;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class FileHierarchyTracerTest extends PlainTestCase {
+public class FileHierarchyTracerTest extends RuntimeTestCase {
 
     public void test_trace() throws Exception {
         // ## Arrange ##

@@ -54,14 +54,12 @@ public class SerializableType extends BytesType {
     }
 
     @Override
-    public void bindValue(Connection conn, PreparedStatement ps, final int index, final Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, PreparedStatement ps, final int index, final Object value) throws SQLException {
         super.bindValue(conn, ps, index, serialize(value));
     }
 
     @Override
-    public void bindValue(Connection conn, CallableStatement cs, final String parameterName, final Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, final String parameterName, final Object value) throws SQLException {
         super.bindValue(conn, cs, parameterName, serialize(value));
     }
 

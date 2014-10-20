@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  */
-public class SimpleMapPmbTest extends PlainTestCase {
+public class SimpleMapPmbTest extends RuntimeTestCase {
 
     public void test_size() {
         // ## Arrange ##

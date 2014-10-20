@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.DfJDBCException;
 import org.dbflute.helper.jdbc.context.DfDataSourceContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The handler of data source basically for main schema.
@@ -37,8 +37,8 @@ public class DfDataSourceHandler implements DfConnectionProvider {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static Log _log = LogFactory.getLog(DfDataSourceHandler.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfDataSourceHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -101,8 +101,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
         }
     }
@@ -124,8 +123,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
                 _log.info("...close()");
                 conn.close();
             }
-        } catch (SQLException ignored) {
-        } finally {
+        } catch (SQLException ignored) {} finally {
             if (DfDataSourceContext.isExistDataSource()) {
                 DfDataSourceContext.clearDataSource();
             }

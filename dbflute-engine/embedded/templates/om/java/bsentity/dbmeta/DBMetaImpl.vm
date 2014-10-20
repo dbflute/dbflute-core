@@ -24,9 +24,9 @@ import org.dbflute.Entity;
 import ${database.relationOptionalEntityClassName};
 #end
 import org.dbflute.dbmeta.AbstractDBMeta;
-import org.dbflute.dbmeta.PropertyGateway;
 import org.dbflute.dbmeta.info.*;
 import org.dbflute.dbmeta.name.*;
+import org.dbflute.dbmeta.property.PropertyGateway;
 import org.dbflute.dbway.DBDef;
 import ${glPackageBaseCommon}.*;
 import ${myExtendedEntityPackageName}.*;

@@ -16,7 +16,7 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ckey.ConditionKey;
-import org.dbflute.cbean.ordering.ManualOrderBean;
+import org.dbflute.cbean.ordering.ManualOrderOption;
 
 /**
  * @author jflute
@@ -26,13 +26,13 @@ public class HpMobConnectedBean {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final ManualOrderBean _parentBean;
+    protected final ManualOrderOption _parentOption;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpMobConnectedBean(ManualOrderBean parentBean) {
-        _parentBean = parentBean;
+    public HpMobConnectedBean(ManualOrderOption parentOption) {
+        _parentOption = parentOption;
     }
 
     // ===================================================================================
@@ -125,21 +125,21 @@ public class HpMobConnectedBean {
 
     protected HpMobConnectedBean delegate(ConditionKey conditionKey, Object orderValue) {
         if (ConditionKey.CK_EQUAL.equals(conditionKey)) {
-            _parentBean.when_Equal(orderValue);
+            _parentOption.when_Equal(orderValue);
         } else if (ConditionKey.CK_NOT_EQUAL_STANDARD.equals(conditionKey)) {
-            _parentBean.when_NotEqual(orderValue);
+            _parentOption.when_NotEqual(orderValue);
         } else if (ConditionKey.CK_GREATER_THAN.equals(conditionKey)) {
-            _parentBean.when_GreaterThan(orderValue);
+            _parentOption.when_GreaterThan(orderValue);
         } else if (ConditionKey.CK_LESS_THAN.equals(conditionKey)) {
-            _parentBean.when_LessThan(orderValue);
+            _parentOption.when_LessThan(orderValue);
         } else if (ConditionKey.CK_GREATER_EQUAL.equals(conditionKey)) {
-            _parentBean.when_GreaterEqual(orderValue);
+            _parentOption.when_GreaterEqual(orderValue);
         } else if (ConditionKey.CK_LESS_EQUAL.equals(conditionKey)) {
-            _parentBean.when_LessEqual(orderValue);
+            _parentOption.when_LessEqual(orderValue);
         } else if (ConditionKey.CK_IS_NULL.equals(conditionKey)) {
-            _parentBean.when_IsNull();
+            _parentOption.when_IsNull();
         } else if (ConditionKey.CK_IS_NOT_NULL.equals(conditionKey)) {
-            _parentBean.when_IsNotNull();
+            _parentOption.when_IsNotNull();
         } else {
             String msg = "Unknown conditionKey: " + conditionKey;
             throw new IllegalStateException(msg);
@@ -151,15 +151,15 @@ public class HpMobConnectedBean {
     //                                                                     Connection Mode
     //                                                                     ===============
     protected void toBeConnectionModeAsAnd() {
-        _parentBean.toBeConnectionModeAsAnd();
+        _parentOption.toBeConnectionModeAsAnd();
     }
 
     protected void toBeConnectionModeAsOr() {
-        _parentBean.toBeConnectionModeAsOr();
+        _parentOption.toBeConnectionModeAsOr();
     }
 
     protected void clearConnectionMode() {
-        _parentBean.clearConnectionMode();
+        _parentOption.clearConnectionMode();
     }
 
     // ===================================================================================
@@ -175,6 +175,6 @@ public class HpMobConnectedBean {
             String msg = "The argument 'thenValue' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        _parentBean.xregisterThenValueToLastElement(thenValue);
+        _parentOption.xregisterThenValueToLastElement(thenValue);
     }
 }

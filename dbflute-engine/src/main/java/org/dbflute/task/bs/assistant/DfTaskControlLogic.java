@@ -21,8 +21,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.bhv.core.context.ResourceContext;
@@ -46,6 +44,8 @@ import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.util.DfTraceViewUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -55,8 +55,8 @@ public class DfTaskControlLogic {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfTaskControlLogic.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfTaskControlLogic.class);
 
     // ===================================================================================
     //                                                                           Attribute

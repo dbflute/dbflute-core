@@ -32,8 +32,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfDelimiterDataColumnDefNotFoundException;
 import org.dbflute.exception.DfDelimiterDataRegistrationFailureException;
@@ -48,6 +46,8 @@ import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataWriter;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -57,8 +57,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfDelimiterDataWriterImpl.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfDelimiterDataWriterImpl.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -224,8 +224,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 }
                 final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
                 final Set<String> sysdateColumnSet = sqlBuilder.getSysdateColumnSet();
-                resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap, sysdateColumnSet,
-                        rowNumber);
+                resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap, sysdateColumnSet, rowNumber);
                 handleLoggingInsert(tableDbName, columnValueMap, loggingInsertType, rowNumber);
 
                 int bindCount = 1;
@@ -237,8 +236,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // /- - - - - - - - - - - - - - - - - -
                     // process Null (against Null Headache)
                     // - - - - - - - - - -/
-                    if (processNull(dataDirectory, tableDbName, columnName, obj, ps, bindCount, columnMetaMap,
-                            rowNumber)) {
+                    if (processNull(dataDirectory, tableDbName, columnName, obj, ps, bindCount, columnMetaMap, rowNumber)) {
                         bindCount++;
                         continue;
                     }
@@ -248,8 +246,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // - - - - - - - - - -/
                     // If the value is not null and the value has the own type except string,
                     // It registers the value to statement by the type.
-                    if (processNotNullNotString(dataDirectory, tableDbName, columnName, obj, conn, ps, bindCount,
-                            columnMetaMap, rowNumber)) {
+                    if (processNotNullNotString(dataDirectory, tableDbName, columnName, obj, conn, ps, bindCount, columnMetaMap, rowNumber)) {
                         bindCount++;
                         continue;
                     }
@@ -258,8 +255,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // process NotNull and StringExpression
                     // - - - - - - - - - -/
                     final String value = (String) obj;
-                    processNotNullString(dataDirectory, dataFile, tableDbName, columnName, value, conn, ps, bindCount,
-                            columnMetaMap, rowNumber);
+                    processNotNullString(dataDirectory, dataFile, tableDbName, columnName, value, conn, ps, bindCount, columnMetaMap,
+                            rowNumber);
                     bindCount++;
                 }
                 if (canBatchUpdate) { // mainly here
@@ -406,8 +403,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         throw new DfDelimiterDataTableNotFoundException(msg);
     }
 
-    protected String buildRegExpMessage(String fileName, String tableDbName, String executedSql,
-            List<String> valueList, Exception e) {
+    protected String buildRegExpMessage(String fileName, String tableDbName, String executedSql, List<String> valueList, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to register the table data.");
         br.addItem("Advice");

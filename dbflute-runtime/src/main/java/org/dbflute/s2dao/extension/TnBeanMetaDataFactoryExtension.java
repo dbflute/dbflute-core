@@ -19,14 +19,11 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbmeta.DBMeta;
@@ -49,7 +46,10 @@ import org.dbflute.s2dao.metadata.impl.TnBeanMetaDataFactoryImpl;
 import org.dbflute.s2dao.metadata.impl.TnBeanMetaDataImpl;
 import org.dbflute.s2dao.metadata.impl.TnDBMetaBeanAnnotationReader;
 import org.dbflute.s2dao.metadata.impl.TnRelationPropertyTypeFactoryBuilderImpl;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The DBFlute extension of factory of bean meta data.
@@ -61,7 +61,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance for internal debug. (XLog should be used instead for execute-status log) */
-    private static final Log _log = LogFactory.getLog(TnBeanMetaDataFactoryExtension.class);
+    private static final Logger _log = LoggerFactory.getLogger(TnBeanMetaDataFactoryExtension.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -161,8 +161,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
         return null;
     }
 
-    protected TnBeanMetaData findOrCreateCachedMetaIfNeeds(DatabaseMetaData dbMetaData, Class<?> beanClass,
-            int relationNestLevel) {
+    protected TnBeanMetaData findOrCreateCachedMetaIfNeeds(DatabaseMetaData dbMetaData, Class<?> beanClass, int relationNestLevel) {
         if (isDBFluteEntity(beanClass)) {
             final TnBeanMetaData cachedMeta = getMetaFromCache(beanClass);
             if (cachedMeta != null) {
@@ -247,22 +246,23 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     @Override
     protected TnModifiedPropertySupport createModifiedPropertySupport() {
         return new TnModifiedPropertySupport() {
-            @SuppressWarnings("unchecked")
             public Set<String> getModifiedPropertyNames(Object bean) {
                 if (bean instanceof Entity) { // all entities of DBFlute are here
-                    return ((Entity) bean).modifiedProperties();
+                    return ((Entity) bean).mymodifiedProperties();
                 } else { // basically no way on DBFlute (S2Dao's route)
                     final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(bean.getClass());
                     final String propertyName = MODIFIED_PROPERTY_PROPERTY_NAME;
                     if (!beanDesc.hasPropertyDesc(propertyName)) {
-                        return Collections.EMPTY_SET;
+                        return DfCollectionUtil.emptySet();
                     } else {
                         final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
                         final Object value = propertyDesc.getValue(bean);
                         if (value != null) {
-                            return (Set<String>) value;
+                            @SuppressWarnings("unchecked")
+                            final Set<String> extractedSet = (Set<String>) value;
+                            return extractedSet;
                         } else {
-                            return Collections.EMPTY_SET;
+                            return DfCollectionUtil.emptySet();
                         }
                     }
                 }
@@ -283,13 +283,12 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     // ===================================================================================
     //                                                                       Property Type
     //                                                                       =============
-    protected TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> beanClass,
-            TnBeanMetaDataImpl localBeanMetaData, TnBeanAnnotationReader beanAnnotationReader,
-            DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation) {
+    protected TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> beanClass, TnBeanMetaDataImpl localBeanMetaData,
+            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation) {
         // DBFlute needs local BeanMetaData for relation property type
         final TnRelationPropertyTypeFactoryBuilder builder = createRelationPropertyTypeFactoryBuilder();
-        return builder.build(beanClass, localBeanMetaData, beanAnnotationReader, dbMetaData, relationNestLevel,
-                stopRelationCreation, getRelationOptionalEntityType());
+        return builder.build(beanClass, localBeanMetaData, beanAnnotationReader, dbMetaData, relationNestLevel, stopRelationCreation,
+                getRelationOptionalEntityType());
     }
 
     protected TnRelationPropertyTypeFactoryBuilder createRelationPropertyTypeFactoryBuilder() {

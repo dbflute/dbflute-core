@@ -20,6 +20,7 @@ package org.dbflute.cbean.result.grouping;
  * @param <ENTITY> The type of entity.
  * @author jflute
  */
+@FunctionalInterface
 public interface GroupingMapDeterminer<ENTITY> {
 
     /**

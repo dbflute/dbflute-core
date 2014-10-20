@@ -58,18 +58,16 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
         return proprertyCache;
     }
 
-    protected void setupPropertyCache(Map<String, TnPropertyMapping> proprertyCache,
-            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap,
-            TnBeanMetaData beanMetaData) throws SQLException {
+    protected void setupPropertyCache(Map<String, TnPropertyMapping> proprertyCache, Map<String, String> selectColumnMap,
+            Map<String, Map<String, Integer>> selectIndexMap, TnBeanMetaData beanMetaData) throws SQLException {
         final List<TnPropertyType> ptList = beanMetaData.getPropertyTypeList();
         for (TnPropertyType pt : ptList) { // already been filtered as data properties only
             setupPropertyCacheElement(proprertyCache, selectColumnMap, selectIndexMap, pt);
         }
     }
 
-    protected void setupPropertyCacheElement(Map<String, TnPropertyMapping> proprertyCache,
-            Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap, TnPropertyType pt)
-            throws SQLException {
+    protected void setupPropertyCacheElement(Map<String, TnPropertyMapping> proprertyCache, Map<String, String> selectColumnMap,
+            Map<String, Map<String, Integer>> selectIndexMap, TnPropertyType pt) throws SQLException {
         final String columnDbName = pt.getColumnDbName();
         if (isOutOfLocalSelectIndex(columnDbName, selectIndexMap)) {
             return;
@@ -89,8 +87,7 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
         // only a column that is not persistent and non-selected property
     }
 
-    protected boolean isOutOfLocalSelectIndex(String columnDbName, Map<String, Map<String, Integer>> selectIndexMap)
-            throws SQLException {
+    protected boolean isOutOfLocalSelectIndex(String columnDbName, Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
         return ResourceContext.isOutOfLocalSelectIndex(columnDbName, selectIndexMap);
     }
 

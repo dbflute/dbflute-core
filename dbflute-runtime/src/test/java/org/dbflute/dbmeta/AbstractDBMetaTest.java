@@ -21,14 +21,14 @@ import java.util.Map;
 import org.dbflute.dbmeta.AbstractDBMeta.MapStringValueAnalyzer;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationMeta;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  * @since 0.9.5.1 (2009/06/30 Tuesday)
  */
-public class AbstractDBMetaTest extends PlainTestCase {
+public class AbstractDBMetaTest extends RuntimeTestCase {
 
     public void test_MapStringValueAnalyzer_analyzeOther_normalValue() throws Exception {
         // ## Arrange ##

@@ -18,13 +18,13 @@ package org.dbflute.helper.token.line;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author jflute
  * @since 0.9.4 (2009/03/14 Saturday)
  */
-public class LineTokenTest extends PlainTestCase {
+public class LineTokenTest extends RuntimeTestCase {
 
     public void test_make_quoteAll_basic() {
         // ## Arrange ##

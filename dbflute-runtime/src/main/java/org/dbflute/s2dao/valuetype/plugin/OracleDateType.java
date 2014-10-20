@@ -59,8 +59,7 @@ public abstract class OracleDateType extends UtilDateAsTimestampType {
     }
 
     @Override
-    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException {
         if (value == null) {
             super.bindValue(conn, cs, parameterName, null);
         } else {

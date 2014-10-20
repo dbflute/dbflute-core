@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -29,6 +27,8 @@ import org.dbflute.properties.DfIncludeQueryProperties;
 import org.dbflute.properties.assistant.DfTableFinder;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -39,8 +39,8 @@ public class DfIncludeQueryInitializer {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfIncludeQueryInitializer.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfIncludeQueryInitializer.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -53,16 +53,14 @@ public class DfIncludeQueryInitializer {
     //                                                                          Initialize
     //                                                                          ==========
     public void initializeIncludeQuery() {
-        final Map<String, Map<String, Map<String, List<String>>>> includeQueryMap = _includeQueryProperties
-                .getIncludeQueryMap();
+        final Map<String, Map<String, Map<String, List<String>>>> includeQueryMap = _includeQueryProperties.getIncludeQueryMap();
         if (!includeQueryMap.isEmpty()) {
             _log.info("/=============================");
             _log.info("...Initializing include query.");
             checkQueryMap(includeQueryMap);
             _log.info("========/");
         }
-        final Map<String, Map<String, Map<String, List<String>>>> excludeQueryMap = _includeQueryProperties
-                .getExcludeQueryMap();
+        final Map<String, Map<String, Map<String, List<String>>>> excludeQueryMap = _includeQueryProperties.getExcludeQueryMap();
         if (!excludeQueryMap.isEmpty()) {
             _log.info("/=============================");
             _log.info("...Initializing exclude query.");

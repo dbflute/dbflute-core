@@ -16,13 +16,13 @@
 package org.dbflute.logic.generate.language;
 
 import org.dbflute.logic.generate.language.DfLanguageSmallHelper;
-import org.dbflute.unit.PlainTestCase;
+import org.dbflute.unit.EngineTestCase;
 
 /**
  * @author jflute
  * @since 1.0.6A (2014/06/16 Monday)
  */
-public class DfLanguageSmallHelperTest extends PlainTestCase {
+public class DfLanguageSmallHelperTest extends EngineTestCase {
 
     public void test_extractGenericClassElement_basic() throws Exception {
         // ## Arrange ##

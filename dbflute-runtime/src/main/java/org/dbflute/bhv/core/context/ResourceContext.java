@@ -376,8 +376,8 @@ public class ResourceContext {
         return doGetValue(rs, SqlClause.BASE_POINT_HANDLING_ENTITY_NO, columnName, valueType, selectIndexMap);
     }
 
-    public static Object getRelationValue(ResultSet rs, String relationNoSuffix, String columnName,
-            ValueType valueType, Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+    public static Object getRelationValue(ResultSet rs, String relationNoSuffix, String columnName, ValueType valueType,
+            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
         return doGetValue(rs, relationNoSuffix, columnName, valueType, selectIndexMap);
     }
 
@@ -410,8 +410,7 @@ public class ResourceContext {
         return selectIndexMap != null && !hasRelationSelectIndex(relationNoSuffix, columnDbName, selectIndexMap);
     }
 
-    protected static boolean hasLocalSelectIndex(String columnName, Map<String, Map<String, Integer>> selectIndexMap)
-            throws SQLException {
+    protected static boolean hasLocalSelectIndex(String columnName, Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
         return doHasSelectIndex(SqlClause.BASE_POINT_HANDLING_ENTITY_NO, columnName, selectIndexMap);
     }
 
@@ -420,8 +419,8 @@ public class ResourceContext {
         return doHasSelectIndex(relationNoSuffix, columnName, selectIndexMap);
     }
 
-    protected static boolean doHasSelectIndex(String entityNo, String columnName,
-            Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
+    protected static boolean doHasSelectIndex(String entityNo, String columnName, Map<String, Map<String, Integer>> selectIndexMap)
+            throws SQLException {
         final Map<String, Integer> innerMap = selectIndexMap != null ? selectIndexMap.get(entityNo) : null;
         return innerMap != null && innerMap.containsKey(columnName);
     }

@@ -15,13 +15,13 @@
  */
 package org.dbflute.properties.assistant.freegen;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.texen.util.FileUtil;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.friends.velocity.DfGenerator;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -31,7 +31,7 @@ public class DfFreeGenManager {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfFreeGenManager.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfFreeGenManager.class);
 
     // ===================================================================================
     //                                                                         Constructor

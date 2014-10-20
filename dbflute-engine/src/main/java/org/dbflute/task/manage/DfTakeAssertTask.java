@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.DfTakeAssertAssertionFailureException;
 import org.dbflute.exception.DfTakeAssertFailureException;
 import org.dbflute.exception.DfTakeFinallyAssertionFailureException;
@@ -35,6 +33,8 @@ import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTask;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -45,7 +45,7 @@ public class DfTakeAssertTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfTakeAssertTask.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfTakeAssertTask.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -113,8 +113,7 @@ public class DfTakeAssertTask extends DfAbstractTask {
         throwTakeAssertAssertionFailureException(_takeAssertExList);
     }
 
-    protected void throwTakeAssertAssertionFailureException(
-            List<DfTakeFinallyAssertionFailureException> takeAssertExList) {
+    protected void throwTakeAssertAssertionFailureException(List<DfTakeFinallyAssertionFailureException> takeAssertExList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Assertion failures were found.");
         br.addItem("Advice");
@@ -143,8 +142,7 @@ public class DfTakeAssertTask extends DfAbstractTask {
             if (bw != null) {
                 try {
                     bw.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
     }

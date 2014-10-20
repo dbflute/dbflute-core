@@ -24,8 +24,8 @@ import java.util.Map.Entry;
 
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.PropertyGateway;
-import org.dbflute.dbmeta.PropertyMethodFinder;
+import org.dbflute.dbmeta.property.PropertyGateway;
+import org.dbflute.dbmeta.property.PropertyMethodFinder;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.Srl;
 

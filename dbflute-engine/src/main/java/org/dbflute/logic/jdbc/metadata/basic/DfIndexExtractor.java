@@ -20,13 +20,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -37,7 +37,7 @@ public class DfIndexExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfIndexExtractor.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfIndexExtractor.class);
 
     // ===================================================================================
     //                                                                        Meta Getting
@@ -52,11 +52,10 @@ public class DfIndexExtractor extends DfAbstractMetaDataBasicExtractor {
         return getIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap);
     }
 
-    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
+    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
+            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
         final String translatedName = translateTableCaseName(tableName);
-        Map<String, Map<Integer, String>> map = doGetIndexMap(metaData, unifiedSchema, translatedName, uniqueKeyMap,
-                false);
+        Map<String, Map<Integer, String>> map = doGetIndexMap(metaData, unifiedSchema, translatedName, uniqueKeyMap, false);
         if (isRetryCaseInsensitiveIndex()) {
             if (map.isEmpty() && !translatedName.equals(translatedName.toLowerCase())) { // retry by lower case
                 map = doGetIndexMap(metaData, unifiedSchema, translatedName.toLowerCase(), uniqueKeyMap, true);
@@ -68,8 +67,8 @@ public class DfIndexExtractor extends DfAbstractMetaDataBasicExtractor {
         return map;
     }
 
-    protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, Map<String, Map<Integer, String>> uniqueKeyMap, boolean retry) throws SQLException { // non unique only
+    protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
+            Map<String, Map<Integer, String>> uniqueKeyMap, boolean retry) throws SQLException { // non unique only
         final Map<String, Map<Integer, String>> indexMap = newTableConstraintMap();
         ResultSet rs = null;
         try {
@@ -151,16 +150,16 @@ public class DfIndexExtractor extends DfAbstractMetaDataBasicExtractor {
         return indexMap;
     }
 
-    protected ResultSet extractIndexMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
-            boolean retry) throws SQLException {
+    protected ResultSet extractIndexMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName, boolean retry)
+            throws SQLException {
         final boolean uniqueKeyOnly = false;
         final DfDatabaseTypeFacadeProp prop = getDatabaseTypeFacadeProp();
         return delegateExtractIndexInfoMetaData(metaData, unifiedSchema, tableName, uniqueKeyOnly, retry, prop);
     }
 
     // public static for recycle
-    public static ResultSet delegateExtractIndexInfoMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, boolean uniqueKeyOnly, boolean retry, DfDatabaseTypeFacadeProp prop) throws SQLException {
+    public static ResultSet delegateExtractIndexInfoMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
+            boolean uniqueKeyOnly, boolean retry, DfDatabaseTypeFacadeProp prop) throws SQLException {
         final String catalogName = unifiedSchema.getPureCatalog();
         final String schemaName = unifiedSchema.getPureSchema();
         try {
@@ -173,8 +172,7 @@ public class DfIndexExtractor extends DfAbstractMetaDataBasicExtractor {
                 final String quoted = Srl.quoteDouble(tableName);
                 try {
                     return metaData.getIndexInfo(catalogName, schemaName, quoted, uniqueKeyOnly, true);
-                } catch (SQLException ignored) {
-                }
+                } catch (SQLException ignored) {}
             }
             if (retry) {
                 // because the exception may be thrown when the table is not found

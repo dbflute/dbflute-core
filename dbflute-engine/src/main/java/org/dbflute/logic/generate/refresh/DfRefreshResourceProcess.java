@@ -18,11 +18,11 @@ package org.dbflute.logic.generate.refresh;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.manage.refresh.DfRefreshResourceRequest;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -32,8 +32,8 @@ public class DfRefreshResourceProcess {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfRefreshResourceProcess.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfRefreshResourceProcess.class);
 
     // ===================================================================================
     //                                                                           Attribute

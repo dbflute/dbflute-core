@@ -24,9 +24,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.helper.thread.exception.ThreadFireFailureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -37,7 +37,7 @@ public class CountDownRace {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(CountDownRace.class);
+    private static final Logger _log = LoggerFactory.getLogger(CountDownRace.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -76,8 +76,7 @@ public class CountDownRace {
         final List<Future<Void>> futureList = new ArrayList<Future<Void>>();
         for (int i = 0; i < _runnerCount; i++) { // basically synchronized with parameter size
             final int entryNumber = i + 1;
-            final Callable<Void> callable = createCallable(execution, ready, start, goal, ourLatch, entryNumber,
-                    lockObj);
+            final Callable<Void> callable = createCallable(execution, ready, start, goal, ourLatch, entryNumber, lockObj);
             final Future<Void> future = service.submit(callable);
             futureList.add(future);
         }
@@ -116,9 +115,8 @@ public class CountDownRace {
     // ===================================================================================
     //                                                                            Callable
     //                                                                            ========
-    protected Callable<Void> createCallable(final CountDownRaceExecution execution, final CountDownLatch ready,
-            final CountDownLatch start, final CountDownLatch goal, final CountDownRaceLatch ourLatch,
-            final int entryNumber, final Object lockObj) {
+    protected Callable<Void> createCallable(final CountDownRaceExecution execution, final CountDownLatch ready, final CountDownLatch start,
+            final CountDownLatch goal, final CountDownRaceLatch ourLatch, final int entryNumber, final Object lockObj) {
         return new Callable<Void>() {
             public Void call() { // each thread here
                 final long threadId = Thread.currentThread().getId();
@@ -148,8 +146,7 @@ public class CountDownRace {
         };
     }
 
-    protected CountDownRaceRunner createRunner(long threadId, CountDownRaceLatch ourLatch, int entryNumber,
-            Object lockObj) {
+    protected CountDownRaceRunner createRunner(long threadId, CountDownRaceLatch ourLatch, int entryNumber, Object lockObj) {
         return new CountDownRaceRunner(threadId, ourLatch, entryNumber, lockObj, _runnerCount);
     }
 }

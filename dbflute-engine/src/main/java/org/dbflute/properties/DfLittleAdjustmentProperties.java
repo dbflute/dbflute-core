@@ -198,6 +198,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // basically use Java8-Time instead of JodaTime since 1.1
+    //  => *unsupported since 1.1
     public boolean isAvailableJodaTimeEntity() {
         return isAvailableJodaTimeLocalDateEntity() || isAvailableJodaTimeZonedDateEntity();
     }
@@ -360,6 +361,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isOverridingQueryAllowed", isCompatibleBeforeJava8());
     }
 
+    public boolean isNonSpecifiedColumnAccessAllowed() { // closet
+        return isProperty("isNonSpecifiedColumnAccessAllowed", isCompatibleBeforeJava8());
+    }
+
     public boolean isMakeConditionQueryEqualEmptyString() {
         return isProperty("isMakeConditionQueryEqualEmptyString", false);
     }
@@ -436,7 +441,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         final String code = doGetClassificationUndefinedHandlingType(defaultValue);
         final ClassificationUndefinedHandlingType handlingType = ClassificationUndefinedHandlingType.codeOf(code);
         if (handlingType == null) {
-            throwUnknownClassificationUndefinedHandlingTypeException(code);
+            throwUnknownClassificationUndefinedHandlingTypeException(code, KEY_littleAdjustmentMap + ".dfprop");
         }
         return handlingType;
     }
@@ -445,7 +450,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getProperty("classificationUndefinedHandlingType", defaultValue);
     }
 
-    protected void throwUnknownClassificationUndefinedHandlingTypeException(String code) {
+    protected void throwUnknownClassificationUndefinedHandlingTypeException(String code, String dfpropFile) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Unknown handling type of classification undefined code.");
         br.addItem("Advice");
@@ -464,6 +469,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         br.addElement("}");
         br.addItem("Specified Unknown Type");
         br.addElement(code);
+        br.addItem("dfprop File");
+        br.addElement(dfpropFile);
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }
@@ -506,6 +513,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isMakeClassificationNativeTypeSetter() { // closet
+        // not make setter as default (but closet classification can be selected with logging) since 1.1
+        // http://d.hatena.ne.jp/jflute/20140823/forcecls
         return isProperty(PROP_isMakeClassificationNativeTypeSetter, false);
     }
 
@@ -524,9 +533,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCDefToStringReturnsName", false);
     }
 
-    public boolean isMakeEntityOldStyleClassify() { // closet
-        return isProperty("isMakeEntityOldStyleClassify", false);
-    }
+    // unsupported since 1.1
+    //public boolean isMakeEntityOldStyleClassify() { // closet
+    //    return isProperty("isMakeEntityOldStyleClassify", false);
+    //}
 
     public boolean isSuppressTableClassificationDBAccessClass() { // closet
         return isProperty("isSuppressTableClassificationDBAccessClass", false);
@@ -535,18 +545,18 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                       Paging Select
     //                                                                       =============
-    public boolean isPagingCountLater() {
+    public boolean isPagingCountLater() { // closet since 1.1
         return isProperty("isPagingCountLater", true); // default true @since 0.9.9.0A
     }
 
-    public boolean isPagingCountLeastJoin() {
+    public boolean isPagingCountLeastJoin() { // closet since 1.1
         return isProperty("isPagingCountLeastJoin", true); // default true @since 0.9.9.0A
     }
 
     // ===================================================================================
     //                                                                          Inner Join
     //                                                                          ==========
-    public boolean isInnerJoinAutoDetect() {
+    public boolean isInnerJoinAutoDetect() { // closet since 1.1
         return isProperty("isInnerJoinAutoDetect", true); // default true @since 1.0.3
     }
 
@@ -982,8 +992,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
                 final Object value = entry.getValue();
                 if (!(value instanceof List<?>)) {
                     final String typeExp = value != null ? value.getClass().getName() : null;
-                    String msg = "The element of suppressReferrerRelationMap should be list but: " + typeExp + " key="
-                            + key;
+                    String msg = "The element of suppressReferrerRelationMap should be list but: " + typeExp + " key=" + key;
                     throw new DfIllegalPropertyTypeException(msg);
                 }
                 @SuppressWarnings("unchecked")
@@ -1268,6 +1277,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isCompatibleDfPropDuplicateEntryIgnored() { // closet
         return isProperty("isCompatibleDfPropDuplicateEntryIgnored", isCompatibleBeforeJava8());
+    }
+
+    public boolean isCompatibleReferrerCBMethodIdentityNameListSuffix() { // closet
+        return isProperty("isCompatibleReferrerCBMethodIdentityNameListSuffix", isCompatibleBeforeJava8());
+    }
+
+    public boolean isCompatibleOutsideSqlFacadeChainOldStyle() { // closet
+        return isProperty("isCompatibleOutsideSqlFacadeChainOldStyle", isCompatibleBeforeJava8());
     }
 
     public boolean isCompatibleBeforeJava8() { // closet

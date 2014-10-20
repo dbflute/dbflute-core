@@ -28,12 +28,12 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.util.DfCollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Super simple facade for JDBC.
@@ -44,7 +44,7 @@ public class DfJdbcFacade {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfJdbcFacade.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfJdbcFacade.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -104,8 +104,7 @@ public class DfJdbcFacade {
      * @param converter The converter to convert to string value. (NullAllowed: means no conversion)
      * @return The list for result. (NotNull)
      */
-    public List<Map<String, String>> selectStringList(String sql, Map<String, ValueType> columnValueTypeMap,
-            DfJFadStringConverter converter) {
+    public List<Map<String, String>> selectStringList(String sql, Map<String, ValueType> columnValueTypeMap, DfJFadStringConverter converter) {
         return selectStringList(sql, columnValueTypeMap, converter, -1);
     }
 
@@ -218,12 +217,10 @@ public class DfJdbcFacade {
         if (_useTransaction) {
             try {
                 conn.rollback();
-            } catch (SQLException ignored) {
-            }
+            } catch (SQLException ignored) {}
             try {
                 conn.setAutoCommit(true);
-            } catch (SQLException ignored) {
-            }
+            } catch (SQLException ignored) {}
         }
     }
 

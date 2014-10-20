@@ -18,10 +18,10 @@ package org.dbflute.outsidesql.typed;
 import org.dbflute.cbean.paging.PagingBean;
 
 /**
- * The parameter-bean for auto-paging handling.
- * @author jflute
+ * The parameter-bean for auto-paging (cursor-skip) handling.
  * @param <BEHAVIOR> The type of a corresponding behavior.
  * @param <ENTITY> The type of an entity (may be scalar) for result.
+ * @author jflute
  */
-public interface AutoPagingHandlingPmb<BEHAVIOR, ENTITY> extends TypedSelectPmb<BEHAVIOR, ENTITY>, PagingBean {
+public interface AutoPagingHandlingPmb<BEHAVIOR, ENTITY> extends PagingHandlingPmb<BEHAVIOR, ENTITY>, PagingBean {
 }

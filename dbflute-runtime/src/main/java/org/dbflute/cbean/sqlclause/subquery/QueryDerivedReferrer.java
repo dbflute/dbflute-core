@@ -19,8 +19,8 @@ import java.util.List;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.name.ColumnRealName;
@@ -45,11 +45,11 @@ public class QueryDerivedReferrer extends DerivedReferrer {
     //                                                                         Constructor
     //                                                                         ===========
     public QueryDerivedReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
-            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
-            String subQueryIdentity, DBMeta subQueryDBMeta, GearedCipherManager cipherManager,
-            String mainSubQueryIdentity, String operand, Object value, String parameterPath) {
-        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
-                subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity);
+            ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause, String subQueryIdentity,
+            DBMeta subQueryDBMeta, GearedCipherManager cipherManager, String mainSubQueryIdentity, String operand, Object value,
+            String parameterPath) {
+        super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause, subQueryIdentity,
+                subQueryDBMeta, cipherManager, mainSubQueryIdentity);
         _operand = operand;
         _value = value;
         _parameterPath = parameterPath;
@@ -59,16 +59,14 @@ public class QueryDerivedReferrer extends DerivedReferrer {
     //                                                                        Build Clause
     //                                                                        ============
     @Override
-    protected String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,
-            ColumnSqlName relatedColumnSqlName, String subQueryClause, String beginMark, String endMark,
-            String endIndent) {
+    protected String doBuildDerivedReferrer(String function, ColumnRealName columnRealName, ColumnSqlName relatedColumnSqlName,
+            String subQueryClause, String beginMark, String endMark, String endIndent) {
         return buildCompleteClause(subQueryClause, beginMark, endMark, endIndent);
     }
 
     @Override
     protected String doBuildDerivedReferrer(String function, ColumnRealName[] correlatedColumnRealNames,
-            ColumnSqlName[] relatedColumnSqlNames, String subQueryClause, String beginMark, String endMark,
-            String endIndent) {
+            ColumnSqlName[] relatedColumnSqlNames, String subQueryClause, String beginMark, String endMark, String endIndent) {
         return buildCompleteClause(subQueryClause, beginMark, endMark, endIndent);
     }
 
@@ -79,7 +77,7 @@ public class QueryDerivedReferrer extends DerivedReferrer {
         sb.append(_operand); // e.g. "(select max(...) from ...) >"
         if (_value != null) {
             sb.append(" "); // e.g. "(select max(...) from ...) > "
-            if (_value instanceof HpSpecifiedColumn) { // DreamCruise
+            if (_value instanceof SpecifiedColumn) { // DreamCruise
                 // e.g. "(select max(...) from ...) > ZAMBINI_PRICE"
                 buildRightClauseDreamCruiseExp(sb);
             } else { // normally here
@@ -92,7 +90,7 @@ public class QueryDerivedReferrer extends DerivedReferrer {
     }
 
     protected void buildRightClauseDreamCruiseExp(StringBuilder sb) {
-        final HpSpecifiedColumn specifiedColumn = (HpSpecifiedColumn) _value;
+        final SpecifiedColumn specifiedColumn = (SpecifiedColumn) _value;
         final String columnExp = specifiedColumn.toColumnRealName().toString();
         final String appended;
         if (specifiedColumn.hasSpecifyCalculation()) {
@@ -137,8 +135,7 @@ public class QueryDerivedReferrer extends DerivedReferrer {
     }
 
     @Override
-    protected void doAssertDerivedReferrerColumnType(String function, String derivedColumnDbName,
-            Class<?> derivedColumnType) {
+    protected void doAssertDerivedReferrerColumnType(String function, String derivedColumnDbName, Class<?> derivedColumnType) {
         final Object value = _value;
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
             if (!Number.class.isAssignableFrom(derivedColumnType)) {
@@ -149,20 +146,17 @@ public class QueryDerivedReferrer extends DerivedReferrer {
             final Class<?> parameterType = value.getClass();
             if (String.class.isAssignableFrom(derivedColumnType)) {
                 if (!String.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName,
-                            derivedColumnType);
+                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
                 }
             }
             if (Number.class.isAssignableFrom(derivedColumnType)) {
                 if (!Number.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName,
-                            derivedColumnType);
+                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
                 }
             }
             if (java.util.Date.class.isAssignableFrom(derivedColumnType)) {
                 if (!java.util.Date.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName,
-                            derivedColumnType);
+                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
                 }
             }
         }
@@ -170,7 +164,6 @@ public class QueryDerivedReferrer extends DerivedReferrer {
 
     protected void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
             Class<?> derivedColumnType) {
-        createCBExThrower().throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName,
-                derivedColumnType, _value);
+        createCBExThrower().throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType, _value);
     }
 }

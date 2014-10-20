@@ -15,6 +15,7 @@
  */
 package org.dbflute.cbean.chelper;
 
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.subquery.DerivedReferrer;
 import org.dbflute.dbmeta.info.ColumnInfo;
@@ -35,8 +36,7 @@ public class HpDerivingSubQueryInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpDerivingSubQueryInfo(String function, String aliasName, String derivingSubQuery,
-            DerivedReferrer derivedReferrer) {
+    public HpDerivingSubQueryInfo(String function, String aliasName, String derivingSubQuery, DerivedReferrer derivedReferrer) {
         _function = function;
         _aliasName = aliasName;
         _derivingSubQuery = derivingSubQuery;
@@ -46,9 +46,9 @@ public class HpDerivingSubQueryInfo {
     // ===================================================================================
     //                                                                       Meta Provider
     //                                                                       =============
-    public HpSpecifiedColumn extractDerivingColumn() {
+    public SpecifiedColumn extractDerivingColumn() {
         final SqlClause subQuerySqlClause = _derivedReferrer.getSubQuerySqlClause();
-        final HpSpecifiedColumn specifiedColumn = subQuerySqlClause.getSpecifiedColumnAsOne();
+        final SpecifiedColumn specifiedColumn = subQuerySqlClause.getSpecifiedColumnAsOne();
         if (specifiedColumn != null) {
             return specifiedColumn;
         }

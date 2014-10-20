@@ -54,8 +54,7 @@ public class OracleResultSetType extends TnAbstractValueType {
         throw new SQLException("not supported");
     }
 
-    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException {
         throw new SQLException("not supported");
     }
 }

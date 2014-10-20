@@ -28,8 +28,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
@@ -50,6 +48,8 @@ import org.dbflute.properties.assistant.classification.DfClassificationSqlResour
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The properties for classification.
@@ -60,7 +60,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfClassificationProperties.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfClassificationProperties.class);
     private static final String SQL_MARK = "$sql:";
 
     // ===================================================================================
@@ -324,8 +324,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // -----------------------------------------------------
     //                                        Process Method
     //                                        --------------
-    protected void processClassificationTopFromLiteralIfNeeds(DfClassificationTop classificationTop,
-            Map<?, ?> elementMap) {
+    protected void processClassificationTopFromLiteralIfNeeds(DfClassificationTop classificationTop, Map<?, ?> elementMap) {
         classificationTop.acceptClassificationTopBasicItemMap(elementMap);
         classificationTop.setCheckClassificationCode(isElementMapCheckClassificationCode(elementMap));
         classificationTop.setUndefinedHandlingType(getElementMapUndefinedHandlingType(elementMap));
@@ -554,8 +553,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return _suppressedDBAccessClassTableSet.contains(tableDbName);
     }
 
-    protected void processTableClassification(DfClassificationTop classificationTop, Map<?, ?> elementMap,
-            String table, List<DfClassificationElement> elementList, Connection conn) {
+    protected void processTableClassification(DfClassificationTop classificationTop, Map<?, ?> elementMap, String table,
+            List<DfClassificationElement> elementList, Connection conn) {
         final DfClassificationElement metaElement = new DfClassificationElement();
         metaElement.setClassificationName(classificationTop.getClassificationName());
         metaElement.setTable(table);
@@ -573,8 +572,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         metaElement.setClassificationTop(classificationTop);
     }
 
-    protected String buildTableClassificationSql(DfClassificationElement element, String table, String where,
-            String orderBy) {
+    protected String buildTableClassificationSql(DfClassificationElement element, String table, String where, String orderBy) {
         final String code = quoteColumnNameIfNeedsDirectUse(element.getCode());
         final String name = quoteColumnNameIfNeedsDirectUse(element.getName());
         final String alias = quoteColumnNameIfNeedsDirectUse(element.getAlias());
@@ -664,9 +662,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return exceptCodeSet;
     }
 
-    protected void setupTableClassification(DfClassificationTop classificationTop,
-            List<DfClassificationElement> elementList, DfClassificationElement metaElement, Set<String> exceptCodeSet,
-            Connection conn, String sql) {
+    protected void setupTableClassification(DfClassificationTop classificationTop, List<DfClassificationElement> elementList,
+            DfClassificationElement metaElement, Set<String> exceptCodeSet, Connection conn, String sql) {
         final String classificationName = classificationTop.getClassificationName();
         final Map<String, Object> subItemPropMap = metaElement.getSubItemMap();
         Statement st = null;
@@ -1139,8 +1136,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return columnClassificationMap;
     }
 
-    protected void registerColumnClsIfNeeds(Map<String, String> columnClsMap, String columnName,
-            String classificationName) {
+    protected void registerColumnClsIfNeeds(Map<String, String> columnClsMap, String columnName, String classificationName) {
         final String value = columnClsMap.get(columnName);
         if (value != null) {
             return;

@@ -20,13 +20,13 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -37,8 +37,8 @@ public class DfOutsideSqlCollector {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfOutsideSqlCollector.class);
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(DfOutsideSqlCollector.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -73,8 +73,7 @@ public class DfOutsideSqlCollector {
                 handleSecondaryDirectory(outsideSqlPack, sqlLocation, sqlDirectory, false);
             } else {
                 final boolean suppressCheck = _suppressDirectoryCheck || sqlLocation.isSuppressDirectoryCheck();
-                final boolean foundSecondaryDirectory = handleSecondaryDirectory(outsideSqlPack, sqlLocation,
-                        sqlDirectory, suppressCheck);
+                final boolean foundSecondaryDirectory = handleSecondaryDirectory(outsideSqlPack, sqlLocation, sqlDirectory, suppressCheck);
                 if (!foundSecondaryDirectory && !suppressCheck) { // means both primary and secondary directory
                     String msg = "The sqlDirectory does not exist: " + sqlDirectory;
                     throw new IllegalStateException(msg);
@@ -93,8 +92,7 @@ public class DfOutsideSqlCollector {
         return new File(sqlDirPath).exists();
     }
 
-    protected List<DfOutsideSqlFile> collectSqlFile(String realSqlDirectory, DfOutsideSqlLocation sqlLocation)
-            throws FileNotFoundException {
+    protected List<DfOutsideSqlFile> collectSqlFile(String realSqlDirectory, DfOutsideSqlLocation sqlLocation) throws FileNotFoundException {
         final List<File> sqlFileList = createSqlFileGetter().getSqlFileList(realSqlDirectory);
         final List<DfOutsideSqlFile> outsideSqlList = new ArrayList<DfOutsideSqlFile>();
         for (File sqlFile : sqlFileList) {
@@ -116,8 +114,8 @@ public class DfOutsideSqlCollector {
         };
     }
 
-    protected boolean handleSecondaryDirectory(DfOutsideSqlPack outsideSqlPack, DfOutsideSqlLocation sqlLocation,
-            String sqlDirectory, boolean checkNotFound) {
+    protected boolean handleSecondaryDirectory(DfOutsideSqlPack outsideSqlPack, DfOutsideSqlLocation sqlLocation, String sqlDirectory,
+            boolean checkNotFound) {
         final DfBasicProperties basicProp = getBasicProperties();
         final DfLanguageDependency lang = basicProp.getLanguageDependency();
         final String secondaryDirectory = lang.convertToSecondaryOutsideSqlDirectory(sqlDirectory);

@@ -23,8 +23,8 @@ import java.util.Set;
 import org.dbflute.Entity;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
-import org.dbflute.cbean.chelper.HpCalculator;
-import org.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.dbflute.cbean.dream.ColumnCalculator;
+import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
@@ -82,17 +82,17 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * purchase.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
      * 
      * <span style="color: #3F7E5E">// e.g. you can update by self calculation values</span>
-     * UpdateOption&lt;PurchaseCB&gt; option = <span style="color: #DD4747">new UpdateOption&lt;PurchaseCB&gt;()</span>;
-     * option.<span style="color: #DD4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
+     * UpdateOption&lt;PurchaseCB&gt; option = <span style="color: #CC4747">new UpdateOption&lt;PurchaseCB&gt;()</span>;
+     * option.<span style="color: #CC4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
      *     public void specify(PurchaseCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnPurchaseCount()</span>;
+     *         cb.specify().<span style="color: #CC4747">columnPurchaseCount()</span>;
      *     }
-     * }).<span style="color: #DD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
+     * }).<span style="color: #CC4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
      * 
      * <span style="color: #3F7E5E">// e.g. you can update by your values for common columns</span>
-     * option.<span style="color: #DD4747">disableCommonColumnAutoSetup</span>();
+     * option.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>();
      * 
-     * purchaseBhv.<span style="color: #DD4747">varyingUpdate</span>(purchase, option);
+     * purchaseBhv.<span style="color: #CC4747">varyingUpdate</span>(purchase, option);
      * </pre>
      */
     public UpdateOption() {
@@ -110,39 +110,52 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * purchase.setPurchaseId(value); <span style="color: #3F7E5E">// required</span>
      * purchase.setOther...(value); <span style="color: #3F7E5E">// you should set only modified columns</span>
      * UpdateOption&lt;PurchaseCB&gt; option = new UpdateOption&lt;PurchaseCB&gt;();
-     * option.<span style="color: #DD4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
+     * option.<span style="color: #CC4747">self</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
      *     public void specify(PurchaseCB cb) {
-     *         cb.specify().<span style="color: #DD4747">columnPurchaseCount()</span>;
+     *         cb.specify().<span style="color: #CC4747">columnPurchaseCount()</span>;
      *     }
-     * }).<span style="color: #DD4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
-     * purchaseBhv.<span style="color: #DD4747">varyingUpdateNonstrict</span>(purchase, option);
+     * }).<span style="color: #CC4747">plus</span>(1); <span style="color: #3F7E5E">// PURCHASE_COUNT = PURCHASE_COUNT + 1</span>
+     * purchaseBhv.<span style="color: #CC4747">varyingUpdateNonstrict</span>(purchase, option);
      * </pre>
-     * @param selfCalculationSpecification The query for specification that specifies only one column. (NotNull)
+     * @param colCBLambda The callback for query for specification that specifies only one column. (NotNull)
      * @return The calculation of specification for the specified column. (NotNull)
      */
-    public HpCalculator self(SpecifyQuery<CB> selfCalculationSpecification) {
-        if (selfCalculationSpecification == null) {
-            String msg = "The argument 'selfCalculationSpecification' should not be null.";
+    public ColumnCalculator self(SpecifyQuery<CB> colCBLambda) {
+        if (colCBLambda == null) {
+            String msg = "The argument 'colCBLambda' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         if (_selfSpecificationList == null) {
             _selfSpecificationList = DfCollectionUtil.newArrayList();
         }
-        final HpCalcSpecification<CB> specification = new HpCalcSpecification<CB>(selfCalculationSpecification);
+        final HpCalcSpecification<CB> specification = createCalcSpecification(colCBLambda);
         _selfSpecificationList.add(specification);
         return specification;
+    }
+
+    protected HpCalcSpecification<CB> createCalcSpecification(SpecifyQuery<CB> colCBLambda) {
+        return newCalcSpecification(colCBLambda);
+    }
+
+    protected HpCalcSpecification<CB> newCalcSpecification(SpecifyQuery<CB> colCBLambda) {
+        return new HpCalcSpecification<CB>(colCBLambda);
     }
 
     public boolean hasSelfSpecification() {
         return _selfSpecificationList != null && !_selfSpecificationList.isEmpty();
     }
 
-    public void resolveSelfSpecification(CB cb) {
+    public static interface UpdateSelfSpecificationCBFactory<CB> {
+        CB create();
+    }
+
+    public void resolveSelfSpecification(UpdateSelfSpecificationCBFactory<CB> factory) {
         if (_selfSpecificationList == null || _selfSpecificationList.isEmpty()) {
             return;
         }
         _selfSpecificationMap = StringKeyMap.createAsFlexibleOrdered();
         for (HpCalcSpecification<CB> specification : _selfSpecificationList) {
+            final CB cb = factory.create(); // needs independent instance per specification 
             specification.specify(cb);
             final String columnDbName = specification.getResolvedSpecifiedColumnDbName();
             assertSpecifiedColumn(cb, columnDbName);
@@ -266,7 +279,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         if (calcSp == null) {
             return null;
         }
-        final HpSpecifiedColumn specifiedColumn = calcSp.getResolvedSpecifiedColumn();
+        final SpecifiedColumn specifiedColumn = calcSp.getResolvedSpecifiedColumn();
         if (specifiedColumn != null && specifiedColumn.hasSpecifyCalculation()) {
             throwVaryingUpdateSpecifyCalculatonUnsupportedException(columnDbName);
         }
@@ -343,7 +356,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * member.setMemberId(3);
      * member.setOthers...(value);
      * UpdateOption&lt;MemberCB&gt; option = new UpdateOption&lt;MemberCB&gt;();
-     * option.<span style="color: #DD4747">specify</span>(new SpecifyQuery&lt;MemberCB&gt;() {
+     * option.<span style="color: #CC4747">specify</span>(new SpecifyQuery&lt;MemberCB&gt;() {
      *     public void query(MemberCB cb) {
      *         <span style="color: #3F7E5E">// only MemberName and Birthdate are updated</span>
      *         <span style="color: #3F7E5E">// with common columns for update and an exclusive control column</span>
@@ -353,14 +366,14 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * });
      * memberBhv.varyingUpdate(member, option);
      * </pre>
-     * @param updateColumnSpecification The query for specifying update columns. (NotNull)
+     * @param colCBLambda The callback for query of specifying update columns. (NotNull)
      */
-    public void specify(SpecifyQuery<CB> updateColumnSpecification) {
-        if (updateColumnSpecification == null) {
+    public void specify(SpecifyQuery<CB> colCBLambda) {
+        if (colCBLambda == null) {
             String msg = "The argument 'updateColumnSpecification' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        _updateColumnSpecification = updateColumnSpecification;
+        _updateColumnSpecification = colCBLambda;
     }
 
     public void resolveUpdateColumnSpecification(CB cb) {
@@ -455,13 +468,13 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         if (xisUpdateColumnModifiedPropertiesFragmentedAllowed()) { // least common multiple
             final Set<String> mergedProps = new LinkedHashSet<String>();
             for (Entity entity : entityList) { // for merge
-                mergedProps.addAll(entity.modifiedProperties());
+                mergedProps.addAll(entity.mymodifiedProperties());
             }
             return mergedProps;
         } else { // same-set columns (mainly here)
-            final Set<String> firstProps = firstEntity.modifiedProperties();
+            final Set<String> firstProps = firstEntity.mymodifiedProperties();
             for (Entity entity : entityList) { // for check
-                if (!entity.modifiedProperties().equals(firstProps)) {
+                if (!entity.mymodifiedProperties().equals(firstProps)) {
                     throwBatchUpdateColumnModifiedPropertiesFragmentedException(firstProps, entity);
                 }
             }
@@ -520,7 +533,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         br.addItem("Fragmented Entity");
         br.addElement(entity.getDBMeta().extractPrimaryKeyMap(entity));
         br.addItem("Fragmented Properties");
-        br.addElement(entity.modifiedProperties());
+        br.addElement(entity.mymodifiedProperties());
         final String msg = br.buildExceptionMessage();
         throw new BatchUpdateColumnModifiedPropertiesFragmentedException(msg);
     }
@@ -594,7 +607,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * member.setUpdateDatetime(updateDatetime);
      * member.setUpdateUser(updateUser);
      * UpdateOption&lt;MemberCB&gt; option = new UpdateOption&lt;MemberCB&gt;();
-     * option.<span style="color: #DD4747">disableCommonColumnAutoSetup</span>();
+     * option.<span style="color: #CC4747">disableCommonColumnAutoSetup</span>();
      * memberBhv.varyingUpdate(member, option);
      * </pre>
      * @return The option of update. (NotNull: returns this)
