@@ -441,7 +441,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         final String code = doGetClassificationUndefinedHandlingType(defaultValue);
         final ClassificationUndefinedHandlingType handlingType = ClassificationUndefinedHandlingType.codeOf(code);
         if (handlingType == null) {
-            throwUnknownClassificationUndefinedHandlingTypeException(code);
+            throwUnknownClassificationUndefinedHandlingTypeException(code, KEY_littleAdjustmentMap + ".dfprop");
         }
         return handlingType;
     }
@@ -450,7 +450,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getProperty("classificationUndefinedHandlingType", defaultValue);
     }
 
-    protected void throwUnknownClassificationUndefinedHandlingTypeException(String code) {
+    protected void throwUnknownClassificationUndefinedHandlingTypeException(String code, String dfpropFile) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Unknown handling type of classification undefined code.");
         br.addItem("Advice");
@@ -469,6 +469,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         br.addElement("}");
         br.addItem("Specified Unknown Type");
         br.addElement(code);
+        br.addItem("dfprop File");
+        br.addElement(dfpropFile);
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }
