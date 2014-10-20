@@ -16,8 +16,11 @@
 package org.dbflute.dbmeta.accessory;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * The modified properties of entity. (basically for Framework)
@@ -42,10 +45,22 @@ public class EntityModifiedProperties implements Serializable {
 
     /**
      * Get the set of properties.
-     * @return The set of properties. (NotNull)
+     * @return The set of properties, read-only. (NotNull)
      */
     public Set<String> getPropertyNames() {
-        return getPropertyNameSet();
+        if (_propertyNameSet != null) {
+            return Collections.unmodifiableSet(_propertyNameSet);
+        }
+        return DfCollectionUtil.emptySet();
+    }
+
+    /**
+     * Is the property modified?
+     * @param propertyName The name of property. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isModifiedProperty(String propertyName) {
+        return _propertyNameSet != null && _propertyNameSet.contains(propertyName);
     }
 
     /**
@@ -53,14 +68,16 @@ public class EntityModifiedProperties implements Serializable {
      * @return The determination, true or false.
      */
     public boolean isEmpty() {
-        return getPropertyNameSet().isEmpty();
+        return _propertyNameSet == null || getPropertyNameSet().isEmpty();
     }
 
     /**
      * Clear the set of properties.
      */
     public void clear() {
-        getPropertyNameSet().clear();
+        if (_propertyNameSet != null) {
+            getPropertyNameSet().clear();
+        }
     }
 
     /**
@@ -68,7 +85,9 @@ public class EntityModifiedProperties implements Serializable {
      * @param propertyName The string for name. (NotNull)
      */
     public void remove(String propertyName) {
-        getPropertyNameSet().remove(propertyName);
+        if (_propertyNameSet != null) {
+            getPropertyNameSet().remove(propertyName);
+        }
     }
 
     /**
@@ -80,15 +99,6 @@ public class EntityModifiedProperties implements Serializable {
         for (String propertyName : properties.getPropertyNames()) {
             addPropertyName(propertyName);
         }
-    }
-
-    /**
-     * Is the property modified?
-     * @param propertyName The name of property. (NotNull)
-     * @return The determination, true or false.
-     */
-    public boolean isModifiedProperty(String propertyName) {
-        return _propertyNameSet != null && _propertyNameSet.contains(propertyName);
     }
 
     protected Set<String> getPropertyNameSet() {

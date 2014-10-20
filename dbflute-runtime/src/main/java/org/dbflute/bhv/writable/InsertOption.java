@@ -220,13 +220,13 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
         if (xisInsertColumnModifiedPropertiesFragmentedAllowed()) { // least common multiple (mainly here)
             final Set<String> mergedProps = new LinkedHashSet<String>();
             for (Entity entity : entityList) {
-                mergedProps.addAll(entity.modifiedProperties());
+                mergedProps.addAll(entity.mymodifiedProperties());
             }
             return mergedProps;
         } else { // same-set columns
-            final Set<String> firstProps = firstEntity.modifiedProperties();
+            final Set<String> firstProps = firstEntity.mymodifiedProperties();
             for (Entity entity : entityList) { // for check
-                if (!entity.modifiedProperties().equals(firstProps)) {
+                if (!entity.mymodifiedProperties().equals(firstProps)) {
                     throwBatchInsertColumnModifiedPropertiesFragmentedException(firstProps, entity);
                 }
             }
@@ -278,7 +278,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
         br.addItem("Fragmented Entity");
         br.addElement(entity.getDBMeta().extractPrimaryKeyMap(entity));
         br.addItem("Fragmented Properties");
-        br.addElement(entity.modifiedProperties());
+        br.addElement(entity.mymodifiedProperties());
         final String msg = br.buildExceptionMessage();
         throw new BatchInsertColumnModifiedPropertiesFragmentedException(msg);
     }

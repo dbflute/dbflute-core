@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.dbmeta;
+package org.dbflute.dbmeta.property;
 
 import org.dbflute.Entity;
 
@@ -24,6 +24,7 @@ import org.dbflute.Entity;
  */
 public interface PropertyGateway {
 
+    // TODO jflute impl: split in DBMeta, for lambda
     /**
      * Read the property value from the entity.
      * @param entity The target entity to read. (NotNull)

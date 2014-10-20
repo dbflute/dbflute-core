@@ -18,18 +18,18 @@ package org.dbflute.optional;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 
 /**
- * @param <THING> The type of thing.
+ * @param <PROP> The type of property.
  * @author jflute
- * @since 1.0.5F (2014/05/05 Monday)
+ * @since 1.1.0 (2014/10/20 Monday)
  */
-public class OptionalThing<THING> extends BaseOptional<THING> {
+public class OptionalProperty<PROP> extends BaseOptional<PROP> {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final OptionalThing<Object> EMPTY_INSTANCE;
+    protected static final OptionalProperty<Object> EMPTY_INSTANCE;
     static {
-        EMPTY_INSTANCE = new OptionalThing<Object>(null, new OptionalThingExceptionThrower() {
+        EMPTY_INSTANCE = new OptionalProperty<Object>(null, new OptionalThingExceptionThrower() {
             public void throwNotFoundException() {
                 String msg = "The empty optional so the value is null.";
                 throw new IllegalStateException(msg);
@@ -49,43 +49,43 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      * @param thing The wrapped instance of thing. (NullAllowed)
      * @param thrower The exception thrower when illegal access. (NotNull)
      */
-    public OptionalThing(THING thing, OptionalThingExceptionThrower thrower) { // basically called by DBFlute
+    public OptionalProperty(PROP thing, OptionalThingExceptionThrower thrower) { // basically called by DBFlute
         super(thing, thrower);
     }
 
     /**
-     * @param <EMPTY> The type of empty optional thing.
+     * @param <EMPTY> The type of empty optional property.
      * @return The fixed instance as empty. (NotNull)
      */
     @SuppressWarnings("unchecked")
-    public static <EMPTY> OptionalThing<EMPTY> empty() {
-        return (OptionalThing<EMPTY>) EMPTY_INSTANCE;
+    public static <EMPTY> OptionalProperty<EMPTY> empty() {
+        return (OptionalProperty<EMPTY>) EMPTY_INSTANCE;
     }
 
     /**
-     * @param <OBJ> The type of object wrapped in the optional thing.
+     * @param <OBJ> The type of object wrapped in the optional property.
      * @param object The wrapped thing which is optional. (NotNull)
-     * @return The new-created instance as existing optional thing. (NotNull)
+     * @return The new-created instance as existing optional property. (NotNull)
      */
-    public static <OBJ> OptionalThing<OBJ> of(OBJ object) {
+    public static <OBJ> OptionalProperty<OBJ> of(OBJ object) {
         if (object == null) {
             String msg = "The argument 'object' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        return new OptionalThing<OBJ>(object, NOWAY_THROWER);
+        return new OptionalProperty<OBJ>(object, NOWAY_THROWER);
     }
 
     /**
-     * @param <OBJ> The type of object wrapped in the optional thing.
+     * @param <OBJ> The type of object wrapped in the optional property.
      * @param object The wrapped instance or thing. (NullAllowed)
      * @param noArgLambda The callback for exception when illegal access. (NotNull)
      * @return The new-created instance as existing or empty optional object. (NotNull)
      */
-    public static <OBJ> OptionalThing<OBJ> ofNullable(OBJ object, OptionalThingExceptionThrower noArgLambda) {
+    public static <OBJ> OptionalProperty<OBJ> ofNullable(OBJ object, OptionalThingExceptionThrower noArgLambda) {
         if (object != null) {
             return of(object);
         } else {
-            return new OptionalThing<OBJ>(object, noArgLambda);
+            return new OptionalProperty<OBJ>(object, noArgLambda);
         }
     }
 
@@ -99,7 +99,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      * @param oneArgLambda The callback interface to consume the optional object. (NotNull)
      * @return The handler of after process when if not present. (NotNull)
      */
-    public OptionalThingIfPresentAfter ifPresent(OptionalThingConsumer<THING> oneArgLambda) {
+    public OptionalThingIfPresentAfter ifPresent(OptionalThingConsumer<PROP> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         return callbackIfPresent(oneArgLambda);
     }
@@ -117,7 +117,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      * @return The instance of the wrapped thing. (NotNull)
      * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
      */
-    public THING get() {
+    public PROP get() {
         return directlyGet();
     }
 
@@ -125,7 +125,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      * @param other The object instance to be returned when the optional is empty. (NullAllowed)
      * @return The wrapped instance or specified other object. (NullAllowed:)
      */
-    public THING orElse(THING other) {
+    public PROP orElse(PROP other) {
         return directlyGetOrElse(other);
     }
 
@@ -134,17 +134,17 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      * @param oneArgLambda The callback to predicate whether the object is remained. (NotNull)
      * @return The filtered optional object, might be empty. (NotNull)
      */
-    public OptionalThing<THING> filter(OptionalThingPredicate<THING> oneArgLambda) {
+    public OptionalProperty<PROP> filter(OptionalThingPredicate<PROP> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
-        return (OptionalThing<THING>) callbackFilter(oneArgLambda);
+        return (OptionalProperty<PROP>) callbackFilter(oneArgLambda);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected <ARG> OptionalThing<ARG> createOptionalFilteredObject(ARG obj) {
-        return new OptionalThing<ARG>(obj, _thrower);
+    protected <ARG> OptionalProperty<ARG> createOptionalFilteredObject(ARG obj) {
+        return new OptionalProperty<ARG>(obj, _thrower);
     }
 
     /**
@@ -154,7 +154,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     @SuppressWarnings("unchecked")
-    public <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super THING, ? extends RESULT> oneArgLambda) {
+    public <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super PROP, ? extends RESULT> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         return (OptionalThing<RESULT>) callbackMapping(oneArgLambda); // downcast allowed because factory is overridden
     }
@@ -163,8 +163,8 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      * {@inheritDoc}
      */
     @Override
-    protected <ARG> OptionalThing<ARG> createOptionalMappedObject(ARG obj) {
-        return new OptionalThing<ARG>(obj, _thrower);
+    protected <ARG> OptionalProperty<ARG> createOptionalMappedObject(ARG obj) {
+        return new OptionalProperty<ARG>(obj, _thrower);
     }
 
     /**
@@ -173,22 +173,22 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      * @param oneArgLambda The callback interface to apply. (NotNull)
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    public <RESULT> OptionalThing<RESULT> flatMap(OptionalThingFunction<? super THING, OptionalThing<RESULT>> oneArgLambda) {
+    public <RESULT> OptionalThing<RESULT> flatMap(OptionalThingFunction<? super PROP, OptionalThing<RESULT>> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         return callbackFlatMapping(oneArgLambda);
     }
 
-    // TODO jflute impl: OptionalThing.orElseThrow(Supplier) and others...
+    // TODO jflute impl: OptionalProperty.orElseThrow(Supplier) and others...
 
     // ===================================================================================
     //                                                                   DBFlute Extension
     //                                                                   =================
     /**
-     * Handle the object in the optional thing or exception if not present.
+     * Handle the object in the optional property or exception if not present.
      * @param oneArgLambda The callback interface to consume the optional object. (NotNull)
      * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
      */
-    public void alwaysPresent(OptionalThingConsumer<THING> oneArgLambda) {
+    public void alwaysPresent(OptionalThingConsumer<PROP> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);
         callbackAlwaysPresent(oneArgLambda);
     }
@@ -198,7 +198,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
      * basically use ifPresent() if might be not present, this is for emergency
      * @return The object instance wrapped in this optional object or null. (NullAllowed: if not present)
      */
-    public THING orElseNull() {
+    public PROP orElseNull() {
         return directlyGetOrElse(null);
     }
 

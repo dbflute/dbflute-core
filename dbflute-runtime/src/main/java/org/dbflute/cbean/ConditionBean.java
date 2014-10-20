@@ -213,11 +213,11 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
      * Ignore null-or-empty check for query when query is set. (default is checked) <br />
      * (no condition if set query is invalid)
      * <pre>
-     * memberBhv.selectList(cb -&gt; {
-     *     cb.ignoreNullOrEmptyQuery();
-     *     cb.query().setMemberName_Equal(null); // no condition (ignored)
-     *     cb.query().setMemberName_Equal("");   // no condition (ignored)
-     *     cb.query().setMemberName_Equal(" ");  // valid condition (MEMBER_NAME = ' ')
+     * <span style="color: #0000C0">memberBhv</span>.selectList(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.<span style="color: #CC4747">ignoreNullOrEmptyQuery()</span>;
+     *     <span style="color: #553000">cb</span>.query().<span style="color: #994747">setMemberName_Equal</span>(null); <span style="color: #3F7E5E">// no condition (ignored)</span>
+     *     <span style="color: #553000">cb</span>.query().<span style="color: #994747">setMemberName_Equal</span>("");   <span style="color: #3F7E5E">// no condition (ignored)</span>
+     *     <span style="color: #553000">cb</span>.query().setMemberName_Equal(" ");  <span style="color: #3F7E5E">// valid (MEMBER_NAME = ' ')</span>
      * });
      * </pre>
      * You should call this before registrations of where clause and other queries. <br />

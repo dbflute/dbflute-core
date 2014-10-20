@@ -51,6 +51,52 @@ public interface Entity {
     DBMeta getDBMeta();
 
     // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
+    // -----------------------------------------------------
+    //                                              Modified
+    //                                              --------
+    /**
+     * Get the set of modified properties. (basically for Framework) <br />
+     * The properties needs to be according to Java Beans rule. <br />
+     * @return The set of property name for modified columns, read-only. (NotNull)
+     */
+    Set<String> mymodifiedProperties(); // 'my' take on unique-driven
+
+    /**
+     * Clear the information of modified properties. (basically for Framework)
+     */
+    void clearModifiedInfo();
+
+    /**
+     * Does it have modifications of property names. (basically for Framework)
+     * @return The determination, true or false.
+     */
+    boolean hasModification();
+
+    // -----------------------------------------------------
+    //                                             Specified
+    //                                             ---------
+    /**
+     * Copy to modified properties to specified properties. <br />
+     * It means non-specified columns are checked
+     */
+    void modifiedToSpecified();
+
+    /**
+     * Get the set of specified properties. (basically for Framework) <br />
+     * The properties needs to be according to Java Beans rule.
+     * @return The set of property name for specified columns, read-only. (NotNull: if empty, no check)
+     */
+    Set<String> myspecifiedProperties(); // 'my' take on unique-driven
+
+    /**
+     * Clear the information of specified properties. (basically for Framework) <br />
+     * It means no check of access to non-specified columns.
+     */
+    void clearSpecifiedInfo();
+
+    // ===================================================================================
     //                                                                         Primary Key
     //                                                                         ===========
     /**
@@ -64,35 +110,6 @@ public interface Entity {
      * @return The set of property name for specified unique columns. (NotNull)
      */
     Set<String> myuniqueDrivenProperties(); // prefix 'my' not to show when uniqueBy() completion
-
-    // ===================================================================================
-    //                                                                 Modified Properties
-    //                                                                 ===================
-    /**
-     * Get the set of modified properties. (basically for Framework) <br />
-     * The properties needs to be according to Java Beans rule.
-     * @return The set of property name for modified columns. (NotNull)
-     */
-    Set<String> modifiedProperties(); // TODO jflute impl: prefix my?
-
-    /**
-     * Clear the information of modified properties. (basically for Framework)
-     */
-    void clearModifiedInfo();
-
-    /**
-     * Does it have modifications of property names. (basically for Framework)
-     * @return The determination, true or false.
-     */
-    boolean hasModification();
-
-    /**
-     * Copy to modified properties to specified properties. <br />
-     * It means non-specified columns are checked
-     */
-    void modifiedToSpecified();
-    
-    // TODO jflute impl: myspecifiedProperties()? clearSpecifiedInfo()? suppressNonSpecifiedColumnAccessCheck()?
 
     // ===================================================================================
     //                                                                     Birthplace Mark

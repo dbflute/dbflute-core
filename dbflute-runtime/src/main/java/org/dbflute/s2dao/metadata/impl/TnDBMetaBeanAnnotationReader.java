@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.dbmeta.MappingValueType;
+import org.dbflute.dbmeta.accessory.MappingValueType;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.helper.beans.DfBeanDesc;

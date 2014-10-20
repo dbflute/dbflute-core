@@ -252,8 +252,8 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * {@inheritDoc}
      */
     @Override
-    protected <ARG> OptionalThing<ARG> createOptionalFilteredObject(ARG obj) {
-        return new OptionalThing<ARG>(obj, _thrower);
+    protected <ARG> OptionalEntity<ARG> createOptionalFilteredObject(ARG obj) {
+        return new OptionalEntity<ARG>(obj, _thrower);
     }
 
     /**
@@ -268,7 +268,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * </pre>
      * @param <RESULT> The type of mapping result.
      * @param entityLambda The callback interface to apply. (NotNull)
-     * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
+     * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     @SuppressWarnings("unchecked")
     public <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super ENTITY, ? extends RESULT> entityLambda) {
@@ -304,7 +304,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     // * @param mapper The callback interface to apply. (NotNull)
     // * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
     // */
-    //public <RESULT> OptionalObject<RESULT> flatMap(OptionalObjectFunction<? super ENTITY, OptionalObject<RESULT>> mapper) {
+    //public <RESULT> OptionalThing<RESULT> flatMap(OptionalObjectFunction<? super ENTITY, OptionalThing<RESULT>> mapper) {
     //    return callbackFlatMapping(mapper);
     //}
 

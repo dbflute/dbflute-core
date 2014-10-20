@@ -165,7 +165,7 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
             List<TnPropertyType> boundPropTypeList) {
         final Map<String, Object> columnParameterMap = new LinkedHashMap<String, Object>();
         final DBMeta dbmeta = entity.getDBMeta();
-        final Set<String> modifiedPropertyNames = entity.modifiedProperties();
+        final Set<String> modifiedPropertyNames = entity.mymodifiedProperties();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         for (final ColumnInfo columnInfo : columnInfoList) {
             if (columnInfo.isOptimisticLock()) {

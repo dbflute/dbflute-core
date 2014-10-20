@@ -19,7 +19,6 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +46,7 @@ import org.dbflute.s2dao.metadata.impl.TnBeanMetaDataFactoryImpl;
 import org.dbflute.s2dao.metadata.impl.TnBeanMetaDataImpl;
 import org.dbflute.s2dao.metadata.impl.TnDBMetaBeanAnnotationReader;
 import org.dbflute.s2dao.metadata.impl.TnRelationPropertyTypeFactoryBuilderImpl;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -246,22 +246,23 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     @Override
     protected TnModifiedPropertySupport createModifiedPropertySupport() {
         return new TnModifiedPropertySupport() {
-            @SuppressWarnings("unchecked")
             public Set<String> getModifiedPropertyNames(Object bean) {
                 if (bean instanceof Entity) { // all entities of DBFlute are here
-                    return ((Entity) bean).modifiedProperties();
+                    return ((Entity) bean).mymodifiedProperties();
                 } else { // basically no way on DBFlute (S2Dao's route)
                     final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(bean.getClass());
                     final String propertyName = MODIFIED_PROPERTY_PROPERTY_NAME;
                     if (!beanDesc.hasPropertyDesc(propertyName)) {
-                        return Collections.EMPTY_SET;
+                        return DfCollectionUtil.emptySet();
                     } else {
                         final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
                         final Object value = propertyDesc.getValue(bean);
                         if (value != null) {
-                            return (Set<String>) value;
+                            @SuppressWarnings("unchecked")
+                            final Set<String> extractedSet = (Set<String>) value;
+                            return extractedSet;
                         } else {
-                            return Collections.EMPTY_SET;
+                            return DfCollectionUtil.emptySet();
                         }
                     }
                 }

@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,6 +40,8 @@ import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
 import org.dbflute.dbmeta.info.UniqueInfo;
+import org.dbflute.dbmeta.property.PropertyGateway;
+import org.dbflute.dbmeta.property.PropertyMethodFinder;
 import org.dbflute.exception.DBMetaNotFoundException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -958,25 +961,32 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                               -------
     protected Map<String, Object> doExtractPrimaryKeyMap(Entity entity) {
         assertObjectNotNull("entity", entity);
-        return doConvertToColumnValueMap(entity, true);
+        return doConvertToColumnValueMap(entity, true, 4);
     }
 
     protected Map<String, Object> doExtractAllColumnMap(Entity entity) {
         assertObjectNotNull("entity", entity);
-        return doConvertToColumnValueMap(entity, false);
+        return doConvertToColumnValueMap(entity, false, 10);
     }
 
-    protected Map<String, Object> doConvertToColumnValueMap(Entity entity, boolean pkOnly) {
-        final Map<String, Object> valueMap = newLinkedHashMap();
+    protected Map<String, Object> doConvertToColumnValueMap(Entity entity, boolean pkOnly, int sized) {
+        final Map<String, Object> valueMap = newLinkedHashMapSized(sized);
         final List<ColumnInfo> columnInfoList;
         if (pkOnly) {
             columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
         } else {
             columnInfoList = getColumnInfoList();
         }
+        final Set<String> specifiedProperties = entity.myspecifiedProperties();
+        final boolean nonSpChecked = !specifiedProperties.isEmpty();
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnName = columnInfo.getColumnDbName();
-            final Object value = columnInfo.read(entity);
+            final Object value;
+            if (nonSpChecked && !specifiedProperties.contains(columnInfo.getPropertyName())) { // non-specified column
+                value = null; // to avoid non-specified check
+            } else {
+                value = columnInfo.read(entity);
+            }
             valueMap.put(columnName, value);
         }
         return valueMap;

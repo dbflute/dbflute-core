@@ -29,6 +29,8 @@ import org.dbflute.dbmeta.accessory.EntityDerivedMap;
 import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
 import org.dbflute.dbmeta.accessory.EntityUniqueDrivenProperties;
 import org.dbflute.jdbc.ClassificationMeta;
+import org.dbflute.optional.OptionalProperty;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * The abstract class of entity.
@@ -68,6 +70,98 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     protected boolean __createdBySelect;
 
     // ===================================================================================
+    //                                                                    Derived Mappable
+    //                                                                    ================
+    /** {@inheritDoc} */
+    public void registerDerivedValue(String aliasName, Object selectedValue) {
+        if (__derivedMap == null) {
+            __derivedMap = newDerivedMap();
+        }
+        __derivedMap.registerDerivedValue(aliasName, selectedValue);
+    }
+
+    /** {@inheritDoc} */
+    public <VALUE> OptionalProperty<VALUE> derived(String aliasName, Class<VALUE> propertyType) {
+        if (__derivedMap == null) {
+            // process of finding has existence check of the alias
+            // so if called here, exception in the map
+            __derivedMap = newDerivedMap();
+        }
+        return __derivedMap.findDerivedValue(this, aliasName, propertyType);
+    }
+
+    protected EntityDerivedMap newDerivedMap() {
+        return new EntityDerivedMap();
+    }
+
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
+    // -----------------------------------------------------
+    //                                              Modified
+    //                                              --------
+    /** {@inheritDoc} */
+    public Set<String> mymodifiedProperties() {
+        return __modifiedProperties.getPropertyNames();
+    }
+
+    /** {@inheritDoc} */
+    public void clearModifiedInfo() {
+        __modifiedProperties.clear();
+    }
+
+    /** {@inheritDoc} */
+    public boolean hasModification() {
+        return !__modifiedProperties.isEmpty();
+    }
+
+    protected EntityModifiedProperties newModifiedProperties() {
+        return new EntityModifiedProperties();
+    }
+
+    protected void registerModifiedProperty(String propertyName) {
+        __modifiedProperties.addPropertyName(propertyName);
+        registerSpecifiedProperty(propertyName); // synchronize if exists, basically for user's manual call
+    }
+
+    // -----------------------------------------------------
+    //                                             Specified
+    //                                             ---------
+    /** {@inheritDoc} */
+    public void modifiedToSpecified() {
+        if (__modifiedProperties.isEmpty()) {
+            // basically no way when called in Framework (because called when SpecifyColumn exists)
+            return;
+        }
+        __specifiedProperties = newModifiedProperties();
+        __specifiedProperties.accept(__modifiedProperties);
+    }
+
+    /** {@inheritDoc} */
+    public Set<String> myspecifiedProperties() {
+        if (__specifiedProperties != null) {
+            return __specifiedProperties.getPropertyNames();
+        }
+        return DfCollectionUtil.emptySet();
+    }
+
+    public void clearSpecifiedInfo() {
+        if (__specifiedProperties != null) {
+            __specifiedProperties.clear();
+        }
+    }
+
+    protected void checkSpecifiedProperty(String propertyName) {
+        FunCustodial.checkSpecifiedProperty(this, propertyName, __specifiedProperties);
+    }
+
+    protected void registerSpecifiedProperty(String propertyName) { // basically called by modified property registration
+        if (__specifiedProperties != null) { // normally false, true if e.g. setting after selected
+            __specifiedProperties.addPropertyName(propertyName);
+        }
+    }
+
+    // ===================================================================================
     //                                                                         Primary Key
     //                                                                         ===========
     /** {@inheritDoc} */
@@ -77,6 +171,19 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
 
     protected EntityUniqueDrivenProperties newUniqueDrivenProperties() {
         return new EntityUniqueDrivenProperties();
+    }
+
+    // ===================================================================================
+    //                                                                     Birthplace Mark
+    //                                                                     ===============
+    /** {@inheritDoc} */
+    public void markAsSelect() {
+        __createdBySelect = true;
+    }
+
+    /** {@inheritDoc} */
+    public boolean createdBySelect() {
+        return __createdBySelect;
     }
 
     // ===================================================================================
@@ -95,86 +202,6 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     //                                                                   =================
     protected <ELEMENT> List<ELEMENT> newReferrerList() {
         return new ArrayList<ELEMENT>();
-    }
-
-    // ===================================================================================
-    //                                                                 Modified Properties
-    //                                                                 ===================
-    /** {@inheritDoc} */
-    public Set<String> modifiedProperties() {
-        return __modifiedProperties.getPropertyNames();
-    }
-
-    /** {@inheritDoc} */
-    public void clearModifiedInfo() {
-        __modifiedProperties.clear();
-    }
-
-    /** {@inheritDoc} */
-    public boolean hasModification() {
-        return !__modifiedProperties.isEmpty();
-    }
-
-    /** {@inheritDoc} */
-    public void modifiedToSpecified() {
-        __specifiedProperties = newModifiedProperties();
-        __specifiedProperties.accept(__modifiedProperties);
-    }
-
-    protected EntityModifiedProperties newModifiedProperties() {
-        return new EntityModifiedProperties();
-    }
-
-    protected void checkSpecifiedProperty(String propertyName) {
-        FunCustodial.checkSpecifiedProperty(this, propertyName, __specifiedProperties);
-    }
-
-    protected void registerModifiedProperty(String propertyName) {
-        __modifiedProperties.addPropertyName(propertyName);
-        registerSpecifiedProperty(propertyName);
-    }
-
-    protected void registerSpecifiedProperty(String propertyName) { // basically called by modified property registration
-        if (__specifiedProperties != null) { // normally false, true if e.g. setting after selected
-            __specifiedProperties.addPropertyName(propertyName);
-        }
-    }
-
-    // ===================================================================================
-    //                                                                     Birthplace Mark
-    //                                                                     ===============
-    /** {@inheritDoc} */
-    public void markAsSelect() {
-        __createdBySelect = true;
-    }
-
-    /** {@inheritDoc} */
-    public boolean createdBySelect() {
-        return __createdBySelect;
-    }
-
-    // ===================================================================================
-    //                                                                    Derived Mappable
-    //                                                                    ================
-    /** {@inheritDoc} */
-    public void registerDerivedValue(String aliasName, Object selectedValue) {
-        if (__derivedMap == null) {
-            __derivedMap = newDerivedMap();
-        }
-        __derivedMap.registerDerivedValue(aliasName, selectedValue);
-    }
-
-    /** {@inheritDoc} */
-    public <VALUE> VALUE derived(String aliasName) {
-        // TODO jflute impl: derived optional?
-        if (__derivedMap == null) {
-            __derivedMap = newDerivedMap();
-        }
-        return __derivedMap.findDerivedValue(aliasName);
-    }
-
-    protected EntityDerivedMap newDerivedMap() {
-        return new EntityDerivedMap();
     }
 
     // ===================================================================================
@@ -224,9 +251,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
         return FunCustodial.calculateHashcode(hs, vl);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int instanceHash() {
         return super.hashCode();
     }
@@ -305,6 +330,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
      * @return The cloned instance of this entity. (NotNull)
      * @throws IllegalStateException When it fails to clone the entity.
      */
+    @Override
     public Entity clone() {
         try {
             return (Entity) super.clone();

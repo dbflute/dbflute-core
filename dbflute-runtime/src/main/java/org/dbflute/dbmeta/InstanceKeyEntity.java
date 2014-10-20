@@ -73,20 +73,11 @@ public class InstanceKeyEntity implements Entity {
         return _actualEntity.getTablePropertyName();
     }
 
-    public boolean hasPrimaryKeyValue() {
-        return _actualEntity.hasPrimaryKeyValue();
-    }
-
-    public Set<String> myuniqueDrivenProperties() {
-        return _actualEntity.myuniqueDrivenProperties();
-    }
-
-    public Set<String> modifiedProperties() {
-        return _actualEntity.modifiedProperties();
-    }
-
-    public void modifiedToSpecified() {
-        _actualEntity.modifiedToSpecified();
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
+    public Set<String> mymodifiedProperties() {
+        return _actualEntity.mymodifiedProperties();
     }
 
     public void clearModifiedInfo() {
@@ -97,6 +88,33 @@ public class InstanceKeyEntity implements Entity {
         return _actualEntity.hasModification();
     }
 
+    public void modifiedToSpecified() {
+        _actualEntity.modifiedToSpecified();
+    }
+
+    public Set<String> myspecifiedProperties() {
+        return _actualEntity.myspecifiedProperties();
+    }
+
+    @Override
+    public void clearSpecifiedInfo() {
+        _actualEntity.clearSpecifiedInfo();
+    }
+
+    // ===================================================================================
+    //                                                                         Primary Key
+    //                                                                         ===========
+    public boolean hasPrimaryKeyValue() {
+        return _actualEntity.hasPrimaryKeyValue();
+    }
+
+    public Set<String> myuniqueDrivenProperties() {
+        return _actualEntity.myuniqueDrivenProperties();
+    }
+
+    // ===================================================================================
+    //                                                                     Birthplace Mark
+    //                                                                     ===============
     public void markAsSelect() {
         _actualEntity.markAsSelect();
     }
@@ -105,6 +123,9 @@ public class InstanceKeyEntity implements Entity {
         return _actualEntity.createdBySelect();
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     public int instanceHash() {
         return _actualEntity.instanceHash();
     }

@@ -144,7 +144,7 @@ import org.dbflute.bhv.referrer.ConditionBeanSetupper;
 import org.dbflute.bhv.referrer.ReferrerConditionSetupper;
 import org.dbflute.cbean.chelper.HpSDRFunction;
 import org.dbflute.cbean.chelper.dbms.HpSDRFunctionMySql;
-import org.dbflute.dbmeta.derived.DerivedMappable;
+import org.dbflute.dbmeta.accessory.DerivedMappable;
 import org.dbflute.dbway.DBDef;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;

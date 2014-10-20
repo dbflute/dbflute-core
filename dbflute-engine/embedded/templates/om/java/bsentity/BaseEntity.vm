@@ -25,7 +25,7 @@ import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.AbstractEntity;
 #if ($table.needsMappingValueType())
-import org.dbflute.dbmeta.MappingValueType;
+import org.dbflute.dbmeta.accessory.MappingValueType;
 #end
 #if ($table.needsRelationOptionalEntityImport())
 import ${database.relationOptionalEntityClassName};
@@ -637,16 +637,12 @@ public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef}
 #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
 #set ($targetJavaName = ${table.findTargetColumnJavaNameByCommonColumnName(${columnName})})
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ${javaNative} get${javaName}() {
         return get${targetJavaName}();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {
         set${targetJavaName}(${uncapitalisedJavaName});
     }
