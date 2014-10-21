@@ -114,7 +114,6 @@ public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef}
     protected ${col.javaNative} _${col.uncapitalisedJavaName};
 
 #end
-
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
