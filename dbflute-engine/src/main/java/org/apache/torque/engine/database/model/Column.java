@@ -213,6 +213,7 @@ public class Column {
     protected Table _sql2EntityRelatedTable;
     protected Column _sql2EntityRelatedColumn;
     protected String _sql2EntityForcedJavaNative;
+    protected String _sql2EntityHintedClassification;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -1875,6 +1876,15 @@ public class Column {
         _sql2EntityForcedJavaNative = sql2EntityForcedJavaNative;
     }
 
+    /**
+     * Set the hinted classification name for Sql2Entity. <br />
+     * This is used at getting classification as high priority.
+     * @param sql2EntityHintedClassification The hinted classification for Sql2Entity. (NullAllowed)
+     */
+    public void setSql2EntityHintedClassification(String sql2EntityHintedClassification) {
+        _sql2EntityHintedClassification = sql2EntityHintedClassification;
+    }
+
     // ===================================================================================
     //                                                                           Immutable
     //                                                                           =========
@@ -2505,30 +2515,23 @@ public class Column {
     //                             Sql2Entity Classification
     //                             -------------------------
     protected boolean hasSql2EntityRelatedTableClassification() {
-        if (!hasSql2EntityRelatedTable()) {
-            return false;
-        }
-        final String tableName = getSql2EntityRelatedTable().getTableDbName();
-        return getClassificationProperties().hasClassification(tableName, getName());
+        return getSql2EntityRelatedTableClassificationName() != null;
     }
 
     protected boolean hasSql2EntityRelatedTableClassificationName() {
-        if (!hasSql2EntityRelatedTable()) {
-            return false;
-        }
-        final String tableName = getSql2EntityRelatedTable().getTableDbName();
-        return getClassificationProperties().hasClassificationName(tableName, getName());
+        final String classificationName = getSql2EntityRelatedTableClassificationName();
+        return classificationName != null && getClassificationProperties().hasClassificationName(classificationName);
     }
 
     protected boolean hasSql2EntityRelatedTableClassificationAlias() {
-        if (!hasSql2EntityRelatedTable()) {
-            return false;
-        }
-        final String tableName = getSql2EntityRelatedTable().getTableDbName();
-        return getClassificationProperties().hasClassificationAlias(tableName, getName());
+        final String classificationName = getSql2EntityRelatedTableClassificationName();
+        return classificationName != null && getClassificationProperties().hasClassificationAlias(classificationName);
     }
 
     protected String getSql2EntityRelatedTableClassificationName() {
+        if (_sql2EntityHintedClassification != null) {
+            return _sql2EntityHintedClassification;
+        }
         if (!hasSql2EntityRelatedTable()) {
             return null;
         }

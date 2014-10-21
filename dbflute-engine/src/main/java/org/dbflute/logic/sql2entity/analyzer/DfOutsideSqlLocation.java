@@ -24,7 +24,7 @@ public class DfOutsideSqlLocation {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _projectName;
+    protected final String _projectName; // e.g. main or (application name)
     protected final String _sqlDirectory;
     protected final String _sql2EntityOutputDirectory;
     protected final boolean _sqlAp;
