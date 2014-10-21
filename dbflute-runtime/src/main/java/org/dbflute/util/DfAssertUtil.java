@@ -27,7 +27,7 @@ public class DfAssertUtil {
      * Assert that the object is not null.
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     public static void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {

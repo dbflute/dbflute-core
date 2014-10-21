@@ -390,10 +390,10 @@ public class PlainResultSetWrapper implements ResultSet {
     }
 
     /**
-     * @param columnIndex
-     * @param scale
+     * @param columnIndex The index of column.
+     * @param scale The number of scale.
      * @return The value as BigDecimal.
-     * @deprecated 
+     * @deprecated
      * @throws SQLException
      */
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
@@ -486,7 +486,7 @@ public class PlainResultSetWrapper implements ResultSet {
     }
 
     /**
-     * @param columnName
+     * @param columnName The name of column. (NotNull)
      * @return The value as InputStream.
      * @deprecated 
      * @throws SQLException
@@ -541,8 +541,8 @@ public class PlainResultSetWrapper implements ResultSet {
     }
 
     /**
-     * @param columnName
-     * @param scale
+     * @param columnName The name of column. (NotNull)
+     * @param scale The number of scale.
      * @return The value as BigDecimal.
      * @deprecated 
      * @throws SQLException

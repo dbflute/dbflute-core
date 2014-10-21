@@ -179,7 +179,7 @@ public interface DBMeta {
      * Find the information of relation.
      * @param relationPropertyName The flexible name of the relation property. (NotNull)
      * @return The information object of relation. (NotNull)
-     * @exception org.dbflute.exception.DBMetaNotFoundException When the corresponding relation info was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding relation info was not found.
      */
     RelationInfo findRelationInfo(String relationPropertyName);
 
@@ -197,7 +197,7 @@ public interface DBMeta {
      * Find the DB meta of foreign relation.
      * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return The DB meta of foreign relation. (NotNull)
-     * @exception org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
      */
     DBMeta findForeignDBMeta(String foreignPropertyName);
 
@@ -205,7 +205,7 @@ public interface DBMeta {
      * Find the information of foreign relation by property name.
      * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return The information object of foreign relation. (NotNull)
-     * @exception org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
      */
     ForeignInfo findForeignInfo(String foreignPropertyName);
 
@@ -213,7 +213,7 @@ public interface DBMeta {
      * Find the information of foreign relation by relation number.
      * @param relationNo The relation number of the foreign property. (NotNull)
      * @return The information object of foreign relation. (NotNull)
-     * @exception org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
      */
     ForeignInfo findForeignInfo(int relationNo);
 
@@ -244,7 +244,7 @@ public interface DBMeta {
      * Find the information of referrer relation.
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return The information object of referrer relation. (NotNull)
-     * @exception org.dbflute.exception.DBMetaNotFoundException When the corresponding referrer info was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding referrer info was not found.
      */
     ReferrerInfo findReferrerInfo(String referrerPropertyName);
 
@@ -395,7 +395,7 @@ public interface DBMeta {
      * Find DB name by flexible name. {Target objects are TABLE and COLUMN}
      * @param flexibleName The flexible name of the object. (NotNull)
      * @return The DB name of anything. (NotNull)
-     * @exception org.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
      */
     String findDbName(String flexibleName); // #later remove this since Java8
 
@@ -403,7 +403,7 @@ public interface DBMeta {
      * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
      * @param flexibleName The flexible name of the property. (NotNull)
      * @return The DB name of anything. (NotNull)
-     * @exception org.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
      */
     String findPropertyName(String flexibleName); // #later remove this since Java8
 

@@ -103,8 +103,8 @@ public class OutsideSqlAutoPagingExecutor<BEHAVIOR> extends AbstractOutsideSqlPa
      * @param <ENTITY> The type of entity.
      * @param pmb The typed parameter-bean for auto-paging handling. (NotNull)
      * @return The result bean of paging. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> PagingResultBean<ENTITY> selectPage(AutoPagingHandlingPmb<BEHAVIOR, ENTITY> pmb) {
         if (pmb == null) {
@@ -160,8 +160,8 @@ public class OutsideSqlAutoPagingExecutor<BEHAVIOR> extends AbstractOutsideSqlPa
      * @param <ENTITY> The type of entity.
      * @param pmb The typed parameter-bean for auto-paging handling. (NotNull)
      * @return The result bean of paged list. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(AutoPagingHandlingPmb<BEHAVIOR, ENTITY> pmb) {
         return doSelectList(pmb.getOutsideSqlPath(), pmb, pmb.getEntityType());

@@ -105,7 +105,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
      * @param pmb The typed parameter-bean for cursor handling. (NotNull)
      * @param handler The handler of cursor called back with result set. (NotNull)
      * @return The result object that the cursor handler returns. (NullAllowed)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
     public <ENTITY> Object selectCursor(CursorHandlingPmb<BEHAVIOR, ENTITY> pmb, CursorHandler handler) {
         if (pmb == null) {
@@ -144,7 +144,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
      * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param handler The handler of cursor called back with result set. (NotNull)
      * @return The result object that the cursor handler returns. (NullAllowed)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
     public Object selectCursor(String path, Object pmb, CursorHandler handler) {
         return doSelectCursor(path, pmb, handler);

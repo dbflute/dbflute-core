@@ -98,8 +98,8 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
      * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param entityType The type of entity. (NotNull)
      * @return The selected entity. (NullAllowed)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     def selectEntity[ENTITY](path: String, pmb: Object, entityType: Class[ENTITY]): Option[ENTITY] = {
         return Option(executor.entityHandling().selectEntity(path, pmb, entityType));
@@ -136,8 +136,8 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
      * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param entityType The element type of entity. (NotNull)
      * @return The result bean of selected list. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     def selectList[ENTITY](path: String, pmb: Object, entityType: Class[ENTITY]): ListResultBean[ENTITY] = {
         return executor.selectList(path, pmb, entityType);
@@ -158,7 +158,7 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @return The count of execution.
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
      */
     def execute(path: String, pmb: Object): Int = {
         return executor.execute(path, pmb);
@@ -231,8 +231,8 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paging. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     def selectPage[ENTITY](path: String, pmb: PagingBean, entityType: Class[ENTITY]): ScrPagingView[ENTITY] = {
         val page = executor.manualPaging.selectPage(path, pmb, entityType);
@@ -288,8 +288,8 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paged list. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     def selectPagingListOnly[ENTITY](path: String, pmb: PagingBean, entityType: Class[ENTITY]): immutable.List[ENTITY] = {
         return toScalaList(executor.selectList(path, pmb, entityType));
@@ -342,7 +342,7 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
      * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param handler The handler of cursor called back with result set. (NotNull)
      * @return The result object that the cursor handler returns. (NullAllowed)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
     def selectCursor(path: String, pmb: Object)(handler: CursorHandler): Object = {
         return executor.cursorHandling().selectCursor(path, pmb, handler);
@@ -486,8 +486,8 @@ class ScrOutsideSqlFreeStyleAutoPagingExecutor[BEHAVIOR](executor: OutsideSqlAut
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paging. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     def selectPage[ENTITY](path: String, pmb: PagingBean, entityType: Class[ENTITY]): ScrPagingView[ENTITY] = {
         val page = executor.selectPage(path, pmb, entityType);
@@ -546,8 +546,8 @@ class ScrOutsideSqlFreeStyleAutoPagingExecutor[BEHAVIOR](executor: OutsideSqlAut
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paged list. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     def selectPagingListOnly[ENTITY](path: String, pmb: PagingBean, entityType: Class[ENTITY]): immutable.List[ENTITY] = {
         return toScalaList(executor.selectList(path, pmb, entityType));

@@ -69,8 +69,8 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param entityType The type of entity. (NotNull)
      * @return The selected entity. (NullAllowed)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> OptionalEntity<ENTITY> selectEntity(String path, Object pmb, Class<ENTITY> entityType) {
         return OptionalEntity.ofNullable(_basicExecutor.entityHandling().selectEntity(path, pmb, entityType), () -> {
@@ -109,8 +109,8 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param entityType The element type of entity. (NotNull)
      * @return The result bean of selected list. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
         return _basicExecutor.selectList(path, pmb, entityType);
@@ -183,8 +183,8 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paging. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> PagingResultBean<ENTITY> selectPage(String path, PagingBean pmb, Class<ENTITY> entityType) {
         if (pmb instanceof ManualPagingHandlingPmb) {
@@ -246,8 +246,8 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paged list. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectPagedListOnly(String path, PagingBean pmb, Class<ENTITY> entityType) {
         if (pmb instanceof ManualPagingHandlingPmb) {
@@ -292,7 +292,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param handler The handler of cursor called back with result set. (NotNull)
      * @return The result object that the cursor handler returns. (NullAllowed)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
     public Object selectCursor(String path, Object pmb, CursorHandler handler) {
         return _basicExecutor.cursorHandling().selectCursor(path, pmb, handler);
@@ -313,7 +313,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @return The count of execution.
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
      */
     public int execute(String path, Object pmb) {
         return _basicExecutor.execute(path, pmb);

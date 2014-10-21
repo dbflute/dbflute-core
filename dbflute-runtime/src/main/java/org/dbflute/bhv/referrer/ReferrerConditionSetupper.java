@@ -26,7 +26,7 @@ import org.dbflute.cbean.ConditionBean;
  *     cb.query().addOrderBy_PurchaseDatetime_Desc();
  *     ...
  * }); <span style="color: #3F7E5E">// you can also load nested referrer from here</span>
- * <span style="color: #3F7E5E">//}).withNestedList(purchaseLoader -&gt {</span>
+ * <span style="color: #3F7E5E">//}).withNestedList(purchaseLoader -&gt; {</span>
  * <span style="color: #3F7E5E">//    purchaseLoader.loadPurchasePaymentList(...);</span>
  * <span style="color: #3F7E5E">//});</span>
  * for (Member member : memberList) {
@@ -54,7 +54,7 @@ public interface ReferrerConditionSetupper<CB extends ConditionBean> {
      *     cb.query().addOrderBy_PurchaseDatetime_Desc();
      *     ...
      * }); <span style="color: #3F7E5E">// you can also load nested referrer from here</span>
-     * <span style="color: #3F7E5E">//}).withNestedList(purchaseLoader -&gt {</span>
+     * <span style="color: #3F7E5E">//}).withNestedList(purchaseLoader -&gt; {</span>
      * <span style="color: #3F7E5E">//    purchaseLoader.loadPurchasePaymentList(...);</span>
      * <span style="color: #3F7E5E">//});</span>
      * for (Member member : memberList) {

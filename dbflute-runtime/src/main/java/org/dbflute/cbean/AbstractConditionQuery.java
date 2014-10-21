@@ -2956,7 +2956,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Assert that the object is not null.
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
@@ -2972,7 +2972,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * Assert that the column-name is not null and is not empty and does not contain comma.
      * @param columnName Column-name. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     protected void assertColumnName(String columnName) {
         if (columnName == null) {
@@ -2992,7 +2992,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * Assert that the alias-name is not null and is not empty and does not contain comma.
      * @param aliasName Alias-name. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     protected void assertAliasName(String aliasName) {
         if (aliasName == null) {

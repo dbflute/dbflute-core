@@ -201,10 +201,10 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @return The entity selected by the condition. (NullAllowed: if no data, it returns null)
 #else
      * @return The optional entity selected by the condition. (NotNull: if no data, empty entity)
-     * @exception EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
+     * @throws EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     public ${table.filterSelectEntityOptionalReturnIfNeeds($myExtendedObjectClassName)} selectEntity(CBCall<${myConditionBeanClassName}> cbLambda) {
         return facadeSelectEntity(createCB(cbLambda));
@@ -256,10 +256,10 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @return The entity selected by the condition. (NullAllowed: if no data, it returns null)
 #else
      * @return The optional entity selected by the condition. (NotNull: if no data, empty entity)
-     * @exception EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
+     * @throws EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     public ${table.filterSelectEntityOptionalReturnIfNeeds($myExtendedObjectClassName)} selectEntity(${myConditionBeanClassName} cb) {
         return facadeSelectEntity(cb);
@@ -294,9 +294,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The entity selected by the condition. (NotNull: if no data, throws exception)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     ${table.selectEntityWithDeletedCheckModifier} ${myExtendedObjectClassName} selectEntityWithDeletedCheck(CBCall<${myConditionBeanClassName}> cbLambda) {
         return facadeSelectEntityWithDeletedCheck(createCB(cbLambda));
@@ -315,9 +315,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The entity selected by the condition. (NotNull: if no data, throws exception)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     ${table.selectEntityWithDeletedCheckModifier} ${myExtendedObjectClassName} selectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
         return facadeSelectEntityWithDeletedCheck(cb);
@@ -332,10 +332,10 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @return The entity selected by the PK. (NullAllowed: if no data, it returns null)
 #else
      * @return The optional entity selected by the PK. (NotNull: if no data, empty entity)
-     * @exception EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
+     * @throws EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     public ${table.filterSelectByPKOptionalReturnIfNeeds($myExtendedObjectClassName)} selectByPK${table.selectByPKSuffix}(${table.primaryKeyArgsString}) {
         return facadeSelectByPK${table.selectByPKSuffix}(${table.primaryKeyArgsCallingString});
@@ -362,9 +362,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * Select the entity by the primary-key value with deleted check.
      * ${table.primaryKeyArgsJavaDocString}
      * @return The entity selected by the PK. (NotNull: if no data, throws exception)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     public ${myExtendedObjectClassName} selectByPK${table.selectByPKSuffix}WithDeletedCheck(${table.primaryKeyArgsString}) {
         return doSelectByPKWithDeletedCheck(${table.primaryKeyArgsCallingString}, typeOfSelectedEntity());
@@ -386,9 +386,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * Select the entity by the unique-key value.
      * ${uq.argsJavaDocString}
      * @return The optional entity selected by the unique key. (NotNull: if no data, empty entity)
-     * @exception EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     * @throws EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     public ${table.filterSelectEntityOptionalReturn(${myExtendedObjectClassName})} selectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}) {
         return facadeSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString});
@@ -425,7 +425,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected list. (NotNull: if no data, returns empty list)
-     * @exception DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws DangerousResultSizeException When the result size is over the specified safety size.
      */
     public ListResultBean<${myExtendedObjectClassName}> selectList(CBCall<${myConditionBeanClassName}> cbLambda) {
         return facadeSelectList(createCB(cbLambda));
@@ -446,7 +446,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected list. (NotNull: if no data, returns empty list)
-     * @exception DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws DangerousResultSizeException When the result size is over the specified safety size.
      */
     public ListResultBean<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
         return facadeSelectList(cb);
@@ -482,7 +482,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected page. (NotNull: if no data, returns bean as empty list)
-     * @exception DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws DangerousResultSizeException When the result size is over the specified safety size.
      */
     public PagingResultBean<${myExtendedObjectClassName}> selectPage(CBCall<${myConditionBeanClassName}> cbLambda) {
         return facadeSelectPage(createCB(cbLambda));
@@ -510,7 +510,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected page. (NotNull: if no data, returns bean as empty list)
-     * @exception DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws DangerousResultSizeException When the result size is over the specified safety size.
      */
     public PagingResultBean<${myExtendedObjectClassName}> selectPage(${myConditionBeanClassName} cb) {
         return facadeSelectPage(cb);
@@ -878,7 +878,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * <p>While, when the entity is created by select, all columns are registered.</p>
      * @param ${myEntityVariableName} The entity of insert. (NotNull, PrimaryKeyNullAllowed: when auto-increment)
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
 #if ($database.isCompatibleInsertColumnNotNullOnly())
@@ -913,13 +913,13 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
 #if ($table.hasOptimisticLock())
      * @param ${myEntityVariableName} The entity of update. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnNotNull)
-     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+     * @throws EntityAlreadyUpdatedException When the entity has already been updated.
 #else
      * @param ${myEntityVariableName} The entity of update. (NotNull, PrimaryKeyNotNull)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     public void update(${myExtendedObjectClassName} ${myEntityVariableName}) {
         doUpdate(${myEntityVariableName}, null);
@@ -941,9 +941,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * <span style="color: #0000C0">${myEntityVariableName}Bhv</span>.<span style="color: #CC4747">updateNonstrict</span>(${myEntityVariableName});
      * </pre>
      * @param ${myEntityVariableName} The entity of update. (NotNull, PrimaryKeyNotNull)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     public void updateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         doUpdateNonstrict(${myEntityVariableName}, null);
@@ -960,12 +960,12 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * <p><span style="color: #CC4747; font-size: 120%">Attention, you cannot update by unique keys instead of PK.</span></p>
      * @param ${myEntityVariableName} The entity of insert or update. (NotNull, ...depends on insert or update)
 #if ($table.hasOptimisticLock())
-     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+     * @throws EntityAlreadyUpdatedException When the entity has already been updated.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     public void insertOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}) {
         doInsertOrUpdate(${myEntityVariableName}, null, null);
@@ -977,9 +977,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * if (the entity has no PK) { insert() } else { update(), but no data, insert() }
      * <p><span style="color: #CC4747; font-size: 120%">Attention, you cannot update by unique keys instead of PK.</span></p>
      * @param ${myEntityVariableName} The entity of insert or update. (NotNull, ...depends on insert or update)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     public void insertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         doInsertOrUpdateNonstrict(${myEntityVariableName}, null, null);
@@ -1005,12 +1005,12 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
 #if ($table.hasOptimisticLock())
      * @param ${myEntityVariableName} The entity of delete. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnNotNull)
-     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+     * @throws EntityAlreadyUpdatedException When the entity has already been updated.
 #else
      * @param ${myEntityVariableName} The entity of delete. (NotNull, PrimaryKeyNotNull)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityDuplicatedException When the entity has been duplicated.
      */
     public void delete(${myExtendedObjectClassName} ${myEntityVariableName}) {
         doDelete(${myEntityVariableName}, null);
@@ -1028,8 +1028,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * <span style="color: #0000C0">${myEntityVariableName}Bhv</span>.<span style="color: #CC4747">deleteNonstrict</span>(${myEntityVariableName});
      * </pre>
      * @param ${myEntityVariableName} The entity of delete. (NotNull, PrimaryKeyNotNull)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         doDeleteNonstrict(${myEntityVariableName}, null);
@@ -1048,7 +1048,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * <span style="color: #3F7E5E">// if the target entity doesn't exist, no exception</span>
      * </pre>
      * @param ${myEntityVariableName} The entity of delete. (NotNull, PrimaryKeyNotNull)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
         doDeleteNonstrictIgnoreDeleted(${myEntityVariableName}, null);
@@ -1132,9 +1132,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #end
      * @return The array of updated count. (NotNull, EmptyAllowed)
 #if ($table.hasOptimisticLock())
-     * @exception BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
+     * @throws BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
     public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -1187,9 +1187,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param colCBLambda The callback for specification of update columns. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
 #if ($table.hasOptimisticLock())
-     * @exception BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
+     * @throws BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
     public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> colCBLambda) {
@@ -1220,7 +1220,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
     public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return doBatchUpdateNonstrict(${myEntityListVariableName}, null);
@@ -1252,7 +1252,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @param colCBLambda The callback for specification of update columns. (NotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
     public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> colCBLambda) {
         return doBatchUpdateNonstrict(${myEntityListVariableName}, createSpecifiedUpdateOption(colCBLambda));
@@ -1270,9 +1270,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @return The array of deleted count. (NotNull, EmptyAllowed)
 #if ($table.hasOptimisticLock())
-     * @exception BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
+     * @throws BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
     public int[] batchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -1285,7 +1285,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * This method uses executeBatch() of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @return The array of deleted count. (NotNull, EmptyAllowed)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
     public int[] batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return doBatchDeleteNonstrict(${myEntityListVariableName}, null);
@@ -1346,7 +1346,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param ${myEntityVariableName} The entity that contains update values. (NotNull, PrimaryKeyNullAllowed)
      * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The updated count.
-     * @exception NonQueryUpdateNotAllowedException When the query has no condition.
+     * @throws NonQueryUpdateNotAllowedException When the query has no condition.
      */
     public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, CBCall<${myConditionBeanClassName}> cbLambda) {
         return doQueryUpdate(${myEntityVariableName}, createCB(cbLambda), null);
@@ -1374,7 +1374,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param ${myEntityVariableName} The entity that contains update values. (NotNull, PrimaryKeyNullAllowed)
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The updated count.
-     * @exception NonQueryUpdateNotAllowedException When the query has no condition.
+     * @throws NonQueryUpdateNotAllowedException When the query has no condition.
      */
     public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
         return doQueryUpdate(${myEntityVariableName}, cb, null);
@@ -1391,7 +1391,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The deleted count.
-     * @exception NonQueryDeleteNotAllowedException When the query has no condition.
+     * @throws NonQueryDeleteNotAllowedException When the query has no condition.
      */
     public int queryDelete(CBCall<${myConditionBeanClassName}> cbLambda) {
         return doQueryDelete(createCB(cbLambda), null);
@@ -1408,7 +1408,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The deleted count.
-     * @exception NonQueryDeleteNotAllowedException When the query has no condition.
+     * @throws NonQueryDeleteNotAllowedException When the query has no condition.
      */
     public int queryDelete(${myConditionBeanClassName} cb) {
         return doQueryDelete(cb, null);
@@ -1438,7 +1438,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * @param ${myEntityVariableName} The entity of insert. (NotNull, PrimaryKeyNullAllowed: when auto-increment)
      * @param opLambda The callback for option of insert for varying requests. (NotNull)
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     public void varyingInsert(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> opLambda) {
         doInsert(${myEntityVariableName}, createInsertOption(opLambda));
@@ -1478,12 +1478,12 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #end
      * @param opLambda The callback for option of update for varying requests. (NotNull)
 #if ($table.hasOptimisticLock())
-     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+     * @throws EntityAlreadyUpdatedException When the entity has already been updated.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     public void varyingUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
         doUpdate(${myEntityVariableName}, createUpdateOption(opLambda));
@@ -1512,9 +1512,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * </pre>
      * @param ${myEntityVariableName} The entity of update. (NotNull, PrimaryKeyNotNull)
      * @param opLambda The callback for option of update for varying requests. (NotNull)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     public void varyingUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
         doUpdateNonstrict(${myEntityVariableName}, createUpdateOption(opLambda));
@@ -1528,12 +1528,12 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param insertOpLambda The callback for option of insert for varying requests. (NotNull)
      * @param updateOpLambda The callback for option of update for varying requests. (NotNull)
 #if ($table.hasOptimisticLock())
-     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+     * @throws EntityAlreadyUpdatedException When the entity has already been updated.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     public void varyingInsertOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> insertOpLambda, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> updateOpLambda) {
         doInsertOrUpdate(${myEntityVariableName}, createInsertOption(insertOpLambda), createUpdateOption(updateOpLambda));
@@ -1546,9 +1546,9 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param ${myEntityVariableName} The entity of insert or update. (NotNull)
      * @param insertOpLambda The callback for option of insert for varying requests. (NotNull)
      * @param updateOpLambda The callback for option of update for varying requests. (NotNull)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     public void varyingInsertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, InsertOption<${myConditionBeanClassName}>> insertOpLambda, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> updateOpLambda) {
         doInsertOrUpdateNonstrict(${myEntityVariableName}, createInsertOption(insertOpLambda), createUpdateOption(updateOpLambda));
@@ -1566,11 +1566,11 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param ${myEntityVariableName} The entity of delete. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnNotNull)
      * @param opLambda The callback for option of delete for varying requests. (NotNull)
 #if ($table.hasOptimisticLock())
-     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+     * @throws EntityAlreadyUpdatedException When the entity has already been updated.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityDuplicatedException When the entity has been duplicated.
      */
     public void varyingDelete(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
         doDelete(${myEntityVariableName}, createDeleteOption(opLambda));
@@ -1583,8 +1583,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * Other specifications are same as deleteNonstrict(entity).
      * @param ${myEntityVariableName} The entity of delete. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnNotNull)
      * @param opLambda The callback for option of delete for varying requests. (NotNull)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
      */
     public void varyingDeleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, WritableOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
         doDeleteNonstrict(${myEntityVariableName}, createDeleteOption(opLambda));
@@ -1705,7 +1705,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @param opLambda The callback for option of update for varying requests. (NotNull)
      * @return The updated count.
-     * @exception NonQueryUpdateNotAllowedException When the query has no condition (if not allowed).
+     * @throws NonQueryUpdateNotAllowedException When the query has no condition (if not allowed).
      */
     public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, CBCall<${myConditionBeanClassName}> cbLambda, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
         return doQueryUpdate(${myEntityVariableName}, createCB(cbLambda), createUpdateOption(opLambda));
@@ -1741,7 +1741,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @param opLambda The callback for option of update for varying requests. (NotNull)
      * @return The updated count.
-     * @exception NonQueryUpdateNotAllowedException When the query has no condition (if not allowed).
+     * @throws NonQueryUpdateNotAllowedException When the query has no condition (if not allowed).
      */
     public int varyingQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, WritableOptionCall<${myConditionBeanClassName}, UpdateOption<${myConditionBeanClassName}>> opLambda) {
         return doQueryUpdate(${myEntityVariableName}, cb, createUpdateOption(opLambda));
@@ -1756,7 +1756,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @param opLambda The callback for option of delete for varying requests. (NotNull)
      * @return The deleted count.
-     * @exception NonQueryDeleteNotAllowedException When the query has no condition (if not allowed).
+     * @throws NonQueryDeleteNotAllowedException When the query has no condition (if not allowed).
      */
     public int varyingQueryDelete(CBCall<${myConditionBeanClassName}> cbLambda, WritableOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
         return doQueryDelete(createCB(cbLambda), createDeleteOption(opLambda));
@@ -1771,7 +1771,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @param opLambda The callback for option of delete for varying requests. (NotNull)
      * @return The deleted count.
-     * @exception NonQueryDeleteNotAllowedException When the query has no condition (if not allowed).
+     * @throws NonQueryDeleteNotAllowedException When the query has no condition (if not allowed).
      */
     public int varyingQueryDelete(${myConditionBeanClassName} cb, WritableOptionCall<${myConditionBeanClassName}, DeleteOption<${myConditionBeanClassName}>> opLambda) {
         return doQueryDelete(cb, createDeleteOption(opLambda));
