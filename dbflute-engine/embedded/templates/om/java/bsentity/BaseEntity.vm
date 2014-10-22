@@ -538,7 +538,7 @@ public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef}
 #elseif ($col.isJavaNativeByteArray())
         sb.append(dm).append(xfBA(_${col.uncapitalisedJavaName}));
 #else
-        sb.append(dm).append(_${col.uncapitalisedJavaName});
+        sb.append(dm).append(xfND(_${col.uncapitalisedJavaName}));
 #end
 #end
         if (sb.length() > dm.length()) {

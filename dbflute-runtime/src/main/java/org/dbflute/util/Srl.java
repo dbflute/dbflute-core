@@ -166,6 +166,16 @@ public class Srl {
         return str.length();
     }
 
+    public static String cut(final String str, int length) {
+        assertStringNotNull(str);
+        return cut(str, length, null);
+    }
+
+    public static String cut(final String str, int length, String suffix) {
+        assertStringNotNull(str);
+        return str.length() > length ? (str.substring(0, length) + (suffix != null ? suffix : "")) : str;
+    }
+
     // ===================================================================================
     //                                                                                Case
     //                                                                                ====

@@ -31,6 +31,7 @@ import org.dbflute.dbmeta.accessory.EntityUniqueDrivenProperties;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.optional.OptionalProperty;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.Srl;
 
 /**
  * The abstract class of entity.
@@ -320,6 +321,42 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
 
     protected String xfBA(byte[] bytes) { // formatByteArray()
         return FunCustodial.toStringBytes(bytes);
+    }
+
+    protected Object xfND(Object obj) { // formatNormalData()
+        if (obj == null) {
+            return null;
+        }
+        if (!(obj instanceof String)) {
+            return obj;
+        }
+        String filteredStr = (String) obj;
+        filteredStr = mycutLargeStringForToString(filteredStr);
+        filteredStr = myremoveLineSepForToString(filteredStr);
+        return filteredStr;
+    }
+
+    protected String mycutLargeStringForToString(String filteredStr) {
+        final int actualSize = filteredStr.length();
+        final int limit = mylargeStringForToStringLimit();
+        if (actualSize > limit) {
+            // e.g. {sea, land, long text now...(length:182), iks, amphi}
+            filteredStr = Srl.cut(filteredStr, limit) + "...(length:" + actualSize + ")";
+        }
+        return filteredStr;
+    }
+
+    protected int mylargeStringForToStringLimit() {
+        return 140;
+    }
+
+    protected String myremoveLineSepForToString(String filteredStr) {
+        final String cr = "\r";
+        final String lf = "\n";
+        if (Srl.containsAny(filteredStr, cr, lf)) {
+            return Srl.replace(Srl.replace(filteredStr, cr, "\\r"), lf, "\\n"); // remove lines
+        }
+        return filteredStr;
     }
 
     // -----------------------------------------------------

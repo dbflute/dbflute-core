@@ -41,11 +41,18 @@ import org.dbflute.jdbc.FetchBean;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
  */
 public class BehaviorExceptionThrower {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Logger _log = LoggerFactory.getLogger(BehaviorExceptionThrower.class);
 
     // ===================================================================================
     //                                                                              Select
@@ -453,7 +460,16 @@ public class BehaviorExceptionThrower {
 
     protected void setupEntityElement(ExceptionMessageBuilder br, Entity entity) {
         br.addItem("Entity");
-        br.addElement(entity);
+        try {
+            br.addElement(entity.toStringWithRelation());
+        } catch (RuntimeException continued) {
+            final String tableDbName = entity.getTableDbName();
+            final String msg = "*Failed to build string from the entity for debug: " + tableDbName;
+            if (_log.isDebugEnabled()) {
+                _log.debug(msg);
+            }
+            br.addElement(msg);
+        }
     }
 
     protected void setupOptionElement(ExceptionMessageBuilder br, WritableOption<? extends ConditionBean> option) {

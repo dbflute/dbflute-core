@@ -72,6 +72,24 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals(3, length("foo"));
     }
 
+    public void test_cut() {
+        assertEquals("", cut("", 3));
+        assertEquals(" ", cut(" ", 2));
+        assertEquals("f", cut("foo", 1));
+        assertEquals("fo", cut("foo", 2));
+        assertEquals("foo", cut("foo", 3));
+        assertEquals("foo", cut("foo", 4));
+    }
+
+    public void test_cut_suffix() {
+        assertEquals("", cut("", 3, "..."));
+        assertEquals(" ", cut(" ", 2, "..."));
+        assertEquals("f...", cut("foo", 1, "..."));
+        assertEquals("fo++", cut("foo", 2, "++"));
+        assertEquals("foo", cut("foo", 3, "@"));
+        assertEquals("foo", cut("foo", 4, ">>>"));
+    }
+
     // ===================================================================================
     //                                                                                Case
     //                                                                                ====

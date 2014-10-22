@@ -184,6 +184,7 @@ public class ForeignKey implements Constraint {
     protected String _fixedSuffix;
     protected boolean _fixedInline;
     protected boolean _fixedReferrer;
+    protected boolean _fixedOnlyJoin;
     protected String _comment;
     protected boolean _suppressJoin;
     protected boolean _suppressSubQuery;
@@ -715,9 +716,16 @@ public class ForeignKey implements Constraint {
             return _localColumnList;
         }
         final List<String> columnList = getLocalColumnNameList();
-        if (columnList == null || columnList.isEmpty()) {
-            String msg = "The list of local column is null or empty." + columnList;
-            throw new IllegalStateException(msg);
+        if (isFixedOnlyJoin()) {
+            if (columnList != null && !columnList.isEmpty()) {
+                String msg = "The list of local column should be null or empty if fixedOnlyJoin: " + columnList;
+                throw new IllegalStateException(msg);
+            }
+        } else { // normally here
+            if (columnList == null || columnList.isEmpty()) {
+                String msg = "The list of local column is null or empty: " + columnList;
+                throw new IllegalStateException(msg);
+            }
         }
         final List<Column> resultList = new ArrayList<Column>();
         for (final Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
@@ -2099,6 +2107,14 @@ public class ForeignKey implements Constraint {
 
     public void setFixedReferrer(boolean fixedReferrer) {
         _fixedReferrer = fixedReferrer;
+    }
+
+    public boolean isFixedOnlyJoin() {
+        return _fixedOnlyJoin;
+    }
+
+    public void setFixedOnlyJoin(boolean fixedOnlyJoin) {
+        _fixedOnlyJoin = fixedOnlyJoin;
     }
 
     public String getComment() {

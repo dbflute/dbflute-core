@@ -1287,6 +1287,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleOutsideSqlFacadeChainOldStyle", isCompatibleBeforeJava8());
     }
 
+    public boolean isCompatibleOutsideSqlSqlCommentCheckDefault() { // closet
+        return isProperty("isCompatibleOutsideSqlSqlCommentCheckDefault", isCompatibleBeforeJava8());
+    }
+
     public boolean isCompatibleBeforeJava8() { // closet
         final boolean defaultValue = getLanguageDependency().getLanguageImplStyle().isCompatibleBeforeJava8();
         return isProperty("isCompatibleBeforeJava8", defaultValue);

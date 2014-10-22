@@ -1295,28 +1295,41 @@ public class Table {
 
     public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList,
             String fixedSuffix) { // all
-        return doExistsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, true);
+        final boolean compareSuffix = true;
+        return doExistsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, compareSuffix);
     }
 
     protected boolean doExistsForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList,
             String fixedSuffix, boolean compareSuffix) {
+        final boolean compareLocalColumn = true;
         final ForeignKey fk =
-                doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, compareSuffix, true);
+                doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, compareSuffix,
+                        compareLocalColumn);
         return fk != null;
     }
 
     public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList) { // no suffix
-        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, null, false, true);
+        final String fixedSuffix = null;
+        final boolean compareSuffix = false;
+        final boolean compareLocalColumn = true;
+        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, compareSuffix,
+                compareLocalColumn);
     }
 
     public ForeignKey findExistingForeignKey(String foreignTableName, List<String> foreignColumnNameList, String fixedSuffix) { // no local columns
-        final List<String> emptyList = DfCollectionUtil.emptyList();
-        return doFindExistingForeignKey(foreignTableName, emptyList, foreignColumnNameList, fixedSuffix, true, false);
+        final List<String> localColumnNameList = DfCollectionUtil.emptyList();
+        final boolean compareSuffix = true;
+        final boolean compareLocalColumn = false;
+        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, compareSuffix,
+                compareLocalColumn);
     }
 
     public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList,
             String fixedSuffix) { // all
-        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, true, true);
+        final boolean compareSuffix = true;
+        final boolean compareLocalColumn = true;
+        return doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, compareSuffix,
+                compareLocalColumn);
     }
 
     protected ForeignKey doFindExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
