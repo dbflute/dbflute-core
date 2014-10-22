@@ -37,6 +37,12 @@ import org.dbflute.util.Srl;
 public class DfRefreshResourceRequest {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** The mark of auto-detect, e.g. searching Eclipse .project file. */
+    public static final String AUTO_DETECT_MARK = "$$AutoDetect$$"; // basically for engine
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final List<String> _projectNameList;
@@ -51,7 +57,7 @@ public class DfRefreshResourceRequest {
      */
     public DfRefreshResourceRequest(List<String> projectNameList, String requestUrl) {
         if (projectNameList == null || projectNameList.isEmpty()) {
-            String msg = "The argument '_projectNameList' should not be null or empty: " + projectNameList;
+            String msg = "The argument 'projectNameList' should not be null or empty: " + projectNameList;
             throw new IllegalArgumentException(msg);
         }
         if (Srl.is_Null_or_TrimmedEmpty(requestUrl)) {

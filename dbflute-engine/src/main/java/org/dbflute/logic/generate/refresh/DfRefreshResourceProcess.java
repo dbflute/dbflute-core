@@ -60,7 +60,7 @@ public class DfRefreshResourceProcess {
         if (!isRefresh()) {
             return;
         }
-        _log.info("...Refreshing: " + _projectNameList);
+        _log.info("...Refreshing: " + _projectNameList); // not null here
         try {
             new DfRefreshResourceRequest(_projectNameList, _requestUrl).refreshResources();
         } catch (IOException e) {
