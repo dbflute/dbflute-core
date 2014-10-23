@@ -38,9 +38,11 @@ public class DfCollectionUtil {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final List<?> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<Object>());
-    private static final Map<?, ?> EMPTY_MAP = Collections.unmodifiableMap(new HashMap<Object, Object>());
-    private static final Set<?> EMPTY_SET = Collections.unmodifiableSet(new HashSet<Object>());
+    // Collections's empty collections can be called clear()
+    // (unmodifiable used before 1.1)
+    private static final List<?> EMPTY_LIST = Collections.emptyList();
+    private static final Map<?, ?> EMPTY_MAP = Collections.emptyMap();
+    private static final Set<?> EMPTY_SET = Collections.emptySet();
 
     // ===================================================================================
     //                                                                          Collection
