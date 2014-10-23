@@ -769,15 +769,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void enableEmptyStringQuery(ModeQuery noArgLambda) {
+    public void enableEmptyStringQuery(ModeQuery noArgInLambda) {
         assertOptionThatBadTiming("enableEmptyStringQuery()");
-        assertObjectNotNull("noArgLambda", noArgLambda);
+        assertObjectNotNull("noArgInLambda", noArgInLambda);
         final boolean originallyAllowed = getSqlClause().isEmptyStringQueryAllowed();
         if (!originallyAllowed) {
             doEnableEmptyStringQuery();
         }
         try {
-            noArgLambda.query();
+            noArgInLambda.query();
         } finally {
             if (!originallyAllowed) {
                 disableEmptyStringQuery();
@@ -803,15 +803,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void enableOverridingQuery(ModeQuery noArgLambda) {
+    public void enableOverridingQuery(ModeQuery noArgInLambda) {
         assertOptionThatBadTiming("enableOverridingQuery()");
-        assertObjectNotNull("noArgLambda", noArgLambda);
+        assertObjectNotNull("noArgInLambda", noArgInLambda);
         final boolean originallyAllowed = getSqlClause().isOverridingQueryAllowed();
         if (!originallyAllowed) {
             doEnableOverridingQuery();
         }
         try {
-            noArgLambda.query();
+            noArgInLambda.query();
         } finally {
             if (!originallyAllowed) {
                 disableOverridingQuery();
