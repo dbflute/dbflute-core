@@ -163,8 +163,8 @@ public class OptionalProperty<PROP> extends BaseOptional<PROP> {
      * {@inheritDoc}
      */
     @Override
-    protected <ARG> OptionalProperty<ARG> createOptionalMappedObject(ARG obj) {
-        return new OptionalProperty<ARG>(obj, _thrower);
+    protected <ARG> OptionalThing<ARG> createOptionalMappedObject(ARG obj) {
+        return new OptionalThing<ARG>(obj, _thrower);
     }
 
     /**
