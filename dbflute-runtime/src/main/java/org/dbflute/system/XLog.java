@@ -92,6 +92,9 @@ public class XLog {
     }
 
     public static void lock() {
+        if (_locked) {
+            return;
+        }
         if (_log.isInfoEnabled()) {
             _log.info("...Locking the log object for execute status!");
         }
@@ -99,6 +102,9 @@ public class XLog {
     }
 
     public static void unlock() {
+        if (!_locked) {
+            return;
+        }
         if (_log.isInfoEnabled()) {
             _log.info("...Unlocking the log object for execute status!");
         }
