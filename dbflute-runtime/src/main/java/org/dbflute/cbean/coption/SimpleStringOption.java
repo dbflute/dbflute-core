@@ -45,18 +45,8 @@ public class SimpleStringOption implements ConditionOption {
         return this;
     }
 
-    protected SimpleStringOption doSplitByBlank(int splitLimitCount) {
-        getSplitOptionParts().splitByBlank(splitLimitCount);
-        return this;
-    }
-
     protected SimpleStringOption doSplitBySpace() {
         getSplitOptionParts().splitBySpace();
-        return this;
-    }
-
-    protected SimpleStringOption doSplitBySpace(int splitLimitCount) {
-        getSplitOptionParts().splitBySpace(splitLimitCount);
         return this;
     }
 
@@ -75,18 +65,8 @@ public class SimpleStringOption implements ConditionOption {
         return this;
     }
 
-    protected SimpleStringOption doSplitByPipeLine(int splitLimitCount) {
-        getSplitOptionParts().splitByPipeLine(splitLimitCount);
-        return this;
-    }
-
     protected SimpleStringOption doSplitByVarious(List<String> delimiterList) {
         getSplitOptionParts().splitByVarious(delimiterList);
-        return this;
-    }
-
-    protected SimpleStringOption doSplitByVarious(List<String> delimiterList, int splitLimitCount) {
-        getSplitOptionParts().splitByVarious(delimiterList, splitLimitCount);
         return this;
     }
 
@@ -107,6 +87,11 @@ public class SimpleStringOption implements ConditionOption {
 
     public String[] generateSplitValueArray(String value) {
         return getSplitOptionParts().generateSplitValueArray(value);
+    }
+
+    protected SimpleStringOption doCutSplit(int splitLimitCount) {
+        getSplitOptionParts().limitSplit(splitLimitCount);
+        return this;
     }
 
     // ===================================================================================

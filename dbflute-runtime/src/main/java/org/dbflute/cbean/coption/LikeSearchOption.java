@@ -192,26 +192,17 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
      * <span style="color: #3F7E5E">// FOO like '%ab%' or FOO like '%g%' or FOO like '%kl%'</span>
      * <span style="color: #3F7E5E">// (conditions have escape statements)</span>
      * </pre>
-     * @return this.
+     * @return this. (NotNull)
      */
     public LikeSearchOption splitByBlank() {
         assertSplitByPrecondition();
         return (LikeSearchOption) doSplitByBlank();
     }
 
+    // memorable codes...
     /**
-     * Split a value as several condition with limit by blank.
-     * @param splitLimitCount The limit count of split. (NotZero, NotMinus)
-     * @return this.
-     */
-    public LikeSearchOption splitByBlank(int splitLimitCount) {
-        assertSplitByPrecondition();
-        return (LikeSearchOption) doSplitByBlank(splitLimitCount);
-    }
-
-    /**
-     * Split a value as several condition by space.
-     * @return this.
+     * Split a value as several condition by half-size space.
+     * @return this. (NotNull)
      */
     public LikeSearchOption splitBySpace() {
         assertSplitByPrecondition();
@@ -219,18 +210,8 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     }
 
     /**
-     * Split a value as several condition with limit by space.
-     * @param splitLimitCount The limit count of split. (NotZero, NotMinus)
-     * @return this.
-     */
-    public LikeSearchOption splitBySpace(int splitLimitCount) {
-        assertSplitByPrecondition();
-        return (LikeSearchOption) doSplitBySpace(splitLimitCount);
-    }
-
-    /**
      * Split a value as several condition by space that contains full-width space.
-     * @return this.
+     * @return this. (NotNull)
      */
     public LikeSearchOption splitBySpaceContainsDoubleByte() {
         assertSplitByPrecondition();
@@ -238,18 +219,8 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     }
 
     /**
-     * Split a value as several condition by space that contains full-width space.
-     * @param splitLimitCount The limit count of split. (NotZero, NotMinus)
-     * @return this.
-     */
-    public LikeSearchOption splitBySpaceContainsDoubleByte(int splitLimitCount) {
-        assertSplitByPrecondition();
-        return (LikeSearchOption) doSplitBySpaceContainsDoubleByte(splitLimitCount);
-    }
-
-    /**
      * Split a value as several condition by pipeline.
-     * @return this.
+     * @return this. (NotNull)
      */
     public LikeSearchOption splitByPipeLine() {
         assertSplitByPrecondition();
@@ -257,34 +228,13 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     }
 
     /**
-     * Split a value as several condition by pipeline.
-     * @param splitLimitCount The limit count of split. (NotZero, NotMinus)
-     * @return this.
-     */
-    public LikeSearchOption splitByPipeLine(int splitLimitCount) {
-        assertSplitByPrecondition();
-        return (LikeSearchOption) doSplitByPipeLine(splitLimitCount);
-    }
-
-    /**
      * Split a value as several condition by specified various delimiters.
      * @param delimiterList The list of delimiter for split. (NotNull, NotEmpty)
-     * @return this.
+     * @return this. (NotNull)
      */
     public LikeSearchOption splitByVarious(List<String> delimiterList) {
         assertSplitByPrecondition();
         return (LikeSearchOption) doSplitByVarious(delimiterList);
-    }
-
-    /**
-     * Split a value as several condition by specified various delimiters.
-     * @param delimiterList The list of delimiter for split. (NotNull, NotEmpty)
-     * @param splitLimitCount The limit count of split. (NotZero, NotMinus)
-     * @return this.
-     */
-    public LikeSearchOption splitByVarious(List<String> delimiterList, int splitLimitCount) {
-        assertSplitByPrecondition();
-        return (LikeSearchOption) doSplitByVarious(delimiterList, splitLimitCount);
     }
 
     protected void assertSplitByPrecondition() {
@@ -297,7 +247,7 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     /**
      * Split as OR condition. <br >
      * You should call this with a splitByXxx method.
-     * @return this.
+     * @return this. (NotNull)
      */
     public LikeSearchOption asOrSplit() {
         _asOrSplit = true;
@@ -306,6 +256,16 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
 
     public boolean isAsOrSplit() {
         return _asOrSplit;
+    }
+
+    /**
+     * Cut the large split (set limit count for split).
+     * @param splitLimitCount The limit count of split. (NotZero, NotMinus)
+     * @return this.
+     */
+    public LikeSearchOption cutSplit(int splitLimitCount) {
+        doCutSplit(splitLimitCount);
+        return this;
     }
 
     // ===================================================================================
