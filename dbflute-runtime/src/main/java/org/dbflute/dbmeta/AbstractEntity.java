@@ -64,9 +64,6 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     /** The map of derived value, key is alias name. (NullAllowed: lazy-loaded) */
     protected EntityDerivedMap __derivedMap;
 
-    /** Is common column auto set up effective? */
-    protected boolean __canCommonColumnAutoSetup = true;
-
     /** Is the entity created by DBFlute select process? */
     protected boolean __createdBySelect;
 
