@@ -141,8 +141,7 @@ public class ManageEngineLicenseTest extends EngineTestCase {
             if (br != null) {
                 try {
                     br.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
         if (!contains) {

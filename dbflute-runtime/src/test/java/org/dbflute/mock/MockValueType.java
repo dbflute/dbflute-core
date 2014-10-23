@@ -52,8 +52,7 @@ public class MockValueType implements ValueType {
     public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
     }
 
-    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value)
-            throws SQLException {
+    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException {
     }
 
     public void registerOutParameter(Connection conn, CallableStatement cs, int index) throws SQLException {

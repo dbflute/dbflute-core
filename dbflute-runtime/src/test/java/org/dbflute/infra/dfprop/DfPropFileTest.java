@@ -109,8 +109,7 @@ public class DfPropFileTest extends RuntimeTestCase {
 
     protected DfPropFile createSwitchStylePropFile() {
         return new DfPropFile() {
-            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler,
-                    String path) {
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler, String path) {
                 return prepareSwitchStyleMap(path);
             }
         };
@@ -147,14 +146,12 @@ public class DfPropFileTest extends RuntimeTestCase {
         DfPropFile propFile = new DfPropFile() {
             @SuppressWarnings("unchecked")
             @Override
-            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler,
-                    String path) {
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler, String path) {
                 Map<String, Object> mockMap = newLinkedHashMap();
                 if ("/dfprop/exampleMap.dfprop".equals(path)) {
                     mockMap.put("main", "mainValue");
                     mockMap.put("main*", "mainValue*");
-                } else if ("/dfprop/maihama/exampleMap.dfprop".equals(path)) {
-                } else {
+                } else if ("/dfprop/maihama/exampleMap.dfprop".equals(path)) {} else {
                     mockMap = null;
                 }
                 return (Map<String, ELEMENT>) mockMap;
@@ -253,8 +250,7 @@ public class DfPropFileTest extends RuntimeTestCase {
 
     protected DfPropFile createInheritStylePropFile() {
         return new DfPropFile() {
-            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler,
-                    String path) {
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler, String path) {
                 return prepareInheritStyleMap(path);
             }
         };
@@ -292,14 +288,12 @@ public class DfPropFileTest extends RuntimeTestCase {
         DfPropFile propFile = new DfPropFile() {
             @SuppressWarnings("unchecked")
             @Override
-            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler,
-                    String path) {
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler, String path) {
                 Map<String, Object> mockMap = newLinkedHashMap();
                 if ("/dfprop/exampleMap.dfprop".equals(path)) {
                     mockMap.put("main", "mainValue");
                     mockMap.put("main*", "mainValue*");
-                } else if ("/dfprop/maihama/exampleMap+.dfprop".equals(path)) {
-                } else {
+                } else if ("/dfprop/maihama/exampleMap+.dfprop".equals(path)) {} else {
                     mockMap = null;
                 }
                 return (Map<String, ELEMENT>) mockMap;
@@ -334,8 +328,7 @@ public class DfPropFileTest extends RuntimeTestCase {
         DfPropFile propFile = new DfPropFile() {
             @SuppressWarnings("unchecked")
             @Override
-            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler,
-                    String path) {
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler, String path) {
                 Map<String, Object> mockMap = newLinkedHashMap();
                 if ("/dfprop/exampleMap.dfprop".equals(path)) {
                     mockMap.put("main", "mainValue");
@@ -459,8 +452,7 @@ public class DfPropFileTest extends RuntimeTestCase {
 
     protected DfPropFile createAllStarsPropFile() {
         return new DfPropFile() {
-            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler,
-                    String path) {
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler, String path) {
                 return prepareAllStarsMap(path);
             }
         };
@@ -493,8 +485,7 @@ public class DfPropFileTest extends RuntimeTestCase {
         DfPropFile propFile = new DfPropFile() {
             @SuppressWarnings("unchecked")
             @Override
-            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler,
-                    String path) {
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler, String path) {
                 return (Map<String, ELEMENT>) newLinkedHashMap("foo", "bar");
             }
         }.returnsNullIfNotFound();
@@ -513,8 +504,7 @@ public class DfPropFileTest extends RuntimeTestCase {
         // ## Arrange ##
         DfPropFile propFile = new DfPropFile() {
             @Override
-            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler,
-                    String path) {
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler, String path) {
                 return newLinkedHashMap();
             }
         }.returnsNullIfNotFound();

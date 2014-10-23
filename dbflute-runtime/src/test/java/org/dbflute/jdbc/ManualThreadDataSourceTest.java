@@ -43,8 +43,7 @@ import org.dbflute.unit.RuntimeTestCase;
 public class ManualThreadDataSourceTest extends RuntimeTestCase {
 
     public void test_thread() throws Exception {
-        final Set<ManualThreadDataSourceHandler> handlerSet = Collections
-                .synchronizedSet(new HashSet<ManualThreadDataSourceHandler>());
+        final Set<ManualThreadDataSourceHandler> handlerSet = Collections.synchronizedSet(new HashSet<ManualThreadDataSourceHandler>());
         ExecutionCreator<ManualThreadDataSourceHandler> creator = new ExecutionCreator<ManualThreadDataSourceHandler>() {
             public Execution<ManualThreadDataSourceHandler> create() {
                 return new Execution<ManualThreadDataSourceHandler>() {

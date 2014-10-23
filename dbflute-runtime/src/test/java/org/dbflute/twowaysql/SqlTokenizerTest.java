@@ -305,8 +305,7 @@ public class SqlTokenizerTest extends RuntimeTestCase {
 
         // ## Act ##
         try {
-            while (SqlTokenizer.EOF != tokenizer.next()) {
-            }
+            while (SqlTokenizer.EOF != tokenizer.next()) {}
 
             // ## Assert ##
             fail();

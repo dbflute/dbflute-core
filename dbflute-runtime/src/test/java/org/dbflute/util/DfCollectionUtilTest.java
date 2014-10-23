@@ -279,8 +279,8 @@ public class DfCollectionUtilTest extends RuntimeTestCase {
     public void test_analyzeOrderChange_various() throws Exception {
         // ## Arrange ##
         List<String> beforeUniqueList = DfCollectionUtil.newArrayList("foo", "bar", "baz", "qux", "deleted", "quux");
-        List<String> afterUniqueList = DfCollectionUtil.newArrayList("qux", "corge", "bar", "grault", "quux", "foo",
-                "baz", "garply", "waldo", "fred");
+        List<String> afterUniqueList =
+                DfCollectionUtil.newArrayList("qux", "corge", "bar", "grault", "quux", "foo", "baz", "garply", "waldo", "fred");
 
         // ## Act ##
         OrderDiff<String> orderDiff = DfCollectionUtil.analyzeOrderDiff(beforeUniqueList, afterUniqueList);

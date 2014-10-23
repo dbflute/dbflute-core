@@ -141,8 +141,7 @@ public class ManageRuntimeLicenseTest extends RuntimeTestCase {
             if (br != null) {
                 try {
                     br.close();
-                } catch (IOException ignored) {
-                }
+                } catch (IOException ignored) {}
             }
         }
         if (!contains) {

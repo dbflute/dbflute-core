@@ -191,8 +191,8 @@ public class DisplaySqlBuilderTest extends RuntimeTestCase {
 
         // ## Assert ##
         log(actual);
-        assertTrue(Srl.containsAll(actual, fooName, barCode, String.valueOf(bazId), "/*foo's bar*/", "escape '|'",
-                "/*qux?*/", "/*quux'?*/and"));
+        assertTrue(Srl.containsAll(actual, fooName, barCode, String.valueOf(bazId), "/*foo's bar*/", "escape '|'", "/*qux?*/",
+                "/*quux'?*/and"));
     }
 
     public void test_buildDisplaySql_beforeComment_quotationOverComment() {
@@ -369,8 +369,7 @@ public class DisplaySqlBuilderTest extends RuntimeTestCase {
 
     protected DisplaySqlBuilder doCreateTarget(String datePattern, String timestampPattern, String timePattern,
             BoundDateDisplayTimeZoneProvider timeZoneProvider) {
-        BoundDateDisplayStyle dateDisplayStyle = new BoundDateDisplayStyle(datePattern, timestampPattern, timePattern,
-                timeZoneProvider);
+        BoundDateDisplayStyle dateDisplayStyle = new BoundDateDisplayStyle(datePattern, timestampPattern, timePattern, timeZoneProvider);
         return new DisplaySqlBuilder(dateDisplayStyle);
     }
 }

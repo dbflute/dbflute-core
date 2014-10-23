@@ -94,8 +94,7 @@ public class DfSql2EntityMarkAnalyzerTest extends EngineTestCase {
         sb.append("select member.MEMBER_ID");
         sb.append(ln()).append(" , member.MEMBER_NAME");
         sb.append(ln()).append(" , member.BIRTHDATE -- // select column comment here (no as)");
-        sb.append(ln()).append(
-                " , member.FORMALIZED_DATETIME as FORMALIZED_DATETIME -- // select column comment here (using as)");
+        sb.append(ln()).append(" , member.FORMALIZED_DATETIME as FORMALIZED_DATETIME -- // select column comment here (using as)");
         sb.append(ln()).append(" , member.MEMBER_STATUS_CODE -- for Classification Test of Sql2Entity");
         sb.append(ln()).append(" , memberStatus.MEMBER_STATUS_NAME");
         sb.append(ln()).append(" , memberStatus.DISPLAY_ORDER as STATUS_DISPLAY_ORDER -- for Alias Name Test");
