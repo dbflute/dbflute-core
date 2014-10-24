@@ -322,10 +322,9 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     }
 
     // ===================================================================================
-    //                                                              Synchronization QyCall
-    //                                                              ======================
-    // synchronize Query(Relation)
-    public HpSpQyCall<CQ> xsyncQyCall() {
+    //                                                                     QyCall Handling
+    //                                                                     ===============
+    public HpSpQyCall<CQ> xsyncQyCall() { // synchronize Query(Relation)
         return _syncQyCall;
     }
 
@@ -335,6 +334,11 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
 
     public boolean xhasSyncQyCall() {
         return _syncQyCall != null;
+    }
+
+    protected <MYCQ extends ConditionQuery> HpSpQyCall<MYCQ> xcreateSpQyCall(HpSpQyHas<MYCQ> has, HpSpQyQy<MYCQ> qy) {
+        // might be called as relation
+        return new HpSpQyDelegatingCall<MYCQ>(has, qy);
     }
 
     // ===================================================================================

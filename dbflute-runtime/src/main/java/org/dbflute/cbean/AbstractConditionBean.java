@@ -32,6 +32,10 @@ import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpSDRFunction;
 import org.dbflute.cbean.chelper.HpSDRFunctionFactory;
 import org.dbflute.cbean.chelper.HpSDRSetupper;
+import org.dbflute.cbean.chelper.HpSpQyCall;
+import org.dbflute.cbean.chelper.HpSpQyDelegatingCall;
+import org.dbflute.cbean.chelper.HpSpQyHas;
+import org.dbflute.cbean.chelper.HpSpQyQy;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
@@ -225,6 +229,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 foreignRelationPath);
     }
 
+    @FunctionalInterface
     protected static interface SsCall {
         public ConditionQuery qf();
     }
@@ -258,6 +263,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
+    protected <CQ extends ConditionQuery> HpSpQyCall<CQ> xcreateSpQyCall(HpSpQyHas<CQ> has, HpSpQyQy<CQ> qy) {
+        return new HpSpQyDelegatingCall<CQ>(has, qy);
+    }
+
     protected void assertSpecifyPurpose() { // called by specify() of sub-class
         if (_purpose.isNoSpecify()) {
             throwSpecifyIllegalPurposeException();

@@ -9,21 +9,25 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.optional;
+package org.dbflute.cbean.chelper;
+
+import org.dbflute.cbean.ConditionQuery;
 
 /**
+ * @param <CQ> The type of condition-query.
  * @author jflute
- * @since 1.0.5F (2014/05/05 Monday)
+ * @since 1.1.0 (2014/10/24 Friday)
  */
 @FunctionalInterface
-public interface OptionalThingExceptionThrower {
+public interface HpSpQyHas<CQ extends ConditionQuery> {
 
     /**
-     * Throw the exception for not-found value.
+     * Does it have its own query?
+     * @return The determination, true or false.
      */
-    void throwNotFoundException();
+    boolean has();
 }

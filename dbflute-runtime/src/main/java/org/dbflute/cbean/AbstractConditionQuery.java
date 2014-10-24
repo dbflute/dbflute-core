@@ -97,6 +97,7 @@ import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.dbflute.helper.function.IndependentProcessor;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ShortCharHandlingMode;
@@ -2882,6 +2883,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
+    protected void lockCall(IndependentProcessor noArgInLambda) {
+        lock();
+        try {
+            noArgInLambda.process();
+        } finally {
+            unlock();
+        }
+    }
+
     protected void lock() {
         xgetSqlClause().lock();
     }

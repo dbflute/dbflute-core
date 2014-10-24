@@ -18,21 +18,27 @@ package org.dbflute.cbean.chelper;
 import org.dbflute.cbean.ConditionQuery;
 
 /**
- * The callback of query for specification.
  * @param <CQ> The type of condition-query.
  * @author jflute
+ * @since 1.1.0 (2014/10/24 Friday)
  */
-public interface HpSpQyCall<CQ extends ConditionQuery> {
+public class HpSpQyDelegatingCall<CQ extends ConditionQuery> implements HpSpQyCall<CQ> {
 
-    /**
-     * Does it have its own query?
-     * @return The determination, true or false.
-     */
-    boolean has();
+    protected final HpSpQyHas<CQ> _has;
+    protected final HpSpQyQy<CQ> _qy;
 
-    /**
-     * Delegate query method.
-     * @return The condition-query. (NotNull)
-     */
-    CQ qy();
+    public HpSpQyDelegatingCall(HpSpQyHas<CQ> has, HpSpQyQy<CQ> qy) {
+        _has = has;
+        _qy = qy;
+    }
+
+    /** {@inheritDoc} */
+    public boolean has() {
+        return _has.has();
+    }
+
+    /** {@inheritDoc} */
+    public CQ qy() {
+        return _qy.qy();
+    }
 }

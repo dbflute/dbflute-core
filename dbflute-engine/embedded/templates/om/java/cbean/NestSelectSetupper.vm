@@ -59,6 +59,10 @@ public class ${myClassName} {
      * @deprecated ${fk.deprecated}
 #end
      */
+#if ($fk.isDeprecatedRelation())
+## deprecated in lambda needs to be suppressed at Eclipse-4.4
+    @SuppressWarnings("deprecation")
+#end
     public ${setupSelectReturnType} with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
         _query.xdoNss(() -> _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
 #if ($hasNestSelectSetupper)

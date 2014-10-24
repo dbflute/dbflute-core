@@ -31,6 +31,7 @@ package org.dbflute.optional;
  * @author jflute
  * @since 1.0.5F (2014/05/10 Saturday)
  */
+@FunctionalInterface
 public interface OptionalThingConsumer<OBJ> {
 
     // TODO jflute impl: function default method
