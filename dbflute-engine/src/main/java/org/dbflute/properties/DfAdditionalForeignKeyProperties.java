@@ -42,6 +42,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     public static final String KEY_FIXED_SUFFIX = "fixedSuffix";
     public static final String KEY_FIXED_INLINE = "fixedInline";
     public static final String KEY_FIXED_REFERRER = "fixedReferrer";
+    public static final String KEY_FIXED_ONLY_JOIN = "fixedOnlyJoin";
     public static final String KEY_SUPPRESS_JOIN = "suppressJoin";
     public static final String KEY_SUPPRESS_SUBQUERY = "suppressSubQuery";
     public static final String KEY_COMMENT = "comment";
@@ -208,24 +209,33 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return doFindAttributeValue(foreignKeyName, KEY_FIXED_SUFFIX);
     }
 
-    public String findFixedInline(String foreignKeyName) {
-        return doFindAttributeValue(foreignKeyName, KEY_FIXED_INLINE);
+    public boolean isFixedInline(String foreignKeyName) {
+        final String value = doFindAttributeValue(foreignKeyName, KEY_FIXED_INLINE);
+        return value != null && value.trim().equalsIgnoreCase("true");
     }
 
-    public String findFixedReferrer(String foreignKeyName) {
-        return doFindAttributeValue(foreignKeyName, KEY_FIXED_REFERRER);
+    public boolean isFixedReferrer(String foreignKeyName) {
+        final String value = doFindAttributeValue(foreignKeyName, KEY_FIXED_REFERRER);
+        return value != null && value.trim().equalsIgnoreCase("true");
+    }
+
+    public boolean isFixedOnlyJoin(String foreignKeyName) {
+        final String value = doFindAttributeValue(foreignKeyName, KEY_FIXED_ONLY_JOIN);
+        return value != null && value.trim().equalsIgnoreCase("true");
     }
 
     public String findComment(String foreignKeyName) {
         return doFindAttributeValue(foreignKeyName, KEY_COMMENT);
     }
 
-    public String findSuppressJoin(String foreignKeyName) {
-        return doFindAttributeValue(foreignKeyName, KEY_SUPPRESS_JOIN);
+    public boolean isSuppressJoin(String foreignKeyName) {
+        final String value = doFindAttributeValue(foreignKeyName, KEY_SUPPRESS_JOIN);
+        return value != null && value.trim().equalsIgnoreCase("true");
     }
 
-    public String findSuppressSubQuery(String foreignKeyName) {
-        return doFindAttributeValue(foreignKeyName, KEY_SUPPRESS_SUBQUERY);
+    public boolean isSuppressSubQuery(String foreignKeyName) {
+        final String value = doFindAttributeValue(foreignKeyName, KEY_SUPPRESS_SUBQUERY);
+        return value != null && value.trim().equalsIgnoreCase("true");
     }
 
     public String findDeprecated(String foreignKeyName) {

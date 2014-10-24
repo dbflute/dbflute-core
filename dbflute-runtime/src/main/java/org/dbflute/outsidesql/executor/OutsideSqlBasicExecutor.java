@@ -125,8 +125,8 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * @param <ENTITY> The type of entity for element.
      * @param pmb The typed parameter-bean for list handling. (NotNull)
      * @return The result bean of selected list. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(ListHandlingPmb<BEHAVIOR, ENTITY> pmb) {
         assertTypedPmbNotNull(pmb);
@@ -161,8 +161,8 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param entityType The element type of entity. (NotNull)
      * @return The result bean of selected list. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
         return doSelectList(path, pmb, entityType);
@@ -213,7 +213,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * </pre>
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @return The count of execution.
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
      */
     public int execute(ExecuteHandlingPmb<BEHAVIOR> pmb) {
         assertTypedPmbNotNull(pmb);
@@ -232,7 +232,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @return The count of execution.
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outsideSql is not found.
      */
     public int execute(String path, Object pmb) {
         return doExecute(path, pmb);

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.util.Srl;
 
 /**
@@ -52,18 +53,8 @@ public class SplitOptionParts implements Serializable {
         addSubDelimiter("\n");
     }
 
-    public void splitByBlank(int splitLimitCount) {
-        splitByBlank();
-        _splitLimitCount = splitLimitCount;
-    }
-
     public void splitBySpace() {
         _delimiter = " ";
-    }
-
-    public void splitBySpace(int splitLimitCount) {
-        splitBySpace();
-        _splitLimitCount = splitLimitCount;
     }
 
     public void splitBySpaceContainsDoubleByte() {
@@ -80,15 +71,9 @@ public class SplitOptionParts implements Serializable {
         _delimiter = "|";
     }
 
-    public void splitByPipeLine(int splitLimitCount) {
-        splitByPipeLine();
-        _splitLimitCount = splitLimitCount;
-    }
-
     public void splitByVarious(List<String> delimiterList) {
         if (delimiterList == null || delimiterList.isEmpty()) {
-            String msg = "The delimiterList should not be null or empty:";
-            msg = msg + " delimiterList=" + delimiterList;
+            String msg = "The delimiterList should not be null or empty: delimiterList=" + delimiterList;
             throw new IllegalArgumentException(msg);
         }
         final List<String> acceptList = new ArrayList<String>(delimiterList);
@@ -96,8 +81,11 @@ public class SplitOptionParts implements Serializable {
         addSubDelimiter(acceptList);
     }
 
-    public void splitByVarious(List<String> delimiterList, int splitLimitCount) {
-        splitByVarious(delimiterList);
+    public void limitSplit(int splitLimitCount) {
+        if (_delimiter == null) {
+            String msg = "The limitSplit() needs splitBy...() but not called.";
+            throw new IllegalConditionBeanOperationException(msg);
+        }
         _splitLimitCount = splitLimitCount;
     }
 

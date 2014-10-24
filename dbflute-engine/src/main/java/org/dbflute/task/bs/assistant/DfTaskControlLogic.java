@@ -32,8 +32,8 @@ import org.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.infra.core.DfEnvironmentType;
 import org.dbflute.logic.DfDBFluteTaskUtil;
-import org.dbflute.logic.generate.refresh.DfRefreshResourceProcess;
 import org.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
+import org.dbflute.logic.manage.DfRefreshMan;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.dbflute.properties.DfBasicProperties;
@@ -295,10 +295,7 @@ public class DfTaskControlLogic {
     //                                                                    Refresh Resource
     //                                                                    ================
     public void refreshResources() {
-        final DfRefreshProperties prop = getRefreshProperties();
-        final List<String> projectNameList = prop.getProjectNameList();
-        final String requestUrl = prop.getRequestUrl();
-        new DfRefreshResourceProcess(projectNameList, requestUrl).refreshResources();
+        new DfRefreshMan().refresh();
     }
 
     // ===================================================================================
@@ -338,10 +335,6 @@ public class DfTaskControlLogic {
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
         return getProperties().getLittleAdjustmentProperties();
-    }
-
-    protected DfRefreshProperties getRefreshProperties() {
-        return getProperties().getRefreshProperties();
     }
 
     // ===================================================================================

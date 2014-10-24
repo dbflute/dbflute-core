@@ -155,9 +155,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
      * @param loaderCall The callback for referrer loader of ${myImmutableExtendedObjectClassName}. (NoArgAllowed: then no loading)
      * @return The optional entity selected by the condition. (NotNull: if no data, empty entity)
-     * @exception EntityAlreadyDeletedException When get() of return value is called and the value is null, which means entity has already been deleted (point is not found).
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     * @throws EntityAlreadyDeletedException When get() of return value is called and the value is null, which means entity has already been deleted (point is not found).
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     def selectEntity(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${table.filterSelectEntityOptionalReturnIfNeeds(${myImmutableExtendedObjectClassName})} = {
         return facadeSelectEntity(callbackCB(cbCall))(loaderCall).map(_.toImmutable);
@@ -194,9 +194,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
      * @param loaderCall The callback for referrer loader of ${myImmutableExtendedObjectClassName}. (NoArgAllowed: then no loading)
      * @return The entity selected by the condition. (NotNull: if no data, throws exception)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (point is not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (point is not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     ${table.selectEntityWithDeletedCheckModifierAsPrefix}def selectEntityWithDeletedCheck(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ${myImmutableExtendedObjectClassName} = {
         return facadeSelectEntityWithDeletedCheck(callbackCB(cbCall))(loaderCall).toImmutable;
@@ -220,9 +220,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * Select the entity by the primary-key value.
      * ${table.primaryKeyArgsJavaDocString}
      * @return The optional entity selected by the PK. (NotNull: if no data, empty entity)
-     * @exception EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     * @throws EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     def selectByPK(${table.primaryKeyArgsString}): ${table.filterSelectEntityOptionalReturnIfNeeds(${myImmutableExtendedObjectClassName})} = {
         return facadeSelectByPK(${table.primaryKeyArgsCallingString}).map(_.toImmutable);
@@ -247,9 +247,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * Select the entity by the unique-key value.
      * ${uq.argsJavaDocString}
      * @return The optional entity selected by the unique key. (NotNull: if no data, empty entity)
-     * @exception EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
+     * @throws EntityAlreadyDeletedException When get(), required() of return value is called and the value is null, which means entity has already been deleted (not found).
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
     def selectByUniqueOf${uq.javaNameKeyword}(${uq.argsString}): ${table.filterSelectEntityOptionalReturn(${myImmutableExtendedObjectClassName})} = {
         return facadeSelectByUniqueOf${uq.javaNameKeyword}(${uq.argsCallingString}).map(_.toImmutable);
@@ -286,7 +286,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
      * @param loaderCall The callback for referrer loader of ${myImmutableExtendedObjectClassName}. (NoArgAllowed: then no loading)
      * @return The result bean of selected list. (NotNull: if no data, returns empty list)
-     * @exception DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws DangerousResultSizeException When the result size is over the specified safety size.
      */
     def selectList(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): immutable.List[${myImmutableExtendedObjectClassName}] = {
         return toImmutableEntityList(facadeSelectList(callbackCB(cbCall))(loaderCall));
@@ -332,7 +332,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
      * @param loaderCall The callback for referrer loader of ${myImmutableExtendedObjectClassName}. (NoArgAllowed: then no loading)
      * @return The result bean of selected page. (NotNull: if no data, returns bean as empty list)
-     * @exception DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws DangerousResultSizeException When the result size is over the specified safety size.
      */
     def selectPage(cbCall: (${myConditionBeanClassName}) => Unit)(implicit loaderCall: (${myReferrerLoaderClassName}) => Unit = null): ScrPagingView[${myImmutableExtendedObjectClassName}] = {
         return newPagingView(facadeSelectPage(callbackCB(cbCall))(loaderCall));
@@ -614,7 +614,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * <p>While, when the entity is created by select, all columns are registered.</p>
      * @param entityCall The callback for entity of insert. (NotNull, PrimaryKeyNullAllowed: when auto-increment)
      * @param optionCall The callback for option of insert. (NoArgAllowed: then no option)
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     def insert(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         assertObjectNotNull("entityCall", entityCall);
@@ -649,12 +649,12 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
 #end
      * @param optionCall The callback for option of update. (NoArgAllowed: then no option)
 #if ($table.hasOptimisticLock())
-     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+     * @throws EntityAlreadyUpdatedException When the entity has already been updated.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     def update(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         assertObjectNotNull("entityCall", entityCall);
@@ -678,9 +678,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * </pre>
      * @param entityCall The callback for entity of update. (NotNull, PrimaryKeyNotNull)
      * @param optionCall The callback for option of update. (NoArgAllowed: then no option)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     def updateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doUpdateNonstrict(callbackMbleEntityToDBable(entityCall), callbackUpdateOption(optionCall));
@@ -699,12 +699,12 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * @param insertOptionCall The callback for option of insert. (NoArgAllowed: then no option)
      * @param updateOptionCall The callback for option of update. (NoArgAllowed: then no option)
 #if ($table.hasOptimisticLock())
-     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+     * @throws EntityAlreadyUpdatedException When the entity has already been updated.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     def insertOrUpdate(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doInsertOrUpdate(callbackMbleEntityToDBable(entityCall), callbackInsertOption(insertOptionCall), callbackUpdateOption(updateOptionCall));
@@ -718,9 +718,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * @param entityCall The callback for entity of insert or update. (NotNull, ...depends on insert or update)
      * @param insertOptionCall The callback for option of insert. (NoArgAllowed: then no option)
      * @param updateOptionCall The callback for option of update. (NoArgAllowed: then no option)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
-     * @exception EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     def insertOrUpdateNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit insertOptionCall: (ScrInsertOption[${myConditionBeanClassName}]) => Unit = null, updateOptionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doInsertOrUpdateNonstrict(callbackMbleEntityToDBable(entityCall), callbackInsertOption(insertOptionCall), callbackUpdateOption(updateOptionCall));
@@ -747,11 +747,11 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * @param entityCall The callback for entity of delete. (NotNull, PrimaryKeyNotNull)
      * @param optionCall The callback for option of delete. (NoArgAllowed: then no option)
 #if ($table.hasOptimisticLock())
-     * @exception EntityAlreadyUpdatedException When the entity has already been updated.
+     * @throws EntityAlreadyUpdatedException When the entity has already been updated.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
-     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityDuplicatedException When the entity has been duplicated.
      */
     def delete(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doDelete(callbackMbleEntityToDBable(entityCall), callbackDeleteOption(optionCall));
@@ -770,8 +770,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * </pre>
      * @param entityCall The callback for entity of delete. (NotNull, PrimaryKeyNotNull)
      * @param optionCall The callback for option of delete. (NoArgAllowed: then no option)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @exception EntityDuplicatedException When the entity has been duplicated.
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityDuplicatedException When the entity has been duplicated.
      */
     def deleteNonstrict(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Unit = {
         doDeleteNonstrict(callbackMbleEntityToDBable(entityCall), callbackDeleteOption(optionCall));
@@ -844,9 +844,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
 #if ($table.hasOptimisticLock())
-     * @exception BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
+     * @throws BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
     def batchUpdate(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
@@ -884,7 +884,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * </pre>
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @return The array of updated count. (NotNull, EmptyAllowed)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
     def batchUpdateNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrUpdateOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchUpdateNonstrict(callbackBatch(batchCall), callbackUpdateOption(optionCall));
@@ -901,9 +901,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @return The array of deleted count. (NotNull, EmptyAllowed)
 #if ($table.hasOptimisticLock())
-     * @exception BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
+     * @throws BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
 #else
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
 #end
      */
     def batchDelete(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
@@ -916,7 +916,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * This method uses executeBatch() of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @return The array of deleted count. (NotNull, EmptyAllowed)
-     * @exception EntityAlreadyDeletedException When the entity has already been deleted. (not found)
+     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
     def batchDeleteNonstrict(batchCall: (ScrBatchEntityList[${myMutableExtendedObjectClassName}]) => Unit)(implicit optionCall: (ScrDeleteOption[${myConditionBeanClassName}]) => Unit = null): Array[Int] = {
         return doBatchDeleteNonstrict(callbackBatch(batchCall), callbackDeleteOption(optionCall));
@@ -976,7 +976,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * @param entityCall The callback for entity that contains update values. (NotNull)
      * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
      * @return The updated count.
-     * @exception NonQueryUpdateNotAllowedException When the query has no condition.
+     * @throws NonQueryUpdateNotAllowedException When the query has no condition.
      */
     def queryUpdate(entityCall: (${myMutableExtendedObjectClassName}) => Unit)(cbCall: (${myConditionBeanClassName}) => Unit): Int = {
         assertObjectNotNull("entityCall", entityCall); assertObjectNotNull("cbCall", cbCall);
@@ -992,7 +992,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      * </pre>
      * @param cbCall The callback for condition-bean of ${myImmutableExtendedObjectClassName}. (NotNull)
      * @return The deleted count.
-     * @exception NonQueryDeleteNotAllowedException When the query has no condition.
+     * @throws NonQueryDeleteNotAllowedException When the query has no condition.
      */
     def queryDelete(cbCall: (${myConditionBeanClassName}) => Unit): Int = {
         assertObjectNotNull("cbCall", cbCall);

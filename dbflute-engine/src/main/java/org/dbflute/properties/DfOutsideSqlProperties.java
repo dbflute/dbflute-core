@@ -262,22 +262,26 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                      OutsideSqlTest
     //                                                                      ==============
+    public boolean isCheckRequiredSqlCommentAlsoSql2Entity() { // closet
+        final boolean defaultValue = !isCompatibleOutsideSqlSqlCommentCheckDefault();
+        return isProperty("isCheckRequiredSqlCommentAlsoSql2Entity", defaultValue);
+    }
+
     public boolean isRequiredSqlTitle() {
-        final boolean defaultValue = !getLittleAdjustmentProperties().isCompatibleBeforeJava8();
+        final boolean defaultValue = !isCompatibleOutsideSqlSqlCommentCheckDefault();
         return isProperty("isRequiredSqlTitle", defaultValue);
     }
 
     public boolean isRequiredSqlDescription() {
-        final boolean defaultValue = !getLittleAdjustmentProperties().isCompatibleBeforeJava8();
+        final boolean defaultValue = !isCompatibleOutsideSqlSqlCommentCheckDefault();
         return isProperty("isRequiredSqlDescription", defaultValue);
     }
 
-    public boolean isCheckRequiredSqlCommentAlsoSql2Entity() { // closet
-        final boolean defaultValue = !getLittleAdjustmentProperties().isCompatibleBeforeJava8();
-        return isProperty("isCheckRequiredSqlCommentAlsoSql2Entity", defaultValue);
+    protected boolean isCompatibleOutsideSqlSqlCommentCheckDefault() {
+        return getLittleAdjustmentProperties().isCompatibleOutsideSqlSqlCommentCheckDefault();
     }
 
-    public boolean isSuppressParameterCommentCheck() { // It's closet!
+    public boolean isSuppressParameterCommentCheck() { // closet
         return isProperty("isSuppressParameterCommentCheck", false);
     }
 

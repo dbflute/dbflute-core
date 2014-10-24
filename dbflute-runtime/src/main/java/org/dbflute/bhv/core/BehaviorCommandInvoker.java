@@ -403,15 +403,19 @@ public class BehaviorCommandInvoker {
                 log("...Initializing sqlExecution for the key '" + key + "'");
             }
             execution = executionCreator.createSqlExecution();
+            assertCreatorReturnExecution(key, executionCreator, execution);
             _executionMap.put(key, execution);
         }
+        toBeDisposable(); // for HotDeploy
+        return execution;
+    }
+
+    protected void assertCreatorReturnExecution(String key, SqlExecutionCreator executionCreator, SqlExecution execution) {
         if (execution == null) {
             String msg = "sqlExecutionCreator.createSqlCommand() should not return null:";
             msg = msg + " sqlExecutionCreator=" + executionCreator + " key=" + key;
             throw new IllegalStateException(msg);
         }
-        toBeDisposable(); // for HotDeploy
-        return execution;
     }
 
     protected Object executeSql(SqlExecution execution, Object[] args) {

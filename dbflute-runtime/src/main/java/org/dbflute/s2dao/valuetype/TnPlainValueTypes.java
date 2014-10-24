@@ -447,7 +447,7 @@ public class TnPlainValueTypes {
      * Assert that the object is not null.
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {

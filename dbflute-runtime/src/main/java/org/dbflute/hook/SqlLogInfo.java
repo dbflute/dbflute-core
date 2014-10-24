@@ -16,6 +16,7 @@
 package org.dbflute.hook;
 
 import org.dbflute.bhv.core.BehaviorCommandMeta;
+import org.dbflute.util.Srl;
 
 /**
  * The information of SQL log.
@@ -73,7 +74,7 @@ public class SqlLogInfo {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("{");
-        sb.append("executedSql.length()=").append(_executedSql != null ? _executedSql.length() : null);
+        sb.append("executedSql=").append(_executedSql != null ? Srl.cut(_executedSql, 30, "...") : null);
         sb.append(", bindArgs.length=").append(_bindArgs != null ? _bindArgs.length : null);
         sb.append(", bindArgTypes.length=").append(_bindArgTypes != null ? _bindArgTypes.length : null);
         sb.append(", cachedDisplaySql.length()=").append(_cachedDisplaySql != null ? _cachedDisplaySql.length() : null);

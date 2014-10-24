@@ -91,8 +91,8 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * @param <ENTITY> The type of entity.
      * @param pmb The typed parameter-bean for entity handling. (NotNull)
      * @return The selected entity. (NullAllowed)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntity(EntityHandlingPmb<BEHAVIOR, ENTITY> pmb) {
         if (pmb == null) {
@@ -123,8 +123,8 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * @param pmb The object as parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param entityType The type of entity. (NotNull)
      * @return The selected entity. (NullAllowed)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntity(String path, Object pmb, Class<ENTITY> entityType) {
         return doSelectEntity(path, pmb, entityType);
@@ -215,9 +215,9 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * @param <ENTITY> The type of entity.
      * @param pmb The typed parameter-bean for entity handling. (NotNull)
      * @return The selected entity. (NullAllowed)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted(not found).
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted(not found).
+     * @throws org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntityWithDeletedCheck(EntityHandlingPmb<BEHAVIOR, ENTITY> pmb) {
         if (pmb == null) {
@@ -244,9 +244,9 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (NullAllowed)
      * @param entityType The type of entity. (NotNull)
      * @return The selected entity. (NullAllowed)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted(not found).
-     * @exception org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted(not found).
+     * @throws org.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntityWithDeletedCheck(String path, Object pmb, Class<ENTITY> entityType) {
         return doSelectEntityWithDeletedCheck(path, pmb, entityType);

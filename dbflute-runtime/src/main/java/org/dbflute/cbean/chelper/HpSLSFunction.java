@@ -394,7 +394,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * Assert that the object is not null.
      * @param variableName The variable name for message. (NotNull)
      * @param value The value the checked variable. (NotNull)
-     * @exception IllegalArgumentException When the variable name or the variable is null.
+     * @throws IllegalArgumentException When the variable name or the variable is null.
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {

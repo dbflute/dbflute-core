@@ -166,6 +166,16 @@ public class Srl {
         return str.length();
     }
 
+    public static String cut(final String str, int length) {
+        assertStringNotNull(str);
+        return cut(str, length, null);
+    }
+
+    public static String cut(final String str, int length, String suffix) {
+        assertStringNotNull(str);
+        return str.length() > length ? (str.substring(0, length) + (suffix != null ? suffix : "")) : str;
+    }
+
     // ===================================================================================
     //                                                                                Case
     //                                                                                ====
@@ -2445,7 +2455,7 @@ public class Srl {
      * Assert that the object is not null.
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     protected static void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {

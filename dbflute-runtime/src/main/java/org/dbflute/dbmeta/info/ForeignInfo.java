@@ -344,7 +344,7 @@ public class ForeignInfo implements RelationInfo {
 
     /**
      * Get the read-only map, key is a local column info, value is a foreign column info.
-     * @return The read-only map. (NotNull)
+     * @return The read-only map. (NotNull, EmptyAllowed: only when fixedOnlyJoin)
      */
     public Map<ColumnInfo, ColumnInfo> getLocalForeignColumnInfoMap() {
         return _localForeignColumnInfoMap;
@@ -352,7 +352,7 @@ public class ForeignInfo implements RelationInfo {
 
     /**
      * Get the read-only map, key is a foreign column info, value is a local column info.
-     * @return The read-only map. (NotNull)
+     * @return The read-only map. (NotNull, EmptyAllowed: only when fixedOnlyJoin)
      */
     public Map<ColumnInfo, ColumnInfo> getForeignLocalColumnInfoMap() {
         return _foreignLocalColumnInfoMap;

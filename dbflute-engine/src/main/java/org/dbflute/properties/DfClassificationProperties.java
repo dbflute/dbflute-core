@@ -1206,18 +1206,16 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     public boolean hasClassificationName(String tableName, String columnName) {
         final String classificationName = getClassificationName(tableName, columnName);
-        if (classificationName == null) {
-            return false;
-        }
+        return classificationName != null && hasClassificationName(classificationName);
+    }
+
+    public boolean hasClassificationName(String classificationName) {
         return getClassificationValidNameOnlyList().contains(classificationName);
     }
 
     public boolean hasClassificationAlias(String tableName, String columnName) {
         final String classificationName = getClassificationName(tableName, columnName);
-        if (classificationName == null) {
-            return false;
-        }
-        return hasClassificationAlias(classificationName);
+        return classificationName != null && hasClassificationAlias(classificationName);
     }
 
     public boolean hasClassificationAlias(String classificationName) {

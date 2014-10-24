@@ -114,7 +114,6 @@ public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef}
     protected ${col.javaNative} _${col.uncapitalisedJavaName};
 
 #end
-
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
@@ -498,12 +497,20 @@ public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef}
         StringBuilder sb = new StringBuilder();
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
+#if ($fk.isForeignPropertyOptionalEntity())
+        if (${foreignVariableName} != null && ${foreignVariableName}.isPresent())
+#else
         if (${foreignVariableName} != null)
+#end
         { sb.append(li).append(xbRDS(${foreignVariableName}, "${fk.foreignPropertyName}")); }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+#if ($fk.isForeignPropertyOptionalEntity())
+        if (${referrerVariableName} != null && ${referrerVariableName}.isPresent())
+#else
         if (${referrerVariableName} != null)
+#end
         { sb.append(li).append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOne}")); }
 #end
 #foreach ($referrer in $table.referrerAsManyList)
@@ -531,7 +538,7 @@ public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef}
 #elseif ($col.isJavaNativeByteArray())
         sb.append(dm).append(xfBA(_${col.uncapitalisedJavaName}));
 #else
-        sb.append(dm).append(_${col.uncapitalisedJavaName});
+        sb.append(dm).append(xfND(_${col.uncapitalisedJavaName}));
 #end
 #end
         if (sb.length() > dm.length()) {

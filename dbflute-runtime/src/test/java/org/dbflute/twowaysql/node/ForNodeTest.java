@@ -1099,11 +1099,9 @@ public class ForNodeTest extends RuntimeTestCase {
         sb.append("   MEMBER_ID = /*pmb.memberId*/").append(ln());
         sb.append("   /*END*/").append(ln());
         sb.append("   /*FOR pmb.nestPmbList*//*FIRST*/and (/*END*/").append(ln());
-        sb.append("     /*NEXT 'or '*/MEMBER_STATUS_CODE = /*#current.memberStatusCode:likeSuffix*/'test'")
-                .append(ln());
+        sb.append("     /*NEXT 'or '*/MEMBER_STATUS_CODE = /*#current.memberStatusCode:likeSuffix*/'test'").append(ln());
         sb.append("     /*FOR #current.nestPmbList*//*FIRST*/and (/*END*/").append(ln());
-        sb.append("       /*NEXT 'or '*/MEMBER_NAME like /*#current.parentPmb.memberName:likeContain*/'foo%'").append(
-                ln());
+        sb.append("       /*NEXT 'or '*/MEMBER_NAME like /*#current.parentPmb.memberName:likeContain*/'foo%'").append(ln());
         sb.append("     /*LAST*/)/*END*//*END*/").append(ln());
         sb.append("   /*LAST*/)/*END*//*END*/").append(ln());
         sb.append(" /*END*/");

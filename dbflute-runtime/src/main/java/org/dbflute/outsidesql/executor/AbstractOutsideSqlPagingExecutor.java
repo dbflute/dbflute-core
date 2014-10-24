@@ -140,8 +140,8 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paging. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> PagingResultBean<ENTITY> selectPage(String path, PagingBean pmb, Class<ENTITY> entityType) {
         return doSelectPage(path, pmb, entityType);
@@ -279,8 +279,8 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paged list. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
-     * @exception org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
+     * @throws org.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
         return doSelectList(path, pmb, entityType);

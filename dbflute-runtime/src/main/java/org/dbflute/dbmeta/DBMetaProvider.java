@@ -42,7 +42,7 @@ public interface DBMetaProvider {
      * Provide the DB meta by name.
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (NotNull)
-     * @exception org.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
      */
     DBMeta provideDBMetaChecked(String tableFlexibleName);
 
@@ -51,7 +51,7 @@ public interface DBMetaProvider {
      * The generic type of the entity type is wild-card because generic for class type is hard to use.
      * @param entityType The entity type of table, which should implement the {@link Entity} interface. (NotNull)
      * @return The instance of DB meta. (NotNull)
-     * @exception org.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
      */
     DBMeta provideDBMetaChecked(Class<?> entityType);
 }

@@ -20,9 +20,10 @@ import org.dbflute.cbean.dream.ColumnCalculator;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 
 /**
- * @author jflute
  * @param <CB> The type of condition-bean.
+ * @author jflute
  */
+@FunctionalInterface
 public interface HpColQyHandler<CB extends ConditionBean> {
 
     /**

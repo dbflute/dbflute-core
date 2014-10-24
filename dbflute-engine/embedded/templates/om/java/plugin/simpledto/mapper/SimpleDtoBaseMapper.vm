@@ -492,7 +492,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
      * @return The determination, true or false.
      */
     protected boolean needsMapping(${myExtendedObjectClassName} dto, Object value, String propName) {
-        Set<String> modifiedProperties = dto.modifiedProperties();
+        Set<String> modifiedProperties = dto.mymodifiedProperties();
         if (modifiedProperties.isEmpty()) {
             return isMappingToEntityContainsNull() || value != null;
         }

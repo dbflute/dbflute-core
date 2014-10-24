@@ -24,7 +24,6 @@ import org.dbflute.Entity;
  */
 public interface PropertyGateway {
 
-    // TODO jflute impl: split in DBMeta, for lambda
     /**
      * Read the property value from the entity.
      * @param entity The target entity to read. (NotNull)

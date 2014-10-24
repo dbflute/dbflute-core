@@ -62,15 +62,15 @@ public class ${myClassName} extends AbstractDBMeta {
     protected final Map<String, PropertyGateway> _epgMap = newHashMap();
     {
 #foreach ($col in $table.columns)
-        setupEpg(_epgMap, new Epg${col.javaName}(), "${col.javaBeansRulePropertyName}");
-#end
-    }
-#foreach ($col in $table.columns)
-#set ($setupperClassName = "Epg${col.javaName}")
+#set ($reader = "et -> ((${myExtendedObjectClassName})et).get${col.javaName}()")
+#set ($writerLambda = "(et, vl) -> ")
+#set ($writerSet = "${writerLambda}((${myExtendedObjectClassName})et).set${col.javaName}")
+#set ($propName = "${col.javaBeansRulePropertyName}")
 #if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
-    public class ${setupperClassName} implements PropertyGateway {
-        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${col.javaName}(); }
-        public void write(Entity et, Object vl) {
+## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## for classification type, needs check and change called methods...
+## - - - - - - - - - -/
+        setupEpg(_epgMap, ${reader}, ${writerLambda}{
             ColumnInfo col = column${col.javaBeansRulePropertyNameInitCap}();
 #if ($col.isCheckSelectedClassification())
             ccls(col, vl);
@@ -94,38 +94,34 @@ public class ${myClassName} extends AbstractDBMeta {
             ((${myExtendedObjectClassName})et).set${col.javaName}((${col.javaNative})vl);
 #end
 #end
-        }
+        }, "${propName}");
 #else
 ## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## for different type between relation (Integer, Long and BigDecimal are prior)
-## - - - - - - - - - -/
-    public static class ${setupperClassName} implements PropertyGateway {
-        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${col.javaName}(); }
-## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+##
 ## number handling might be enough to mapping but use simple name converter for small line
 ## (and for compatible, keep just in case)
 ## - - - - - - - - - -/
 #if ($col.isJavaNativeNumberObject())
 #if ($col.isJavaNativeInteger())
-        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(cti(vl)); }
+        setupEpg(_epgMap, ${reader}, ${writerSet}(cti(vl)), "${propName}");
 #elseif ($col.isJavaNativeLong())
-        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(ctl(vl)); }
+        setupEpg(_epgMap, ${reader}, ${writerSet}(ctl(vl)), "${propName}");
 #elseif ($col.isJavaNativeBigDecimal())
-        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(ctb(vl)); }
+        setupEpg(_epgMap, ${reader}, ${writerSet}(ctb(vl)), "${propName}");
 #else
-        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(ctn(vl, ${col.javaNative}.class)); }
+        setupEpg(_epgMap, ${reader}, ${writerSet}(ctn(vl, ${col.javaNative}.class)), "${propName}");
 #end
 #else
 #if ($col.isJavaNativeUtilList())
-        @SuppressWarnings("unchecked")
-        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}((${col.javaNative})vl); }
+        setupEpg(_epgMap, ${reader}, ${writerSet}((${col.javaNative})vl), "${propName}");
 #else
-        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}((${col.javaNative})vl); }
+        setupEpg(_epgMap, ${reader}, ${writerSet}((${col.javaNative})vl), "${propName}");
+#end
 #end
 #end
 #end
     }
-#end
     public PropertyGateway findPropertyGateway(String prop)
     { return doFindEpg(_epgMap, prop); }
 #if ($table.hasForeignKey() || $table.hasReferrerAsOne())
@@ -134,40 +130,23 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                      Foreign Property
     //                                      ----------------
     protected final Map<String, PropertyGateway> _efpgMap = newHashMap();
-#if ($table.hasForeignKey())
-    {
+## calling method for adding suppress warning
+    { xsetupEfpg(); }
+#if ($table.hasOptionalRelation())
+    @SuppressWarnings("unchecked")
+#end
+    protected void xsetupEfpg() {
 #foreach ($fk in $table.foreignKeys)
-        setupEfpg(_efpgMap, new Efpg${fk.foreignJavaBeansRulePropertyNameInitCap}(), "${fk.foreignJavaBeansRulePropertyName}");
+#set ($reader = "et -> ((${myExtendedObjectClassName})et).get${fk.foreignJavaBeansRulePropertyNameInitCap}()")
+#set ($writer = "(et, vl) -> ((${myExtendedObjectClassName})et).set${fk.foreignJavaBeansRulePropertyNameInitCap}((${fk.foreignPropertyEntityDefinitionType})vl)")
+        setupEfpg(_efpgMap, ${reader}, ${writer}, "${fk.foreignJavaBeansRulePropertyName}");
 #end
-    }
-#foreach ($fk in $table.foreignKeys)
-#set ($setupperClassName = "Efpg${fk.foreignJavaBeansRulePropertyNameInitCap}")
-    public class ${setupperClassName} implements PropertyGateway {
-        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${fk.foreignJavaBeansRulePropertyNameInitCap}(); }
-#if ($fk.isForeignPropertyOptionalEntity())
-        @SuppressWarnings("unchecked")
-#end
-        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${fk.foreignJavaBeansRulePropertyNameInitCap}((${fk.foreignPropertyEntityDefinitionType})vl); }
-    }
-#end
-#end
-#if ($table.hasReferrerAsOne())
-    {
 #foreach ($referrer in $table.referrerAsOneList)
-        setupEfpg(_efpgMap, new Efpg${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(), "${referrer.referrerJavaBeansRulePropertyNameAsOne}");
+#set ($reader = "et -> ((${myExtendedObjectClassName})et).get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}()")
+#set ($writer = "(et, vl) -> ((${myExtendedObjectClassName})et).set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}((${referrer.referrerPropertyEntityDefinitionTypeAsOne})vl)")
+        setupEfpg(_efpgMap, ${reader}, ${writer}, "${referrer.referrerJavaBeansRulePropertyNameAsOne}");
 #end
     }
-#foreach ($referrer in $table.referrerAsOneList)
-#set ($setupperClassName = "Efpg${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}")
-    public class ${setupperClassName} implements PropertyGateway {
-        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(); }
-#if ($referrer.isReferrerPropertyOptionalEntityAsOne())
-        @SuppressWarnings("unchecked")
-#end
-        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}((${referrer.referrerPropertyEntityDefinitionTypeAsOne})vl); }
-    }
-#end
-#end
     public PropertyGateway findForeignPropertyGateway(String prop)
     { return doFindEfpg(_efpgMap, prop); }
 #end

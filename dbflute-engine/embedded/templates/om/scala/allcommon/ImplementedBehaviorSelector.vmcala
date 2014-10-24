@@ -270,7 +270,7 @@ class ${glImplementedBehaviorSelector} extends BehaviorSelector {
      * Assert that the object is not null.
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     protected def assertObjectNotNull(variableName: String, value: Object): Unit = {
         if (variableName == null) {

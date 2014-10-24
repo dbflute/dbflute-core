@@ -115,7 +115,7 @@ public class OptionalProperty<PROP> extends BaseOptional<PROP> {
     /**
      * Get the thing or exception if null.
      * @return The instance of the wrapped thing. (NotNull)
-     * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
+     * @throws EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
      */
     public PROP get() {
         return directlyGet();
@@ -163,8 +163,8 @@ public class OptionalProperty<PROP> extends BaseOptional<PROP> {
      * {@inheritDoc}
      */
     @Override
-    protected <ARG> OptionalProperty<ARG> createOptionalMappedObject(ARG obj) {
-        return new OptionalProperty<ARG>(obj, _thrower);
+    protected <ARG> OptionalThing<ARG> createOptionalMappedObject(ARG obj) {
+        return new OptionalThing<ARG>(obj, _thrower);
     }
 
     /**
@@ -186,7 +186,7 @@ public class OptionalProperty<PROP> extends BaseOptional<PROP> {
     /**
      * Handle the object in the optional property or exception if not present.
      * @param oneArgLambda The callback interface to consume the optional object. (NotNull)
-     * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
+     * @throws EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
      */
     public void alwaysPresent(OptionalThingConsumer<PROP> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);

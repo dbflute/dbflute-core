@@ -1230,8 +1230,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             if (isInlineViewOptimizedCondition(fixedCondition)) {
                 return currentConditionCount;
             }
-            sb.append(ln()).append("    ");
-            sb.append(currentConditionCount > 0 ? " and " : "");
+            if (currentConditionCount > 0) { // basically true from first loop (false if fixedOnlyJoin)
+                sb.append(ln()).append("    ");
+                sb.append(" and ");
+            }
             sb.append(fixedCondition);
             ++currentConditionCount;
         }
@@ -1700,10 +1702,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void assertJoinOnMapNotEmpty(Map<ColumnRealName, ColumnRealName> joinOnMap, String foreignAliasName) {
-        if (joinOnMap.isEmpty()) {
-            String msg = "The joinOnMap should not be empty: foreignAliasName=" + foreignAliasName;
-            throw new IllegalStateException(msg);
-        }
+        // joinOnMap can be empty only when fixedOnlyJoin
+        // though it should be checked when the option is false
+        // it does not have the option info in runtime meta data
+        // and it needs big refactor (but get small joy)
+        // and checked in engine so no check here
+        //if (joinOnMap.isEmpty()) {
+        //    String msg = "The joinOnMap should not be empty: foreignAliasName=" + foreignAliasName;
+        //    throw new IllegalStateException(msg);
+        //}
     }
 
     // ===================================================================================

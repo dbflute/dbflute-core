@@ -28,6 +28,7 @@ package org.dbflute.optional;
  * @author jflute
  * @since 1.1.0 (2014/10/05 Sunday)
  */
+@FunctionalInterface
 public interface OptionalThingNoneProcessor {
 
     /**

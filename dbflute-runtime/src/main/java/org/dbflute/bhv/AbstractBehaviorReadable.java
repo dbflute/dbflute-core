@@ -251,7 +251,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      * Assert that the entity is not deleted.
      * @param entity Selected entity. (NullAllowed)
      * @param searchKey Search-key for logging.
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @throws org.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      */
     protected void assertEntityNotDeleted(Entity entity, Object searchKey) {
         if (entity == null) {
@@ -263,7 +263,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      * Assert that the entity is not deleted.
      * @param ls Selected list. (NullAllowed)
      * @param searchKey Search-key for logging. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException
+     * @throws org.dbflute.exception.EntityAlreadyDeletedException
      */
     protected void assertEntityNotDeleted(List<? extends Entity> ls, Object searchKey) {
         if (ls == null || ls.isEmpty()) {
@@ -275,8 +275,8 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      * Assert that the entity is selected as one.
      * @param ls Selected list. (NotNull)
      * @param searchKey Search-key for logging. (NotNull)
-     * @exception org.dbflute.exception.EntityAlreadyDeletedException
-     * @exception org.dbflute.exception.EntityDuplicatedException
+     * @throws org.dbflute.exception.EntityAlreadyDeletedException
+     * @throws org.dbflute.exception.EntityDuplicatedException
      */
     protected void assertEntitySelectedAsOne(List<? extends Entity> ls, Object searchKey) {
         if (ls == null || ls.isEmpty()) {
@@ -1732,7 +1732,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      * Assert that the object is not null.
      * @param variableName The variable name for message. (NotNull)
      * @param value The value the checked variable. (NotNull)
-     * @exception IllegalArgumentException When the variable name or the variable is null.
+     * @throws IllegalArgumentException When the variable name or the variable is null.
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {

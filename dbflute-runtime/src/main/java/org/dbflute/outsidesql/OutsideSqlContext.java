@@ -190,7 +190,7 @@ public class OutsideSqlContext {
      * @param sqlFileEncoding The encoding of SQL file. (NotNull)
      * @param dbmsSuffix The suffix of DBMS. (NotNull)
      * @return The filtered outside-SQL. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the SQL is not found.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the SQL is not found.
      */
     public String readFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) { // entry here
         String sql = readPlainOutsideSql(sqlFileEncoding, dbmsSuffix);
@@ -242,7 +242,7 @@ public class OutsideSqlContext {
      * @param sqlFileEncoding The encoding of SQL file. (NotNull)
      * @param dbmsSuffix The suffix of DBMS. (NotNull)
      * @return The text of SQL. (NotNull)
-     * @exception org.dbflute.exception.OutsideSqlNotFoundException When the SQL is not found.
+     * @throws org.dbflute.exception.OutsideSqlNotFoundException When the SQL is not found.
      */
     protected String readPlainOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
         final String standardPath = _outsideSqlPath;

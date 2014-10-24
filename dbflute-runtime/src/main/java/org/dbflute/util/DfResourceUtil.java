@@ -361,7 +361,7 @@ public class DfResourceUtil {
      * Assert that the object is not null.
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     protected static void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {

@@ -97,6 +97,7 @@ import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.dbflute.helper.function.IndependentProcessor;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ShortCharHandlingMode;
@@ -428,6 +429,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 foreignRelationPath);
     }
 
+    @FunctionalInterface
     public static interface NssCall { // very internal
         public ConditionQuery qf();
     }
@@ -2881,6 +2883,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
+    protected void lockCall(IndependentProcessor noArgInLambda) {
+        lock();
+        try {
+            noArgInLambda.process();
+        } finally {
+            unlock();
+        }
+    }
+
     protected void lock() {
         xgetSqlClause().lock();
     }
@@ -2956,7 +2967,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * Assert that the object is not null.
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
@@ -2972,7 +2983,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * Assert that the column-name is not null and is not empty and does not contain comma.
      * @param columnName Column-name. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     protected void assertColumnName(String columnName) {
         if (columnName == null) {
@@ -2992,7 +3003,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * Assert that the alias-name is not null and is not empty and does not contain comma.
      * @param aliasName Alias-name. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     protected void assertAliasName(String aliasName) {
         if (aliasName == null) {

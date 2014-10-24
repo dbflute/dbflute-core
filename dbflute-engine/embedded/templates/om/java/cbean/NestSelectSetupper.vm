@@ -16,9 +16,6 @@
 ${database.allClassCopyright}package ${glPackageNss};
 #set ($myClassName = "${myNestSelectSetupperClassName}")
 
-#if ($table.hasJoinableForeignKeyOrReferrerAsOne())
-import org.dbflute.cbean.ConditionQuery;
-#end
 import ${glPackageCQ}.${myConditionQueryClassName};
 
 /**
@@ -62,8 +59,12 @@ public class ${myClassName} {
      * @deprecated ${fk.deprecated}
 #end
      */
+#if ($fk.isDeprecatedRelation())
+## deprecated in lambda needs to be suppressed at Eclipse-4.4
+    @SuppressWarnings("deprecation")
+#end
     public ${setupSelectReturnType} with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
-        _query.xdoNss(new ${myConditionQueryClassName}.NssCall() { public ConditionQuery qf() { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
+        _query.xdoNss(() -> _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
 #if ($hasNestSelectSetupper)
         return new ${fk.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
 #end
@@ -86,7 +87,7 @@ public class ${myClassName} {
 #end
      */
     public ${setupSelectReturnType} with${tmpPropertyNameInitCap}() {
-        _query.xdoNss(new ${myConditionQueryClassName}.NssCall() { public ConditionQuery qf() { return _query.query${tmpPropertyNameInitCap}(); }});
+        _query.xdoNss(() -> _query.query${tmpPropertyNameInitCap}());
 #if ($hasNestSelectSetupper)
         return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
 #end

@@ -9,4 +9,3 @@ cd ../dbflute-test-active-dockside/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh regenerate
 cd ..
-mvn -e compile

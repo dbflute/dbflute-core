@@ -28,9 +28,8 @@ import org.dbflute.dbmeta.property.PropertyMethodFinder;
 public class MockColumnInfo extends ColumnInfo {
 
     public MockColumnInfo() {
-        super(new MockDBMeta(), "mock", "mock", null, "mock", Integer.class, "mock", Integer.class, true, false, true,
-                "INTEGER", 3, 0, null, false, OptimisticLockType.NONE, "mock", null, null, null,
-                createPropertyMethodFinder());
+        super(new MockDBMeta(), "mock", "mock", null, "mock", Integer.class, "mock", Integer.class, true, false, true, "INTEGER", 3, 0,
+                null, false, OptimisticLockType.NONE, "mock", null, null, null, createPropertyMethodFinder());
     }
 
     protected static PropertyMethodFinder createPropertyMethodFinder() {

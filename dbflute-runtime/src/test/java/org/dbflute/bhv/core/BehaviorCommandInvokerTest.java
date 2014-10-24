@@ -95,8 +95,7 @@ public class BehaviorCommandInvokerTest extends RuntimeTestCase {
             }
 
             @Override
-            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
-                    long before, long after) {
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
                 markList.add("logReturn");
                 log("before=" + before + ", after=" + after);
                 assertTrue(before > 0);
@@ -171,8 +170,7 @@ public class BehaviorCommandInvokerTest extends RuntimeTestCase {
             }
 
             @Override
-            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
-                    long before, long after) {
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
                 throw new IllegalStateException("logReturn() should not be called!");
             }
 
@@ -247,8 +245,7 @@ public class BehaviorCommandInvokerTest extends RuntimeTestCase {
             }
 
             @Override
-            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
-                    long before, long after) {
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
                 throw new IllegalStateException("logReturn() should not be called!");
             }
         };
@@ -317,8 +314,7 @@ public class BehaviorCommandInvokerTest extends RuntimeTestCase {
             }
 
             @Override
-            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
-                    long before, long after) {
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
                 throw new IllegalStateException("logReturn should not be called!");
             }
         };
@@ -395,8 +391,7 @@ public class BehaviorCommandInvokerTest extends RuntimeTestCase {
         }
     }
 
-    protected Callable<List<SqlExecution>> createTestCallable(final BehaviorCommandInvoker invoker,
-            final ExecutionCreationCount count) {
+    protected Callable<List<SqlExecution>> createTestCallable(final BehaviorCommandInvoker invoker, final ExecutionCreationCount count) {
         return new Callable<List<SqlExecution>>() {
             public List<SqlExecution> call() {
                 SqlExecutionCreator creator = new SqlExecutionCreator() {
@@ -492,8 +487,8 @@ public class BehaviorCommandInvokerTest extends RuntimeTestCase {
         };
         final HashSet<String> markSet = new HashSet<String>();
         try {
-            SqlLogInfo sqlLogInfo = new SqlLogInfo(mockCmd, "select ...", new Object[] {}, new Class<?>[] {},
-                    new SqlLogDisplaySqlBuilder() {
+            SqlLogInfo sqlLogInfo =
+                    new SqlLogInfo(mockCmd, "select ...", new Object[] {}, new Class<?>[] {}, new SqlLogDisplaySqlBuilder() {
                         public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
                             return "select ...";
                         }
@@ -542,12 +537,11 @@ public class BehaviorCommandInvokerTest extends RuntimeTestCase {
             }
         };
         final HashSet<String> markSet = new HashSet<String>();
-        SqlLogInfo sqlLogInfo = new SqlLogInfo(mockCmd, "select ...", new Object[] {}, new Class<?>[] {},
-                new SqlLogDisplaySqlBuilder() {
-                    public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
-                        return "select ...";
-                    }
-                });
+        SqlLogInfo sqlLogInfo = new SqlLogInfo(mockCmd, "select ...", new Object[] {}, new Class<?>[] {}, new SqlLogDisplaySqlBuilder() {
+            public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
+                return "select ...";
+            }
+        });
         InternalMapContext.setResultSqlLogInfo(sqlLogInfo);
         try {
             // ## Act & Assert ##

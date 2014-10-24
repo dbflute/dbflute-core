@@ -97,7 +97,7 @@ public class LikeSearchOptionTest extends RuntimeTestCase {
         final LikeSearchOption option = new LikeSearchOption();
 
         // ## Act ##
-        option.splitByBlank(3);
+        option.splitByBlank().cutSplit(3);
         List<String> actual = Arrays.asList(option.generateSplitValueArray("FOO B　AR\tQU\rX\nQUU\r\nX"));
 
         // ## Assert ##

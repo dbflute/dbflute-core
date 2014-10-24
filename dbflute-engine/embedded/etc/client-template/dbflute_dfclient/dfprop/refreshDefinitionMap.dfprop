@@ -13,7 +13,7 @@
 # *The line that starts with '#' means comment-out.
 #
 map:{
-    ; projectName = @projectName@
+    ; projectName = $$AutoDetect$$
     ; requestUrl = http://localhost:8386/
 }
 # ----------------/

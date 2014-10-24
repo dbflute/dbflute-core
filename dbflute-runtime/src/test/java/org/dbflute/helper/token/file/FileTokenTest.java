@@ -388,9 +388,7 @@ public class FileTokenTest extends RuntimeTestCase {
                         writer.writeRow(valueList);
                     }
                 }
-            },
-                    new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally()
-                            .headerInfo(columnNameList));
+            }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally().headerInfo(columnNameList));
 
             // ## Assert ##
             fail();
@@ -436,8 +434,9 @@ public class FileTokenTest extends RuntimeTestCase {
                     writer.writeRow(valueList);
                 }
             }
-        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally()
-                .suppressValueCountCheck().headerInfo(columnNameList));
+        },
+                new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally().suppressValueCountCheck()
+                        .headerInfo(columnNameList));
 
         // ## Assert ##
         String actual = ous.toString();

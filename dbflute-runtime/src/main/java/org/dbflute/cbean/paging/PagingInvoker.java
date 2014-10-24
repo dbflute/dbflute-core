@@ -53,8 +53,8 @@ public class PagingInvoker<ENTITY> {
      * Invoke select-page by handler.
      * @param handler The handler of paging. (NotNull)
      * @return The result bean of paging. (NotNull)
-     * @exception org.dbflute.exception.PagingStatusInvalidException When the paging status is invalid.
-     * @exception org.dbflute.exception.PagingOverSafetySizeException When the paging is over safety size.
+     * @throws org.dbflute.exception.PagingStatusInvalidException When the paging status is invalid.
+     * @throws org.dbflute.exception.PagingOverSafetySizeException When the paging is over safety size.
      */
     public PagingResultBean<ENTITY> invokePaging(PagingHandler<ENTITY> handler) {
         assertObjectNotNull("handler", handler);
@@ -280,7 +280,7 @@ public class PagingInvoker<ENTITY> {
      * Assert that the object is not null.
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {

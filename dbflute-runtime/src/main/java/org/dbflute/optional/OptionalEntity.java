@@ -224,7 +224,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * }
      * </pre>
      * @return The entity instance wrapped in this optional object. (NotNull)
-     * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     * @throws EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
      */
     public ENTITY get() {
         return directlyGet();
@@ -329,7 +329,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * });
      * </pre>
      * @param entityLambda The callback interface to consume the optional value. (NotNull)
-     * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     * @throws EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
      */
     public void alwaysPresent(OptionalThingConsumer<ENTITY> entityLambda) {
         assertEntityLambdaNotNull(entityLambda);
@@ -348,7 +348,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     /**
      * Handle the entity in the optional object or exception if not present.
      * @param entityLambda The callback interface to consume the optional value. (NotNull)
-     * @exception EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
+     * @throws EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
      * @deprecated use alwaysPresent(), this is old style
      */
     public void required(OptionalThingConsumer<ENTITY> entityLambda) {

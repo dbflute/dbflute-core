@@ -120,27 +120,26 @@ public class TnRelationRowOptionalHandler {
     protected void throwRelationEntityNotFoundException(Object row, String propertyName, DBMeta localDBMeta, ConditionBean cb,
             String outsideSqlPath, Object parameterBean) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The relation entity was NOT found.");
+        br.addNotice("Not found the relation entity.");
         br.addItem("Advice");
         br.addElement("Confirm the existence in your business rule.");
-        br.addElement("If the relation entity might not exist, ...");
+        br.addElement("If the relation entity might not exist, check it.");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.setupSelect_MemberServiceAsOne();");
-        br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
+        br.addElement("    List<Member> memberList = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.setupSelect_MemberServiceAsOne();");
+        br.addElement("    });");
         br.addElement("    for (Member member : memberList) {");
-        br.addElement("        ... = member.getMemberServiceAsOne().get()...; // *No");
+        br.addElement("        ... = member.getMemberServiceAsOne().alwaysPresent(...); // *No");
         br.addElement("    }");
         br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.setupSelect_MemberServiceAsOne();");
-        br.addElement("    List<Member> memberList = memberBhv.selectList(cb);");
+        br.addElement("    List<Member> memberList = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.setupSelect_MemberServiceAsOne();");
+        br.addElement("    });");
         br.addElement("    for (Member member : memberList) {");
-        br.addElement("        member.getMemberServiceAsOne().ifPresent(service -> {");
-        br.addElement("            ... = service.getServicePointCount(); // OK");
+        br.addElement("        member.getMemberServiceAsOne().ifPresent(service -> {  // OK");
+        br.addElement("            ... = service.getServicePointCount();");
         br.addElement("        });");
-        br.addElement("        // and you can use isPresent(), map(), orElseNull(), ...");
         br.addElement("    }");
         br.addItem("Your Operation");
         final String localTable = localDBMeta.getTableDbName();
@@ -151,7 +150,24 @@ public class TnRelationRowOptionalHandler {
         } else {
             localSuffix = "{" + row + "}";
         }
-        br.addElement(localTable + ":" + localSuffix + " -> " + propertyName);
+        br.addElement(localTable + ":" + localSuffix + " => " + propertyName);
+        if (row instanceof Entity) { // basically here
+            final Entity entity = ((Entity) row);
+            br.addItem("Local Entity");
+            try {
+                br.addElement(entity.toStringWithRelation());
+            } catch (RuntimeException continued) {
+                final String tableDbName = entity.getTableDbName();
+                final String msg = "*Failed to build string from the entity for debug: " + tableDbName;
+                if (_log.isDebugEnabled()) {
+                    _log.debug(msg);
+                }
+                br.addElement(msg);
+            }
+        } else {
+            br.addItem("Local Entity");
+            br.addElement(row);
+        }
         // cannot get it because this exception is after behavior command
         // (thread locals are destroyed at that time)
         //final InvokePathProvider invokePathProvider = InternalMapContext.getInvokePathProvider();
@@ -161,15 +177,17 @@ public class TnRelationRowOptionalHandler {
         //    br.addElement(invokePath);
         //}
         if (cb != null) {
+            br.addItem("ConditionBean");
             try {
                 final String displaySql = cb.toDisplaySql();
-                br.addItem("ConditionBean");
                 br.addElement(displaySql);
             } catch (RuntimeException continued) {
+                final String tableDbName = cb.getTableDbName();
+                final String msg = "*Failed to get display SQL from the condition-bean for debug: " + tableDbName;
                 if (_log.isDebugEnabled()) {
-                    final String tableDbName = cb.getTableDbName();
-                    _log.debug("Failed to get display SQL from the condition-bean for debug: " + tableDbName);
+                    _log.debug(msg);
                 }
+                br.addElement(msg);
             }
         }
         if (outsideSqlPath != null) {

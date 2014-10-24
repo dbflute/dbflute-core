@@ -55,8 +55,7 @@ public class DfOutsideSqlPropertiesTest extends EngineTestCase {
         final DfOutsideSqlProperties prop = new DfOutsideSqlProperties(new Properties());
 
         // ## Act ##
-        final String actual = prop
-                .resolveSqlPackageFileSeparatorWithFlatDirectory("abc.def.ghi.dbflute", "ghi.dbflute");
+        final String actual = prop.resolveSqlPackageFileSeparatorWithFlatDirectory("abc.def.ghi.dbflute", "ghi.dbflute");
 
         // ## Assert ##
         log(actual);

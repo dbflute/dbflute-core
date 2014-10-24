@@ -115,7 +115,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
     /**
      * Get the thing or exception if null.
      * @return The instance of the wrapped thing. (NotNull)
-     * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
+     * @throws EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
      */
     public THING get() {
         return directlyGet();
@@ -186,7 +186,7 @@ public class OptionalThing<THING> extends BaseOptional<THING> {
     /**
      * Handle the object in the optional thing or exception if not present.
      * @param oneArgLambda The callback interface to consume the optional object. (NotNull)
-     * @exception EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
+     * @throws EntityAlreadyDeletedException When the object instance wrapped in this optional object is null, which means object has already been deleted (point is not found).
      */
     public void alwaysPresent(OptionalThingConsumer<THING> oneArgLambda) {
         assertOneArgLambdaNotNull(oneArgLambda);

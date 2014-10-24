@@ -40,8 +40,11 @@ import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
 import org.dbflute.dbmeta.info.UniqueInfo;
+import org.dbflute.dbmeta.property.DelegatingPropertyGateway;
 import org.dbflute.dbmeta.property.PropertyGateway;
 import org.dbflute.dbmeta.property.PropertyMethodFinder;
+import org.dbflute.dbmeta.property.PropertyReader;
+import org.dbflute.dbmeta.property.PropertyWriter;
 import org.dbflute.exception.DBMetaNotFoundException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -121,7 +124,14 @@ public abstract class AbstractDBMeta implements DBMeta {
     // -----------------------------------------------------
     //                                       Column Property
     //                                       ---------------
-    protected void setupEpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway, String propertyName) {
+    // old style for 1.0.x
+    //protected void setupEpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway, String propertyName) {
+    //    propertyGatewayMap.put(propertyName, gateway); // the map should be plain map for performance
+    //}
+
+    protected void setupEpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyReader reader, PropertyWriter writer,
+            String propertyName) {
+        final DelegatingPropertyGateway gateway = new DelegatingPropertyGateway(reader, writer);
         propertyGatewayMap.put(propertyName, gateway); // the map should be plain map for performance
     }
 
@@ -136,7 +146,14 @@ public abstract class AbstractDBMeta implements DBMeta {
     // -----------------------------------------------------
     //                                      Foreign Property
     //                                      ----------------
-    protected void setupEfpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway, String foreignPropertyName) {
+    // old style for 1.0.x
+    //protected void setupEfpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway, String foreignPropertyName) {
+    //    propertyGatewayMap.put(foreignPropertyName, gateway); // the map should be plain map for performance
+    //}
+
+    protected void setupEfpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyReader reader, PropertyWriter writer,
+            String foreignPropertyName) {
+        final DelegatingPropertyGateway gateway = new DelegatingPropertyGateway(reader, writer);
         propertyGatewayMap.put(foreignPropertyName, gateway); // the map should be plain map for performance
     }
 

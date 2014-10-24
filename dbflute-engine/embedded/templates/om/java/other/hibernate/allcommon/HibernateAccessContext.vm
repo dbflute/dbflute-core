@@ -73,7 +73,7 @@ public class ${glAccessContext} {
     /**
      * Get access user on thread.
      * @return Access user. (NotNull)
-     * @exception IllegalStateException When it couldn't get access user.
+     * @throws IllegalStateException When it couldn't get access user.
      */
     public static String getAccessUserOnThread() {
         if (isExistAccessContextOnThread()) {
@@ -95,7 +95,7 @@ public class ${glAccessContext} {
     /**
      * Get access process on thread.
      * @return Access process. (NotNull)
-     * @exception IllegalStateException When it couldn't get access process.
+     * @throws IllegalStateException When it couldn't get access process.
      */
     public static String getAccessProcessOnThread() {
         if (isExistAccessContextOnThread()) {
@@ -117,7 +117,7 @@ public class ${glAccessContext} {
     /**
      * Get access module on thread.
      * @return Access module. (NotNull)
-     * @exception IllegalStateException When it couldn't get access module.
+     * @throws IllegalStateException When it couldn't get access module.
      */
     public static String getAccessModuleOnThread() {
         if (isExistAccessContextOnThread()) {
@@ -178,7 +178,7 @@ public class ${glAccessContext} {
      * Get access value on thread.
      * @param key Key. (NotNull)
      * @return Access value. (NullAllowed: If the key has null value, it returns null)
-     * @exception IllegalStateException When it couldn't get access value.
+     * @throws IllegalStateException When it couldn't get access value.
      */
     public static Object getAccessValueOnThread(String key) {
         if (isExistAccessContextOnThread()) {
