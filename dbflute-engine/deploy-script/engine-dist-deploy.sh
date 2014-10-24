@@ -11,13 +11,22 @@ export answer=y
 
 cd ../dbflute-test-active-dockside/dbflute_maihamadb
 rm ./log/*.log
-. manage.sh renewal
+. manage.sh replace-schema
+. manage.sh jdbc
+. manage.sh doc
+. manage.sh generate
+. manage.sh sql2entity
+. manage.sh outside-sql-test
 cd ..
 mvn -e compile
 
 cd ../dbflute-test-active-hanger/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
+. manage.sh load-data-reverse
+. manage.sh freegen
+. diffworld-test.sh
+. syncworld-test.sh
 cd ..
 mvn -e compile
 
