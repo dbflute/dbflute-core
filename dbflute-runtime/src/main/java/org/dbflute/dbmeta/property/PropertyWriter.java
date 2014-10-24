@@ -18,18 +18,12 @@ package org.dbflute.dbmeta.property;
 import org.dbflute.Entity;
 
 /**
- * The interface of property gateway.
+ * The interface of property writing.
  * @author jflute
- * @since 0.9.9.3D (2012/03/26 Monday)
+ * @since 1.1.0 (2014/10/24 Friday)
  */
-public interface PropertyGateway {
-
-    /**
-     * Read the property value from the entity.
-     * @param entity The target entity to read. (NotNull)
-     * @return The read value. (NullAllowed)
-     */
-    Object read(Entity entity);
+@FunctionalInterface
+public interface PropertyWriter {
 
     /**
      * Write the property value to the entity.

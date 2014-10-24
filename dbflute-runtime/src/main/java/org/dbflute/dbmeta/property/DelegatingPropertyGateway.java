@@ -20,21 +20,25 @@ import org.dbflute.Entity;
 /**
  * The interface of property gateway.
  * @author jflute
- * @since 0.9.9.3D (2012/03/26 Monday)
+ * @since 1.1.0 (2014/10/24 Friday)
  */
-public interface PropertyGateway {
+public class DelegatingPropertyGateway implements PropertyGateway {
 
-    /**
-     * Read the property value from the entity.
-     * @param entity The target entity to read. (NotNull)
-     * @return The read value. (NullAllowed)
-     */
-    Object read(Entity entity);
+    protected final PropertyReader _reader;
+    protected final PropertyWriter _writer;
 
-    /**
-     * Write the property value to the entity.
-     * @param entity The target entity to write. (NotNull)
-     * @param value The written value. (NullAllowed)
-     */
-    void write(Entity entity, Object value);
+    public DelegatingPropertyGateway(PropertyReader reader, PropertyWriter writer) {
+        _reader = reader;
+        _writer = writer;
+    }
+
+    /** {@inheritDoc} */
+    public Object read(Entity entity) {
+        return _reader.read(entity);
+    }
+
+    /** {@inheritDoc} */
+    public void write(Entity entity, Object value) {
+        _writer.write(entity, value);
+    }
 }
