@@ -428,6 +428,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 foreignRelationPath);
     }
 
+    @FunctionalInterface
     public static interface NssCall { // very internal
         public ConditionQuery qf();
     }

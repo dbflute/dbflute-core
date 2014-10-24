@@ -24,6 +24,7 @@ import org.dbflute.cbean.scoping.SubQuery;
  * @param <CB> The type of condition-bean.
  * @author jflute
  */
+@FunctionalInterface
 public interface HpQDRSetupper<CB extends ConditionBean> {
 
     /**

@@ -26,6 +26,7 @@ import org.dbflute.cbean.scoping.SubQuery;
  * @param <LOCAL_CQ> The type of local condition-query.
  * @author jflute
  */
+@FunctionalInterface
 public interface HpSDRSetupper<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> {
 
     /**

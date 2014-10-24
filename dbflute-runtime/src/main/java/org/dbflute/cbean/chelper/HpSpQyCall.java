@@ -24,6 +24,7 @@ import org.dbflute.cbean.ConditionQuery;
  */
 public interface HpSpQyCall<CQ extends ConditionQuery> {
 
+    // TODO jflute impl: delegating
     /**
      * Does it have its own query?
      * @return The determination, true or false.
