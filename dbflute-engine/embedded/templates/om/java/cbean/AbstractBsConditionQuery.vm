@@ -494,11 +494,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
-        return xcQDRFunc(new HpQDRSetupper<${relatedCBClassName}>() {
-            public void setup(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
-                xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
-            }
-        });
+        return xcQDRFunc((fn, sq, rd, vl, op) -> xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op));
     }
     public void xqderive${referrer.referrerPropertyNameInitCap}(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
         assertObjectNotNull("subQuery", sq);
@@ -873,11 +869,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
-        return xcQDRFunc(new HpQDRSetupper<${relatedCBClassName}>() {
-            public void setup(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
-                xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op);
-            }
-        });
+        return xcQDRFunc((fn, sq, rd, vl, op) -> xqderive${referrer.referrerPropertyNameInitCap}(fn, sq, rd, vl, op));
     }
     public void xqderive${referrer.referrerPropertyNameInitCap}(String fn, SubQuery<${relatedCBClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
         assertObjectNotNull("subQuery", sq);
