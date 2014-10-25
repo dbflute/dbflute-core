@@ -852,11 +852,21 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
         val cm: String = ",  ";
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
-        if (${foreignVariableName} != null) { sb.append(cm).append("${fk.foreignPropertyName}"); }
+#if ($fk.isForeignPropertyOptionalEntity())
+        if (${foreignVariableName} != null && ${foreignVariableName}.isEmpty)
+#else
+        if (${foreignVariableName} != null)
+#end
+        { sb.append(cm).append("${fk.foreignPropertyName}"); }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-        if (${referrerVariableName} != null) { sb.append(cm).append("${referrer.referrerPropertyNameAsOne}"); }
+#if ($referrer.isReferrerPropertyOptionalEntityAsOne())
+        if (${referrerVariableName} != null && ${referrerVariableName}.isEmpty)
+#else
+        if (${referrerVariableName} != null)
+#end
+        { sb.append(cm).append("${referrer.referrerPropertyNameAsOne}"); }
 #end
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
