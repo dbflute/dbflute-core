@@ -17,6 +17,9 @@ package org.dbflute.twowaysql;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.TimeZone;
 
@@ -226,9 +229,15 @@ public class DisplaySqlBuilder {
             return quote(bindVariable.toString());
         } else if (bindVariable instanceof Number) {
             return bindVariable.toString();
-        } else if (bindVariable instanceof Timestamp) {
+        } else if (bindVariable instanceof LocalDate) { // #dateParade
+            return buildLocalDateText(bindVariable);
+        } else if (bindVariable instanceof LocalDateTime) {
+            return buildLocalDateTimeText(bindVariable);
+        } else if (bindVariable instanceof LocalTime) {
+            return buildLocalTimeText(bindVariable);
+        } else if (bindVariable instanceof Timestamp) { // should be before util.Date
             return buildTimestampText(bindVariable);
-        } else if (bindVariable instanceof Time) {
+        } else if (bindVariable instanceof Time) { // should be before util.Date
             return buildTimeText(bindVariable);
         } else if (bindVariable instanceof java.util.Date) {
             return buildDateText(bindVariable);
@@ -244,27 +253,33 @@ public class DisplaySqlBuilder {
     // ===================================================================================
     //                                                                       Date Handling
     //                                                                       =============
-    protected String buildTimestampText(Object bindVariable) {
-        final String realPattern = getTimestampPattern();
-        final java.util.Date date = (java.util.Date) bindVariable;
-        return processDateDisplay(date, realPattern);
+    protected String buildLocalDateText(Object bindVariable) {
+        return processDateDisplay(DfTypeUtil.toDate((LocalDate) bindVariable, getTimeZone()), getLocalDatePattern());
     }
 
-    protected String buildTimeText(Object bindVariable) {
-        final String realPattern = getTimePattern();
-        final java.util.Date date = (java.util.Date) bindVariable;
-        return quote(DfTypeUtil.toString(date, realPattern));
+    protected String buildLocalDateTimeText(Object bindVariable) {
+        return processDateDisplay(DfTypeUtil.toDate((LocalDateTime) bindVariable, getTimeZone()), getLocalDateTimePattern());
+    }
+
+    protected String buildLocalTimeText(Object bindVariable) {
+        return processDateDisplay(DfTypeUtil.toDate((LocalTime) bindVariable, getTimeZone()), getLocalTimePattern());
     }
 
     protected String buildDateText(Object bindVariable) {
-        final String realPattern = getDatePattern();
-        final java.util.Date date = (java.util.Date) bindVariable;
-        return processDateDisplay(date, realPattern);
+        return processDateDisplay((java.util.Date) bindVariable, getDatePattern());
+    }
+
+    protected String buildTimestampText(Object bindVariable) {
+        return processDateDisplay((java.util.Date) bindVariable, getTimestampPattern());
+    }
+
+    protected String buildTimeText(Object bindVariable) {
+        return quote(DfTypeUtil.toString((java.util.Date) bindVariable, getTimePattern()));
     }
 
     protected String processDateDisplay(java.util.Date date, String format) {
         final DateFormatResource resource = analyzeDateFormat(format);
-        String disp = DfTypeUtil.toStringDate(date, resource.getFormat(), getTimeZone());
+        String disp = DfTypeUtil.toDispDate(date, resource.getFormat(), getTimeZone());
         if (isBCPrefixTarget(date, resource)) {
             // fixed specification, basically not use 'G'
             // in pattern at least default pattern
@@ -277,6 +292,21 @@ public class DisplaySqlBuilder {
     // -----------------------------------------------------
     //                                         Style Pattern
     //                                         -------------
+    protected String getLocalDatePattern() {
+        final String datePattern = _dateDisplayStyle.getDatePattern();
+        return datePattern != null ? datePattern : DEFAULT_DATE_FORMAT;
+    }
+
+    protected String getLocalDateTimePattern() {
+        final String datePattern = _dateDisplayStyle.getTimestampPattern();
+        return datePattern != null ? datePattern : DEFAULT_TIMESTAMP_FORMAT;
+    }
+
+    protected String getLocalTimePattern() {
+        final String datePattern = _dateDisplayStyle.getTimePattern();
+        return datePattern != null ? datePattern : DEFAULT_TIME_FORMAT;
+    }
+
     protected String getDatePattern() {
         final String datePattern = _dateDisplayStyle.getDatePattern();
         return datePattern != null ? datePattern : DEFAULT_DATE_FORMAT;
@@ -294,7 +324,11 @@ public class DisplaySqlBuilder {
 
     protected TimeZone getTimeZone() {
         final BoundDateDisplayTimeZoneProvider provider = _dateDisplayStyle.getTimeZoneProvider();
-        return provider != null ? provider.provide() : DBFluteSystem.getFinalTimeZone();
+        return provider != null ? provider.provide() : getDBFluteSystemFinalTimeZone();
+    }
+
+    protected TimeZone getDBFluteSystemFinalTimeZone() {
+        return DBFluteSystem.getFinalTimeZone();
     }
 
     // -----------------------------------------------------
@@ -322,13 +356,13 @@ public class DisplaySqlBuilder {
     protected DateFormatResource analyzeDateFormat(String format) {
         final DateFormatResource resource = new DateFormatResource();
         final String dfMark = "$df:{";
-        final int dfMarkBeginIndex = format.indexOf(dfMark);
-        if (dfMarkBeginIndex >= 0) {
-            final String rear = format.substring(dfMarkBeginIndex + dfMark.length());
+        final int dfmarkBeginIndex = format.indexOf(dfMark);
+        if (dfmarkBeginIndex >= 0) {
+            final String rear = format.substring(dfmarkBeginIndex + dfMark.length());
             final int dfMarkEndIndex = rear.indexOf("}");
             if (dfMarkEndIndex >= 0) {
                 resource.setFormat(rear.substring(0, dfMarkEndIndex));
-                resource.setPrefix(format.substring(0, dfMarkBeginIndex));
+                resource.setPrefix(format.substring(0, dfmarkBeginIndex));
                 resource.setSuffix(rear.substring(dfMarkEndIndex + "}".length()));
                 return resource;
             }

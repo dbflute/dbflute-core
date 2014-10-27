@@ -19,6 +19,7 @@ package org.dbflute.system.provider;
  * @author jflute
  * @since 1.1.0 (2014/09/29 Monday)
  */
+@FunctionalInterface
 public interface DfCurrentDateProvider {
 
     /**

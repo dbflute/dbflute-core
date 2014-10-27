@@ -16,6 +16,7 @@
 package org.dbflute.cbean.coption;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.dbflute.dbway.ExtensionOperand;
 import org.dbflute.dbway.OnQueryStringConnector;
+import org.dbflute.helper.HandyDate;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
@@ -272,9 +274,51 @@ public class FromToOption implements ConditionOption {
         return this;
     }
 
+    public boolean isUsePattern() { // basically for framework
+        return _usePattern;
+    }
+
     // -----------------------------------------------------
     //                                            Begin Year
     //                                            ----------
+    /**
+     * Begin year from the specified month. <br />
+     * The date of argument is used as only the month part.
+     * <pre>
+     * e.g. beginYear_Month(toLocalDate("2001/04/01"))
+     *  year is from 4th month to 3rd month of next year
+     *  (the 2011 year means 2011/04/01 to 2012/03/31)
+     * 
+     * e.g. option.compareAsYear().beginYear_Month(toLocalDate("2001/04/01"))
+     *  if from-date is 2011/01/01 and to-date is 2012/01/01 (means 2011, 2012 year are target),
+     *  the condition is: greater-equal 2011/04/01 and less-than 2013/04/04
+     * </pre>
+     * @param yearBeginMonth The local date that has the month of year-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public FromToOption beginYear_Month(LocalDate yearBeginMonth) { // #dateParade
+        return doBeginYear_Month(toDate(yearBeginMonth));
+    }
+
+    /**
+     * Begin year from the specified month. <br />
+     * The date of argument is used as only the month part.
+     * <pre>
+     * e.g. beginYear_Month(toLocalDateTime("2001/04/01"))
+     *  year is from 4th month to 3rd month of next year
+     *  (the 2011 year means 2011/04/01 to 2012/03/31)
+     * 
+     * e.g. option.compareAsYear().beginYear_Month(toLocalDateTime("2001/04/01"))
+     *  if from-date is 2011/01/01 and to-date is 2012/01/01 (means 2011, 2012 year are target),
+     *  the condition is: greater-equal 2011/04/01 and less-than 2013/04/04
+     * </pre>
+     * @param yearBeginMonth The local date-time that has the month of year-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public FromToOption beginYear_Month(LocalDateTime yearBeginMonth) {
+        return doBeginYear_Month(toDate(yearBeginMonth));
+    }
+
     /**
      * Begin year from the specified month. <br />
      * The date of argument is used as only the month part.
@@ -291,11 +335,13 @@ public class FromToOption implements ConditionOption {
      * @return this. (NotNull)
      */
     public FromToOption beginYear_Month(Date yearBeginMonth) {
+        return doBeginYear_Month(yearBeginMonth);
+    }
+
+    protected FromToOption doBeginYear_Month(Date yearBeginMonth) {
         assertPatternOptionValid("beginYear_Month");
         assertArgumentNotNull("yearBeginMonth", yearBeginMonth);
-        final Calendar cal = Calendar.getInstance();
-        cal.setTime(yearBeginMonth);
-        _yearBeginMonth = cal.get(Calendar.MONTH) + 1; // zero origin headache
+        _yearBeginMonth = toHandyDate(yearBeginMonth).getMonthAsOneOrigin();
         return this;
     }
 
@@ -468,6 +514,44 @@ public class FromToOption implements ConditionOption {
      * Begin month from the specified day. <br />
      * The date of argument is used as only the day part.
      * <pre>
+     * e.g. beginMonth_Day(toLocalDate("2001/01/03"))
+     *  month is from 3 day to 2 day of next month
+     *  (the 2011/11 means 2011/11/03 to 2011/12/02)
+     * 
+     * e.g. option.compareAsMonth().beginMonth_Day(toLocalDate("2001/01/03"))
+     *  if from-date is 2011/11/01 and to-date is 2011/12/01 (means 11th, 12th months are target),
+     *  the condition is: greater-equal 2011/11/03 and less-than 2012/01/03
+     * </pre>
+     * @param monthBeginDay The local date that has the day of month-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public FromToOption beginMonth_Day(LocalDate monthBeginDay) {
+        return doBeginMonth_Day(toDate(monthBeginDay));
+    }
+
+    /**
+     * Begin month from the specified day. <br />
+     * The date of argument is used as only the day part.
+     * <pre>
+     * e.g. beginMonth_Day(toLocalDateTime("2001/01/03"))
+     *  month is from 3 day to 2 day of next month
+     *  (the 2011/11 means 2011/11/03 to 2011/12/02)
+     * 
+     * e.g. option.compareAsMonth().beginMonth_Day(toLocalDateTime("2001/01/03"))
+     *  if from-date is 2011/11/01 and to-date is 2011/12/01 (means 11th, 12th months are target),
+     *  the condition is: greater-equal 2011/11/03 and less-than 2012/01/03
+     * </pre>
+     * @param monthBeginDay The local date-time that has the day of month-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public FromToOption beginMonth_Day(LocalDateTime monthBeginDay) {
+        return doBeginMonth_Day(toDate(monthBeginDay));
+    }
+
+    /**
+     * Begin month from the specified day. <br />
+     * The date of argument is used as only the day part.
+     * <pre>
      * e.g. beginMonth_Day(toDate("2001/01/03"))
      *  month is from 3 day to 2 day of next month
      *  (the 2011/11 means 2011/11/03 to 2011/12/02)
@@ -480,11 +564,13 @@ public class FromToOption implements ConditionOption {
      * @return this. (NotNull)
      */
     public FromToOption beginMonth_Day(Date monthBeginDay) {
+        return doBeginMonth_Day(monthBeginDay);
+    }
+
+    protected FromToOption doBeginMonth_Day(Date monthBeginDay) {
         assertPatternOptionValid("beginMonth_Day");
         assertArgumentNotNull("monthBeginDay", monthBeginDay);
-        final Calendar cal = Calendar.getInstance();
-        cal.setTime(monthBeginDay);
-        _monthBeginDay = cal.get(Calendar.DAY_OF_MONTH);
+        _monthBeginDay = toHandyDate(monthBeginDay).getDay();
         return this;
     }
 
@@ -536,6 +622,42 @@ public class FromToOption implements ConditionOption {
     /**
      * Begin day from the specified hour.
      * <pre>
+     * e.g. beginDay_Hour(toLocalDate("2001/01/01 06:00:00"))
+     *  day is from 06h to 05h of next day
+     *  (the 2011/11/27 means 2011/11/27 06h to 2011/11/28 05h)
+     * 
+     * e.g. option.compareAsDate().beginDay_Hour(toLocalDate("2001/01/01 06:00:00"))
+     *  if from-date is 2011/11/27 and to-date is 2011/11/28 (means 27, 28 days are target),
+     *  the condition is: greater-equal 2011/11/27 06:00:00 and less-than 2011/11/28 06:00:00
+     * </pre>
+     * @param dayBeginHour The local date that has the hour of day-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public FromToOption beginDay_Hour(LocalDate dayBeginHour) {
+        return doBeginDay_Hour(toDate(dayBeginHour));
+    }
+
+    /**
+     * Begin day from the specified hour.
+     * <pre>
+     * e.g. beginDay_Hour(toLocalDateTime("2001/01/01 06:00:00"))
+     *  day is from 06h to 05h of next day
+     *  (the 2011/11/27 means 2011/11/27 06h to 2011/11/28 05h)
+     * 
+     * e.g. option.compareAsDate().beginDay_Hour(toLocalDateTime("2001/01/01 06:00:00"))
+     *  if from-date is 2011/11/27 and to-date is 2011/11/28 (means 27, 28 days are target),
+     *  the condition is: greater-equal 2011/11/27 06:00:00 and less-than 2011/11/28 06:00:00
+     * </pre>
+     * @param dayBeginHour The local date-time that has the hour of day-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public FromToOption beginDay_Hour(LocalDateTime dayBeginHour) {
+        return doBeginDay_Hour(toDate(dayBeginHour));
+    }
+
+    /**
+     * Begin day from the specified hour.
+     * <pre>
      * e.g. beginDay_Hour(toDate("2001/01/01 06:00:00"))
      *  day is from 06h to 05h of next day
      *  (the 2011/11/27 means 2011/11/27 06h to 2011/11/28 05h)
@@ -548,11 +670,13 @@ public class FromToOption implements ConditionOption {
      * @return this. (NotNull)
      */
     public FromToOption beginDay_Hour(Date dayBeginHour) {
+        return doBeginDay_Hour(dayBeginHour);
+    }
+
+    protected FromToOption doBeginDay_Hour(Date dayBeginHour) {
         assertPatternOptionValid("beginDay_Hour");
         assertArgumentNotNull("dayBeginHour", dayBeginHour);
-        final Calendar cal = Calendar.getInstance();
-        cal.setTime(dayBeginHour);
-        _dayBeginHour = cal.get(Calendar.HOUR_OF_DAY);
+        _dayBeginHour = toHandyDate(dayBeginHour).getHour();
         return this;
     }
 
@@ -604,6 +728,40 @@ public class FromToOption implements ConditionOption {
     /**
      * Begin week from the specified day of week.
      * <pre>
+     * e.g. beginWeek_DayOfWeek(toLocalDate("2011/11/28")) *means Monday
+     *  week starts Monday (the 2011/11/27 belongs the week, 2011/11/21 to 2011/11/27)
+     * 
+     * e.g. option.compareAsWeek().beginWeek_DayOfWeek(toLocalDate("2011/11/28")) *means Monday
+     *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
+     *  the condition is: greater-equal 2011/11/21 and less-than 2011/12/05
+     * </pre>
+     * @param weekBeginDayOfWeek The local date that has the day of day-of-week-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public FromToOption beginWeek_DayOfWeek(LocalDate weekBeginDayOfWeek) {
+        return doBeginWeek_DayOfWeek(toDate(weekBeginDayOfWeek));
+    }
+
+    /**
+     * Begin week from the specified day of week.
+     * <pre>
+     * e.g. beginWeek_DayOfWeek(toLocalDateTime("2011/11/28")) *means Monday
+     *  week starts Monday (the 2011/11/27 belongs the week, 2011/11/21 to 2011/11/27)
+     * 
+     * e.g. option.compareAsWeek().beginWeek_DayOfWeek(toLocalDateTime("2011/11/28")) *means Monday
+     *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
+     *  the condition is: greater-equal 2011/11/21 and less-than 2011/12/05
+     * </pre>
+     * @param weekBeginDayOfWeek The local date-time that has the day of day-of-week-begin. (NotNull)
+     * @return this. (NotNull)
+     */
+    public FromToOption beginWeek_DayOfWeek(LocalDateTime weekBeginDayOfWeek) {
+        return doBeginWeek_DayOfWeek(toDate(weekBeginDayOfWeek));
+    }
+
+    /**
+     * Begin week from the specified day of week.
+     * <pre>
      * e.g. beginWeek_DayOfWeek(toDate("2011/11/28")) *means Monday
      *  week starts Monday (the 2011/11/27 belongs the week, 2011/11/21 to 2011/11/27)
      * 
@@ -615,12 +773,13 @@ public class FromToOption implements ConditionOption {
      * @return this. (NotNull)
      */
     public FromToOption beginWeek_DayOfWeek(Date weekBeginDayOfWeek) {
+        return doBeginWeek_DayOfWeek(weekBeginDayOfWeek);
+    }
+
+    protected FromToOption doBeginWeek_DayOfWeek(Date weekBeginDayOfWeek) {
         assertPatternOptionValid("beginWeek_DayOfWeek");
         assertArgumentNotNull("weekBeginDayOfWeek", weekBeginDayOfWeek);
-        final Calendar cal = Calendar.getInstance();
-        cal.setTime(weekBeginDayOfWeek);
-        final int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-        return doBeginWeek(dayOfWeek);
+        return doBeginWeek(toHandyDate(weekBeginDayOfWeek).getDayOfWeek());
     }
 
     /**
@@ -801,6 +960,14 @@ public class FromToOption implements ConditionOption {
         return this;
     }
 
+    public boolean isGreaterThan() { // basically for framework
+        return _greaterThan;
+    }
+
+    public boolean isLessThan() { // basically for framework
+        return _lessThan;
+    }
+
     protected void clearOperand() {
         _greaterThan = false;
         _lessThan = false;
@@ -961,6 +1128,14 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
+     * Does it add or-is-null to the condition?
+     * @return The determination, true or false.
+     */
+    public boolean isOrIsNull() { // basically for framework
+        return _orIsNull;
+    }
+
+    /**
      * Allow you to set one-side only condition. (null allowed) <br />
      * If you ignore null-or-empty query, you don't need to call this.
      * @return this. (NotNull)
@@ -979,9 +1154,9 @@ public class FromToOption implements ConditionOption {
     }
 
     // ===================================================================================
-    //                                                                       Internal Main
-    //                                                                       =============
-    public LocalDate filterFromDate(LocalDate fromDate) {
+    //                                                                          Filte Date
+    //                                                                          ==========
+    public LocalDate filterFromDate(LocalDate fromDate) { // #dateParade
         final TimeZone timeZone = DBFluteSystem.getFinalTimeZone();
         return DfTypeUtil.toLocalDate(filterFromDate(DfTypeUtil.toDate(fromDate, timeZone)), timeZone);
     }
@@ -1307,8 +1482,16 @@ public class FromToOption implements ConditionOption {
         return this;
     }
 
+    /**
+     * Get the time-zone in this option basically for filtering.
+     * @return The time-zone for filtering. (NotNull: if no setting, system zone)
+     */
     public TimeZone getTimeZone() {
-        return _timeZone;
+        return _timeZone != null ? _timeZone : getDBFluteSystemFinalTimeZone();
+    }
+
+    protected TimeZone getDBFluteSystemFinalTimeZone() {
+        return DBFluteSystem.getFinalTimeZone();
     }
 
     // ===================================================================================
@@ -1344,6 +1527,21 @@ public class FromToOption implements ConditionOption {
 
     public GearedCipherManager getGearedCipherManager() {
         return null;
+    }
+
+    // ===================================================================================
+    //                                                                        Small Helper
+    //                                                                        ============
+    protected Date toDate(LocalDate date) {
+        return DfTypeUtil.toDate(date, getTimeZone());
+    }
+
+    protected Date toDate(LocalDateTime date) {
+        return DfTypeUtil.toDate(date, getTimeZone());
+    }
+
+    protected HandyDate toHandyDate(Date date) {
+        return new HandyDate(date).timeZone(getTimeZone());
     }
 
     // ===================================================================================

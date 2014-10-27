@@ -93,7 +93,7 @@ public class HandyDate implements Serializable {
      * </pre>
      * @param localDate The instance of the local date. (NotNull)
      */
-    public HandyDate(LocalDate localDate) {
+    public HandyDate(LocalDate localDate) { // #dateParade
         assertConstructorArgNotNull("localDate", localDate);
         _cal = createCalendar(null); // means default zone
         prepareDefaultBeginAttribute();
@@ -186,11 +186,10 @@ public class HandyDate implements Serializable {
      */
     public HandyDate(String exp) {
         assertConstructorArgNotNullAndNotEmpty("exp", exp);
-        final TimeZone timeZone = null; // means default zone
-        _cal = createCalendar(timeZone);
+        _cal = createCalendar(null); // means default zone
         prepareDefaultBeginAttribute();
         try {
-            _cal.setTime(DfTypeUtil.toDate(exp, timeZone));
+            _cal.setTime(DfTypeUtil.toDate(exp));
         } catch (ParseDateException e) {
             throwParseDateExpressionFailureException(exp, e);
         }
@@ -290,8 +289,16 @@ public class HandyDate implements Serializable {
     }
 
     protected Calendar createCalendar(TimeZone timeZone) {
+        // locale has no setting point so null
+        // basically only for week data and basically no use in HandyDate
+        // so unneeded but just in case
+        final Locale locale = chooseRealLocale(null);
         final TimeZone realZone = chooseRealZone(timeZone);
-        return Calendar.getInstance(realZone);
+        return Calendar.getInstance(realZone, locale);
+    }
+
+    protected Locale chooseRealLocale(Locale locale) { // also called by toDisp()
+        return locale != null ? locale : DBFluteSystem.getFinalLocale();
     }
 
     protected TimeZone chooseRealZone(TimeZone timeZone) {
@@ -2049,7 +2056,7 @@ public class HandyDate implements Serializable {
      * @return The determination, true or false.
      */
     public boolean isYear_BeforeChrist() {
-        return getYear() < 0;
+        return getYear() < 0; // -1 means 'BC0001' (cannot be 0) in calendar
     }
 
     // -----------------------------------------------------
@@ -4517,12 +4524,7 @@ public class HandyDate implements Serializable {
      * @return The new-created date format. (NotNull)
      */
     protected DateFormat createDateFormat(String pattern, TimeZone timeZone, Locale locale) {
-        final SimpleDateFormat dateFormat;
-        if (locale != null) {
-            dateFormat = new SimpleDateFormat(pattern, locale);
-        } else {
-            dateFormat = new SimpleDateFormat(pattern);
-        }
+        final SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, chooseRealLocale(locale));
         if (timeZone != null) { // basically true, calendar has default zone
             dateFormat.setTimeZone(timeZone);
         }

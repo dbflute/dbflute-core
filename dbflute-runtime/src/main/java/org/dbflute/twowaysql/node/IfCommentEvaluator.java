@@ -17,11 +17,16 @@ package org.dbflute.twowaysql.node;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
+import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
@@ -262,16 +267,26 @@ public class IfCommentEvaluator {
 
     protected boolean compareLeftRight(Object leftResult, Object rightResult, ComparaDeterminer determiner, String booleanClause) {
         assertCompareType(leftResult, rightResult, booleanClause);
-        if (leftResult instanceof Date) {
-            final Date leftDate = (Date) leftResult;
-            final Date rightDate = (Date) rightResult;
-            return determiner.compare(leftDate.compareTo(rightDate));
-        } else if (leftResult instanceof Number) {
-            final Number leftNumber = (Number) leftResult;
-            final BigDecimal leftDecimal = new BigDecimal(leftNumber.toString());
-            final Number rightNumber = (Number) rightResult;
-            final BigDecimal rightDecimal = new BigDecimal(rightNumber.toString());
+        if (leftResult instanceof Number) {
+            final BigDecimal leftDecimal = new BigDecimal(((Number) leftResult).toString());
+            final BigDecimal rightDecimal = new BigDecimal(((Number) rightResult).toString());
             return determiner.compare(leftDecimal.compareTo(rightDecimal));
+        } else if (leftResult instanceof LocalDate) { // #dateParade
+            final LocalDate leftDate = (LocalDate) leftResult;
+            final LocalDate rightDate = DfTypeUtil.toLocalDate(rightResult); // to fit with left, just in case
+            return determiner.compare(leftDate.compareTo(rightDate));
+        } else if (leftResult instanceof LocalDateTime) {
+            final LocalDateTime leftDate = (LocalDateTime) leftResult;
+            final LocalDateTime rightDate = DfTypeUtil.toLocalDateTime(rightResult);
+            return determiner.compare(leftDate.compareTo(rightDate));
+        } else if (leftResult instanceof LocalTime) {
+            final LocalTime leftDate = (LocalTime) leftResult;
+            final LocalTime rightDate = DfTypeUtil.toLocalTime(rightResult);
+            return determiner.compare(leftDate.compareTo(rightDate));
+        } else if (leftResult instanceof Date) {
+            final Date leftDate = (Date) leftResult;
+            final Date rightDate = DfTypeUtil.toDate(rightResult);
+            return determiner.compare(leftDate.compareTo(rightDate));
         } else {
             throwIfCommentUnsupportedTypeComparisonException(leftResult, rightResult, booleanClause);
             return false; // unreachable
@@ -279,12 +294,15 @@ public class IfCommentEvaluator {
     }
 
     protected void assertCompareType(Object leftResult, Object rightResult, String booleanClause) {
-        if (leftResult != null && rightResult != null && leftResult instanceof Date) {
-            if (!(rightResult instanceof Date)) {
+        if (leftResult == null || rightResult == null) {
+            return;
+        }
+        if (leftResult instanceof Number) {
+            if (!(rightResult instanceof Number)) {
                 throwIfCommentDifferentTypeComparisonException(leftResult, rightResult, booleanClause);
             }
-        } else if (leftResult != null && rightResult != null && leftResult instanceof Number) {
-            if (!(rightResult instanceof Number)) {
+        } else if (leftResult instanceof Date || DfTypeUtil.isAnyLocalDate(leftResult)) { // #dateParade
+            if (!(rightResult instanceof Date) && !DfTypeUtil.isAnyLocalDate(rightResult)) { // converted if Date vs. LocalDate
                 throwIfCommentDifferentTypeComparisonException(leftResult, rightResult, booleanClause);
             }
         }
@@ -298,7 +316,7 @@ public class IfCommentEvaluator {
         final String left = booleanClause.substring(0, booleanClause.indexOf(operand)).trim();
         final String right = booleanClause.substring(booleanClause.indexOf(operand) + operand.length()).trim();
         final Object leftResult = evaluateComparePiece(left, null);
-        final Object rightResult = evaluateComparePiece(right, null);
+        final Object rightResult = evaluateComparePiece(right, leftResult);
         return evaluator.evaluate(leftResult, rightResult);
     }
 
@@ -329,7 +347,13 @@ public class IfCommentEvaluator {
                 if (rearValue.startsWith(quote) && rearValue.endsWith(quote)) {
                     final String literal = rearValue.substring(qlen, rearValue.length() - qlen).trim();
                     try {
-                        return DfTypeUtil.toTimestamp(literal);
+                        if (leftResult instanceof LocalDate) { // #dateParade
+                            return DfTypeUtil.toLocalDate(literal);
+                        } else if (leftResult instanceof LocalDateTime) {
+                            return DfTypeUtil.toLocalDateTime(literal);
+                        } else {
+                            return DfTypeUtil.toTimestamp(literal);
+                        }
                     } catch (ParseTimestampException ignored) {}
                 }
             }
@@ -718,10 +742,10 @@ public class IfCommentEvaluator {
         msg = msg + "[Target Boolean Clause]" + ln() + booleanClause + ln();
         msg = msg + ln();
         msg = msg + "[Left]" + ln() + (left != null ? left.getClass() : "null") + ln();
-        msg = msg + " --> " + left + ln();
+        msg = msg + " => " + left + ln();
         msg = msg + ln();
         msg = msg + "[Right]" + ln() + (right != null ? right.getClass() : "null") + ln();
-        msg = msg + " --> " + right + ln();
+        msg = msg + " => " + right + ln();
         msg = msg + ln();
         msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
         msg = msg + ln();
@@ -745,10 +769,10 @@ public class IfCommentEvaluator {
         msg = msg + "[Target Boolean Clause]" + ln() + booleanClause + ln();
         msg = msg + ln();
         msg = msg + "[Left]" + ln() + (left != null ? left.getClass() : "null") + ln();
-        msg = msg + " --> " + left + ln();
+        msg = msg + " => " + left + ln();
         msg = msg + ln();
         msg = msg + "[Right]" + ln() + (right != null ? right.getClass() : "null") + ln();
-        msg = msg + " --> " + right + ln();
+        msg = msg + " => " + right + ln();
         msg = msg + ln();
         msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
         msg = msg + ln();
@@ -823,15 +847,28 @@ public class IfCommentEvaluator {
     }
 
     // ===================================================================================
-    //                                                                    Exception Helper
-    //                                                                    ================
+    //                                                                        Small Helper
+    //                                                                        ============
+    protected Date toDate(LocalDate date) {
+        return DfTypeUtil.toDate(date, getDBFluteSystemFinalTimeZone());
+    }
+
+    protected Date toDate(LocalDateTime date) {
+        return DfTypeUtil.toDate(date, getDBFluteSystemFinalTimeZone());
+    }
+
+    protected HandyDate toHandyDate(Date date) {
+        return new HandyDate(date).timeZone(getDBFluteSystemFinalTimeZone());
+    }
+
+    protected TimeZone getDBFluteSystemFinalTimeZone() {
+        return DBFluteSystem.getFinalTimeZone();
+    }
+
     protected ExceptionMessageBuilder createExceptionMessageBuilder() {
         return new ExceptionMessageBuilder();
     }
 
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
     protected String ln() {
         return DBFluteSystem.ln();
     }

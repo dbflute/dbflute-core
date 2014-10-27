@@ -15,7 +15,34 @@
  */
 package org.dbflute.util;
 
-import static org.dbflute.util.DfTypeUtil.*;
+import static org.dbflute.util.DfTypeUtil.GMT_AD_ORIGIN_MILLISECOND;
+import static org.dbflute.util.DfTypeUtil.addCalendarDay;
+import static org.dbflute.util.DfTypeUtil.addDateDay;
+import static org.dbflute.util.DfTypeUtil.addDateHour;
+import static org.dbflute.util.DfTypeUtil.addDateMillisecond;
+import static org.dbflute.util.DfTypeUtil.addDateMinute;
+import static org.dbflute.util.DfTypeUtil.addDateMonth;
+import static org.dbflute.util.DfTypeUtil.addDateSecond;
+import static org.dbflute.util.DfTypeUtil.addDateWeekOfMonth;
+import static org.dbflute.util.DfTypeUtil.addDateYear;
+import static org.dbflute.util.DfTypeUtil.clearCalendarTimeParts;
+import static org.dbflute.util.DfTypeUtil.clearDateTimeParts;
+import static org.dbflute.util.DfTypeUtil.createDateFormat;
+import static org.dbflute.util.DfTypeUtil.getTimeZonedADOriginMillis;
+import static org.dbflute.util.DfTypeUtil.isDateAD;
+import static org.dbflute.util.DfTypeUtil.isDateBC;
+import static org.dbflute.util.DfTypeUtil.toBigInteger;
+import static org.dbflute.util.DfTypeUtil.toBinary;
+import static org.dbflute.util.DfTypeUtil.toCalendar;
+import static org.dbflute.util.DfTypeUtil.toClassTitle;
+import static org.dbflute.util.DfTypeUtil.toDate;
+import static org.dbflute.util.DfTypeUtil.toDispDate;
+import static org.dbflute.util.DfTypeUtil.toInteger;
+import static org.dbflute.util.DfTypeUtil.toLocalDate;
+import static org.dbflute.util.DfTypeUtil.toLocalDateTime;
+import static org.dbflute.util.DfTypeUtil.toSqlDate;
+import static org.dbflute.util.DfTypeUtil.toTime;
+import static org.dbflute.util.DfTypeUtil.toTimestamp;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -215,13 +242,13 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
         // e.g. 1 hour is 3600000L, 7 hours is 25200000L, 9 hours is 32400000L
         Date reversedDate = DfTypeUtil.toDate(ldt, gmt2hour);
-        String reversedStrDate = DfTypeUtil.toStringDate(reversedDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
+        String reversedStrDate = DfTypeUtil.toDispDate(reversedDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
         log("reversed  : " + reversedStrDate + ", " + reversedDate.getTime());
         assertEquals("1970/01/01 09:00:06.789", reversedStrDate);
 
         TimeZone gmtZone = TimeZone.getTimeZone("GMT");
         Date gmt7hour = toDate("1970/01/01 07:00:06.789", gmtZone);
-        log("emg7hour  : " + toStringDate(gmt7hour, "yyyy/MM/dd HH:mm:ss.SSS", gmtZone));
+        log("emg7hour  : " + toDispDate(gmt7hour, "yyyy/MM/dd HH:mm:ss.SSS", gmtZone));
         assertEquals(gmt7hour.getTime(), reversedDate.getTime());
     }
 
@@ -354,11 +381,14 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertTrue(DfTypeUtil.toDate("B.C.8-9-1 2:4:6").getTime() < timeZonedADJustTimeMillis);
         assertTrue(DfTypeUtil.toDate("B.C.2008-09-01 02:04:06").getTime() < timeZonedADJustTimeMillis);
         assertTrue(DfTypeUtil.toDate("B.C.2008-13-01 02:04:06").getTime() < timeZonedADJustTimeMillis);
-        assertEquals("2008/11/01 02:04:06", df.format(DfTypeUtil.toDate("-2008-11-01 02:04:06")));
-        assertEquals("0008/09/01 00:00:00", df.format(DfTypeUtil.toDate("date -80901")));
-
-        // no calendar check when BC 
-        assertEquals("2007/01/01 02:04:06", df.format(DfTypeUtil.toDate("-2008-13-01 02:04:06")));
+        assertEquals("2008/11/01 02:04:06", df.format(toDate("BC2008-11-01 02:04:06")));
+        // until 1.0.x (changed to be minus 0 origin)
+        //assertEquals("2008/11/01 02:04:06", df.format(toDate("-2008-11-01 02:04:06")));
+        //assertEquals("0008/09/01 00:00:00", df.format(toDate("date -80901")));
+        //assertEquals("2007/01/01 02:04:06", df.format(toDate("-2008-13-01 02:04:06"))); // no calendar check when BC
+        assertEquals("2009/11/01 02:04:06", df.format(toDate("-2008-11-01 02:04:06")));
+        assertEquals("0009/09/01 00:00:00", df.format(toDate("date -80901")));
+        assertEquals("2008/01/01 02:04:06", df.format(toDate("-2008-13-01 02:04:06"))); // no calendar check when BC
     }
 
     public void test_toDate_string_various() {
@@ -581,7 +611,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         Date actual = toDate(strDate, timeZone); // expects 7 hour for GMT
 
         // ## Assert ##
-        String reversed = toStringDate(actual, "yyyy/MM/dd HH:mm:ss.SSS", timeZone);
+        String reversed = toDispDate(actual, "yyyy/MM/dd HH:mm:ss.SSS", timeZone);
         Date gmt7hour = toDate("1970-01-01 07:00:06.789", TimeZone.getTimeZone("GMT"));
         log(reversed + ", " + actual.getTime() + ", " + gmt7hour.getTime());
         assertEquals(gmt7hour.getTime(), actual.getTime());
@@ -919,11 +949,10 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertTrue(DfTypeUtil.toTimestamp("B.C.8-9-1 2:4:6").getTime() < GMT_AD_ORIGIN_MILLISECOND);
         assertTrue(DfTypeUtil.toTimestamp("B.C.2008-09-01 02:04:06.123").getTime() < GMT_AD_ORIGIN_MILLISECOND);
         assertTrue(DfTypeUtil.toTimestamp("B.C.2008-13-01 02:04:06").getTime() < GMT_AD_ORIGIN_MILLISECOND);
-        assertEquals("2008/11/01 02:04:06.123", df.format(toTimestamp("-2008-11-01 02:04:06.123")));
-        assertEquals("0008/09/01 00:00:00.000", df.format(toTimestamp("date -80901")));
-
-        // no calendar check when BC 
-        assertEquals("2007/01/01 02:04:06.123", df.format(toTimestamp("-2008-13-01 02:04:06.123")));
+        assertEquals("2008/11/01 02:04:06.123", df.format(toTimestamp("BC2008-11-01 02:04:06.123")));
+        assertEquals("2009/11/01 02:04:06.123", df.format(toTimestamp("-2008-11-01 02:04:06.123")));
+        assertEquals("0009/09/01 00:00:00.000", df.format(toTimestamp("date -80901")));
+        assertEquals("2008/01/01 02:04:06.123", df.format(toTimestamp("-2008-13-01 02:04:06.123"))); // no calendar check when BC
     }
 
     public void test_toTimestamp_long_basic() {

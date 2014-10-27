@@ -771,7 +771,7 @@ public class FunctionFilterOption implements ParameterOption {
             return true;
         }
         final Object snapshot = _mysticBindingSnapshot;
-        if (snapshot != null && (snapshot instanceof Date || DfTypeUtil.isAnyLocalDate(snapshot))) {
+        if (snapshot != null && (snapshot instanceof Date || DfTypeUtil.isAnyLocalDate(snapshot))) { // #dateParade
             return true;
         }
         return false;

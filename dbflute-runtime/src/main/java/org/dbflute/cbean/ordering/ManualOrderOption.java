@@ -185,11 +185,8 @@ public class ManualOrderOption implements ColumnCalculator {
      * @param opLambda The callback for option of from-to. (NotNull)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public HpMobConnectedBean when_FromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) {
-        assertFromToOptionCall(opLambda);
-        final FromToOption op = createFromToOption();
-        opLambda.callback(op);
-        return doWhen_FromTo(toDate(fromDate), toDate(toDate), op);
+    public HpMobConnectedBean when_FromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) { // #dateParade
+        return doWhen_FromTo(toDate(fromDate), toDate(toDate), createFromToOption(opLambda));
     }
 
     /**
@@ -203,10 +200,7 @@ public class ManualOrderOption implements ColumnCalculator {
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
     public HpMobConnectedBean when_FromTo(LocalDateTime fromDate, LocalDateTime toDate, ConditionOptionCall<FromToOption> opLambda) {
-        assertFromToOptionCall(opLambda);
-        final FromToOption op = createFromToOption();
-        opLambda.callback(op);
-        return doWhen_FromTo(toDate(fromDate), toDate(toDate), op);
+        return doWhen_FromTo(toDate(fromDate), toDate(toDate), createFromToOption(opLambda));
     }
 
     /**
@@ -220,20 +214,24 @@ public class ManualOrderOption implements ColumnCalculator {
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
     public HpMobConnectedBean when_FromTo(Date fromDate, Date toDate, ConditionOptionCall<FromToOption> opLambda) {
+        return doWhen_FromTo(fromDate, toDate, createFromToOption(opLambda));
+    }
+
+    protected FromToOption createFromToOption(ConditionOptionCall<FromToOption> opLambda) {
         assertFromToOptionCall(opLambda);
-        final FromToOption op = createFromToOption();
+        final FromToOption op = newFromToOption();
         opLambda.callback(op);
-        return doWhen_FromTo(fromDate, toDate, op);
+        return op;
     }
 
     protected void assertFromToOptionCall(ConditionOptionCall<FromToOption> opLambda) {
         if (opLambda == null) {
             String msg = "The argument 'opLambda' for from-to option of ManualOrder should not be null.";
-            throw new IllegalArgumentException(msg);
+            throw new IllegalConditionBeanOperationException(msg);
         }
     }
 
-    protected FromToOption createFromToOption() {
+    protected FromToOption newFromToOption() {
         return new FromToOption();
     }
 
@@ -250,21 +248,23 @@ public class ManualOrderOption implements ColumnCalculator {
     protected void assertFromToOption(FromToOption option) {
         if (option == null) {
             String msg = "The argument 'option' for from-to should not be null.";
-            throw new IllegalArgumentException(msg);
+            throw new IllegalConditionBeanOperationException(msg);
         }
     }
 
     protected void assertFromToDateBothExistsOrOneSideAllowed(Date fromDate, Date toDate, FromToOption option) {
         final boolean oneSideAllowed = option.isOneSideAllowed();
         if (fromDate == null && toDate == null) {
-            String msg = "The both arguments for from-to were null: " + option;
-            throw new IllegalArgumentException(msg);
+            String msg = "The both arguments of from-to for ManualOrder were null: " + option;
+            throw new IllegalConditionBeanOperationException(msg);
         } else if (fromDate == null && !oneSideAllowed) {
-            String msg = "The argument 'fromDate' for from-to was null: toDate=" + toDate + " option=" + option;
-            throw new IllegalArgumentException(msg);
+            String msg = "The argument 'fromDate' of from-to for ManualOrder was null:";
+            msg = msg + " toDate=" + toDate + " option=" + option;
+            throw new IllegalConditionBeanOperationException(msg);
         } else if (toDate == null && !oneSideAllowed) {
-            String msg = "The argument 'toDate' for from-to was null: fromDate=" + toDate + " option=" + option;
-            throw new IllegalArgumentException(msg);
+            String msg = "The argument 'toDate' of from-to for ManualOrder was null:";
+            msg = msg + " fromDate=" + fromDate + " option=" + option;
+            throw new IllegalConditionBeanOperationException(msg);
         }
     }
 
@@ -649,6 +649,9 @@ public class ManualOrderOption implements ColumnCalculator {
         }
     }
 
+    // -----------------------------------------------------
+    //                                         Resolve Bound
+    //                                         -------------
     protected Object resolveBoundValue(HpManualOrderThemeListHandler handler, Object plainValue, boolean suppressBinding) {
         if (plainValue == null) {
             return null;
@@ -674,7 +677,7 @@ public class ManualOrderOption implements ColumnCalculator {
                 }
             } else if (plainValue instanceof Number) {
                 boundExp = buildLiteralNumberExpression(plainValue);
-            } else if (plainValue instanceof Date) {
+            } else if (isAnyLocalDate(plainValue) || plainValue instanceof Date) { // #dateParade
                 boundExp = buildLiteralDateExpression(plainValue);
             } else {
                 String notice = "The binding of the type is unsupported on the DBMS.";
@@ -698,6 +701,9 @@ public class ManualOrderOption implements ColumnCalculator {
         return columnExp;
     }
 
+    // -----------------------------------------------------
+    //                                        Classification
+    //                                        --------------
     protected Object handleClassificationOrderValue(Classification cls) {
         final Object orderValue;
         final String plainCode = cls.code();
@@ -729,14 +735,27 @@ public class ManualOrderOption implements ColumnCalculator {
         return codeType != null && codeType.equals(ClassificationCodeType.Number) && codeType.equals(ClassificationCodeType.Boolean);
     }
 
+    // -----------------------------------------------------
+    //                                       Number Handling
+    //                                       ---------------
     protected String buildLiteralNumberExpression(Object plainValue) {
         return plainValue.toString();
+    }
+
+    // -----------------------------------------------------
+    //                                         Date Handling
+    //                                         -------------
+    protected boolean isAnyLocalDate(Object plainValue) {
+        return DfTypeUtil.isAnyLocalDate(plainValue);
     }
 
     protected String buildLiteralDateExpression(Object plainValue) {
         return "'" + DfTypeUtil.toString(plainValue, "yyyy-MM-dd HH:mm:ss.SSS") + "'";
     }
 
+    // -----------------------------------------------------
+    //                                    Exception Handling
+    //                                    ------------------
     protected void throwUnsupportedTypeSpecifiedException(String notice, Object plainValue) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
@@ -750,6 +769,9 @@ public class ManualOrderOption implements ColumnCalculator {
         throw new IllegalConditionBeanOperationException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                     Then/Else Binding
+    //                                     -----------------
     public ManualOrderOption suppressThenBinding() {
         _suppressThenBinding = true;
         return this;

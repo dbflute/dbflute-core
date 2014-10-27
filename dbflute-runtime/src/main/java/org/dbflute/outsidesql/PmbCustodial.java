@@ -103,7 +103,7 @@ public class PmbCustodial {
 
     @SuppressWarnings("unchecked")
     public static <DATE> DATE toLocalDate(Date date, Class<DATE> localType, TimeZone timeZone) {
-        if (LocalDate.class.isAssignableFrom(localType)) {
+        if (LocalDate.class.isAssignableFrom(localType)) { // #dateParade
             return (DATE) DfTypeUtil.toLocalDate(date, timeZone);
         } else if (LocalDateTime.class.isAssignableFrom(localType)) {
             return (DATE) DfTypeUtil.toLocalDateTime(date, timeZone);
@@ -112,7 +112,7 @@ public class PmbCustodial {
     }
 
     public static String formatUtilDate(Date date, String pattern, TimeZone specifiedZone) {
-        return DfTypeUtil.toStringDate(date, pattern, chooseRealTimeZone(specifiedZone));
+        return DfTypeUtil.toDispDate(date, pattern, chooseRealTimeZone(specifiedZone));
     }
 
     public static void assertFromToOptionValid(String name, FromToOption option) {

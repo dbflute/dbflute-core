@@ -15,19 +15,19 @@
  */
 package org.dbflute.system.provider;
 
-import java.util.TimeZone;
+import java.util.Locale;
 
 /**
  * @author jflute
- * @since 1.1.0 (2014/09/29 Monday)
+ * @since 1.1.0 (2014/10/26 Sunday)
  */
 @FunctionalInterface
-public interface DfFinalTimeZoneProvider {
+public interface DfFinalLocaleProvider {
 
     /**
-     * Provide the time-zone as final default. <br />
+     * Provide the locale as final default. <br />
      * This might be called many times, so take care of performance.
-     * @return The time-zone instance. (NullAllowed: if null, server zone might be used)
+     * @return The locale instance. (NullAllowed: if null, server locale might be used)
      */
-    TimeZone provide();
+    Locale provide();
 }
