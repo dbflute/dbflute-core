@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.dbflute.helper.HandyDate;
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
@@ -273,19 +272,19 @@ public class IfCommentEvaluator {
             return determiner.compare(leftDecimal.compareTo(rightDecimal));
         } else if (leftResult instanceof LocalDate) { // #dateParade
             final LocalDate leftDate = (LocalDate) leftResult;
-            final LocalDate rightDate = DfTypeUtil.toLocalDate(rightResult); // to fit with left, just in case
+            final LocalDate rightDate = toLocalDate(rightResult); // to fit with left, just in case
             return determiner.compare(leftDate.compareTo(rightDate));
         } else if (leftResult instanceof LocalDateTime) {
             final LocalDateTime leftDate = (LocalDateTime) leftResult;
-            final LocalDateTime rightDate = DfTypeUtil.toLocalDateTime(rightResult);
+            final LocalDateTime rightDate = toLocalDateTime(rightResult);
             return determiner.compare(leftDate.compareTo(rightDate));
         } else if (leftResult instanceof LocalTime) {
             final LocalTime leftDate = (LocalTime) leftResult;
-            final LocalTime rightDate = DfTypeUtil.toLocalTime(rightResult);
+            final LocalTime rightDate = toLocalTime(rightResult);
             return determiner.compare(leftDate.compareTo(rightDate));
         } else if (leftResult instanceof Date) {
             final Date leftDate = (Date) leftResult;
-            final Date rightDate = DfTypeUtil.toDate(rightResult);
+            final Date rightDate = toDate(rightResult);
             return determiner.compare(leftDate.compareTo(rightDate));
         } else {
             throwIfCommentUnsupportedTypeComparisonException(leftResult, rightResult, booleanClause);
@@ -348,9 +347,11 @@ public class IfCommentEvaluator {
                     final String literal = rearValue.substring(qlen, rearValue.length() - qlen).trim();
                     try {
                         if (leftResult instanceof LocalDate) { // #dateParade
-                            return DfTypeUtil.toLocalDate(literal);
+                            return toLocalDate(literal);
                         } else if (leftResult instanceof LocalDateTime) {
-                            return DfTypeUtil.toLocalDateTime(literal);
+                            return toLocalDateTime(literal);
+                        } else if (leftResult instanceof LocalTime) {
+                            return toLocalTime(literal);
                         } else {
                             return DfTypeUtil.toTimestamp(literal);
                         }
@@ -849,16 +850,20 @@ public class IfCommentEvaluator {
     // ===================================================================================
     //                                                                        Small Helper
     //                                                                        ============
-    protected Date toDate(LocalDate date) {
-        return DfTypeUtil.toDate(date, getDBFluteSystemFinalTimeZone());
+    protected LocalDate toLocalDate(Object obj) {
+        return DfTypeUtil.toLocalDate(obj, getDBFluteSystemFinalTimeZone());
     }
 
-    protected Date toDate(LocalDateTime date) {
-        return DfTypeUtil.toDate(date, getDBFluteSystemFinalTimeZone());
+    protected LocalDateTime toLocalDateTime(Object obj) {
+        return DfTypeUtil.toLocalDateTime(obj, getDBFluteSystemFinalTimeZone());
     }
 
-    protected HandyDate toHandyDate(Date date) {
-        return new HandyDate(date).timeZone(getDBFluteSystemFinalTimeZone());
+    protected LocalTime toLocalTime(Object obj) {
+        return DfTypeUtil.toLocalTime(obj, getDBFluteSystemFinalTimeZone());
+    }
+
+    protected Date toDate(Object obj) {
+        return DfTypeUtil.toDate(obj, getDBFluteSystemFinalTimeZone());
     }
 
     protected TimeZone getDBFluteSystemFinalTimeZone() {

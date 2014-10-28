@@ -23,6 +23,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Time;
@@ -32,11 +33,14 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -58,6 +62,7 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    protected static final String DEFAULT_FULL_DATE_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
     protected static final String NULL = "null";
     protected static final long GMT_AD_ORIGIN_MILLISECOND;
     static {
@@ -95,57 +100,74 @@ public final class DfTypeUtil {
     //                                            toString()
     //                                            ----------
     /**
-     * Convert the object to the instance that is string. <br />
-     * If the object is a byte array, encode as base64. <br />
-     * And if the object is a date, use the default time-zone. <br />
-     * And if the object is a exception (throw-able), convert to stack-trace.
+     * Convert the object to the instance that is string.
+     * <pre>
+     * e.g.
+     *  date       :: use the default time-zone.
+     *  byte array :: encode as base64.
+     *  exception  :: convert to stack-trace.
+     * </pre>
      * @param obj The parsed object. (NullAllowed)
      * @return The instance of string. (NullAllowed)
      */
     public static String toString(Object obj) {
-        return toString(obj, null);
+        return doConvertToString(obj, (String) null);
     }
 
     /**
-     * Convert the object to the instance that is string. <br />
-     * If the object is a byte array, encode as base64. <br />
-     * And if the object is a date, use the default time-zone. <br />
-     * And if the object is a exception (throw-able), convert to stack-trace.
+     * Convert the object to the instance that is string by the pattern.
+     * <pre>
+     * e.g.
+     *  date       :: use the default time-zone.
+     *  byte array :: encode as base64.
+     *  exception  :: convert to stack-trace.
+     * </pre>
      * @param obj The parsed object. (NullAllowed)
-     * @param pattern The pattern format to parse. (NullAllowed)
+     * @param pattern The pattern format to parse for e.g. number, date. (NotNull)
      * @return The instance of string. (NullAllowed)
      */
     public static String toString(Object obj, String pattern) {
+        assertPatternNotNull("toString()", pattern);
+        return doConvertToString(obj, pattern);
+    }
+
+    protected static String doConvertToString(Object obj, String pattern) {
         if (obj == null) {
             return null;
         } else if (obj instanceof String) {
             return (String) obj;
         } else if (obj instanceof Number) {
-            return doConvertToDispNumber((Number) obj, pattern);
-        } else if (isAnyLocalDate(obj)) {
-            return doConvertToDispDate(toDate(obj), pattern, null);
+            return doConvertToStringNumber((Number) obj, pattern);
+        } else if (obj instanceof LocalDate) {
+            return doConvertToStringLocalDate((LocalDate) obj, pattern);
+        } else if (obj instanceof LocalDateTime) {
+            return doConvertToStringLocalDateTime((LocalDateTime) obj, pattern);
+        } else if (obj instanceof LocalTime) {
+            return doConvertToStringLocalTime((LocalTime) obj, pattern);
+        } else if (obj instanceof Time) {
+            return doConvertToStringDate((Time) obj, pattern != null ? pattern : "HH:mm:ss", null);
         } else if (obj instanceof Date) {
-            return doConvertToDispDate((Date) obj, pattern, null);
+            return doConvertToStringDate((Date) obj, pattern, null);
         } else if (obj instanceof Calendar) {
-            return doConvertToDispDate(((Calendar) obj).getTime(), pattern, null);
+            return doConvertToStringDate(((Calendar) obj).getTime(), pattern, null);
         } else if (obj instanceof byte[]) {
             return encodeAsBase64((byte[]) obj);
         } else if (obj instanceof Throwable) {
-            return toDispStackTrace((Throwable) obj);
+            return toStringStackTrace((Throwable) obj);
         } else {
             return obj.toString();
         }
     }
 
     // -----------------------------------------------------
-    //                                               Display
-    //                                               -------
-    public static String toDispNumber(Number value, String pattern) {
+    //                                        Specified Type
+    //                                        --------------
+    public static String toStringNumber(Number value, String pattern) {
         assertPatternNotNull("toDispNumber()", pattern);
-        return doConvertToDispNumber(value, pattern);
+        return doConvertToStringNumber(value, pattern);
     }
 
-    protected static String doConvertToDispNumber(Number value, String pattern) {
+    protected static String doConvertToStringNumber(Number value, String pattern) {
         if (value == null) {
             return null;
         }
@@ -155,40 +177,57 @@ public final class DfTypeUtil {
         return value.toString();
     }
 
-    public static String toDispDate(Date value, String pattern, TimeZone timeZone) {
+    public static String toStringLocalDate(LocalDate value, String pattern) {
+        assertPatternNotNull("toDispDate()", pattern);
+        return doConvertToStringLocalDate(value, pattern);
+    }
+
+    protected static String doConvertToStringLocalDate(LocalDate value, String pattern) {
+        final String realPattern = pattern != null ? pattern : "yyyy-MM-dd";
+        return value.format(DateTimeFormatter.ofPattern(realPattern));
+    }
+
+    public static String toStringLocalDateTime(LocalDateTime value, String pattern) {
+        assertPatternNotNull("toDispDate()", pattern);
+        return doConvertToStringLocalDateTime(value, pattern);
+    }
+
+    protected static String doConvertToStringLocalDateTime(LocalDateTime value, String pattern) {
+        final String realPattern = pattern != null ? pattern : DEFAULT_FULL_DATE_PATTERN; // only millisecond (not nanosecond) as default
+        return value.format(DateTimeFormatter.ofPattern(realPattern));
+    }
+
+    public static String toStringLocalTime(LocalTime value, String pattern) {
+        assertPatternNotNull("toDispDate()", pattern);
+        return doConvertToStringLocalTime(value, pattern);
+    }
+
+    protected static String doConvertToStringLocalTime(LocalTime value, String pattern) {
+        final String realPattern = pattern != null ? pattern : "HH:mm:ss"; // not use nanosecond part as default
+        return value.format(DateTimeFormatter.ofPattern(realPattern));
+    }
+
+    public static String toStringDate(Date value, String pattern, TimeZone timeZone) {
         assertPatternNotNull("toDispNumber()", pattern);
         assertTimeZoneNotNull("toDispNumber()", timeZone);
-        return doConvertToDispDate(value, pattern, timeZone);
+        return doConvertToStringDate(value, pattern, timeZone);
     }
 
-    public static String toDispDate(LocalDate value, String pattern, TimeZone timeZone) {
-        // TODO jflute impl: plain string
-        assertPatternNotNull("toDispDate()", pattern);
-        assertTimeZoneNotNull("toDispDate()", timeZone);
-        return doConvertToDispDate(toDate(value, timeZone), pattern, timeZone);
+    protected static String doConvertToStringDate(Date value, String pattern, TimeZone timeZone) {
+        final String realPattern;
+        if (value != null && value instanceof Time && pattern == null) {
+            realPattern = "HH:mm:ss";
+        } else {
+            realPattern = pattern; // null or specified (if null, default pattern of formatter)
+        }
+        return value != null ? doCreateDateFormat(realPattern, timeZone, false).format(value) : null;
     }
 
-    public static String toDispDate(LocalDateTime value, String pattern, TimeZone timeZone) {
-        assertPatternNotNull("toDispDate()", pattern);
-        assertTimeZoneNotNull("toDispDate()", timeZone);
-        return doConvertToDispDate(toDate(value, timeZone), pattern, timeZone);
-    }
-
-    public static String toDispDate(LocalTime value, String pattern, TimeZone timeZone) {
-        assertPatternNotNull("toDispDate()", pattern);
-        assertTimeZoneNotNull("toDispDate()", timeZone);
-        return doConvertToDispDate(toTime(value, timeZone), pattern, timeZone);
-    }
-
-    protected static String doConvertToDispDate(Date value, String pattern, TimeZone timeZone) {
-        return value != null ? doCreateDateFormat(pattern, timeZone, false).format(value) : null;
-    }
-
-    public static String toDispStackTrace(Throwable t) {
+    public static String toStringStackTrace(Throwable cause) {
         StringWriter sw = null;
         try {
             sw = new StringWriter();
-            t.printStackTrace(new PrintWriter(sw));
+            cause.printStackTrace(new PrintWriter(sw));
             return sw.toString();
         } finally {
             if (sw != null) {
@@ -705,6 +744,21 @@ public final class DfTypeUtil {
         return wrapper != null ? wrapper.byteValue() : 0;
     }
 
+    // -----------------------------------------------------
+    //                                                 Bytes
+    //                                                 -----
+    public static byte[] toBytes(String str, String encoding) {
+        if (str == null) {
+            return null;
+        }
+        try {
+            return str.getBytes(encoding);
+        } catch (UnsupportedEncodingException e) {
+            String msg = "The encoding is invalid: encoding=" + encoding + " str=" + str;
+            throw new IllegalStateException(msg);
+        }
+    }
+
     // ===================================================================================
     //                                                                          BigDecimal
     //                                                                          ==========
@@ -783,85 +837,399 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                             LocalDate
     //                                             ---------
-    // TODO jflute javadoc: toLocalDate()
-    // TODO jflute impl: toLocalDate() pattern overload
-    // TODO jflute impl: toLocalDate() parsed directly
     /**
+     * Convert the object to the instance that is date for the default time-zone. <br />
+     * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
+     * with flexible-parsing if the object is string type. <br />
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalDate.of().</p>
+     * 
      * @param obj The object to be converted. (NullAllowed: if null, returns null)
      * @return The local date. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      */
     public static LocalDate toLocalDate(Object obj) { // #dateParade
-        return doConvertToLocalDate(obj, null);
+        return doConvertToLocalDate(obj, (String) null, (TimeZone) null);
     }
 
     /**
+     * Convert the object to the instance that is date for the default time-zone. <br />
+     * This method uses the specified date pattern if the object is string type. 
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalDate.parse().</p>
+     * 
      * @param obj The object to be converted. (NullAllowed: if null, returns null)
-     * @param timeZone The time-zone for the local date. (NotNull)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
      * @return The local date. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     */
+    public static LocalDate toLocalDate(Object obj, String pattern) {
+        assertPatternNotNull("toLocalDate()", pattern);
+        return doConvertToLocalDate(obj, pattern, (TimeZone) null);
+    }
+
+    /**
+     * Convert the object to the instance that is date for the specified time-zone. <br />
+     * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
+     * with flexible-parsing if the object is string type. <br />
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalDate.of(). and millisecond handling is following:</p>
+     * 
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param timeZone The time-zone for the local date. (NotNull: no used when string is specified)
+     * @return The local date. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      */
     public static LocalDate toLocalDate(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalDate()", timeZone);
-        return doConvertToLocalDate(obj, timeZone);
+        return doConvertToLocalDate(obj, (String) null, timeZone);
     }
 
-    protected static LocalDate doConvertToLocalDate(Object obj, TimeZone timeZone) {
+    /**
+     * Convert the object to the instance that is date for the specified time-zone. <br />
+     * This method uses the specified date pattern if the object is string type. <br />
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalDate.parse().</p>
+     * 
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @param timeZone The time-zone for the local date. (NotNull: no used when string is specified)
+     * @return The local date. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     */
+    public static LocalDate toLocalDate(Object obj, String pattern, TimeZone timeZone) {
+        assertPatternNotNull("toLocalDate()", pattern);
+        assertTimeZoneNotNull("toLocalDate()", timeZone);
+        return doConvertToLocalDate(obj, pattern, timeZone);
+    }
+
+    protected static LocalDate doConvertToLocalDate(Object obj, String pattern, TimeZone timeZone) {
+        if (obj instanceof String) {
+            return doParseStringAsLocalDate((String) obj, pattern); // no need time-zone
+        } else if (obj instanceof LocalDate) {
+            return (LocalDate) obj;
+        } else if (obj instanceof LocalDateTime) {
+            return ((LocalDateTime) obj).toLocalDate();
+        }
         final TimeZone realZone = chooseRealZone(timeZone);
         final Date zonedResourceDate = toZonedResourceDate(obj, realZone);
         return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, realZone).toLocalDate() : null;
+    }
+
+    protected static LocalDate doParseStringAsLocalDate(String str, String pattern) {
+        if (str == null || str.trim().length() == 0) {
+            return null;
+        }
+        final boolean includeTime = false;
+        final boolean includeMillis = false;
+        final boolean keepMillisMore = false;
+        if (pattern != null) {
+            try {
+                return LocalDate.parse(str, DateTimeFormatter.ofPattern(pattern));
+            } catch (DateTimeParseException e) {
+                throw new ParseDateException("Failed to parse the expression: " + str + ", pattern=" + pattern, e);
+            }
+        } else {
+            String filtered = filterDateStringValueFlexibly(str, includeTime, includeMillis, keepMillisMore);
+            if (filtered.startsWith("-0000")) { // e.g. BC0001 converted to -0000
+                filtered = Srl.ltrim(filtered, "-"); // local date cannot parse -0000
+            }
+            try {
+                return LocalDate.parse(filtered);
+            } catch (DateTimeParseException e) {
+                throw new ParseDateException("Failed to parse the expression: " + filtered + ", before-filter=" + str, e);
+            }
+            // *cannot determine out-of-calendar by the exception from local date
+        }
     }
 
     // -----------------------------------------------------
     //                                         LocalDateTime
     //                                         -------------
     /**
+     * Convert the object to the instance that is date-time for the default time-zone. <br />
+     * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
+     * with flexible-parsing if the object is string type. <br />
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalDateTime.of(). and millisecond handling is following:</p>
+     * 
+     * <pre>
+     * e.g. millisecond and nanosecond handling
+     *  "2014/10/28 12:34:56.789" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789000000)
+     *  "2014/10/28 12:34:56.7" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 007000000)
+     *  "2014/10/28 12:34:56.78" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 078000000)
+     *  "2014/10/28 12:34:56.7891" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789100000)
+     *  "2014/10/28 12:34:56.789123" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789123000)
+     *  "2014/10/28 12:34:56.789123456" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789123456)
+     * </pre>
      * @param obj The object to be converted. (NullAllowed: if null, returns null)
      * @return The local date-time. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      */
     public static LocalDateTime toLocalDateTime(Object obj) {
-        return doConvertToLocalDateTime(obj, null);
+        return doConvertToLocalDateTime(obj, (String) null, (TimeZone) null);
     }
 
     /**
+     * Convert the object to the instance that is date-time for the default time-zone. <br />
+     * This method uses the specified date pattern if the object is string type. 
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalDateTime.parse().</p>
+     * 
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @return The local date-time. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     */
+    public static LocalDateTime toLocalDateTime(Object obj, String pattern) {
+        assertPatternNotNull("toLocalDateTime()", pattern);
+        return doConvertToLocalDateTime(obj, pattern, (TimeZone) null);
+    }
+
+    /**
+     * Convert the object to the instance that is date-time for the specified time-zone. <br />
+     * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
+     * with flexible-parsing if the object is string type. <br />
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalDateTime.of(). and millisecond handling is following:</p>
+     * 
+     * <pre>
+     * e.g. millisecond and nanosecond handling
+     *  "2014/10/28 12:34:56.789" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789000000)
+     *  "2014/10/28 12:34:56.7" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 007000000)
+     *  "2014/10/28 12:34:56.78" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 078000000)
+     *  "2014/10/28 12:34:56.7891" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789100000)
+     *  "2014/10/28 12:34:56.789123" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789123000)
+     *  "2014/10/28 12:34:56.789123456" :: same as LocalDateTime.of(2014, 10, 28, 12, 34, 56, 789123456)
+     * </pre>
      * @param obj The object to be converted. (NullAllowed: if null, returns null)
      * @param timeZone The time-zone for the local date-time. (NotNull)
      * @return The local date-time. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      */
     public static LocalDateTime toLocalDateTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalDateTime()", timeZone);
-        return doConvertToLocalDateTime(obj, timeZone);
+        return doConvertToLocalDateTime(obj, (String) null, timeZone);
     }
 
-    protected static LocalDateTime doConvertToLocalDateTime(Object obj, TimeZone timeZone) {
+    /**
+     * Convert the object to the instance that is date-time for the specified time-zone. <br />
+     * This method uses the specified date pattern if the object is string type.
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalDate.parse().</p>
+     * 
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @param timeZone The time-zone for the local date-time. (NotNull)
+     * @return The local date-time. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     */
+    public static LocalDateTime toLocalDateTime(Object obj, String pattern, TimeZone timeZone) {
+        assertTimeZoneNotNull("toLocalDateTime()", timeZone);
+        return doConvertToLocalDateTime(obj, (String) null, timeZone);
+    }
+
+    protected static LocalDateTime doConvertToLocalDateTime(Object obj, String pattern, TimeZone timeZone) {
+        if (obj instanceof String) {
+            return doParseStringAsLocalDateTime((String) obj, pattern); // no need time-zone
+        } else if (obj instanceof LocalDate) {
+            return ((LocalDate) obj).atTime(0, 0, 0);
+        } else if (obj instanceof LocalDateTime) {
+            return (LocalDateTime) obj;
+        }
         final TimeZone realZone = chooseRealZone(timeZone);
         final Date zonedResourceDate = toZonedResourceDate(obj, realZone);
         return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, realZone).toLocalDateTime() : null;
+    }
+
+    protected static LocalDateTime doParseStringAsLocalDateTime(String str, String pattern) {
+        if (str == null || str.trim().length() == 0) {
+            return null;
+        }
+        final boolean includeTime = true;
+        final boolean includeMillis = true;
+        final boolean keepMillisMore = true; // local date can use nanosecond
+        if (pattern != null) {
+            try {
+                return LocalDateTime.parse(str, DateTimeFormatter.ofPattern(pattern, chooseRealLocale(null)));
+            } catch (DateTimeParseException e) {
+                throw new ParseDateException("Failed to parse the expression: " + str + ", pattern=" + pattern, e);
+            }
+        } else {
+            final String filtered = filterDateStringValueFlexibly(str, includeTime, includeMillis, keepMillisMore);
+            return LocalDateTime.of(doParseStringAsLocalDate(filtered, null), doParseStringAsLocalTime(filtered, null));
+        }
     }
 
     // -----------------------------------------------------
     //                                             LocalTime
     //                                             ---------
     /**
+     * Convert the object to the instance that is time for the default time-zone. <br />
+     * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
+     * with flexible-parsing if the object is string type. <br />
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalTime.of(). and millisecond handling is following:</p>
+     * 
+     * <pre>
+     * e.g. millisecond and nanosecond handling
+     *  "2014/10/28 12:34:56.789" :: same as LocalTime.of(12, 34, 56, 789000000)
+     *  "2014/10/28 12:34:56.7" :: same as LocalTime.of(34, 56, 007000000)
+     *  "2014/10/28 12:34:56.78" :: same as LocalTime.of(12, 34, 56, 078000000)
+     *  "2014/10/28 12:34:56.7891" :: same as LocalTime.of(12, 34, 56, 789100000)
+     *  "2014/10/28 12:34:56.789123" :: same as LocalTime.of(12, 34, 56, 789123000)
+     *  "2014/10/28 12:34:56.789123456" :: same as LocalTime.of(12, 34, 56, 789123456)
+     * </pre>
      * @param obj The object to be converted. (NullAllowed: if null, returns null)
      * @return The local time. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      */
     public static LocalTime toLocalTime(Object obj) {
-        return doConvertToLocalTime(obj, null);
+        return doConvertToLocalTime(obj, (String) null, (TimeZone) null);
     }
 
     /**
+     * Convert the object to the instance that is date-time for the default time-zone. <br />
+     * This method uses the specified date pattern if the object is string type. 
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalTime.parse().</p>
+     * 
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @return The local time. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     */
+    public static LocalTime toLocalTime(Object obj, String pattern) {
+        assertPatternNotNull("toLocalTime()", pattern);
+        return doConvertToLocalTime(obj, pattern, (TimeZone) null);
+    }
+
+    /**
+     * Convert the object to the instance that is time for the specified time-zone. <br />
+     * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
+     * with flexible-parsing if the object is string type. <br />
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalTime.of(). and millisecond handling is following:</p>
+     * 
+     * <pre>
+     * e.g. millisecond and nanosecond handling
+     *  "2014/10/28 12:34:56.789" :: same as LocalTime.of(12, 34, 56, 789000000)
+     *  "2014/10/28 12:34:56.7" :: same as LocalTime.of(34, 56, 007000000)
+     *  "2014/10/28 12:34:56.78" :: same as LocalTime.of(12, 34, 56, 078000000)
+     *  "2014/10/28 12:34:56.7891" :: same as LocalTime.of(12, 34, 56, 789100000)
+     *  "2014/10/28 12:34:56.789123" :: same as LocalTime.of(12, 34, 56, 789123000)
+     *  "2014/10/28 12:34:56.789123456" :: same as LocalTime.of(12, 34, 56, 789123456)
+     * </pre>
      * @param obj The object to be converted. (NullAllowed: if null, returns null)
      * @param timeZone The time-zone for the local time. (NotNull)
      * @return The local time. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      */
     public static LocalTime toLocalTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toLocalTime()", timeZone);
-        return doConvertToLocalTime(obj, timeZone);
+        return doConvertToLocalTime(obj, (String) null, timeZone);
     }
 
-    protected static LocalTime doConvertToLocalTime(Object obj, TimeZone timeZone) {
+    /**
+     * Convert the object to the instance that is date-time for the specified time-zone. <br />
+     * This method uses the specified date pattern if the object is string type. 
+     * 
+     * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
+     * Then the time-zone is not used in conversion. It uses LocalTime.parse().</p>
+     * 
+     * @param obj The object to be converted. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @param timeZone The time-zone for the local time. (NotNull)
+     * @return The local time. (NullAllowed: when the argument is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     */
+    public static LocalTime toLocalTime(Object obj, String pattern, TimeZone timeZone) {
+        assertPatternNotNull("toLocalTime()", pattern);
+        assertTimeZoneNotNull("toLocalTime()", timeZone);
+        return doConvertToLocalTime(obj, pattern, timeZone);
+    }
+
+    protected static LocalTime doConvertToLocalTime(Object obj, String pattern, TimeZone timeZone) {
+        if (obj instanceof String) {
+            return doParseStringAsLocalTime((String) obj, pattern);
+        } else if (obj instanceof LocalDateTime) {
+            return ((LocalDateTime) obj).toLocalTime();
+        } else if (obj instanceof LocalTime) {
+            return (LocalTime) obj;
+        }
         final TimeZone realZone = chooseRealZone(timeZone);
         final Date zonedResourceDate = toZonedResourceDate(obj, realZone);
         return zonedResourceDate != null ? toZonedDateTime(zonedResourceDate, realZone).toLocalTime() : null;
+    }
+
+    protected static LocalTime doParseStringAsLocalTime(String str, String pattern) {
+        if (str == null || str.trim().length() == 0) {
+            return null;
+        }
+        if (pattern != null) {
+            try {
+                return LocalTime.parse(str, DateTimeFormatter.ofPattern(pattern, chooseRealLocale(null)));
+            } catch (DateTimeParseException e) {
+                throw new ParseDateException("Failed to parse the expression: " + str + " pattern=" + pattern, e);
+            }
+        }
+        final boolean includeMillis = true;
+        final boolean keepMillisMore = true; // local date can use nanosecond
+        final String timePart = filterTimeStringValueFlexibly(str, includeMillis, keepMillisMore); // HH:mm:ss[.SSS...]
+        try {
+            // parse myself for millisecond and nanosecond handling
+            final String timeDelim = ":";
+            final String millisDelim = ".";
+            final int hour = toInteger(Srl.substringFirstFront(timePart, timeDelim));
+            final int minute = toInteger(Srl.substringFirstFront(Srl.substringFirstRear(timePart, timeDelim), timeDelim));
+            final int second = toInteger(Srl.substringFirstFront(Srl.substringLastRear(timePart, timeDelim), millisDelim));
+            final int nanos;
+            if (timePart.contains(millisDelim)) {
+                final String millisPart = Srl.substringFirstRear(timePart, millisDelim);
+                nanos = toInteger(doConvertMillisToNanosString(millisPart));
+            } else {
+                nanos = 0;
+            }
+            try {
+                return LocalTime.of(hour, minute, second, nanos); // no need time-zone
+            } catch (DateTimeException e) {
+                String msg = "Failed to convert to local time:";
+                msg = msg + " " + hour + ", " + minute + ", " + second + ", " + nanos + ", timePart=" + timePart;
+                throw new ParseDateException(msg, e);
+            }
+        } catch (RuntimeException e) {
+            throw new ParseDateException("Failed to parse the expression: " + timePart + ", before-filter=" + str, e);
+        }
+    }
+
+    protected static String doConvertMillisToNanosString(String millis) {
+        if (millis.length() < 3) { // no way
+            throw new IllegalArgumentException("The argument 'millis' needs at least 3 length: " + millis);
+        }
+        return Srl.rfill(millis, 9, '0');
     }
 
     // -----------------------------------------------------
@@ -872,7 +1240,8 @@ public final class DfTypeUtil {
      * @param timeZone The time-zone for the local date. (NotNull)
      * @return The zoned date-time. (NullAllowed: when the argument is null)
      */
-    public static ZonedDateTime toZonedDateTime(Object obj, TimeZone timeZone) {
+    protected static ZonedDateTime toZonedDateTime(Object obj, TimeZone timeZone) {
+        // internal function for now, needs to know zoned handling
         assertTimeZoneNotNull("toZonedDateTime()", timeZone);
         if (obj == null) {
             return null;
@@ -890,8 +1259,8 @@ public final class DfTypeUtil {
     }
 
     // -----------------------------------------------------
-    //                                         Assist Jelper
-    //                                         -------------
+    //                                          Any Handling
+    //                                          ------------
     /**
      * Is the object local date or local date-time or local time?
      * @param obj The object to be judged. (NotNull)
@@ -899,6 +1268,17 @@ public final class DfTypeUtil {
      */
     public static boolean isAnyLocalDate(Object obj) {
         return obj instanceof LocalDate || obj instanceof LocalDateTime || obj instanceof LocalTime;
+    }
+
+    // -----------------------------------------------------
+    //                                        AD/BC Handling
+    //                                        --------------
+    public static boolean isLocalDateAD(LocalDate date) {
+        return date.getYear() > 0;
+    }
+
+    public static boolean isLocalDateBC(LocalDate date) {
+        return date.getYear() <= 0; // 0 means BC0001 in local date
     }
 
     // ===================================================================================
@@ -1003,13 +1383,13 @@ public final class DfTypeUtil {
         if (obj == null) {
             return null;
         } else if (obj instanceof String) {
-            return toDateFromString((String) obj, pattern, timeZone);
+            return doParseStringAsDate((String) obj, pattern, timeZone);
         } else if (obj instanceof LocalDate) {
             final LocalDate localDate = (LocalDate) obj;
-            return toDateFromLocalDate(localDate, timeZone);
+            return doParseLocalDateAsDate(localDate, timeZone);
         } else if (obj instanceof LocalDateTime) {
             final LocalDateTime localDateTime = (LocalDateTime) obj;
-            return toDateFromLocalDateTime(localDateTime, timeZone);
+            return doParseLocalDateTimeAsDate(localDateTime, timeZone);
         } else if (obj instanceof Date) {
             final Date paramDate = (Date) obj;
             if (Date.class.equals(paramDate.getClass())) { // pure date
@@ -1024,23 +1404,22 @@ public final class DfTypeUtil {
         } else if (obj instanceof Long) {
             return new Date((Long) obj);
         } else {
-            return toDateFromString(obj.toString(), pattern, timeZone);
+            return doParseStringAsDate(obj.toString(), pattern, timeZone);
         }
     }
 
-    protected static Date toDateFromString(String str, String pattern, TimeZone timeZone) {
+    protected static Date doParseStringAsDate(String str, String pattern, TimeZone timeZone) {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
         boolean strict;
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            // after all, includes when date too
-            // because date type can have millisecond formally
-            final boolean includeMilli = true;
-
-            str = filterDateStringValueFlexibly(str, includeMilli);
+            final boolean includeTime = true; // date has time part
+            final boolean includeMillis = true; // after all, includes when date too because date type can have millisecond formally
+            final boolean keepMillisMore = false; // date cannot use nanosecond
+            str = filterDateStringValueFlexibly(str, includeTime, includeMillis, keepMillisMore);
             strict = !str.startsWith("-"); // not BC
-            pattern = "yyyy-MM-dd HH:mm:ss.SSS";
+            pattern = DEFAULT_FULL_DATE_PATTERN;
         } else {
             strict = true;
         }
@@ -1052,17 +1431,20 @@ public final class DfTypeUtil {
                 df.setLenient(true);
                 df.parse(str); // no exception means illegal date
                 String msg = "The date expression is out of calendar:";
-                msg = msg + " string=" + str + " pattern=" + pattern;
+                msg = msg + " string=" + str + " pattern=" + pattern + " timeZone=" + timeZone;
                 throw new ParseDateOutOfCalendarException(msg, e);
             } catch (ParseException ignored) {
                 String msg = "Failed to parse the string to date:";
-                msg = msg + " string=" + str + " pattern=" + pattern;
+                msg = msg + " string=" + str + " pattern=" + pattern + " timeZone=" + timeZone;
                 throw new ParseDateException(msg, e);
             }
         }
     }
 
-    protected static String filterDateStringValueFlexibly(final String pureStr, boolean includeMilli) {
+    protected static String filterDateStringValueFlexibly(final String pureStr //
+            , boolean includeTime // HH:mm:ss
+            , boolean includeMillis // .SSS
+            , boolean keepMillisMore) { // .SSS...
         String value = pureStr;
         value = value.trim();
 
@@ -1163,25 +1545,29 @@ public final class DfTypeUtil {
         formatDateElementAsNumber(dd, "dd", pureStr); // check only
         final String yyyy_MM_dd = yyyy + dateDlm + mm + dateDlm + dd;
 
-        if (dayEndIndex >= 0) { // has time parts
-            final String time = startsDay.substring(dayEndIndex + dateTimeDlm.length());
+        if (includeTime) {
+            if (dayEndIndex >= 0) { // has time parts
+                final String time = startsDay.substring(dayEndIndex + dateTimeDlm.length());
 
-            // check whether it can filter
-            if (!time.contains(timeDlm) || (time.indexOf(timeDlm) == time.lastIndexOf(timeDlm))) {
-                return pureStr; // couldn't filter for example '2009-12-12 123451' and '2009-12-12 123:451'
-            }
+                // check whether it can filter
+                if (!time.contains(timeDlm) || (time.indexOf(timeDlm) == time.lastIndexOf(timeDlm))) {
+                    return pureStr; // couldn't filter for example '2009-12-12 123451' and '2009-12-12 123:451'
+                }
 
-            value = yyyy_MM_dd + dateTimeDlm + handleTimeZeroPrefix(time, pureStr, includeMilli);
-        } else {
-            value = yyyy_MM_dd + dateTimeDlm + "00:00:00";
-            if (includeMilli) {
-                value = value + timeMilliDlm + "000";
+                value = yyyy_MM_dd + dateTimeDlm + handleTimeZeroPrefix(time, pureStr, includeMillis, keepMillisMore);
+            } else {
+                value = yyyy_MM_dd + dateTimeDlm + "00:00:00";
+                if (includeMillis) {
+                    value = value + timeMilliDlm + "000";
+                }
             }
+        } else { // no time-part
+            value = yyyy_MM_dd;
         }
         return (bc ? bcMinusPrefix : "") + value;
     }
 
-    protected static String handleTimeZeroPrefix(String time, String pureStr, boolean includeMilli) {
+    protected static String handleTimeZeroPrefix(String time, String pureStr, boolean includeMillis, boolean keepMillisMore) {
         final String timeDlm = ":";
         final String timeMilliDlm = ".";
 
@@ -1203,11 +1589,11 @@ public final class DfTypeUtil {
         formatDateElementAsNumber(sec, "ss", pureStr); // check only
 
         String value = hour + timeDlm + min + timeDlm + sec;
-        if (includeMilli) {
+        if (includeMillis) {
             if (secEndIndex >= 0) {
                 String millis = startsSec.substring(secEndIndex + timeMilliDlm.length());
-                if (millis.length() > 3) { // truncate details
-                    millis = millis.substring(0, 3);
+                if (millis.length() > 3) { // keep or truncate details
+                    millis = keepMillisMore ? millis : millis.substring(0, 3);
                 } else { // add zero prefix
                     millis = resolveDateElementZeroPrefix(millis, 3 - millis.length());
                 }
@@ -1273,15 +1659,15 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                         from Time API
     //                                         -------------
-    protected static Date toDateFromLocalDate(LocalDate localDate, TimeZone timeZone) {
+    protected static Date doParseLocalDateAsDate(LocalDate localDate, TimeZone timeZone) {
         if (localDate == null) {
             return null;
         }
         final LocalDateTime localDateTime = localDate.atTime(0, 0, 0, 0);
-        return toDateFromLocalDateTime(localDateTime, timeZone);
+        return doParseLocalDateTimeAsDate(localDateTime, timeZone);
     }
 
-    protected static Date toDateFromLocalDateTime(LocalDateTime localDateTime, TimeZone timeZone) {
+    protected static Date doParseLocalDateTimeAsDate(LocalDateTime localDateTime, TimeZone timeZone) {
         if (localDateTime == null) {
             return null;
         }
@@ -1290,15 +1676,15 @@ public final class DfTypeUtil {
         return Date.from(localDateTime.toInstant(zoneId.getRules().getOffset(localDateTime)));
     }
 
-    protected static Timestamp toTimestampFromLocalDate(LocalDate localDate, TimeZone timeZone) {
+    protected static Timestamp doParseLocalDateAsTimestamp(LocalDate localDate, TimeZone timeZone) {
         if (localDate == null) {
             return null;
         }
         final LocalDateTime localDateTime = localDate.atTime(0, 0, 0, 0);
-        return toTimestampFromLocalDateTime(localDateTime, timeZone);
+        return doParseLocalDateTimeAsTimestamp(localDateTime, timeZone);
     }
 
-    protected static Timestamp toTimestampFromLocalDateTime(LocalDateTime localDateTime, TimeZone timeZone) {
+    protected static Timestamp doParseLocalDateTimeAsTimestamp(LocalDateTime localDateTime, TimeZone timeZone) {
         if (localDateTime == null) {
             return null;
         }
@@ -1308,8 +1694,8 @@ public final class DfTypeUtil {
     }
 
     // -----------------------------------------------------
-    //                                         Determination
-    //                                         -------------
+    //                                        AD/BC Handling
+    //                                        --------------
     public static boolean isDateAD(Date date) {
         return doJudgeDateAD(date, null);
     }
@@ -1813,8 +2199,9 @@ public final class DfTypeUtil {
     }
 
     protected static DateFormat doCreateDateFormat(String pattern, TimeZone timeZone, boolean strict) {
-        final Locale locale = chooseRealLocale(null); // no setting point so null
-        final SimpleDateFormat sdf = new SimpleDateFormat(pattern, locale);
+        final String realPattern = pattern != null ? pattern : DEFAULT_FULL_DATE_PATTERN;
+        final Locale realLocale = chooseRealLocale(null); // no setting point so null
+        final SimpleDateFormat sdf = new SimpleDateFormat(realPattern, realLocale);
         final TimeZone realZone = chooseRealZone(timeZone);
         sdf.setTimeZone(realZone);
         sdf.setLenient(!strict);
@@ -1907,14 +2294,14 @@ public final class DfTypeUtil {
             }
         } else if (obj instanceof LocalDate) {
             final LocalDate localDate = (LocalDate) obj;
-            return toTimestampFromLocalDate(localDate, timeZone);
+            return doParseLocalDateAsTimestamp(localDate, timeZone);
         } else if (obj instanceof LocalDateTime) {
             final LocalDateTime localDateTime = (LocalDateTime) obj;
-            return toTimestampFromLocalDateTime(localDateTime, timeZone);
+            return doParseLocalDateTimeAsTimestamp(localDateTime, timeZone);
         } else if (obj instanceof Date) {
             return new Timestamp(((Date) obj).getTime());
         } else if (obj instanceof String) {
-            return toTimestampFromString((String) obj, pattern, timeZone);
+            return doParseStringAsTimestamp((String) obj, pattern, timeZone);
         } else if (obj instanceof Calendar) {
             return new Timestamp(((Calendar) obj).getTime().getTime());
         } else if (obj instanceof byte[]) {
@@ -1922,11 +2309,11 @@ public final class DfTypeUtil {
         } else if (obj instanceof Long) {
             return new Timestamp((Long) obj);
         } else {
-            return toTimestampFromString(obj.toString(), pattern, timeZone);
+            return doParseStringAsTimestamp(obj.toString(), pattern, timeZone);
         }
     }
 
-    protected static Timestamp toTimestampFromString(String str, String pattern, TimeZone timeZone) {
+    protected static Timestamp doParseStringAsTimestamp(String str, String pattern, TimeZone timeZone) {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
@@ -1934,7 +2321,7 @@ public final class DfTypeUtil {
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
             str = filterTimestampStringValueFlexibly(str);
             strict = !str.startsWith("-"); // not BC
-            pattern = "yyyy-MM-dd HH:mm:ss.SSS";
+            pattern = DEFAULT_FULL_DATE_PATTERN;
         } else {
             strict = true;
         }
@@ -1959,8 +2346,10 @@ public final class DfTypeUtil {
     protected static String filterTimestampStringValueFlexibly(final String pureStr) {
         String str = pureStr;
         try {
-            final boolean includeMilli = true;
-            str = filterDateStringValueFlexibly(str, includeMilli); // based on date way
+            final boolean includeTime = true; // off course
+            final boolean includeMilli = true; // off course
+            final boolean keepMillisMore = false; // time-stamp cannot use nanosecond
+            str = filterDateStringValueFlexibly(str, includeTime, includeMilli, keepMillisMore); // based on date way
         } catch (ParseDateNumberFormatException e) {
             String msg = "Failed to format the timestamp as number:";
             msg = msg + " value=" + pureStr;
@@ -2070,7 +2459,7 @@ public final class DfTypeUtil {
         if (obj == null) {
             return null;
         } else if (obj instanceof String) {
-            return toTimeFromString((String) obj, pattern, timeZone);
+            return doParseStringAsTime((String) obj, pattern, timeZone);
         } else if (obj instanceof Time) {
             final Time paramTime = (Time) obj;
             if (Time.class.equals(paramTime.getClass())) { // pure time
@@ -2079,16 +2468,30 @@ public final class DfTypeUtil {
                 // because the time type is not final class.
                 return new Time(paramTime.getTime());
             }
+        } else if (isAnyLocalDate(obj)) {
+            final String localTimePattern = "HH:mm:ss";
+            if (obj instanceof LocalDate) {
+                final String strTime = ((LocalDate) obj).format(DateTimeFormatter.ofPattern(localTimePattern));
+                return doParseStringAsTime(strTime, pattern, timeZone);
+            } else if (obj instanceof LocalDateTime) {
+                final String strTime = ((LocalDateTime) obj).format(DateTimeFormatter.ofPattern(localTimePattern));
+                return doParseStringAsTime(strTime, pattern, timeZone);
+            } else if (obj instanceof LocalTime) {
+                final String strTime = ((LocalTime) obj).format(DateTimeFormatter.ofPattern(localTimePattern));
+                return doParseStringAsTime(strTime, pattern, timeZone);
+            } else { // no way
+                throw new IllegalStateException("Unknown local date: type=" + obj.getClass() + ", value=" + obj);
+            }
         } else if (obj instanceof Date) {
-            Date date = (Date) obj;
-            Calendar cal = Calendar.getInstance();
+            final Date date = (Date) obj;
+            final Calendar cal = Calendar.getInstance();
             cal.setTime(date);
             cal.set(Calendar.YEAR, 1970);
             cal.set(Calendar.MONTH, Calendar.JANUARY);
             cal.set(Calendar.DATE, 1);
             return new Time(cal.getTimeInMillis());
         } else if (obj instanceof Calendar) {
-            Calendar cal = (Calendar) obj;
+            final Calendar cal = (Calendar) obj;
             cal.set(Calendar.YEAR, 1970);
             cal.set(Calendar.MONTH, Calendar.JANUARY);
             cal.set(Calendar.DATE, 1);
@@ -2098,16 +2501,18 @@ public final class DfTypeUtil {
         } else if (obj instanceof Long) {
             return toTime(toDate((Long) obj));
         } else {
-            return toTimeFromString(obj.toString(), pattern, timeZone);
+            return doParseStringAsTime(obj.toString(), pattern, timeZone);
         }
     }
 
-    protected static Time toTimeFromString(String str, String pattern, TimeZone timeZone) {
+    protected static Time doParseStringAsTime(String str, String pattern, TimeZone timeZone) {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            str = filterTimeStringValueFlexibly(str);
+            final boolean includeMillis = false; // time cannot use millisecond
+            final boolean keepMillisMore = false; // time cannot use nanosecond
+            str = filterTimeStringValueFlexibly(str, includeMillis, keepMillisMore);
             pattern = "HH:mm:ss";
         }
         final DateFormat df = doCreateDateFormat(pattern, timeZone, true);
@@ -2128,16 +2533,15 @@ public final class DfTypeUtil {
         }
     }
 
-    protected static String filterTimeStringValueFlexibly(String pureStr) {
+    protected static String filterTimeStringValueFlexibly(String pureStr, boolean includeMillis, boolean keepMillisMore) {
         String str = pureStr;
         str = str.trim();
         final int dateEndIndex = str.indexOf(" ");
         if (dateEndIndex >= 0) {
             // '2008-12-12 12:34:56' to '12:34:56'
             final String time = str.substring(dateEndIndex + " ".length());
-            final boolean includeMilli = false;
             try {
-                str = handleTimeZeroPrefix(time, pureStr, includeMilli);
+                str = handleTimeZeroPrefix(time, pureStr, includeMillis, keepMillisMore);
             } catch (ParseDateNumberFormatException e) {
                 String msg = "Failed to format the time as number:";
                 msg = msg + " value=" + pureStr;

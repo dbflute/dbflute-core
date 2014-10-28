@@ -68,7 +68,7 @@ public class FunCustodial {
             return null;
         }
         final TimeZone realZone = timeZone != null ? timeZone : DBFluteSystem.getFinalTimeZone();
-        final String str = DfTypeUtil.toDispDate(date, pattern, realZone);
+        final String str = DfTypeUtil.toStringDate(date, pattern, realZone);
         return (DfTypeUtil.isDateBC(date) ? "BC" : "") + str;
     }
 

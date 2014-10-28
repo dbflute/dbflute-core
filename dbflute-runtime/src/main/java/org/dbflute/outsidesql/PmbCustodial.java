@@ -112,7 +112,7 @@ public class PmbCustodial {
     }
 
     public static String formatUtilDate(Date date, String pattern, TimeZone specifiedZone) {
-        return DfTypeUtil.toDispDate(date, pattern, chooseRealTimeZone(specifiedZone));
+        return DfTypeUtil.toStringDate(date, pattern, chooseRealTimeZone(specifiedZone));
     }
 
     public static void assertFromToOptionValid(String name, FromToOption option) {

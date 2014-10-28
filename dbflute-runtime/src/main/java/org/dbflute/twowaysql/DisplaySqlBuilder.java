@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.TimeZone;
+import java.util.function.BooleanSupplier;
 
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.system.DBFluteSystem;
@@ -254,15 +255,15 @@ public class DisplaySqlBuilder {
     //                                                                       Date Handling
     //                                                                       =============
     protected String buildLocalDateText(Object bindVariable) {
-        return processDateDisplay(DfTypeUtil.toDate((LocalDate) bindVariable, getTimeZone()), getLocalDatePattern());
+        return processLocalDateDisplay((LocalDate) bindVariable, getLocalDatePattern());
     }
 
     protected String buildLocalDateTimeText(Object bindVariable) {
-        return processDateDisplay(DfTypeUtil.toDate((LocalDateTime) bindVariable, getTimeZone()), getLocalDateTimePattern());
+        return processLocalDateTimeDisplay((LocalDateTime) bindVariable, getLocalDateTimePattern());
     }
 
     protected String buildLocalTimeText(Object bindVariable) {
-        return processDateDisplay(DfTypeUtil.toDate((LocalTime) bindVariable, getTimeZone()), getLocalTimePattern());
+        return processLocalTimeDisplay((LocalTime) bindVariable, getLocalTimePattern());
     }
 
     protected String buildDateText(Object bindVariable) {
@@ -277,16 +278,38 @@ public class DisplaySqlBuilder {
         return quote(DfTypeUtil.toString((java.util.Date) bindVariable, getTimePattern()));
     }
 
+    protected String processLocalDateDisplay(LocalDate date, String format) {
+        final DateFormatResource resource = analyzeDateFormat(format);
+        String disp = DfTypeUtil.toStringLocalDate(date, resource.getFormat());
+        disp = filterBCPrefix(disp, () -> isBCPrefixTarget(date, resource));
+        return quote(disp, resource);
+    }
+
+    protected String processLocalDateTimeDisplay(LocalDateTime date, String format) {
+        final DateFormatResource resource = analyzeDateFormat(format);
+        String disp = DfTypeUtil.toStringLocalDateTime(date, resource.getFormat());
+        disp = filterBCPrefix(disp, () -> isBCPrefixTarget(date, resource));
+        return quote(disp, resource);
+    }
+
+    protected String processLocalTimeDisplay(LocalTime date, String format) {
+        final DateFormatResource resource = analyzeDateFormat(format);
+        final String disp = DfTypeUtil.toStringLocalTime(date, resource.getFormat());
+        return quote(disp, resource);
+    }
+
     protected String processDateDisplay(java.util.Date date, String format) {
         final DateFormatResource resource = analyzeDateFormat(format);
-        String disp = DfTypeUtil.toDispDate(date, resource.getFormat(), getTimeZone());
-        if (isBCPrefixTarget(date, resource)) {
-            // fixed specification, basically not use 'G'
-            // in pattern at least default pattern
-            // because it should be displayed only when BC date
-            disp = "BC" + disp;
-        }
+        String disp = DfTypeUtil.toStringDate(date, resource.getFormat(), getTimeZone());
+        disp = filterBCPrefix(disp, () -> isBCPrefixTarget(date, resource));
         return quote(disp, resource);
+    }
+
+    protected String filterBCPrefix(String disp, BooleanSupplier noArgLambda) {
+        // fixed specification, basically not use 'G'
+        // in pattern at least default pattern
+        // because it should be displayed only when BC date
+        return noArgLambda.getAsBoolean() ? ("BC" + disp) : disp;
     }
 
     // -----------------------------------------------------
@@ -335,8 +358,19 @@ public class DisplaySqlBuilder {
     //                                              AD or BC
     //                                              --------
     protected boolean isBCPrefixTarget(java.util.Date date, DateFormatResource resource) {
-        final String format = resource.getFormat();
-        return DfTypeUtil.isDateBC(date) && format.startsWith("yyyy") && !format.contains("G");
+        return DfTypeUtil.isDateBC(date) && judgeBCPrefixTargetFormat(resource.getFormat());
+    }
+
+    protected boolean isBCPrefixTarget(LocalDate date, DateFormatResource resource) {
+        return DfTypeUtil.isLocalDateBC(date) && judgeBCPrefixTargetFormat(resource.getFormat());
+    }
+
+    protected boolean isBCPrefixTarget(LocalDateTime date, DateFormatResource resource) {
+        return DfTypeUtil.isLocalDateBC(date.toLocalDate()) && judgeBCPrefixTargetFormat(resource.getFormat());
+    }
+
+    protected boolean judgeBCPrefixTargetFormat(String format) {
+        return format.startsWith("yyyy") && !format.contains("G");
     }
 
     // -----------------------------------------------------

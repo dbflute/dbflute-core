@@ -852,7 +852,7 @@ public class HandyDateZonedTest extends RuntimeTestCase {
 
         // ## Assert ##
         Date utilDate = handyDate.getDate();
-        String strDate = DfTypeUtil.toDispDate(utilDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
+        String strDate = DfTypeUtil.toStringDate(utilDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
         log(strDate);
         assertEquals("1970/01/01 00:00:00.000", strDate);
         assertEquals(-7200000L, utilDate.getTime()); // 2 hours before in GMT
@@ -888,7 +888,7 @@ public class HandyDateZonedTest extends RuntimeTestCase {
 
         // ## Assert ##
         Date utilDate = handyDate.getDate();
-        String strDate = DfTypeUtil.toDispDate(utilDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
+        String strDate = DfTypeUtil.toStringDate(utilDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
         log(strDate);
         assertEquals("1970/01/01 01:00:00.000", strDate);
         assertEquals(-3600000L, utilDate.getTime()); // 1 hour before in GMT
@@ -905,7 +905,7 @@ public class HandyDateZonedTest extends RuntimeTestCase {
 
         // ## Assert ##
         Date utilDate = handyDate.getDate();
-        String strDate = DfTypeUtil.toDispDate(utilDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
+        String strDate = DfTypeUtil.toStringDate(utilDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
         log(strDate);
         assertEquals("1970/01/01 02:00:00.000", strDate);
         assertEquals(0L, utilDate.getTime());

@@ -1400,14 +1400,22 @@ public class Srl {
     //                                                                                Fill
     //                                                                                ====
     public static String rfill(String str, int size) {
-        return doFill(str, size, false);
+        return doFill(str, size, false, ' ');
+    }
+
+    public static String rfill(String str, int size, Character addedChar) {
+        return doFill(str, size, false, addedChar);
     }
 
     public static String lfill(String str, int size) {
-        return doFill(str, size, true);
+        return doFill(str, size, true, ' ');
     }
 
-    protected static String doFill(String str, int size, boolean left) {
+    public static String lfill(String str, int size, Character addedChar) {
+        return doFill(str, size, true, addedChar);
+    }
+
+    protected static String doFill(String str, int size, boolean left, Character addedChar) {
         assertStringNotNull(str);
         if (str.length() >= size) {
             return str;
@@ -1415,7 +1423,7 @@ public class Srl {
         final int addSize = size - str.length();
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < addSize; i++) {
-            sb.append(" ");
+            sb.append(addedChar);
         }
         if (left) {
             return sb + str;
