@@ -18,10 +18,10 @@ package org.dbflute.optional;
 /**
  * The predicate of optional value.
  * <pre>
- * OptionalObject&lt;MemberWebBean&gt; beanOpt = entityOpt.<span style="color: #CC4747">filter</span>(member -&gt; {
+ * entityOpt.<span style="color: #CC4747">filter</span>(member -&gt; {
  *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
  *     return member.getMemberId() % 2 == 0;
- * });
+ * }).<span style="color: #994747">ifPresent</span>(...);
  * </pre>
  * @param <OBJ> The type of wrapped object in optional object.
  * @author jflute

@@ -248,9 +248,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
         return (OptionalEntity<ENTITY>) callbackFilter(entityLambda);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected <ARG> OptionalEntity<ARG> createOptionalFilteredObject(ARG obj) {
         return new OptionalEntity<ARG>(obj, _thrower);
@@ -276,46 +274,51 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
         return (OptionalThing<RESULT>) callbackMapping(entityLambda); // downcast allowed because factory is overridden
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    protected <ARG> OptionalThing<ARG> createOptionalMappedObject(ARG obj) {
-        return new OptionalThing<ARG>(obj, _thrower);
+    protected <ARG> OptionalEntity<ARG> createOptionalMappedObject(ARG obj) {
+        return new OptionalEntity<ARG>(obj, _thrower);
     }
 
-    // TODO jflute impl: Optional.flatMap()
-    // almost no needed
-    ///**
-    // * Apply the flat-mapping of entity to result object.
-    // * <pre>
-    // * MemberCB cb = new MemberCB();
-    // * cb.query().set...
-    // * OptionalEntity&lt;Member&gt; entity = memberBhv.selectEntity(cb);
-    // * OptionalObject&lt;MemberWebBean&gt; bean = entity.<span style="color: #CC4747">map</span>(member <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
-    // *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
-    // *     if (member.getMemberId() % 2 == 0) {
-    // *         return OptionalObject.of(new MemberWebBean(member));
-    // *     } else {
-    // *         return OptionalObject.empty();
-    // *     }
-    // * });
-    // * </pre>
-    // * @param mapper The callback interface to apply. (NotNull)
-    // * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
-    // */
-    //public <RESULT> OptionalThing<RESULT> flatMap(OptionalObjectFunction<? super ENTITY, OptionalThing<RESULT>> mapper) {
-    //    return callbackFlatMapping(mapper);
-    //}
+    /**
+     * Apply the flat-mapping of entity to result object.
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(1)).<span style="color: #CC4747">flatMap</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
+     *     return <span style="color: #553000">member</span>.getMemberWithdrawal();
+     * }).<span style="color: #994747">ifPresent</span>(<span style="color: #553000">withdrawal</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ...
+     * });
+     * </pre>
+     * @param <RESULT> The type of mapping result.
+     * @param entityLambda The callback interface to apply. (NotNull)
+     * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
+     */
+    public <RESULT> OptionalThing<RESULT> flatMap(OptionalThingFunction<? super ENTITY, OptionalThing<RESULT>> entityLambda) {
+        assertEntityLambdaNotNull(entityLambda);
+        return callbackFlatMapping(entityLambda);
+    }
 
-    // unsupported because of absolutely no needed, and making orElseNull() stand out
-    //public ENTITY orElse(...) {
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // following methods might be rare case...
+    // _/_/_/_/_/_/_/_/_/_/
+
+    /** {@inheritDoc} */
+    @Override
+    public ENTITY orElse(ENTITY other) {
+        return directlyGetOrElse(other);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ENTITY orElseGet(OptionalThingSupplier<ENTITY> noArgLambda) {
+        return directlyGetOrElseGet(noArgLambda);
+    }
+
+    // unsupported because of almost no needed, see the comment on OptionalThing for the details
+    //public ENTITY orElseThrow(...) {
     //    return ...;
     //}
-    //public ENTITY orElseGet(...) {
-    //    return ...;
-    //}
-    // TODO jflute impl: Optional.orElseThrow(Supplier) and others...
 
     // ===================================================================================
     //                                                                   DBFlute Extension
@@ -343,16 +346,6 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      */
     public ENTITY orElseNull() {
         return directlyGetOrElse(null);
-    }
-
-    /**
-     * Handle the entity in the optional object or exception if not present.
-     * @param entityLambda The callback interface to consume the optional value. (NotNull)
-     * @throws EntityAlreadyDeletedException When the entity instance wrapped in this optional object is null, which means entity has already been deleted (point is not found).
-     * @deprecated use alwaysPresent(), this is old style
-     */
-    public void required(OptionalThingConsumer<ENTITY> entityLambda) {
-        callbackAlwaysPresent(entityLambda);
     }
 
     // ===================================================================================

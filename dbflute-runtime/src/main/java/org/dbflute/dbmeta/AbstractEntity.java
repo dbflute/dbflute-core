@@ -29,7 +29,7 @@ import org.dbflute.dbmeta.accessory.EntityDerivedMap;
 import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
 import org.dbflute.dbmeta.accessory.EntityUniqueDrivenProperties;
 import org.dbflute.jdbc.ClassificationMeta;
-import org.dbflute.optional.OptionalProperty;
+import org.dbflute.optional.OptionalScalar;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
@@ -79,7 +79,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     }
 
     /** {@inheritDoc} */
-    public <VALUE> OptionalProperty<VALUE> derived(String aliasName, Class<VALUE> propertyType) {
+    public <VALUE> OptionalScalar<VALUE> derived(String aliasName, Class<VALUE> propertyType) {
         if (__derivedMap == null) {
             // process of finding has existence check of the alias
             // so if called here, exception in the map

@@ -16,25 +16,23 @@
 package org.dbflute.optional;
 
 /**
- * The function of optional thing.
+ * The supplier of optional thing.
  * <pre>
- * entityOpt.<span style="color: #CC4747">map</span>(member -&gt; {
- *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
- *     return new MemberWebBean(member);
- * }).<span style="color: #994747">ifPresent</span>(...);
+ * Member member = entityOpt.<span style="color: #CC4747">orElseGet</span>(() -&gt; {
+ *     <span style="color: #3F7E5E">// called if value NOT exists, not called if present</span>
+ *     return new Member();
+ * });
  * </pre>
- * @param <OBJ> The type of wrapped object in optional thing.
  * @param <RESULT> The type of result of mapping.
  * @author jflute
- * @since 1.0.5F (2014/05/10 Saturday)
+ * @since 1.1.0 (2014/10/28 Tuesday)
  */
 @FunctionalInterface
-public interface OptionalThingFunction<OBJ, RESULT> {
+public interface OptionalThingSupplier<RESULT> {
 
     /**
-     * Apply the object in the optional thing.
-     * @param obj The wrapped object in the optional thing. (NotNull)
-     * @return The result of mapping. (NullAllowed: if null, map() returns empty optional thing)
+     * Get the object from the callback process.
+     * @return The result of getting. (NullAllowed: if null, returns null)
      */
-    RESULT apply(OBJ obj);
+    RESULT get();
 }

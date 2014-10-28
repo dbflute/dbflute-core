@@ -23,7 +23,7 @@ import java.util.Optional;
  * @author jflute
  * @since 1.0.5F (2014/05/10 Saturday)
  */
-public abstract class BaseOptional<OBJ> {
+public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
 
     // ===================================================================================
     //                                                                          Definition
@@ -124,14 +124,26 @@ public abstract class BaseOptional<OBJ> {
         return exists() ? _obj : other;
     }
 
+    /**
+     * @param supplier The supplier of other instance if null. (NotNull)
+     * @return The object instance wrapped in this optional object or specified value. (NullAllowed: if null specified)
+     */
+    protected OBJ directlyGetOrElseGet(OptionalThingSupplier<OBJ> supplier) {
+        if (supplier == null) {
+            String msg = "The argument 'supplier' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        return exists() ? _obj : supplier.get();
+    }
+
     // -----------------------------------------------------
     //                                              filter()
     //                                              --------
     /**
      * @param mapper The callback interface to apply. (NotNull)
-     * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
+     * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    protected BaseOptional<OBJ> callbackFilter(OptionalThingPredicate<OBJ> mapper) {
+    protected OptionalThing<OBJ> callbackFilter(OptionalThingPredicate<OBJ> mapper) {
         if (mapper == null) {
             String msg = "The argument 'mapper' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -148,11 +160,11 @@ public abstract class BaseOptional<OBJ> {
     }
 
     /**
-     * @param <ARG> The type of value for optional object.
-     * @param obj The plain object for the optional object. (NullAllowed: if null, return s empty optional)
-     * @return The new-created instance of optional object. (NotNull)
+     * @param <ARG> The type of value for optional thing.
+     * @param obj The plain object for the optional thing. (NullAllowed: if null, return s empty optional)
+     * @return The new-created instance of optional thing. (NotNull)
      */
-    protected abstract <ARG> BaseOptional<ARG> createOptionalFilteredObject(ARG obj);
+    protected abstract <ARG> OptionalThing<ARG> createOptionalFilteredObject(ARG obj);
 
     // -----------------------------------------------------
     //                                                 map()
@@ -162,7 +174,7 @@ public abstract class BaseOptional<OBJ> {
      * @param mapper The callback interface to apply. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
-    protected <RESULT> BaseOptional<RESULT> callbackMapping(OptionalThingFunction<? super OBJ, ? extends RESULT> mapper) {
+    protected <RESULT> OptionalThing<RESULT> callbackMapping(OptionalThingFunction<? super OBJ, ? extends RESULT> mapper) {
         if (mapper == null) {
             String msg = "The argument 'mapper' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -172,16 +184,16 @@ public abstract class BaseOptional<OBJ> {
     }
 
     /**
-     * @param <ARG> The type of value for optional object.
-     * @param obj The plain object for the optional object. (NullAllowed: if null, return s empty optional)
-     * @return The new-created instance of optional object. (NotNull)
+     * @param <ARG> The type of value for optional thing.
+     * @param obj The plain object for the optional thing. (NullAllowed: if null, return s empty optional)
+     * @return The new-created instance of optional thing. (NotNull)
      */
-    protected abstract <ARG> BaseOptional<ARG> createOptionalMappedObject(ARG obj);
+    protected abstract <ARG> OptionalThing<ARG> createOptionalMappedObject(ARG obj);
 
     /**
      * @param <RESULT> The type of mapping result.
      * @param mapper The callback interface to apply. (NotNull)
-     * @return The optional object as flat-mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
+     * @return The optional thing as flat-mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     protected <RESULT> OptionalThing<RESULT> callbackFlatMapping(OptionalThingFunction<? super OBJ, OptionalThing<RESULT>> mapper) {
         if (mapper == null) {
@@ -194,11 +206,7 @@ public abstract class BaseOptional<OBJ> {
     // ===================================================================================
     //                                                                   Standard Optional
     //                                                                   =================
-    /**
-     * Convert to Java standard optional class. <br />
-     * For only when standard optional handling is needed, so basically you don't use this.
-     * @return The new-created instance or empty. (NotNull)
-     */
+    /** {@inheritDoc} */
     public Optional<OBJ> toOptional() {
         return Optional.ofNullable(directlyGetOrElse(null));
     }

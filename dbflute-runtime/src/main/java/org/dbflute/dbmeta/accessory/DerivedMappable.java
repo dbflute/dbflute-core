@@ -18,7 +18,7 @@ package org.dbflute.dbmeta.accessory;
 import org.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.dbflute.exception.SpecifyDerivedReferrerUnknownAliasNameException;
 import org.dbflute.exception.SpecifyDerivedReferrerUnmatchedPropertyTypeException;
-import org.dbflute.optional.OptionalProperty;
+import org.dbflute.optional.OptionalScalar;
 
 /**
  * The interface of derived mappable object (basically entity), for (Specify)DerivedReferrer.
@@ -83,5 +83,5 @@ public interface DerivedMappable {
      * @throws SpecifyDerivedReferrerUnknownAliasNameException When the alias name is unknown, no derived.
      * @throws SpecifyDerivedReferrerUnmatchedPropertyTypeException When the property type is unmatched with actual type.
      */
-    <VALUE> OptionalProperty<VALUE> derived(String aliasName, Class<VALUE> propertyType);
+    <VALUE> OptionalScalar<VALUE> derived(String aliasName, Class<VALUE> propertyType);
 }
