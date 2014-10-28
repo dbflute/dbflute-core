@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
@@ -94,6 +95,9 @@ public class FunctionFilterOption implements ParameterOption {
     protected boolean _databaseDerby;
     protected Object _tmpTrunc;
     protected boolean _mayNullRevived;
+
+    /** The time-zone for filtering. (NullAllowed: if null, default zone) */
+    protected TimeZone _timeZone;
 
     // ===================================================================================
     //                                                                              Option
@@ -278,13 +282,14 @@ public class FunctionFilterOption implements ParameterOption {
         final Object realParam;
         if (coalesce instanceof String && isDateTypeColumn()) {
             if (isJustDateTypeColumn()) {
-                realParam = DfTypeUtil.toLocalDate(coalesce);
+                // even if util.Date, use local date here (can be mapped correctly)
+                realParam = DfTypeUtil.toLocalDate(coalesce, getTimeZone());
             } else if (isJustTimestampTypeColumn()) {
-                realParam = DfTypeUtil.toLocalDateTime(coalesce);
+                realParam = DfTypeUtil.toLocalDateTime(coalesce, getTimeZone());
             } else if (isJustTimeTypeColumn()) {
-                realParam = DfTypeUtil.toLocalTime(coalesce);
+                realParam = DfTypeUtil.toLocalTime(coalesce, getTimeZone());
             } else { // basically no way, just in case
-                realParam = DfTypeUtil.toLocalDateTime(coalesce);
+                realParam = DfTypeUtil.toLocalDateTime(coalesce, getTimeZone());
             }
         } else {
             realParam = coalesce;
@@ -728,6 +733,34 @@ public class FunctionFilterOption implements ParameterOption {
     public boolean mayNullRevived() { // basically for auto-detect of inner-join
         // coalesce can change a null value to an existing value
         return _mayNullRevived;
+    }
+
+    // ===================================================================================
+    //                                                                            TimeZone
+    //                                                                            ========
+    /**
+     * Set time-zone, basically for LocalDate conversion. <br />
+     * Normally you don't need to set this, you can adjust other ways. <br />
+     * (DBFlute system's time-zone is used as default) <br />
+     * And it should be called before e.g. coalesce()
+     * @param timeZone The time-zone for filtering. (NullAllowed: if null, default zone)
+     * @return this. (NotNull)
+     */
+    public FunctionFilterOption zone(TimeZone timeZone) {
+        _timeZone = timeZone;
+        return this;
+    }
+
+    /**
+     * Get the time-zone in this option basically for filtering.
+     * @return The time-zone for filtering. (NotNull: if no setting, system zone)
+     */
+    public TimeZone getTimeZone() {
+        return _timeZone != null ? _timeZone : getDBFluteSystemFinalTimeZone();
+    }
+
+    protected TimeZone getDBFluteSystemFinalTimeZone() {
+        return DBFluteSystem.getFinalTimeZone();
     }
 
     // ===================================================================================

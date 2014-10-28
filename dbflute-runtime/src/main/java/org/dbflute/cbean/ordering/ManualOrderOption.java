@@ -761,7 +761,7 @@ public class ManualOrderOption implements ColumnCalculator {
         } else if (plainValue instanceof LocalTime) {
             final String pattern = DisplaySqlBuilder.DEFAULT_TIME_FORMAT;
             return doBuildLiteralDateExpression(DfTypeUtil.toStringLocalTime((LocalTime) plainValue, pattern));
-        } else {
+        } else { // instance of util.Date, as time-stamp fixedly (since 1.0.x)
             final String pattern = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
             return doBuildLiteralDateExpression(DfTypeUtil.toString(plainValue, pattern));
         }
