@@ -39,9 +39,9 @@ public class DisplaySqlBuilder {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
-    public static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
-    public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
+    public static final String DEFAULT_DATE_FORMAT = DfTypeUtil.HYPHENED_DATE_PATTERN;
+    public static final String DEFAULT_TIMESTAMP_FORMAT = DfTypeUtil.HYPHENED_TIMESTAMP_PATTERN;
+    public static final String DEFAULT_TIME_FORMAT = DfTypeUtil.COLONED_TIME_PATTERN;
     public static final String NULL = "null";
 
     // ===================================================================================

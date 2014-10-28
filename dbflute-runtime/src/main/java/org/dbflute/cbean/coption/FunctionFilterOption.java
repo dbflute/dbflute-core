@@ -15,6 +15,11 @@
  */
 package org.dbflute.cbean.coption;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -272,7 +277,15 @@ public class FunctionFilterOption implements ParameterOption {
         }
         final Object realParam;
         if (coalesce instanceof String && isDateTypeColumn()) {
-            realParam = DfTypeUtil.toDate(coalesce);
+            if (isJustDateTypeColumn()) {
+                realParam = DfTypeUtil.toLocalDate(coalesce);
+            } else if (isJustTimestampTypeColumn()) {
+                realParam = DfTypeUtil.toLocalDateTime(coalesce);
+            } else if (isJustTimeTypeColumn()) {
+                realParam = DfTypeUtil.toLocalTime(coalesce);
+            } else { // basically no way, just in case
+                realParam = DfTypeUtil.toLocalDateTime(coalesce);
+            }
         } else {
             realParam = coalesce;
         }
@@ -720,6 +733,9 @@ public class FunctionFilterOption implements ParameterOption {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    // -----------------------------------------------------
+    //                                       Simple Function
+    //                                       ---------------
     protected String processSimpleFunction(String functionExp, String functionName, String thirdArg, boolean leftArg, Object bindKey) {
         final String bindExp = buildBindParameter(bindKey);
         final StringBuilder sb = new StringBuilder();
@@ -748,6 +764,13 @@ public class FunctionFilterOption implements ParameterOption {
         return sb.toString();
     }
 
+    protected boolean hasSubQueryEndOnLastLine(String functionExp) {
+        return SubQueryIndentProcessor.hasSubQueryEndOnLastLine(functionExp);
+    }
+
+    // -----------------------------------------------------
+    //                                        Bind Parameter
+    //                                        --------------
     protected String buildBindParameter(Object bindKey) {
         final String bindExp;
         if (isDreamCruiseTicket(bindKey)) {
@@ -758,39 +781,88 @@ public class FunctionFilterOption implements ParameterOption {
         return bindExp;
     }
 
-    protected boolean hasSubQueryEndOnLastLine(String functionExp) {
-        return SubQueryIndentProcessor.hasSubQueryEndOnLastLine(functionExp);
+    protected Object registerBindParameter(int index, Object parameter) {
+        if (isDreamCruiseTicket(parameter)) {
+            return parameter;
+        }
+        if (_bindMap == null) {
+            _bindMap = new HashMap<String, Object>(4);
+        }
+        final String bindKey = "param" + index;
+        _bindMap.put(bindKey, parameter);
+        return bindKey;
     }
 
+    // -----------------------------------------------------
+    //                                   Additional Variable
+    //                                   -------------------
     protected boolean hasTargetColumnInfo() {
         return _targetColumnInfo != null;
-    }
-
-    protected boolean isDateTypeColumn() {
-        if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeDate()) {
-            return true;
-        }
-        final Object snapshot = _mysticBindingSnapshot;
-        if (snapshot != null && (snapshot instanceof Date || DfTypeUtil.isAnyLocalDate(snapshot))) { // #dateParade
-            return true;
-        }
-        return false;
     }
 
     protected boolean hasMysticBinding() {
         return _mysticBindingSnapshot != null;
     }
 
+    // -----------------------------------------------------
+    //                                             Date Type
+    //                                             ---------
+    protected boolean isDateTypeColumn() { // #dateParade
+        if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeDate()) {
+            return true;
+        }
+        final Object snapshot = _mysticBindingSnapshot;
+        if (snapshot != null && (snapshot instanceof Date || DfTypeUtil.isAnyLocalDate(snapshot))) {
+            return true;
+        }
+        return false;
+    }
+
     protected boolean isJustDateTypeColumn() {
         if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeJustDate()) {
             return true;
         }
-        if (_mysticBindingSnapshot != null && _mysticBindingSnapshot.getClass().equals(Date.class)) {
-            return true;
+        final Object snapshot = _mysticBindingSnapshot;
+        if (snapshot != null) {
+            final Class<?> snapType = snapshot.getClass();
+            if (snapType.equals(Date.class) || snapType.equals(LocalDate.class)) {
+                return true;
+            }
         }
         return false; // unknown, basically no way
     }
 
+    protected boolean isJustTimestampTypeColumn() {
+        if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeJustTimestamp()) {
+            return true;
+        }
+        final Object snapshot = _mysticBindingSnapshot;
+        if (snapshot != null) {
+            final Class<?> snapType = snapshot.getClass();
+            if (snapType.equals(Timestamp.class) || snapType.equals(LocalDateTime.class)) {
+                return true;
+            }
+        }
+        return false; // unknown, basically no way
+    }
+
+    protected boolean isJustTimeTypeColumn() {
+        if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeJustTime()) {
+            return true;
+        }
+        final Object snapshot = _mysticBindingSnapshot;
+        if (snapshot != null) {
+            final Class<?> snapType = snapshot.getClass();
+            if (snapType.equals(Time.class) || snapType.equals(LocalTime.class)) {
+                return true;
+            }
+        }
+        return false; // unknown, basically no way
+    }
+
+    // -----------------------------------------------------
+    //                                          Dream Cruise
+    //                                          ------------
     protected boolean isDreamCruiseTicket(Object value) {
         return value instanceof SpecifiedColumn;
     }
@@ -807,18 +879,6 @@ public class FunctionFilterOption implements ParameterOption {
             bindPath = columnExp;
         }
         return bindPath;
-    }
-
-    protected Object registerBindParameter(int index, Object parameter) {
-        if (isDreamCruiseTicket(parameter)) {
-            return parameter;
-        }
-        if (_bindMap == null) {
-            _bindMap = new HashMap<String, Object>(4);
-        }
-        final String bindKey = "param" + index;
-        _bindMap.put(bindKey, parameter);
-        return bindKey;
     }
 
     // ===================================================================================

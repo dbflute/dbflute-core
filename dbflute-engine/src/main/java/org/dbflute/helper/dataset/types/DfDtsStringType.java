@@ -29,7 +29,11 @@ public class DfDtsStringType extends DfDtsObjectType {
 
     @Override
     public Object convert(Object value, String formatPattern) {
-        return DfTypeUtil.toString(value, formatPattern);
+        if (formatPattern != null) {
+            return DfTypeUtil.toString(value, formatPattern);
+        } else {
+            return DfTypeUtil.toString(value);
+        }
     }
 
     @Override

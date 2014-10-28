@@ -17,6 +17,7 @@ package org.dbflute.cbean.ordering;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationCodeType;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.twowaysql.DisplaySqlBuilder;
 import org.dbflute.util.DfTypeUtil;
 
 /**
@@ -750,7 +752,23 @@ public class ManualOrderOption implements ColumnCalculator {
     }
 
     protected String buildLiteralDateExpression(Object plainValue) {
-        return "'" + DfTypeUtil.toString(plainValue, "yyyy-MM-dd HH:mm:ss.SSS") + "'";
+        if (plainValue instanceof LocalDate) { // local date cannot use time-part so check it
+            final String pattern = DisplaySqlBuilder.DEFAULT_DATE_FORMAT;
+            return doBuildLiteralDateExpression(DfTypeUtil.toStringLocalDate((LocalDate) plainValue, pattern));
+        } else if (plainValue instanceof LocalDateTime) {
+            final String pattern = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
+            return doBuildLiteralDateExpression(DfTypeUtil.toStringLocalDateTime((LocalDateTime) plainValue, pattern));
+        } else if (plainValue instanceof LocalTime) {
+            final String pattern = DisplaySqlBuilder.DEFAULT_TIME_FORMAT;
+            return doBuildLiteralDateExpression(DfTypeUtil.toStringLocalTime((LocalTime) plainValue, pattern));
+        } else {
+            final String pattern = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
+            return doBuildLiteralDateExpression(DfTypeUtil.toString(plainValue, pattern));
+        }
+    }
+
+    protected String doBuildLiteralDateExpression(String formatted) {
+        return "'" + formatted + "'";
     }
 
     // -----------------------------------------------------

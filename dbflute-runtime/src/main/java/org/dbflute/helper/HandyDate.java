@@ -4538,7 +4538,7 @@ public class HandyDate implements Serializable {
     public boolean equals(Object obj) {
         if (obj instanceof HandyDate) {
             final HandyDate date = (HandyDate) obj;
-            final String pattern = getBasicPattern();
+            final String pattern = getBasicDispPattern();
             return date.toDisp(pattern).equals(toDisp(pattern));
         } else {
             return false;
@@ -4547,20 +4547,17 @@ public class HandyDate implements Serializable {
 
     @Override
     public int hashCode() {
-        return toDisp(getBasicPattern()).hashCode();
+        return toDisp(getBasicDispPattern()).hashCode();
     }
 
     @Override
     public String toString() {
-        return toDisp(getBasicPattern());
+        return toDisp(getBasicDispPattern());
     }
 
-    protected String getBasicPattern() {
-        if (isYear_BeforeChrist()) {
-            return "'BC'yyyy/MM/dd HH:mm:ss.SSS";
-        } else {
-            return "yyyy/MM/dd HH:mm:ss.SSS";
-        }
+    protected String getBasicDispPattern() {
+        final String prefix = isYear_BeforeChrist() ? "'BC'" : "";
+        return prefix + DfTypeUtil.SLASHED_TIMESTAMP_PATTERN;
     }
 
     // *clone() is very hard to use (final field problem)

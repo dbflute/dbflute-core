@@ -62,8 +62,26 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final String DEFAULT_FULL_DATE_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String HYPHENED_DATE_PATTERN = "yyyy-MM-dd";
+    public static final String SLASHED_DATE_PATTERN = "yyyy/MM/dd";
+    public static final String COLONED_TIME_PATTERN = "HH:mm:ss";
+    public static final String PLAIN_MILLIS_PATTERN = "SSS";
+    public static final String HYPHENED_TIMESTAMP_PATTERN;
+    static {
+        HYPHENED_TIMESTAMP_PATTERN = HYPHENED_DATE_PATTERN + " " + COLONED_TIME_PATTERN + "." + PLAIN_MILLIS_PATTERN;
+    }
+    public static final String SLASHED_TIMESTAMP_PATTERN;
+    static {
+        SLASHED_TIMESTAMP_PATTERN = SLASHED_DATE_PATTERN + " " + COLONED_TIME_PATTERN + "." + PLAIN_MILLIS_PATTERN;
+    }
+    // *hyphen basis in program, so the default patterns are hyphened
+    // while, slash basis in human view (so HandyDate#toDisp() uses slashed)
+    public static final String DEFAULT_DATE_PATTERN = HYPHENED_DATE_PATTERN;
+    public static final String DEFAULT_TIMESTAMP_PATTERN = HYPHENED_TIMESTAMP_PATTERN;
+    public static final String DEFAULT_TIME_PATTERN = COLONED_TIME_PATTERN;
+
     protected static final String NULL = "null";
+    protected static final String[] EMPTY_STRINGS = new String[0];
     protected static final long GMT_AD_ORIGIN_MILLISECOND;
     static {
         final Calendar cal = Calendar.getInstance();
@@ -145,7 +163,7 @@ public final class DfTypeUtil {
         } else if (obj instanceof LocalTime) {
             return doConvertToStringLocalTime((LocalTime) obj, pattern);
         } else if (obj instanceof Time) {
-            return doConvertToStringDate((Time) obj, pattern != null ? pattern : "HH:mm:ss", null);
+            return doConvertToStringDate((Time) obj, pattern != null ? pattern : DEFAULT_TIME_PATTERN, null);
         } else if (obj instanceof Date) {
             return doConvertToStringDate((Date) obj, pattern, null);
         } else if (obj instanceof Calendar) {
@@ -183,7 +201,7 @@ public final class DfTypeUtil {
     }
 
     protected static String doConvertToStringLocalDate(LocalDate value, String pattern) {
-        final String realPattern = pattern != null ? pattern : "yyyy-MM-dd";
+        final String realPattern = pattern != null ? pattern : DEFAULT_DATE_PATTERN;
         return value.format(DateTimeFormatter.ofPattern(realPattern));
     }
 
@@ -193,7 +211,7 @@ public final class DfTypeUtil {
     }
 
     protected static String doConvertToStringLocalDateTime(LocalDateTime value, String pattern) {
-        final String realPattern = pattern != null ? pattern : DEFAULT_FULL_DATE_PATTERN; // only millisecond (not nanosecond) as default
+        final String realPattern = pattern != null ? pattern : DEFAULT_TIMESTAMP_PATTERN; // only millisecond (not nanosecond) as default
         return value.format(DateTimeFormatter.ofPattern(realPattern));
     }
 
@@ -203,7 +221,7 @@ public final class DfTypeUtil {
     }
 
     protected static String doConvertToStringLocalTime(LocalTime value, String pattern) {
-        final String realPattern = pattern != null ? pattern : "HH:mm:ss"; // not use nanosecond part as default
+        final String realPattern = pattern != null ? pattern : DEFAULT_TIME_PATTERN; // not use nanosecond part as default
         return value.format(DateTimeFormatter.ofPattern(realPattern));
     }
 
@@ -216,7 +234,7 @@ public final class DfTypeUtil {
     protected static String doConvertToStringDate(Date value, String pattern, TimeZone timeZone) {
         final String realPattern;
         if (value != null && value instanceof Time && pattern == null) {
-            realPattern = "HH:mm:ss";
+            realPattern = DEFAULT_TIME_PATTERN;
         } else {
             realPattern = pattern; // null or specified (if null, default pattern of formatter)
         }
@@ -465,10 +483,15 @@ public final class DfTypeUtil {
      * @throws NumberFormatException When the object cannot be parsed.
      */
     public static Integer toInteger(Object obj) {
-        return toInteger(obj, null);
+        return doConvertToInteger(obj, null);
     }
 
     public static Integer toInteger(Object obj, String pattern) {
+        assertPatternNotNull("toInteger()", pattern);
+        return doConvertToInteger(obj, pattern);
+    }
+
+    protected static Integer doConvertToInteger(Object obj, String pattern) {
         if (obj == null) {
             return null;
         } else if (obj instanceof Integer) {
@@ -476,7 +499,7 @@ public final class DfTypeUtil {
         } else if (obj instanceof Number) {
             return Integer.valueOf(((Number) obj).intValue());
         } else if (obj instanceof String) {
-            return toInteger((String) obj);
+            return doParseStringAsInteger((String) obj);
         } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
                 final DateFormat dateFormat = createDateFormat(pattern);
@@ -488,11 +511,11 @@ public final class DfTypeUtil {
         } else if (obj instanceof byte[]) {
             return toInteger(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toInteger(obj.toString());
+            return doParseStringAsInteger(obj.toString());
         }
     }
 
-    protected static Integer toInteger(String str) {
+    protected static Integer doParseStringAsInteger(String str) {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
@@ -500,11 +523,16 @@ public final class DfTypeUtil {
     }
 
     public static int toPrimitiveInt(Object obj) {
-        return toPrimitiveInt(obj, null);
+        return doConvertToPrimitiveInt(obj, null);
     }
 
     public static int toPrimitiveInt(Object obj, String pattern) {
-        Integer wrapper = toInteger(obj, pattern);
+        assertPatternNotNull("toPrimitiveInt()", pattern);
+        return doConvertToPrimitiveInt(obj, pattern);
+    }
+
+    protected static int doConvertToPrimitiveInt(Object obj, String pattern) {
+        final Integer wrapper = doConvertToInteger(obj, pattern);
         return wrapper != null ? wrapper.intValue() : 0;
     }
 
@@ -517,10 +545,15 @@ public final class DfTypeUtil {
      * @throws NumberFormatException When the object cannot be parsed.
      */
     public static Long toLong(Object obj) {
-        return toLong(obj, null);
+        return doConvertToLong(obj, null);
     }
 
     public static Long toLong(Object obj, String pattern) {
+        assertPatternNotNull("toLong()", pattern);
+        return doConvertToLong(obj, pattern);
+    }
+
+    protected static Long doConvertToLong(Object obj, String pattern) {
         if (obj == null) {
             return null;
         } else if (obj instanceof Long) {
@@ -528,7 +561,7 @@ public final class DfTypeUtil {
         } else if (obj instanceof Number) {
             return Long.valueOf(((Number) obj).longValue());
         } else if (obj instanceof String) {
-            return toLong((String) obj);
+            return doParseStringAsLong((String) obj);
         } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
                 final DateFormat dateFormat = createDateFormat(pattern);
@@ -540,11 +573,11 @@ public final class DfTypeUtil {
         } else if (obj instanceof byte[]) {
             return toLong(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toLong(obj.toString());
+            return doParseStringAsLong(obj.toString());
         }
     }
 
-    protected static Long toLong(String str) {
+    protected static Long doParseStringAsLong(String str) {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
@@ -552,11 +585,16 @@ public final class DfTypeUtil {
     }
 
     public static long toPrimitiveLong(Object obj) {
-        return toPrimitiveLong(obj, null);
+        return doConvertToPrimitiveLong(obj, null);
     }
 
     public static long toPrimitiveLong(Object obj, String pattern) {
-        Long wrapper = toLong(obj, pattern);
+        assertPatternNotNull("toPrimitiveLong()", pattern);
+        return doConvertToPrimitiveLong(obj, pattern);
+    }
+
+    protected static long doConvertToPrimitiveLong(Object obj, String pattern) {
+        final Long wrapper = doConvertToLong(obj, pattern);
         return wrapper != null ? wrapper.longValue() : 0L;
     }
 
@@ -568,6 +606,11 @@ public final class DfTypeUtil {
     }
 
     public static Double toDouble(Object obj, String pattern) {
+        assertPatternNotNull("toDouble()", pattern);
+        return doConvertToDouble(obj, pattern);
+    }
+
+    protected static Double doConvertToDouble(Object obj, String pattern) {
         if (obj == null) {
             return null;
         } else if (obj instanceof Double) {
@@ -575,7 +618,7 @@ public final class DfTypeUtil {
         } else if (obj instanceof Number) {
             return Double.valueOf(((Number) obj).doubleValue());
         } else if (obj instanceof String) {
-            return toDouble((String) obj);
+            return doParseStringAsDouble((String) obj);
         } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
                 final DateFormat dateFormat = createDateFormat(pattern);
@@ -585,11 +628,11 @@ public final class DfTypeUtil {
         } else if (obj instanceof byte[]) {
             return toDouble(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toDouble(obj.toString());
+            return doParseStringAsDouble(obj.toString());
         }
     }
 
-    protected static Double toDouble(String str) {
+    protected static Double doParseStringAsDouble(String str) {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
@@ -597,11 +640,16 @@ public final class DfTypeUtil {
     }
 
     public static double toPrimitiveDouble(Object obj) {
-        return toPrimitiveDouble(obj, null);
+        return doConvertToPrimitiveDouble(obj, null);
     }
 
     public static double toPrimitiveDouble(Object obj, String pattern) {
-        Double wrapper = toDouble(obj, pattern);
+        assertPatternNotNull("toPrimitiveDouble()", pattern);
+        return doConvertToPrimitiveDouble(obj, pattern);
+    }
+
+    protected static double doConvertToPrimitiveDouble(Object obj, String pattern) {
+        final Double wrapper = doConvertToDouble(obj, pattern);
         return wrapper != null ? wrapper.doubleValue() : 0;
     }
 
@@ -609,10 +657,15 @@ public final class DfTypeUtil {
     //                                                                               Float
     //                                                                               =====
     public static Float toFloat(Object obj) {
-        return toFloat(obj, null);
+        return doConvertToFloat(obj, null);
     }
 
     public static Float toFloat(Object obj, String pattern) {
+        assertPatternNotNull("toFloat()", pattern);
+        return doConvertToFloat(obj, pattern);
+    }
+
+    protected static Float doConvertToFloat(Object obj, String pattern) {
         if (obj == null) {
             return null;
         } else if (obj instanceof Float) {
@@ -620,7 +673,7 @@ public final class DfTypeUtil {
         } else if (obj instanceof Number) {
             return Float.valueOf(((Number) obj).floatValue());
         } else if (obj instanceof String) {
-            return toFloat((String) obj);
+            return doParseStringAsFloat((String) obj);
         } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
                 final DateFormat dateFormat = createDateFormat(pattern);
@@ -630,11 +683,11 @@ public final class DfTypeUtil {
         } else if (obj instanceof byte[]) {
             return toFloat(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toFloat(obj.toString());
+            return doParseStringAsFloat(obj.toString());
         }
     }
 
-    protected static Float toFloat(String str) {
+    protected static Float doParseStringAsFloat(String str) {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
@@ -642,11 +695,16 @@ public final class DfTypeUtil {
     }
 
     public static float toPrimitiveFloat(Object obj) {
-        return toPrimitiveFloat(obj, null);
+        return doConvertToPrimitiveFloat(obj, null);
     }
 
     public static float toPrimitiveFloat(Object obj, String pattern) {
-        Float wrapper = toFloat(obj, pattern);
+        assertPatternNotNull("toPrimitiveFloat()", pattern);
+        return doConvertToPrimitiveFloat(obj, pattern);
+    }
+
+    protected static float doConvertToPrimitiveFloat(Object obj, String pattern) {
+        final Float wrapper = doConvertToFloat(obj, pattern);
         return wrapper != null ? wrapper.floatValue() : 0;
     }
 
@@ -654,10 +712,15 @@ public final class DfTypeUtil {
     //                                                                               Short
     //                                                                               =====
     public static Short toShort(Object obj) {
-        return toShort(obj, null);
+        return doConvertToShort(obj, null);
     }
 
     public static Short toShort(Object obj, String pattern) {
+        assertPatternNotNull("toShort()", pattern);
+        return doConvertToShort(obj, pattern);
+    }
+
+    protected static Short doConvertToShort(Object obj, String pattern) {
         if (obj == null) {
             return null;
         } else if (obj instanceof Short) {
@@ -693,7 +756,12 @@ public final class DfTypeUtil {
     }
 
     public static short toPrimitiveShort(Object obj, String pattern) {
-        Short wrapper = toShort(obj, pattern);
+        assertPatternNotNull("toPrimitiveShort()", pattern);
+        return doConvertToPrimitiveShort(obj, pattern);
+    }
+
+    protected static short doConvertToPrimitiveShort(Object obj, String pattern) {
+        final Short wrapper = doConvertToShort(obj, pattern);
         return wrapper != null ? wrapper.shortValue() : 0;
     }
 
@@ -701,10 +769,15 @@ public final class DfTypeUtil {
     //                                                                                Byte
     //                                                                                ====
     public static Byte toByte(Object obj) {
-        return toByte(obj, null);
+        return doConvertToByte(obj, null);
     }
 
     public static Byte toByte(Object obj, String pattern) {
+        assertPatternNotNull("toByte()", pattern);
+        return doConvertToByte(obj, pattern);
+    }
+
+    protected static Byte doConvertToByte(Object obj, String pattern) {
         if (obj == null) {
             return null;
         } else if (obj instanceof Byte) {
@@ -736,11 +809,16 @@ public final class DfTypeUtil {
     }
 
     public static byte toPrimitiveByte(Object obj) {
-        return toPrimitiveByte(obj, null);
+        return doConvertToPrimitiveByte(obj, null);
     }
 
     public static byte toPrimitiveByte(Object obj, String pattern) {
-        Byte wrapper = toByte(obj, pattern);
+        assertPatternNotNull("toPrimitiveByte()", pattern);
+        return doConvertToPrimitiveByte(obj, pattern);
+    }
+
+    protected static byte doConvertToPrimitiveByte(Object obj, String pattern) {
+        final Byte wrapper = doConvertToByte(obj, pattern);
         return wrapper != null ? wrapper.byteValue() : 0;
     }
 
@@ -763,10 +841,15 @@ public final class DfTypeUtil {
     //                                                                          BigDecimal
     //                                                                          ==========
     public static BigDecimal toBigDecimal(Object obj) {
-        return toBigDecimal(obj, null);
+        return doConvertToBigDecimal(obj, null);
     }
 
     public static BigDecimal toBigDecimal(Object obj, String pattern) {
+        assertPatternNotNull("toBigDecimal()", pattern);
+        return doConvertToBigDecimal(obj, pattern);
+    }
+
+    protected static BigDecimal doConvertToBigDecimal(Object obj, String pattern) {
         if (obj == null) {
             return null;
         } else if (obj instanceof BigDecimal) {
@@ -800,10 +883,15 @@ public final class DfTypeUtil {
     //                                                                          BigInteger
     //                                                                          ==========
     public static BigInteger toBigInteger(Object obj) {
-        return toBigInteger(obj, null);
+        return doConvertToBigInteger(obj, null);
     }
 
     public static BigInteger toBigInteger(Object obj, String pattern) {
+        assertPatternNotNull("toBigInteger()", pattern);
+        return doConvertToBigInteger(obj, pattern);
+    }
+
+    protected static BigInteger doConvertToBigInteger(Object obj, String pattern) {
         if (obj == null) {
             return null;
         } else if (obj instanceof BigInteger) {
@@ -823,11 +911,11 @@ public final class DfTypeUtil {
             }
             return toBigDecimal(normalize(str)).toBigInteger();
         } else {
-            Long l = toLong(obj, pattern);
-            if (l == null) {
+            Long lg = doConvertToLong(obj, pattern);
+            if (lg == null) {
                 return null;
             }
-            return BigInteger.valueOf(l.longValue());
+            return BigInteger.valueOf(lg.longValue());
         }
     }
 
@@ -1203,13 +1291,13 @@ public final class DfTypeUtil {
             // parse myself for millisecond and nanosecond handling
             final String timeDelim = ":";
             final String millisDelim = ".";
-            final int hour = toInteger(Srl.substringFirstFront(timePart, timeDelim));
-            final int minute = toInteger(Srl.substringFirstFront(Srl.substringFirstRear(timePart, timeDelim), timeDelim));
-            final int second = toInteger(Srl.substringFirstFront(Srl.substringLastRear(timePart, timeDelim), millisDelim));
+            final int hour = doParseStringAsInteger(Srl.substringFirstFront(timePart, timeDelim));
+            final int minute = doParseStringAsInteger(Srl.substringFirstFront(Srl.substringFirstRear(timePart, timeDelim), timeDelim));
+            final int second = doParseStringAsInteger(Srl.substringFirstFront(Srl.substringLastRear(timePart, timeDelim), millisDelim));
             final int nanos;
             if (timePart.contains(millisDelim)) {
                 final String millisPart = Srl.substringFirstRear(timePart, millisDelim);
-                nanos = toInteger(doConvertMillisToNanosString(millisPart));
+                nanos = doParseStringAsInteger(doConvertMillisToNanosString(millisPart));
             } else {
                 nanos = 0;
             }
@@ -1419,7 +1507,7 @@ public final class DfTypeUtil {
             final boolean keepMillisMore = false; // date cannot use nanosecond
             str = filterDateStringValueFlexibly(str, includeTime, includeMillis, keepMillisMore);
             strict = !str.startsWith("-"); // not BC
-            pattern = DEFAULT_FULL_DATE_PATTERN;
+            pattern = DEFAULT_TIMESTAMP_PATTERN;
         } else {
             strict = true;
         }
@@ -2199,7 +2287,7 @@ public final class DfTypeUtil {
     }
 
     protected static DateFormat doCreateDateFormat(String pattern, TimeZone timeZone, boolean strict) {
-        final String realPattern = pattern != null ? pattern : DEFAULT_FULL_DATE_PATTERN;
+        final String realPattern = pattern != null ? pattern : DEFAULT_TIMESTAMP_PATTERN;
         final Locale realLocale = chooseRealLocale(null); // no setting point so null
         final SimpleDateFormat sdf = new SimpleDateFormat(realPattern, realLocale);
         final TimeZone realZone = chooseRealZone(timeZone);
@@ -2321,7 +2409,7 @@ public final class DfTypeUtil {
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
             str = filterTimestampStringValueFlexibly(str);
             strict = !str.startsWith("-"); // not BC
-            pattern = DEFAULT_FULL_DATE_PATTERN;
+            pattern = DEFAULT_TIMESTAMP_PATTERN;
         } else {
             strict = true;
         }
@@ -2469,7 +2557,7 @@ public final class DfTypeUtil {
                 return new Time(paramTime.getTime());
             }
         } else if (isAnyLocalDate(obj)) {
-            final String localTimePattern = "HH:mm:ss";
+            final String localTimePattern = DEFAULT_TIME_PATTERN;
             if (obj instanceof LocalDate) {
                 final String strTime = ((LocalDate) obj).format(DateTimeFormatter.ofPattern(localTimePattern));
                 return doParseStringAsTime(strTime, pattern, timeZone);
@@ -2513,7 +2601,7 @@ public final class DfTypeUtil {
             final boolean includeMillis = false; // time cannot use millisecond
             final boolean keepMillisMore = false; // time cannot use nanosecond
             str = filterTimeStringValueFlexibly(str, includeMillis, keepMillisMore);
-            pattern = "HH:mm:ss";
+            pattern = DEFAULT_TIME_PATTERN;
         }
         final DateFormat df = doCreateDateFormat(pattern, timeZone, true);
         try {
@@ -3399,45 +3487,45 @@ public final class DfTypeUtil {
     //                                                                             =======
     public static Object toWrapper(Object obj, Class<?> type) {
         if (type == int.class) {
-            Integer i = toInteger(obj);
-            if (i != null) {
-                return i;
+            final Integer it = toInteger(obj);
+            if (it != null) {
+                return it;
             }
             return Integer.valueOf(0);
         } else if (type == double.class) {
-            Double d = toDouble(obj);
-            if (d != null) {
-                return d;
+            Double db = toDouble(obj);
+            if (db != null) {
+                return db;
             }
             return new Double(0);
         } else if (type == long.class) {
-            Long l = toLong(obj);
-            if (l != null) {
-                return l;
+            Long lg = toLong(obj);
+            if (lg != null) {
+                return lg;
             }
             return Long.valueOf(0);
         } else if (type == float.class) {
-            Float f = toFloat(obj);
-            if (f != null) {
-                return f;
+            Float ft = toFloat(obj);
+            if (ft != null) {
+                return ft;
             }
             return new Float(0);
         } else if (type == short.class) {
-            Short s = toShort(obj);
-            if (s != null) {
-                return s;
+            Short st = toShort(obj);
+            if (st != null) {
+                return st;
             }
             return Short.valueOf((short) 0);
         } else if (type == boolean.class) {
-            Boolean b = toBoolean(obj);
-            if (b != null) {
-                return b;
+            Boolean bl = toBoolean(obj);
+            if (bl != null) {
+                return bl;
             }
             return Boolean.FALSE;
         } else if (type == byte.class) {
-            Byte b = toByte(obj);
-            if (b != null) {
-                return b;
+            Byte bt = toByte(obj);
+            if (bt != null) {
+                return bt;
             }
             return Byte.valueOf((byte) 0);
         }
@@ -3479,7 +3567,7 @@ public final class DfTypeUtil {
         if (text == null || from == null || to == null) {
             return null;
         }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         int pos = 0;
         int pos2 = 0;
         do {
@@ -3497,8 +3585,6 @@ public final class DfTypeUtil {
             }
         } while (true);
     }
-
-    protected static final String[] EMPTY_STRINGS = new String[0];
 
     protected static String[] split(final String str, final String delimiter) {
         if (str == null || str.trim().length() == 0) {
