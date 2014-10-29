@@ -421,7 +421,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * });
      * for (${myExtendedObjectClassName} <span style="color: #553000">${myEntityVariableName}</span> : <span style="color: #553000">${myEntityListVariableName}</span>) {
      *     ... = <span style="color: #553000">${myEntityVariableName}</span>.get...();
-     * });
+     * }
      * </pre>
      * @param cbLambda The callback for condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result bean of selected list. (NotNull: if no data, returns empty list)
