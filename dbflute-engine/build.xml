@@ -6,7 +6,7 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1.0" />
-	<property name="build.version" value="${version}-pilotA-SNAPSHOT" />
+	<property name="build.version" value="${version}-pilotB-SNAPSHOT" />
 	<property name="runtime.version" value="1.1.0" />
 	<property name="runtime.build.version" value="${runtime.version}-pilotA-SNAPSHOT" />
 	<property name="example.latest.version" value="1.x" />

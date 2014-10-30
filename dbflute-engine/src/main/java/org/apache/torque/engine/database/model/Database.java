@@ -1340,16 +1340,8 @@ public class Database {
         return getBasicProperties().isTargetContainerSpring();
     }
 
-    public boolean isTargetContainerLucy() {
-        return getBasicProperties().isTargetContainerLucy();
-    }
-
     public boolean isTargetContainerGuice() {
         return getBasicProperties().isTargetContainerGuice();
-    }
-
-    public boolean isTargetContainerSlim3() {
-        return getBasicProperties().isTargetContainerSlim3();
     }
 
     public boolean isTargetContainerCDI() {
