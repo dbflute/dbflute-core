@@ -217,7 +217,7 @@ public class DfUpgradeTask extends DfAbstractTask {
         sb.append(ln()).append("  *you need to upgrade also DBFlute Runtime");
         sb.append(ln()).append("");
         sb.append(ln()).append("    e.g. pom.xml:");
-        sb.append(ln()).append("     <version>").append(_actualVersion).append("</version>");
+        sb.append(ln()).append("     <dbflute.version>").append(_actualVersion).append("</dbflute.version>");
         sb.append(ln()).append("");
         return sb.toString();
     }
