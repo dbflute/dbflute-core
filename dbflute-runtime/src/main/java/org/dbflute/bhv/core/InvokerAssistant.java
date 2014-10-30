@@ -29,6 +29,7 @@ import org.dbflute.jdbc.SQLExceptionDigger;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.optional.RelationOptionalFactory;
+import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
@@ -85,7 +86,12 @@ public interface InvokerAssistant {
     SqlAnalyzerFactory assistSqlAnalyzerFactory();
 
     /**
-     * Assist the factory of outside SQL executor.
+     * @return The first option of outside-SQL. (NullAllowed: if null, lazy-loaded)
+     */
+    OutsideSqlOption assistFirstOutsideSqlOption();
+
+    /**
+     * Assist the factory of outside-SQL executor.
      * @return The instance of factory. (NotNull)
      */
     OutsideSqlExecutorFactory assistOutsideSqlExecutorFactory();

@@ -38,6 +38,8 @@ public class OutsideSqlOption {
 
     protected boolean _formatSql;
 
+    protected boolean _nonSpecifiedColumnAccessAllowed;
+
     /** The configuration of statement specified by configure(). (NullAllowed) */
     protected StatementConfig _statementConfig;
 
@@ -52,24 +54,34 @@ public class OutsideSqlOption {
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
-    public void autoPaging() {
+    public OutsideSqlOption autoPaging() {
         _pagingRequestType = "auto";
+        return this;
     }
 
-    public void manualPaging() {
+    public OutsideSqlOption manualPaging() {
         _pagingRequestType = "manual";
+        return this;
     }
 
-    public void removeBlockComment() {
+    public OutsideSqlOption removeBlockComment() {
         _removeBlockComment = true;
+        return this;
     }
 
-    public void removeLineComment() {
+    public OutsideSqlOption removeLineComment() {
         _removeLineComment = true;
+        return this;
     }
 
-    public void formatSql() {
+    public OutsideSqlOption formatSql() {
         _formatSql = true;
+        return this;
+    }
+
+    public OutsideSqlOption enableNonSpecifiedColumnAccess() {
+        _nonSpecifiedColumnAccessAllowed = true;
+        return this;
     }
 
     // ===================================================================================
@@ -97,6 +109,9 @@ public class OutsideSqlOption {
         }
         if (_formatSql) {
             copyOption.formatSql();
+        }
+        if (_nonSpecifiedColumnAccessAllowed) {
+            copyOption.enableNonSpecifiedColumnAccess();
         }
         // inherit only queryTimeout (others are basically not related to count select)
         if (_statementConfig != null && _statementConfig.hasQueryTimeout()) {
@@ -158,6 +173,10 @@ public class OutsideSqlOption {
 
     public boolean isFormatSql() {
         return _formatSql;
+    }
+
+    public boolean isNonSpecifiedColumnAccessAllowed() {
+        return _nonSpecifiedColumnAccessAllowed;
     }
 
     public StatementConfig getStatementConfig() {

@@ -385,7 +385,6 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyEveryColumnAlreadySpecifiedColumnException(msg);
     }
 
-    // TODO jflute exception: CB message
     public void throwSpecifyExceptColumnAlreadySpecifiedColumnException(String tableDbName, Map<String, SpecifiedColumn> specifiedColumnMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SpecifyExceptColumn is specified after SpecifyColumn.");
@@ -393,15 +392,18 @@ public class ConditionBeanExceptionThrower {
         br.addElement("You cannot specify columns with except columns.");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    cb.specify().columnMemberName();");
-        br.addElement("    cb.specify().exceptRecordMetaColumn(); // *No");
-        br.addElement("    ... = memberBhv.selectList(cb);");
+        br.addElement("    ... = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.specify().columnMemberName(");
+        br.addElement("        cb.specify().exceptRecordMetaColumn(); // *No");
+        br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    cb.specify().exceptRecordMetaColumn();");
-        br.addElement("    ... = memberBhv.selectList(cb);");
+        br.addElement("    ... = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.specify().exceptRecordMetaColumn();");
+        br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    cb.specify().columnMemberName();");
-        br.addElement("    ... = memberBhv.selectList(cb);");
+        br.addElement("    ... = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.specify().columnMemberName()");
+        br.addElement("    });");
         br.addItem("Base Table");
         br.addElement(tableDbName);
         if (specifiedColumnMap != null) { // basically true
@@ -415,6 +417,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyExceptColumnAlreadySpecifiedColumnException(msg);
     }
 
+    // TODO jflute exception: CB message
     public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String relationName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Bad location to call specify() for relation.");

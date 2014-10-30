@@ -69,6 +69,12 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     protected boolean __createdBySelect;
 
     // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    // TODO jflute 
+    //protected abstract boolean isDomainEntity();
+    
+    // ===================================================================================
     //                                                                    Derived Mappable
     //                                                                    ================
     /** {@inheritDoc} */

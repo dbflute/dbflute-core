@@ -116,24 +116,25 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
         return context;
     }
 
-    protected void setupOutsideSqlContextProperty(OutsideSqlContext outsideSqlContext) {
+    protected void setupOutsideSqlContextProperty(OutsideSqlContext context) {
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
         final OutsideSqlOption option = _outsideSqlOption;
-        outsideSqlContext.setOutsideSqlPath(path);
-        outsideSqlContext.setParameterBean(pmb);
-        outsideSqlContext.setResultType(getResultType());
-        outsideSqlContext.setMethodName(getCommandName());
-        outsideSqlContext.setStatementConfig(option.getStatementConfig());
-        outsideSqlContext.setTableDbName(option.getTableDbName());
-        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
-        outsideSqlContext.setOutsideSqlFilter(_outsideSqlFilter);
-        outsideSqlContext.setRemoveBlockComment(option.isRemoveBlockComment());
-        outsideSqlContext.setRemoveLineComment(option.isRemoveLineComment());
-        outsideSqlContext.setFormatSql(option.isFormatSql());
-        outsideSqlContext.setInternalDebug(ResourceContext.isInternalDebug());
-        outsideSqlContext.setupBehaviorQueryPathIfNeeds();
+        context.setOutsideSqlPath(path);
+        context.setParameterBean(pmb);
+        context.setResultType(getResultType());
+        context.setMethodName(getCommandName());
+        context.setStatementConfig(option.getStatementConfig());
+        context.setTableDbName(option.getTableDbName());
+        context.setOffsetByCursorForcedly(option.isAutoPaging());
+        context.setLimitByCursorForcedly(option.isAutoPaging());
+        context.setOutsideSqlFilter(_outsideSqlFilter);
+        context.setRemoveBlockComment(option.isRemoveBlockComment());
+        context.setRemoveLineComment(option.isRemoveLineComment());
+        context.setFormatSql(option.isFormatSql());
+        context.setNonSpecifiedColumnAccessAllowed(option.isNonSpecifiedColumnAccessAllowed());
+        context.setInternalDebug(ResourceContext.isInternalDebug());
+        context.setupBehaviorQueryPathIfNeeds();
     }
 
     protected abstract Class<?> getResultType();

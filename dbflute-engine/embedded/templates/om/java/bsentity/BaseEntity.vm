@@ -24,6 +24,11 @@ import org.dbflute.Entity;
 #end
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.AbstractEntity;
+#if ($isSql2Entity)
+import org.dbflute.dbmeta.accessory.CustomizeEntity;
+#else
+import org.dbflute.dbmeta.accessory.DomainEntity;
+#end
 #if ($table.needsMappingValueType())
 import org.dbflute.dbmeta.accessory.MappingValueType;
 #end
@@ -43,14 +48,17 @@ import ${myExtendedEntityPackageName}.*;
 #if ($table.isLoadableCustomizeEntity())
 import ${glPackageExtendedEntity}.*;
 #end
-#set ($myEntityInterfaceDef = "")
-#if (${table.hasAllCommonColumn()})
-#set ($myEntityInterfaceDef = " implements ${glEntityDefinedCommonColumn}")
-#else
-#set ($myEntityInterfaceDef = "")
-#end
 #if ($table.hasRelationalNullObjectProviderImport())
 import ${table.relationalNullObjectProviderPackage}.*;
+#end
+#set ($myEntityInterfaceDef = "")
+#if ($isSql2Entity)
+#set ($myEntityInterfaceDef = "CustomizeEntity")
+#else
+#set ($myEntityInterfaceDef = "DomainEntity")
+#end
+#if (${table.hasAllCommonColumn()})
+#set ($myEntityInterfaceDef = "${myEntityInterfaceDef}, ${glEntityDefinedCommonColumn}")
 #end
 
 /**
@@ -98,7 +106,7 @@ import ${table.relationalNullObjectProviderPackage}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
-public abstract class $myClassName extends AbstractEntity${myEntityInterfaceDef} {
+public abstract class $myClassName extends AbstractEntity implements ${myEntityInterfaceDef} {
 
     // ===================================================================================
     //                                                                          Definition
