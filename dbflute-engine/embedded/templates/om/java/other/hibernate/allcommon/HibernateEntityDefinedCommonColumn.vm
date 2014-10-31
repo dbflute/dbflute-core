@@ -46,13 +46,13 @@ public interface ${glEntityDefinedCommonColumn} extends ${glEntity} {
 #foreach ($classificationElement in $classificationTop.classificationElementList)
 
     /**
-     * Classify the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br />
+     * Classify the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void classify${javaName}${classificationElement.name}();
 
     /**
-     * Is the value of ${uncapitalisedJavaName} '${classificationElement.name}'? <br />
+     * Is the value of ${uncapitalisedJavaName} '${classificationElement.name}'? <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>
      * The difference of capital letters and small letters is NOT distinguished.

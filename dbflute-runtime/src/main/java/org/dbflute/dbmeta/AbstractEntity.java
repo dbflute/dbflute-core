@@ -73,7 +73,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     //                                                                              ======
     // TODO jflute 
     //protected abstract boolean isDomainEntity();
-    
+
     // ===================================================================================
     //                                                                    Derived Mappable
     //                                                                    ================

@@ -84,11 +84,11 @@ abstract class ${myCompanionBaseClassName} {
 
 /**
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
- * The base class for typed parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
+ * The base class for typed parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br>
  * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataBehaviorQueryPath($pmbClassName)}</span>" on ${database.getPmbMetaDataBehaviorClassName($pmbClassName)}.
 #else
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
- * The base class for procedure parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br />
+ * The base class for procedure parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}. <br>
  * This is related to "<span style="color: #AD4747">${database.getPmbMetaDataProcedureName($pmbClassName)}</span>".
 #else
  * The base class for parameter-bean of ${database.getPmbMetaDataBusinessName($pmbClassName)}.
@@ -427,7 +427,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 ###end
 #set ($entryPropertyType = "${propertyType}")
     /**
-     * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
@@ -453,7 +453,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #if (!$database.hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter($pmbClassName, $propertyName))
 
     /**
-     * [set] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
@@ -466,7 +466,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as likeSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as likeSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
@@ -483,7 +483,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as prefixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as prefixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
@@ -497,7 +497,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as containSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as containSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
@@ -511,7 +511,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as suffixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as suffixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
@@ -535,7 +535,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #if ($database.isPmbMetaDataPropertyOptionFromDate($pmbClassName, $propertyName))
 
     /**
-     * [set as fromDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as fromDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
@@ -552,7 +552,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #if ($database.isPmbMetaDataPropertyOptionFromDateOption($pmbClassName, $propertyName))
 
     /**
-     * [set as fromScope] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as fromScope] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
@@ -572,7 +572,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
 
     /**
-     * [set as toDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as toDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
@@ -589,7 +589,7 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #if ($database.isPmbMetaDataPropertyOptionToDateOption($pmbClassName, $propertyName))
 
     /**
-     * [set as toScope] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as toScope] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
 #end
@@ -610,9 +610,9 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #foreach ($classificationElement in $database.getPmbMetaDataPropertyOptionClassificationTop($pmbClassName, $propertyName).classificationElementList)
 
     /**
-     * [set as ${classificationElement.name}] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as ${classificationElement.name}] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
-     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)} <br />
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)} <br>
 #end
 #if ($classificationElement.hasComment())
      * ${classificationElement.comment}

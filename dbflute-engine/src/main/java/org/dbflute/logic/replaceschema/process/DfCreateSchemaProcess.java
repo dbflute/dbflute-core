@@ -101,7 +101,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
 
         /**
          * Callback getting data source.
-         * It returns valid data source after setupDataSource() success. <br />
+         * It returns valid data source after setupDataSource() success. <br>
          * Basically not null but when data source does not exist on thread, it returns null.
          * @return The data source with schema. (NullAllowed: when data source does not exist on thread, e.g. lazy connection)
          */
@@ -109,14 +109,14 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
 
         /**
          * Callback setting up data source.
-         * @throws SQLException
+         * @throws SQLException When it fails to handle the SQL.
          */
         void callbackSetupDataSource() throws SQLException;
     }
 
     /**
-     * Get data source. <br />
-     * It returns valid data source after setupDataSource() success. <br />
+     * Get data source. <br>
+     * It returns valid data source after setupDataSource() success. <br>
      * Basically not null but when data source does not exist on thread, it returns null.
      * @return The data source. (NullAllowed: when data source does not exist on thread, e.g. lazy connection)
      */
@@ -126,7 +126,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
 
     /**
      * Set up data source.
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected void setupDataSource() throws SQLException {
         _dataSourcePlayer.callbackSetupDataSource();

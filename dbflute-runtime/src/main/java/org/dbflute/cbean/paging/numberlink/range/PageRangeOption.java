@@ -68,7 +68,7 @@ public class PageRangeOption implements PageNumberLinkOption, Serializable {
      * Set the size of page range.
      * <pre>
      * e.g. range-size=5, current-page=8
-     * PageRangeBean pageRange = page.pageRange(op -> op.<span style="color: #CC4747">rangeSize</span>(5));
+     * PageRangeBean pageRange = page.pageRange(op -&gt; op.<span style="color: #CC4747">rangeSize</span>(5));
      * List&lt;Integer&gt; numberList = pageRange.createPageNumberList();
      *
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
@@ -94,7 +94,7 @@ public class PageRangeOption implements PageNumberLinkOption, Serializable {
      * Set fill-limit option.
      * <pre>
      * e.g. range-size=5, current-page=8
-     * PageRangeBean pageRange = page.pageRange(op -> op.rangeSize(5).<span style="color: #CC4747">fillLimit()</span>);
+     * PageRangeBean pageRange = page.pageRange(op -&gt; op.rangeSize(5).<span style="color: #CC4747">fillLimit()</span>);
      * List&lt;Integer&gt; numberList = pageRange.createPageNumberList();
      * 
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>

@@ -306,8 +306,8 @@ public class Table {
     //                                            Table Name
     //                                            ----------
     /**
-     * Get the pure name of the table, no prefix even if schema-driven. <br />
-     * You cannot use for identity, instead you should use {@link #getTableDbName()}. <br />
+     * Get the pure name of the table, no prefix even if schema-driven. <br>
+     * You cannot use for identity, instead you should use {@link #getTableDbName()}. <br>
      * Basically no referred from velocity templates because of no necessary.
      * @return The table name as String. (NotNull)
      */
@@ -324,8 +324,8 @@ public class Table {
     }
 
     /**
-     * Get the DB name of the table, resolved schema-driven or table-driven. <br />
-     * You can use this for e.g. matching with specified table in properties, and use for simple display. <br />
+     * Get the DB name of the table, resolved schema-driven or table-driven. <br>
+     * You can use this for e.g. matching with specified table in properties, and use for simple display. <br>
      * And you can use as identity for e.g. map key.
      * @return The table name as String, might contains dot '.'. (NotNull)
      */
@@ -387,7 +387,7 @@ public class Table {
     //                                              SQL Name
     //                                              --------
     /**
-     * Get the SQL name of the table, which is used in your SQL after generated world. (for templates) <br />
+     * Get the SQL name of the table, which is used in your SQL after generated world. (for templates) <br>
      * This might be quoted with fitting to template or has its schema prefix.
      * @return The table name as String. (NotNull)
      */
@@ -397,7 +397,7 @@ public class Table {
     }
 
     /**
-     * Get the SQL name of the table, which is used in your SQL on the Java process. (for direct use) <br />
+     * Get the SQL name of the table, which is used in your SQL on the Java process. (for direct use) <br>
      * This might be quoted for direct use or has its schema prefix.
      * @return The table name as String. (NotNull)
      */
@@ -1210,7 +1210,7 @@ public class Table {
     //                                               Arrange
     //                                               -------
     /**
-     * Returns an comma string containing all the foreign table name. <br />
+     * Returns an comma string containing all the foreign table name. <br>
      * And contains one-to-one table.
      * @return Foreign table as comma string.
      */

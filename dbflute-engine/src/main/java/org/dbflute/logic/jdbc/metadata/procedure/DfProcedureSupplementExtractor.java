@@ -29,7 +29,7 @@ import org.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 public interface DfProcedureSupplementExtractor {
 
     /**
-     * Extract the map of overload info. <br />
+     * Extract the map of overload info. <br>
      * Same name and different type parameters of overload are unsupported.
      * @param unifiedSchema The unified schema to extract. (NotNull)
      * @return The map of parameter's overload info. (NotNull)
@@ -37,7 +37,7 @@ public interface DfProcedureSupplementExtractor {
     Map<String, Integer> extractParameterOverloadInfoMap(UnifiedSchema unifiedSchema);
 
     /**
-     * Extract the map of array info. <br />
+     * Extract the map of array info. <br>
      * Same name and different type parameters of overload are unsupported.
      * @param unifiedSchema The unified schema to extract. (NotNull)
      * @return The map of array info. (NotNull)
@@ -45,7 +45,7 @@ public interface DfProcedureSupplementExtractor {
     Map<String, DfTypeArrayInfo> extractParameterArrayInfoMap(UnifiedSchema unifiedSchema);
 
     /**
-     * Extract the map of struct info for procedure. <br />
+     * Extract the map of struct info for procedure. <br>
      * (but it contains structs that are not defined as procedure parameters)
      * @param unifiedSchema The unified schema to extract. (NotNull)
      * @return The map of array info. (NotNull)

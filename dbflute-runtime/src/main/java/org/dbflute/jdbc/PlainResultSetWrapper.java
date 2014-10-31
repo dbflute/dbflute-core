@@ -264,9 +264,9 @@ public class PlainResultSetWrapper implements ResultSet {
     }
 
     /**
-     * @param columnIndex
+     * @param columnIndex The index of column.
      * @return The value as InputStream.
-     * @deprecated 
+     * @deprecated inherits the original method
      * @throws SQLException When it fails to handle the SQL.
      */
     public InputStream getUnicodeStream(int columnIndex) throws SQLException {
@@ -393,7 +393,7 @@ public class PlainResultSetWrapper implements ResultSet {
      * @param columnIndex The index of column.
      * @param scale The number of scale.
      * @return The value as BigDecimal.
-     * @deprecated
+     * @deprecated inherits the original method
      * @throws SQLException When it fails to handle the SQL.
      */
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
@@ -488,7 +488,7 @@ public class PlainResultSetWrapper implements ResultSet {
     /**
      * @param columnName The name of column. (NotNull)
      * @return The value as InputStream.
-     * @deprecated 
+     * @deprecated inherits the original method 
      * @throws SQLException When it fails to handle the SQL.
      */
     public InputStream getUnicodeStream(String columnName) throws SQLException {
@@ -544,7 +544,7 @@ public class PlainResultSetWrapper implements ResultSet {
      * @param columnName The name of column. (NotNull)
      * @param scale The number of scale.
      * @return The value as BigDecimal.
-     * @deprecated 
+     * @deprecated inherits the original method 
      * @throws SQLException When it fails to handle the SQL.
      */
     public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {

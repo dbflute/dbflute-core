@@ -29,7 +29,7 @@ import ${glPackageCB}.*;
 #end
 
 /**
- * The referrer loader of ${table.basicInfoDispString}. <br />
+ * The referrer loader of ${table.basicInfoDispString}. <br>
  * <pre>
  * [primary key]
  *     ${table.primaryKeyNameCommaString}
@@ -94,7 +94,7 @@ public class ${myClassName} {
     protected List<${referrerEntityClassName}> _referrer${referrerMethodIdentityName};
 
     /**
-     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br />
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br>
      * ${referrer.referrerDispForJavaDoc}
      * <pre>
      * <span style="color: #0000C0">${myEntityVariableName}Bhv</span>.<span style="color: #994747">load</span>(<span style="color: #553000">${myEntityListVariableName}</span>, <span style="color: #553000">${table.lambdaShortName}Loader</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
@@ -103,7 +103,7 @@ public class ${myClassName} {
      *         <span style="color: #553000">${referrer.referrerLambdaExampleCBName}</span>.query().set...
      *         <span style="color: #553000">${referrer.referrerLambdaExampleCBName}</span>.query().addOrderBy...
      *     }); <span style="color: #3F7E5E">// you can load nested referrer from here</span>
-     *     <span style="color: #3F7E5E">//}).withNestedReferrer(<span style="color: #553000">${referrer.referrerLambdaShortName}Loader</span> -&gt {</span>
+     *     <span style="color: #3F7E5E">//}).withNestedReferrer(<span style="color: #553000">${referrer.referrerLambdaShortName}Loader</span> -&gt; {</span>
      *     <span style="color: #3F7E5E">//    ${referrer.referrerLambdaShortName}Loader.load...</span>
      *     <span style="color: #3F7E5E">//});</span>
      * });
@@ -111,7 +111,7 @@ public class ${myClassName} {
      *     ... = ${myEntityVariableName}.<span style="color: #CC4747">get${referrer.referrerJavaBeansRulePropertyNameInitCap}()</span>;
      * }
      * </pre>
-     * About internal policy, the value of primary key (and others too) is treated as case-insensitive. <br />
+     * About internal policy, the value of primary key (and others too) is treated as case-insensitive. <br>
      * The condition-bean, which the set-upper provides, has settings before callback as follows:
      * <pre>
 #if ($referrer.isSimpleKeyFK())

@@ -97,22 +97,22 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                                                 Available Procedure
     //                                                                 ===================
     /**
-     * Get the list of available meta information. <br />
+     * Get the list of available meta information. <br>
      * The list is ordered per schema, as main schema first.
      * @param dataSource The data source for getting meta data. (NotNull)
      * @return The list of available procedure meta informations. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public List<DfProcedureMeta> getAvailableProcedureList(DfSchemaSource dataSource) throws SQLException {
         return new ArrayList<DfProcedureMeta>(getAvailableProcedureMap(dataSource).values());
     }
 
     /**
-     * Get the map of available meta information. <br />
+     * Get the map of available meta information. <br>
      * The map key is procedure name that contains package prefix).
      * @param dataSource The data source for getting meta data. (NotNull)
      * @return The map of available procedure meta informations. The key is full-qualified name. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public Map<String, DfProcedureMeta> getAvailableProcedureMap(DfSchemaSource dataSource) throws SQLException {
         if (isQuitByGenerateProp()) {
@@ -424,7 +424,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                                                     Plain Procedure
     //                                                                     ===============
     /**
-     * Get the list of plain procedures. <br />
+     * Get the list of plain procedures. <br>
      * It selects procedures of specified schema only.
      * @param dataSource Data source. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)

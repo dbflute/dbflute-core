@@ -40,9 +40,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: default
      * </pre>
-     * @throws Exception 
      */
-    public void test_readMap_SwitchStyle_default() throws Exception {
+    public void test_readMap_SwitchStyle_default() {
         // ## Arrange ##
         DfPropFile propFile = createSwitchStylePropFile();
 
@@ -66,9 +65,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: maihama
      * </pre>
-     * @throws Exception 
      */
-    public void test_readMap_SwitchStyle_maihama() throws Exception {
+    public void test_readMap_SwitchStyle_maihama() {
         // ## Arrange ##
         DfPropFile propFile = createSwitchStylePropFile();
 
@@ -91,9 +89,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: noexists
      * </pre>
-     * @throws Exception 
      */
-    public void test_readMap_SwitchStyle_noexists() throws Exception {
+    public void test_readMap_SwitchStyle_noexists() {
         // ## Arrange ##
         DfPropFile propFile = createSwitchStylePropFile();
 
@@ -139,9 +136,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: noexists
      * </pre>
-     * @throws Exception 
      */
-    public void test_readMap_SwitchStyle_emptySwitch() throws Exception {
+    public void test_readMap_SwitchStyle_emptySwitch() {
         // ## Arrange ##
         DfPropFile propFile = new DfPropFile() {
             @SuppressWarnings("unchecked")
@@ -179,9 +175,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: default
      * </pre>
-     * @throws Exception 
      */
-    public void test_readMap_InheritStyle_default() throws Exception {
+    public void test_readMap_InheritStyle_default() {
         // ## Arrange ##
         DfPropFile propFile = createInheritStylePropFile();
 
@@ -205,9 +200,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: maihama
      * </pre>
-     * @throws Exception 
      */
-    public void test_readMap_InheritStyle_maihama() throws Exception {
+    public void test_readMap_InheritStyle_maihama() {
         // ## Arrange ##
         DfPropFile propFile = createInheritStylePropFile();
 
@@ -232,9 +226,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: noexists
      * </pre>
-     * @throws Exception 
      */
-    public void test_readMap_InheritStyle_noexists() throws Exception {
+    public void test_readMap_InheritStyle_noexists() {
         // ## Arrange ##
         DfPropFile propFile = createInheritStylePropFile();
 
@@ -281,9 +274,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: maihama
      * </pre>
-     * @throws Exception 
      */
-    public void test_readMap_InheritStyle_emptyInherit() throws Exception {
+    public void test_readMap_InheritStyle_emptyInherit() {
         // ## Arrange ##
         DfPropFile propFile = new DfPropFile() {
             @SuppressWarnings("unchecked")
@@ -321,9 +313,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: maihama
      * </pre>
-     * @throws Exception
      */
-    public void test_readMap_InheritStyle_doubleInherit() throws Exception {
+    public void test_readMap_InheritStyle_doubleInherit() {
         // ## Arrange ##
         DfPropFile propFile = new DfPropFile() {
             @SuppressWarnings("unchecked")
@@ -375,9 +366,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: default
      * </pre>
-     * @throws Exception 
      */
-    public void test_readMap_AllStars_default() throws Exception {
+    public void test_readMap_AllStars_default() {
         // ## Arrange ##
         DfPropFile propFile = createAllStarsPropFile();
 
@@ -404,9 +394,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: maihama
      * </pre>
-     * @throws Exception 
      */
-    public void test_readMap_AllStars_maihama() throws Exception {
+    public void test_readMap_AllStars_maihama() {
         // ## Arrange ##
         DfPropFile propFile = createAllStarsPropFile();
 
@@ -433,9 +422,8 @@ public class DfPropFileTest extends RuntimeTestCase {
      *  
      * env: noexists
      * </pre>
-     * @throws Exception 
      */
-    public void test_readMap_AllStars_noExists() throws Exception {
+    public void test_readMap_AllStars_noExists() {
         // ## Arrange ##
         DfPropFile propFile = createAllStarsPropFile();
 

@@ -4,8 +4,8 @@ using System;
 namespace ${glPackageBaseCommonJdbc} {
 
     /**
-     * The handler of SQL result. <br />
-     * This handler is called back after executing the SQL and mapping entities. <br />
+     * The handler of SQL result. <br>
+     * This handler is called back after executing the SQL and mapping entities. <br>
      * (before you get the result)
      * <pre>
      * [SqlResultInfo]
@@ -16,9 +16,9 @@ namespace ${glPackageBaseCommonJdbc} {
      * o afterDateTime : The date time after executing command(after mapping entities).
      * </pre>
      * <p>
-     * Attention: <br />
+     * Attention: <br>
      * If the SQL would be not executed, the displaySql in the information is null.
-     * For example, update() that the entity has no modification. <br />
+     * For example, update() that the entity has no modification. <br>
      * And if the command would be for batch, this is called back only once in a command.
      * So the displaySql is the latest SQL in a command at that time.
      * </p>

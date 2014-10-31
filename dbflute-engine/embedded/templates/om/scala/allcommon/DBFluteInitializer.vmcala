@@ -66,7 +66,7 @@ class ${glDBFluteInitializer} {
     }
 
     /**
-     * This is the story for ... <br />
+     * This is the story for ... <br>
      * You can override this to set your DBFluteConfig settings
      * with calling super.prologue() in it.
      */
@@ -116,14 +116,14 @@ class ${glDBFluteInitializer} {
     }
 
     /**
-     * Set up the handler of data source to the configuration of DBFlute. <br />
+     * Set up the handler of data source to the configuration of DBFlute. <br>
      * If it uses commons-DBCP, it needs to arrange some for transaction.
      * <ul>
      *     <li>A. To use DataSourceUtils which is Spring Framework class.</li>
      *     <li>B. To use TransactionConnection that is original class and doesn't close really.</li>
      * </ul>
      * If you use a transaction library which has a data source which supports transaction,
-     * It doesn't need these arrangement. (For example, the framework 'Atomikos') <br />
+     * It doesn't need these arrangement. (For example, the framework 'Atomikos') <br>
      * This method should be executed when application is initialized.
      * @param dataSourceFqcn The FQCN of data source. (NotNull)
      */

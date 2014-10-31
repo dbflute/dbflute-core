@@ -342,7 +342,7 @@ public class Column {
     //                                              SQL Name
     //                                              --------
     /**
-     * Get the SQL name of the column, which is used in your SQL after generated world. (for templates) <br />
+     * Get the SQL name of the column, which is used in your SQL after generated world. (for templates) <br>
      * This might be quoted with fitting to template.
      * @return The column name as String. (NotNull)
      */
@@ -351,7 +351,7 @@ public class Column {
     }
 
     /**
-     * Get the SQL name of the column, which is used in your SQL on the Java process. (for direct use) <br />
+     * Get the SQL name of the column, which is used in your SQL on the Java process. (for direct use) <br>
      * This might be quoted for direct use or has its schema prefix.
      * @return The column name as String. (NotNull)
      */
@@ -384,7 +384,7 @@ public class Column {
     //                                               HTML ID
     //                                               -------
     /**
-     * Get the value for HTML (SchemaHTML) ID attribute of the column. <br />
+     * Get the value for HTML (SchemaHTML) ID attribute of the column. <br>
      * This contains the table's ID value.
      * @return The column ID for SchemaHTML. (NotNull)
      */
@@ -909,7 +909,7 @@ public class Column {
         final StringBuilder sb = new StringBuilder();
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
-        final String delimiter = ",<br />";
+        final String delimiter = ",<br>";
         final List<ForeignKey> foreignKeyList = getForeignKeyList();
         final int size = foreignKeyList.size();
         if (size == 0) {
@@ -1175,7 +1175,7 @@ public class Column {
         }
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
-        final String delimiter = ",<br />";
+        final String delimiter = ",<br>";
         final StringBuffer sb = new StringBuffer();
         for (ForeignKey fk : _referrerList) {
             final Table referrerTable = fk.getTable();
@@ -1838,7 +1838,7 @@ public class Column {
     }
 
     /**
-     * Set the related table for Sql2Entity. <br />
+     * Set the related table for Sql2Entity. <br>
      * This is used at supplementary information and LoadReferrer for customize entity.
      * @param sql2EntityRelatedTable The related table for Sql2Entity. (NullAllowed)
      */
@@ -1855,7 +1855,7 @@ public class Column {
     }
 
     /**
-     * Set the related column for Sql2Entity. <br />
+     * Set the related column for Sql2Entity. <br>
      * This is used at supplementary information and LoadReferrer for customize entity.
      * @param sql2EntityRelatedColumn The related column for Sql2Entity. (NullAllowed)
      */
@@ -1868,7 +1868,7 @@ public class Column {
     }
 
     /**
-     * Set the forced java native type for Sql2Entity. <br />
+     * Set the forced java native type for Sql2Entity. <br>
      * This is used at getting java native type as high priority.
      * @param sql2EntityForcedJavaNative The forced java native type for Sql2Entity. (NullAllowed)
      */
@@ -1877,7 +1877,7 @@ public class Column {
     }
 
     /**
-     * Set the hinted classification name for Sql2Entity. <br />
+     * Set the hinted classification name for Sql2Entity. <br>
      * This is used at getting classification as high priority.
      * @param sql2EntityHintedClassification The hinted classification for Sql2Entity. (NullAllowed)
      */

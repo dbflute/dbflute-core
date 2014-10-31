@@ -135,8 +135,8 @@ public class DfTaskControlLogic {
     }
 
     /**
-     * Get data source for main connection. <br />
-     * It returns valid data source after setupDataSource() success. <br />
+     * Get data source for main connection. <br>
+     * It returns valid data source after setupDataSource() success. <br>
      * Basically not null but when data source does not exist on thread, it returns null.
      * @return The data source with schema. (NullAllowed: when data source does not exist on thread, e.g. lazy connection)
      */
@@ -145,8 +145,8 @@ public class DfTaskControlLogic {
     }
 
     /**
-     * Get schema source for main connection. <br />
-     * It returns valid data source after setupDataSource() success. <br />
+     * Get schema source for main connection. <br>
+     * It returns valid data source after setupDataSource() success. <br>
      * Basically not null but when data source does not exist on thread, it returns null.
      * @return The schema source. (NullAllowed: when data source does not exist on thread, e.g. lazy connection)
      */

@@ -119,7 +119,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * <span style="color: #3F7E5E">// e.g. grouping per three records</span>
      * List&lt;ListResultBean&lt;Member&gt;&gt; groupingList = memberList.<span style="color: #CC4747">groupingList</span>(new GroupingListDeterminer&lt;Member&gt;() {
      *     public boolean isBreakRow(GroupingListRowResource&lt;Member&gt; rowResource, Member nextEntity) {
-     *         return rowResource.getNextIndex() >= 3;
+     *         return rowResource.getNextIndex() &gt;= 3;
      *     }
      * }, groupingOption);
      * 

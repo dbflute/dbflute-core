@@ -1254,8 +1254,9 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                         -------------
     /**
      * Assert that the argument is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
+     * @throws IllegalArgumentException When the argument is null.
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         DfAssertUtil.assertObjectNotNull(variableName, value);
@@ -1266,8 +1267,9 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                         -------------
     /**
      * Assert that the string is not null and not trimmed empty.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
+     * @throws IllegalArgumentException When the argument is null or empty.
      */
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         DfAssertUtil.assertStringNotNullAndNotTrimmedEmpty(variableName, value);

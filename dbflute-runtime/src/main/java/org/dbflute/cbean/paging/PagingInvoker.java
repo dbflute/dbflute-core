@@ -278,9 +278,9 @@ public class PagingInvoker<ENTITY> {
     //                                                                       =============
     /**
      * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @throws IllegalArgumentException
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
+     * @throws IllegalArgumentException When the argument is null.
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {

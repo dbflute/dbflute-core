@@ -161,7 +161,7 @@ public class AppData {
     }
 
     /**
-     * Get database object for application. <br />
+     * Get database object for application. <br>
      * @return The instance of the database. (NullAllowed: if null, not loaded yet)
      */
     public Database getDatabase() {

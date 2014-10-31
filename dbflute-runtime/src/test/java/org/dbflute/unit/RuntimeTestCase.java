@@ -456,16 +456,6 @@ public abstract class RuntimeTestCase extends TestCase {
         }
     }
 
-    /**
-     * @param list
-     * @deprecated use {@link #assertHasAnyElement(Collection)}
-     */
-    protected void assertListNotEmpty(List<?> list) { // old style
-        if (list.isEmpty()) {
-            fail("the list should NOT be empty but empty.");
-        }
-    }
-
     // -----------------------------------------------------
     //                                             Mark Here
     //                                             ---------

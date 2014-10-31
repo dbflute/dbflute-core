@@ -48,7 +48,7 @@ class ${myClassName}(query: ${myConditionQueryClassName}) {
 #end
 #set ($hasNestSelectSetupper = ${fk.hasForeignNestSelectSetupper()})
     /**
-     * With nested relation columns to select clause. <br />
+     * With nested relation columns to select clause. <br>
      * ${fk.foreignDispForJavaDoc}
 #if ($fk.hasDynamicFixedCondition())
      * ${fk.dynamicFixedConditionArgsJavaDocString}
@@ -71,7 +71,7 @@ class ${myClassName}(query: ${myConditionQueryClassName}) {
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($hasNestSelectSetupper = ${referrer.hasReferrerNestSelectSetupper()})
     /**
-     * With nested relation columns to select clause. <br />
+     * With nested relation columns to select clause. <br>
      * ${referrer.referrerDispAsOneForJavaDoc}
 #set ($setupSelectReturnType = "Unit")
 #if ($hasNestSelectSetupper)

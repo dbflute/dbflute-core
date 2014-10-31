@@ -663,7 +663,7 @@ public interface SqlClause {
      * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
      * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
      * </p>
-     * @param fetchPageNumber The number of fetch page. 1 origin. (NotMinus & NotZero: if minus or zero, set one)
+     * @param fetchPageNumber The number of fetch page. 1 origin. (NotMinus, NotZero: if minus or zero, set one)
      */
     void fetchPage(int fetchPageNumber);
 

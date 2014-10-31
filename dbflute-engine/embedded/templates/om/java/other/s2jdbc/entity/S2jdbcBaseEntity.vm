@@ -30,7 +30,7 @@ import ${myExtendedEntityPackageName}.*;
 #end
 
 /**
- * The entity of ${table.basicInfoDispString}. <br />
+ * The entity of ${table.basicInfoDispString}. <br>
 #if ($table.isCommentForJavaDocValid())
  * ${table.commentForJavaDoc}
 #end
@@ -81,7 +81,7 @@ public abstract class ${myClassName} implements Serializable {
     /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
 #else
     /**
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
@@ -303,7 +303,7 @@ public abstract class ${myClassName} implements Serializable {
 
 #end
     /**
-     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
@@ -318,7 +318,7 @@ public abstract class ${myClassName} implements Serializable {
     }
 
     /**
-     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end

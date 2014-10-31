@@ -232,7 +232,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                                                 Torque Type Getting
     //                                                                 ===================
     /**
-     * Get the JDBC type of the column. <br /> 
+     * Get the JDBC type of the column. <br> 
      * Look at the java-doc of overload method if you want to know the priority of mapping.
      * @param columnMeta The meta information of column. (NotNull)
      * @return The JDBC type of the column. (NotNull)

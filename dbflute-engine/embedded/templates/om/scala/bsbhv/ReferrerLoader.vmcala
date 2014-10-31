@@ -34,7 +34,7 @@ import ${glPackageCB}._;
 #end
 
 /**
- * The referrer loader of ${table.basicInfoDispString}. <br />
+ * The referrer loader of ${table.basicInfoDispString}. <br>
  * <pre>
  * [primary key]
  *     ${table.primaryKeyNameCommaString}

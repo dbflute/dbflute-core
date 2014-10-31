@@ -69,7 +69,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param metaData JDBC meta data. (NotNull)
      * @param tableInfo The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo) throws SQLException {
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
@@ -83,7 +83,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @param tableName The name of table. (NotNull, CaseInsensitiveByOption)
      * @return A list of foreign keys in <code>tableName</code>.
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {

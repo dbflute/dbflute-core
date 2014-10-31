@@ -118,7 +118,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * Add to the date or date-time value by the specified years column. <br>
      * Plus only, if you want minus, use substractYear() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT years)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT years)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -142,7 +142,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified years column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT years)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT years)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -180,7 +180,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * Add to the date or date-time value by the specified months column. <br>
      * Plus only, if you want minus, use substractMonth() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT months)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT months)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -204,7 +204,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified months column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT months)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT months)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -242,7 +242,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * Add to the date or date-time value by the specified days column. <br>
      * Plus only, if you want minus, use substractDay() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT days)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT days)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -266,7 +266,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified days column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT days)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT days)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -304,7 +304,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * Add to the date or date-time value by the specified hours column. <br>
      * Plus only, if you want minus, use substractHour() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT hours)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT hours)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -328,7 +328,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified hours column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT hours)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT hours)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -366,7 +366,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * Add to the date or date-time value by the specified minutes column. <br>
      * Plus only, if you want minus, use substractMinute() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT minutes)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT minutes)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -390,7 +390,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified minutes column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT minutes)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT minutes)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -428,7 +428,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
      * Add to the date or date-time value by the specified seconds column. <br>
      * Plus only, if you want minus, use substractSecond() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT seconds)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT seconds)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -452,7 +452,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified seconds column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT seconds)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT seconds)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {

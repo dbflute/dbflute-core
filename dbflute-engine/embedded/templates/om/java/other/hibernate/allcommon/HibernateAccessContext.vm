@@ -137,7 +137,7 @@ public class ${glAccessContext} {
     }
 
     /**
-     * Get access date on thread. <br />
+     * Get access date on thread. <br>
      * If it couldn't get access date from access-context, it returns application current date!
      * @return Access date. (NotNull)
      */
@@ -156,7 +156,7 @@ public class ${glAccessContext} {
     }
 
     /**
-     * Get access time-stamp on thread. <br />
+     * Get access time-stamp on thread. <br>
      * If it couldn't get access time-stamp from access-context, it returns application current time-stamp!
      * @return Access time-stamp. (NotNull)
      */

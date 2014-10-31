@@ -78,7 +78,7 @@ import ${table.relationalNullObjectProviderPackage}._;
 #end
 
 /**
- * The entity of ${table.basicInfoDispString}. <br />
+ * The entity of ${table.basicInfoDispString}. <br>
 #if ($table.isCommentForJavaDocValid())
  * ${table.commentForJavaDoc}
 #end
@@ -236,7 +236,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 #foreach ($uq in $table.keyableUniqueList)
 
     /**
-     * To be unique by the unique column. <br />
+     * To be unique by the unique column. <br>
      * You can update the entity by the key when entity update (NOT batch update).
      * ${uq.argsJavaDocString}
      */
@@ -268,8 +268,8 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 #if ($col.hasClassification())
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
     /**
-     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br>
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -281,8 +281,8 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
     }
 
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br>
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -300,8 +300,8 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 #if ($classificationTop.isSisterBooleanHandling())
 
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as boolean. <br />
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * Set the value of ${col.uncapitalisedJavaName} as boolean. <br>
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -321,7 +321,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 #if ($col.hasClassification())
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name} (${classificationElement.code}). <br />
+     * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name} (${classificationElement.code}). <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
 #if ($classificationElement.isDeprecated())
@@ -341,7 +341,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 #if ($col.hasClassification())
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Is the value of ${col.uncapitalisedJavaName} ${classificationElement.name}? <br />
+     * Is the value of ${col.uncapitalisedJavaName} ${classificationElement.name}? <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
@@ -358,7 +358,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 #foreach ($group in $col.classificationTop.groupList)
 #if ($group.hasGroupComment())
     /**
-     * ${group.groupCommentForJavaDoc} <br />
+     * ${group.groupCommentForJavaDoc} <br>
      * ${group.buildElementDisp()}
      * @return The determination, true or false.
      */
@@ -697,7 +697,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
     //                                                                      Basic Override
     //                                                                      ==============
     /**
-     * Determine the object is equal with this. <br />
+     * Determine the object is equal with this. <br>
      * If primary-keys or columns of the other are same as this one, returns true.
      * @param obj The object as other entity. (NullAllowed: if null, returns false fixedly)
      * @return Comparing result.
@@ -906,7 +906,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 
 #end
     /**
-     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
@@ -931,7 +931,7 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
     }
 
     /**
-     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end

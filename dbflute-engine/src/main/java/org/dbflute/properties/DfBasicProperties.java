@@ -37,7 +37,7 @@ import org.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 import org.dbflute.util.Srl;
 
 /**
- * The basic properties for DBFlute property. <br />
+ * The basic properties for DBFlute property. <br>
  * This class is very important for DBFlute.
  * @author jflute
  */

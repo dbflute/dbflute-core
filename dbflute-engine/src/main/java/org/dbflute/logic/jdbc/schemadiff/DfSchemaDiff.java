@@ -650,7 +650,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                         Assist Helper
     //                                         -------------
     /**
-     * Find the table from next schema by table object. <br />
+     * Find the table from next schema by table object. <br>
      * This method can be used after {@link #loadNextSchema()}.
      * @param table The object of target table that has table name. (NotNull)
      * @return The object of found table. (NullAllowed: if null, not found)
@@ -660,7 +660,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     /**
-     * Find the table from previous schema by table object. <br />
+     * Find the table from previous schema by table object. <br>
      * This method can be used after {@link #loadPreviousSchema()}.
      * @param table The object of target table that has table name. (NotNull)
      * @return The object of found table. (NullAllowed: if null, not found)
@@ -670,7 +670,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     /**
-     * Find the table from previous schema by table name. <br />
+     * Find the table from previous schema by table name. <br>
      * This method can be used after {@link #loadPreviousSchema()}.
      * @param tableDbName The DB name of target table. (NotNull)
      * @return The object of found table. (NullAllowed: if null, not found)
@@ -1506,8 +1506,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     /**
-     * Is the first time to read the schema? <br />
-     * It also means previous schema info was not found. <br />
+     * Is the first time to read the schema? <br>
+     * It also means previous schema info was not found. <br>
      * This determination is set after {@link #loadPreviousSchema()}.
      * @return The determination, true or false.
      */

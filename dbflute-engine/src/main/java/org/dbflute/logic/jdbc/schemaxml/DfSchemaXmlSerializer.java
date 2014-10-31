@@ -240,7 +240,7 @@ public class DfSchemaXmlSerializer {
     }
 
     /**
-     * Create instance as manage process. <br />
+     * Create instance as manage process. <br>
      * CraftDiff settings are not set here. 
      * @param dataSource The data source of the database. (NotNull)
      * @param schemaXml The XML file to output meta info of the schema. (NotNull)
@@ -351,7 +351,7 @@ public class DfSchemaXmlSerializer {
 
     /**
      * Generates an XML database schema from JDBC meta data.
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected void generateXML() throws SQLException {
         Connection conn = null;
@@ -935,7 +935,7 @@ public class DfSchemaXmlSerializer {
     }
 
     /**
-     * Extract craft meta to meta files by SQL firing. <br />
+     * Extract craft meta to meta files by SQL firing. <br>
      * This extracts them to next files after rolling existing next files to previous files.
      * @param tableList The list of table meta. (NotNull)
      */
@@ -955,7 +955,7 @@ public class DfSchemaXmlSerializer {
      * Get the list of table meta in the current database that are not system tables.
      * @param dbMeta The meta data of a database. (NotNull)
      * @return The list of all the tables in a database. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public List<DfTableMeta> getTableList(DatabaseMetaData dbMeta) throws SQLException {
         final UnifiedSchema mainSchema = _dataSource.getSchema();
@@ -1063,7 +1063,7 @@ public class DfSchemaXmlSerializer {
     // = = = = = = = = = =/
 
     /**
-     * Process helper execution about synonym table. <br />
+     * Process helper execution about synonym table. <br>
      * This should be executed after loading synonyms!
      * @param tableList The list of meta information of table. (NotNull)
      */
@@ -1104,7 +1104,7 @@ public class DfSchemaXmlSerializer {
      * @param dbMeta The meta data of a database. (NotNull)
      * @param tableMeta The meta information of table, which has column list after this method. (NotNull)
      * @return The list of columns in <code>tableName</code>.
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected List<DfColumnMeta> getColumns(DatabaseMetaData dbMeta, DfTableMeta tableMeta) throws SQLException {
         List<DfColumnMeta> columnList = _columnExtractor.getColumnList(dbMeta, tableMeta);
@@ -1186,7 +1186,7 @@ public class DfSchemaXmlSerializer {
      * @param metaData The meta data of a database. (NotNull)
      * @param tableMeta The meta information of table. (NotNull)
      * @return The meta information of primary key. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected DfPrimaryKeyMeta getPrimaryColumnMetaInfo(DatabaseMetaData metaData, DfTableMeta tableMeta) throws SQLException {
         final DfPrimaryKeyMeta pkInfo = _uniqueKeyExtractor.getPrimaryKey(metaData, tableMeta);
@@ -1211,7 +1211,7 @@ public class DfSchemaXmlSerializer {
      * @param tableMeta The meta information of table. (NotNull)
      * @param pkInfo The meta information of primary key. (NotNull)
      * @return The list of unique columns. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableMeta, DfPrimaryKeyMeta pkInfo)
             throws SQLException {
@@ -1232,7 +1232,7 @@ public class DfSchemaXmlSerializer {
      * @param primaryKeyColumnInfo The meta information of primary-key column.
      * @param conn Connection.
      * @return Auto-increment column name. (NullAllowed)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableMeta, DfColumnMeta primaryKeyColumnInfo) throws SQLException {
         if (_autoIncrementExtractor.isAutoIncrementColumn(conn, tableMeta, primaryKeyColumnInfo)) {
@@ -1274,7 +1274,7 @@ public class DfSchemaXmlSerializer {
      * @param metaData The meta data of a database. (NotNull)
      * @param tableMeta The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected Map<String, DfForeignKeyMeta> getForeignKeys(DatabaseMetaData metaData, DfTableMeta tableMeta) throws SQLException {
         final Map<String, DfForeignKeyMeta> foreignKeyMap = _foreignKeyExtractor.getForeignKeyMap(metaData, tableMeta);
@@ -1294,7 +1294,7 @@ public class DfSchemaXmlSerializer {
      * @param tableMeta The meta information of table. (NotNull)
      * @param uniqueKeyMap The map of unique key. (NotNull)
      * @return The list of index columns. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, DfTableMeta tableMeta,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {

@@ -86,7 +86,7 @@ public class ManualThreadDataSourceHandler implements DataSourceHandler {
      * Get the connection instance on thread.
      * @param actualDs The actual data source. (NotNull)
      * @return The wrapped connection which cannot be closed really. (NotNull)
-     * @throws java.sql.SQLException
+     * @throws SQLException When it fails to get connection.
      */
     public Connection getConnection(DataSource actualDs) throws SQLException {
         if (_connectionWrapper != null) {

@@ -48,7 +48,7 @@ import org.dbflute.properties.DfTypeMappingProperties;
 import org.dbflute.properties.handler.DfPropertiesHandler;
 
 /**
- * The properties to build. <br />
+ * The properties to build. <br>
  * Actually this class is provider of various DBFlute properties.
  * @author jflute
  */

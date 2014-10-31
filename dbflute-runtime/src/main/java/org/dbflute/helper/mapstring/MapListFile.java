@@ -78,7 +78,7 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     public Map<String, Object> readMap(InputStream ins) throws IOException {
         final String mapString = readString(ins);
@@ -103,7 +103,7 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     public Map<String, String> readMapAsStringValue(InputStream ins) throws IOException {
         final Map<String, String> resultMap = new LinkedHashMap<String, String>();
@@ -129,7 +129,7 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string list. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     @SuppressWarnings("unchecked")
     public Map<String, List<String>> readMapAsStringListValue(InputStream ins) throws IOException {
@@ -156,7 +156,7 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string map. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     @SuppressWarnings("unchecked")
     public Map<String, Map<String, String>> readMapAsStringMapValue(InputStream ins) throws IOException {
@@ -198,7 +198,7 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read list. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     public List<Object> readList(InputStream ins) throws IOException {
         final String listString = readString(ins);
@@ -229,7 +229,7 @@ public class MapListFile {
      * A trimmed line that starts with '#' is treated as line comment.
      * @param ins The input stream for DBFlute property file. (NotNull)
      * @return The read string. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     public String readString(InputStream ins) throws IOException {
         final String encoding = getFileEncoding();

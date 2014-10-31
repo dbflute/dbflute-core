@@ -45,7 +45,7 @@ import ${myExtendedEntityPackageName}.${referrerEntityClassName};
 #end
 
 /**
- * The entity of ${table.basicInfoDispString}. <br />
+ * The entity of ${table.basicInfoDispString}. <br>
 #if ($table.isCommentForJavaDocValid())
  * ${table.commentForJavaDoc}
 #end
@@ -131,7 +131,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if (${col.hasClassification()})
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
     /**
-     * Classify the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * Classify the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br>
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -161,7 +161,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Classify the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}. <br />
+     * Classify the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}. <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void classify${col.javaName}${classificationElement.name}() {
@@ -178,7 +178,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if (${col.hasClassification()})
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
     /**
-     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br>
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -194,7 +194,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Is the value of ${col.uncapitalisedJavaName} '${classificationElement.name}'? <br />
+     * Is the value of ${col.uncapitalisedJavaName} '${classificationElement.name}'? <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>
      * The difference of capital letters and small letters is NOT distinguished.
@@ -564,7 +564,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
 #end
     /**
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
@@ -575,7 +575,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     }
 
     /**
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
@@ -598,7 +598,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #set ($targetJavaName = ${table.findTargetColumnJavaNameByCommonColumnName(${columnName})})
 
     /**
-     * Get the value of the column '${uncapitalisedJavaName}'. <br />
+     * Get the value of the column '${uncapitalisedJavaName}'. <br>
      * @return The value of the column '${uncapitalisedJavaName}'. (NullAllowed)
      */
     public ${javaNative} get${javaName}() {
@@ -606,7 +606,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     }
 
     /**
-     * Set the value of the column '${uncapitalisedJavaName}'. <br />
+     * Set the value of the column '${uncapitalisedJavaName}'. <br>
      * @param ${uncapitalisedJavaName} The value of the column '${uncapitalisedJavaName}'. (NullAllowed)
      */
     public void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {

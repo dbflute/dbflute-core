@@ -43,7 +43,7 @@ public interface ColumnCalculator {
      *  mob.<span style="color: #CC4747">plus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
-     * e.g. ColumnQuery: ... > PURCHASE_PRICE + PURCHASE_COUNT
+     * e.g. ColumnQuery: ... &gt; PURCHASE_PRICE + PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -76,7 +76,7 @@ public interface ColumnCalculator {
      *  mob.<span style="color: #CC4747">minus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
-     * e.g. ColumnQuery: ... > PURCHASE_PRICE - PURCHASE_COUNT
+     * e.g. ColumnQuery: ... &gt; PURCHASE_PRICE - PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -109,7 +109,7 @@ public interface ColumnCalculator {
      *  mob.<span style="color: #CC4747">multiply</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
-     * e.g. ColumnQuery: ... > PURCHASE_PRICE * PURCHASE_COUNT
+     * e.g. ColumnQuery: ... &gt; PURCHASE_PRICE * PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -142,7 +142,7 @@ public interface ColumnCalculator {
      *  mob.<span style="color: #CC4747">divide</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
      * 
-     * e.g. ColumnQuery: ... > PURCHASE_PRICE / PURCHASE_COUNT
+     * e.g. ColumnQuery: ... &gt; PURCHASE_PRICE / PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
