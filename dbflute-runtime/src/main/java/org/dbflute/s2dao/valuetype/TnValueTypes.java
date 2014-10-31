@@ -185,7 +185,7 @@ public class TnValueTypes {
     //                                                  Find
     //                                                  ----
     /**
-     * Find a value type by a class type or an object instance. <br />
+     * Find a value type by a class type or an object instance. <br>
      * A class type is a prior searching key.
      * @param type The type of class. (NullAllowed: if null, searching by instance)
      * @param value The object value. (NullAllowed: if null, returns default object type)
@@ -196,7 +196,7 @@ public class TnValueTypes {
     }
 
     /**
-     * Find a value type by an object instance or a definition type of JDBC. <br />
+     * Find a value type by an object instance or a definition type of JDBC. <br>
      * An object instance is a prior searching key.
      * @param value The object value. (NullAllowed: if null, returns dynamic object type)
      * @param jdbcDefType The definition type of JDBC. (NullAllowed: if null, searching by instance)
@@ -226,7 +226,7 @@ public class TnValueTypes {
     //                                                byType
     //                                                ------
     /**
-     * Get the value type by class type. <br />
+     * Get the value type by class type. <br>
      * The basic objects are prior to the basic interfaces basically,
      * but only when the ENUM is assignable from the class type, interfaces are prior.
      * Because frequently the ENUM has application own interfaces.

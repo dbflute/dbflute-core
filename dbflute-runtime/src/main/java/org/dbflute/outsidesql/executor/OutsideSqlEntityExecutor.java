@@ -74,7 +74,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     //                                                                  Entity NullAllowed
     //                                                                  ==================
     /**
-     * Select entity by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Select entity by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -103,7 +103,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     }
 
     /**
-     * Select entity by the outside-SQL. {FreeStyle Interface}<br />
+     * Select entity by the outside-SQL. {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -202,7 +202,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     //                                                                      Entity NotNull
     //                                                                      ==============
     /**
-     * Select entity with deleted check by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Select entity with deleted check by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -228,7 +228,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     }
 
     /**
-     * Select entity with deleted check by the outside-SQL. {FreeStyle Interface}<br />
+     * Select entity with deleted check by the outside-SQL. {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -286,7 +286,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     }
 
     /**
-     * Set up format-SQL for this outside-SQL. <br />
+     * Set up format-SQL for this outside-SQL. <br>
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */

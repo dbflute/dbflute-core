@@ -37,7 +37,7 @@ import org.dbflute.cbean.ConditionBean;
 public interface SpecifyQuery<CB extends ConditionBean> {
 
     /**
-     * Specify your column for query. <br />
+     * Specify your column for query. <br>
      * Don't call the method 'setupSelect_Xxx()' and 'query()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
      * @param spCB The condition-bean for specification. (NotNull)

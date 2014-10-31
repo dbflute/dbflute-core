@@ -31,7 +31,7 @@ public interface DBMetaProvider {
     DBMeta provideDBMeta(String tableFlexibleName);
 
     /**
-     * Provide the DB meta by type. <br />
+     * Provide the DB meta by type. <br>
      * The generic type of the entity type is wild-card because generic for class type is hard to use.
      * @param entityType The entity type of table, which should implement the {@link Entity} interface. (NotNull)
      * @return The instance of DB meta. (NullAllowed: If the DB meta is not found, it returns null)
@@ -47,7 +47,7 @@ public interface DBMetaProvider {
     DBMeta provideDBMetaChecked(String tableFlexibleName);
 
     /**
-     * Provide the DB meta by type. <br />
+     * Provide the DB meta by type. <br>
      * The generic type of the entity type is wild-card because generic for class type is hard to use.
      * @param entityType The entity type of table, which should implement the {@link Entity} interface. (NotNull)
      * @return The instance of DB meta. (NotNull)

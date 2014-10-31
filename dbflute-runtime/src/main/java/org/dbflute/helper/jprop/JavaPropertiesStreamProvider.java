@@ -24,9 +24,9 @@ import java.io.InputStream;
 public interface JavaPropertiesStreamProvider {
 
     /**
-     * Provider the stream for java properties. <br />
-     * This method is called back twice times. <br />
-     * So returned input stream should be always new-created stream. <br />
+     * Provider the stream for java properties. <br>
+     * This method is called back twice times. <br>
+     * So returned input stream should be always new-created stream. <br>
      * (The stream is closed after reading)
      * @return The new-created stream for java properties. (NotNull)
      * @throws IOException When it fails to provide the stream.

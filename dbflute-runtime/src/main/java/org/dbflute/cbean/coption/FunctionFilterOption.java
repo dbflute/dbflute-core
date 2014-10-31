@@ -53,7 +53,7 @@ import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
 /**
- * The option to filter by function. <br />
+ * The option to filter by function. <br>
  * You can filter an aggregate function by scalar function filters.
  * @author jflute
  */
@@ -237,7 +237,7 @@ public class FunctionFilterOption implements ParameterOption {
     //                                                                              Filter
     //                                                                              ======
     /**
-     * Filter the expression of function part. <br />
+     * Filter the expression of function part. <br>
      * For example, an expression is like: max(foo.FOO_DATE), sum(bar.BAR_PRICE), ...
      * @param functionExp The expression of function part that is not filtered. (NotNull) 
      * @return The filtered expression. (NotNull)
@@ -739,9 +739,9 @@ public class FunctionFilterOption implements ParameterOption {
     //                                                                            TimeZone
     //                                                                            ========
     /**
-     * Set time-zone, basically for LocalDate conversion. <br />
-     * Normally you don't need to set this, you can adjust other ways. <br />
-     * (DBFlute system's time-zone is used as default) <br />
+     * Set time-zone, basically for LocalDate conversion. <br>
+     * Normally you don't need to set this, you can adjust other ways. <br>
+     * (DBFlute system's time-zone is used as default) <br>
      * And it should be called before e.g. coalesce()
      * @param timeZone The time-zone for filtering. (NullAllowed: if null, default zone)
      * @return this. (NotNull)

@@ -66,7 +66,7 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @param selectColumnMap The map of select column name. map:{flexibleName = columnAliasName} (NotNull)
      * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed)
      * @return The map of row property cache. map:{columnName, PropertyMapping} (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected Map<String, TnPropertyMapping> createPropertyCache(Map<String, String> selectColumnMap,
             Map<String, Map<String, Integer>> selectIndexMap) throws SQLException {
@@ -82,7 +82,7 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed)
      * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
      * @return The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected Map<String, Map<String, TnPropertyMapping>> createRelationPropertyCache(Map<String, String> selectColumnMap,
             Map<String, Map<String, Integer>> selectIndexMap, TnRelationSelector relSelector) throws SQLException {
@@ -98,7 +98,7 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed)
      * @param propertyCache The map of property cache. map:{columnName, PropertyMapping} (NotNull)
      * @return The created row. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap, Map<String, TnPropertyMapping> propertyCache)
             throws SQLException {
@@ -120,7 +120,7 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @param relRowCache The cache of relation row. (NotNull)
      * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
      * @return Created relation row. (NullAllowed)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
             Map<String, Map<String, Integer>> selectIndexMap, TnRelationKey relKey,

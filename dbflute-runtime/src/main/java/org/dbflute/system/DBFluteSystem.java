@@ -41,21 +41,21 @@ public class DBFluteSystem {
     //                                                                    Option Attribute
     //                                                                    ================
     /**
-     * The provider of current date for DBFlute system. <br />
-     * e.g. AccessContext might use this (actually, very very rare case) <br />
+     * The provider of current date for DBFlute system. <br>
+     * e.g. AccessContext might use this (actually, very very rare case) <br>
      * (NullAllowed: if null, server date might be used)
      */
     protected static DfCurrentDateProvider _currentDateProvider;
     /**
-     * The provider of final default locale for DBFlute system. <br />
-     * e.g. DisplaySql, Date conversion, LocalDate mapping and so on... <br />
+     * The provider of final default locale for DBFlute system. <br>
+     * e.g. DisplaySql, Date conversion, LocalDate mapping and so on... <br>
      * (NullAllowed: if null, server locale might be used)
      */
     protected static DfFinalLocaleProvider _finalLocaleProvider;
 
     /**
-     * The provider of final default time-zone for DBFlute system. <br />
-     * e.g. DisplaySql, Date conversion, LocalDate mapping and so on... <br />
+     * The provider of final default time-zone for DBFlute system. <br>
+     * e.g. DisplaySql, Date conversion, LocalDate mapping and so on... <br>
      * (NullAllowed: if null, server zone might be used)
      */
     protected static DfFinalTimeZoneProvider _finalTimeZoneProvider;
@@ -100,7 +100,7 @@ public class DBFluteSystem {
     //                                                                        Final Locale
     //                                                                        ============
     /**
-     * Get the final default locale for DBFlute system. <br />
+     * Get the final default locale for DBFlute system. <br>
      * basically for e.g. DisplaySql, Date conversion, LocalDate mapping and so on...
      * @return The final default locale for DBFlute system. (NotNull: if no provider, server locale)
      */
@@ -112,7 +112,7 @@ public class DBFluteSystem {
     //                                                                      Final TimeZone
     //                                                                      ==============
     /**
-     * Get the final default time-zone for DBFlute system. <br />
+     * Get the final default time-zone for DBFlute system. <br>
      * basically for e.g. DisplaySql, Date conversion, LocalDate mapping and so on...
      * @return The final default time-zone for DBFlute system. (NotNull: if no provider, server zone)
      */

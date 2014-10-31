@@ -18,7 +18,7 @@ package org.dbflute.hook;
 import org.dbflute.bhv.core.BehaviorCommandMeta;
 
 /**
- * The filter of SQL string. <br />
+ * The filter of SQL string. <br>
  * This filter is called back before executing the SQL.
  * <pre>
  * context.setSqlStringFilter(new SqlStringFilter() {
@@ -59,7 +59,7 @@ public interface SqlStringFilter {
     String filterQueryUpdate(BehaviorCommandMeta meta, String executedSql);
 
     /**
-     * Filter the executed SQL of outside-SQL. <br />
+     * Filter the executed SQL of outside-SQL. <br>
      * Called after filtering by outside-SQL filter.
      * @param meta The meta information of the behavior command. (NotNull)
      * @param executedSql The string of actually-executed SQL. (NotNull)

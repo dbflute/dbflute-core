@@ -43,8 +43,8 @@ public class OutsideSqlManualPagingExecutor<BEHAVIOR> extends AbstractOutsideSql
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select page by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * (both count-select and paging-select are executed)<br />
+     * Select page by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
+     * (both count-select and paging-select are executed)<br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -115,8 +115,8 @@ public class OutsideSqlManualPagingExecutor<BEHAVIOR> extends AbstractOutsideSql
     }
 
     /**
-     * Select list with paging by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * (count-select is not executed, only paging-select)<br />
+     * Select list with paging by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
+     * (count-select is not executed, only paging-select)<br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>

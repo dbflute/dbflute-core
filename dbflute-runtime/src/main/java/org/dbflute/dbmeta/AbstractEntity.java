@@ -216,7 +216,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     //                                              equals()
     //                                              --------
     /**
-     * Determine the object is equal with this. <br />
+     * Determine the object is equal with this. <br>
      * If primary-keys or columns of the other are same as this one, returns true.
      * @param obj The object as other entity. (NullAllowed: if null, returns false fixedly)
      * @return Comparing result.

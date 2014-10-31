@@ -77,8 +77,8 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
     //                                                                                Page
     //                                                                                ====
     /**
-     * Select page by the outside-SQL. {FreeStyle Interface}<br />
-     * (both count-select and paging-select are executed)<br />
+     * Select page by the outside-SQL. {FreeStyle Interface}<br>
+     * (both count-select and paging-select are executed)<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -231,8 +231,8 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
     //                                                                                List
     //                                                                                ====
     /**
-     * Select list with paging by the outside-SQL. {FreeStyle Interface}<br />
-     * (count-select is not executed, only paging-select)<br />
+     * Select list with paging by the outside-SQL. {FreeStyle Interface}<br>
+     * (count-select is not executed, only paging-select)<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -331,7 +331,7 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
     }
 
     /**
-     * Set up format-SQL for this outside-SQL. <br />
+     * Set up format-SQL for this outside-SQL. <br>
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */

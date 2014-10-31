@@ -64,7 +64,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     //                                                                            Function
     //                                                                            ========
     /**
-     * Select the count value. <br />
+     * Select the count value. <br>
      * You can also get same result by selectCount(cb) method.
      * <pre>
      * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">count</span>(new ScalarQuery(MemberCB cb) {
@@ -104,7 +104,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     }
 
     /**
-     * Select the count-distinct value. <br />
+     * Select the count-distinct value. <br>
      * You can also get same result by selectCount(cb) method.
      * <pre>
      * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {

@@ -883,7 +883,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                                Insert
     //                                                ------
     /**
-     * Process before insert. <br />
+     * Process before insert. <br>
      * You can stop the process by your extension.
      * @param entity The entity for insert. (NotNull)
      * @param option The option of insert. (NullAllowed)
@@ -904,7 +904,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     /**
-     * Process before query-insert. <br />
+     * Process before query-insert. <br>
      * You can stop the process by your extension.
      * @param entity The entity for query-insert. (NotNull)
      * @param intoCB The condition-bean for inserted table. (NotNull)
@@ -1002,7 +1002,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                                Update
     //                                                ------
     /**
-     * Process before update. <br />
+     * Process before update. <br>
      * You can stop the process by your extension.
      * @param entity The entity for update that has primary key. (NotNull)
      * @param option The option of update. (NullAllowed)
@@ -1017,7 +1017,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     /**
-     * Process before query-update. <br />
+     * Process before query-update. <br>
      * You can stop the process by your extension.
      * @param entity The entity for update that is not needed primary key. (NotNull)
      * @param cb The condition-bean for query. (NotNull)
@@ -1092,7 +1092,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                                Delete
     //                                                ------
     /**
-     * Process before delete. <br />
+     * Process before delete. <br>
      * You can stop the process by your extension.
      * @param entity The entity for delete that has primary key. (NotNull)
      * @param option The option of delete. (NullAllowed)
@@ -1107,7 +1107,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     /**
-     * Process before query-delete. <br />
+     * Process before query-delete. <br>
      * You can stop the process by your extension.
      * @param cb The condition-bean for query. (NotNull)
      * @param option The option of delete. (NullAllowed)

@@ -33,8 +33,8 @@ public class CursorSelectOption {
     //                                                                           by Paging
     //                                                                           =========
     /**
-     * Do cursor select by paging ordering by PK. <br />
-     * Consistent-read is not perfect. <br />
+     * Do cursor select by paging ordering by PK. <br>
+     * Consistent-read is not perfect. <br>
      * You might select records at second or more select that are not target when the first select.
      * @param pageSize The size of one page. (NotMinus, NotZero)
      * @return this. (NotNull)
@@ -47,8 +47,8 @@ public class CursorSelectOption {
     }
 
     /**
-     * Do cursor select by paging simply. <br />
-     * Consistent-read is not guaranteed. <br />
+     * Do cursor select by paging simply. <br>
+     * Consistent-read is not guaranteed. <br>
      * You might select duplicate records or cannot select required records,
      * so you should save consistent-read by DBMS settings, e.g. MySQL's RepeatableRead.
      * @param pageSize The size of one page. (NotMinus, NotZero)

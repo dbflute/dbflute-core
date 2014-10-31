@@ -43,7 +43,7 @@ public interface ConditionQuery {
     // not to be same as column names 
 
     /**
-     * Convert to the column real name. (with real alias name) <br />
+     * Convert to the column real name. (with real alias name) <br>
      * With finding DBMeta.
      * @param columnDbName The DB name of column. (NotNull)
      * @return the column real name. (NotNull)
@@ -51,7 +51,7 @@ public interface ConditionQuery {
     ColumnRealName toColumnRealName(String columnDbName);
 
     /**
-     * Convert to the column real name. (with real alias name) <br />
+     * Convert to the column real name. (with real alias name) <br>
      * Without finding DBMeta.
      * @param columnInfo The information of column. (NotNull)
      * @return the column real name. (NotNull)
@@ -59,7 +59,7 @@ public interface ConditionQuery {
     ColumnRealName toColumnRealName(ColumnInfo columnInfo);
 
     /**
-     * Convert to the column SQL name. <br />
+     * Convert to the column SQL name. <br>
      * With finding DBMeta.
      * @param columnDbName The DB name of column. (NotNull)
      * @return the column SQL name. (NotNull)
@@ -146,8 +146,8 @@ public interface ConditionQuery {
     ConditionValue invokeValue(String columnFlexibleName);
 
     /**
-     * Invoke setting query. {RelationResolved} <br />
-     * Basically for keys that does not need a condition option. <br />
+     * Invoke setting query. {RelationResolved} <br>
+     * Basically for keys that does not need a condition option. <br>
      * And you should set a list that has fromDate and toDate to conditionValue when DateFromTo,
      * and set a dummy object to it when keys that does not have an argument, e.g. IsNull. 
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
@@ -158,8 +158,8 @@ public interface ConditionQuery {
     void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue);
 
     /**
-     * Invoke setting query with option. {RelationResolved} <br />
-     * Basically for LikeSearch, NotLikeSearch, FromTo. <br />
+     * Invoke setting query with option. {RelationResolved} <br>
+     * Basically for LikeSearch, NotLikeSearch, FromTo. <br>
      * And you should set a list that has fromDate and toDate to conditionValue when FromTo,
      * and set a dummy object to it when keys that does not have an argument, e.g. IsNull.
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
@@ -187,7 +187,7 @@ public interface ConditionQuery {
     void invokeOrderBy(String columnFlexibleName, boolean isAsc);
 
     /**
-     * Invoke getting foreign condition-query. <br />
+     * Invoke getting foreign condition-query. <br>
      * A method with parameters (using fixed condition) is unsupported.
      * @param foreignPropertyName The property name(s), can contain '.' , of the foreign relation. (NotNull, NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)

@@ -77,7 +77,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select the cursor of the entity by outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Select the cursor of the entity by outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path.
      * <pre>
@@ -116,7 +116,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
     }
 
     /**
-     * Select the cursor of the entity by outside-SQL. {FreeStyle Interface}<br />
+     * Select the cursor of the entity by outside-SQL. {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type), cursor-handler.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -218,7 +218,7 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
     }
 
     /**
-     * Set up format-SQL for this outside-SQL. <br />
+     * Set up format-SQL for this outside-SQL. <br>
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */

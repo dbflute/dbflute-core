@@ -18,7 +18,7 @@ package org.dbflute.s2dao.metadata;
 import java.util.List;
 
 /**
- * The property type for relation. <br />
+ * The property type for relation. <br>
  * This interface provides relation meta info.
  * @author modified by jflute (originated in S2Dao)
  */
@@ -31,7 +31,7 @@ public interface TnRelationPropertyType extends TnPropertyType {
     int getRelationNo();
 
     /**
-     * Get the suffix part of relation No for relation path that indicates unique location. <br /> 
+     * Get the suffix part of relation No for relation path that indicates unique location. <br> 
      * This suffix is added to selected column label.
      * @return The suffix string. e.g. _0 (NotNull)
      */
@@ -83,14 +83,14 @@ public interface TnRelationPropertyType extends TnPropertyType {
     List<TnPropertyType> getUniquePropertyTypeList();
 
     /**
-     * Does it have simple unique key? (not compound?) <br />
+     * Does it have simple unique key? (not compound?) <br>
      * Derived method for performance.
      * @return The determination, true or false.
      */
     boolean hasSimpleUniqueKey();
 
     /**
-     * Does it have compound unique key? <br />
+     * Does it have compound unique key? <br>
      * Derived method for performance.
      * @return The determination, true or false.
      */

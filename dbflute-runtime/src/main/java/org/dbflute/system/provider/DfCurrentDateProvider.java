@@ -23,7 +23,7 @@ package org.dbflute.system.provider;
 public interface DfCurrentDateProvider {
 
     /**
-     * Get current date as milliseconds. <br />
+     * Get current date as milliseconds. <br>
      * This might be called many times, so take care of performance.
      * @return The long value as milliseconds.
      */

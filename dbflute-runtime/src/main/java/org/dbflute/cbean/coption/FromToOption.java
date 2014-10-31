@@ -129,7 +129,7 @@ public class FromToOption implements ConditionOption {
     //                                                                  Comparison Pattern
     //                                                                  ==================
     /**
-     * Compare as year. <br />
+     * Compare as year. <br>
      * The year part of the date is only used.
      * This method ignores operand adjustments and other patterns.
      * <pre>
@@ -155,8 +155,8 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Compare as month. <br />
-     * The year and month parts of the date are only used. <br />
+     * Compare as month. <br>
+     * The year and month parts of the date are only used. <br>
      * This method ignores operand adjustments and other patterns.
      * <pre>
      * e.g. from:{<span style="color: #CC4747">2007/04</span>/10 08:24:53} to:{<span style="color: #CC4747">2008/08</span>/16 14:36:29}
@@ -181,8 +181,8 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Compare as date. <br />
-     * The year, month, day parts of the date are only used. <br />
+     * Compare as date. <br>
+     * The year, month, day parts of the date are only used. <br>
      * This method ignores operand adjustments and other patterns.
      * <pre>
      * e.g. from:{<span style="color: #CC4747">2007/04/10</span> 08:24:53} to:{<span style="color: #CC4747">2007/04/16</span> 14:36:29}
@@ -207,8 +207,8 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Compare as hour. <br />
-     * The year, month, day, hour parts of the date are only used. <br />
+     * Compare as hour. <br>
+     * The year, month, day, hour parts of the date are only used. <br>
      * This method ignores operand adjustments and other patterns.
      * <pre>
      * e.g. from:{<span style="color: #CC4747">2007/04/10 08</span>:24:53} to:{<span style="color: #CC4747">2007/04/16 14</span>:36:29}
@@ -229,9 +229,9 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Compare as week. <br />
-     * The year, month, day parts of the date are only used. <br />
-     * This method ignores operand adjustments and other patterns. <br />
+     * Compare as week. <br>
+     * The year, month, day parts of the date are only used. <br>
+     * This method ignores operand adjustments and other patterns. <br>
      * The default beginning day of week is Sunday, but you can change it by beginWeek_DayOfWeek...() methods.
      * <pre>
      * e.g. from:{<span style="color: #CC4747">2007/04/10</span> 08:24:53} to:{<span style="color: #CC4747">2007/04/16</span> 14:36:29}
@@ -252,9 +252,9 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Compare as quarter of year. <br />
-     * The year and month parts of the date are only used. <br />
-     * This method ignores operand adjustments and other patterns. <br />
+     * Compare as quarter of year. <br>
+     * The year and month parts of the date are only used. <br>
+     * This method ignores operand adjustments and other patterns. <br>
      * The default beginning of quarter of year is 1st month, but you can change it by beginYear_Month...() methods.
      * <pre>
      * e.g. from:{<span style="color: #CC4747">2007/04</span>/10 08:24:53} to:{<span style="color: #CC4747">2008/08</span>/16 14:36:29}
@@ -282,7 +282,7 @@ public class FromToOption implements ConditionOption {
     //                                            Begin Year
     //                                            ----------
     /**
-     * Begin year from the specified month. <br />
+     * Begin year from the specified month. <br>
      * The date of argument is used as only the month part.
      * <pre>
      * e.g. beginYear_Month(toLocalDate("2001/04/01"))
@@ -301,7 +301,7 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Begin year from the specified month. <br />
+     * Begin year from the specified month. <br>
      * The date of argument is used as only the month part.
      * <pre>
      * e.g. beginYear_Month(toLocalDateTime("2001/04/01"))
@@ -320,7 +320,7 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Begin year from the specified month. <br />
+     * Begin year from the specified month. <br>
      * The date of argument is used as only the month part.
      * <pre>
      * e.g. beginYear_Month(toDate("2001/04/01"))
@@ -511,7 +511,7 @@ public class FromToOption implements ConditionOption {
     //                                           Begin Month
     //                                           -----------
     /**
-     * Begin month from the specified day. <br />
+     * Begin month from the specified day. <br>
      * The date of argument is used as only the day part.
      * <pre>
      * e.g. beginMonth_Day(toLocalDate("2001/01/03"))
@@ -530,7 +530,7 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Begin month from the specified day. <br />
+     * Begin month from the specified day. <br>
      * The date of argument is used as only the day part.
      * <pre>
      * e.g. beginMonth_Day(toLocalDateTime("2001/01/03"))
@@ -549,7 +549,7 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Begin month from the specified day. <br />
+     * Begin month from the specified day. <br>
      * The date of argument is used as only the day part.
      * <pre>
      * e.g. beginMonth_Day(toDate("2001/01/03"))
@@ -939,7 +939,7 @@ public class FromToOption implements ConditionOption {
     //                                               Operand
     //                                               -------
     /**
-     * Set up operand for from-date as greater-than. <br />
+     * Set up operand for from-date as greater-than. <br>
      * This is for manual adjustment.
      * @return this. (NotNull)
      */
@@ -950,7 +950,7 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Set up operand for to-date as less-than. <br />
+     * Set up operand for to-date as less-than. <br>
      * This is for manual adjustment.
      * @return this. (NotNull)
      */
@@ -1136,7 +1136,7 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Allow you to set one-side only condition. (null allowed) <br />
+     * Allow you to set one-side only condition. (null allowed) <br>
      * If you ignore null-or-empty query, you don't need to call this.
      * @return this. (NotNull)
      */
@@ -1146,7 +1146,7 @@ public class FromToOption implements ConditionOption {
     }
 
     /**
-     * Does it allow you to set one-side only condition. <br />
+     * Does it allow you to set one-side only condition. <br>
      * @return The determination, true or false.
      */
     public boolean isOneSideAllowed() {
@@ -1471,8 +1471,8 @@ public class FromToOption implements ConditionOption {
     //                                                                            TimeZone
     //                                                                            ========
     /**
-     * Set time-zone, basically for LocalDate conversion. <br />
-     * Normally you don't need to set this, you can adjust other ways. <br />
+     * Set time-zone, basically for LocalDate conversion. <br>
+     * Normally you don't need to set this, you can adjust other ways. <br>
      * (DBFlute system's time-zone is used as default)
      * @param timeZone The time-zone for filtering. (NullAllowed: if null, default zone)
      * @return this. (NotNull)

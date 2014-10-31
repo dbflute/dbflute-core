@@ -39,7 +39,7 @@ import java.util.Map;
 public interface FileMakingRowWriter {
 
     /**
-     * Write the row as value list to token file. <br />
+     * Write the row as value list to token file. <br>
      * Not Collection type because order is important here.
      * @param valueList The list of value for row. (NotNull, NotEmpty)
      * @throws IOException When the file writing failed.
@@ -47,7 +47,7 @@ public interface FileMakingRowWriter {
     void writeRow(List<String> valueList) throws IOException;
 
     /**
-     * Write the row as column-key value map to token file. <br />
+     * Write the row as column-key value map to token file. <br>
      * Unordered map is allowed by key-mapping. (according to header's column order)
      * @param columnValueMap The map of column-key value for row. (NotNull, NotEmpty)
      * @throws IOException When the file writing failed.

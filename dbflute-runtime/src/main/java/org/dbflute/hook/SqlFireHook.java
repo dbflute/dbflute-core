@@ -18,7 +18,7 @@ package org.dbflute.hook;
 import org.dbflute.bhv.core.BehaviorCommandMeta;
 
 /**
- * The hook interface of SQL fires for call-back. <br />
+ * The hook interface of SQL fires for call-back. <br>
  * You can hook before-and-finally of all SQL fires.
  * @author jflute
  */

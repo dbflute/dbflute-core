@@ -16,8 +16,8 @@
 package org.dbflute.hook;
 
 /**
- * The handler of SQL result. <br />
- * This handler is called back after executing the SQL and mapping entities. <br />
+ * The handler of SQL result. <br>
+ * This handler is called back after executing the SQL and mapping entities. <br>
  * (before you get the result)
  * <pre>
  * context.setSqlResultHandler(new SqlResultHandler() {
@@ -31,7 +31,7 @@ package org.dbflute.hook;
 public interface SqlResultHandler {
 
     /**
-     * Handle the SQL result. <br />
+     * Handle the SQL result. <br>
      * This is called back per command execution.
      * <pre>
      * [SqlResultInfo]

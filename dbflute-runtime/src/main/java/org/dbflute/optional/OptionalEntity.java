@@ -20,7 +20,7 @@ import org.dbflute.exception.NonSetupSelectRelationAccessException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 
 /**
- * The entity as optional object, which has entity instance in it. <br />
+ * The entity as optional object, which has entity instance in it. <br>
  * You can handle null value by this methods without direct null handling.
  * <pre>
  * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
@@ -168,8 +168,8 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     //                                                                   Standard Handling
     //                                                                   =================
     /**
-     * Handle the wrapped entity if it is present. <br />
-     * You should call this if null entity handling is unnecessary (do nothing if null). <br />
+     * Handle the wrapped entity if it is present. <br>
+     * You should call this if null entity handling is unnecessary (do nothing if null). <br>
      * If exception is preferred when null entity, use required().
      * <pre>
      * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(1)).<span style="color: #CC4747">ifPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
@@ -340,7 +340,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     /**
-     * Get the entity instance or null if not present. <br />
+     * Get the entity instance or null if not present. <br>
      * basically use ifPresent() if might be not present, this is for emergency
      * @return The object instance wrapped in this optional object or null. (NullAllowed: if not present)
      */

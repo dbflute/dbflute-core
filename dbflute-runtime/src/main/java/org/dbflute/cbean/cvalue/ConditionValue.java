@@ -787,7 +787,7 @@ public class ConditionValue implements Serializable {
     }
 
     /**
-     * Get the map of fixed values. {basically for parameter-comment} <br />
+     * Get the map of fixed values. {basically for parameter-comment} <br>
      * @return The map of fixed values. map:{[query or inline or onClause] = map:{[condition-key] = [value]}} (NullAllowed)
      */
     public Map<String, Map<String, Object>> getFixed() {
@@ -795,7 +795,7 @@ public class ConditionValue implements Serializable {
     }
 
     /**
-     * Get the map of fixed values for query. {basically for internal tests} <br />
+     * Get the map of fixed values for query. {basically for internal tests} <br>
      * @return The map of query. map:{[condition-key] = [value]} (NullAllowed)
      */
     public Map<String, Object> getFixedQuery() {
@@ -803,7 +803,7 @@ public class ConditionValue implements Serializable {
     }
 
     /**
-     * Get the map of fixed values for in-line. {basically for internal tests} <br />
+     * Get the map of fixed values for in-line. {basically for internal tests} <br>
      * @return The map of in-line query. map:{[condition-key] = [value]} (NullAllowed)
      */
     public Map<String, Object> getFixedInline() {
@@ -811,7 +811,7 @@ public class ConditionValue implements Serializable {
     }
 
     /**
-     * Get the map of fixed values for on-clause. {basically for internal tests} <br />
+     * Get the map of fixed values for on-clause. {basically for internal tests} <br>
      * @return The map of on-clause query. map:{[condition-key] = [value]} (NullAllowed)
      */
     public Map<String, Object> getFixedOnClause() {
@@ -819,7 +819,7 @@ public class ConditionValue implements Serializable {
     }
 
     /**
-     * Get the map of varying values. {basically for parameter-comment} <br />
+     * Get the map of varying values. {basically for parameter-comment} <br>
      * @return The map of varying values. map:{[condition-key] = map:{[varying-key] = [value]}} (NullAllowed)
      */
     public Map<String, Map<String, Object>> getVarying() {

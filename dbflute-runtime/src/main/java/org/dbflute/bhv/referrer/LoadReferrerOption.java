@@ -21,7 +21,7 @@ import org.dbflute.Entity;
 import org.dbflute.cbean.ConditionBean;
 
 /**
- * The class of load referrer option. #beforejava8 <br />
+ * The class of load referrer option. #beforejava8 <br>
  * This option is basically for loading second or more level referrer.
  * @param <REFERRER_CB> The type of referrer condition-bean.
  * @param <REFERRER_ENTITY> The type of referrer entity.
@@ -41,7 +41,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor. <br />
+     * Constructor. <br>
      * This option is basically for loading second or more level referrer like this:
      * <pre>
      * <span style="color: #3F7E5E">// base point table is MEMBER</span>
@@ -109,7 +109,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
     }
 
     /**
-     * Set the set-upper of condition-bean for first level referrer. <br />
+     * Set the set-upper of condition-bean for first level referrer. <br>
      * <pre>
      * LoadReferrerOption option = new LoadReferrerOption();
      * 
@@ -132,7 +132,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
     }
 
     /**
-     * Set the set-upper of condition-bean for first level referrer. <br />
+     * Set the set-upper of condition-bean for first level referrer. <br>
      * <pre>
      * LoadReferrerOption option = new LoadReferrerOption();
      * 
@@ -155,7 +155,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
     }
 
     /**
-     * Set the set-upper of entity list for second or more level referrer. <br />
+     * Set the set-upper of entity list for second or more level referrer. <br>
      * <pre>
      * LoadReferrerOption loadReferrerOption = new LoadReferrerOption();
      * ...
@@ -182,7 +182,7 @@ public class LoadReferrerOption<REFERRER_CB extends ConditionBean, REFERRER_ENTI
     }
 
     /**
-     * Set the original instance of condition-bean for first level referrer. <br />
+     * Set the original instance of condition-bean for first level referrer. <br>
      * use this, if you want to set the original instance.
      * @param referrerConditionBean The original instance of condition-bean. (NullAllowed: if null, means normal)
      */

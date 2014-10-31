@@ -26,7 +26,7 @@ import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
- * The object of column specified by condition-bean. (return type of specify()) <br />
+ * The object of column specified by condition-bean. (return type of specify()) <br>
  * And also it'll be DreamCruise ticket.
  * @author jflute
  */

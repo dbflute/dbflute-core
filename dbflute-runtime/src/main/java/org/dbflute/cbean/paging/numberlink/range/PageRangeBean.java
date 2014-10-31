@@ -227,7 +227,7 @@ public class PageRangeBean implements Serializable {
     //                                   Calculated Property
     //                                   -------------------
     /**
-     * Get the value of preRangeNearestPageNumber that is calculated. <br />
+     * Get the value of preRangeNearestPageNumber that is calculated. <br>
      * You should use this.isExistPrePageRange() before calling this. (call only when true)
      * <pre>
      * e.g. range-size=5, current-page=8 
@@ -249,7 +249,7 @@ public class PageRangeBean implements Serializable {
     }
 
     /**
-     * Get the value of nextRangeNearestPageNumber that is calculated. <br />
+     * Get the value of nextRangeNearestPageNumber that is calculated. <br>
      * You should use this.isExistNextPageRange() before calling this. (call only when true)
      * <pre>
      * e.g. range-size=5, current-page=8 

@@ -19,7 +19,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.outsidesql.OutsideSqlOption;
 
 /**
- * The meta information interface of behavior commands. <br />
+ * The meta information interface of behavior commands. <br>
  * You can get what the behavior command is.
  * @author jflute
  */
@@ -57,31 +57,31 @@ public interface BehaviorCommandMeta {
     //                                                                  Detail Information
     //                                                                  ==================
     /**
-     * Does the command use condition-bean? <br />
+     * Does the command use condition-bean? <br>
      * e.g. selectList(cb), queryUpdate(entity, cb)
      * @return The determination, true or false.
      */
     boolean isConditionBean();
 
     /**
-     * Does the command use outside-SQL? <br />
-     * It contains procedure calls. <br />
+     * Does the command use outside-SQL? <br>
+     * It contains procedure calls. <br>
      * e.g. outsideSql().selectList(pmb), outsideSql().execute(pmb)
      * @return The determination, true or false.
      */
     boolean isOutsideSql();
 
     /**
-     * Does the command call procedure? <br />
-     * But if an outside-SQL containing procedure call in it, it returns false. <br />
+     * Does the command call procedure? <br>
+     * But if an outside-SQL containing procedure call in it, it returns false. <br>
      * e.g. outsideSql().call(pmb)
      * @return The determination, true or false.
      */
     boolean isProcedure();
 
     /**
-     * Does the command return selected records? <br />
-     * But if it's a procedure, it returns false. <br />
+     * Does the command return selected records? <br>
+     * But if it's a procedure, it returns false. <br>
      * e.g. selectList(cb), outsideSql().select(pmb)
      * @return The determination, true or false.
      */
@@ -103,24 +103,24 @@ public interface BehaviorCommandMeta {
     boolean isSelectCursor();
 
     /**
-     * Does the command execute insert? <br />
-     * But if it's a procedure or an outside-SQL, it returns false. <br />
+     * Does the command execute insert? <br>
+     * But if it's a procedure or an outside-SQL, it returns false. <br>
      * e.g. insert(entity), queryInsert(setupper)
      * @return The determination, true or false.
      */
     boolean isInsert();
 
     /**
-     * Does the command execute update? <br />
-     * But if it's a procedure or an outside-SQL, it returns false. <br />
+     * Does the command execute update? <br>
+     * But if it's a procedure or an outside-SQL, it returns false. <br>
      * e.g. update(entity), queryUpdate(entity, cb)
      * @return The determination, true or false.
      */
     boolean isUpdate();
 
     /**
-     * Does the command execute delete? <br />
-     * But if it's a procedure or an outside-SQL, it returns false. <br />
+     * Does the command execute delete? <br>
+     * But if it's a procedure or an outside-SQL, it returns false. <br>
      * e.g. delete(entity), queryDelete(cb)
      * @return The determination, true or false.
      */
@@ -157,8 +157,8 @@ public interface BehaviorCommandMeta {
     //                                                                 Runtime Information
     //                                                                 ===================
     /**
-     * Get the invoke path of behavior command lazily. <br />
-     * Invoke path is e.g. FooAction.index():38 -&gt; BarLogic.selectQux():127 -&gt; ... <br />
+     * Get the invoke path of behavior command lazily. <br>
+     * Invoke path is e.g. FooAction.index():38 -&gt; BarLogic.selectQux():127 -&gt; ... <br>
      * To create this path needs stack trace (from exception instance) so lazily.
      * @return The display string of invoke path. (NotNull)
      */

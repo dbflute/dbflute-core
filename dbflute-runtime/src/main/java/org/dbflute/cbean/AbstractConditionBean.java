@@ -973,8 +973,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     /**
-     * Enable that it splits the SQL execute select and query of paging. <br />
-     * You should confirm that the executed SQL on log matches with your expectation. <br />
+     * Enable that it splits the SQL execute select and query of paging. <br>
+     * You should confirm that the executed SQL on log matches with your expectation. <br>
      * It is very difficult internal logic so it also has simplistic logic. Be careful!
      * <pre>
      * Cannot use this:
@@ -1357,7 +1357,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                      Entity Mapping
     //                                                                      ==============
     /**
-     * Disable (entity instance) cache of relation mapping. <br />
+     * Disable (entity instance) cache of relation mapping. <br>
      * Basically you don't need this. This is for accidents.
      * @deprecated You should not use this easily. It's a dangerous function.
      */
@@ -1391,10 +1391,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                     Embed Condition
     //                                                                     ===============
     /**
-     * Embed conditions in their variables on where clause (and 'on' clause). <br />
-     * You should not use this normally. It's a final weapon! <br />
-     * And that this method is not perfect so be attention! <br />
-     * If the same-name-columns exist in your conditions, both are embedded. <br />
+     * Embed conditions in their variables on where clause (and 'on' clause). <br>
+     * You should not use this normally. It's a final weapon! <br>
+     * And that this method is not perfect so be attention! <br>
+     * If the same-name-columns exist in your conditions, both are embedded. <br>
      * And an empty set means that all conditions are target.
      * @param embeddedColumnInfoSet The set of embedded target column information. (NotNull)
      * @param quote Should the conditions value be quoted?
@@ -1807,8 +1807,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                  ExistsReferrer Way
     //                                                                  ==================
     /**
-     * Use in-scope sub-query for exists-referrer, basically for performance tuning. <br />
-     * The exists-referrer uses plain sub-query way instead of correlation way. <br />
+     * Use in-scope sub-query for exists-referrer, basically for performance tuning. <br>
+     * The exists-referrer uses plain sub-query way instead of correlation way. <br>
      * <pre>
      * cb.query().existsPurchase(purchaseCB -&gt; {
      *     purchaseCB.<span style="color: #CC4747">useInScopeSubQuery()</span>;

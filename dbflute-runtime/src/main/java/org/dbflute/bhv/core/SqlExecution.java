@@ -16,7 +16,7 @@
 package org.dbflute.bhv.core;
 
 /**
- * The interface of SQL execution. <br />
+ * The interface of SQL execution. <br>
  * This is basically reused on executing so it's thread safe.
  * @author jflute
  */

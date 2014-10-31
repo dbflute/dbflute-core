@@ -56,7 +56,7 @@ public class RangeOfOption implements ConditionOption, ColumnCalculator {
     //                                               Operand
     //                                               -------
     /**
-     * Set up operand for min number as greater-than. <br />
+     * Set up operand for min number as greater-than. <br>
      * This is for manual adjustment.
      * @return this. (NotNull)
      */
@@ -66,7 +66,7 @@ public class RangeOfOption implements ConditionOption, ColumnCalculator {
     }
 
     /**
-     * Set up operand for max number as less-than. <br />
+     * Set up operand for max number as less-than. <br>
      * This is for manual adjustment.
      * @return this. (NotNull)
      */
@@ -109,7 +109,7 @@ public class RangeOfOption implements ConditionOption, ColumnCalculator {
     }
 
     /**
-     * Allow you to set one-side only condition. (null allowed) <br />
+     * Allow you to set one-side only condition. (null allowed) <br>
      * If you ignore null-or-empty query, you don't need to call this.
      * @return this. (NotNull)
      */

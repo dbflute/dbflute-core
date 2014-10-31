@@ -176,7 +176,7 @@ public interface ColumnCalculator {
     ColumnCalculator left();
 
     /**
-     * To be for right column. (default)<br />
+     * To be for right column. (default)<br>
      * It also means main process internally.
      * @return this. (NotNull)
      */

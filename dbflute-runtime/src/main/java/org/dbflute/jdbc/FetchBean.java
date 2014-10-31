@@ -22,7 +22,7 @@ package org.dbflute.jdbc;
 public interface FetchBean {
 
     /**
-     * Check whether the result size is safety or not. <br />
+     * Check whether the result size is safety or not. <br>
      * If the result size is in Danger Zone, the select method throws DangerousResultSizeException.
      * @param safetyMaxResultSize The max size of safety result. (If zero or minus, checking is invalid)
      */

@@ -38,7 +38,7 @@ public interface DerivedMappable {
     void registerDerivedValue(String aliasName, Object selectedValue);
 
     /**
-     * Find the derived value from derived map by alias name (starts with '$'). <br />
+     * Find the derived value from derived map by alias name (starts with '$'). <br>
      * It needs to downcast process for getting the value so don't mistake it.s
      * <pre>
      * mapping type:

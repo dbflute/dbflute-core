@@ -33,13 +33,13 @@ import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.dbflute.s2dao.rowcreator.TnRelationSelector;
 
 /**
- * The implementation as S2Dao of creator of relation row. <br />
+ * The implementation as S2Dao of creator of relation row. <br>
  * This class has sub-class extended by DBFlute.
  * <pre>
  * {@link TnRelationRowCreatorImpl} is close to S2Dao logic
  * {@link TnRelationRowCreatorExtension} has DBFlute logic
  * </pre>
- * DBFlute depended on S2Dao before 0.9.0. <br />
+ * DBFlute depended on S2Dao before 0.9.0. <br>
  * It saves these structure to be easy to know what DBFlute extends it.
  * However several S2Dao's logics are deleted as abstract methods.
  * @author modified by jflute (originated in S2Dao)
@@ -90,7 +90,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     /**
      * @param res The resource of relation row creation. (NotNull)
      * @return Created relation row. (NullAllowed)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected Object createRelationRow(TnRelationRowCreationResource res) throws SQLException {
         // - - - - - - - - - - - 

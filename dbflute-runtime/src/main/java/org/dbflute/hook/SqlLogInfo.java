@@ -54,8 +54,8 @@ public class SqlLogInfo {
     //                                                                          DisplaySql
     //                                                                          ==========
     /**
-     * Get the SQL string for display, bind variables are embedded. <br />
-     * Basically the string is built lazily, but no guarantee. <br />
+     * Get the SQL string for display, bind variables are embedded. <br>
+     * Basically the string is built lazily, but no guarantee. <br>
      * If the command is for batch, it returns SQLs for a part of entities.
      * @return The string of SQL. (basically NotNull: if no SQL execution, returns null)
      */

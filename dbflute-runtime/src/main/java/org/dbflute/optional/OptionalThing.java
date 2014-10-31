@@ -30,8 +30,8 @@ public interface OptionalThing<THING> {
     //                                                                   Standard Handling
     //                                                                   =================
     /**
-     * Handle the wrapped thing if it is present. <br />
-     * You should call this if null object handling is unnecessary (do nothing if null). <br />
+     * Handle the wrapped thing if it is present. <br>
+     * You should call this if null object handling is unnecessary (do nothing if null). <br>
      * If exception is preferred when null object, use required().
      * @param oneArgLambda The callback interface to consume the optional thing. (NotNull)
      * @return The handler of after process when if not present. (NotNull)
@@ -98,7 +98,7 @@ public interface OptionalThing<THING> {
     //                                                                   Standard Optional
     //                                                                   =================
     /**
-     * Convert to Java standard optional class. <br />
+     * Convert to Java standard optional class. <br>
      * For only when standard optional handling is needed, so basically you don't use this.
      * @return The new-created instance or empty. (NotNull)
      */
@@ -115,7 +115,7 @@ public interface OptionalThing<THING> {
     void alwaysPresent(OptionalThingConsumer<THING> oneArgLambda);
 
     /**
-     * Get the object instance or null if not present. <br />
+     * Get the object instance or null if not present. <br>
      * basically use ifPresent() if might be not present, this is for emergency
      * @return The object instance wrapped in this optional thing or null. (NullAllowed: if not present)
      */

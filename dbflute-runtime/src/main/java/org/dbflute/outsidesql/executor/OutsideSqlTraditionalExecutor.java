@@ -49,7 +49,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
     //                                                                       Entity Select
     //                                                                       =============
     /**
-     * Select entity by the outside-SQL. {FreeStyle Interface}<br />
+     * Select entity by the outside-SQL. {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -82,7 +82,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
     //                                                                         List Select
     //                                                                         ===========
     /**
-     * Select the list of the entity by the outsideSql. {FreeStyle Interface}<br />
+     * Select the list of the entity by the outsideSql. {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -120,8 +120,8 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
     //                                                                       Paging Select
     //                                                                       =============
     /**
-     * Select page by the outside-SQL. {FreeStyle Interface}<br />
-     * (both count-select and paging-select are executed)<br />
+     * Select page by the outside-SQL. {FreeStyle Interface}<br>
+     * (both count-select and paging-select are executed)<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -198,8 +198,8 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
     }
 
     /**
-     * Select list with paging by the outside-SQL. {FreeStyle Interface}<br />
-     * (count-select is not executed, only paging-select)<br />
+     * Select list with paging by the outside-SQL. {FreeStyle Interface}<br>
+     * (count-select is not executed, only paging-select)<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -264,7 +264,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
     //                                                                       Cursor Select
     //                                                                       =============
     /**
-     * Select the cursor of the entity by outside-SQL. {FreeStyle Interface}<br />
+     * Select the cursor of the entity by outside-SQL. {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type), cursor-handler.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -302,7 +302,7 @@ public class OutsideSqlTraditionalExecutor<BEHAVIOR> {
     //                                                                             Execute
     //                                                                             =======
     /**
-     * Execute the outsideSql. (insert, update, delete, etc...) {FreeStyle Interface}<br />
+     * Execute the outsideSql. (insert, update, delete, etc...) {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type).
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;

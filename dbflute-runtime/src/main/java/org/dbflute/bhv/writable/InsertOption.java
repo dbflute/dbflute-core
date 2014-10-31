@@ -91,7 +91,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     //                                        Specify Column
     //                                        --------------
     /**
-     * Specify insert columns manually. <br />
+     * Specify insert columns manually. <br>
      * You can insert fixed columns instead of modified update columns.
      * <pre>
      * Member member = new Member();
@@ -352,7 +352,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                       Common Column
     //                                                                       =============
     /**
-     * Disable auto-setup for common columns. <br />
+     * Disable auto-setup for common columns. <br>
      * You can insert by your values for common columns.
      * <pre>
      * Member member = new Member();
@@ -380,7 +380,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                     Identity Insert
     //                                                                     ===============
     /**
-     * Disable identity for primary key. <br />
+     * Disable identity for primary key. <br>
      * you can insert by your value for primary key.
      * <pre>
      * Member member = new Member();
@@ -405,8 +405,8 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                       Batch Logging
     //                                                                       =============
     /**
-     * Limit batch-insert logging by logging size. <br />
-     * For example, if you set 3, only 3 records are logged. <br />
+     * Limit batch-insert logging by logging size. <br>
+     * For example, if you set 3, only 3 records are logged. <br>
      * This also works to SqlLogHandler's call-back and SqlResultInfo's displaySql.
      * @param batchInsertLoggingLimit The limit size of batch-insert logging. (NullAllowed: if null and minus, means no limit)
      */

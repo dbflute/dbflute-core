@@ -25,7 +25,7 @@ import java.util.Locale;
 public interface DfFinalLocaleProvider {
 
     /**
-     * Provide the locale as final default. <br />
+     * Provide the locale as final default. <br>
      * This might be called many times, so take care of performance.
      * @return The locale instance. (NullAllowed: if null, server locale might be used)
      */

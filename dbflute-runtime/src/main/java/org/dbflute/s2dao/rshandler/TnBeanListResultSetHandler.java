@@ -208,8 +208,8 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     }
 
     /**
-     * Do mapping first relation row. <br />
-     * This logic is similar to next relation mapping in {@link TnRelationRowCreatorExtension}. <br />
+     * Do mapping first relation row. <br>
+     * This logic is similar to next relation mapping in {@link TnRelationRowCreatorExtension}. <br>
      * So you should check it when this logic has modification.
      * @param rs The result set of JDBC, connecting to database here. (NotNull)
      * @param row The base point row. (NotNull)
@@ -219,7 +219,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
      * @param relPropCache The map of relation property cache. (NotNull) 
      * @param relRowCache The cache of relation row. (NotNull)
      * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected void mappingFirstRelation(ResultSet rs, Object row, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
             Map<String, Map<String, Integer>> selectIndexMap, Map<String, Map<String, TnPropertyMapping>> relPropCache,
@@ -306,7 +306,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     }
 
     /**
-     * Is the selected relation empty? <br />
+     * Is the selected relation empty? <br>
      * You should call {@link #hasConditionBean()} before calling this.
      * @return The determination, true or false.
      */
@@ -316,7 +316,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     }
 
     /**
-     * Get the count of selected relation. <br />
+     * Get the count of selected relation. <br>
      * You should call {@link #hasConditionBean()} before calling this.
      * @return The integer of the count. (NotMinus)
      */
@@ -326,7 +326,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     }
 
     /**
-     * Can the relation mapping (entity instance) cache? <br />
+     * Can the relation mapping (entity instance) cache? <br>
      * You should call {@link #hasConditionBean()} before calling this.
      * @return The determination, true or false.
      */

@@ -55,7 +55,7 @@ public interface InvokerAssistant {
     DBMetaProvider assistDBMetaProvider();
 
     /**
-     * Assist the creator of SQL clause. <br />
+     * Assist the creator of SQL clause. <br>
      * This is only used in internal world of DBFlute (to judge unique-constraint).
      * So condition-bean does not use this.
      * @return The instance of creator. (NotNull)
@@ -78,7 +78,7 @@ public interface InvokerAssistant {
     RelationOptionalFactory assistRelationOptionalFactory();
 
     /**
-     * Assist the factory of SQL analyzer. <br />
+     * Assist the factory of SQL analyzer. <br>
      * This factory is also used on ConditionBean.toDisplaySql().
      * So this method should be state-less.
      * @return The instance of factory. (NotNull)

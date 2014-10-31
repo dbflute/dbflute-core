@@ -170,7 +170,7 @@ public class ColumnInfo {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the value from the entity by its gateway (means no reflection). <br />
+     * Read the value from the entity by its gateway (means no reflection). <br>
      * It returns plain value in entity as property access type.
      * @param <PROPERTY> The type of the property.
      * @param entity The target entity of this column to read. (NotNull)
@@ -193,7 +193,7 @@ public class ColumnInfo {
     //                                                 Write
     //                                                 -----
     /**
-     * Write the value to the entity by its gateway (means no reflection). <br />
+     * Write the value to the entity by its gateway (means no reflection). <br>
      * It contains the basic conversion, but no converting to optional so check the property access type.
      * @param entity The target entity of this column to write. (NotNull)
      * @param value The written value. (NullAllowed: if null, null value is written)
@@ -247,7 +247,7 @@ public class ColumnInfo {
     //                                                                        Convert Type
     //                                                                        ============
     /**
-     * Convert the value to object native type. <br />
+     * Convert the value to object native type. <br>
      * @param <VALUE> The type of column value.
      * @param value The conversion target value. (NullAllowed: if null, returns null)
      * @return The converted value as object native type. (NullAllowed: when the value is null)
@@ -414,7 +414,7 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the DB name of the column. <br />
+     * Get the DB name of the column. <br>
      * This is for identity of column. (NOT for SQL)
      * @return The DB name of the column. (NotNull)
      */
@@ -423,7 +423,7 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the SQL name of the column. <br />
+     * Get the SQL name of the column. <br>
      * This is for SQL, which is resolved about schema prefix and quoted and so on...  
      * @return The SQL-name object of the column. (NotNull)
      */
@@ -432,7 +432,7 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the synonym of the column. <br />
+     * Get the synonym of the column. <br>
      * This is for the synonym of DBFlute. (for example, PgReservColumn handling)
      * @return The synonym of the column. (NullAllowed: when the column does not have its synonym)
      */
@@ -449,8 +449,8 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the native type mapped to object for the column. (NOT property access type) <br />
-     * e.g. String even if optional is defined at getter/setter in entity. <br />
+     * Get the native type mapped to object for the column. (NOT property access type) <br>
+     * e.g. String even if optional is defined at getter/setter in entity. <br>
      * Also there is the other method that returns property access type.
      * @return The class type of property for the column. (NotNull)
      */
@@ -547,8 +547,8 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the type of property access for the column. <br />
-     * It is defined at getter/setter in entity. (e.g. String or Optional) <br />
+     * Get the type of property access for the column. <br>
+     * It is defined at getter/setter in entity. (e.g. String or Optional) <br>
      * Also there is the other method that always returns object native type.
      * @return The class type to access the property. (NotNull)
      */
@@ -645,7 +645,7 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the comment of the column. <br />
+     * Get the comment of the column. <br>
      * If the real comment contains the alias,
      * this result does NOT contain it and its delimiter.  
      * @return The comment of the column. (NullAllowed: when it cannot get an alias from meta)
@@ -657,7 +657,7 @@ public class ColumnInfo {
     // these methods, get foreign/referrer info list, are not called
     // in core logic (e.g. mapping) so initialization is allowed to be here
     /**
-     * Get the read-only list of the foreign info related to this column. <br />
+     * Get the read-only list of the foreign info related to this column. <br>
      * It contains one-to-one relations.
      * @return The read-only list. (NotNull: when no FK, returns empty list)
      */

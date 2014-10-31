@@ -69,13 +69,13 @@ public class AccessContext {
     protected static boolean _locked = true; // at first locked
 
     /**
-     * The holder of for access context. <br />
+     * The holder of for access context. <br>
      * Basically for asynchronous of web framework e.g. Play2.
      */
     public static interface AccessContextHolder {
 
         /**
-         * Provide access context. <br />
+         * Provide access context. <br>
          * You should return same instance in same request.
          * @return The instance of access context. (NullAllowed: when no context, but should exist in real handling)
          */
@@ -138,7 +138,7 @@ public class AccessContext {
     //                                            Management
     //                                            ----------
     /**
-     * Use the surrogate holder for access context. (automatically locked after setting) <br />
+     * Use the surrogate holder for access context. (automatically locked after setting) <br>
      * You should call this in application initialization if it needs.
      * @param holder The holder instance. (NullAllowed: if null, use default holder)
      */
@@ -201,7 +201,7 @@ public class AccessContext {
     //                                  Access LocalDateTime
     //                                  --------------------
     /**
-     * Get access local date on thread. <br />
+     * Get access local date on thread. <br>
      * If it couldn't get access local date from access-context, it returns null.
      * @return The local date that specifies access time. (NotNull)
      */
@@ -227,7 +227,7 @@ public class AccessContext {
     //                                  Access LocalDateTime
     //                                  --------------------
     /**
-     * Get access local date-time on thread. <br />
+     * Get access local date-time on thread. <br>
      * If it couldn't get access local date-time from access-context, it returns null.
      * @return The local date-time that specifies access time. (NotNull)
      */
@@ -253,7 +253,7 @@ public class AccessContext {
     //                                           Access Date
     //                                           -----------
     /**
-     * Get access date on thread. <br />
+     * Get access date on thread. <br>
      * If it couldn't get access date from access-context, it returns current date of {@link DBFluteSystem}.
      * @return The date that specifies access time. (NotNull)
      */
@@ -279,7 +279,7 @@ public class AccessContext {
     //                                      Access Timestamp
     //                                      ----------------
     /**
-     * Get access time-stamp on thread. <br />
+     * Get access time-stamp on thread. <br>
      * If it couldn't get access time-stamp from access-context, it returns current time-stamp of {@link DBFluteSystem}.
      * @return The time-stamp that specifies access time. (NotNull)
      */

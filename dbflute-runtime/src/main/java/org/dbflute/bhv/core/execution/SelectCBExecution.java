@@ -39,7 +39,7 @@ import org.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.dbflute.twowaysql.node.Node;
 
 /**
- * The SQL execution of select by condition-bean. <br />
+ * The SQL execution of select by condition-bean. <br>
  * The first element of arguments should be condition-bean (and not null).
  * @author jflute
  */

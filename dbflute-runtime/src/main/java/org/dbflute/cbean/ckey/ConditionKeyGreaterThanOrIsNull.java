@@ -21,7 +21,7 @@ import org.dbflute.cbean.sqlclause.query.QueryClause;
 import org.dbflute.dbmeta.name.ColumnRealName;
 
 /**
- * The condition-key of greaterThan or isNull. <br />
+ * The condition-key of greaterThan or isNull. <br>
  * This key is greaterThan's alternate so you cannot independent use.
  * @author jflute
  */

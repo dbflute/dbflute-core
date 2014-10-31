@@ -438,7 +438,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                          Outer Join
     //                                                                          ==========
     /**
-     * Register outer-join. <br />
+     * Register outer-join. <br>
      * Optional info, fixed condition and fixed in-line, are resolved in this method.
      * @param foreignCQ The condition-query for foreign table. (NotNull)
      * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
@@ -1764,7 +1764,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                          Inner Join
     //                                                                          ==========
     /**
-     * Change the join type for this relation to inner join. <br />
+     * Change the join type for this relation to inner join. <br>
      * This method is for PERFORMANCE TUNING basically.
      */
     public void innerJoin() {
@@ -2446,7 +2446,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /**
-     * Filter removing an empty string as null. <br />
+     * Filter removing an empty string as null. <br>
      * You can extend this to use an empty string value as condition.
      * @param value The string value for query. (NullAllowed)
      * @return Filtered value. (NullAllowed)
@@ -2746,8 +2746,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                  ColumnQuery Object
     //                                                                  ==================
     /**
-     * Get the condition-bean map of ColumnQuery for parameter comment. {Internal}. <br />
-     * This is basically for (Specify)DerivedReferrer's bind conditions in ColumnQuery. <br />
+     * Get the condition-bean map of ColumnQuery for parameter comment. {Internal}. <br>
+     * This is basically for (Specify)DerivedReferrer's bind conditions in ColumnQuery. <br>
      * The value is treated as Object type because this will be only called from parameter comment.
      * @return The instance of the map. (NullAllowed)
      */

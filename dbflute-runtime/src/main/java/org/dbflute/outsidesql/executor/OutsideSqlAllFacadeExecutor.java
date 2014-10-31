@@ -78,7 +78,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
     //                                                                       Entity Select
     //                                                                       =============
     /**
-     * Select entity by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Select entity by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -108,7 +108,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
     //                                                                         List Select
     //                                                                         ===========
     /**
-     * Select the list of the entity by the outsideSql. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Select the list of the entity by the outsideSql. <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -143,8 +143,8 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
     //                                                                       Paging Select
     //                                                                       =============
     /**
-     * Select page by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * (both count-select and paging-select are executed)<br />
+     * Select page by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
+     * (both count-select and paging-select are executed)<br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -218,8 +218,8 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
     }
 
     /**
-     * Select list with paging by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * (count-select is not executed, only paging-select)<br />
+     * Select list with paging by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
+     * (count-select is not executed, only paging-select)<br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -281,7 +281,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
     //                                                                       Cursor Select
     //                                                                       =============
     /**
-     * Select the cursor of the entity by outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Select the cursor of the entity by outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path.
      * <pre>
@@ -319,7 +319,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
     //                                                                             Execute
     //                                                                             =======
     /**
-     * Execute the outsideSql. (insert, update, delete, etc...) <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Execute the outsideSql. (insert, update, delete, etc...) <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path.
      * <pre>
@@ -392,7 +392,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
     //                                            Format SQL
     //                                            ----------
     /**
-     * Set up format-SQL for this outsideSql. <br />
+     * Set up format-SQL for this outsideSql. <br>
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */

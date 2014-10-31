@@ -115,7 +115,7 @@ public class MapListString {
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor setting as default. <br />
+     * Constructor setting as default. <br>
      * You can change marks by setters after creation.
      */
     public MapListString() {

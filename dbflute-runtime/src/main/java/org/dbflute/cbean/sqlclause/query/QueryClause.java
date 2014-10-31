@@ -16,7 +16,7 @@
 package org.dbflute.cbean.sqlclause.query;
 
 /**
- * The interface of query clause. <br />
+ * The interface of query clause. <br>
  * The basic purpose of this interface is lazy registration to SqlClause.
  * @author jflute
  */

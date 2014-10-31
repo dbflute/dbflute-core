@@ -24,7 +24,7 @@ import java.sql.SQLException;
 public interface FileTokenizingCallback {
 
     /**
-     * Handle the row per one record data. <br />
+     * Handle the row per one record data. <br>
      * You can get the data from row resources.
      * @param resource The resource of row for the file-tokenizing. (NotNull)
      * @throws IOException When the IO handling fails in the row handling process.

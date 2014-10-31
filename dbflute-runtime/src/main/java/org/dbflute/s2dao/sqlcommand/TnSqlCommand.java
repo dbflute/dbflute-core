@@ -16,7 +16,7 @@
 package org.dbflute.s2dao.sqlcommand;
 
 /**
- * The command of SQL. <br />
+ * The command of SQL. <br>
  * This interface is unused on DBFlute.
  * @author modified by jflute (originated in S2Dao)
  */

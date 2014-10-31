@@ -57,8 +57,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The basic handler to execute SQL. <br />
- * All SQL executions of DBFlute are under this handler. <br />
+ * The basic handler to execute SQL. <br>
+ * All SQL executions of DBFlute are under this handler. <br>
  * This is always created when executing so it's non thread safe.
  * @author modified by jflute (originated in S2Dao)
  */
@@ -431,8 +431,8 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                            Connection
     //                                            ----------
     /**
-     * Get the database connection from data source. <br />
-     * getting connection for SQL executions is only here. <br />
+     * Get the database connection from data source. <br>
+     * getting connection for SQL executions is only here. <br>
      * (for meta data is at TnBeanMetaDataFactoryImpl)
      * @return The new-created or inherited instance of connection. (NotNull)
      */

@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The row resource of file-making. <br />
- * You can set one record info to this resource as list of string or map of string with header info. <br />
+ * The row resource of file-making. <br>
+ * You can set one record info to this resource as list of string or map of string with header info. <br>
  * Null resource or null data or empty data means the end of data.
  * @author jflute
  */

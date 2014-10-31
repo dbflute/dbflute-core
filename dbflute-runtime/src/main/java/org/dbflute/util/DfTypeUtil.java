@@ -268,8 +268,8 @@ public final class DfTypeUtil {
      * o Foo to Foo
      * o Foo$Bar to Foo$Bar
      * </pre>
-     * If the object is Class, it uses Class.getName() as convert target string. <br />
-     * If the object is String, it uses it directly as convert target string. <br />
+     * If the object is Class, it uses Class.getName() as convert target string. <br>
+     * If the object is String, it uses it directly as convert target string. <br>
      * If the object is the other object, it uses obj.getClass().getName() as convert target string.
      * @param obj The target object. String or Class are treated as special. (NullAllowed: if null, returns null)
      * @return The string as class title. (NullAllowed: when the argument is null)
@@ -926,9 +926,9 @@ public final class DfTypeUtil {
     //                                             LocalDate
     //                                             ---------
     /**
-     * Convert the object to the instance that is date for the default time-zone. <br />
+     * Convert the object to the instance that is date for the default time-zone. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
-     * with flexible-parsing if the object is string type. <br />
+     * with flexible-parsing if the object is string type. <br>
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
      * Then the time-zone is not used in conversion. It uses LocalDate.of().</p>
@@ -943,7 +943,7 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date for the default time-zone. <br />
+     * Convert the object to the instance that is date for the default time-zone. <br>
      * This method uses the specified date pattern if the object is string type. 
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
@@ -961,9 +961,9 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date for the specified time-zone. <br />
+     * Convert the object to the instance that is date for the specified time-zone. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
-     * with flexible-parsing if the object is string type. <br />
+     * with flexible-parsing if the object is string type. <br>
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
      * Then the time-zone is not used in conversion. It uses LocalDate.of(). and millisecond handling is following:</p>
@@ -980,8 +980,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date for the specified time-zone. <br />
-     * This method uses the specified date pattern if the object is string type. <br />
+     * Convert the object to the instance that is date for the specified time-zone. <br>
+     * This method uses the specified date pattern if the object is string type. <br>
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
      * Then the time-zone is not used in conversion. It uses LocalDate.parse().</p>
@@ -1043,9 +1043,9 @@ public final class DfTypeUtil {
     //                                         LocalDateTime
     //                                         -------------
     /**
-     * Convert the object to the instance that is date-time for the default time-zone. <br />
+     * Convert the object to the instance that is date-time for the default time-zone. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
-     * with flexible-parsing if the object is string type. <br />
+     * with flexible-parsing if the object is string type. <br>
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
      * Then the time-zone is not used in conversion. It uses LocalDateTime.of(). and millisecond handling is following:</p>
@@ -1069,7 +1069,7 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date-time for the default time-zone. <br />
+     * Convert the object to the instance that is date-time for the default time-zone. <br>
      * This method uses the specified date pattern if the object is string type. 
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
@@ -1087,9 +1087,9 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date-time for the specified time-zone. <br />
+     * Convert the object to the instance that is date-time for the specified time-zone. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
-     * with flexible-parsing if the object is string type. <br />
+     * with flexible-parsing if the object is string type. <br>
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
      * Then the time-zone is not used in conversion. It uses LocalDateTime.of(). and millisecond handling is following:</p>
@@ -1115,7 +1115,7 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date-time for the specified time-zone. <br />
+     * Convert the object to the instance that is date-time for the specified time-zone. <br>
      * This method uses the specified date pattern if the object is string type.
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
@@ -1169,9 +1169,9 @@ public final class DfTypeUtil {
     //                                             LocalTime
     //                                             ---------
     /**
-     * Convert the object to the instance that is time for the default time-zone. <br />
+     * Convert the object to the instance that is time for the default time-zone. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
-     * with flexible-parsing if the object is string type. <br />
+     * with flexible-parsing if the object is string type. <br>
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
      * Then the time-zone is not used in conversion. It uses LocalTime.of(). and millisecond handling is following:</p>
@@ -1195,7 +1195,7 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date-time for the default time-zone. <br />
+     * Convert the object to the instance that is date-time for the default time-zone. <br>
      * This method uses the specified date pattern if the object is string type. 
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
@@ -1213,9 +1213,9 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is time for the specified time-zone. <br />
+     * Convert the object to the instance that is time for the specified time-zone. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
-     * with flexible-parsing if the object is string type. <br />
+     * with flexible-parsing if the object is string type. <br>
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
      * Then the time-zone is not used in conversion. It uses LocalTime.of(). and millisecond handling is following:</p>
@@ -1241,7 +1241,7 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date-time for the specified time-zone. <br />
+     * Convert the object to the instance that is date-time for the specified time-zone. <br>
      * This method uses the specified date pattern if the object is string type. 
      * 
      * <p>If string expression is specified, The year, month, ... parts are parsed from the string.
@@ -1398,8 +1398,8 @@ public final class DfTypeUtil {
     //                                                                          (util)Date
     //                                                                          ==========
     /**
-     * Convert the object to the instance that is date for the default time-zone. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is date for the default time-zone. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
      * @param obj The parsed object. (NullAllowed)
@@ -1413,8 +1413,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is date. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses specified date pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default date pattern
      * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
@@ -1431,8 +1431,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date for the specified time-zone. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is date for the specified time-zone. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
      * @param obj The parsed object. (NullAllowed)
@@ -1448,8 +1448,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is date. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is date. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses specified date pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default date pattern
      * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
@@ -2300,8 +2300,8 @@ public final class DfTypeUtil {
     //                                                                           Timestamp
     //                                                                           =========
     /**
-     * Convert the object to the instance that is time-stamp. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is time-stamp. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
      * @param obj The parsed object. (NullAllowed)
@@ -2315,8 +2315,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is time-stamp. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is time-stamp. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses specified time-stamp pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default time-stamp pattern
      * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
@@ -2333,8 +2333,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is time-stamp. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is time-stamp. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
      * @param obj The parsed object. (NullAllowed)
@@ -2350,8 +2350,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is time-stamp. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is time-stamp. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses specified time-stamp pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default time-stamp pattern
      * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
@@ -2474,8 +2474,8 @@ public final class DfTypeUtil {
     //                                                                                Time
     //                                                                                ====
     /**
-     * Convert the object to the instance that is time. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is time. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default time pattern based on 'HH:mm:ss'
      * with flexible-parsing if the object is string type.
      * @param obj The parsed object. (NullAllowed)
@@ -2489,8 +2489,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is time. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is time. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses specified time pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default time pattern
      * with flexible-parsing based on 'HH:mm:ss'.
@@ -2507,8 +2507,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is time. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is time. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default time pattern based on 'HH:mm:ss'
      * with flexible-parsing if the object is string type.
      * @param obj The parsed object. (NullAllowed)
@@ -2524,8 +2524,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is time. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is time. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses specified time pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default time pattern
      * with flexible-parsing based on 'HH:mm:ss'.
@@ -2667,8 +2667,8 @@ public final class DfTypeUtil {
     //                                                                           (sql)Date
     //                                                                           =========
     /**
-     * Convert the object to the instance that is SQL-date. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is SQL-date. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd'
      * with flexible-parsing if the object is string type.
      * @param obj The parsed object. (NullAllowed)
@@ -2682,8 +2682,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is SQL-date cleared seconds. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is SQL-date cleared seconds. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses specified SQL-date pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default SQL-date pattern
      * with flexible-parsing based on 'yyyy-MM-dd'.
@@ -2700,8 +2700,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is SQL-date. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is SQL-date. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd'
      * with flexible-parsing if the object is string type.
      * @param obj The parsed object. (NullAllowed)
@@ -2717,8 +2717,8 @@ public final class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance that is SQL-date cleared seconds. <br />
-     * Even if it's the sub class type, it returns a new instance. <br />
+     * Convert the object to the instance that is SQL-date cleared seconds. <br>
+     * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses specified SQL-date pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default SQL-date pattern
      * with flexible-parsing based on 'yyyy-MM-dd'.

@@ -70,29 +70,29 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     void xsetPaging(boolean paging);
 
     /**
-     * Enable paging count-later that means counting after selecting. (back to default) <br />
+     * Enable paging count-later that means counting after selecting. (back to default) <br>
      * You can use it by default on DBFlute so you don't need to call this basically.
-     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
+     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br>
      * You should call this before execution of selectPage().
      */
     void enablePagingCountLater();
 
     /**
-     * Disable paging count-later that means counting after selecting. (default is enabled) <br />
+     * Disable paging count-later that means counting after selecting. (default is enabled) <br>
      * You should call this before execution of selectPage().
      */
     void disablePagingCountLater();
 
     /**
-     * Enable paging re-select that is executed when the page number is over page count. (back to default) <br />
+     * Enable paging re-select that is executed when the page number is over page count. (back to default) <br>
      * You can use it by default on DBFlute so you don't need to call this basically.
-     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
+     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br>
      * You should call this before execution of selectPage().
      */
     void enablePagingReSelect();
 
     /**
-     * Disable paging re-select that is executed when the page number is over page count. (default is enabled) <br />
+     * Disable paging re-select that is executed when the page number is over page count. (default is enabled) <br>
      * You should call this before execution of selectPage().
      */
     void disablePagingReSelect();
@@ -115,8 +115,8 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     PagingBean fetchFirst(int fetchSize);
 
     /**
-     * Fetch records in the scope only. {Internal}<br />
-     * This method is an old style, so you should use paging() instead of this. <br />
+     * Fetch records in the scope only. {Internal}<br>
+     * This method is an old style, so you should use paging() instead of this. <br>
      * @param fetchStartIndex The start index of fetch. 0 origin. (NotMinus)
      * @param fetchSize The size of fetch. (NotMinus & NotZero)
      * @return this. (NotNull)
@@ -124,10 +124,10 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     PagingBean xfetchScope(int fetchStartIndex, int fetchSize);
 
     /**
-     * Fetch page. {Internal}<br />
-     * This method is an old style, so you should use paging() instead of this. <br />
-     * When you call this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. <br />
-     * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'. <br />
+     * Fetch page. {Internal}<br>
+     * This method is an old style, so you should use paging() instead of this. <br>
+     * When you call this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. <br>
+     * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'. <br>
      * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
      * @param fetchPageNumber The page number of fetch. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)

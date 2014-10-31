@@ -34,7 +34,7 @@ import org.dbflute.cbean.result.mapping.EntityDtoMapper;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 
 /**
- * The result bean for list. <br />
+ * The result bean for list. <br>
  * You can treat it as normal List, because this implements java.util.List.
  * <pre>
  * [Extension Method]
@@ -113,7 +113,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     //                                                                            Grouping
     //                                                                            ========
     /**
-     * Return grouping list (split the list per group). <br />
+     * Return grouping list (split the list per group). <br>
      * This method needs the property 'selectedList' only.
      * <pre>
      * <span style="color: #3F7E5E">// e.g. grouping per three records</span>
@@ -169,7 +169,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     }
 
     /**
-     * Return grouping map (split the list per group key). <br />
+     * Return grouping map (split the list per group key). <br>
      * This method needs the property 'selectedList' only.
      * <pre>
      * <span style="color: #3F7E5E">// e.g. grouping per initial character of MEMBER_NAME</span>

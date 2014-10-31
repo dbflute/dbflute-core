@@ -31,7 +31,7 @@ import org.dbflute.cbean.ConditionBean;
 public interface SubQuery<SUB_CB extends ConditionBean> {
 
     /**
-     * Set up your query condition for sub-query. <br />
+     * Set up your query condition for sub-query. <br>
      * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
      * @param subCB The condition-bean for sub-query. (NotNull)

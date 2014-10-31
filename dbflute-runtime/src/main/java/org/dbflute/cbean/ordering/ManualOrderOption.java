@@ -178,9 +178,9 @@ public class ManualOrderOption implements ColumnCalculator {
     }
 
     /**
-     * Add 'when' element for 'case' statement as FromTo using local date. <br />
-     * You can set various from-to patterns by the from-to option. <br />
-     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br />
+     * Add 'when' element for 'case' statement as FromTo using local date. <br>
+     * You can set various from-to patterns by the from-to option. <br>
+     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br>
      * See the {@link FromToOption} class for the details.
      * @param fromDate The local date as from-date. (basically NotNull: null allowed if one-side allowed)
      * @param toDate The local date as to-date. (basically NotNull: null allowed if one-side allowed)
@@ -192,9 +192,9 @@ public class ManualOrderOption implements ColumnCalculator {
     }
 
     /**
-     * Add 'when' element for 'case' statement as FromTo using local date-time. <br />
-     * You can set various from-to patterns by the from-to option. <br />
-     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br />
+     * Add 'when' element for 'case' statement as FromTo using local date-time. <br>
+     * You can set various from-to patterns by the from-to option. <br>
+     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br>
      * See the {@link FromToOption} class for the details.
      * @param fromDate The local date-time as from-date. (basically NotNull: null allowed if one-side allowed)
      * @param toDate The local date-time as to-date. (basically NotNull: null allowed if one-side allowed)
@@ -206,9 +206,9 @@ public class ManualOrderOption implements ColumnCalculator {
     }
 
     /**
-     * Add 'when' element for 'case' statement as FromTo. <br />
-     * You can set various from-to patterns by the from-to option. <br />
-     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br />
+     * Add 'when' element for 'case' statement as FromTo. <br>
+     * You can set various from-to patterns by the from-to option. <br>
+     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br>
      * See the {@link FromToOption} class for the details.
      * @param fromDate The date as from-date. (basically NotNull: null allowed if one-side allowed)
      * @param toDate The date as to-date. (basically NotNull: null allowed if one-side allowed)
@@ -407,7 +407,7 @@ public class ManualOrderOption implements ColumnCalculator {
     }
 
     /**
-     * Add 'else' value. (Basically for SwitchOrder) <br />
+     * Add 'else' value. (Basically for SwitchOrder) <br>
      * You should set 'then' values before calling this.
      * @param elseValue The value for 'else', String, Integer, Date, DreamCruiseTicket... (NotNull)
      */
@@ -616,7 +616,7 @@ public class ManualOrderOption implements ColumnCalculator {
     //                                                                     Binding Process
     //                                                                     ===============
     /**
-     * Bind parameters for manual order. <br />
+     * Bind parameters for manual order. <br>
      * It is called from DBFlute runtime internally.
      * @param handler The handler for free parameters. (NotNull)
      */
@@ -804,7 +804,7 @@ public class ManualOrderOption implements ColumnCalculator {
     //                                                                          Validation
     //                                                                          ==========
     /**
-     * Validate case-when constraints. <br />
+     * Validate case-when constraints. <br>
      * It is called from DBFlute runtime internally.
      */
     public void validate() { // called when set to query
@@ -1005,7 +1005,7 @@ public class ManualOrderOption implements ColumnCalculator {
     }
 
     /**
-     * Get the 'else' value, which is bound. <br />
+     * Get the 'else' value, which is bound. <br>
      * It returns null if you set only 'else' value but not binding.
      * @return The value for 'else'. (NullAllowed)
      */

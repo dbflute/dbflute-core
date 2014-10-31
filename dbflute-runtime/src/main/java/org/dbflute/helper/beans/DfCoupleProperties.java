@@ -16,8 +16,8 @@
 package org.dbflute.helper.beans;
 
 /**
- * The marker interface that means it has couple properties. <br />
- * Basically for Scala entity, e.g. String memberName(), memberName(String). <br />
+ * The marker interface that means it has couple properties. <br>
+ * Basically for Scala entity, e.g. String memberName(), memberName(String). <br>
  * (Cannot get annotation on Scala entity from Java so this way)
  * @author jflute
  * @since 1.0.5J (2014/06/02 Monday)

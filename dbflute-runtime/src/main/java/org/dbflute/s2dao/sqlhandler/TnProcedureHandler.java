@@ -135,7 +135,7 @@ public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
      * @param cs The statement of procedure. (NotNull)
      * @param pmb The parameter bean from arguments. (NotNull)
      * @param executed The return value of execute() that means whether the first result is a result set. 
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     @SuppressWarnings("resource")
     protected void handleNotParamResult(Connection conn, CallableStatement cs, Object pmb, boolean executed) throws SQLException {
@@ -176,7 +176,7 @@ public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
      * @param cs The statement of procedure. (NotNull)
      * @param pmb The parameter bean from arguments. (NotNull)
      * @param executed The return value of execute() that means whether the first result is a result set.
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected void handleOutParameter(Connection conn, CallableStatement cs, Object pmb, boolean executed) throws SQLException {
         if (pmb == null) {

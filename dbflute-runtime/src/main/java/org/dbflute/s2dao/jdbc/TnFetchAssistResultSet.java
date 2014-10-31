@@ -161,7 +161,7 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
     /**
      * Move to the next record.
      * @return Does the result set have next record?
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     @Override
     public boolean next() throws SQLException {

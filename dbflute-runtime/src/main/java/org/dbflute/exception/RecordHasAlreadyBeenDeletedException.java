@@ -16,7 +16,7 @@
 package org.dbflute.exception;
 
 /**
- * The exception when the record has already been deleted (by other thread). <br />
+ * The exception when the record has already been deleted (by other thread). <br>
  * This class is old.
  * @author jflute
  */

@@ -18,7 +18,7 @@ package org.dbflute.jdbc;
 import java.util.Map;
 
 /**
- * The basic interface of classification. <br />
+ * The basic interface of classification. <br>
  * It's an internal interface for DBFlute runtime.
  * @author jflute
  */

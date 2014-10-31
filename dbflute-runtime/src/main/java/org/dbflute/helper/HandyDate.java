@@ -55,7 +55,7 @@ import org.dbflute.util.DfTypeUtil.ParseDateException;
  *  }
  *  date.calculateDistanceDays(toDate("2011/11/30")); // 3
  * </pre>
- * The internal calendar uses default time-zone as default. <br />
+ * The internal calendar uses default time-zone as default. <br>
  * You can change the time-zone for it.
  * <pre>
  * e.g.
@@ -150,13 +150,13 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Construct the handy date by the specified date. <br />
-     * The specified date is not changed by this handy date. <br />
+     * Construct the handy date by the specified date. <br>
+     * The specified date is not changed by this handy date. <br>
      * <pre>
      * e.g.
      *  Date adjusted = new HandyDate(date).addDay(3).getDate();
      * </pre>
-     * The internal calendar uses default time-zone as default. <br />
+     * The internal calendar uses default time-zone as default. <br>
      * You can change the time-zone for it.
      * <pre>
      * e.g.
@@ -223,7 +223,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Construct the handy date by the string expression for the default time-zone. <br />
+     * Construct the handy date by the string expression for the default time-zone. <br>
      * <pre>
      * e.g.
      *  new HandyDate("20010101", "yyyyMMdd"): 2001-01-01 00:00:00.000
@@ -246,7 +246,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Construct the handy date by the string expression for the specified time-zone. <br />
+     * Construct the handy date by the string expression for the specified time-zone. <br>
      * <pre>
      * e.g.
      *  TimeZone timeZone = ...
@@ -322,7 +322,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Set the time-zone to internal calendar. <br />
+     * Set the time-zone to internal calendar. <br>
      * <pre>
      * e.g.
      *  new HandyDate(date).timeZone(timeZone);
@@ -441,7 +441,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the year just (beginning). <br />
+     * Move to the year just (beginning). <br>
      * e.g. moveToYearJust(): 2011/11/27 12:34:56.789 to 2011/<span style="color: #CC4747">01/01 00:00:00.000</span>
      * @return this. (NotNull)
      */
@@ -452,7 +452,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the year just (beginning) after the year added. <br />
+     * Move to the year just (beginning) after the year added. <br>
      * e.g. moveToYearJustAdded(1): 2011/11/27 12:34:56.789 to 2012/01/01 00:00:00.000
      * @param years The count added of year. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
@@ -463,7 +463,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the year just (beginning) after the year moved-to. <br />
+     * Move to the year just (beginning) after the year moved-to. <br>
      * e.g. moveToYearJustFor(2007): 2011/11/27 12:34:56.789 to 2007/01/01 00:00:00.000
      * @param year The move-to year. (NotZero, MinusAllowed: if minus, means before Christ)
      * @return this. (NotNull)
@@ -474,7 +474,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the year. <br />
+     * Move to the terminal of the year. <br>
      * e.g. moveToYearTerminal(): 2011/11/27 12:34:56.789 to 2011/<span style="color: #CC4747">12/31 23:59:59.999</span>
      * @return this. (NotNull)
      */
@@ -485,7 +485,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the year after the year added. <br />
+     * Move to the terminal of the year after the year added. <br>
      * e.g. moveToYearTerminalAdded(1): 2011/11/27 12:34:56.789 to 2012/12/31 23:59:59.999
      * @param years The count added of year. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
@@ -496,7 +496,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the year after the year moved-to. <br />
+     * Move to the terminal of the year after the year moved-to. <br>
      * e.g. moveToYearTerminalFor(2007): 2011/11/27 12:34:56.789 to 2007/12/31 23:59:59.999
      * @param year The move-to year. (NotZero, MinusAllowed: if minus, means before Christ)
      * @return this. (NotNull)
@@ -510,7 +510,7 @@ public class HandyDate implements Serializable {
     //                                         Move-to Month
     //                                         -------------
     /**
-     * Move to the specified month. <br />
+     * Move to the specified month. <br>
      * e.g. moveToMonth(9): 2011/11/27 to 2011/<span style="color: #CC4747">09</span>/27
      * @param month The move-to month. (NotZero, NotMinus)
      * @return this. (NotNull)
@@ -522,7 +522,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the month just (beginning). <br />
+     * Move to the month just (beginning). <br>
      * e.g. moveToMonthJust(): 2011/11/27 12:34:56.789 to 2011/11/<span style="color: #CC4747">01 00:00:00.000</span>
      * @return this. (NotNull)
      */
@@ -533,7 +533,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the month just (beginning) after the month added. <br />
+     * Move to the month just (beginning) after the month added. <br>
      * e.g. moveToMonthJustAdded(1): 2011/11/27 12:34:56.789 to 2011/12/01 00:00:00.000
      * @param months The count added of month. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
@@ -544,7 +544,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the month just (beginning) after the month moved-to. <br />
+     * Move to the month just (beginning) after the month moved-to. <br>
      * e.g. moveToMonthJustFor(9): 2011/11/27 12:34:56.789 to 2011/09/01 00:00:00.000
      * @param month The move-to month. (NotZero, NotMinus)
      * @return this. (NotNull)
@@ -556,7 +556,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the month. <br />
+     * Move to the terminal of the month. <br>
      * e.g. moveToMonthTerminal(): 2011/11/27 12:34:56.789 to 2011/11/<span style="color: #CC4747">30 23:59:59.999</span>
      * @return this. (NotNull)
      */
@@ -567,7 +567,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the month after the month added. <br />
+     * Move to the terminal of the month after the month added. <br>
      * e.g. moveToMonthTerminalAdded(1): 2011/11/27 12:34:56.789 to 2011/12/31 23:59:59.999
      * @param months The count added of month. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
@@ -578,7 +578,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the month after the month moved-to. <br />
+     * Move to the terminal of the month after the month moved-to. <br>
      * e.g. moveToMonthTerminalFor(9): 2011/11/27 12:34:56.789 to 2011/09/30 23:59:59.999
      * @param month The move-to month. (NotZero, NotMinus)
      * @return this. (NotNull)
@@ -590,7 +590,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the first weekday just of the month. <br />
+     * Move to the first weekday just of the month. <br>
      * e.g. moveToMonthFirstWeekdayJust(): 2013/06/10 12:34:56.789 to 2013/06/<span style="color: #CC4747">03 00:00:00:000</span>
      * @return this. (NotNull)
      */
@@ -605,7 +605,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the month last weekday. <br />
+     * Move to the terminal of the month last weekday. <br>
      * e.g. moveToMonthWeekdayTerminal(): 2013/03/10 12:34:56.789 to 2013/03/<span style="color: #CC4747">29 23:59:59.999</span>
      * @return this. (NotNull)
      */
@@ -620,7 +620,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the first weekend just of the month. <br />
+     * Move to the first weekend just of the month. <br>
      * e.g. moveToMonthFirstWeekendJust(): 2013/03/10 12:34:56.789 to 2013/03/<span style="color: #CC4747">02 00:00:00:000</span>
      * @return this. (NotNull)
      */
@@ -636,7 +636,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the month last weekend. <br />
+     * Move to the terminal of the month last weekend. <br>
      * e.g. moveToMonthWeekdayTerminal(): 2013/04/10 12:34:56.789 to 2013/04/<span style="color: #CC4747">28 23:59:59.999</span>
      * @return this. (NotNull)
      */
@@ -655,7 +655,7 @@ public class HandyDate implements Serializable {
     //                                           Move-to Day
     //                                           -----------
     /**
-     * Move to the specified day. <br />
+     * Move to the specified day. <br>
      * e.g. moveToDay(23): 2001/01/16 to 2007/01/<span style="color: #CC4747">23</span>
      * @param day The move-to day. (NotZero, NotMinus)
      * @return this. (NotNull)
@@ -667,7 +667,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the day just (beginning). <br />
+     * Move to the day just (beginning). <br>
      * e.g. moveToDayJust(): 2011/11/27 12:34:56.789 to 2011/11/27 <span style="color: #CC4747">00:00:00.000</span>
      * @return this. (NotNull)
      */
@@ -677,7 +677,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the day just (beginning) after the day added. <br />
+     * Move to the day just (beginning) after the day added. <br>
      * e.g. moveToDayJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/28 00:00:00.000
      * @param days The count added of day. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
@@ -688,7 +688,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the day just after the day moved-to. <br />
+     * Move to the day just after the day moved-to. <br>
      * e.g. moveToDayJustFor(14): 2011/11/27 12:34:56.789 to 2011/11/14 00:00:00.000
      * @param day The move-to day. (NotZero, NotMinus)
      * @return this. (NotNull)
@@ -700,7 +700,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the day. <br />
+     * Move to the terminal of the day. <br>
      * e.g. moveToDayTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 <span style="color: #CC4747">23:59:59.999</span>
      * @return this. (NotNull)
      */
@@ -710,7 +710,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the day after the day added. <br />
+     * Move to the terminal of the day after the day added. <br>
      * e.g. moveToDayJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/28 23:59:59.999
      * @param days The count added of day. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
@@ -721,7 +721,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the day just after the day moved-to. <br />
+     * Move to the day just after the day moved-to. <br>
      * e.g. moveToDayTerminalFor(14): 2011/11/27 12:34:56.789 to 2011/11/14 23:59:59.999
      * @param day The move-to day. (NotZero, NotMinus)
      * @return this. (NotNull)
@@ -752,7 +752,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the hour just (beginning). <br />
+     * Move to the hour just (beginning). <br>
      * e.g. moveToHourJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:<span style="color: #CC4747">00:00.000</span>
      * @return this. (NotNull)
      */
@@ -762,7 +762,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the hour just (beginning) after the hour added. <br />
+     * Move to the hour just (beginning) after the hour added. <br>
      * e.g. moveToHourJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/27 13:00:00.000
      * @param hours The count added of hour. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
@@ -773,7 +773,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the hour just (beginning) after the hour moved-to. <br />
+     * Move to the hour just (beginning) after the hour moved-to. <br>
      * e.g. moveToHourJustFor(4): 2011/11/27 12:34:56.789 to 2011/11/27 04:00:00.000
      * @param hour The move-to hour. (NotMinus)
      * @return this. (NotNull)
@@ -785,7 +785,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the hour. <br />
+     * Move to the terminal of the hour. <br>
      * e.g. moveToHourTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:<span style="color: #CC4747">59:59.999</span>
      * @return this. (NotNull)
      */
@@ -795,7 +795,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the hour after the hour added. <br />
+     * Move to the terminal of the hour after the hour added. <br>
      * e.g. moveToHourTerminalAdded(1): 2011/11/27 12:34:56.789 to 2011/11/27 13:59:59.999
      * @param hours The count added of hour. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
@@ -806,7 +806,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the hour after the hour moved-to. <br />
+     * Move to the terminal of the hour after the hour moved-to. <br>
      * e.g. moveToHourTerminalFor(4): 2011/11/27 12:34:56.789 to 2011/11/27 04:59:59.999
      * @param hour The move-to hour. (NotMinus)
      * @return this. (NotNull)
@@ -818,7 +818,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the hour just noon. <br />
+     * Move to the hour just noon. <br>
      * e.g. moveToHourJustNoon(): 2011/11/27 22:34:56.789 to 2011/11/27 12:00:00.000
      * @return this. (NotNull)
      */
@@ -847,7 +847,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the minute just (beginning). <br />
+     * Move to the minute just (beginning). <br>
      * e.g. moveToMinuteJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:<span style="color: #CC4747">00.000</span>
      * @return this. (NotNull)
      */
@@ -868,7 +868,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the minute. <br />
+     * Move to the terminal of the minute. <br>
      * e.g. moveToMinuteTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:<span style="color: #CC4747">59.999</span>
      * @return this. (NotNull)
      */
@@ -908,7 +908,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the second just (beginning). <br />
+     * Move to the second just (beginning). <br>
      * e.g. moveToSecondJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:56.<span style="color: #CC4747">000</span>
      * @return this. (NotNull)
      */
@@ -929,7 +929,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the second. <br />
+     * Move to the terminal of the second. <br>
      * e.g. moveToSecondTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:56.<span style="color: #CC4747">999</span>
      * @return this. (NotNull)
      */
@@ -972,8 +972,8 @@ public class HandyDate implements Serializable {
     //                                          Move-to Week
     //                                          ------------
     /**
-     * Move to the week just (beginning). <br />
-     * You can change the beginning of day of week by beginWeek_...(). <br />
+     * Move to the week just (beginning). <br>
+     * You can change the beginning of day of week by beginWeek_...(). <br>
      * Default day of week is Sunday.
      * <pre>
      * e.g. 2011/11/30 12:34:56.789 (Wednesday)
@@ -992,8 +992,8 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Move to the terminal of the week. <br />
-     * You can change the beginning of day of week by beginWeek_...(). <br />
+     * Move to the terminal of the week. <br>
+     * You can change the beginning of day of week by beginWeek_...(). <br>
      * Default day of week is Sunday.
      * <pre>
      * e.g. 2011/11/30 12:34:56.789 (Wednesday)
@@ -1025,8 +1025,8 @@ public class HandyDate implements Serializable {
     //                               Move-to Quarter of Year
     //                               -----------------------
     /**
-     * Move to the quarter of year just (beginning). <br />
-     * You can change the beginning of year by beginYear_Month...(). <br />
+     * Move to the quarter of year just (beginning). <br>
+     * You can change the beginning of year by beginYear_Month...(). <br>
      * Default quarter of year is 1-3, 4-6, 7-9, 10-12.
      * <pre>
      * e.g.
@@ -1122,7 +1122,7 @@ public class HandyDate implements Serializable {
     //                                                                          Clear Date
     //                                                                          ==========
     /**
-     * Clear the time parts, hours, minutes, seconds, milliseconds. <br />
+     * Clear the time parts, hours, minutes, seconds, milliseconds. <br>
      * e.g. clearTimeParts(): 2011/11/27 12:34:56.789 to 2011/11/27 00:00:00.000
      * @return this. (NotNull)
      */
@@ -1132,7 +1132,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Clear the minute with rear parts, minutes, seconds, milliseconds. <br />
+     * Clear the minute with rear parts, minutes, seconds, milliseconds. <br>
      * e.g. clearMinuteWithRear(): 2011/11/27 12:34:56.789 to 2011/11/27 12:00:00.000
      * @return this. (NotNull)
      */
@@ -1142,7 +1142,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Clear the second with rear parts, seconds, milliseconds. <br />
+     * Clear the second with rear parts, seconds, milliseconds. <br>
      * e.g. clearSecondWithRear(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:00.000
      * @return this. (NotNull)
      */
@@ -1152,7 +1152,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Clear the millisecond. <br />
+     * Clear the millisecond. <br>
      * e.g. clearMillisecond(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:56.000
      * @return this. (NotNull)
      */
@@ -1988,7 +1988,7 @@ public class HandyDate implements Serializable {
     //                                          Confirm Year
     //                                          ------------
     /**
-     * Is the year of this date same as specified year? <br />
+     * Is the year of this date same as specified year? <br>
      * e.g. if 2011/11/27, isYear(2011) is true
      * @param year The integer of year.
      * @return The determination, true or false.
@@ -1998,7 +1998,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the year of this date same as the year of the specified local date? <br />
+     * Is the year of this date same as the year of the specified local date? <br>
      * e.g. if 2011/11/27, isYearSameAs(toLocalDate("2011/01/01")) is true
      * @param date The local date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2009,7 +2009,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the year of this date same as the year of the specified local date-time? <br />
+     * Is the year of this date same as the year of the specified local date-time? <br>
      * e.g. if 2011/11/27, isYearSameAs(toLocalDate("2011/01/01")) is true
      * @param date The local date-time to compare. (NotNull)
      * @return The determination, true or false.
@@ -2020,7 +2020,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the year of this date same as the year of the specified date? <br />
+     * Is the year of this date same as the year of the specified date? <br>
      * e.g. if 2011/11/27, isYearSameAs(toDate("2011/01/01")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2031,7 +2031,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the year of this date same as the year of the specified date? <br />
+     * Is the year of this date same as the year of the specified date? <br>
      * e.g. if 2011/11/27, isYearSameAs(new HandyDate("2011/01/01")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2042,7 +2042,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the year of this date Anno Domini? <br />
+     * Is the year of this date Anno Domini? <br>
      * e.g. 2011/11/27: true, BC982/11/27: false
      * @return The determination, true or false.
      */
@@ -2051,7 +2051,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the year of this date Before Christ? <br />
+     * Is the year of this date Before Christ? <br>
      * e.g. 2011/11/27: false, BC982/11/27: true
      * @return The determination, true or false.
      */
@@ -2063,7 +2063,7 @@ public class HandyDate implements Serializable {
     //                                         Confirm Month
     //                                         -------------
     /**
-     * Is the month of this date same as specified month? <br />
+     * Is the month of this date same as specified month? <br>
      * e.g. if 2011/11/27, isMonth(11) is true
      * @param month The integer of month. (1 origin)
      * @return The determination, true or false.
@@ -2073,7 +2073,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the month of this date same as specified month? <br />
+     * Is the month of this date same as specified month? <br>
      * e.g. if 2011/11/27, isMonth(11) is true
      * @param month The enumeration of month. (NotNull, 1 origin)
      * @return The determination, true or false.
@@ -2084,7 +2084,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the month of this date same as the month of the specified local date? <br />
+     * Is the month of this date same as the month of the specified local date? <br>
      * e.g. if 2011/11/27, isMonthSameAs(toLocalDate("2013/11/01")) is true
      * @param date The local date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2095,7 +2095,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the month of this date same as the month of the specified local date-time? <br />
+     * Is the month of this date same as the month of the specified local date-time? <br>
      * e.g. if 2011/11/27, isMonthSameAs(toLocalDateTime("2013/11/01")) is true
      * @param date The local date-time to compare. (NotNull)
      * @return The determination, true or false.
@@ -2106,7 +2106,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the month of this date same as the month of the specified date? <br />
+     * Is the month of this date same as the month of the specified date? <br>
      * e.g. if 2011/11/27, isMonthSameAs(toDate("2013/11/01")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2117,7 +2117,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the month of this date same as the month of the specified date? <br />
+     * Is the month of this date same as the month of the specified date? <br>
      * e.g. if 2011/11/27, isMonthSameAs(new HandyDate("2013/11/01")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2128,7 +2128,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the year and month of this date same as the specified date? <br />
+     * Is the year and month of this date same as the specified date? <br>
      * e.g. if 2011/11/27, isMonthOfYearSameAs(toDate("2011/11/01")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2139,7 +2139,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the year and month of this date same as the specified date? <br />
+     * Is the year and month of this date same as the specified date? <br>
      * e.g. if 2011/11/27, isMonthOfYearSameAs(new HandyDate("2011/11/01")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2249,7 +2249,7 @@ public class HandyDate implements Serializable {
     //                                           Confirm Day
     //                                           -----------
     /**
-     * Is the day of this date same as specified day? <br />
+     * Is the day of this date same as specified day? <br>
      * e.g. if 2011/11/27, isDay(27) is true
      * @param day The integer of day.
      * @return The determination, true or false.
@@ -2259,7 +2259,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the day of this date same as the day of the specified local date? <br />
+     * Is the day of this date same as the day of the specified local date? <br>
      * e.g. if 2011/11/27, isDaySameAs(toLocalDate("2013/09/27")) is true
      * @param date The local date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2270,7 +2270,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the day of this date same as the day of the specified local date-time? <br />
+     * Is the day of this date same as the day of the specified local date-time? <br>
      * e.g. if 2011/11/27, isDaySameAs(toLocalDateTime("2013/09/27")) is true
      * @param date The local date-time to compare. (NotNull)
      * @return The determination, true or false.
@@ -2281,7 +2281,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the day of this date same as the day of the specified date? <br />
+     * Is the day of this date same as the day of the specified date? <br>
      * e.g. if 2011/11/27, isDaySameAs(toDate("2013/09/27")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2292,7 +2292,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the day of this date same as the day of the specified date? <br />
+     * Is the day of this date same as the day of the specified date? <br>
      * e.g. if 2011/11/27, isDaySameAs(new HandyDate("2013/09/27")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2303,7 +2303,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the date and day same as the specified local date? <br />
+     * Is the date and day same as the specified local date? <br>
      * e.g. if 2011/11/27 00:00:00, isDayOfDateSameAs(toLocalDate("2011/11/27 12:34:56")) is true
      * @param date The local date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2314,7 +2314,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the date and day same as the specified local date-time? <br />
+     * Is the date and day same as the specified local date-time? <br>
      * e.g. if 2011/11/27 00:00:00, isDayOfDateSameAs(toLocalDateTime("2011/11/27 12:34:56")) is true
      * @param date The local date-time to compare. (NotNull)
      * @return The determination, true or false.
@@ -2325,7 +2325,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the date and day same as the specified date? <br />
+     * Is the date and day same as the specified date? <br>
      * e.g. if 2011/11/27 00:00:00, isDayOfDateSameAs(toDate("2011/11/27 12:34:56")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2336,7 +2336,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the date and day same as the specified date? <br />
+     * Is the date and day same as the specified date? <br>
      * e.g. if 2011/11/27 00:00:00, isDayOfDateSameAs(new HandyDate("2011/11/27 12:34:56")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2347,7 +2347,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the day of this date same as first day of the month? <br />
+     * Is the day of this date same as first day of the month? <br>
      * <pre>
      * e.g.
      *  2011/11/01: true
@@ -2361,7 +2361,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the day of this date same as last day of the month? <br />
+     * Is the day of this date same as last day of the month? <br>
      * <pre>
      * e.g.
      *  2011/11/01: false
@@ -2380,7 +2380,7 @@ public class HandyDate implements Serializable {
     //                                          Confirm Hour
     //                                          ------------
     /**
-     * Is the hour of this date same as specified hour? <br />
+     * Is the hour of this date same as specified hour? <br>
      * e.g. if 2011/11/27 12:34:56, isHour(12) is true
      * @param hour The integer of hour(0-23).
      * @return The determination, true or false.
@@ -2390,7 +2390,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the hour of this date same as the hour of the specified local date-time? <br />
+     * Is the hour of this date same as the hour of the specified local date-time? <br>
      * e.g. if 2011/11/27 12:34:56, isHourSameAs(toLocalDateTime("2013/09/24 12:21:58")) is true
      * @param date The local date-time to compare. (NotNull)
      * @return The determination, true or false.
@@ -2401,7 +2401,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the hour of this date same as the hour of the specified date? <br />
+     * Is the hour of this date same as the hour of the specified date? <br>
      * e.g. if 2011/11/27 12:34:56, isHourSameAs(toDate("2013/09/24 12:21:58")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2412,7 +2412,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the hour of this date same as the hour of the specified date? <br />
+     * Is the hour of this date same as the hour of the specified date? <br>
      * e.g. if 2011/11/27 12:34:56, isHourSameAs(new HandyDate("2013/09/24 12:21:58")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2423,7 +2423,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the date and hour same as the specified date? <br />
+     * Is the date and hour same as the specified date? <br>
      * e.g. if 2011/11/27 12:00:00, isHourOfDateSameAs(toDate("2011/11/27 12:34:56")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2434,7 +2434,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the date and hour same as the specified date? <br />
+     * Is the date and hour same as the specified date? <br>
      * e.g. if 2011/11/27 12:00:00, isHourOfDateSameAs(new HandyDate("2011/11/27 12:34:56")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2448,7 +2448,7 @@ public class HandyDate implements Serializable {
     //                                        Confirm Minute
     //                                        --------------
     /**
-     * Is the minute of this date same as specified minute? <br />
+     * Is the minute of this date same as specified minute? <br>
      * e.g. if 2011/11/27 12:34:56, isMinute(34) is true
      * @param minute The integer of minute(0-59).
      * @return The determination, true or false.
@@ -2458,7 +2458,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the minute of this date same as the minute of the specified local date-time? <br />
+     * Is the minute of this date same as the minute of the specified local date-time? <br>
      * e.g. if 2011/11/27 12:34:56, isMinuteSameAs(toLocalDateTime("2013/09/26 07:34:31")) is true
      * @param date The local date-time to compare. (NotNull)
      * @return The determination, true or false.
@@ -2469,7 +2469,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the minute of this date same as the minute of the specified date? <br />
+     * Is the minute of this date same as the minute of the specified date? <br>
      * e.g. if 2011/11/27 12:34:56, isMinuteSameAs(toDate("2013/09/26 07:34:31")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2480,7 +2480,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the minute of this date same as the minute of the specified date? <br />
+     * Is the minute of this date same as the minute of the specified date? <br>
      * e.g. if 2011/11/27 12:34:56, isMinuteSameAs(new HandyDate("2013/09/26 07:34:31")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2491,7 +2491,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the date and hour and minute same as the specified date? <br />
+     * Is the date and hour and minute same as the specified date? <br>
      * e.g. if 2011/11/27 12:34:00, isMinuteOfDateSameAs(toDate("2011/11/27 12:34:56")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2502,7 +2502,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the date and hour and minute same as the specified date? <br />
+     * Is the date and hour and minute same as the specified date? <br>
      * e.g. if 2011/11/27 12:34:00, isMinuteOfDateSameAs(new HandyDate("2011/11/27 12:34:56")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2516,7 +2516,7 @@ public class HandyDate implements Serializable {
     //                                        Confirm Second
     //                                        --------------
     /**
-     * Is the second of this date same as specified second? <br />
+     * Is the second of this date same as specified second? <br>
      * e.g. if 2011/11/27 12:34:56, isSecond(56) is true
      * @param second The integer of minute(0-59).
      * @return The determination, true or false.
@@ -2526,7 +2526,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the second of this date same as the second of the specified local date-time? <br />
+     * Is the second of this date same as the second of the specified local date-time? <br>
      * e.g. if 2011/11/27 12:34:56.123, isSecondSameAs(toLocalDateTime("2013/09/26 07:41:56.456")) is true
      * @param date The local date-time to compare. (NotNull)
      * @return The determination, true or false.
@@ -2537,7 +2537,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the second of this date same as the second of the specified date? <br />
+     * Is the second of this date same as the second of the specified date? <br>
      * e.g. if 2011/11/27 12:34:56.123, isSecondSameAs(toDate("2013/09/26 07:41:56.456")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2548,7 +2548,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the second of this date same as the second of the specified date? <br />
+     * Is the second of this date same as the second of the specified date? <br>
      * e.g. if 2011/11/27 12:34:56.123, isSecondSameAs(new HandyDate("2013/09/26 07:34:56.456")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2559,7 +2559,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the date and time same as the specified date? <br />
+     * Is the date and time same as the specified date? <br>
      * e.g. if 2011/11/27 12:34:56.123, isSecondOfDateSameAs(toDate("2011/11/27 12:34:56.456")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2570,7 +2570,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the date and time same as the specified date? <br />
+     * Is the date and time same as the specified date? <br>
      * e.g. if 2011/11/27 12:34:56.123, isSecondOfDateSameAs(new HandyDate("2011/11/27 12:34:56.456")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
@@ -2662,7 +2662,7 @@ public class HandyDate implements Serializable {
     //                                     Calendar Distance
     //                                     -----------------
     /**
-     * Calculate calendar distance of year between two date. <br />
+     * Calculate calendar distance of year between two date. <br>
      * <pre>
      * e.g.
      *  2013/03/03(this) and 2014/03/03(argument): 1
@@ -2677,7 +2677,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate calendar distance of year between two date. <br />
+     * Calculate calendar distance of year between two date. <br>
      * <pre>
      * e.g.
      *  2013/03/03(this) and 2014/03/03(argument): 1
@@ -2692,7 +2692,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate calendar distance of year between two date. <br />
+     * Calculate calendar distance of year between two date. <br>
      * <pre>
      * e.g.
      *  2013/03/03(this) and 2014/03/03(argument): 1
@@ -2716,7 +2716,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate calendar distance of month between two date. <br />
+     * Calculate calendar distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/03/03(this) and 2013/04/03(argument): 1
@@ -2732,7 +2732,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate calendar distance of month between two date. <br />
+     * Calculate calendar distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/03/03(this) and 2013/04/03(argument): 1
@@ -2748,7 +2748,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate calendar distance of month between two date. <br />
+     * Calculate calendar distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/03/03(this) and 2013/04/03(argument): 1
@@ -3087,7 +3087,7 @@ public class HandyDate implements Serializable {
     //                                     Measured Distance
     //                                     -----------------
     /**
-     * Calculate measured distance of year between two date. <br />
+     * Calculate measured distance of year between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31(this) and 2014/01/01(argument): 0
@@ -3104,7 +3104,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of year between two date. <br />
+     * Calculate measured distance of year between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31(this) and 2014/01/01(argument): 0
@@ -3121,7 +3121,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of year between two date. <br />
+     * Calculate measured distance of year between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31(this) and 2014/01/01(argument): 0
@@ -3143,7 +3143,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * The distance might have margin of error.
      * <pre>
      * e.g.
@@ -3164,7 +3164,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * The distance might have margin of error.
      * <pre>
      * e.g.
@@ -3185,7 +3185,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * The distance might have margin of error.
      * <pre>
      * e.g.
@@ -3222,7 +3222,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/04/01 23:59:59(this) and 2013/04/02 00:00:00(argument): 0
@@ -3236,7 +3236,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/04/01 23:59:59(this) and 2013/04/02 00:00:00(argument): 0
@@ -3250,7 +3250,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/04/01 23:59:59(this) and 2013/04/02 00:00:00(argument): 0
@@ -3269,7 +3269,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31 12:34:56(this) and 2013/12/31 13:00:00(argument): 0
@@ -3283,7 +3283,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31 12:34:56(this) and 2013/12/31 13:00:00(argument): 0
@@ -3297,7 +3297,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31 12:34:56(this) and 2013/12/31 13:00:00(argument): 0
@@ -3316,7 +3316,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31 12:34:56(this) and 2013/12/31 12:35:00(argument): 0
@@ -3330,7 +3330,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31 12:34:56(this) and 2013/12/31 12:35:00(argument): 0
@@ -3344,7 +3344,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31 12:34:56(this) and 2013/12/31 12:35:00(argument): 0
@@ -3363,7 +3363,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31 12:34:56.789(this) and 2013/12/31 12:34:57.000(argument): 0
@@ -3377,7 +3377,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31 12:34:56.789(this) and 2013/12/31 12:34:57.000(argument): 0
@@ -3391,7 +3391,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate measured distance of month between two date. <br />
+     * Calculate measured distance of month between two date. <br>
      * <pre>
      * e.g.
      *  2013/12/31 12:34:56.789(this) and 2013/12/31 12:34:57.000(argument): 0
@@ -3597,7 +3597,7 @@ public class HandyDate implements Serializable {
     //                                        Both-side Date
     //                                        --------------
     /**
-     * Choose the nearest date to this date. <br />
+     * Choose the nearest date to this date. <br>
      * If the same distance is found, it returns the future date.
      * <pre>
      * e.g. date: 2011/11/27
@@ -3612,7 +3612,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Choose the nearest date to this date. <br />
+     * Choose the nearest date to this date. <br>
      * If the same distance is found, it returns the future date.
      * <pre>
      * e.g. date: 2011/11/27
@@ -3627,7 +3627,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Choose the nearest date to this date. <br />
+     * Choose the nearest date to this date. <br>
      * If the same distance is found, it returns the future date.
      * <pre>
      * e.g. date: 2011/11/27
@@ -3797,7 +3797,7 @@ public class HandyDate implements Serializable {
     //                                            Begin Year
     //                                            ----------
     /**
-     * Begin year from the specified month. <br />
+     * Begin year from the specified month. <br>
      * The date of argument is used as only the month part.
      * <pre>
      * e.g. beginYear_Month(toLocalDate("2001/04/01"))
@@ -3816,7 +3816,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Begin year from the specified month. <br />
+     * Begin year from the specified month. <br>
      * The date of argument is used as only the month part.
      * <pre>
      * e.g. beginYear_Month(toLocalDate("2001/04/01"))
@@ -3835,7 +3835,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Begin year from the specified month. <br />
+     * Begin year from the specified month. <br>
      * The date of argument is used as only the month part.
      * <pre>
      * e.g. beginYear_Month(toDate("2001/04/01"))
@@ -4008,7 +4008,7 @@ public class HandyDate implements Serializable {
     //                                           Begin Month
     //                                           -----------
     /**
-     * Begin month from the specified day. <br />
+     * Begin month from the specified day. <br>
      * The date of argument is used as only the day part.
      * <pre>
      * e.g. beginMonth_Day(toLocalDate("2001/01/03"))
@@ -4027,7 +4027,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Begin month from the specified day. <br />
+     * Begin month from the specified day. <br>
      * The date of argument is used as only the day part.
      * <pre>
      * e.g. beginMonth_Day(toLocalDateTime("2001/01/03"))
@@ -4046,7 +4046,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Begin month from the specified day. <br />
+     * Begin month from the specified day. <br>
      * The date of argument is used as only the day part.
      * <pre>
      * e.g. beginMonth_Day(toDate("2001/01/03"))
@@ -4267,8 +4267,8 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Begin week from Sunday. <br />
-     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/27 <br />
+     * Begin week from Sunday. <br>
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/27 <br>
      * (means the date moves to just beginning of week containing 2011/11/27)
      * @return this. (NotNull)
      */
@@ -4278,8 +4278,8 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Begin week from Monday. <br />
-     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/21 <br />
+     * Begin week from Monday. <br>
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/21 <br>
      * (means the date moves to just beginning of week containing 2011/11/27)
      * @return this. (NotNull)
      */
@@ -4289,8 +4289,8 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Begin week from Tuesday. <br />
-     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/22 <br />
+     * Begin week from Tuesday. <br>
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/22 <br>
      * (means the date moves to just beginning of week containing 2011/11/27)
      * @return this. (NotNull)
      */
@@ -4300,8 +4300,8 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Begin week from Wednesday. <br />
-     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/23 <br />
+     * Begin week from Wednesday. <br>
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/23 <br>
      * (means the date moves to just beginning of week containing 2011/11/27)
      * @return this. (NotNull)
      */
@@ -4311,8 +4311,8 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Begin week from Thursday. <br />
-     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/24 <br />
+     * Begin week from Thursday. <br>
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/24 <br>
      * (means the date moves to just beginning of week containing 2011/11/27)
      * @return this. (NotNull)
      */
@@ -4322,8 +4322,8 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Begin week from Friday. <br />
-     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/25 <br />
+     * Begin week from Friday. <br>
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/25 <br>
      * (means the date moves to just beginning of week containing 2011/11/27)
      * @return this. (NotNull)
      */
@@ -4333,8 +4333,8 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Begin week from Saturday. <br />
-     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/26 <br />
+     * Begin week from Saturday. <br>
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/26 <br>
      * (means the date moves to just beginning of week containing 2011/11/27)
      * @return this. (NotNull)
      */
@@ -4347,7 +4347,7 @@ public class HandyDate implements Serializable {
     //                                                                            Get Date
     //                                                                            ========
     /**
-     * Get created new local date that has the same time of this handy date. <br />
+     * Get created new local date that has the same time of this handy date. <br>
      * The conversion logic uses the TimeZone saved in calendar, might be null.
      * @return The instance of local date. (NotNull)
      */
@@ -4356,7 +4356,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Get created new local date-time that has the same time of this handy date. <br />
+     * Get created new local date-time that has the same time of this handy date. <br>
      * The conversion logic uses the TimeZone saved in calendar, might be null.
      * @return The instance of local date-time. (NotNull)
      */

@@ -18,7 +18,7 @@ package org.dbflute.s2dao.valuetype.basic;
 import java.sql.Types;
 
 /**
- * The value type of UUID as string handling. <br />
+ * The value type of UUID as string handling. <br>
  * This value type is available if the JDBC driver does NOT allow UUID type, for example when binding.
  * @author jflute
  */

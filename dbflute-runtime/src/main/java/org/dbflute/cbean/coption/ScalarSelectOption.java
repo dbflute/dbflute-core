@@ -16,7 +16,7 @@
 package org.dbflute.cbean.coption;
 
 /**
- * The option for ScalarSelect. <br />
+ * The option for ScalarSelect. <br>
  * You can filter an aggregate function by scalar function filters.
  * @author jflute
  */
@@ -26,7 +26,7 @@ public class ScalarSelectOption extends FunctionFilterOption {
     //                                                                     Function Option
     //                                                                     ===============
     /**
-     * Set the value for coalesce function. <br />
+     * Set the value for coalesce function. <br>
      * If you set string value and the derived column is date type, it converts it to a date object internally.
      * For example, "2010-10-30 12:34:56.789", "2010/10/30" and so on ... are acceptable.
      * @param coalesce An alternate value when group function returns null. (NullAllowed: if null, no coalesce)

@@ -308,7 +308,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Get the value of allRecordCount when no paging. <br />
+     * Get the value of allRecordCount when no paging. <br>
      * This is not same as size() basically.
      * <pre>
      * e.g. range-size=5, current-page=8 
@@ -385,7 +385,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     }
 
     /**
-     * Get the value of prePageNumber that is calculated. <br />
+     * Get the value of prePageNumber that is calculated. <br>
      * You should use this.isExistPrePage() before calling this. (call only when true)
      * <pre>
      * e.g. range-size=5, current-page=8 
@@ -404,7 +404,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     }
 
     /**
-     * Get the value of nextPageNumber that is calculated. <br />
+     * Get the value of nextPageNumber that is calculated. <br>
      * You should use this.isExistNextPage() before calling this. (call only when true)
      * <pre>
      * e.g. range-size=5, current-page=8 

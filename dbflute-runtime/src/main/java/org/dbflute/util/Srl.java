@@ -1969,7 +1969,7 @@ public class Srl {
     //                                                                       Line Handling
     //                                                                       =============
     /**
-     * Remove empty lines. <br />
+     * Remove empty lines. <br>
      * And CR is removed.
      * @param str The target string. (NotNull)
      * @return The filtered string. (NotNull)
@@ -2031,7 +2031,7 @@ public class Srl {
     }
 
     /**
-     * Adjust initial character(s) as beans property. <br />
+     * Adjust initial character(s) as beans property. <br>
      * Basically same as initUncap() method except only when
      * it starts with two upper case character, for example, 'EMecha'
      * @param capitalizedName The capitalized name for beans property. (NotNull)
@@ -2179,7 +2179,7 @@ public class Srl {
     }
 
     /**
-     * Remove line comments. <br />
+     * Remove line comments. <br>
      * And CR is removed.
      * @param sql The string of SQL. (NotNull)
      * @return The filtered string. (NotNull)

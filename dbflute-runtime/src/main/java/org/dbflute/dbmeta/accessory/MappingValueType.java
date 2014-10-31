@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The annotation of value type for mapping. <br />
+ * The annotation of value type for mapping. <br>
  * You can specify your value type at your extended entity.
  * <pre>
  * &#064;Override

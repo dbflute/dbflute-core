@@ -63,8 +63,8 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     //                                                                           Condition
     //                                                                           =========
     /**
-     * Set up the operand 'equal' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'equal' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -82,8 +82,8 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     }
 
     /**
-     * Set up the operand 'notEqual' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'notEqual' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -101,8 +101,8 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     }
 
     /**
-     * Set up the operand 'greaterThan' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'greaterThan' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -120,8 +120,8 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     }
 
     /**
-     * Set up the operand 'lessThan' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'lessThan' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -139,8 +139,8 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     }
 
     /**
-     * Set up the operand 'greaterEqual' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'greaterEqual' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -158,8 +158,8 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     }
 
     /**
-     * Set up the operand 'lessEqual' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'lessEqual' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -177,7 +177,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     }
 
     /**
-     * Set up the operand 'isNull' and the value of parameter. <br />
+     * Set up the operand 'isNull' and the value of parameter. <br>
      * The type of the parameter should be same as the type of target column. 
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -193,7 +193,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     }
 
     /**
-     * Set up the operand 'isNull' and the value of parameter. <br />
+     * Set up the operand 'isNull' and the value of parameter. <br>
      * The type of the parameter should be same as the type of target column. 
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -212,8 +212,8 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     //                                               RangeOf
     //                                               -------
     /**
-     * Set up the comparison 'RangeOf' and the values of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the comparison 'RangeOf' and the values of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * <pre>
      * cb.query().derivedPurchaseList().max(<span style="color: #553000">purchasCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #553000">purchasCB</span>.specify().columnPurchasePrice();
@@ -257,7 +257,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     //                                                FromTo
     //                                                ------
     /**
-     * Set up the comparison 'FromTo' and the values of parameter. <br />
+     * Set up the comparison 'FromTo' and the values of parameter. <br>
      * The type of the parameter should be same as the type of target column.
      * <pre>
      * cb.query().<span style="color: #994747">derivedPurchaseList()</span>.max(<span style="color: #553000">purchasCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
@@ -275,7 +275,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     }
 
     /**
-     * Set up the comparison 'FromTo' and the values of parameter. <br />
+     * Set up the comparison 'FromTo' and the values of parameter. <br>
      * The type of the parameter should be same as the type of target column.
      * <pre>
      * cb.query().<span style="color: #994747">derivedPurchaseList()</span>.max(<span style="color: #553000">purchasCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
@@ -293,8 +293,8 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     }
 
     /**
-     * Set up the comparison 'FromTo' and the values of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the comparison 'FromTo' and the values of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().<span style="color: #994747">derivedPurchaseList()</span>.max(<span style="color: #553000">purchasCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {

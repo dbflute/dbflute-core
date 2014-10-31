@@ -597,7 +597,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     }
 
     /**
-     * Prepare an outside-SQL execution by returning an instance of the executor for outside-SQL. <br />
+     * Prepare an outside-SQL execution by returning an instance of the executor for outside-SQL. <br>
      * It's an extension point for your adding original customization to outside-SQL executions.
      * @param <BEHAVIOR> The type of behavior.
      * @return The facade for outside-SQL. (NotNull)
@@ -626,7 +626,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     //                                       New Entry Point
     //                                       ---------------
     /**
-     * Help load referrer internally. (new entry point) <br />
+     * Help load referrer internally. (new entry point) <br>
      * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * @param <LOCAL_ENTITY> The type of base entity.
      * @param <PK> The type of primary key.
@@ -863,7 +863,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     //                                   Ancient Entry Point
     //                                   -------------------
     /**
-     * Help load referrer internally. (ancient entry point) <br />
+     * Help load referrer internally. (ancient entry point) <br>
      * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * @param <LOCAL_ENTITY> The type of base entity.
      * @param <KEY> The type of primary key.
@@ -1033,7 +1033,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     }
 
     /**
-     * Convert the primary key to mapping key for load-referrer. <br />
+     * Convert the primary key to mapping key for load-referrer. <br>
      * This default implementation is to-lower if string type.
      * @param <PK> The type of primary key.
      * @param value The value of primary key. (NotNull)

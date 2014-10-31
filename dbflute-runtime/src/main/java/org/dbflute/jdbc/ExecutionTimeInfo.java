@@ -45,7 +45,7 @@ public class ExecutionTimeInfo {
     //                                                                                View
     //                                                                                ====
     /**
-     * The performance view of command invoking. e.g. 01m40s012ms <br />
+     * The performance view of command invoking. e.g. 01m40s012ms <br>
      * @return The view string of command invoking. (NotNull: if command failure, in SqlFireHook, and so on..., returns "*No time") 
      */
     public String toCommandPerformanceView() {
@@ -57,8 +57,8 @@ public class ExecutionTimeInfo {
     }
 
     /**
-     * The performance view of SQL fire. e.g. 01m40s012ms <br />
-     * (before building SQL clause after mapping to entity). <br />
+     * The performance view of SQL fire. e.g. 01m40s012ms <br>
+     * (before building SQL clause after mapping to entity). <br>
      * When batch execution, all statements is contained to the time.
      * @return The view string of SQL fire. (NotNull: if no-modified-column update, SQL failure, and so on..., returns "*No time")
      */
@@ -83,7 +83,7 @@ public class ExecutionTimeInfo {
     //                                                                              Status
     //                                                                              ======
     /**
-     * Does it have the time of behavior command. <br />
+     * Does it have the time of behavior command. <br>
      * @return The determination, true or false. (basically true but no guarantee)
      */
     public boolean hasCommandTimeMillis() {
@@ -91,8 +91,8 @@ public class ExecutionTimeInfo {
     }
 
     /**
-     * Does it have the time of SQL fire. <br />
-     * Basically it returns true but no guarantee, because this is additional info. <br />
+     * Does it have the time of SQL fire. <br>
+     * Basically it returns true but no guarantee, because this is additional info. <br>
      * For example, no-modified-column update execution does not have its SQL fire.
      * @return The determination, true or false. (basically true but no guarantee)
      */
@@ -135,8 +135,8 @@ public class ExecutionTimeInfo {
     }
 
     /**
-     * Get the time as millisecond before SQL fire (after building SQL clause). <br />
-     * (before building SQL clause after mapping to entity). <br />
+     * Get the time as millisecond before SQL fire (after building SQL clause). <br>
+     * (before building SQL clause after mapping to entity). <br>
      * When batch execution, all statements is contained to the time.
      * @return The long value of millisecond. (NullAllowed: when no-modified-column update, SQL failure, and so on...)
      */
@@ -145,8 +145,8 @@ public class ExecutionTimeInfo {
     }
 
     /**
-     * Get the time as millisecond after SQL fire (before mapping to entity). <br />
-     * (before building SQL clause after mapping to entity). <br />
+     * Get the time as millisecond after SQL fire (before mapping to entity). <br>
+     * (before building SQL clause after mapping to entity). <br>
      * When batch execution, all statements is contained to the time.
      * @return The long value of millisecond. (NullAllowed: when no-modified-column update, SQL failure, and so on...)
      */

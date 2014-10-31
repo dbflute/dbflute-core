@@ -24,7 +24,7 @@ import org.dbflute.s2dao.valuetype.basic.BigDecimalType;
 import org.dbflute.util.DfTypeUtil;
 
 /**
- * The value type for BigDecimal which uses setObject() when binding. <br />
+ * The value type for BigDecimal which uses setObject() when binding. <br>
  * Basically for NUMERIC of PostgreSQL's procedure parameter which needs setObject().
  * @author modified by jflute (originated in Seasar2)
  */

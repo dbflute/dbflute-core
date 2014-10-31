@@ -18,7 +18,7 @@ package org.dbflute.jdbc;
 import java.util.List;
 
 /**
- * The meta of classification. <br />
+ * The meta of classification. <br>
  * It's an internal interface for DBFlute runtime.
  * @author jflute
  */

@@ -62,7 +62,7 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
     }
 
     /**
-     * Create the factory of outside-SQL context. <br />
+     * Create the factory of outside-SQL context. <br>
      * This is the very point for an extension of the outside-SQL context. 
      * @return The instance of the factory. (NotNull)
      */
@@ -71,7 +71,7 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
     }
 
     /**
-     * Create the filter of outside-SQL. <br />
+     * Create the filter of outside-SQL. <br>
      * This is the very point for an extension of the outside-SQL filtering. 
      * @return The instance of the filter. (NullAllowed)
      */
