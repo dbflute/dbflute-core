@@ -237,7 +237,7 @@ public class PageGroupBean implements Serializable {
     //                                   Calculated Property
     //                                   -------------------
     /**
-     * Get the value of preGroupNearestPageNumber that is calculated. <br />
+     * Get the value of preGroupNearestPageNumber that is calculated. <br>
      * You should use this.isExistPrePageGroup() before calling this. (call only when true)
      * <pre>
      * e.g. group-size=10, current-page=12
@@ -259,7 +259,7 @@ public class PageGroupBean implements Serializable {
     }
 
     /**
-     * Get the value of nextGroupNearestPageNumber that is calculated. <br />
+     * Get the value of nextGroupNearestPageNumber that is calculated. <br>
      * You should use this.isExistNextPageGroup() before calling this. (call only when true)
      * <pre>
      * e.g. group-size=10, current-page=12

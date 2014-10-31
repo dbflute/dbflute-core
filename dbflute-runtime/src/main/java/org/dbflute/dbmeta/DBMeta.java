@@ -69,14 +69,14 @@ public interface DBMeta {
     //                                                                    ================
     // these fields and methods should be defined before definitions of column info at implementation classes
     /**
-     * Find the property gateway of the entity for the column. <br />
+     * Find the property gateway of the entity for the column. <br>
      * @param propertyName The property name of the column as case insensitive for performance. (NotNull)
      * @return The instance of the property gateway. (NullAllowed: if not found, returns null)
      */
     PropertyGateway findPropertyGateway(String propertyName);
 
     /**
-     * Find the foreign property gateway of the entity for the relation. <br />
+     * Find the foreign property gateway of the entity for the relation. <br>
      * @param foreignPropertyName The property name of the relation as case insensitive for performance. (NotNull)
      * @return The instance of the property gateway. (NullAllowed: if not found, returns null)
      */
@@ -110,7 +110,7 @@ public interface DBMeta {
     String getTableAlias();
 
     /**
-     * Get the comment of the table. <br />
+     * Get the comment of the table. <br>
      * If the real comment contains the alias,
      * this result does NOT contain it and its delimiter.  
      * @return The comment of the table. (NullAllowed: when it cannot get a comment from meta)
@@ -149,7 +149,7 @@ public interface DBMeta {
     //                                                                         Unique Info
     //                                                                         ===========
     /**
-     * Get primary unique info that means unique info for primary key. <br />
+     * Get primary unique info that means unique info for primary key. <br>
      * If this table does not have primary-key, this method throws UnsupportedOperationException.
      * @return Primary unique info. (NotNull)
      */
@@ -162,7 +162,7 @@ public interface DBMeta {
     boolean hasPrimaryKey();
 
     /**
-     * Does this table have compound primary-key? <br />
+     * Does this table have compound primary-key? <br>
      * If this table does not have primary-key in the first place,
      * this method returns false. 
      * @return The determination, true or false.
@@ -460,7 +460,7 @@ public interface DBMeta {
     void acceptPrimaryKeyMap(Entity entity, Map<String, ? extends Object> primaryKeyMap);
 
     /**
-     * Accept the map of all columns. map:{[column-name] = [value]}<br />
+     * Accept the map of all columns. map:{[column-name] = [value]}<br>
      * Derived columns are not accepted, physical columns only.
      * @param entity The instance of entity to accept the map data. (NotNull)
      * @param allColumnMap The value map of all columns. (NotNull, NotEmpty)
@@ -478,7 +478,7 @@ public interface DBMeta {
     Map<String, Object> extractPrimaryKeyMap(Entity entity);
 
     /**
-     * Extract The map of all columns. map:{[column-name] = [value]}<br />
+     * Extract The map of all columns. map:{[column-name] = [value]}<br>
      * Derived columns are not extracted, physical columns only.
      * @param entity The instance of entity to extract the data. (NotNull)
      * @return The map of all columns. (NotNull)

@@ -35,7 +35,7 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 
 /**
- * The connection wrapper that is not closed in the method 'close()'. <br />
+ * The connection wrapper that is not closed in the method 'close()'. <br>
  * The method 'close()' do not close really. Only gets out an actual connection.
  * @author jflute
  * @since 0.9.5 (2009/04/29 Wednesday)
@@ -67,7 +67,7 @@ public class NotClosingConnectionWrapper implements Connection {
     }
 
     /**
-     * Keep the actual connection in this wrapper even if closed. <br />
+     * Keep the actual connection in this wrapper even if closed. <br>
      * You can use the connection after closing.
      */
     public void keepActualIfClosed() {
@@ -76,7 +76,7 @@ public class NotClosingConnectionWrapper implements Connection {
 
     /**
      * Close the actual connection really if exists.
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public void closeActualReally() throws SQLException {
         if (_actualConnection != null) {

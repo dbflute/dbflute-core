@@ -30,7 +30,7 @@ import org.dbflute.util.DfResourceUtil;
 import org.dbflute.util.DfTypeUtil;
 
 /**
- * The value type for CLOB type. <br />
+ * The value type for CLOB type. <br>
  * This class's main target is Oracle.
  * @author modified by jflute (originated in Seasar2)
  */

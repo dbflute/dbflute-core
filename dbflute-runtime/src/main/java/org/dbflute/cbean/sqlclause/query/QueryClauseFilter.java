@@ -44,7 +44,7 @@ public interface QueryClauseFilter {
     String filterClauseElement(String clauseElement);
 
     /**
-     * The simple filter for query clause to embedded. <br />
+     * The simple filter for query clause to embedded. <br>
      * Attention: Searching column is not perfect. This class determines by column name only!
      * So when there are same-name column between tables, both are target!
      * @author jflute
@@ -97,7 +97,7 @@ public interface QueryClauseFilter {
     }
 
     /**
-     * The simple filter for query clause to embedded and quoted. <br />
+     * The simple filter for query clause to embedded and quoted. <br>
      * Attention: Searching column is not perfect. This class determines by column name only!
      * So when there are same-name column between tables, both are target!
      * @author jflute

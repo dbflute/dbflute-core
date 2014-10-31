@@ -45,7 +45,7 @@ import org.dbflute.helper.token.line.LineTokenizingOption;
 import org.dbflute.util.Srl;
 
 /**
- * The handler of token file. <br />
+ * The handler of token file. <br>
  * You can read/write the token file.
  * <pre>
  * e.g. Tokenize (read)
@@ -95,7 +95,7 @@ public class FileToken {
     //                                                                     Tokenize (read)
     //                                                                     ===============
     /**
-     * Tokenize (read) the token data from the specified file. (file-tokenizing) <br />
+     * Tokenize (read) the token data from the specified file. (file-tokenizing) <br>
      * CR + LF is treated as LF.
      * <pre>
      * File tsvFile = ... <span style="color: #3F7E5E">// input file</span>
@@ -133,9 +133,9 @@ public class FileToken {
     }
 
     /**
-     * Tokenize (read) token data to specified file. (named file-tokenizing) <br />
-     * CR + LF is treated as LF. <br />
-     * This method uses {@link InputStreamReader} and {@link BufferedReader} that wrap the stream. <br />
+     * Tokenize (read) token data to specified file. (named file-tokenizing) <br>
+     * CR + LF is treated as LF. <br>
+     * This method uses {@link InputStreamReader} and {@link BufferedReader} that wrap the stream. <br>
      * And these objects are closed. (close() called finally)
      * <pre>
      * File tsvFile = ... <span style="color: #3F7E5E">// input file</span>
@@ -474,8 +474,8 @@ public class FileToken {
     }
 
     /**
-     * Make (write) token file by row writer that accepts row resources. <br />
-     * This method uses {@link OutputStreamWriter} and {@link BufferedWriter} that wrap the stream. <br />
+     * Make (write) token file by row writer that accepts row resources. <br>
+     * This method uses {@link OutputStreamWriter} and {@link BufferedWriter} that wrap the stream. <br>
      * And these objects are closed. (close() called finally)
      * <pre>
      * File tsvFile = ... <span style="color: #3F7E5E">// output file</span>

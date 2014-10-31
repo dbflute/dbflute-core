@@ -21,7 +21,7 @@ import java.util.Properties;
 import org.dbflute.util.DfStringUtil;
 
 /**
- * The properties of behavior filter. <br />
+ * The properties of behavior filter. <br>
  * Basically closet properties.
  * @author jflute
  */

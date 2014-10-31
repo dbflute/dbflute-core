@@ -33,7 +33,7 @@ import org.dbflute.cbean.ConditionBean;
 public interface UnionQuery<UNION_CB extends ConditionBean> {
 
     /**
-     * Set up your query condition for union. <br />
+     * Set up your query condition for union. <br>
      * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
      * @param unionCB The condition-bean for union. (NotNull)

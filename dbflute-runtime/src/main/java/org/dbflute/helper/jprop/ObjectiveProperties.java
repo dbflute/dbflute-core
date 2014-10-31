@@ -28,7 +28,7 @@ import org.dbflute.util.DfTypeUtil.ParseDateNumberFormatException;
 import org.dbflute.util.DfTypeUtil.ParseDateOutOfCalendarException;
 
 /**
- * The properties object that can be objective. <br />
+ * The properties object that can be objective. <br>
  * You can make properties that extends other (super) properties.
  * @author jflute
  * @since 1.0.1 (2012/12/30 Sunday)
@@ -87,7 +87,7 @@ public class ObjectiveProperties {
     }
 
     /**
-     * Enable implicit override check. <br />
+     * Enable implicit override check. <br>
      * If the property existing in super-properties is set in sub-properties implicitly,
      * an exception is thrown (you can detect the wrong situation).
      * You can override by override annotation in the line comment like this:
@@ -105,7 +105,7 @@ public class ObjectiveProperties {
     }
 
     /**
-     * Encode the stream to the properties file as UTF-8. <br />
+     * Encode the stream to the properties file as UTF-8. <br>
      * If not use this, encoded as default encoding.
      * @return this. (NotNull)
      */
@@ -118,7 +118,7 @@ public class ObjectiveProperties {
     //                                                                     Load Properties
     //                                                                     ===============
     /**
-     * Load properties. <br />
+     * Load properties. <br>
      * You can get properties after loading.
      * @return this. (NotNull)
      */

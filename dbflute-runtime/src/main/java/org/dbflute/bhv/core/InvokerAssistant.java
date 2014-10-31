@@ -29,6 +29,7 @@ import org.dbflute.jdbc.SQLExceptionDigger;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.optional.RelationOptionalFactory;
+import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
@@ -54,7 +55,7 @@ public interface InvokerAssistant {
     DBMetaProvider assistDBMetaProvider();
 
     /**
-     * Assist the creator of SQL clause. <br />
+     * Assist the creator of SQL clause. <br>
      * This is only used in internal world of DBFlute (to judge unique-constraint).
      * So condition-bean does not use this.
      * @return The instance of creator. (NotNull)
@@ -77,7 +78,7 @@ public interface InvokerAssistant {
     RelationOptionalFactory assistRelationOptionalFactory();
 
     /**
-     * Assist the factory of SQL analyzer. <br />
+     * Assist the factory of SQL analyzer. <br>
      * This factory is also used on ConditionBean.toDisplaySql().
      * So this method should be state-less.
      * @return The instance of factory. (NotNull)
@@ -85,7 +86,12 @@ public interface InvokerAssistant {
     SqlAnalyzerFactory assistSqlAnalyzerFactory();
 
     /**
-     * Assist the factory of outside SQL executor.
+     * @return The first option of outside-SQL. (NullAllowed: if null, lazy-loaded)
+     */
+    OutsideSqlOption assistFirstOutsideSqlOption();
+
+    /**
+     * Assist the factory of outside-SQL executor.
      * @return The instance of factory. (NotNull)
      */
     OutsideSqlExecutorFactory assistOutsideSqlExecutorFactory();

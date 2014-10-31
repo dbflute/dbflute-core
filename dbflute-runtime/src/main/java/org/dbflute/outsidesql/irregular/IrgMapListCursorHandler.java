@@ -24,8 +24,8 @@ import org.dbflute.jdbc.CursorHandler;
 import org.dbflute.s2dao.rshandler.TnMapListResultSetHandler;
 
 /**
- * The cursor handler returning list for map. <br />
- * Normally it should not be used. <br />
+ * The cursor handler returning list for map. <br>
+ * Normally it should not be used. <br>
  * Basically only for direct SQL when it cannot be helped.
  * @author jflute
  * @since 1.0.5F (2014/05/12 Monday)

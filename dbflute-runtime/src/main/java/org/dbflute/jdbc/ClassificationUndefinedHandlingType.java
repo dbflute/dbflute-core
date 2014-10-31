@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The handling type of undefined classification code. <br />
+ * The handling type of undefined classification code. <br>
  * It's an internal type for DBFlute runtime.
  * @author jflute
  * @since 1.0.5K (2014/08/20 Wednesday)

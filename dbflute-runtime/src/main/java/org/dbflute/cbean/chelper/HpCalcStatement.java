@@ -23,7 +23,7 @@ import java.util.Map;
 public interface HpCalcStatement {
 
     /**
-     * Build the calculation statement of the column as SQL name. <br />
+     * Build the calculation statement of the column as SQL name. <br>
      * e.g. called by Update Calculation
      * @param aliasName The alias name of the target column, containing dot mark. (NullAllowed)
      * @return The statement that has calculation. (NullAllowed: if null, means the column is not specified)
@@ -31,7 +31,7 @@ public interface HpCalcStatement {
     String buildStatementAsSqlName(String aliasName);
 
     /**
-     * Build the calculation statement to the specified column. <br />
+     * Build the calculation statement to the specified column. <br>
      * e.g. called by ColumnQuery Calculation
      * @param columnExp The expression of the column. (NotNull)
      * @return The statement that has calculation. (NullAllowed: if null, means the column is not specified)
@@ -39,8 +39,8 @@ public interface HpCalcStatement {
     String buildStatementToSpecifidName(String columnExp);
 
     /**
-     * Build the calculation statement to the specified column. <br />
-     * No cipher here because the column has already been handled cipher. <br />
+     * Build the calculation statement to the specified column. <br>
+     * No cipher here because the column has already been handled cipher. <br>
      * e.g. called by ManualOrder Calculation
      * @param columnExp The expression of the column. (NotNull)
      * @param columnAliasMap The map of column alias. (NotNull)

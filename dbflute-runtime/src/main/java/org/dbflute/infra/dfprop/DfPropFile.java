@@ -51,9 +51,9 @@ public class DfPropFile {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the map string file. <br />
-     * If the type of values is various type, this method is available. <br />
-     * A trimmed line that starts with '#' is treated as line comment. <br />
+     * Read the map string file. <br>
+     * If the type of values is various type, this method is available. <br>
+     * A trimmed line that starts with '#' is treated as line comment. <br>
      * This is the most basic method here.
      * <pre>
      * map:{
@@ -63,7 +63,7 @@ public class DfPropFile {
      *     ; ... = ...
      * }
      * </pre>
-     * And resolve property file, switched and extended file, for environment. <br />
+     * And resolve property file, switched and extended file, for environment. <br>
      * It returns merged properties like this:
      * <pre>
      * for example:
@@ -149,8 +149,8 @@ public class DfPropFile {
     }
 
     /**
-     * Read the map string file as string value. <br />
-     * If the type of all values is string type, this method is available. <br />
+     * Read the map string file as string value. <br>
+     * If the type of all values is string type, this method is available. <br>
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
      * e.g.
@@ -187,8 +187,8 @@ public class DfPropFile {
     }
 
     /**
-     * Read the map string file as string list value. <br />
-     * If the type of all values is string list type, this method is available. <br />
+     * Read the map string file as string list value. <br>
+     * If the type of all values is string list type, this method is available. <br>
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
      * e.g.
@@ -225,8 +225,8 @@ public class DfPropFile {
     }
 
     /**
-     * Read the map string file as string map value. <br />
-     * If the type of all values is string map type, this method is available. <br />
+     * Read the map string file as string map value. <br>
+     * If the type of all values is string map type, this method is available. <br>
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
      * e.g.
@@ -269,9 +269,9 @@ public class DfPropFile {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the list string file. <br />
-     * If the type of values is various type, this method is available. <br />
-     * A trimmed line that starts with '#' is treated as line comment. <br />
+     * Read the list string file. <br>
+     * If the type of values is various type, this method is available. <br>
+     * A trimmed line that starts with '#' is treated as line comment. <br>
      * <pre>
      * list:{
      *     ; element1
@@ -309,7 +309,7 @@ public class DfPropFile {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the string file. <br />
+     * Read the string file. <br>
      * A trimmed line that starts with '#' is treated as line comment.
      * @param dfpropPath The path of DBFlute property file. (NotNull)
      * @param envType The environment type of DBFlute. (NullAllowed: if null, no environment file)

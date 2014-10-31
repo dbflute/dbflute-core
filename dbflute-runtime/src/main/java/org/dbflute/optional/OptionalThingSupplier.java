@@ -13,12 +13,26 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.cbean.ordering;
+package org.dbflute.optional;
 
 /**
- * for compatibility
+ * The supplier of optional thing.
+ * <pre>
+ * Member member = entityOpt.<span style="color: #CC4747">orElseGet</span>(() -&gt; {
+ *     <span style="color: #3F7E5E">// called if value NOT exists, not called if present</span>
+ *     return new Member();
+ * });
+ * </pre>
+ * @param <RESULT> The type of result of mapping.
  * @author jflute
- * @since 1.1.0 (2014/10/06 Monday)
+ * @since 1.1.0 (2014/10/28 Tuesday)
  */
-public class ManualOrderBean extends ManualOrderOption {
+@FunctionalInterface
+public interface OptionalThingSupplier<RESULT> {
+
+    /**
+     * Get the object from the callback process.
+     * @return The result of getting. (NullAllowed: if null, returns null)
+     */
+    RESULT get();
 }

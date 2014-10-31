@@ -171,6 +171,6 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
     }
 
     protected String doBuildJavaDocLineAndIndent(String sourceCodeLineSeparator, String adjustedIndent) {
-        return "<br />" + sourceCodeLineSeparator + adjustedIndent + " * ";
+        return "<br>" + sourceCodeLineSeparator + adjustedIndent + " * ";
     }
 }

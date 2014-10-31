@@ -54,7 +54,7 @@ public class PageNumberLink implements Serializable {
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor. <br />
+     * Constructor. <br>
      * You can initialize attributes by initialize() after this creation.
      */
     public PageNumberLink() {

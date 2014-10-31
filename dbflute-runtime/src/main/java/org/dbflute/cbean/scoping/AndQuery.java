@@ -39,7 +39,7 @@ import org.dbflute.cbean.ConditionBean;
 public interface AndQuery<AND_CB extends ConditionBean> {
 
     /**
-     * Set up your query condition for and-query. <br />
+     * Set up your query condition for and-query. <br>
      * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
      * @param andCB The condition-bean for and-query. (NotNull)

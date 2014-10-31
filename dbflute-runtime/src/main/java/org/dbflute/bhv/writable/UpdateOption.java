@@ -102,7 +102,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                    Self Calculation
     //                                                                    ================
     /**
-     * Specify a self calculation as update value. <br />
+     * Specify a self calculation as update value. <br>
      * You can specify a column except PK column, common column and optimistic-lock column.
      * And you can specify only one column that is a number type.
      * <pre>
@@ -349,7 +349,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     //                                        Specify Column
     //                                        --------------
     /**
-     * Specify update columns manually. <br />
+     * Specify update columns manually. <br>
      * You can update fixed columns instead of modified update columns.
      * <pre>
      * Member member = new Member();
@@ -598,7 +598,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                       Common Column
     //                                                                       =============
     /**
-     * Disable auto-setup for common columns. <br />
+     * Disable auto-setup for common columns. <br>
      * You can update by your values for common columns.
      * <pre>
      * Member member = new Member();
@@ -625,7 +625,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                        Query Update
     //                                                                        ============
     /**
-     * Allow you to non-query-update (means query-update without a query condition). <br />
+     * Allow you to non-query-update (means query-update without a query condition). <br>
      * Normally it is not allowed, so you can do it by this option if you want.
      * @return The option of update. (NotNull: returns this)
      */
@@ -655,8 +655,8 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                       Batch Logging
     //                                                                       =============
     /**
-     * Limit batch-update logging by logging size. <br />
-     * For example, if you set 3, only 3 records are logged. <br />
+     * Limit batch-update logging by logging size. <br>
+     * For example, if you set 3, only 3 records are logged. <br>
      * This also works to SqlLogHandler's call-back and SqlResultInfo's displaySql.
      * @param batchLoggingUpdateLimit The limit size of batch-update logging. (NullAllowed: if null and minus, means no limit)
      */

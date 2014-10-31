@@ -113,7 +113,7 @@ public class SequenceCacheHandler {
     //                                                                      Union Sequence
     //                                                                      ==============
     /**
-     * Filter the SQL for next value. <br />
+     * Filter the SQL for next value. <br>
      * This method uses ResourceContext.
      * @param cacheSize The cache size of sequence. (NotNull, CacheValidSize)
      * @param incrementSize The increment size of sequence. (NotNull, NotMinus, NotZero)

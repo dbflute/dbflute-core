@@ -152,7 +152,7 @@ public class ReferrerInfo implements RelationInfo {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the value to the entity. <br />
+     * Read the value to the entity. <br>
      * It returns plain value in entity as property access type.
      * @param <PROPERTY> The type of property, basically entity list.
      * @param localEntity The local entity of this column to read. (NotNull)
@@ -175,7 +175,7 @@ public class ReferrerInfo implements RelationInfo {
     //                                                 Write
     //                                                 -----
     /**
-     * Write the value to the entity. <br />
+     * Write the value to the entity. <br>
      * No converting to anything so check the property access type.
      * @param localEntity The local entity of this column to write. (NotNull)
      * @param referrerEntityList The written list of referrer entity. (NullAllowed: if null, null written)
@@ -288,8 +288,8 @@ public class ReferrerInfo implements RelationInfo {
     }
 
     /**
-     * Get the property name of the foreign relation. <br />
-     * This is unique name in the table. <br />
+     * Get the property name of the foreign relation. <br>
+     * This is unique name in the table. <br>
      * For example, if the relation MEMBER and PURCHASE, this returns 'purchaseList'.
      * @return The string for property name. (NotNull)
      */
@@ -305,7 +305,7 @@ public class ReferrerInfo implements RelationInfo {
     }
 
     /**
-     * Get the DB meta of the referrer table. <br />
+     * Get the DB meta of the referrer table. <br>
      * For example, if the relation MEMBER and PURCHASE, this returns PURCHASE's one.
      * @return The DB meta singleton instance. (NotNull)
      */
@@ -344,7 +344,7 @@ public class ReferrerInfo implements RelationInfo {
     }
 
     /**
-     * {@inheritDoc} <br />
+     * {@inheritDoc} <br>
      * But basically this returns false because DBFlute treats one-to-one relations as a foreign relation.  
      */
     public boolean isOneToOne() {

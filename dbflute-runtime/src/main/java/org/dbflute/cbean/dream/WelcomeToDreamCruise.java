@@ -50,7 +50,7 @@ public interface WelcomeToDreamCruise {
      *      colCB.<span style="color: #CC4747">mysticRhythms</span>(toDate("2015/04/05"));
      *  }).convert(op -&gt; op.<span style="color: #994747">addDay</span>(cb.<span style="color: #994747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      * </pre>
-     * @param mysticBinding
+     * @param mysticBinding The mystic value of the column e.g. to compare with other column. (NotNull)
      */
     void mysticRhythms(Object mysticBinding); // #dream
 }

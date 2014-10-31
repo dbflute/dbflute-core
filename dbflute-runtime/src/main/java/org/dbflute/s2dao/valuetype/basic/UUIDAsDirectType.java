@@ -27,7 +27,7 @@ import org.dbflute.s2dao.valuetype.TnAbstractValueType;
 import org.dbflute.util.DfTypeUtil;
 
 /**
- * The value type of UUID as direct handling. <br />
+ * The value type of UUID as direct handling. <br>
  * This value type is available if the JDBC driver allows UUID type, for example when binding.
  * @author jflute
  */

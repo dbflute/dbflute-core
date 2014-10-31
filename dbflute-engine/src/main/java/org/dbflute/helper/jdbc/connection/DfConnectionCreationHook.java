@@ -26,7 +26,7 @@ public interface DfConnectionCreationHook {
 
     /**
      * @param conn The new-created connection. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     void hook(Connection conn) throws SQLException;
 }

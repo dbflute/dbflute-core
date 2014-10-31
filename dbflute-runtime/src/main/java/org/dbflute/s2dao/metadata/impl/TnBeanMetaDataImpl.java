@@ -41,13 +41,13 @@ import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 
 /**
- * The implementation as S2Dao of bean meta data. <br />
+ * The implementation as S2Dao of bean meta data. <br>
  * This class has sub-class extended by DBFlute.
  * <pre>
  * {@link TnBeanMetaDataImpl} is close to S2Dao logic
  * The extension in {@link TnBeanMetaDataFactoryExtension} has DBFlute logic
  * </pre>
- * DBFlute depended on S2Dao before 0.9.0. <br />
+ * DBFlute depended on S2Dao before 0.9.0. <br>
  * It saves these structure to be easy to know what DBFlute extends it.
  * @author modified by jflute (originated in S2Dao)
  */

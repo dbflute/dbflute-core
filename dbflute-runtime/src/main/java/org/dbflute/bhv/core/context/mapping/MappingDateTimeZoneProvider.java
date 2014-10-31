@@ -24,7 +24,7 @@ import java.util.TimeZone;
 public interface MappingDateTimeZoneProvider {
 
     /**
-     * Provide the time-zone for conversion in value type mapping. <br />
+     * Provide the time-zone for conversion in value type mapping. <br>
      * This might be called many times, so take care of performance.
      * @return The time-zone for conversion in value type mapping. (NullAllowed: if null, default zone)
      */

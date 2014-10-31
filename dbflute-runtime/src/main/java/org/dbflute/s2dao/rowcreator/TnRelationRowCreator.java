@@ -39,7 +39,7 @@ public interface TnRelationRowCreator {
      * @param relRowCache The cache of relation row. (NotNull)
      * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
      * @return The created row of the relation. (NullAllowed: if null, no data about the relation)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
             Map<String, Map<String, Integer>> selectIndexMap, TnRelationKey relKey,
@@ -53,7 +53,7 @@ public interface TnRelationRowCreator {
      * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
      * @param baseBmd Bean meta data of base object. (NotNull)
      * @return The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Map<String, String> selectColumnMap,
             Map<String, Map<String, Integer>> selectIndexMap, TnRelationSelector relSelector, TnBeanMetaData baseBmd) throws SQLException;

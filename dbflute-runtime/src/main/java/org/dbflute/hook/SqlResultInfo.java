@@ -73,7 +73,7 @@ public class SqlResultInfo {
     }
 
     /**
-     * Get the result of SQL execution (mapped to entity if select). <br />
+     * Get the result of SQL execution (mapped to entity if select). <br>
      * @return The instance of result. (NullAllowed)
      */
     public Object getResult() {

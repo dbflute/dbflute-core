@@ -21,7 +21,7 @@ import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.jdbc.StatementFactory;
 
 /**
- * The basic command to execute SQL. <br />
+ * The basic command to execute SQL. <br>
  * This is basically reused on executing so it's thread safe.
  * @author modified by jflute (originated in S2Dao)
  */

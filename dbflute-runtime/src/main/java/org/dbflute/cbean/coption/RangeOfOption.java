@@ -56,7 +56,7 @@ public class RangeOfOption implements ConditionOption, ColumnCalculator {
     //                                               Operand
     //                                               -------
     /**
-     * Set up operand for min number as greater-than. <br />
+     * Set up operand for min number as greater-than. <br>
      * This is for manual adjustment.
      * @return this. (NotNull)
      */
@@ -66,13 +66,21 @@ public class RangeOfOption implements ConditionOption, ColumnCalculator {
     }
 
     /**
-     * Set up operand for max number as less-than. <br />
+     * Set up operand for max number as less-than. <br>
      * This is for manual adjustment.
      * @return this. (NotNull)
      */
     public RangeOfOption lessThan() {
         _lessThan = true;
         return this;
+    }
+
+    public boolean isGreaterThan() { // basically for framework
+        return _greaterThan;
+    }
+
+    public boolean isLessThan() { // basically for framework
+        return _lessThan;
     }
 
     protected void clearOperand() {
@@ -93,7 +101,15 @@ public class RangeOfOption implements ConditionOption, ColumnCalculator {
     }
 
     /**
-     * Allow you to set one-side only condition. (null allowed) <br />
+     * Does it add or-is-null to the condition?
+     * @return The determination, true or false.
+     */
+    public boolean isOrIsNull() { // basically for framework
+        return _orIsNull;
+    }
+
+    /**
+     * Allow you to set one-side only condition. (null allowed) <br>
      * If you ignore null-or-empty query, you don't need to call this.
      * @return this. (NotNull)
      */
@@ -103,10 +119,10 @@ public class RangeOfOption implements ConditionOption, ColumnCalculator {
     }
 
     /**
-     * Does it allow you to set one-side only condition. <br />
+     * Does it allow you to set one-side only condition.
      * @return The determination, true or false.
      */
-    public boolean isOneSideAllowed() {
+    public boolean isOneSideAllowed() { // basically for framework
         return _oneSideAllowed;
     }
 
@@ -369,8 +385,11 @@ public class RangeOfOption implements ConditionOption, ColumnCalculator {
         final String title = DfTypeUtil.toClassTitle(this);
         final StringBuilder sb = new StringBuilder();
         sb.append(title);
-        sb.append(":{greaterThan=").append(_greaterThan).append(", lessThan=").append(_lessThan);
-        sb.append(", orIsNull=").append(_orIsNull).append("}");
+        sb.append(":{greaterThan=").append(_greaterThan);
+        sb.append(", lessThan=").append(_lessThan);
+        sb.append(", orIsNull=").append(_orIsNull);
+        sb.append(", allowOneSide=").append(_oneSideAllowed);
+        sb.append(", calcSpec=").append(_calcSpecification).append("}");
         return sb.toString();
     }
 }

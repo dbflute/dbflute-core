@@ -48,6 +48,7 @@ import org.dbflute.jdbc.SQLExceptionDigger;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.optional.RelationOptionalFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
+import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.outsidesql.executor.OutsideSqlAllFacadeExecutor;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.dbflute.system.DBFluteSystem;
@@ -702,7 +703,8 @@ public class BehaviorCommandInvoker {
         final OutsideSqlExecutorFactory factory = _invokerAssistant.assistOutsideSqlExecutorFactory();
         final DBDef dbdef = _invokerAssistant.assistCurrentDBDef();
         final StatementConfig config = _invokerAssistant.assistDefaultStatementConfig();
-        return factory.createAllFacade(factory.createBasic(this, tableDbName, dbdef, config, null));
+        final OutsideSqlOption outsideSqlOption = _invokerAssistant.assistFirstOutsideSqlOption();
+        return factory.createAllFacade(factory.createBasic(this, tableDbName, dbdef, config, outsideSqlOption));
     }
 
     // ===================================================================================

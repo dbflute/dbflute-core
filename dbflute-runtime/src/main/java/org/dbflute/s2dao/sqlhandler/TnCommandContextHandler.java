@@ -124,7 +124,7 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Set the list of bound property type in first scope. <br />
+     * Set the list of bound property type in first scope. <br>
      * You can specify original value types for properties in first scope.
      * @param firstBoundPropTypeList The list of bound property type. (NullAllowed)
      */

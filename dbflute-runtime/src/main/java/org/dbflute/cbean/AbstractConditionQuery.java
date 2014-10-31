@@ -438,7 +438,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                          Outer Join
     //                                                                          ==========
     /**
-     * Register outer-join. <br />
+     * Register outer-join. <br>
      * Optional info, fixed condition and fixed in-line, are resolved in this method.
      * @param foreignCQ The condition-query for foreign table. (NotNull)
      * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
@@ -1049,7 +1049,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return date;
     }
 
-    protected Object xtoFromToLocalDate(Object date, String columnDbName, FromToOption option) {
+    protected Object xtoFromToLocalDate(Object date, String columnDbName, FromToOption option) { // #dateParade
         final TimeZone realZone = xchooseFromToRealTimeZone(columnDbName, option);
         return DfTypeUtil.toLocalDate(date, realZone);
     }
@@ -1764,7 +1764,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                          Inner Join
     //                                                                          ==========
     /**
-     * Change the join type for this relation to inner join. <br />
+     * Change the join type for this relation to inner join. <br>
      * This method is for PERFORMANCE TUNING basically.
      */
     public void innerJoin() {
@@ -2062,11 +2062,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         final String methodName = xbuildQuerySetMethodName(ckey, columnCapPropName);
         final List<Class<?>> typeList = newArrayListSized(4);
+        final Class<?> propertyType = columnInfo.getObjectNativeType();
         if (fromTo) {
-            typeList.add(Date.class);
-            typeList.add(Date.class);
+            if (LocalDate.class.isAssignableFrom(propertyType)) { // #dateParade
+                typeList.add(propertyType);
+                typeList.add(propertyType);
+            } else if (LocalDateTime.class.isAssignableFrom(propertyType)) {
+                typeList.add(propertyType);
+                typeList.add(propertyType);
+            } else { // fixedly util.Date
+                typeList.add(Date.class);
+                typeList.add(Date.class);
+            }
         } else if (rangeOf) {
-            final Class<?> propertyType = columnInfo.getObjectNativeType();
             typeList.add(propertyType);
             typeList.add(propertyType);
         } else {
@@ -2438,7 +2446,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /**
-     * Filter removing an empty string as null. <br />
+     * Filter removing an empty string as null. <br>
      * You can extend this to use an empty string value as condition.
      * @param value The string value for query. (NullAllowed)
      * @return Filtered value. (NullAllowed)
@@ -2738,8 +2746,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                  ColumnQuery Object
     //                                                                  ==================
     /**
-     * Get the condition-bean map of ColumnQuery for parameter comment. {Internal}. <br />
-     * This is basically for (Specify)DerivedReferrer's bind conditions in ColumnQuery. <br />
+     * Get the condition-bean map of ColumnQuery for parameter comment. {Internal}. <br>
+     * This is basically for (Specify)DerivedReferrer's bind conditions in ColumnQuery. <br>
      * The value is treated as Object type because this will be only called from parameter comment.
      * @return The instance of the map. (NullAllowed)
      */
@@ -2965,9 +2973,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                         -------------
     /**
      * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @throws IllegalArgumentException
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
+     * @throws IllegalArgumentException When the argument is null.
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
@@ -2982,8 +2990,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /**
      * Assert that the column-name is not null and is not empty and does not contain comma.
-     * @param columnName Column-name. (NotNull)
-     * @throws IllegalArgumentException
+     * @param columnName The checked name of column. (NotNull)
+     * @throws IllegalArgumentException When the argument is invalid.
      */
     protected void assertColumnName(String columnName) {
         if (columnName == null) {
@@ -3002,8 +3010,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /**
      * Assert that the alias-name is not null and is not empty and does not contain comma.
-     * @param aliasName Alias-name. (NotNull)
-     * @throws IllegalArgumentException
+     * @param aliasName The checked name for alias. (NotNull)
+     * @throws IllegalArgumentException When the argument is invalid.
      */
     protected void assertAliasName(String aliasName) {
         if (aliasName == null) {
@@ -3025,8 +3033,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                         -------------
     /**
      * Assert that the string is not null and not trimmed empty.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
+     * @throws IllegalArgumentException When the argument is null or empty.
      */
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);

@@ -50,7 +50,7 @@ import org.dbflute.Entity;
 public interface ReferrerListHandler<REFERRER extends Entity> {
 
     /**
-     * Handle the list of referrer to load nested referrer. <br />
+     * Handle the list of referrer to load nested referrer. <br>
      * You can call LoadReferrer for nested table.
      * <pre>
      * MemberCB cb = new MemberCB();

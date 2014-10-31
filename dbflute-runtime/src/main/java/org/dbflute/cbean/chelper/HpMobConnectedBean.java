@@ -166,7 +166,7 @@ public class HpMobConnectedBean {
     //                                                                          Then Value
     //                                                                          ==========
     /**
-     * Add 'then' value to the last case-when element. (Basically for SwitchOrder) <br />
+     * Add 'then' value to the last case-when element. (Basically for SwitchOrder) <br>
      * You should also set 'then' values to other elements and set 'else' value.
      * @param thenValue The value for 'then', String, Integer, Date, DreamCruiseTicket... (NotNull)
      */

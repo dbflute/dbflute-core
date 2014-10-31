@@ -30,7 +30,7 @@ public interface DataSourceHandler {
      * Get the connection from the data source.
      * @param dataSource The data source for a database connection. (NotNull)
      * @return The database connection. (NotNull)
-     * @throws java.sql.SQLException
+     * @throws SQLException When it fails to get connection.
      */
     Connection getConnection(DataSource dataSource) throws SQLException;
 }

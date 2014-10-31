@@ -139,7 +139,7 @@ public enum DBDef {
     //                                                                          Switch Way
     //                                                                          ==========
     /**
-     * Switch from the old DB-way to the specified DB-way for the DB. (automatically locked after setting) <br />
+     * Switch from the old DB-way to the specified DB-way for the DB. (automatically locked after setting) <br>
      * You should call this in application initialization if it needs.
      * @param dbway The new DB-way of the DB. (NotNull)
      */

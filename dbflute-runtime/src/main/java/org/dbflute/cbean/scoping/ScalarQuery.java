@@ -34,7 +34,7 @@ import org.dbflute.cbean.ConditionBean;
 public interface ScalarQuery<CB extends ConditionBean> {
 
     /**
-     * Set up your query condition for scalar-query. <br />
+     * Set up your query condition for scalar-query. <br>
      * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
      * @param cb The condition-bean for scalar-query. (NotNull)

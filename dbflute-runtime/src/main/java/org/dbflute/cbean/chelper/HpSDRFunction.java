@@ -332,7 +332,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     //                                       User Definition
     //                                       ---------------
     /**
-     * Basically for database dependency (DBMS sub-class). {Internal} <br />
+     * Basically for database dependency (DBMS sub-class). {Internal} <br>
      * Not public because of condition-bean policy: cannot input SQL string.
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)

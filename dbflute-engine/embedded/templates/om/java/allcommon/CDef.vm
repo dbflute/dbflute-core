@@ -114,9 +114,9 @@ public interface ${glCDef} extends Classification {
 #end
 #foreach ($group in $classificationTop.groupList)
         /**
-         * Is the classification in the group? <br />
+         * Is the classification in the group? <br>
 #if ($group.hasGroupComment())
-         * ${group.groupCommentForJavaDocNest} <br />
+         * ${group.groupCommentForJavaDocNest} <br>
 #end
          * ${group.buildElementDisp()}
          * @return The determination, true or false.
@@ -164,9 +164,9 @@ public interface ${glCDef} extends Classification {
 #foreach ($group in $classificationTop.groupList)
 
         /**
-         * Get the list of group classification elements. (returns new copied list) <br />
+         * Get the list of group classification elements. (returns new copied list) <br>
 #if ($group.hasGroupComment())
-         * ${group.groupCommentForJavaDocNest} <br />
+         * ${group.groupCommentForJavaDocNest} <br>
 #end
          * ${group.buildElementDisp()}
          * @return The list of classification elements in the group. (NotNull)
@@ -177,7 +177,7 @@ public interface ${glCDef} extends Classification {
 #end
 
         /**
-         * Get the list of classification elements in the specified group. (returns new copied list) <br />
+         * Get the list of classification elements in the specified group. (returns new copied list) <br>
          * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
          * @return The list of classification elements in the group. (NotNull)
          */

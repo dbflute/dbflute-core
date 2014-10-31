@@ -41,13 +41,13 @@ public interface ValueType {
     // = = = = = = = = = =/
 
     /**
-     * Bind the value. <br />
+     * Bind the value. <br>
      * Also used to procedures instead of bindValue(CallableStatement).
      * @param conn The connection for the database. (NotNull)
      * @param ps The prepared statement. (NotNull)
      * @param index The parameter index.
      * @param value The parameter value. (NullAllowed)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException;
 

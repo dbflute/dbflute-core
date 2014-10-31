@@ -172,7 +172,7 @@ public class ForeignInfo implements RelationInfo {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the value to the entity by its gateway (means no reflection). <br />
+     * Read the value to the entity by its gateway (means no reflection). <br>
      * It returns plain value in entity as property access type.
      * @param <PROPERTY> The type of property, might be optional.
      * @param localEntity The local entity of this column to read. (NotNull)
@@ -195,7 +195,7 @@ public class ForeignInfo implements RelationInfo {
     //                                                 Write
     //                                                 -----
     /**
-     * Write the value to the entity by its gateway (means no reflection). <br />
+     * Write the value to the entity by its gateway (means no reflection). <br>
      * No converting to optional so check the property access type.
      * @param localEntity The local entity of this column to write. (NotNull)
      * @param foreignEntity The written instance of foreign entity, might be optional. (NullAllowed: if null, null written)
@@ -317,8 +317,8 @@ public class ForeignInfo implements RelationInfo {
     }
 
     /**
-     * Get the property name of the foreign relation. <br />
-     * This is unique name in the table. <br />
+     * Get the property name of the foreign relation. <br>
+     * This is unique name in the table. <br>
      * For example, if the member entity has getMemberStatus(), this returns 'memberStatus'.
      * @return The string for property name. (NotNull)
      */
@@ -334,7 +334,7 @@ public class ForeignInfo implements RelationInfo {
     }
 
     /**
-     * Get the DB meta of the foreign table. <br />
+     * Get the DB meta of the foreign table. <br>
      * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER_STATUS's one.
      * @return The DB meta singleton instance. (NotNull)
      */

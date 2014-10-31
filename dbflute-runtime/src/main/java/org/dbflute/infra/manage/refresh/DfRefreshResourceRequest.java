@@ -25,7 +25,7 @@ import java.util.List;
 import org.dbflute.util.Srl;
 
 /**
- * The request of (Eclipse's) refresh resource. <br />
+ * The request of (Eclipse's) refresh resource. <br>
  * You can refresh automatically by this.
  * <pre>
  * DfRefreshResourceRequest request

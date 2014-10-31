@@ -18,8 +18,8 @@ package org.dbflute.cbean.scoping;
 import org.dbflute.cbean.ConditionBean;
 
 /**
- * The interface of next-stage query, that means it sets up condition for the next select statement. <br />
- * It contains sub-query, union-query. <br />
+ * The interface of next-stage query, that means it sets up condition for the next select statement. <br>
+ * It contains sub-query, union-query. <br>
  * You can handle the query without their differences by this interface.
  * @author jflute
  * @param <CB> The type of condition-bean.

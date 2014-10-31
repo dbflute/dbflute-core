@@ -34,7 +34,7 @@ import org.dbflute.cbean.ConditionBean;
 public interface OrQuery<OR_CB extends ConditionBean> {
 
     /**
-     * Set up your query condition for or-query. <br />
+     * Set up your query condition for or-query. <br>
      * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
      * and they are ignored if you call.
      * @param orCB The condition-bean for or-query. (NotNull)

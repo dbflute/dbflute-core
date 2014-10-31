@@ -23,7 +23,7 @@ import org.dbflute.cbean.coption.DerivedReferrerOptionFactory;
 import org.dbflute.dbmeta.DBMetaProvider;
 
 /**
- * The Oracle function for (Specify)DerivedReferrer. <br />
+ * The Oracle function for (Specify)DerivedReferrer. <br>
  * <span style="color: #CC4747">This is base implementation for #future needs.</span>
  * @param <REFERRER_CB> The type of referrer condition-bean.
  * @param <LOCAL_CQ> The type of local condition-query.

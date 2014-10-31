@@ -177,7 +177,7 @@ public class HpColQyOperand<CB extends ConditionBean> {
         }
 
         /**
-         * BitAnd(&).
+         * BitAnd(&amp;).
          * @param rightSpecifyQuery The specify-query for right column. (NotNull)
          * @return The calculator for right column. (NotNull)
          */

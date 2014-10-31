@@ -35,7 +35,7 @@ public interface HpColumnSpHandler {
     //                                                                        Theme Column
     //                                                                        ============
     /**
-     * Specify every column in the table. <br />
+     * Specify every column in the table. <br>
      * You cannot use normal SpecifyColumn with this method.
      * <p>no check of modified properties in entities when BatchUpdate.</p>
      */
@@ -44,8 +44,8 @@ public interface HpColumnSpHandler {
     boolean isSpecifiedEveryColumn();
 
     /**
-     * Specify columns except record meta columns. <br />
-     * You cannot use normal SpecifyColumn with this method. <br />
+     * Specify columns except record meta columns. <br>
+     * You cannot use normal SpecifyColumn with this method. <br>
      * <p>Basically you don't need this when BatchUpdate
      * because record meta columns are automatically controlled.</p>
      */

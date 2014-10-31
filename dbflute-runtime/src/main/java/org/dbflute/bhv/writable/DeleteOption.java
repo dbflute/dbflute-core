@@ -48,7 +48,7 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                        Query Delete
     //                                                                        ============
     /**
-     * Allow you to non-query-delete (means query-delete without a query condition). <br />
+     * Allow you to non-query-delete (means query-delete without a query condition). <br>
      * Normally it is not allowed, so you can do it by this option if you want.
      * @return The option of delete. (NotNull: returns this)
      */
@@ -78,8 +78,8 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                       Batch Logging
     //                                                                       =============
     /**
-     * Limit batch-delete logging by logging size. <br />
-     * For example, if you set 3, only 3 records are logged. <br />
+     * Limit batch-delete logging by logging size. <br>
+     * For example, if you set 3, only 3 records are logged. <br>
      * This also works to SqlLogHandler's call-back and SqlResultInfo's displaySql.
      * @param batchDeleteLoggingLimit The limit size of batch-delete logging. (NullAllowed: if null and minus, means no limit)
      */

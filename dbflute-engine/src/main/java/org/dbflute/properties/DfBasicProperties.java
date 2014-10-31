@@ -37,7 +37,7 @@ import org.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 import org.dbflute.util.Srl;
 
 /**
- * The basic properties for DBFlute property. <br />
+ * The basic properties for DBFlute property. <br>
  * This class is very important for DBFlute.
  * @author jflute
  */
@@ -299,16 +299,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getTargetContainerName().trim().equalsIgnoreCase("spring");
     }
 
-    public boolean isTargetContainerLucy() {
-        return getTargetContainerName().trim().equalsIgnoreCase("lucy");
-    }
-
     public boolean isTargetContainerGuice() {
         return getTargetContainerName().trim().equalsIgnoreCase("guice");
-    }
-
-    public boolean isTargetContainerSlim3() {
-        return getTargetContainerName().trim().equalsIgnoreCase("slim3");
     }
 
     public boolean isTargetContainerCDI() {
@@ -317,11 +309,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
 
     protected void checkContainer(String containerName) {
         containerName = containerName.toLowerCase();
-        if (Srl.equalsPlain(containerName, "seasar", "spring", "lucy", "guice", "slim3", "cdi")) {
+        if (Srl.equalsPlain(containerName, "seasar", "spring", "guice", "cdi")) {
             return;
         }
-        String msg = "The targetContainer is unknown:";
-        msg = msg + " targetContainer=" + containerName;
+        String msg = "The targetContainer is unknown: targetContainer=" + containerName;
         throw new IllegalStateException(msg);
     }
 

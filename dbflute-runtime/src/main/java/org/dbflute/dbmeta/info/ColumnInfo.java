@@ -19,6 +19,9 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,29 +56,22 @@ public class ColumnInfo {
     /** The empty read-only list for empty property. */
     protected static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<String>());
 
-    /** The type name of JodaTime's just date. */
-    protected static final String JODA_JUST_DATE_TYPE = "org.joda.time.LocalDate";
-
-    /** The set of type name for JodaTime judgment. */
-    protected static final Set<String> JODA_DATE_TYPE_SET;
-    static {
-        final Set<String> tmpSet = new HashSet<String>();
-        tmpSet.add(JODA_JUST_DATE_TYPE);
-        tmpSet.add("org.joda.time.LocalDateTime");
-        tmpSet.add("org.joda.time.LocalTime");
-        JODA_DATE_TYPE_SET = Collections.unmodifiableSet(tmpSet);
-    }
-
     /** The type name of Java8Time's just date. */
-    protected static final String JAVA8_JUST_DATE_TYPE = "java.time.LocalDate";
+    protected static final String JAVA8_JUST_DATE_TYPE = LocalDate.class.getName();
+
+    /** The type name of Java8Time's just time-stamp. */
+    protected static final String JAVA8_JUST_TIMESTAMP_TYPE = LocalDateTime.class.getName();
+
+    /** The type name of Java8Time's just time. */
+    protected static final String JAVA8_JUST_TIME_TYPE = LocalTime.class.getName();
 
     /** The set of type name for Java8Time judgment. */
     protected static final Set<String> JAVA8_DATE_TYPE_SET;
     static {
         final Set<String> tmpSet = new HashSet<String>();
         tmpSet.add(JAVA8_JUST_DATE_TYPE);
-        tmpSet.add("java.time.LocalDateTime");
-        tmpSet.add("java.time.LocalTime");
+        tmpSet.add(JAVA8_JUST_TIMESTAMP_TYPE);
+        tmpSet.add(JAVA8_JUST_TIME_TYPE);
         JAVA8_DATE_TYPE_SET = Collections.unmodifiableSet(tmpSet);
     }
 
@@ -174,7 +170,7 @@ public class ColumnInfo {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the value from the entity by its gateway (means no reflection). <br />
+     * Read the value from the entity by its gateway (means no reflection). <br>
      * It returns plain value in entity as property access type.
      * @param <PROPERTY> The type of the property.
      * @param entity The target entity of this column to read. (NotNull)
@@ -197,7 +193,7 @@ public class ColumnInfo {
     //                                                 Write
     //                                                 -----
     /**
-     * Write the value to the entity by its gateway (means no reflection). <br />
+     * Write the value to the entity by its gateway (means no reflection). <br>
      * It contains the basic conversion, but no converting to optional so check the property access type.
      * @param entity The target entity of this column to write. (NotNull)
      * @param value The written value. (NullAllowed: if null, null value is written)
@@ -251,7 +247,7 @@ public class ColumnInfo {
     //                                                                        Convert Type
     //                                                                        ============
     /**
-     * Convert the value to object native type. <br />
+     * Convert the value to object native type. <br>
      * @param <VALUE> The type of column value.
      * @param value The conversion target value. (NullAllowed: if null, returns null)
      * @return The converted value as object native type. (NullAllowed: when the value is null)
@@ -305,16 +301,6 @@ public class ColumnInfo {
         @SuppressWarnings("unchecked")
         final VALUE result = (VALUE) converted;
         return result;
-    }
-
-    /**
-     * @param <VALUE> The type of property value.
-     * @param value The conversion target value. (NullAllowed)
-     * @return The converted value as property type. (NullAllowed)
-     * @deprecated use convertToObjectNativeType()
-     */
-    public <VALUE> VALUE toPropretyType(Object value) {
-        return convertToObjectNativeType(value);
     }
 
     // ===================================================================================
@@ -428,7 +414,7 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the DB name of the column. <br />
+     * Get the DB name of the column. <br>
      * This is for identity of column. (NOT for SQL)
      * @return The DB name of the column. (NotNull)
      */
@@ -437,7 +423,7 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the SQL name of the column. <br />
+     * Get the SQL name of the column. <br>
      * This is for SQL, which is resolved about schema prefix and quoted and so on...  
      * @return The SQL-name object of the column. (NotNull)
      */
@@ -446,7 +432,7 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the synonym of the column. <br />
+     * Get the synonym of the column. <br>
      * This is for the synonym of DBFlute. (for example, PgReservColumn handling)
      * @return The synonym of the column. (NullAllowed: when the column does not have its synonym)
      */
@@ -463,8 +449,8 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the native type mapped to object for the column. (NOT property access type) <br />
-     * e.g. String even if optional is defined at getter/setter in entity. <br />
+     * Get the native type mapped to object for the column. (NOT property access type) <br>
+     * e.g. String even if optional is defined at getter/setter in entity. <br>
      * Also there is the other method that returns property access type.
      * @return The class type of property for the column. (NotNull)
      */
@@ -493,17 +479,11 @@ public class ColumnInfo {
      * @return The determination, true or false.
      */
     public boolean isObjectNativeTypeDate() {
-        return assignableObjectNativeTypeUtilDate() // traditional date
-                || assignableObjectNativeTypeJava8Date() // Java8Date
-                || assignableObjectNativeTypeJodaDate(); // JodaDate
+        return assignableObjectNativeTypeUtilDate() || assignableObjectNativeTypeJava8Date();
     }
 
     protected boolean assignableObjectNativeTypeUtilDate() {
         return Date.class.isAssignableFrom(_objectNativeType);
-    }
-
-    protected boolean assignableObjectNativeTypeJodaDate() {
-        return JODA_DATE_TYPE_SET.contains(_objectNativeType.getName());
     }
 
     protected boolean assignableObjectNativeTypeJava8Date() {
@@ -511,25 +491,51 @@ public class ColumnInfo {
     }
 
     /**
-     * Is the object native type just (equals) Date? (assignable from)
+     * Is the object native type just (equals) date?
      * @return The determination, true or false.
      */
     public boolean isObjectNativeTypeJustDate() {
-        return justObjectNativeTypeUtilDate() // traditional date
-                || justObjectNativeJodaDate() // JodaDate
-                || justObjectNativeJava8Date(); // Java8Date
+        return justObjectNativeTypeUtilDate() || justObjectNativeJava8Date();
     }
 
     protected boolean justObjectNativeTypeUtilDate() {
         return Date.class.equals(_objectNativeType);
     }
 
-    protected boolean justObjectNativeJodaDate() {
-        return _objectNativeType.getName().equals(JODA_JUST_DATE_TYPE);
-    }
-
     protected boolean justObjectNativeJava8Date() {
         return _objectNativeType.getName().equals(JAVA8_JUST_DATE_TYPE);
+    }
+
+    /**
+     * Is the object native type just (equals) time-stamp?
+     * @return The determination, true or false.
+     */
+    public boolean isObjectNativeTypeJustTimestamp() {
+        return justObjectNativeTypeUtilTimestamp() || justObjectNativeJava8Timestamp();
+    }
+
+    protected boolean justObjectNativeTypeUtilTimestamp() {
+        return Timestamp.class.equals(_objectNativeType);
+    }
+
+    protected boolean justObjectNativeJava8Timestamp() {
+        return _objectNativeType.getName().equals(JAVA8_JUST_TIMESTAMP_TYPE);
+    }
+
+    /**
+     * Is the object native type just (equals) time? (assignable from)
+     * @return The determination, true or false.
+     */
+    public boolean isObjectNativeTypeJustTime() {
+        return justObjectNativeTypeUtilTime() || justObjectNativeJava8Time();
+    }
+
+    protected boolean justObjectNativeTypeUtilTime() {
+        return Time.class.equals(_objectNativeType);
+    }
+
+    protected boolean justObjectNativeJava8Time() {
+        return _objectNativeType.getName().equals(JAVA8_JUST_TIME_TYPE);
     }
 
     /**
@@ -541,50 +547,13 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the type of property access for the column. <br />
-     * It is defined at getter/setter in entity. (e.g. String or Optional) <br />
+     * Get the type of property access for the column. <br>
+     * It is defined at getter/setter in entity. (e.g. String or Optional) <br>
      * Also there is the other method that always returns object native type.
      * @return The class type to access the property. (NotNull)
      */
     public Class<?> getPropertyAccessType() {
         return _propertyAccessType;
-    }
-
-    /**
-     * Get the type of property for the column. (NOT property access type) <br />
-     * e.g. String even if optional is defined at getter/setter in entity.
-     * @return The class type of property for the column. (NotNull)
-     * @deprecated Use object native type
-     */
-    public Class<?> getPropertyType() {
-        return getObjectNativeType();
-    }
-
-    /**
-     * Is the property type String? (assignable from)
-     * @return The determination, true or false.
-     * @deprecated Use object native type
-     */
-    public boolean isPropertyTypeString() {
-        return isObjectNativeTypeString();
-    }
-
-    /**
-     * Is the property type Number? (assignable from)
-     * @return The determination, true or false.
-     * @deprecated Use object native type
-     */
-    public boolean isPropertyTypeNumber() {
-        return isObjectNativeTypeNumber();
-    }
-
-    /**
-     * Is the property type Date? (assignable from)
-     * @return The determination, true or false.
-     * @deprecated Use object native type
-     */
-    public boolean isPropertyTypeDate() {
-        return isObjectNativeTypeDate();
     }
 
     /**
@@ -676,7 +645,7 @@ public class ColumnInfo {
     }
 
     /**
-     * Get the comment of the column. <br />
+     * Get the comment of the column. <br>
      * If the real comment contains the alias,
      * this result does NOT contain it and its delimiter.  
      * @return The comment of the column. (NullAllowed: when it cannot get an alias from meta)
@@ -688,7 +657,7 @@ public class ColumnInfo {
     // these methods, get foreign/referrer info list, are not called
     // in core logic (e.g. mapping) so initialization is allowed to be here
     /**
-     * Get the read-only list of the foreign info related to this column. <br />
+     * Get the read-only list of the foreign info related to this column. <br>
      * It contains one-to-one relations.
      * @return The read-only list. (NotNull: when no FK, returns empty list)
      */

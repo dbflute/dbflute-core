@@ -45,7 +45,7 @@ public interface OracleAgent {
      * @param arrayTypeName The name of ARRAY type for Oracle. (NotNull)
      * @param arrayValue The value of array. (NotNull) 
      * @return The instance of oracle.sql.ARRAY for the array argument. (NotNull)
-     * @throws java.sql.SQLException
+     * @throws SQLException When it fails to handle the connection or result value
      */
     Object toOracleArray(Connection conn, String arrayTypeName, Object arrayValue) throws SQLException;
 
@@ -53,7 +53,7 @@ public interface OracleAgent {
      * Convert the Oracle's ARRAY to a standard array.
      * @param oracleArray The value of Oracle's ARRAY (oracle.sql.ARRAY). (NotNull) 
      * @return The instance of standard array for the Oracle's array argument. (NotNull)
-     * @throws java.sql.SQLException
+     * @throws SQLException When it fails to handle the connection or result value
      */
     Object toStandardArray(Object oracleArray) throws SQLException;
 
@@ -73,7 +73,7 @@ public interface OracleAgent {
      * @param structTypeName The name of STRUCT type for Oracle. (NotNull)
      * @param attrs The array of attribute value. (NotNull) 
      * @return The STRUCT type contained to attribute values. (NotNull)
-     * @throws java.sql.SQLException
+     * @throws SQLException When it fails to handle the connection or result value
      */
     Object toOracleStruct(Connection conn, String structTypeName, Object[] attrs) throws SQLException;
 
@@ -81,7 +81,7 @@ public interface OracleAgent {
      * Convert the Oracle's STRUCT to a standard attributes.
      * @param oracleStruct The value of Oracle's STRUCT (oracle.sql.STRUCT). (NotNull) 
      * @return The array of attribute value as standard type. (NotNull)
-     * @throws java.sql.SQLException
+     * @throws SQLException When it fails to handle the connection or result value
      */
     Object[] toStandardStructAttributes(Object oracleStruct) throws SQLException;
 

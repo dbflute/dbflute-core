@@ -50,13 +50,13 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
 #foreach ($classificationElement in $classificationTop.classificationElementList)
 
     /**
-     * Set the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br />
+     * Set the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     void set${javaName}_${classificationElement.name}();
 
     /**
-     * Is the value of ${uncapitalisedJavaName} '${classificationElement.name}'? <br />
+     * Is the value of ${uncapitalisedJavaName} '${classificationElement.name}'? <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.

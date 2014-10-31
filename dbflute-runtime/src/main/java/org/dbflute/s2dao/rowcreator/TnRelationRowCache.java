@@ -30,7 +30,7 @@ import org.dbflute.s2dao.rowcreator.impl.TnRelationKeyEmpty;
 import org.dbflute.s2dao.rowcreator.impl.TnRelationKeySimple;
 
 /**
- * The cache of relation row. <br />
+ * The cache of relation row. <br>
  * This is not thread safe so you should create per one select.
  * @author modified by jflute (originated in S2Dao)
  */
@@ -111,7 +111,7 @@ public class TnRelationRowCache {
      * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed: If it's null, it doesn't use select index.)
      * @param relationNoSuffix The suffix of relation No. (NotNull)
      * @return The key of relation. (NullAllowed: null means no data of the relation)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public TnRelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt // basic resource
             , Map<String, String> selectColumnMap, Map<String, Map<String, Integer>> selectIndexMap // select resource

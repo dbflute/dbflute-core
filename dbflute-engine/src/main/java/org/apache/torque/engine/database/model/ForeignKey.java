@@ -1003,7 +1003,7 @@ public class ForeignKey implements Constraint {
     //                                         for S2Dao.NET
     //                                         -------------
     /**
-     * Returns RelationKeysCommaString. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (LOCAL:FOREIGN) <br />
+     * Returns RelationKeysCommaString. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (LOCAL:FOREIGN) <br>
      * (for s2dao)
      * @return Generated string.
      */
@@ -1025,7 +1025,7 @@ public class ForeignKey implements Constraint {
     }
 
     /**
-     * Returns RelationKeysCommaString for OneToOneReferrer. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (FOREIGN:LOCAL) <br />
+     * Returns RelationKeysCommaString for OneToOneReferrer. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (FOREIGN:LOCAL) <br>
      * (for s2dao)
      * @return Generated string.
      */
@@ -1611,7 +1611,7 @@ public class ForeignKey implements Constraint {
     }
 
     /**
-     * Are all foreign columns primary-key? <br />
+     * Are all foreign columns primary-key? <br>
      * Basically true. If biz-one-to-one and unique key, false.
      * @return The determination, true or false.
      */
@@ -1620,7 +1620,7 @@ public class ForeignKey implements Constraint {
     }
 
     /**
-     * Are all foreign columns unique-key? <br />
+     * Are all foreign columns unique-key? <br>
      * @return The determination, true or false.
      */
     public boolean isForeignColumnUnique() {
@@ -1764,7 +1764,7 @@ public class ForeignKey implements Constraint {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
             final String comment = resolveCommentForJavaDoc(_comment, indent);
             final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
-            sb.append(" <br />").append(sourceCodeLn);
+            sb.append(" <br>").append(sourceCodeLn);
             sb.append(indent).append(" * ").append(comment);
         }
         return sb.toString();
@@ -1797,7 +1797,7 @@ public class ForeignKey implements Constraint {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
             final String comment = resolveCommentForJavaDoc(_comment, indent);
             final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
-            sb.append(" <br />").append(sourceCodeLn);
+            sb.append(" <br>").append(sourceCodeLn);
             sb.append(indent).append(" * ").append(comment);
         }
         return sb.toString();
@@ -1829,7 +1829,7 @@ public class ForeignKey implements Constraint {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
             final String comment = resolveCommentForJavaDoc(_comment, indent);
             final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
-            sb.append(" <br />").append(sourceCodeLn);
+            sb.append(" <br>").append(sourceCodeLn);
             sb.append(indent).append(" * ").append(comment);
         }
         return sb.toString();

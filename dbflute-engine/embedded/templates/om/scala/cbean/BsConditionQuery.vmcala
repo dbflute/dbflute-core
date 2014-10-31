@@ -44,7 +44,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
     //                                                                 InlineView/OrClause
     //                                                                 ===================
     /**
-     * Prepare InlineView query. <br />
+     * Prepare InlineView query. <br>
      * {select ... from ... left outer join (select * from ${table.tableDbName}) where FOO = [value] ...}
      * <pre>
      * cb.query().queryMemberStatus().<span style="color: #CC4747">inline()</span>.setFoo...;
@@ -67,7 +67,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
     }
 
     /**
-     * Prepare OnClause query. <br />
+     * Prepare OnClause query. <br>
      * {select ... from ... left outer join ${table.tableDbName} on ... and FOO = [value] ...}
      * <pre>
      * cb.query().queryMemberStatus().<span style="color: #CC4747">on()</span>.setFoo...;
@@ -292,7 +292,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #end
 #if ($col.isAvailableOrderByAsc())
     /** 
-     * Add order-by as ascend. <br />
+     * Add order-by as ascend. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @return this. (NotNull)
      */
@@ -301,7 +301,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #end
 #if ($col.isAvailableOrderByDesc())
     /**
-     * Add order-by as descend. <br />
+     * Add order-by as descend. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @return this. (NotNull)
      */
@@ -380,7 +380,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionArgs}")
 #end
     /**
-     * Get the condition-query for relation table. <br />
+     * Get the condition-query for relation table. <br>
      * ${fk.foreignDispForJavaDoc}
 #if ($fk.hasDynamicFixedCondition())
      * ${fk.dynamicFixedConditionArgsJavaDocString}
@@ -419,7 +419,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #foreach ($referrer in $table.joinableReferrerAsOneList)
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
     /**
-     * Get the condition-query for relation table. <br />
+     * Get the condition-query for relation table. <br>
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @return The instance of condition-query. (NotNull)
      */
@@ -507,7 +507,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
     /**
-     * Set up ExistsReferrer (correlated sub-query). <br />
+     * Set up ExistsReferrer (correlated sub-query). <br>
      * {exists (select ... from ${referrer.table.tableDbName} where ...)}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
@@ -540,7 +540,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
     /**
-     * Set up NotExistsReferrer (correlated sub-query). <br />
+     * Set up NotExistsReferrer (correlated sub-query). <br>
      * {not exists (select ... from ${referrer.table.tableDbName} where ...)}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not exists'. (NotNull)
      */
@@ -616,8 +616,8 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
     /**
-     * Prepare for (Query)DerivedReferrer (correlated sub-query). <br />
-     * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
+     * Prepare for (Query)DerivedReferrer (correlated sub-query). <br>
+     * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br>
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #CC4747">derived${referrer.referrerPropertyNameInitCap}()</span>.<span style="color: #CC4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {

@@ -30,7 +30,11 @@ public class DfDtsBigDecimalType extends DfDtsObjectType {
 
     @Override
     public Object convert(Object value, String formatPattern) {
-        return DfTypeUtil.toBigDecimal(value, formatPattern);
+        if (formatPattern != null) {
+            return DfTypeUtil.toBigDecimal(value, formatPattern);
+        } else {
+            return DfTypeUtil.toBigDecimal(value);
+        }
     }
 
     @Override

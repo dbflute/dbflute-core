@@ -319,10 +319,10 @@ public class DfReflectionUtil {
     }
 
     /**
-     * Get the public method. <br />
-     * And it has the flexibly searching so you can specify types of sub-class to argTypes. <br />
-     * But if overload methods exist, it returns the first-found method. <br />
-     * And no cache so you should cache it yourself if you call several times. <br />
+     * Get the public method. <br>
+     * And it has the flexibly searching so you can specify types of sub-class to argTypes. <br>
+     * But if overload methods exist, it returns the first-found method. <br>
+     * And no cache so you should cache it yourself if you call several times. <br>
      * @param clazz The type of class that defines the method. (NotNull)
      * @param methodName The name of method. (NotNull)
      * @param argTypes The type of argument. (NotNull)
@@ -358,8 +358,8 @@ public class DfReflectionUtil {
      * o target class's methods = all
      * o superclass's methods   = all (also contains private)
      * </pre>
-     * And it has the flexibly searching so you can specify types of sub-class to argTypes. <br />
-     * But if overload methods exist, it returns the first-found method. <br />
+     * And it has the flexibly searching so you can specify types of sub-class to argTypes. <br>
+     * But if overload methods exist, it returns the first-found method. <br>
      * And no cache so you should cache it yourself if you call several times.
      * @param clazz The type of class that defines the method. (NotNull)
      * @param methodName The name of method. (NotNull)
@@ -636,9 +636,9 @@ public class DfReflectionUtil {
     //                                                                       =============
     /**
      * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @throws IllegalArgumentException
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
+     * @throws IllegalArgumentException When the argument is null.
      */
     protected static void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
@@ -653,8 +653,8 @@ public class DfReflectionUtil {
 
     /**
      * Assert that the entity is not null and not trimmed empty.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
      */
     public static void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);

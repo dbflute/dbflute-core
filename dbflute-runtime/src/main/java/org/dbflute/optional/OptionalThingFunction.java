@@ -18,10 +18,10 @@ package org.dbflute.optional;
 /**
  * The function of optional thing.
  * <pre>
- * OptionalObject&lt;MemberWebBean&gt; beanOpt = entityOpt.<span style="color: #CC4747">map</span>(member -&gt; {
+ * entityOpt.<span style="color: #CC4747">map</span>(member -&gt; {
  *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
  *     return new MemberWebBean(member);
- * });
+ * }).<span style="color: #994747">ifPresent</span>(...);
  * </pre>
  * @param <OBJ> The type of wrapped object in optional thing.
  * @param <RESULT> The type of result of mapping.
@@ -32,9 +32,9 @@ package org.dbflute.optional;
 public interface OptionalThingFunction<OBJ, RESULT> {
 
     /**
-     * Apply the object in the optional object.
-     * @param obj The wrapped object in the optional object. (NotNull)
-     * @return The result of mapping. (NullAllowed: if null, map() returns empty optional object)
+     * Apply the object in the optional thing.
+     * @param obj The wrapped object in the optional thing. (NotNull)
+     * @return The result of mapping. (NullAllowed: if null, map() returns empty optional thing)
      */
     RESULT apply(OBJ obj);
 }

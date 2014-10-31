@@ -1041,7 +1041,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
 
         /**
-         * Set up the operand 'equal' and the value of parameter. <br />
+         * Set up the operand 'equal' and the value of parameter. <br>
          * The type of the parameter should be same as the type of target column. 
          * <pre>
          * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -1058,7 +1058,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
         
         /**
-         * Set up the operand 'greaterThan' and the value of parameter. <br />
+         * Set up the operand 'greaterThan' and the value of parameter. <br>
          * The type of the parameter should be same as the type of target column. 
          * <pre>
          * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -1075,7 +1075,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
         
         /**
-         * Set up the operand 'lessThan' and the value of parameter. <br />
+         * Set up the operand 'lessThan' and the value of parameter. <br>
          * The type of the parameter should be same as the type of target column. 
          * <pre>
          * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -1092,7 +1092,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
         
         /**
-         * Set up the operand 'greaterEqual' and the value of parameter. <br />
+         * Set up the operand 'greaterEqual' and the value of parameter. <br>
          * The type of the parameter should be same as the type of target column. 
          * <pre>
          * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -1109,7 +1109,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
         
         /**
-         * Set up the operand 'lessEqual' and the value of parameter. <br />
+         * Set up the operand 'lessEqual' and the value of parameter. <br>
          * The type of the parameter should be same as the type of target column. 
          * <pre>
          * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {

@@ -27,28 +27,28 @@ import org.dbflute.dbmeta.DBMeta;
 public interface RelationInfo {
 
     /**
-     * Get the name of the relation constraint. <br />
+     * Get the name of the relation constraint. <br>
      * The foreign info and the referrer info of the same relation have the same name.
      * @return The name of the relation constraint. (NotNull)
      */
     String getConstraintName();
 
     /**
-     * Get the property name of the relation. <br />
+     * Get the property name of the relation. <br>
      * This is unique name in the table.
      * @return The property name of the relation. (NotNull)
      */
     String getRelationPropertyName();
 
     /**
-     * Get the DB meta of the local table. <br />
+     * Get the DB meta of the local table. <br>
      * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER's one.
      * @return The DB meta singleton instance. (NotNull)
      */
     DBMeta getLocalDBMeta();
 
     /**
-     * Get the DB meta of the target table. <br />
+     * Get the DB meta of the target table. <br>
      * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER_STATUS's one.
      * @return The DB meta singleton instance. (NotNull)
      */
@@ -61,16 +61,16 @@ public interface RelationInfo {
     Map<ColumnInfo, ColumnInfo> getLocalTargetColumnInfoMap();
 
     /**
-     * Get the native type mapped to object for the column. (NOT property access type) <br />
-     * It returns basically relation entity type even if the property type is optional. <br />
+     * Get the native type mapped to object for the column. (NOT property access type) <br>
+     * It returns basically relation entity type even if the property type is optional. <br>
      * And also there is the other method that returns property access type.
      * @return The class type for the relation entity. (NotNull)
      */
     Class<?> getObjectNativeType();
 
     /**
-     * Get the type of property access for the relation. <br />
-     * It is defined at getter/setter in entity. (e.g. Entity or Optional) <br />
+     * Get the type of property access for the relation. <br>
+     * It is defined at getter/setter in entity. (e.g. Entity or Optional) <br>
      * And also there is the other method that always returns object native type.
      * @return The class type to access the property, e.g. Entity or Optional. (NotNull)
      */
@@ -95,7 +95,7 @@ public interface RelationInfo {
     RelationInfo getReverseRelation();
 
     /**
-     * Read the value to the entity by its gateway (means no reflection). <br />
+     * Read the value to the entity by its gateway (means no reflection). <br>
      * It returns plain value in entity as property access type.
      * @param <PROPERTY> The type of property, might be optional or list.
      * @param localEntity The local entity of this column to read. (NotNull)
@@ -104,7 +104,7 @@ public interface RelationInfo {
     <PROPERTY> PROPERTY read(Entity localEntity);
 
     /**
-     * Write the value to the entity by its gateway (means no reflection). <br />
+     * Write the value to the entity by its gateway (means no reflection). <br>
      * No converting to optional so check the property access type.
      * @param localEntity The local entity of this column to write. (NotNull)
      * @param foreignEntity The written instance of relation entity, might be optional or list. (NullAllowed: if null, null written)

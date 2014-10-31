@@ -50,7 +50,7 @@ import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.dbway.DBWay;
 
 /**
- * The interface of SQL clause. <br />
+ * The interface of SQL clause. <br>
  *
  * <p>And this also has a role of a container for common info
  * between the top level condition-bean and related condition-queries.</p>
@@ -119,16 +119,16 @@ public interface SqlClause {
     //                                       Fragment Clause
     //                                       ---------------
     /**
-     * Get from-where clause without select and orderBy and sqlSuffix. <br />
-     * Basically for subQuery and selectCount. <br />
+     * Get from-where clause without select and orderBy and sqlSuffix. <br>
+     * Basically for subQuery and selectCount. <br>
      * You should handle UnionSelectClauseMark and UnionWhereClauseMark and UnionWhereFirstConditionMark in clause.
      * @return The 'from-where' clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
     String getClauseFromWhereWithUnionTemplate();
 
     /**
-     * Get from-where clause without select and orderBy and sqlSuffix as template. <br />
-     * Basically for subQuery and selectCount. <br />
+     * Get from-where clause without select and orderBy and sqlSuffix as template. <br>
+     * Basically for subQuery and selectCount. <br>
      * You should handle UnionSelectClauseMark and UnionWhereClauseMark and UnionWhereFirstConditionMark
      * and WhereClauseMark and WhereFirstConditionMark in clause.
      * @return The 'from-where' clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
@@ -145,14 +145,14 @@ public interface SqlClause {
     String getSelectClause();
 
     /**
-     * Get the map of select index by key name of select column. <br />
+     * Get the map of select index by key name of select column. <br>
      * map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}}
      * @return The map of select index. (NullAllowed: null means lazy-loaded not yet or select index is disabled)
      */
     Map<String, Map<String, Integer>> getSelectIndexMap();
 
     /**
-     * Get the map of key name of select column by on-query name. <br />
+     * Get the map of key name of select column by on-query name. <br>
      * map:{onQueryAlias = selectColumnKeyName}}
      * @return The map of key name. (NullAllowed: null means lazy-loaded not yet or select index is disabled)
      */
@@ -259,7 +259,7 @@ public interface SqlClause {
     boolean hasSelectedRelation(String foreignRelationPath);
 
     /**
-     * Get the map of selected relation column. <br />
+     * Get the map of selected relation column. <br>
      * Basically internal but public for analyzing.
      * @return The map of selected relation column. map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}} (NotNull)
      */
@@ -279,7 +279,7 @@ public interface SqlClause {
     //                                          Registration
     //                                          ------------
     /**
-     * Register outer-join. <br />
+     * Register outer-join. <br>
      * The fixed-conditions are located on on-clause.
      * @param foreignAliasName The alias name of foreign table. {left outer join [foreignTableDbName] [foreignAliasName]} (NotNull, Unique)
      * @param foreignTableDbName The DB name of foreign table. {left outer join [foreignTableDbName] [foreignAliasName]} (NotNull)
@@ -296,7 +296,7 @@ public interface SqlClause {
             FixedConditionResolver fixedConditionResolver);
 
     /**
-     * Register outer-join using in-line view for fixed-conditions. <br />
+     * Register outer-join using in-line view for fixed-conditions. <br>
      * The fixed-conditions are located on in-line view.
      * @param foreignAliasName The alias name of foreign table. {left outer join [foreignTableDbName] [foreignAliasName]} (NotNull, Unique)
      * @param foreignTableDbName The DB name of foreign table. {left outer join [foreignTableDbName] [foreignAliasName]} (NotNull)
@@ -313,7 +313,7 @@ public interface SqlClause {
             FixedConditionResolver fixedConditionResolver);
 
     /**
-     * Register the lazy checker for the fixed condition. <br />
+     * Register the lazy checker for the fixed condition. <br>
      * This is called when building SQL clause.
      * @param checker The callback instance of checker. (NotNull)
      */
@@ -323,7 +323,7 @@ public interface SqlClause {
     //                                   OuterJoin Attribute
     //                                   -------------------
     /**
-     * Get the information of left-outer-join. <br />
+     * Get the information of left-outer-join. <br>
      * Basically internal but public for analyzing.
      * @return The map of left-outer-join info. map:{ foreignAliasName : leftOuterJoinInfo } (NotNull)
      */
@@ -363,14 +363,14 @@ public interface SqlClause {
     //                                  --------------------
     // has several items of inner-join auto-detected
     /**
-     * Enable to auto-detect joins that can be (all type) inner-join. <br />
+     * Enable to auto-detect joins that can be (all type) inner-join. <br>
      * You should call this before registrations of where clause.
      * (actually you can call before selecting but it's a fixed specification for user)
      */
     void enableInnerJoinAutoDetect();
 
     /**
-     * Disable auto-detecting inner-join. <br />
+     * Disable auto-detecting inner-join. <br>
      * You should call this before registrations of where clause.
      */
     void disableInnerJoinAutoDetect();
@@ -380,14 +380,14 @@ public interface SqlClause {
     //                          ----------------------------
     // one of inner-join auto-detect
     /**
-     * Enable to auto-detect joins that can be structure-possible inner-join. <br />
+     * Enable to auto-detect joins that can be structure-possible inner-join. <br>
      * You should call this before registrations of where clause.
      * (actually you can call before selecting but it's a fixed specification for user)
      */
     void enableStructuralPossibleInnerJoin();
 
     /**
-     * Disable auto-detecting structural-possible inner-join. <br />
+     * Disable auto-detecting structural-possible inner-join. <br>
      * You should call this before registrations of where clause.
      */
     void disableStructuralPossibleInnerJoin();
@@ -403,7 +403,7 @@ public interface SqlClause {
     //                                   -------------------
     // one of inner-join auto-detect
     /**
-     * Enable to auto-detect joins that can be where-used inner-join. <br />
+     * Enable to auto-detect joins that can be where-used inner-join. <br>
      * You should call this before registrations of where clause.
      */
     void enableWhereUsedInnerJoin();
@@ -439,7 +439,7 @@ public interface SqlClause {
             ConditionOption option, String usedAliasName);
 
     /**
-     * Register 'where' clause. <br />
+     * Register 'where' clause. <br>
      * The join of the alias, if it's a relation condition, may have a chance to be inner-join.
      * @param clause The string clause of 'where'. (NotNull)
      * @param usedAliasName The alias name of table used on the where clause. (NotNull)
@@ -447,7 +447,7 @@ public interface SqlClause {
     void registerWhereClause(String clause, String usedAliasName);
 
     /**
-     * Register 'where' clause. <br />
+     * Register 'where' clause. <br>
      * You can control the inner-join possibility.
      * @param clause The string clause of 'where'. (NotNull)
      * @param usedAliasName The alias name of table used on the where clause. (NotNull)
@@ -456,7 +456,7 @@ public interface SqlClause {
     void registerWhereClause(String clause, String usedAliasName, boolean noWayInner);
 
     /**
-     * Register 'where' clause. <br />
+     * Register 'where' clause. <br>
      * You can control the inner-join possibility.
      * @param clause The string clause of 'where'. (NotNull)
      * @param usedAliasInfos The array of information of used alias, contains no-way-inner determination. (NotNull, NotEmpty)
@@ -467,7 +467,7 @@ public interface SqlClause {
     //                                        WhereUsed Join
     //                                        --------------
     /**
-     * Reflect the information of where-used-to join. <br />
+     * Reflect the information of where-used-to join. <br>
      * Basically interface for DreamCruise.
      * @param usedAliasInfo The information of used alias, contains no-way-inner determination. (NotNull, NotEmpty)
      */
@@ -482,26 +482,26 @@ public interface SqlClause {
     void exchangeFirstWhereClauseForLastOne();
 
     /**
-     * Does it have where clauses on the base query? <br />
+     * Does it have where clauses on the base query? <br>
      * Clauses on union queries and in-line views are not concerned.
      * @return The determination, true or false.
      */
     boolean hasWhereClauseOnBaseQuery();
 
     /**
-     * Back up where clause on base query. <br />
+     * Back up where clause on base query. <br>
      * You can restore it later.
      */
     void backupWhereClauseOnBaseQuery();
 
     /**
-     * Restore where clause on base query if backup exists. <br />
+     * Restore where clause on base query if backup exists. <br>
      * You should call this after backup.
      */
     void restoreWhereClauseOnBaseQuery();
 
     /**
-     * Clear where clauses on the base query. <br />
+     * Clear where clauses on the base query. <br>
      * Clauses on union queries and in-line views are not concerned.
      */
     void clearWhereClauseOnBaseQuery();
@@ -593,7 +593,7 @@ public interface SqlClause {
     void suppressOrderBy();
 
     /**
-     * Revive order-by from suppressed status. <br />
+     * Revive order-by from suppressed status. <br>
      * You can call when not suppressed, only reloaded.
      */
     void reviveOrderBy();
@@ -618,14 +618,14 @@ public interface SqlClause {
     void addManualOrderToPreviousOrderByElement(ManualOrderOption manualOrderOption);
 
     /**
-     * Does it have order-by clauses? <br />
+     * Does it have order-by clauses? <br>
      * Whether effective or not has no influence.
      * @return The determination, true or false.
      */
     boolean hasOrderByClause();
 
     /**
-     * Does it have order-by clauses as specified-derived order-by? <br />
+     * Does it have order-by clauses as specified-derived order-by? <br>
      * Whether effective or not has no influence.
      * @return The determination, true or false.
      */
@@ -663,7 +663,7 @@ public interface SqlClause {
      * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
      * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
      * </p>
-     * @param fetchPageNumber The number of fetch page. 1 origin. (NotMinus & NotZero: if minus or zero, set one)
+     * @param fetchPageNumber The number of fetch page. 1 origin. (NotMinus, NotZero: if minus or zero, set one)
      */
     void fetchPage(int fetchPageNumber);
 
@@ -703,7 +703,7 @@ public interface SqlClause {
     void suppressFetchScope();
 
     /**
-     * Revive fetch-scope from suppressed status. <br />
+     * Revive fetch-scope from suppressed status. <br>
      * You can call when not suppressed, only reloaded.
      */
     void reviveFetchScope();
@@ -763,7 +763,7 @@ public interface SqlClause {
     //                                                                    Table Alias Info
     //                                                                    ================
     /**
-     * Get the alias name for base point table. <br />
+     * Get the alias name for base point table. <br>
      * @return The string name for alias. (NotNull)
      */
     String getBasePointAliasName();
@@ -843,7 +843,7 @@ public interface SqlClause {
     //                                        Specify Column
     //                                        --------------
     /**
-     * Specify select columns. <br />
+     * Specify select columns. <br>
      * It is overridden when the specified column has already been specified.
      * @param specifiedColumn The info about column specification. (NotNull)
      */
@@ -872,13 +872,13 @@ public interface SqlClause {
     void handleSpecifiedSelectColumn(String tableAliasName, SpecifiedSelectColumnHandler columnHandler);
 
     /**
-     * Back up specified select columns. <br />
+     * Back up specified select columns. <br>
      * You can restore it later.
      */
     void backupSpecifiedSelectColumn();
 
     /**
-     * Restore specified select columns if backup exists. <br />
+     * Restore specified select columns if backup exists. <br>
      * You should call this after backup.
      */
     void restoreSpecifiedSelectColumn();
@@ -925,8 +925,8 @@ public interface SqlClause {
     //                                      Specify Deriving
     //                                      ----------------
     /**
-     * Specify deriving sub-query for DerivedReferrer. <br />
-     * It is overridden when the specified column has already been specified. <br />
+     * Specify deriving sub-query for DerivedReferrer. <br>
+     * It is overridden when the specified column has already been specified. <br>
      * The aliasName is allowed to be null for (Specify)DerivedReferrer to be used in other functions.
      * @param subQueryInfo The info about deriving sub-query. (NotNull: aliasName is allowed to be null)
      */
@@ -1007,7 +1007,7 @@ public interface SqlClause {
     ColumnSqlName getSpecifiedResolvedColumnSqlNameAsOne();
 
     /**
-     * Get the real name of sub-query resolved column (specified or deriving) as specified one. <br />
+     * Get the real name of sub-query resolved column (specified or deriving) as specified one. <br>
      * And the SpecifyCalculation is resolved here.
      * @return The object of real name. (NullAllowed: if not found or not one)
      */
@@ -1020,7 +1020,7 @@ public interface SqlClause {
     //                                     NullOrEmpty Query
     //                                     -----------------
     /**
-     * Check null-or-empty query. <br />
+     * Check null-or-empty query. <br>
      * The default is ignored, but public default is checked by DBFluteConfig
      */
     void checkNullOrEmptyQuery();
@@ -1174,13 +1174,13 @@ public interface SqlClause {
     ColumnFunctionCipher findColumnFunctionCipher(ColumnInfo columnInfo);
 
     /**
-     * Enable select column cipher effective. <br />
+     * Enable select column cipher effective. <br>
      * The default is enabled (if cipher manager is set) so this method is called after disabling.
      */
     void enableSelectColumnCipher();
 
     /**
-     * Disable select column cipher effective. <br />
+     * Disable select column cipher effective. <br>
      * basically for queryInsert().
      */
     void disableSelectColumnCipher();
@@ -1203,7 +1203,7 @@ public interface SqlClause {
     //                                     Paging Adjustment
     //                                     -----------------
     /**
-     * Enable paging adjustment, e.g. PagingCountLater, PagingCountLeastJoin, effective. <br />
+     * Enable paging adjustment, e.g. PagingCountLater, PagingCountLeastJoin, effective. <br>
      * The options might be on by default so the adjustments are off normally.
      */
     void enablePagingAdjustment();
@@ -1217,15 +1217,15 @@ public interface SqlClause {
     //                                           Count Later
     //                                           -----------
     /**
-     * Enable paging count-later that means counting after selecting. <br />
-     * And you should also make paging adjustment effective to enable this. <br />
-     * This option is copy of condition-bean's one for clause adjustment, e.g. MySQL found_rows(). <br />
+     * Enable paging count-later that means counting after selecting. <br>
+     * And you should also make paging adjustment effective to enable this. <br>
+     * This option is copy of condition-bean's one for clause adjustment, e.g. MySQL found_rows(). <br>
      * The default is disabled, but public default is enabled by DBFluteConfig.
      */
     void enablePagingCountLater();
 
     /**
-     * Disable paging count-later that means counting after selecting. <br />
+     * Disable paging count-later that means counting after selecting. <br>
      * You should call this before execution of selectPage().
      */
     void disablePagingCountLater();
@@ -1234,14 +1234,14 @@ public interface SqlClause {
     //                                       Count LeastJoin
     //                                       ---------------
     /**
-     * Enable paging count-least-join, which means least joined on count select. <br />
-     * And you should also make paging adjustment effective to enable this. <br />
+     * Enable paging count-least-join, which means least joined on count select. <br>
+     * And you should also make paging adjustment effective to enable this. <br>
      * The default is disabled, but public default is enabled by DBFluteConfig.
      */
     void enablePagingCountLeastJoin();
 
     /**
-     * Disable paging count-least-join, which means least joined on count select. <br />
+     * Disable paging count-least-join, which means least joined on count select. <br>
      * You should call this before execution of selectPage().
      */
     void disablePagingCountLeastJoin();
@@ -1257,13 +1257,13 @@ public interface SqlClause {
     //                                        PK Only Select
     //                                        --------------
     /**
-     * Enable PK only select forcedly effective, ignoring select clause setting and derived referrer. <br />
+     * Enable PK only select forcedly effective, ignoring select clause setting and derived referrer. <br>
      * Basically for PagingSelectAndQuerySplit.
      */
     void enablePKOnlySelectForcedly();
 
     /**
-     * Disable PK only select forcedly. <br />
+     * Disable PK only select forcedly. <br>
      * Basically for PagingSelectAndQuerySplit.
      */
     void disablePKOnlySelectForcedly();
@@ -1296,7 +1296,7 @@ public interface SqlClause {
     String getClauseQueryUpdate(Map<String, Object> columnParameterMap);
 
     /**
-     * The handler of calculation on set clause of query-update. <br />
+     * The handler of calculation on set clause of query-update. <br>
      * This is set on column parameter map as value.
      */
     interface QueryUpdateSetCalculationHandler {
@@ -1315,7 +1315,7 @@ public interface SqlClause {
 
     /**
      * Enable to use direct clause in query update forcedly (contains query delete).
-     * You cannot use join, sub-query, union and so on, by calling this. <br />
+     * You cannot use join, sub-query, union and so on, by calling this. <br>
      * So you may have the painful SQLException by this, attention!
      */
     void enableQueryUpdateForcedDirect();
@@ -1337,7 +1337,7 @@ public interface SqlClause {
     void setPurpose(HpCBPurpose purpose);
 
     /**
-     * Is the clause object locked? e.g. true if in sub-query process and check allowed <br />
+     * Is the clause object locked? e.g. true if in sub-query process and check allowed <br>
      * Java8 cannot use the same name as lambda argument with already existing name in the scope.
      * <pre>
      * cb.query().existsPurchaseList(subCB -&gt; {
@@ -1355,7 +1355,7 @@ public interface SqlClause {
     boolean isLocked();
 
     /**
-     * Lock the clause object. <br />
+     * Lock the clause object. <br>
      * Only saving lock status here, you should rightly check by this status.
      */
     void lock();
@@ -1371,7 +1371,7 @@ public interface SqlClause {
     void enableThatsBadTimingDetect();
 
     /**
-     * Disable "that's-bad-timing" detect for compatible. <br />
+     * Disable "that's-bad-timing" detect for compatible. <br>
      * If disabled, isLocked() always returns false.
      */
     void disableThatsBadTimingDetect();

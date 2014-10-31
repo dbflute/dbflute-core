@@ -25,7 +25,7 @@ public interface OutsideSqlFilter {
     /**
      * Filter the outside-SQL immediately before execution. (for user customization) <br >
      * This filter is executed immediately before execution.
-     * (but removing comments and formatting options are after the filter) <br />
+     * (but removing comments and formatting options are after the filter) <br>
      * And whether a procedure's SQL is contained or not is determined by containsProcedure().
      * @param executedSql The string of executed outside-SQL already resolved parameter comments. (NotNull)
      * @param filterType The type of execution filter. (NotNull)
@@ -34,7 +34,7 @@ public interface OutsideSqlFilter {
     String filterExecution(String executedSql, ExecutionFilterType filterType);
 
     /**
-     * Filter the outside-SQL immediately after reading a SQL file. (for user customization) <br />
+     * Filter the outside-SQL immediately after reading a SQL file. (for user customization) <br>
      * This filter is executed immediately after reading.
      * (but removing UTF-8 BOM and adjusting bind mark on comment are before the filter)
      * @param readSql The string of read outside-SQL still remained parameter comments. (NotNull)

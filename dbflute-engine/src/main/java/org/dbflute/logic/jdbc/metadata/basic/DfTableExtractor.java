@@ -47,12 +47,12 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                                                        Meta Getting
     //                                                                        ============
     /**
-     * Get all the table names in the current database that are not system tables. <br />
+     * Get all the table names in the current database that are not system tables. <br>
      * This does not contain additional schema. only specified schema is considered.
      * @param metaData JDBC database meta data. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @return The list of all the table meta info in a database.
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public List<DfTableMeta> getTableList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) throws SQLException {
         return doGetTableList(metaData, unifiedSchema);

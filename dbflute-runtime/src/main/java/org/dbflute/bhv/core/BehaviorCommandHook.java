@@ -16,8 +16,8 @@
 package org.dbflute.bhv.core;
 
 /**
- * The hook interface of behavior commands for call-back. <br />
- * You can hook before-and-finally of all behavior commands. <br />
+ * The hook interface of behavior commands for call-back. <br>
+ * You can hook before-and-finally of all behavior commands. <br>
  * The hook methods may be called by nested process
  * so you should pay attention to it when you implements this.
  * @author jflute

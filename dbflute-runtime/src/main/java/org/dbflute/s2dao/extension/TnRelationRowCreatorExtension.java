@@ -184,12 +184,12 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     }
 
     /**
-     * Do mapping next relation row. <br />
-     * This logic is similar to first relation mapping in {@link TnBeanListResultSetHandler}. <br />
+     * Do mapping next relation row. <br>
+     * This logic is similar to first relation mapping in {@link TnBeanListResultSetHandler}. <br>
      * So you should check it when this logic has modification.
      * @param res The resource of relation row creation. (NotNull)
      * @param row The base point row, which is previous relation row. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected void mappingNextRelation(TnRelationRowCreationResource res, Object row) throws SQLException {
         if (res.isStopCurrentRelationMapping()) {

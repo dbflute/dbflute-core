@@ -28,7 +28,7 @@ public interface PhysicalConnectionDigger {
      * Dig up the physical connection from logical one.
      * @param conn The connection supposed to be logical connection. (NotNull)
      * @return The instance of connection as physical one. (NotNull)
-     * @throws java.sql.SQLException
+     * @throws SQLException When it fails to handle the connection.
      */
     Connection digUp(Connection conn) throws SQLException;
 }

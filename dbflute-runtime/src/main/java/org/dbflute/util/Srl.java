@@ -1400,14 +1400,22 @@ public class Srl {
     //                                                                                Fill
     //                                                                                ====
     public static String rfill(String str, int size) {
-        return doFill(str, size, false);
+        return doFill(str, size, false, ' ');
+    }
+
+    public static String rfill(String str, int size, Character addedChar) {
+        return doFill(str, size, false, addedChar);
     }
 
     public static String lfill(String str, int size) {
-        return doFill(str, size, true);
+        return doFill(str, size, true, ' ');
     }
 
-    protected static String doFill(String str, int size, boolean left) {
+    public static String lfill(String str, int size, Character addedChar) {
+        return doFill(str, size, true, addedChar);
+    }
+
+    protected static String doFill(String str, int size, boolean left, Character addedChar) {
         assertStringNotNull(str);
         if (str.length() >= size) {
             return str;
@@ -1415,7 +1423,7 @@ public class Srl {
         final int addSize = size - str.length();
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < addSize; i++) {
-            sb.append(" ");
+            sb.append(addedChar);
         }
         if (left) {
             return sb + str;
@@ -1961,7 +1969,7 @@ public class Srl {
     //                                                                       Line Handling
     //                                                                       =============
     /**
-     * Remove empty lines. <br />
+     * Remove empty lines. <br>
      * And CR is removed.
      * @param str The target string. (NotNull)
      * @return The filtered string. (NotNull)
@@ -2023,7 +2031,7 @@ public class Srl {
     }
 
     /**
-     * Adjust initial character(s) as beans property. <br />
+     * Adjust initial character(s) as beans property. <br>
      * Basically same as initUncap() method except only when
      * it starts with two upper case character, for example, 'EMecha'
      * @param capitalizedName The capitalized name for beans property. (NotNull)
@@ -2171,7 +2179,7 @@ public class Srl {
     }
 
     /**
-     * Remove line comments. <br />
+     * Remove line comments. <br>
      * And CR is removed.
      * @param sql The string of SQL. (NotNull)
      * @return The filtered string. (NotNull)
@@ -2453,9 +2461,9 @@ public class Srl {
 
     /**
      * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @throws IllegalArgumentException
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
+     * @throws IllegalArgumentException When the argument is null.
      */
     protected static void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
@@ -2470,8 +2478,8 @@ public class Srl {
 
     /**
      * Assert that the entity is not null and not trimmed empty.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
      */
     protected static void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);

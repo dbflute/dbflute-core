@@ -123,7 +123,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     }
 
     /**
-     * Get the query call with sync. <br />
+     * Get the query call with sync. <br>
      * This method is basically for SpecifyColumn.
      * Don't set this (or call-back that uses this) to other objects.
      * @return The instance of query call. (NotNull)

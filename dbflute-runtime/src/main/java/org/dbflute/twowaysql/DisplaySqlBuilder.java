@@ -17,8 +17,12 @@ package org.dbflute.twowaysql;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.TimeZone;
+import java.util.function.BooleanSupplier;
 
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.system.DBFluteSystem;
@@ -35,9 +39,9 @@ public class DisplaySqlBuilder {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
-    public static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
-    public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
+    public static final String DEFAULT_DATE_FORMAT = DfTypeUtil.HYPHENED_DATE_PATTERN;
+    public static final String DEFAULT_TIMESTAMP_FORMAT = DfTypeUtil.HYPHENED_TIMESTAMP_PATTERN;
+    public static final String DEFAULT_TIME_FORMAT = DfTypeUtil.COLONED_TIME_PATTERN;
     public static final String NULL = "null";
 
     // ===================================================================================
@@ -226,9 +230,15 @@ public class DisplaySqlBuilder {
             return quote(bindVariable.toString());
         } else if (bindVariable instanceof Number) {
             return bindVariable.toString();
-        } else if (bindVariable instanceof Timestamp) {
+        } else if (bindVariable instanceof LocalDate) { // #dateParade
+            return buildLocalDateText(bindVariable);
+        } else if (bindVariable instanceof LocalDateTime) {
+            return buildLocalDateTimeText(bindVariable);
+        } else if (bindVariable instanceof LocalTime) {
+            return buildLocalTimeText(bindVariable);
+        } else if (bindVariable instanceof Timestamp) { // should be before util.Date
             return buildTimestampText(bindVariable);
-        } else if (bindVariable instanceof Time) {
+        } else if (bindVariable instanceof Time) { // should be before util.Date
             return buildTimeText(bindVariable);
         } else if (bindVariable instanceof java.util.Date) {
             return buildDateText(bindVariable);
@@ -244,39 +254,82 @@ public class DisplaySqlBuilder {
     // ===================================================================================
     //                                                                       Date Handling
     //                                                                       =============
-    protected String buildTimestampText(Object bindVariable) {
-        final String realPattern = getTimestampPattern();
-        final java.util.Date date = (java.util.Date) bindVariable;
-        return processDateDisplay(date, realPattern);
+    protected String buildLocalDateText(Object bindVariable) {
+        return processLocalDateDisplay((LocalDate) bindVariable, getLocalDatePattern());
     }
 
-    protected String buildTimeText(Object bindVariable) {
-        final String realPattern = getTimePattern();
-        final java.util.Date date = (java.util.Date) bindVariable;
-        return quote(DfTypeUtil.toString(date, realPattern));
+    protected String buildLocalDateTimeText(Object bindVariable) {
+        return processLocalDateTimeDisplay((LocalDateTime) bindVariable, getLocalDateTimePattern());
+    }
+
+    protected String buildLocalTimeText(Object bindVariable) {
+        return processLocalTimeDisplay((LocalTime) bindVariable, getLocalTimePattern());
     }
 
     protected String buildDateText(Object bindVariable) {
-        final String realPattern = getDatePattern();
-        final java.util.Date date = (java.util.Date) bindVariable;
-        return processDateDisplay(date, realPattern);
+        return processDateDisplay((java.util.Date) bindVariable, getDatePattern());
+    }
+
+    protected String buildTimestampText(Object bindVariable) {
+        return processDateDisplay((java.util.Date) bindVariable, getTimestampPattern());
+    }
+
+    protected String buildTimeText(Object bindVariable) {
+        return quote(DfTypeUtil.toString((java.util.Date) bindVariable, getTimePattern()));
+    }
+
+    protected String processLocalDateDisplay(LocalDate date, String format) {
+        final DateFormatResource resource = analyzeDateFormat(format);
+        String disp = DfTypeUtil.toStringLocalDate(date, resource.getFormat());
+        disp = filterBCPrefix(disp, () -> isBCPrefixTarget(date, resource));
+        return quote(disp, resource);
+    }
+
+    protected String processLocalDateTimeDisplay(LocalDateTime date, String format) {
+        final DateFormatResource resource = analyzeDateFormat(format);
+        String disp = DfTypeUtil.toStringLocalDateTime(date, resource.getFormat());
+        disp = filterBCPrefix(disp, () -> isBCPrefixTarget(date, resource));
+        return quote(disp, resource);
+    }
+
+    protected String processLocalTimeDisplay(LocalTime date, String format) {
+        final DateFormatResource resource = analyzeDateFormat(format);
+        final String disp = DfTypeUtil.toStringLocalTime(date, resource.getFormat());
+        return quote(disp, resource);
     }
 
     protected String processDateDisplay(java.util.Date date, String format) {
         final DateFormatResource resource = analyzeDateFormat(format);
         String disp = DfTypeUtil.toStringDate(date, resource.getFormat(), getTimeZone());
-        if (isBCPrefixTarget(date, resource)) {
-            // fixed specification, basically not use 'G'
-            // in pattern at least default pattern
-            // because it should be displayed only when BC date
-            disp = "BC" + disp;
-        }
+        disp = filterBCPrefix(disp, () -> isBCPrefixTarget(date, resource));
         return quote(disp, resource);
+    }
+
+    protected String filterBCPrefix(String disp, BooleanSupplier noArgLambda) {
+        // fixed specification, basically not use 'G'
+        // in pattern at least default pattern
+        // because it should be displayed only when BC date
+        return noArgLambda.getAsBoolean() ? ("BC" + disp) : disp;
     }
 
     // -----------------------------------------------------
     //                                         Style Pattern
     //                                         -------------
+    protected String getLocalDatePattern() {
+        final String datePattern = _dateDisplayStyle.getDatePattern();
+        return datePattern != null ? datePattern : DEFAULT_DATE_FORMAT;
+    }
+
+    protected String getLocalDateTimePattern() {
+        final String datePattern = _dateDisplayStyle.getTimestampPattern();
+        return datePattern != null ? datePattern : DEFAULT_TIMESTAMP_FORMAT;
+    }
+
+    protected String getLocalTimePattern() {
+        final String datePattern = _dateDisplayStyle.getTimePattern();
+        return datePattern != null ? datePattern : DEFAULT_TIME_FORMAT;
+    }
+
     protected String getDatePattern() {
         final String datePattern = _dateDisplayStyle.getDatePattern();
         return datePattern != null ? datePattern : DEFAULT_DATE_FORMAT;
@@ -294,15 +347,30 @@ public class DisplaySqlBuilder {
 
     protected TimeZone getTimeZone() {
         final BoundDateDisplayTimeZoneProvider provider = _dateDisplayStyle.getTimeZoneProvider();
-        return provider != null ? provider.provide() : DBFluteSystem.getFinalTimeZone();
+        return provider != null ? provider.provide() : getDBFluteSystemFinalTimeZone();
+    }
+
+    protected TimeZone getDBFluteSystemFinalTimeZone() {
+        return DBFluteSystem.getFinalTimeZone();
     }
 
     // -----------------------------------------------------
     //                                              AD or BC
     //                                              --------
     protected boolean isBCPrefixTarget(java.util.Date date, DateFormatResource resource) {
-        final String format = resource.getFormat();
-        return DfTypeUtil.isDateBC(date) && format.startsWith("yyyy") && !format.contains("G");
+        return DfTypeUtil.isDateBC(date) && judgeBCPrefixTargetFormat(resource.getFormat());
+    }
+
+    protected boolean isBCPrefixTarget(LocalDate date, DateFormatResource resource) {
+        return DfTypeUtil.isLocalDateBC(date) && judgeBCPrefixTargetFormat(resource.getFormat());
+    }
+
+    protected boolean isBCPrefixTarget(LocalDateTime date, DateFormatResource resource) {
+        return DfTypeUtil.isLocalDateBC(date.toLocalDate()) && judgeBCPrefixTargetFormat(resource.getFormat());
+    }
+
+    protected boolean judgeBCPrefixTargetFormat(String format) {
+        return format.startsWith("yyyy") && !format.contains("G");
     }
 
     // -----------------------------------------------------
@@ -322,13 +390,13 @@ public class DisplaySqlBuilder {
     protected DateFormatResource analyzeDateFormat(String format) {
         final DateFormatResource resource = new DateFormatResource();
         final String dfMark = "$df:{";
-        final int dfMarkBeginIndex = format.indexOf(dfMark);
-        if (dfMarkBeginIndex >= 0) {
-            final String rear = format.substring(dfMarkBeginIndex + dfMark.length());
+        final int dfmarkBeginIndex = format.indexOf(dfMark);
+        if (dfmarkBeginIndex >= 0) {
+            final String rear = format.substring(dfmarkBeginIndex + dfMark.length());
             final int dfMarkEndIndex = rear.indexOf("}");
             if (dfMarkEndIndex >= 0) {
                 resource.setFormat(rear.substring(0, dfMarkEndIndex));
-                resource.setPrefix(format.substring(0, dfMarkBeginIndex));
+                resource.setPrefix(format.substring(0, dfmarkBeginIndex));
                 resource.setSuffix(rear.substring(dfMarkEndIndex + "}".length()));
                 return resource;
             }

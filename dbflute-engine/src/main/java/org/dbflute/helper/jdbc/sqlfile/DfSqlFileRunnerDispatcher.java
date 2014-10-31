@@ -33,7 +33,7 @@ public interface DfSqlFileRunnerDispatcher {
      * @param st Statement. (NotNull)
      * @param sql SQL string. (NotNull)
      * @return The type of dispatch result. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     DfRunnerDispatchResult dispatch(File sqlFile, Statement st, String sql) throws SQLException;
 }

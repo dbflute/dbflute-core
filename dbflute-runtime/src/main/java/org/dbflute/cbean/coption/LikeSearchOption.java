@@ -337,7 +337,7 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     //                                          Optimization
     //                                          ------------
     /**
-     * Optimize compound columns by fixed size. <br />
+     * Optimize compound columns by fixed size. <br>
      * The columns specified their sizes should be fixed-size string type 'char'. (but no check so attention)
      * @param sizes The array of column size for main column and compound columns. (NotNull)
      * @return this. (NotNull)

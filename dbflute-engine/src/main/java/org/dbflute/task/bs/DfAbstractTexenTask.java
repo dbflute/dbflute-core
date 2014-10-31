@@ -183,8 +183,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     /**
-     * Get data source for main connection. <br />
-     * It returns valid data source after setupDataSource() success. <br />
+     * Get data source for main connection. <br>
+     * It returns valid data source after setupDataSource() success. <br>
      * Basically not null but when data source does not exist on thread, it returns null.
      * @return The data source with schema. (NullAllowed: when data source does not exist on thread, e.g. lazy connection)
      */

@@ -36,7 +36,7 @@ import ${myExtendedEntityPackageName}.*;
 #end
 
 /**
- * The simple DTO of ${table.basicInfoDispString}. <br />
+ * The simple DTO of ${table.basicInfoDispString}. <br>
 #if ($table.isCommentForJavaDocValid())
  * ${table.commentForJavaDoc}
 #end
@@ -135,7 +135,7 @@ public abstract class $myClassName implements Serializable {
 #if ($col.hasClassification())
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br>
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -152,7 +152,7 @@ public abstract class $myClassName implements Serializable {
     }
 
     /**
-     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br>
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -172,7 +172,7 @@ public abstract class $myClassName implements Serializable {
 #if ($col.hasClassification())
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}. <br />
+     * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}. <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void set${col.javaName}_${classificationElement.name}() {
@@ -189,7 +189,7 @@ public abstract class $myClassName implements Serializable {
 #if ($col.hasClassification())
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Is the value of ${col.uncapitalisedJavaName} '${classificationElement.name}'? <br />
+     * Is the value of ${col.uncapitalisedJavaName} '${classificationElement.name}'? <br>
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
@@ -344,7 +344,7 @@ public abstract class $myClassName implements Serializable {
     //                                                                            ========
 #foreach ($col in $table.columns)
     /**
-     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
@@ -373,7 +373,7 @@ public abstract class $myClassName implements Serializable {
     }
 
     /**
-     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end

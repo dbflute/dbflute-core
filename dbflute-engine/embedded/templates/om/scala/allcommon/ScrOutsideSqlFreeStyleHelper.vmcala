@@ -78,7 +78,7 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
     //                                                                              Entity
     //                                                                              ======
     /**
-     * Select entity by the outside-SQL. {FreeStyle Interface}<br />
+     * Select entity by the outside-SQL. {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -109,7 +109,7 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select the list of the entity by the outsideSql. {FreeStyle Interface}<br />
+     * Select the list of the entity by the outsideSql. {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -147,7 +147,7 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
     //                                                                             Execute
     //                                                                             =======
     /**
-     * Execute the outsideSql. (insert, update, delete, etc...) {FreeStyle Interface}<br />
+     * Execute the outsideSql. (insert, update, delete, etc...) {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type).
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -168,8 +168,8 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
     //                                                                              Paging
     //                                                                              ======
     /**
-     * Select page by the outside-SQL. {FreeStyle Interface}<br />
-     * (both count-select and paging-select are executed)<br />
+     * Select page by the outside-SQL. {FreeStyle Interface}<br>
+     * (both count-select and paging-select are executed)<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -240,8 +240,8 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
     }
 
     /**
-     * Select list with paging by the outside-SQL. {FreeStyle Interface}<br />
-     * (count-select is not executed, only paging-select)<br />
+     * Select list with paging by the outside-SQL. {FreeStyle Interface}<br>
+     * (count-select is not executed, only paging-select)<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -314,7 +314,7 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
     //                                                                              Cursor
     //                                                                              ======
     /**
-     * Select the cursor of the entity by outside-SQL. {FreeStyle Interface}<br />
+     * Select the cursor of the entity by outside-SQL. {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type), cursor-handler.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -374,7 +374,7 @@ class ScrOutsideSqlFreeStyleBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExe
     //                                            Format SQL
     //                                            ----------
     /**
-     * Set up format-SQL for this outsideSql. <br />
+     * Set up format-SQL for this outsideSql. <br>
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */
@@ -423,8 +423,8 @@ class ScrOutsideSqlFreeStyleAutoPagingExecutor[BEHAVIOR](executor: OutsideSqlAut
     //                                                                                Page
     //                                                                                ====
     /**
-     * Select page by the outside-SQL. {FreeStyle Interface}<br />
-     * (both count-select and paging-select are executed)<br />
+     * Select page by the outside-SQL. {FreeStyle Interface}<br>
+     * (both count-select and paging-select are executed)<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -498,8 +498,8 @@ class ScrOutsideSqlFreeStyleAutoPagingExecutor[BEHAVIOR](executor: OutsideSqlAut
     //                                                                                List
     //                                                                                ====
     /**
-     * Select list only of paging by the outside-SQL. {FreeStyle Interface}<br />
-     * (count-select is not executed, only paging-select)<br />
+     * Select list only of paging by the outside-SQL. {FreeStyle Interface}<br>
+     * (count-select is not executed, only paging-select)<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;

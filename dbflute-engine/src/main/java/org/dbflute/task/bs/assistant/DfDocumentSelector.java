@@ -169,7 +169,7 @@ public class DfDocumentSelector {
     //                                                                  Properties Request
     //                                                                  ==================
     /**
-     * Load requests for properties HTML. <br />
+     * Load requests for properties HTML. <br>
      * If no property, do nothing.
      */
     public void loadPropertiesHtmlRequest() {

@@ -57,8 +57,8 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
      * cb.<span style="color: #CC4747">paging</span>(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * PagingResultBean&lt;Member&gt; page = memberBhv.<span style="color: #CC4747">selectPage</span>(cb);
      * </pre>
-     * @param pageSize The page size per one page. (NotMinus & NotZero)
-     * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
+     * @param pageSize The page size per one page. (NotMinus, NotZero)
+     * @param pageNumber The number of page. It's ONE origin. (NotMinus, NotZero: If it's minus or zero, it treats as one.)
      * @throws org.dbflute.exception.PagingPageSizeNotPlusException When the page size for paging is minus or zero. 
      */
     void paging(int pageSize, int pageNumber);
@@ -70,29 +70,29 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     void xsetPaging(boolean paging);
 
     /**
-     * Enable paging count-later that means counting after selecting. (back to default) <br />
+     * Enable paging count-later that means counting after selecting. (back to default) <br>
      * You can use it by default on DBFlute so you don't need to call this basically.
-     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
+     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br>
      * You should call this before execution of selectPage().
      */
     void enablePagingCountLater();
 
     /**
-     * Disable paging count-later that means counting after selecting. (default is enabled) <br />
+     * Disable paging count-later that means counting after selecting. (default is enabled) <br>
      * You should call this before execution of selectPage().
      */
     void disablePagingCountLater();
 
     /**
-     * Enable paging re-select that is executed when the page number is over page count. (back to default) <br />
+     * Enable paging re-select that is executed when the page number is over page count. (back to default) <br>
      * You can use it by default on DBFlute so you don't need to call this basically.
-     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
+     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br>
      * You should call this before execution of selectPage().
      */
     void enablePagingReSelect();
 
     /**
-     * Disable paging re-select that is executed when the page number is over page count. (default is enabled) <br />
+     * Disable paging re-select that is executed when the page number is over page count. (default is enabled) <br>
      * You should call this before execution of selectPage().
      */
     void disablePagingReSelect();
@@ -108,28 +108,27 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
      * cb.query().addOrderBy_Birthdate_Desc();
      * cb.<span style="color: #CC4747">fetchFirst</span>(5); <span style="color: #3F7E5E">// top 5</span>
      * ListResultBean&lt;Member&gt; memberList = memberBhv.<span style="color: #CC4747">selectList</span>(cb);
-     * </pre>
-     * @param fetchSize The size of fetch. (NotMinus & NotZero)
+     * @param fetchSize The size of fetch. (NotMinus, NotZero)
      * @return this. (NotNull)
      */
     PagingBean fetchFirst(int fetchSize);
 
     /**
-     * Fetch records in the scope only. {Internal}<br />
-     * This method is an old style, so you should use paging() instead of this. <br />
+     * Fetch records in the scope only. {Internal}<br>
+     * This method is an old style, so you should use paging() instead of this. <br>
      * @param fetchStartIndex The start index of fetch. 0 origin. (NotMinus)
-     * @param fetchSize The size of fetch. (NotMinus & NotZero)
+     * @param fetchSize The size of fetch. (NotMinus, NotZero)
      * @return this. (NotNull)
      */
     PagingBean xfetchScope(int fetchStartIndex, int fetchSize);
 
     /**
-     * Fetch page. {Internal}<br />
-     * This method is an old style, so you should use paging() instead of this. <br />
-     * When you call this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. <br />
-     * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'. <br />
+     * Fetch page. {Internal}<br>
+     * This method is an old style, so you should use paging() instead of this. <br>
+     * When you call this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. <br>
+     * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'. <br>
      * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
-     * @param fetchPageNumber The page number of fetch. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
+     * @param fetchPageNumber The page number of fetch. 1 origin. (NotMinus, NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
     PagingBean xfetchPage(int fetchPageNumber);
@@ -149,32 +148,32 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     //                                                                      Fetch Property
     //                                                                      ==============
     /**
-     * Get fetch-start-index.
-     * @return Fetch-start-index.
+     * Get fetch start index.
+     * @return The index of fetch-start.
      */
     int getFetchStartIndex();
 
     /**
-     * Get fetch-size.
-     * @return Fetch-size.
+     * Get fetch size.
+     * @return The size of fetching rows.
      */
     int getFetchSize();
 
     /**
-     * Get fetch-page-number.
-     * @return Fetch-page-number.
+     * Get fetch page number.
+     * @return The page number of fetch.
      */
     int getFetchPageNumber();
 
     /**
      * Get page start index.
-     * @return Page start index. 0 origin. (NotMinus)
+     * @return The index of page start, 0 origin. (NotMinus)
      */
     int getPageStartIndex();
 
     /**
      * Get page end index.
-     * @return Page end index. 0 origin. (NotMinus)
+     * @return The index of page end, 0 origin. (NotMinus)
      */
     int getPageEndIndex();
 

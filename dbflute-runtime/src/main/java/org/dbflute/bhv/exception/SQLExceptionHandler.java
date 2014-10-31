@@ -195,7 +195,7 @@ public class SQLExceptionHandler {
     //}
 
     /**
-     * Set up the element of target SQL. <br />
+     * Set up the element of target SQL. <br>
      * It uses displaySql as default.
      * <p>
      * If you want to hide application data on exception message,

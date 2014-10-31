@@ -17,6 +17,7 @@ package org.dbflute.cbean.ordering;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationCodeType;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.twowaysql.DisplaySqlBuilder;
 import org.dbflute.util.DfTypeUtil;
 
 /**
@@ -176,26 +178,23 @@ public class ManualOrderOption implements ColumnCalculator {
     }
 
     /**
-     * Add 'when' element for 'case' statement as FromTo using local date. <br />
-     * You can set various from-to patterns by the from-to option. <br />
-     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br />
+     * Add 'when' element for 'case' statement as FromTo using local date. <br>
+     * You can set various from-to patterns by the from-to option. <br>
+     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br>
      * See the {@link FromToOption} class for the details.
      * @param fromDate The local date as from-date. (basically NotNull: null allowed if one-side allowed)
      * @param toDate The local date as to-date. (basically NotNull: null allowed if one-side allowed)
      * @param opLambda The callback for option of from-to. (NotNull)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public HpMobConnectedBean when_FromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) {
-        assertFromToOptionCall(opLambda);
-        final FromToOption op = createFromToOption();
-        opLambda.callback(op);
-        return doWhen_FromTo(toDate(fromDate), toDate(toDate), op);
+    public HpMobConnectedBean when_FromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) { // #dateParade
+        return doWhen_FromTo(toDate(fromDate), toDate(toDate), createFromToOption(opLambda));
     }
 
     /**
-     * Add 'when' element for 'case' statement as FromTo using local date-time. <br />
-     * You can set various from-to patterns by the from-to option. <br />
-     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br />
+     * Add 'when' element for 'case' statement as FromTo using local date-time. <br>
+     * You can set various from-to patterns by the from-to option. <br>
+     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br>
      * See the {@link FromToOption} class for the details.
      * @param fromDate The local date-time as from-date. (basically NotNull: null allowed if one-side allowed)
      * @param toDate The local date-time as to-date. (basically NotNull: null allowed if one-side allowed)
@@ -203,16 +202,13 @@ public class ManualOrderOption implements ColumnCalculator {
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
     public HpMobConnectedBean when_FromTo(LocalDateTime fromDate, LocalDateTime toDate, ConditionOptionCall<FromToOption> opLambda) {
-        assertFromToOptionCall(opLambda);
-        final FromToOption op = createFromToOption();
-        opLambda.callback(op);
-        return doWhen_FromTo(toDate(fromDate), toDate(toDate), op);
+        return doWhen_FromTo(toDate(fromDate), toDate(toDate), createFromToOption(opLambda));
     }
 
     /**
-     * Add 'when' element for 'case' statement as FromTo. <br />
-     * You can set various from-to patterns by the from-to option. <br />
-     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br />
+     * Add 'when' element for 'case' statement as FromTo. <br>
+     * You can set various from-to patterns by the from-to option. <br>
+     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br>
      * See the {@link FromToOption} class for the details.
      * @param fromDate The date as from-date. (basically NotNull: null allowed if one-side allowed)
      * @param toDate The date as to-date. (basically NotNull: null allowed if one-side allowed)
@@ -220,20 +216,24 @@ public class ManualOrderOption implements ColumnCalculator {
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
     public HpMobConnectedBean when_FromTo(Date fromDate, Date toDate, ConditionOptionCall<FromToOption> opLambda) {
+        return doWhen_FromTo(fromDate, toDate, createFromToOption(opLambda));
+    }
+
+    protected FromToOption createFromToOption(ConditionOptionCall<FromToOption> opLambda) {
         assertFromToOptionCall(opLambda);
-        final FromToOption op = createFromToOption();
+        final FromToOption op = newFromToOption();
         opLambda.callback(op);
-        return doWhen_FromTo(fromDate, toDate, op);
+        return op;
     }
 
     protected void assertFromToOptionCall(ConditionOptionCall<FromToOption> opLambda) {
         if (opLambda == null) {
             String msg = "The argument 'opLambda' for from-to option of ManualOrder should not be null.";
-            throw new IllegalArgumentException(msg);
+            throw new IllegalConditionBeanOperationException(msg);
         }
     }
 
-    protected FromToOption createFromToOption() {
+    protected FromToOption newFromToOption() {
         return new FromToOption();
     }
 
@@ -250,21 +250,23 @@ public class ManualOrderOption implements ColumnCalculator {
     protected void assertFromToOption(FromToOption option) {
         if (option == null) {
             String msg = "The argument 'option' for from-to should not be null.";
-            throw new IllegalArgumentException(msg);
+            throw new IllegalConditionBeanOperationException(msg);
         }
     }
 
     protected void assertFromToDateBothExistsOrOneSideAllowed(Date fromDate, Date toDate, FromToOption option) {
         final boolean oneSideAllowed = option.isOneSideAllowed();
         if (fromDate == null && toDate == null) {
-            String msg = "The both arguments for from-to were null: " + option;
-            throw new IllegalArgumentException(msg);
+            String msg = "The both arguments of from-to for ManualOrder were null: " + option;
+            throw new IllegalConditionBeanOperationException(msg);
         } else if (fromDate == null && !oneSideAllowed) {
-            String msg = "The argument 'fromDate' for from-to was null: toDate=" + toDate + " option=" + option;
-            throw new IllegalArgumentException(msg);
+            String msg = "The argument 'fromDate' of from-to for ManualOrder was null:";
+            msg = msg + " toDate=" + toDate + " option=" + option;
+            throw new IllegalConditionBeanOperationException(msg);
         } else if (toDate == null && !oneSideAllowed) {
-            String msg = "The argument 'toDate' for from-to was null: fromDate=" + toDate + " option=" + option;
-            throw new IllegalArgumentException(msg);
+            String msg = "The argument 'toDate' of from-to for ManualOrder was null:";
+            msg = msg + " fromDate=" + fromDate + " option=" + option;
+            throw new IllegalConditionBeanOperationException(msg);
         }
     }
 
@@ -405,7 +407,7 @@ public class ManualOrderOption implements ColumnCalculator {
     }
 
     /**
-     * Add 'else' value. (Basically for SwitchOrder) <br />
+     * Add 'else' value. (Basically for SwitchOrder) <br>
      * You should set 'then' values before calling this.
      * @param elseValue The value for 'else', String, Integer, Date, DreamCruiseTicket... (NotNull)
      */
@@ -614,7 +616,7 @@ public class ManualOrderOption implements ColumnCalculator {
     //                                                                     Binding Process
     //                                                                     ===============
     /**
-     * Bind parameters for manual order. <br />
+     * Bind parameters for manual order. <br>
      * It is called from DBFlute runtime internally.
      * @param handler The handler for free parameters. (NotNull)
      */
@@ -649,6 +651,9 @@ public class ManualOrderOption implements ColumnCalculator {
         }
     }
 
+    // -----------------------------------------------------
+    //                                         Resolve Bound
+    //                                         -------------
     protected Object resolveBoundValue(HpManualOrderThemeListHandler handler, Object plainValue, boolean suppressBinding) {
         if (plainValue == null) {
             return null;
@@ -674,7 +679,7 @@ public class ManualOrderOption implements ColumnCalculator {
                 }
             } else if (plainValue instanceof Number) {
                 boundExp = buildLiteralNumberExpression(plainValue);
-            } else if (plainValue instanceof Date) {
+            } else if (isAnyLocalDate(plainValue) || plainValue instanceof Date) { // #dateParade
                 boundExp = buildLiteralDateExpression(plainValue);
             } else {
                 String notice = "The binding of the type is unsupported on the DBMS.";
@@ -698,6 +703,9 @@ public class ManualOrderOption implements ColumnCalculator {
         return columnExp;
     }
 
+    // -----------------------------------------------------
+    //                                        Classification
+    //                                        --------------
     protected Object handleClassificationOrderValue(Classification cls) {
         final Object orderValue;
         final String plainCode = cls.code();
@@ -729,14 +737,43 @@ public class ManualOrderOption implements ColumnCalculator {
         return codeType != null && codeType.equals(ClassificationCodeType.Number) && codeType.equals(ClassificationCodeType.Boolean);
     }
 
+    // -----------------------------------------------------
+    //                                       Number Handling
+    //                                       ---------------
     protected String buildLiteralNumberExpression(Object plainValue) {
         return plainValue.toString();
     }
 
-    protected String buildLiteralDateExpression(Object plainValue) {
-        return "'" + DfTypeUtil.toString(plainValue, "yyyy-MM-dd HH:mm:ss.SSS") + "'";
+    // -----------------------------------------------------
+    //                                         Date Handling
+    //                                         -------------
+    protected boolean isAnyLocalDate(Object plainValue) {
+        return DfTypeUtil.isAnyLocalDate(plainValue);
     }
 
+    protected String buildLiteralDateExpression(Object plainValue) {
+        if (plainValue instanceof LocalDate) { // local date cannot use time-part so check it
+            final String pattern = DisplaySqlBuilder.DEFAULT_DATE_FORMAT;
+            return doBuildLiteralDateExpression(DfTypeUtil.toStringLocalDate((LocalDate) plainValue, pattern));
+        } else if (plainValue instanceof LocalDateTime) {
+            final String pattern = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
+            return doBuildLiteralDateExpression(DfTypeUtil.toStringLocalDateTime((LocalDateTime) plainValue, pattern));
+        } else if (plainValue instanceof LocalTime) {
+            final String pattern = DisplaySqlBuilder.DEFAULT_TIME_FORMAT;
+            return doBuildLiteralDateExpression(DfTypeUtil.toStringLocalTime((LocalTime) plainValue, pattern));
+        } else { // instance of util.Date, as time-stamp fixedly (since 1.0.x)
+            final String pattern = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
+            return doBuildLiteralDateExpression(DfTypeUtil.toString(plainValue, pattern));
+        }
+    }
+
+    protected String doBuildLiteralDateExpression(String formatted) {
+        return "'" + formatted + "'";
+    }
+
+    // -----------------------------------------------------
+    //                                    Exception Handling
+    //                                    ------------------
     protected void throwUnsupportedTypeSpecifiedException(String notice, Object plainValue) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
@@ -750,6 +787,9 @@ public class ManualOrderOption implements ColumnCalculator {
         throw new IllegalConditionBeanOperationException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                     Then/Else Binding
+    //                                     -----------------
     public ManualOrderOption suppressThenBinding() {
         _suppressThenBinding = true;
         return this;
@@ -764,7 +804,7 @@ public class ManualOrderOption implements ColumnCalculator {
     //                                                                          Validation
     //                                                                          ==========
     /**
-     * Validate case-when constraints. <br />
+     * Validate case-when constraints. <br>
      * It is called from DBFlute runtime internally.
      */
     public void validate() { // called when set to query
@@ -965,7 +1005,7 @@ public class ManualOrderOption implements ColumnCalculator {
     }
 
     /**
-     * Get the 'else' value, which is bound. <br />
+     * Get the 'else' value, which is bound. <br>
      * It returns null if you set only 'else' value but not binding.
      * @return The value for 'else'. (NullAllowed)
      */

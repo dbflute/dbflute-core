@@ -28,7 +28,7 @@ public interface CursorHandler {
      * Handle the cursor.
      * @param rs The cursor (result set) for the query, which has first pointer. (NotNull)
      * @return The result object of handling process. (NullAllowed)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     Object handle(ResultSet rs) throws SQLException;
 }

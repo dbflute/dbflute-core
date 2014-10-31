@@ -62,7 +62,7 @@ public class SqlFireResultInfo {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Get the JDBC native result of SQL fire. <br />
+     * Get the JDBC native result of SQL fire. <br>
      * @return The instance of result. (NullAllowed)
      */
     public Object getNativeResult() {

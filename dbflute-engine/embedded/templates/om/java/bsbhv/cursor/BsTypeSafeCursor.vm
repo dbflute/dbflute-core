@@ -23,7 +23,7 @@ import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
- * The cursor of ${table.basicInfoDispString}. <br />
+ * The cursor of ${table.basicInfoDispString}. <br>
 #if ($table.isCommentForJavaDocValid())
  * ${table.commentForJavaDoc}
 #end
@@ -101,7 +101,7 @@ public class ${myClassName} {
     /**
      * Move to next result.
      * @return Is exist next result.
-     * @throws SQLException
+     * @throws SQLException When it fails to move the cursor to next point.
      */
     public boolean next() throws SQLException {
         return _rs.next();
@@ -112,12 +112,12 @@ public class ${myClassName} {
     //                                                                  ==================
 #foreach ($col in $table.columns)
     /**
-     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
      * @return The value of ${col.uncapitalisedJavaName}. (NullAllowed)
-     * @throws java.sql.SQLException
+     * @throws SQLException When it fails to get the value from result set.
      */
     public ${col.javaNative} get${col.javaName}() throws SQLException {
         return (${col.javaNative})_vt${col.javaName}.getValue(_rs, DB_NAME_${col.name});

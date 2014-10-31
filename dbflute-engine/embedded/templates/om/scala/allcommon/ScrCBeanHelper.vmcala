@@ -481,8 +481,8 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
 class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParameter[CB, PARAMETER]) {
 
     /**
-     * Set up the operand 'equal' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'equal' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -497,8 +497,8 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
     def equal(value: PARAMETER): Unit = { parameter.equal(value) }
 
     /**
-     * Set up the operand 'notEqual' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'notEqual' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -513,8 +513,8 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
     def notEqual(value: PARAMETER): Unit = { parameter.notEqual(value) }
 
     /**
-     * Set up the operand 'greaterThan' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'greaterThan' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -529,8 +529,8 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
     def greaterThan(value: PARAMETER): Unit = { parameter.greaterThan(value) }
 
     /**
-     * Set up the operand 'lessThan' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'lessThan' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -545,8 +545,8 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
     def lessThan(value: PARAMETER): Unit = { parameter.lessThan(value) }
 
     /**
-     * Set up the operand 'greaterEqual' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'greaterEqual' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -561,8 +561,8 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
     def greaterEqual(value: PARAMETER): Unit = { parameter.greaterEqual(value) }
 
     /**
-     * Set up the operand 'lessEqual' and the value of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'lessEqual' and the value of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -577,7 +577,7 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
     def lessEqual(value: PARAMETER): Unit = { parameter.lessEqual(value) }
 
     /**
-     * Set up the operand 'isNull' and the value of parameter. <br />
+     * Set up the operand 'isNull' and the value of parameter. <br>
      * The type of the parameter should be same as the type of target column. 
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -591,7 +591,7 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
     def isNull(): Unit = { parameter.isNull() }
 
     /**
-     * Set up the operand 'isNull' and the value of parameter. <br />
+     * Set up the operand 'isNull' and the value of parameter. <br>
      * The type of the parameter should be same as the type of target column. 
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -605,8 +605,8 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
     def isNotNull(): Unit = { parameter.isNotNull() }
 
     /**
-     * Set up the operand 'between' and the values of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the operand 'between' and the values of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -622,8 +622,8 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
     def between(fromValue: PARAMETER, toValue: PARAMETER): Unit = { parameter.between(fromValue, toValue) }
 
     /**
-     * Set up the comparison 'DateFromTo' and the values of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the comparison 'DateFromTo' and the values of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -640,8 +640,8 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
     def dateFromTo(fromDate: Date, toDate: Date): Unit = { parameter.dateFromTo(fromDate, toDate) }
 
     /**
-     * Set up the comparison 'FromTo' and the values of parameter. <br />
-     * The type of the parameter should be same as the type of target column. <br />
+     * Set up the comparison 'FromTo' and the values of parameter. <br>
+     * The type of the parameter should be same as the type of target column. <br>
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -682,7 +682,7 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
 class ScrHpSLSFunction[CB <: ConditionBean, RESULT](function: HpSLSFunction[CB, RESULT]) {
 
     /**
-     * Select the count value. <br />
+     * Select the count value. <br>
      * You can also get same result by selectCount(cb) method.
      * <pre>
      * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">count</span>(new ScalarQuery(MemberCB cb) {
@@ -700,7 +700,7 @@ class ScrHpSLSFunction[CB <: ConditionBean, RESULT](function: HpSLSFunction[CB, 
     }
 
     /**
-     * Select the count-distinct value. <br />
+     * Select the count-distinct value. <br>
      * You can also get same result by selectCount(cb) method.
      * <pre>
      * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
@@ -891,7 +891,7 @@ class ScrHpSSQDecorator[CB <: ConditionBean](decorator: HpSSQDecorator[CB]) {
     //                                                                          Decoration
     //                                                                          ==========
     /**
-     * Partition the scope of condition by the specified query. <br />
+     * Partition the scope of condition by the specified query. <br>
      * You can add a correlation condition to the sub-query.
      * <pre>
      * cb.query().scalar_Equal().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
@@ -1081,7 +1081,7 @@ class ScrColumnCalculator(calculator: ColumnCalculator) {
     def left(): ScrColumnCalculator = { calculator.left(); return this; }
 
     /**
-     * To be for right column. (default)<br />
+     * To be for right column. (default)<br>
      * It also means main process internally.
      * @return this. (NotNull)
      */

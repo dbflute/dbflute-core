@@ -17,9 +17,11 @@ package org.dbflute.system;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.dbflute.system.provider.DfCurrentDateProvider;
+import org.dbflute.system.provider.DfFinalLocaleProvider;
 import org.dbflute.system.provider.DfFinalTimeZoneProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,15 +41,21 @@ public class DBFluteSystem {
     //                                                                    Option Attribute
     //                                                                    ================
     /**
-     * The provider of current date for DBFlute system. <br />
-     * e.g. AccessContext might use this (actually, very very rare case) <br />
+     * The provider of current date for DBFlute system. <br>
+     * e.g. AccessContext might use this (actually, very very rare case) <br>
      * (NullAllowed: if null, server date might be used)
      */
     protected static DfCurrentDateProvider _currentDateProvider;
+    /**
+     * The provider of final default locale for DBFlute system. <br>
+     * e.g. DisplaySql, Date conversion, LocalDate mapping and so on... <br>
+     * (NullAllowed: if null, server locale might be used)
+     */
+    protected static DfFinalLocaleProvider _finalLocaleProvider;
 
     /**
-     * The provider of final default time-zone for DBFlute system. <br />
-     * e.g. DisplaySql, Date conversion, LocalDate mapping and so on... <br />
+     * The provider of final default time-zone for DBFlute system. <br>
+     * e.g. DisplaySql, Date conversion, LocalDate mapping and so on... <br>
      * (NullAllowed: if null, server zone might be used)
      */
     protected static DfFinalTimeZoneProvider _finalTimeZoneProvider;
@@ -89,10 +97,22 @@ public class DBFluteSystem {
     }
 
     // ===================================================================================
+    //                                                                        Final Locale
+    //                                                                        ============
+    /**
+     * Get the final default locale for DBFlute system. <br>
+     * basically for e.g. DisplaySql, Date conversion, LocalDate mapping and so on...
+     * @return The final default locale for DBFlute system. (NotNull: if no provider, server locale)
+     */
+    public static Locale getFinalLocale() {
+        return _finalLocaleProvider != null ? _finalLocaleProvider.provide() : Locale.getDefault();
+    }
+
+    // ===================================================================================
     //                                                                      Final TimeZone
     //                                                                      ==============
     /**
-     * Get the final default time-zone for DBFlute system. <br />
+     * Get the final default time-zone for DBFlute system. <br>
      * basically for e.g. DisplaySql, Date conversion, LocalDate mapping and so on...
      * @return The final default time-zone for DBFlute system. (NotNull: if no provider, server zone)
      */
@@ -136,6 +156,22 @@ public class DBFluteSystem {
             _log.info("...Setting currentDateProvider: " + currentDateProvider);
         }
         _currentDateProvider = currentDateProvider;
+        lock(); // auto-lock here, because of deep world
+    }
+
+    // -----------------------------------------------------
+    //                                          Final Locale
+    //                                          ------------
+    public static boolean hasFinalLocaleProvider() {
+        return _finalTimeZoneProvider != null;
+    }
+
+    public static void setFinalLocaleProvider(DfFinalLocaleProvider finalLocaleProvider) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting finalLocaleProvider: " + finalLocaleProvider);
+        }
+        _finalLocaleProvider = finalLocaleProvider;
         lock(); // auto-lock here, because of deep world
     }
 

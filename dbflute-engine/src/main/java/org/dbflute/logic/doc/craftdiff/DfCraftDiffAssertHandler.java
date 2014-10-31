@@ -68,7 +68,7 @@ public class DfCraftDiffAssertHandler {
      * @param sqlFile The SQL file that contains the assert SQL. (NotNull)
      * @param st The statement for the SQL. (NotNull)
      * @param sql The SQL string to assert. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public void handle(File sqlFile, Statement st, String sql) throws SQLException {
         prepareCraftMetaDir();

@@ -65,7 +65,7 @@ public class DfJdbcTypeMapper {
     //                                                                 Torque Type Getting
     //                                                                 ===================
     /**
-     * Get the JDBC type of the column. (contains point type-mapping) <br />
+     * Get the JDBC type of the column. (contains point type-mapping) <br>
      * Look at the java-doc of overload method if you want to know the priority of mapping.
      * @param columnMeta The meta information of column. (NotNull)
      * @return The JDBC type of the column. (NotNull)
@@ -109,7 +109,7 @@ public class DfJdbcTypeMapper {
     }
 
     /**
-     * Get the JDBC type of the column. <br /> 
+     * Get the JDBC type of the column. <br> 
      * The priority of mapping is as follows:
      * <pre>
      * 1. The specified type mapping by DB type name (typeMappingMap.dfprop)
@@ -240,7 +240,7 @@ public class DfJdbcTypeMapper {
     /**
      * Is the type 'PlainClob' as concept type? </br >
      * This type is not related to a way of JDBC handling,
-     * whether the type can be purely called 'CLOB type' or not. <br />
+     * whether the type can be purely called 'CLOB type' or not. <br>
      * But 'text' type is not contained to it.
      * @param dbTypeName The name of DB type. (NotNull)
      * @return The determination, true or false.

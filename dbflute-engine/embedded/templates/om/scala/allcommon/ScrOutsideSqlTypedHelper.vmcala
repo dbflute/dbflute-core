@@ -78,7 +78,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
     //                                                                       Entity Select
     //                                                                       =============
     /**
-     * Select entity by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Select entity by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -106,7 +106,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
     //                                                                         List Select
     //                                                                         ===========
     /**
-     * Select the list of the entity by the outsideSql. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Select the list of the entity by the outsideSql. <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -138,7 +138,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
     }
 
     /**
-     * Select the list of the entity by the outsideSql. {Typed Interface}<br />
+     * Select the list of the entity by the outsideSql. {Typed Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -176,8 +176,8 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
     //                                                                       Paging Select
     //                                                                       =============
     /**
-     * Select page limited by SQL skip by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * (both count-select and paging-select are executed)<br />
+     * Select page limited by SQL skip by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
+     * (both count-select and paging-select are executed)<br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -245,8 +245,8 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
     }
 
     /**
-     * Select list only of paging limited by SQL skip by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * (count-select is not executed, only paging-select)<br />
+     * Select list only of paging limited by SQL skip by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
+     * (count-select is not executed, only paging-select)<br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -298,7 +298,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
     }
 
     /**
-     * Prepare paging by cursor-skip. <br />
+     * Prepare paging by cursor-skip. <br>
      * Basically you should use paging limited by SQL like this:
      * <pre>
      * memberBhv.outsideSql().<span style="color: #CC4747">selectPage</span>(pmb);
@@ -319,7 +319,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
     //                                                                       Cursor Select
     //                                                                       =============
     /**
-     * Select the cursor of the entity by outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Select the cursor of the entity by outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path.
      * <pre>
@@ -356,7 +356,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
     //                                                                             Execute
     //                                                                             =======
     /**
-     * Execute the outsideSql. (insert, update, delete, etc...) <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Execute the outsideSql. (insert, update, delete, etc...) <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path.
      * <pre>
@@ -434,7 +434,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
     //                                            Format SQL
     //                                            ----------
     /**
-     * Set up format-SQL for this outsideSql. <br />
+     * Set up format-SQL for this outsideSql. <br>
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */
@@ -480,8 +480,8 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
 class ScrOutsideSqlTypedAutoPagingExecutor[BEHAVIOR](executor: OutsideSqlAutoPagingExecutor[BEHAVIOR]) {
 
     /**
-     * Select page limited by cursor skip by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * (both count-select and paging-select are executed)<br />
+     * Select page limited by cursor skip by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
+     * (both count-select and paging-select are executed)<br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -549,8 +549,8 @@ class ScrOutsideSqlTypedAutoPagingExecutor[BEHAVIOR](executor: OutsideSqlAutoPag
     }
 
     /**
-     * Select list only of paging limited by cursor skip by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br />
-     * (count-select is not executed, only paging-select)<br />
+     * Select list only of paging limited by cursor skip by the outside-SQL. <span style="color: #AD4747">{Typed Interface}</span><br>
+     * (count-select is not executed, only paging-select)<br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>

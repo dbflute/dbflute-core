@@ -26,7 +26,7 @@ import org.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 
 /**
- * The resource for relation row creation. <br />
+ * The resource for relation row creation. <br>
  * S2Dao logics are modified for DBFlute.
  * @author modified by jflute (originated in S2Dao)
  */
@@ -210,10 +210,10 @@ public class TnRelationRowCreationResource {
     //                                                                  Relation Row Cache
     //                                                                  ==================
     /**
-     * Prepare the relation key of the current relation. <br />
+     * Prepare the relation key of the current relation. <br>
      * The created relation key is returned and saved in this resource if the key is created.
      * @return The created relation key. (NullAllowed: null means the relation has no data)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public TnRelationKey prepareRelationKey() throws SQLException {
         final TnRelationKey relKey = doCreateRelationKey();
@@ -333,7 +333,7 @@ public class TnRelationRowCreationResource {
     //                                                                   Relation Selector
     //                                                                   =================
     /**
-     * Does it stop the mapping of the next level relation? <br />
+     * Does it stop the mapping of the next level relation? <br>
      * This contains various determinations for performance.
      * @return The determination, true or false.
      */
@@ -351,7 +351,7 @@ public class TnRelationRowCreationResource {
     }
 
     /**
-     * Does it stop the mapping of the current relation? <br />
+     * Does it stop the mapping of the current relation? <br>
      * This contains various determinations for performance.
      * @return The determination, true or false.
      */

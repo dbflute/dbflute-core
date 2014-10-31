@@ -54,7 +54,7 @@ import ${myDBMetaPackageName}._;
 import ${glPackageCB}._;
 
 /**
- * The behavior of ${table.basicInfoDispString}. <br />
+ * The behavior of ${table.basicInfoDispString}. <br>
  * <pre>
  * [primary key]
  *     ${table.primaryKeyNameCommaString}
@@ -109,7 +109,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     //                                                                        Count Select
     //                                                                        ============
     /**
-     * Select the count of uniquely-selected records by the condition-bean. {IgnorePagingCondition, IgnoreSpecifyColumn}<br />
+     * Select the count of uniquely-selected records by the condition-bean. {IgnorePagingCondition, IgnoreSpecifyColumn}<br>
      * SpecifyColumn is ignored but you can use it only to remove text type column for union's distinct.
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
@@ -127,9 +127,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     //                                                                       Entity Select
     //                                                                       =============
     /**
-     * Select the entity by the condition-bean. <br />
-     * It returns not-null optional entity, so you should ... <br />
-     * <span style="color: #AD4747; font-size: 120%">If the data always exists as your business rule, get() without check.</span> <br />
+     * Select the entity by the condition-bean. <br>
+     * It returns not-null optional entity, so you should ... <br>
+     * <span style="color: #AD4747; font-size: 120%">If the data always exists as your business rule, get() without check.</span> <br>
      * <span style="color: #AD4747; font-size: 120%">If it might be no data, get() after check by isPresent() or orElse(), ...</span>
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
@@ -183,7 +183,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     override protected def doReadEntity(cb: ConditionBean): Entity = { facadeSelectEntity(downcast(cb))().orNull }
 
     /**
-     * Select the entity by the condition-bean with deleted check. <br />
+     * Select the entity by the condition-bean with deleted check. <br>
      * <span style="color: #AD4747; font-size: 120%">If the data always exists as your business rule, this method is good.</span>
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
@@ -312,7 +312,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     //                                                                         Page Select
     //                                                                         ===========
     /**
-     * Select the page as result bean. <br />
+     * Select the page as result bean. <br>
      * (both count-select and paging-select are executed)
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
@@ -377,7 +377,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     //                                                                       Scalar Select
     //                                                                       =============
     /**
-     * Select the scalar value derived by a function from uniquely-selected records. <br />
+     * Select the scalar value derived by a function from uniquely-selected records. <br>
      * You should call a function method after this method called like as follows:
      * <pre>
      * ${myEntityVariableName}Bhv.<span style="color: #CC4747">scalarSelect</span>(Date.class).max(new ScalarQuery() {
@@ -403,7 +403,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     //                                                                            ========
 #if ($table.isUseSequence())
     /**
-     * Select the next value as sequence. <br />
+     * Select the next value as sequence. <br>
      * This method is called when insert() and set to primary-key automatically.
      * So you don't need to call this as long as you need to get next value before insert().
      * @return The next value. (NotNull)
@@ -454,7 +454,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
 #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
     /**
-     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br />
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br>
      * ${referrer.referrerDispForJavaDoc}
      * <pre>
      * ${myEntityVariableName}Bhv.<span style="color: #CC4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ${table.loadReferrerConditionSetupperName}&lt;${referrerCBClassName}&gt;() {
@@ -464,14 +464,14 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      *         cb.query().addOrderBy_Bar...();
      *     }
      * }); <span style="color: #3F7E5E">// you can load nested referrer from here</span>
-     * <span style="color: #3F7E5E">//}).withNestedList(referrerList -&gt {</span>
+     * <span style="color: #3F7E5E">//}).withNestedList(referrerList -&gt; {</span>
      * <span style="color: #3F7E5E">//    ...</span>
      * <span style="color: #3F7E5E">//});</span>
      * for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
      *     ... = ${myEntityVariableName}.<span style="color: #CC4747">get${referrer.referrerJavaBeansRulePropertyNameInitCap}()</span>;
      * }
      * </pre>
-     * About internal policy, the value of primary key (and others too) is treated as case-insensitive. <br />
+     * About internal policy, the value of primary key (and others too) is treated as case-insensitive. <br>
      * The condition-bean, which the set-upper provides, has settings before callback as follows:
      * <pre>
 #if ($referrer.isSimpleKeyFK())
@@ -493,7 +493,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     }
 
     /**
-     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br />
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} by the set-upper of referrer. <br>
      * ${referrer.referrerDispForJavaDoc}
      * <pre>
      * ${myEntityVariableName}Bhv.<span style="color: #CC4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ${table.loadReferrerConditionSetupperName}&lt;${referrerCBClassName}&gt;() {
@@ -503,12 +503,12 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
      *         cb.query().addOrderBy_Bar...();
      *     }
      * }); <span style="color: #3F7E5E">// you can load nested referrer from here</span>
-     * <span style="color: #3F7E5E">//}).withNestedList(referrerList -&gt {</span>
+     * <span style="color: #3F7E5E">//}).withNestedList(referrerList -&gt; {</span>
      * <span style="color: #3F7E5E">//    ...</span>
      * <span style="color: #3F7E5E">//});</span>
      * ... = ${myEntityVariableName}.<span style="color: #CC4747">get${referrer.referrerJavaBeansRulePropertyNameInitCap}()</span>;
      * </pre>
-     * About internal policy, the value of primary key (and others too) is treated as case-insensitive. <br />
+     * About internal policy, the value of primary key (and others too) is treated as case-insensitive. <br>
      * The condition-bean, which the set-upper provides, has settings before callback as follows:
      * <pre>
 #if ($referrer.isSimpleKeyFK())
@@ -689,11 +689,11 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
 
     /**
 #if ($table.hasOptimisticLock())
-     * Insert or update the entity modified-only. (DefaultConstraintsEnabled, ExclusiveControl) <br />
+     * Insert or update the entity modified-only. (DefaultConstraintsEnabled, ExclusiveControl) <br>
 #else
-     * Insert or update the entity modified-only. (DefaultConstraintsEnabled, NonExclusiveControl) <br />
+     * Insert or update the entity modified-only. (DefaultConstraintsEnabled, NonExclusiveControl) <br>
 #end
-     * if (the entity has no PK) { insert() } else { update(), but no data, insert() } <br />
+     * if (the entity has no PK) { insert() } else { update(), but no data, insert() } <br>
      * <p><span style="color: #CC4747; font-size: 120%">Attention, you cannot update by unique keys instead of PK.</span></p>
      * @param entityCall The callback for entity of insert or update. (NotNull, ...depends on insert or update)
      * @param insertOptionCall The callback for option of insert. (NoArgAllowed: then no option)
@@ -712,7 +712,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
 #if ($table.hasOptimisticLock())
 
     /**
-     * Insert or update the entity non-strictly modified-only. (DefaultConstraintsEnabled, NonExclusiveControl) <br />
+     * Insert or update the entity non-strictly modified-only. (DefaultConstraintsEnabled, NonExclusiveControl) <br>
      * if (the entity has no PK) { insert() } else { update(), but no data, insert() }
      * <p><span style="color: #CC4747; font-size: 120%">Attention, you cannot update by unique keys instead of PK.</span></p>
      * @param entityCall The callback for entity of insert or update. (NotNull, ...depends on insert or update)
@@ -782,8 +782,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     //                                                                        Batch Update
     //                                                                        ============
     /**
-     * Batch-insert the entity list modified-only of same-set columns. (DefaultConstraintsEnabled) <br />
-     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
+     * Batch-insert the entity list modified-only of same-set columns. (DefaultConstraintsEnabled) <br>
+     * This method uses executeBatch() of java.sql.PreparedStatement. <br>
      * <p><span style="color: #CC4747; font-size: 120%">The columns of least common multiple are registered like this:</span></p>
      * <pre>
      * for (... : ...) {
@@ -819,11 +819,11 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
 
     /**
 #if ($table.hasOptimisticLock())
-     * Batch-update the entity list modified-only of same-set columns. (ExclusiveControl) <br />
+     * Batch-update the entity list modified-only of same-set columns. (ExclusiveControl) <br>
 #else
-     * Batch-update the entity list modified-only of same-set columns. (NonExclusiveControl) <br />
+     * Batch-update the entity list modified-only of same-set columns. (NonExclusiveControl) <br>
 #end
-     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
+     * This method uses executeBatch() of java.sql.PreparedStatement. <br>
      * <span style="color: #CC4747; font-size: 120%">You should specify same-set columns to all entities like this:</span>
      * <pre>
      * for (... : ...) {
@@ -863,8 +863,8 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
 #if ($table.hasOptimisticLock())
 
     /**
-     * Batch-update the entity list non-strictly modified-only of same-set columns. (NonExclusiveControl) <br />
-     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
+     * Batch-update the entity list non-strictly modified-only of same-set columns. (NonExclusiveControl) <br>
+     * This method uses executeBatch() of java.sql.PreparedStatement. <br>
      * <span style="color: #CC4747; font-size: 140%">You should specify same-set columns to all entities like this:</span>
      * <pre>
      * for (... : ...) {
@@ -893,9 +893,9 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
 
     /**
 #if ($table.hasOptimisticLock())
-     * Batch-delete the entity list. (ExclusiveControl) <br />
+     * Batch-delete the entity list. (ExclusiveControl) <br>
 #else
-     * Batch-delete the entity list. (NonExclusiveControl) <br />
+     * Batch-delete the entity list. (NonExclusiveControl) <br>
 #end
      * This method uses executeBatch() of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
@@ -912,7 +912,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
 #if ($table.hasOptimisticLock())
 
     /**
-     * Batch-delete the entity list non-strictly. {NonExclusiveControl} <br />
+     * Batch-delete the entity list non-strictly. {NonExclusiveControl} <br>
      * This method uses executeBatch() of java.sql.PreparedStatement.
      * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @return The array of deleted count. (NotNull, EmptyAllowed)
@@ -1005,7 +1005,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     //                                                                       Entity Update
     //                                                                       =============
     /**
-     * Insert the entity for a table not defined primary key. <br />
+     * Insert the entity for a table not defined primary key. <br>
      * The auto-setup for common columns is unsupported.
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
@@ -1026,7 +1026,7 @@ abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassName}[${my
     //                                                                          OutsideSql
     //                                                                          ==========
     /**
-     * Prepare the basic executor of outside-SQL to execute it. <br />
+     * Prepare the basic executor of outside-SQL to execute it. <br>
      * The invoker of behavior command should be not null when you call this method.
      * <pre>
      * You can use the methods for outside-SQL are as follows:

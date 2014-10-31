@@ -187,7 +187,7 @@ public abstract class ConditionKey implements Serializable {
     //                                                                      Override Check
     //                                                                      ==============
     /**
-     * Does it need to override the existing value to register the value? <br />
+     * Does it need to override the existing value to register the value? <br>
      * This should be called in CallbackProcessor for e.g. in-line query
      * @param cvalue The object of condition value. (NotNull)
      * @return The determination, true or false.

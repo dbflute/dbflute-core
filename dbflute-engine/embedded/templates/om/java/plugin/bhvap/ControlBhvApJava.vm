@@ -107,17 +107,6 @@ $database.info("public void parseContainerConfig() {")
     $generator.parse("om/${glResourceDirectory}/plugin/bhvap/container/spring/BhvApSpringDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
   #end
 #end
-#if ($database.isTargetContainerLucy())
-  #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
-    #set ($path = "${dbfluteBeansPackageName}" )
-    $database.makeDirectory($path)
-
-    #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
-    #set ($path = $database.filterDBFluteBeansBhvAp($path) )
-    $database.info("    ${path}")
-    $generator.parse("om/${glResourceDirectory}/plugin/bhvap/container/lucy/BhvApLucyDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
-  #end
-#end
 #if ($database.isTargetContainerGuice())
   #set ($path = $database.getPackageAsPath(${glPackageBaseCommonAp}))
   $database.makeDirectory($path)

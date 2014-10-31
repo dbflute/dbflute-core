@@ -16,7 +16,7 @@
 package org.dbflute.immutable;
 
 /**
- * The interface of DB-able entity, used when immutable handling is available. <br />
+ * The interface of DB-able entity, used when immutable handling is available. <br>
  * The word 'DB-able' means entity that can be DBFlute handling.
  * @param <IMMU> The type of immutable entity corresponding the DB-able entity.
  * @author jflute

@@ -117,7 +117,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     }
 
     /**
-     * Create the provider of connection for database meta data. <br />
+     * Create the provider of connection for database meta data. <br>
      * The provider might provide connection from manual thread.
      * @return The instance of the connection provider. (NotNull)
      */

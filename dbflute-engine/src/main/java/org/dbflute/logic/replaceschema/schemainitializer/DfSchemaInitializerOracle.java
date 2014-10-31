@@ -88,7 +88,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     }
 
     /**
-     * Drop DB links that are private DB links. <br />
+     * Drop DB links that are private DB links. <br>
      * @param conn The connection to main schema. (NotNull)
      */
     protected void doDropDBLink(Connection conn) {

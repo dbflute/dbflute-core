@@ -44,8 +44,8 @@ import org.dbflute.cbean.ConditionBean;
 public interface ReferrerConditionSetupper<CB extends ConditionBean> {
 
     /**
-     * Set up condition-bean for referrer. <br />
-     * You can call SetupSelect, Query, OrderBy... <br />
+     * Set up condition-bean for referrer. <br>
+     * You can call SetupSelect, Query, OrderBy... <br>
      * Ordering by FK is already set up so you should add next order condition here.
      * <pre>
      * loader.<span style="color: #CC4747">loadPurchaseList</span>(memberList, referrerCB -&gt; {

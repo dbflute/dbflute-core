@@ -18,7 +18,7 @@ package org.dbflute.cbean.coption;
 import org.dbflute.cbean.dream.SpecifiedColumn;
 
 /**
- * The conversion option for column. e.g. ColumnQuery <br />
+ * The conversion option for column. e.g. ColumnQuery <br>
  * You can filter an aggregate function by scalar function filters.
  * @author jflute
  */
@@ -28,7 +28,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     //                                                                     Function Option
     //                                                                     ===============
     /**
-     * Set the value for coalesce function. <br />
+     * Set the value for coalesce function. <br>
      * If you set string value and the derived column is date type, it converts it to a date object internally.
      * For example, "2010-10-30 12:34:56.789", "2010/10/30" and so on ... are acceptable.
      * @param coalesce An alternate value when group function returns null. (NullAllowed: if null, no coalesce)
@@ -115,10 +115,10 @@ public class ColumnConversionOption extends FunctionFilterOption {
     }
 
     /**
-     * Add to the date or date-time value by the specified years column. <br />
+     * Add to the date or date-time value by the specified years column. <br>
      * Plus only, if you want minus, use substractYear() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT years)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT years)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -142,7 +142,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified years column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT years)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT years)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -177,10 +177,10 @@ public class ColumnConversionOption extends FunctionFilterOption {
     }
 
     /**
-     * Add to the date or date-time value by the specified months column. <br />
+     * Add to the date or date-time value by the specified months column. <br>
      * Plus only, if you want minus, use substractMonth() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT months)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT months)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -204,7 +204,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified months column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT months)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT months)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -239,10 +239,10 @@ public class ColumnConversionOption extends FunctionFilterOption {
     }
 
     /**
-     * Add to the date or date-time value by the specified days column. <br />
+     * Add to the date or date-time value by the specified days column. <br>
      * Plus only, if you want minus, use substractDay() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT days)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT days)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -266,7 +266,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified days column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT days)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT days)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -301,10 +301,10 @@ public class ColumnConversionOption extends FunctionFilterOption {
     }
 
     /**
-     * Add to the date or date-time value by the specified hours column. <br />
+     * Add to the date or date-time value by the specified hours column. <br>
      * Plus only, if you want minus, use substractHour() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT hours)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT hours)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -328,7 +328,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified hours column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT hours)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT hours)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -363,10 +363,10 @@ public class ColumnConversionOption extends FunctionFilterOption {
     }
 
     /**
-     * Add to the date or date-time value by the specified minutes column. <br />
+     * Add to the date or date-time value by the specified minutes column. <br>
      * Plus only, if you want minus, use substractMinute() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT minutes)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT minutes)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -390,7 +390,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified minutes column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT minutes)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT minutes)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -425,10 +425,10 @@ public class ColumnConversionOption extends FunctionFilterOption {
     }
 
     /**
-     * Add to the date or date-time value by the specified seconds column. <br />
+     * Add to the date or date-time value by the specified seconds column. <br>
      * Plus only, if you want minus, use substractSecond() method.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME + (PURCHASE_COUNT seconds)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME + (PURCHASE_COUNT seconds)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {
@@ -452,7 +452,7 @@ public class ColumnConversionOption extends FunctionFilterOption {
     /**
      * Subtract to the date or date-time value by the specified seconds column.
      * <pre>
-     * e.g. ColumnQuery: ... > PURCHASE_DATETIME - (PURCHASE_COUNT seconds)
+     * e.g. ColumnQuery: ... &gt; PURCHASE_DATETIME - (PURCHASE_COUNT seconds)
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
      *      public void specify(Purchase cb) {

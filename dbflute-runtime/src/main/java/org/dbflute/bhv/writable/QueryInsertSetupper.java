@@ -27,7 +27,7 @@ import org.dbflute.cbean.ConditionBean;
 public interface QueryInsertSetupper<ENTITY extends Entity, CB extends ConditionBean> {
 
     /**
-     * Set up your query condition for insert. <br />
+     * Set up your query condition for insert. <br>
      * @param entity The entity of inserted table, to be set fixed values. (NotNull, EmptyEntity)
      * @param intoCB The condition-bean of inserted table, to be specified columns. (NotNull, EmptyCB)
      * @return The condition-bean of resource table, that has queries. (NotNull)

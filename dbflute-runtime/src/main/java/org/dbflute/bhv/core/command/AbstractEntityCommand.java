@@ -142,7 +142,7 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
     //                                                                       Assist Helper
     //                                                                       =============
     /**
-     * Find DB meta. <br />
+     * Find DB meta. <br>
      * Basically this method should be called when initializing only.
      * @return DB meta. (NullAllowed: If the entity does not its DB meta)
      */
@@ -170,7 +170,7 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
     }
 
     /**
-     * Get persistent property names. <br />
+     * Get persistent property names. <br>
      * Basically this method should be called when initializing only.
      * @param bmd The bean meta data. (NotNull)
      * @return Persistent property names. (NotNull)

@@ -16,7 +16,7 @@
 package org.dbflute.hook;
 
 /**
- * The handler of SQL log. <br />
+ * The handler of SQL log. <br>
  * This handler is called back before executing the SQL.
  * <pre>
  * context.setSqlLogHandler(new SqlLogHandler() {
@@ -30,7 +30,7 @@ package org.dbflute.hook;
 public interface SqlLogHandler {
 
     /**
-     * Handle the SQL log. <br />
+     * Handle the SQL log. <br>
      * This is called back per SQL logging.
      * But if the SQL would be not executed, this is not called back,
      * for example, update() that the entity has no modification.

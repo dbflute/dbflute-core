@@ -41,7 +41,7 @@ public interface TnBeanMetaDataFactory {
     TnBeanMetaData createBeanMetaData(Class<?> beanClass, int relationNestLevel);
 
     /**
-     * Create the bean meta data for relation with specified database meta data. <br />
+     * Create the bean meta data for relation with specified database meta data. <br>
      * Other methods also use meta data but you can specify your own meta data by this.
      * @param dbMetaData The meta data of database. (NotNull)
      * @param beanClass The type of bean. (NotNull)
@@ -51,7 +51,7 @@ public interface TnBeanMetaDataFactory {
     TnBeanMetaData createBeanMetaData(DatabaseMetaData dbMetaData, Class<?> beanClass, int relationNestLevel);
 
     /**
-     * Get the factory for relation optional object. <br />
+     * Get the factory for relation optional object. <br>
      * Basically always return the same instance.
      * @return The instance of factory. (NotNull)
      */

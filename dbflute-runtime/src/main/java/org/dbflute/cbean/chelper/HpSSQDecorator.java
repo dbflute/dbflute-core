@@ -41,7 +41,7 @@ public class HpSSQDecorator<CB extends ConditionBean> {
     //                                                                          Decoration
     //                                                                          ==========
     /**
-     * Partition the scope of condition by the specified query. <br />
+     * Partition the scope of condition by the specified query. <br>
      * You can add a correlation condition to the sub-query.
      * <pre>
      * cb.query().scalar_Equal().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {

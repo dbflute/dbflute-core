@@ -15,11 +15,17 @@
  */
 package org.dbflute.cbean.coption;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
@@ -47,7 +53,7 @@ import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
 /**
- * The option to filter by function. <br />
+ * The option to filter by function. <br>
  * You can filter an aggregate function by scalar function filters.
  * @author jflute
  */
@@ -89,6 +95,9 @@ public class FunctionFilterOption implements ParameterOption {
     protected boolean _databaseDerby;
     protected Object _tmpTrunc;
     protected boolean _mayNullRevived;
+
+    /** The time-zone for filtering. (NullAllowed: if null, default zone) */
+    protected TimeZone _timeZone;
 
     // ===================================================================================
     //                                                                              Option
@@ -228,7 +237,7 @@ public class FunctionFilterOption implements ParameterOption {
     //                                                                              Filter
     //                                                                              ======
     /**
-     * Filter the expression of function part. <br />
+     * Filter the expression of function part. <br>
      * For example, an expression is like: max(foo.FOO_DATE), sum(bar.BAR_PRICE), ...
      * @param functionExp The expression of function part that is not filtered. (NotNull) 
      * @return The filtered expression. (NotNull)
@@ -272,7 +281,16 @@ public class FunctionFilterOption implements ParameterOption {
         }
         final Object realParam;
         if (coalesce instanceof String && isDateTypeColumn()) {
-            realParam = DfTypeUtil.toDate(coalesce);
+            if (isJustDateTypeColumn()) {
+                // even if util.Date, use local date here (can be mapped correctly)
+                realParam = DfTypeUtil.toLocalDate(coalesce, getTimeZone());
+            } else if (isJustTimestampTypeColumn()) {
+                realParam = DfTypeUtil.toLocalDateTime(coalesce, getTimeZone());
+            } else if (isJustTimeTypeColumn()) {
+                realParam = DfTypeUtil.toLocalTime(coalesce, getTimeZone());
+            } else { // basically no way, just in case
+                realParam = DfTypeUtil.toLocalDateTime(coalesce, getTimeZone());
+            }
         } else {
             realParam = coalesce;
         }
@@ -718,8 +736,39 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     // ===================================================================================
+    //                                                                            TimeZone
+    //                                                                            ========
+    /**
+     * Set time-zone, basically for LocalDate conversion. <br>
+     * Normally you don't need to set this, you can adjust other ways. <br>
+     * (DBFlute system's time-zone is used as default) <br>
+     * And it should be called before e.g. coalesce()
+     * @param timeZone The time-zone for filtering. (NullAllowed: if null, default zone)
+     * @return this. (NotNull)
+     */
+    public FunctionFilterOption zone(TimeZone timeZone) {
+        _timeZone = timeZone;
+        return this;
+    }
+
+    /**
+     * Get the time-zone in this option basically for filtering.
+     * @return The time-zone for filtering. (NotNull: if no setting, system zone)
+     */
+    public TimeZone getTimeZone() {
+        return _timeZone != null ? _timeZone : getDBFluteSystemFinalTimeZone();
+    }
+
+    protected TimeZone getDBFluteSystemFinalTimeZone() {
+        return DBFluteSystem.getFinalTimeZone();
+    }
+
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    // -----------------------------------------------------
+    //                                       Simple Function
+    //                                       ---------------
     protected String processSimpleFunction(String functionExp, String functionName, String thirdArg, boolean leftArg, Object bindKey) {
         final String bindExp = buildBindParameter(bindKey);
         final StringBuilder sb = new StringBuilder();
@@ -748,6 +797,13 @@ public class FunctionFilterOption implements ParameterOption {
         return sb.toString();
     }
 
+    protected boolean hasSubQueryEndOnLastLine(String functionExp) {
+        return SubQueryIndentProcessor.hasSubQueryEndOnLastLine(functionExp);
+    }
+
+    // -----------------------------------------------------
+    //                                        Bind Parameter
+    //                                        --------------
     protected String buildBindParameter(Object bindKey) {
         final String bindExp;
         if (isDreamCruiseTicket(bindKey)) {
@@ -758,15 +814,33 @@ public class FunctionFilterOption implements ParameterOption {
         return bindExp;
     }
 
-    protected boolean hasSubQueryEndOnLastLine(String functionExp) {
-        return SubQueryIndentProcessor.hasSubQueryEndOnLastLine(functionExp);
+    protected Object registerBindParameter(int index, Object parameter) {
+        if (isDreamCruiseTicket(parameter)) {
+            return parameter;
+        }
+        if (_bindMap == null) {
+            _bindMap = new HashMap<String, Object>(4);
+        }
+        final String bindKey = "param" + index;
+        _bindMap.put(bindKey, parameter);
+        return bindKey;
     }
 
+    // -----------------------------------------------------
+    //                                   Additional Variable
+    //                                   -------------------
     protected boolean hasTargetColumnInfo() {
         return _targetColumnInfo != null;
     }
 
-    protected boolean isDateTypeColumn() {
+    protected boolean hasMysticBinding() {
+        return _mysticBindingSnapshot != null;
+    }
+
+    // -----------------------------------------------------
+    //                                             Date Type
+    //                                             ---------
+    protected boolean isDateTypeColumn() { // #dateParade
         if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeDate()) {
             return true;
         }
@@ -777,20 +851,51 @@ public class FunctionFilterOption implements ParameterOption {
         return false;
     }
 
-    protected boolean hasMysticBinding() {
-        return _mysticBindingSnapshot != null;
-    }
-
     protected boolean isJustDateTypeColumn() {
         if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeJustDate()) {
             return true;
         }
-        if (_mysticBindingSnapshot != null && _mysticBindingSnapshot.getClass().equals(Date.class)) {
-            return true;
+        final Object snapshot = _mysticBindingSnapshot;
+        if (snapshot != null) {
+            final Class<?> snapType = snapshot.getClass();
+            if (snapType.equals(Date.class) || snapType.equals(LocalDate.class)) {
+                return true;
+            }
         }
         return false; // unknown, basically no way
     }
 
+    protected boolean isJustTimestampTypeColumn() {
+        if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeJustTimestamp()) {
+            return true;
+        }
+        final Object snapshot = _mysticBindingSnapshot;
+        if (snapshot != null) {
+            final Class<?> snapType = snapshot.getClass();
+            if (snapType.equals(Timestamp.class) || snapType.equals(LocalDateTime.class)) {
+                return true;
+            }
+        }
+        return false; // unknown, basically no way
+    }
+
+    protected boolean isJustTimeTypeColumn() {
+        if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeJustTime()) {
+            return true;
+        }
+        final Object snapshot = _mysticBindingSnapshot;
+        if (snapshot != null) {
+            final Class<?> snapType = snapshot.getClass();
+            if (snapType.equals(Time.class) || snapType.equals(LocalTime.class)) {
+                return true;
+            }
+        }
+        return false; // unknown, basically no way
+    }
+
+    // -----------------------------------------------------
+    //                                          Dream Cruise
+    //                                          ------------
     protected boolean isDreamCruiseTicket(Object value) {
         return value instanceof SpecifiedColumn;
     }
@@ -809,18 +914,6 @@ public class FunctionFilterOption implements ParameterOption {
         return bindPath;
     }
 
-    protected Object registerBindParameter(int index, Object parameter) {
-        if (isDreamCruiseTicket(parameter)) {
-            return parameter;
-        }
-        if (_bindMap == null) {
-            _bindMap = new HashMap<String, Object>(4);
-        }
-        final String bindKey = "param" + index;
-        _bindMap.put(bindKey, parameter);
-        return bindKey;
-    }
-
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
@@ -829,9 +922,9 @@ public class FunctionFilterOption implements ParameterOption {
     //                                         -------------
     /**
      * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @throws IllegalArgumentException
+     * @param variableName The check name of variable for message. (NotNull)
+     * @param value The checked value. (NotNull)
+     * @throws IllegalArgumentException When the argument is null.
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {

@@ -53,7 +53,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param metaData JDBC meta data. (NotNull)
      * @param tableInfo The meta information of table. (NotNull)
      * @return The meta information of primary keys. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public DfPrimaryKeyMeta getPrimaryKey(DatabaseMetaData metaData, DfTableMeta tableInfo) throws SQLException {
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
@@ -67,7 +67,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @param tableName The name of table. (NotNull, CaseInsensitiveByOption)
      * @return The meta information of primary keys. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public DfPrimaryKeyMeta getPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName) throws SQLException {
         final String translatedName = translateTableCaseName(tableName);
@@ -176,7 +176,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param tableName The name of table. (NotNull)
      * @param info The empty meta information of primary key. (NotNull)
      * @return The meta information of primary key. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected DfPrimaryKeyMeta processMSAccess(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
             DfPrimaryKeyMeta info) throws SQLException {
@@ -204,7 +204,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param tableInfo The meta information of table. (NotNull)
      * @param pkInfo The information of primary key of the table. (NotNull)
      * @return The meta information map of unique keys. The key is unique key name. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo, DfPrimaryKeyMeta pkInfo)
             throws SQLException { // Non Primary Key Only
@@ -222,7 +222,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @param tableName The name of table. (NotNull, CaseInsensitiveByOption)
      * @return The meta information map of unique keys. The key is unique key name. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
             List<String> pkList) throws SQLException { // non primary key only

@@ -26,7 +26,7 @@ public interface MetaDataConnectionProvider {
 
     /**
      * @return The instance of connection. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     Connection getConnection() throws SQLException;
 }

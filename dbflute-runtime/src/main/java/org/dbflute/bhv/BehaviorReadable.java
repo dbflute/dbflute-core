@@ -66,7 +66,7 @@ public interface BehaviorReadable {
     //                                                                    Basic Read Count
     //                                                                    ================
     /**
-     * Read count by condition-bean. <br />
+     * Read count by condition-bean. <br>
      * An interface dispatch for selectCount().
      * @param cb The instance of corresponding condition-bean. (NotNull)
      * @return Read count. (NotNull)
@@ -77,7 +77,7 @@ public interface BehaviorReadable {
     //                                                                   Basic Read Entity
     //                                                                   =================
     /**
-     * Read entity by condition-bean. <br />
+     * Read entity by condition-bean. <br>
      * An interface dispatch for selectEntity().
      * @param cb The instance of corresponding condition-bean. (NotNull)
      * @return Read entity. (Nullalble)
@@ -85,7 +85,7 @@ public interface BehaviorReadable {
     Entity readEntity(ConditionBean cb);
 
     /**
-     * Read simple entity by condition-bean with deleted check. <br />
+     * Read simple entity by condition-bean with deleted check. <br>
      * An interface dispatch for selectEntityWithDeletedCheck().
      * @param cb The instance of corresponding condition-bean. (NotNull)
      * @return Read entity. (NotNull)
@@ -96,7 +96,7 @@ public interface BehaviorReadable {
     //                                                                     Basic Read List
     //                                                                     ===============
     /**
-     * Read list as result-bean. <br />
+     * Read list as result-bean. <br>
      * An interface dispatch for selectList().
      * @param <RESULT> The result type of entity.
      * @param cb The instance of corresponding condition-bean. (NotNull)
@@ -105,7 +105,7 @@ public interface BehaviorReadable {
     <RESULT extends Entity> ListResultBean<RESULT> readList(ConditionBean cb);
 
     /**
-     * Read page as result-bean. <br />
+     * Read page as result-bean. <br>
      * An interface dispatch for selectPage().
      * @param <RESULT> The result type of entity.
      * @param cb The instance of corresponding condition-bean. (NotNull)
@@ -117,7 +117,7 @@ public interface BehaviorReadable {
     //                                                                         Scalar Read
     //                                                                         ===========
     /**
-     * Read the scalar value derived by a function from uniquely-selected records. <br />
+     * Read the scalar value derived by a function from uniquely-selected records. <br>
      * An interface dispatch for scalarSelect().
      * @param <RESULT> The type of scalar result.
      * @param resultType The type of result. (NotNull)
@@ -129,7 +129,7 @@ public interface BehaviorReadable {
     //                                                                            Sequence
     //                                                                            ========
     /**
-     * Read next value of sequence. <br />
+     * Read next value of sequence. <br>
      * An interface dispatch for selectNextVal().
      * @return The next value of sequence. (NotNull)
      */

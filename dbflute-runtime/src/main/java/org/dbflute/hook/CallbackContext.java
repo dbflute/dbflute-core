@@ -60,13 +60,13 @@ public class CallbackContext {
     protected static boolean _locked = true; // at first locked
 
     /**
-     * The holder of for callback context. <br />
+     * The holder of for callback context. <br>
      * Basically for asynchronous of web framework e.g. Play2.
      */
     public static interface CallbackContextHolder {
 
         /**
-         * Provide callback context. <br />
+         * Provide callback context. <br>
          * You should return same instance in same request.
          * @return The instance of callback context. (NullAllowed: when no context, but should exist in real handling)
          */
@@ -91,7 +91,7 @@ public class CallbackContext {
     }
 
     /**
-     * Set callback context on thread. <br />
+     * Set callback context on thread. <br>
      * You can use setting methods per interface instead of this method.
      * @param callbackContext The context of callback. (NotNull)
      */
@@ -104,7 +104,7 @@ public class CallbackContext {
     }
 
     /**
-     * Is existing callback context on thread? <br />
+     * Is existing callback context on thread? <br>
      * You can use determination methods per interface instead of this method.
      * @return The determination, true or false.
      */
@@ -113,7 +113,7 @@ public class CallbackContext {
     }
 
     /**
-     * Clear callback context on thread. <br />
+     * Clear callback context on thread. <br>
      * Basically you should call other clear methods per interfaces,
      * because this clear method clears all interfaces. 
      */
@@ -133,7 +133,7 @@ public class CallbackContext {
     //                                            Management
     //                                            ----------
     /**
-     * Use the surrogate holder for callback context. (automatically locked after setting) <br />
+     * Use the surrogate holder for callback context. (automatically locked after setting) <br>
      * You should call this in application initialization if it needs.
      * @param holder The holder instance. (NullAllowed: if null, use default holder)
      */
@@ -193,8 +193,8 @@ public class CallbackContext {
     //                                   BehaviorCommandHook
     //                                   -------------------
     /**
-     * Set the hook interface of behavior commands. <br />
-     * This hook interface is called back before executing behavior commands and finally. <br /> 
+     * Set the hook interface of behavior commands. <br>
+     * This hook interface is called back before executing behavior commands and finally. <br> 
      * The hook methods may be called by nested process
      * so you should pay attention to it when you implements this.
      * <pre>
@@ -223,7 +223,7 @@ public class CallbackContext {
     }
 
     /**
-     * Clear the hook interface of behavior commands from callback context on thread. <br />
+     * Clear the hook interface of behavior commands from callback context on thread. <br>
      * If the callback context does not have other interfaces, the context is removed from thread.
      */
     public static void clearBehaviorCommandHookOnThread() {
@@ -238,8 +238,8 @@ public class CallbackContext {
     //                                           SqlFireHook
     //                                           -----------
     /**
-     * Set the hook interface of SQL fires. <br />
-     * This hook interface is called back before firing SQL and finally. <br /> 
+     * Set the hook interface of SQL fires. <br>
+     * This hook interface is called back before firing SQL and finally. <br> 
      * The hook methods may be called by nested process
      * so you should pay attention to it when you implements this.
      * <pre>
@@ -268,7 +268,7 @@ public class CallbackContext {
     }
 
     /**
-     * Clear the hook interface of behavior commands from callback context on thread. <br />
+     * Clear the hook interface of behavior commands from callback context on thread. <br>
      * If the callback context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlFireHookOnThread() {
@@ -283,7 +283,7 @@ public class CallbackContext {
     //                                         SqlLogHandler
     //                                         -------------
     /**
-     * Set the handler of SQL log. <br />
+     * Set the handler of SQL log. <br>
      * This handler is called back before executing the SQL.
      * <pre>
      * context.setSqlLogHandler(new SqlLogHandler() {
@@ -308,7 +308,7 @@ public class CallbackContext {
     }
 
     /**
-     * Clear the handler of SQL log from callback context on thread. <br />
+     * Clear the handler of SQL log from callback context on thread. <br>
      * If the callback context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlLogHandlerOnThread() {
@@ -323,7 +323,7 @@ public class CallbackContext {
     //                                      SqlResultHandler
     //                                      ----------------
     /**
-     * Set the handler of SQL result. <br />
+     * Set the handler of SQL result. <br>
      * This handler is called back before executing the SQL. 
      * <pre>
      * context.setSqlResultHandler(new SqlResultHandler() {
@@ -348,7 +348,7 @@ public class CallbackContext {
     }
 
     /**
-     * Clear the handler of SQL result from callback context on thread. <br />
+     * Clear the handler of SQL result from callback context on thread. <br>
      * If the callback context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlResultHandlerOnThread() {
@@ -363,7 +363,7 @@ public class CallbackContext {
     //                                       SqlStringFilter
     //                                       ---------------
     /**
-     * Set the filter of SQL string. <br />
+     * Set the filter of SQL string. <br>
      * This handler is called back before executing the SQL. 
      * <pre>
      * context.setSqlStringFilter(new SqlStringFilter() {
@@ -388,7 +388,7 @@ public class CallbackContext {
     }
 
     /**
-     * Clear the filter of SQL string from callback context on thread. <br />
+     * Clear the filter of SQL string from callback context on thread. <br>
      * If the callback context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlStringFilterOnThread() {
@@ -464,8 +464,8 @@ public class CallbackContext {
     }
 
     /**
-     * Set the hook interface of behavior commands. <br />
-     * This hook interface is called back before executing behavior commands and finally. <br /> 
+     * Set the hook interface of behavior commands. <br>
+     * This hook interface is called back before executing behavior commands and finally. <br> 
      * The hook methods may be called by nested process
      * so you should pay attention to it when you implements this.
      * <pre>
@@ -492,8 +492,8 @@ public class CallbackContext {
     }
 
     /**
-     * Set the hook interface of SQL fires. <br />
-     * This hook interface is called back before firing SQL and finally. <br /> 
+     * Set the hook interface of SQL fires. <br>
+     * This hook interface is called back before firing SQL and finally. <br> 
      * The hook methods may be called by nested process
      * so you should pay attention to it when you implements this.
      * <pre>
@@ -520,7 +520,7 @@ public class CallbackContext {
     }
 
     /**
-     * Set the handler of SQL log. <br />
+     * Set the handler of SQL log. <br>
      * This handler is called back before executing the SQL. 
      * <pre>
      * context.setSqlLogHandler(new SqlLogHandler() {
@@ -544,7 +544,7 @@ public class CallbackContext {
     }
 
     /**
-     * Set the handler of SQL result. <br />
+     * Set the handler of SQL result. <br>
      * This handler is called back before executing the SQL. 
      * <pre>
      * context.setSqlResultHandler(new SqlResultHandler() {
@@ -567,7 +567,7 @@ public class CallbackContext {
     }
 
     /**
-     * Set the filter of SQL string. <br />
+     * Set the filter of SQL string. <br>
      * This filter is called back before executing the SQL. 
      * <pre>
      * context.setSqlStringFilter(new SqlStringFilter() {

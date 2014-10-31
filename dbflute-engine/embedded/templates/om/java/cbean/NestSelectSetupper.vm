@@ -45,7 +45,7 @@ public class ${myClassName} {
 #end
 #set ($hasNestSelectSetupper = ${fk.hasForeignNestSelectSetupper()})
     /**
-     * With nested relation columns to select clause. <br />
+     * With nested relation columns to select clause. <br>
      * ${fk.foreignDispForJavaDoc}
 #if ($fk.hasDynamicFixedCondition())
      * ${fk.dynamicFixedConditionArgsJavaDocString}
@@ -75,7 +75,7 @@ public class ${myClassName} {
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($hasNestSelectSetupper = ${referrer.hasReferrerNestSelectSetupper()})
     /**
-     * With nested relation columns to select clause. <br />
+     * With nested relation columns to select clause. <br>
      * ${referrer.referrerDispAsOneForJavaDoc}
 #set ($setupSelectReturnType = "void")
 #if ($hasNestSelectSetupper)

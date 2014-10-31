@@ -199,7 +199,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
         // line separator
         text = removeCR(text);
-        final String htmlLineSeparator = "<br />";
+        final String htmlLineSeparator = "<br>";
         if (text.contains(BASIC_LINE_SEPARATOR)) {
             text = text.replaceAll(BASIC_LINE_SEPARATOR, htmlLineSeparator);
         }

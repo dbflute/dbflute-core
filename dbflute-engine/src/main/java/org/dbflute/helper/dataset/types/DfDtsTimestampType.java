@@ -31,7 +31,11 @@ public class DfDtsTimestampType extends DfDtsObjectType {
 
     @Override
     public Object convert(Object value, String formatPattern) {
-        return DfTypeUtil.toTimestamp(value, formatPattern);
+        if (formatPattern != null) {
+            return DfTypeUtil.toTimestamp(value, formatPattern);
+        } else {
+            return DfTypeUtil.toTimestamp(value);
+        }
     }
 
     @Override

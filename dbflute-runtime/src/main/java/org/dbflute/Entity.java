@@ -20,7 +20,7 @@ import java.util.Set;
 import org.dbflute.dbmeta.DBMeta;
 
 /**
- * The interface of entity. <br />
+ * The interface of entity. <br>
  * And it's the landmark class for DBFlute.
  * @author jflute
  */
@@ -57,8 +57,8 @@ public interface Entity {
     //                                              Modified
     //                                              --------
     /**
-     * Get the set of modified properties. (basically for Framework) <br />
-     * The properties needs to be according to Java Beans rule. <br />
+     * Get the set of modified properties. (basically for Framework) <br>
+     * The properties needs to be according to Java Beans rule. <br>
      * @return The set of property name for modified columns, read-only. (NotNull)
      */
     Set<String> mymodifiedProperties(); // 'my' take on unique-driven
@@ -78,20 +78,20 @@ public interface Entity {
     //                                             Specified
     //                                             ---------
     /**
-     * Copy to modified properties to specified properties. <br />
+     * Copy to modified properties to specified properties. <br>
      * It means non-specified columns are checked
      */
     void modifiedToSpecified();
 
     /**
-     * Get the set of specified properties. (basically for Framework) <br />
+     * Get the set of specified properties. (basically for Framework) <br>
      * The properties needs to be according to Java Beans rule.
      * @return The set of property name for specified columns, read-only. (NotNull: if empty, no check)
      */
     Set<String> myspecifiedProperties(); // 'my' take on unique-driven
 
     /**
-     * Clear the information of specified properties. (basically for Framework) <br />
+     * Clear the information of specified properties. (basically for Framework) <br>
      * It means no check of access to non-specified columns.
      */
     void clearSpecifiedInfo();

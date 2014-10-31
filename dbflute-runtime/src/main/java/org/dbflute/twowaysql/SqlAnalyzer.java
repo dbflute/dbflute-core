@@ -553,8 +553,8 @@ public class SqlAnalyzer {
     //                                                                            Research
     //                                                                            ========
     /**
-     * Research IF comments. (basically for research only, NOT for execution)<br />
-     * This method should be called before calling analyze(). <br />
+     * Research IF comments. (basically for research only, NOT for execution)<br>
+     * This method should be called before calling analyze(). <br>
      * The returned list is filled with IF comment after calling analyze().
      * @return The list of IF comment. (NotNull)
      */
@@ -565,8 +565,8 @@ public class SqlAnalyzer {
     }
 
     /**
-     * Research bind variable comments. (basically for research only, NOT for execution)<br />
-     * This method should be called before calling analyze(). <br />
+     * Research bind variable comments. (basically for research only, NOT for execution)<br>
+     * This method should be called before calling analyze(). <br>
      * The returned list is filled with bind variable comment after calling analyze().
      * @return The list of bind variable comment. (NotNull)
      */
@@ -577,8 +577,8 @@ public class SqlAnalyzer {
     }
 
     /**
-     * Research embedded variable comments. (basically for research only, NOT for execution)<br />
-     * This method should be called before calling analyze(). <br />
+     * Research embedded variable comments. (basically for research only, NOT for execution)<br>
+     * This method should be called before calling analyze(). <br>
      * The returned list is filled with embedded variable comment after calling analyze().
      * @return The list of embedded variable comment. (NotNull)
      */

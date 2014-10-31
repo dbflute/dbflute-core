@@ -72,7 +72,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     }
 
     /**
-     * Create The map of string key as case insensitive. <br />
+     * Create The map of string key as case insensitive. <br>
      * You can set null key and value. And plain keys to be set is kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as case insensitive. (NotNull)
@@ -82,7 +82,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     }
 
     /**
-     * Create The map of string key as case insensitive and concurrent. <br />
+     * Create The map of string key as case insensitive and concurrent. <br>
      * You cannot set null key and value. And plain keys to be set is NOT kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as case insensitive and concurrent. (NotNull)
@@ -92,7 +92,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     }
 
     /**
-     * Create The map of string key as case insensitive and ordered. <br />
+     * Create The map of string key as case insensitive and ordered. <br>
      * You can set null key and value. And plain keys to be set is kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as case insensitive and ordered. (NotNull)
@@ -102,7 +102,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     }
 
     /**
-     * Create The map of string key as flexible. <br />
+     * Create The map of string key as flexible. <br>
      * You can set null key and value. And plain keys to be set is kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as flexible. (NotNull)
@@ -112,7 +112,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     }
 
     /**
-     * Create The map of string key as flexible and concurrent. <br />
+     * Create The map of string key as flexible and concurrent. <br>
      * You cannot set null key and value. And plain keys to be set is NOT kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as flexible and concurrent. (NotNull)
@@ -122,7 +122,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE>, Serializable {
     }
 
     /**
-     * Create The map of string key as flexible and ordered. <br />
+     * Create The map of string key as flexible and ordered. <br>
      * You can set null key and value. And plain keys to be set is kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as flexible and ordered. (NotNull)

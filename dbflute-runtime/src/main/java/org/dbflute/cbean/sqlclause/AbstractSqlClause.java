@@ -123,19 +123,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // The resources that are not frequently used to are lazy-loaded for performance.
     // - - - - - - - - - -/
     /**
-     * The basic map of selected relation. (NullAllowed: lazy-loaded) <br />
+     * The basic map of selected relation. (NullAllowed: lazy-loaded) <br>
      * map:{foreignRelationPath: relationNoSuffix = foreignPropertyName}
      */
     protected Map<String, String> _selectedRelationBasicMap;
 
     /**
-     * The path-to-alias map of selected relation. (NullAllowed: lazy-loaded) <br />
+     * The path-to-alias map of selected relation. (NullAllowed: lazy-loaded) <br>
      * map:{foreignRelationPath: relationNoSuffix = foreignTableAliasName}
      */
     protected Map<String, String> _selectedRelationPathToTableAliasMap;
 
     /**
-     * The column map of selected relation. (NullAllowed: lazy-loaded) <br />
+     * The column map of selected relation. (NullAllowed: lazy-loaded) <br>
      * map:{foreignTableAliasName = map:{columnName = selectedRelationColumn}}
      */
     protected Map<String, Map<String, SelectedRelationColumn>> _selectedRelationColumnMap;
@@ -144,13 +144,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected Set<String> _selectedNextConnectingRelationSet;
 
     /**
-     * Specified select column map. (NullAllowed: lazy-loaded) <br />
+     * Specified select column map. (NullAllowed: lazy-loaded) <br>
      * map:{tableAliasName = map:{ columnName = specifiedInfo}}
      */
     protected Map<String, Map<String, SpecifiedColumn>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
 
     /**
-     * Specified select column map for backup. (NullAllowed: lazy-loaded) <br />
+     * Specified select column map for backup. (NullAllowed: lazy-loaded) <br>
      * map:{tableAliasName = map:{ columnName = specifiedInfo}}
      */
     protected Map<String, Map<String, SpecifiedColumn>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
@@ -168,13 +168,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected SelectClauseType _previousSelectClauseType;
 
     /**
-     * The map of select index by key name of select column. (NullAllowed: lazy-load or no use select index) <br />
+     * The map of select index by key name of select column. (NullAllowed: lazy-load or no use select index) <br>
      * map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}}
      */
     protected Map<String, Map<String, Integer>> _selectIndexMap;
 
     /**
-     * The map of key name of select column by on-query name. (NullAllowed: lazy-load or no use select index) <br />
+     * The map of key name of select column by on-query name. (NullAllowed: lazy-load or no use select index) <br>
      * map:{onQueryAlias = selectColumnKeyName}}
      */
     protected Map<String, String> _selectColumnKeyNameMap;
@@ -186,13 +186,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected int _aliasNameLimitSize = getDefaultAliasNameLimitSize();
 
     /**
-     * The map of left-outer-join info. (NullAllowed: lazy-load) <br />
+     * The map of left-outer-join info. (NullAllowed: lazy-load) <br>
      * map:{foreignAliasName : leftOuterJoinInfo}
      */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap;
 
     /**
-     * The map of relationPath and foreignAliasName. (NullAllowed: lazy-load) <br />
+     * The map of relationPath and foreignAliasName. (NullAllowed: lazy-load) <br>
      * map:{relationPath : foreignAliasName}
      */
     protected Map<String, String> _relationPathForeignAliasMap;
@@ -378,7 +378,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     /**
-     * Set the provider of DB meta. <br />
+     * Set the provider of DB meta. <br>
      * If you want to use all functions, this method is required.
      * @param dbmetaProvider The provider of DB meta. (NotNull)
      * @return this. (NotNull)
@@ -394,7 +394,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     /**
-     * Set the manager of geared cipher. <br />
+     * Set the manager of geared cipher. <br>
      * And enable cipher of select column.
      * @param manager The manager of geared cipher. (NullAllowed)
      * @return this. (NotNull)

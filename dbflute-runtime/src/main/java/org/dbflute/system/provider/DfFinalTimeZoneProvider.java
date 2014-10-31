@@ -21,10 +21,11 @@ import java.util.TimeZone;
  * @author jflute
  * @since 1.1.0 (2014/09/29 Monday)
  */
+@FunctionalInterface
 public interface DfFinalTimeZoneProvider {
 
     /**
-     * Provide the time-zone as final default. <br />
+     * Provide the time-zone as final default. <br>
      * This might be called many times, so take care of performance.
      * @return The time-zone instance. (NullAllowed: if null, server zone might be used)
      */

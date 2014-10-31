@@ -101,7 +101,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     //                                                                         List Select
     //                                                                         ===========
     /**
-     * Select the list of the entity by the outsideSql. <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Select the list of the entity by the outsideSql. <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path and entity-type.
      * <pre>
@@ -134,7 +134,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     /**
-     * Select the list of the entity by the outsideSql. {FreeStyle Interface}<br />
+     * Select the list of the entity by the outsideSql. {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type), entity-type.
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -203,7 +203,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     //                                                                             Execute
     //                                                                             =======
     /**
-     * Execute the outsideSql. (insert, update, delete, etc...) <span style="color: #AD4747">{Typed Interface}</span><br />
+     * Execute the outsideSql. (insert, update, delete, etc...) <span style="color: #AD4747">{Typed Interface}</span><br>
      * You can call this method by only a typed parameter-bean
      * which is related to its own (outside-SQL) path.
      * <pre>
@@ -221,7 +221,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     /**
-     * Execute the outsideSql. (insert, update, delete, etc...) {FreeStyle Interface}<br />
+     * Execute the outsideSql. (insert, update, delete, etc...) {FreeStyle Interface}<br>
      * This method can accept each element: path, parameter-bean(Object type).
      * <pre>
      * String path = MemberBhv.PATH_selectSimpleMember;
@@ -452,7 +452,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     //                                            Format SQL
     //                                            ----------
     /**
-     * Set up format-SQL for this outsideSql. <br />
+     * Set up format-SQL for this outsideSql. <br>
      * (For example, empty lines removed)
      * @return this. (NotNull)
      */

@@ -45,7 +45,7 @@ abstract class ${myClassName} extends CursorHandler {
      * Handle the cursor.
      * @param rs The cursor (result set) for the query, which has first pointer. (NotNull)
      * @return The result object of handling process. (NullAllowed)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     def handle(rs: ResultSet): Object = {
         return fetchCursor(createTypeSafeCursor(rs));
@@ -55,7 +55,7 @@ abstract class ${myClassName} extends CursorHandler {
      * Create the type-safe cursor.
      * @param rs The cursor (result set) for the query, which has first pointer. (NotNull)
      * @return The created type-safe cursor. (NotNull)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected def createTypeSafeCursor(rs: ResultSet): ${myExtendedTypeSafeCursorClassName} = {
         val cursor = new ${myExtendedTypeSafeCursorClassName}();
@@ -67,7 +67,7 @@ abstract class ${myClassName} extends CursorHandler {
      * Fetch the cursor.
      * @param cursor The type-safe cursor for the query, which has first pointer. (NotNull)
      * @return The result object of handling process. (NullAllowed)
-     * @throws SQLException
+     * @throws SQLException When it fails to handle the SQL.
      */
     protected def fetchCursor(cursor: ${myExtendedTypeSafeCursorClassName}): Object;
 }

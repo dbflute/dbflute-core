@@ -29,7 +29,7 @@ import org.dbflute.outsidesql.OutsideSqlFilter.ExecutionFilterType;
 import org.dbflute.util.Srl;
 
 /**
- * The SQL execution by outside-SQL. <br />
+ * The SQL execution by outside-SQL. <br>
  * This has filter options.
  * @author jflute
  */

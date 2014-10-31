@@ -16,7 +16,7 @@
 package org.dbflute.jdbc;
 
 /**
- * The type of classification code. <br />
+ * The type of classification code. <br>
  * It's an internal class for DBFlute runtime.
  * @author jflute
  */

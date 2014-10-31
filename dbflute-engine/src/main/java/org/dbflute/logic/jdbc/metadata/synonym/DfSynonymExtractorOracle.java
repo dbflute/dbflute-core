@@ -444,7 +444,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     }
 
     /**
-     * Set up table and column comment. <br />
+     * Set up table and column comment. <br>
      * This does not support DB link synonym.
      * @param synonymMap The map of synonym. (NotNull)
      */

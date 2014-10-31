@@ -186,7 +186,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
 /**
- * A class for holding application data structures. <br />
+ * A class for holding application data structures. <br>
  * DBFlute treats all tables containing other schema's as one database object.
  * @author modified by jflute (originated in Apache Torque)
  */
@@ -976,7 +976,7 @@ public class Database {
     //                                  AdditionalForeignKey
     //                                  --------------------
     /**
-     * Initialize additional foreign key. <br />
+     * Initialize additional foreign key. <br>
      * This is basically for Generate task. (Not Sql2Entity)
      */
     public void initializeAdditionalForeignKey() {
@@ -1023,7 +1023,7 @@ public class Database {
     //                                                                    Check Properties
     //                                                                    ================
     /**
-     * Check properties as mutually related validation. <br />
+     * Check properties as mutually related validation. <br>
      * This is basically for Generate task. (Not Sql2Entity)
      */
     public void checkProperties() {
@@ -1340,16 +1340,8 @@ public class Database {
         return getBasicProperties().isTargetContainerSpring();
     }
 
-    public boolean isTargetContainerLucy() {
-        return getBasicProperties().isTargetContainerLucy();
-    }
-
     public boolean isTargetContainerGuice() {
         return getBasicProperties().isTargetContainerGuice();
-    }
-
-    public boolean isTargetContainerSlim3() {
-        return getBasicProperties().isTargetContainerSlim3();
     }
 
     public boolean isTargetContainerCDI() {

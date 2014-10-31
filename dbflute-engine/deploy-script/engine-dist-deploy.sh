@@ -33,6 +33,8 @@ mvn -e compile
 cd ../dbflute-test-dbms-mysql/dbflute_maihamadb
 rm ./log/*.log
 # not replace-schema because of big data
+. nextdb-renewal.sh
+. slave-replace-schema.sh
 . manage.sh regenerate
 cd ..
 mvn -e compile

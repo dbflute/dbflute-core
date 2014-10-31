@@ -25,7 +25,7 @@ import java.util.Map;
 public interface DfUniqueKeyFkExtractor {
 
     /**
-     * Extract unique-key FK info. (same schema only) <br />
+     * Extract unique-key FK info. (same schema only) <br>
      * @return The map of unique-key FK. map:{ tableName = map:{ fkName = list:{ columns } } }
      */
     Map<String, Map<String, List<UserUniqueFkColumn>>> extractUniqueKeyFkMap();

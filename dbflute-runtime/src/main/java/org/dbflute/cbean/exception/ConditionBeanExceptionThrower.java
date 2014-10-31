@@ -275,7 +275,6 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyColumnNotSetupSelectColumnException(msg);
     }
 
-    // TODO jflute exception: CB message
     public void throwSpecifyColumnWithDerivedReferrerException(HpCBPurpose purpose, ConditionBean baseCB, String columnName,
             String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -285,23 +284,17 @@ public class ConditionBeanExceptionThrower {
         br.addElement("Because the conditoin-bean is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (ColumnQuery)");
-        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB> {");
-        br.addElement("        public void query(MemberCB cb) {");
-        br.addElement("            cb.specify().columnBirthdate();");
-        br.addElement("            cb.specify().derivedPurchaseList().max(...); // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.columnQuery(cb -> {");
+        br.addElement("        cb.specify().columnBirthdate();");
+        br.addElement("        cb.specify().derivedPurchaseList().max(...); // *NG");
         br.addElement("    }).greaterEqual(...);");
         br.addElement("  (o): (ColumnQuery)");
-        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB> {");
-        br.addElement("        public void query(MemberCB cb) {");
-        br.addElement("            cb.specify().columnBirthdate(); // OK");
-        br.addElement("        }");
+        br.addElement("    cb.columnQuery(colCB -> {");
+        br.addElement("        colCB.specify().columnBirthdate(); // OK");
         br.addElement("    }).greaterEqual(...);");
         br.addElement("  (o): (ColumnQuery)");
-        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB> {");
-        br.addElement("        public void query(MemberCB cb) {");
-        br.addElement("            cb.specify().derivedPurchaseList().max(...); // OK");
-        br.addElement("        }");
+        br.addElement("    cb.columnQuery(colCB -> {");
+        br.addElement("        colCB.specify().derivedPurchaseList().max(...); // OK");
         br.addElement("    }).greaterEqual(...);");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
@@ -321,18 +314,14 @@ public class ConditionBeanExceptionThrower {
         br.addElement("You cannot specify columns with every column.");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.specify().everyColumn();");
-        br.addElement("            cb.specify().columnMemberName(); // *No");
-        br.addElement("        }");
-        br.addElement("    }");
+        br.addElement("    memberBhv.batchUpdate(memberList, colCB -> {");
+        br.addElement("        colCB.specify().everyColumn();");
+        br.addElement("        colCB.specify().columnMemberName(); // *No");
+        br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.specify().everyColumn();");
-        br.addElement("        }");
-        br.addElement("    }");
+        br.addElement("    memberBhv.batchUpdate(memberList, colCB -> {");
+        br.addElement("        colCB.specify().everyColumn();");
+        br.addElement("    });");
         br.addItem("Base Table");
         br.addElement(tableDbName);
         br.addItem("Specified Column");
@@ -348,15 +337,18 @@ public class ConditionBeanExceptionThrower {
         br.addElement("You cannot specify columns with except columns.");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    cb.specify().exceptRecordMetaColumn();");
-        br.addElement("    cb.specify().columnMemberName(); // *No");
-        br.addElement("    ... = memberBhv.selectList(cb);");
+        br.addElement("    ... = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.specify().exceptRecordMetaColumn();");
+        br.addElement("        cb.specify().columnMemberName(); // *No");
+        br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    cb.specify().exceptRecordMetaColumn();");
-        br.addElement("    ... = memberBhv.selectList(cb);");
+        br.addElement("    ... = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.specify().exceptRecordMetaColumn();");
+        br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    cb.specify().columnMemberName();");
-        br.addElement("    ... = memberBhv.selectList(cb);");
+        br.addElement("    ... = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.specify().columnMemberName();");
+        br.addElement("    });");
         br.addItem("Base Table");
         br.addElement(tableDbName);
         br.addItem("Specified Column");
@@ -372,18 +364,14 @@ public class ConditionBeanExceptionThrower {
         br.addElement("You cannot specify columns with every column.");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.specify().columnMemberName();");
-        br.addElement("            cb.specify().everyColumn(); // *No");
-        br.addElement("        }");
-        br.addElement("    }");
+        br.addElement("    memberBhv.batchUpdate(memberList, colCB -> {");
+        br.addElement("        colCB.specify().columnMemberName();");
+        br.addElement("        colCB.specify().everyColumn(); // *No");
+        br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.specify().everyColumn();");
-        br.addElement("        }");
-        br.addElement("    }");
+        br.addElement("    memberBhv.batchUpdate(memberList, colCB -> {");
+        br.addElement("        colCB.specify().everyColumn();");
+        br.addElement("    });");
         br.addItem("Base Table");
         br.addElement(tableDbName);
         if (specifiedColumnMap != null) { // basically true
@@ -404,15 +392,18 @@ public class ConditionBeanExceptionThrower {
         br.addElement("You cannot specify columns with except columns.");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    cb.specify().columnMemberName();");
-        br.addElement("    cb.specify().exceptRecordMetaColumn(); // *No");
-        br.addElement("    ... = memberBhv.selectList(cb);");
+        br.addElement("    ... = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.specify().columnMemberName(");
+        br.addElement("        cb.specify().exceptRecordMetaColumn(); // *No");
+        br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    cb.specify().exceptRecordMetaColumn();");
-        br.addElement("    ... = memberBhv.selectList(cb);");
+        br.addElement("    ... = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.specify().exceptRecordMetaColumn();");
+        br.addElement("    });");
         br.addElement("  (o):");
-        br.addElement("    cb.specify().columnMemberName();");
-        br.addElement("    ... = memberBhv.selectList(cb);");
+        br.addElement("    ... = memberBhv.selectList(cb -> {");
+        br.addElement("        cb.specify().columnMemberName()");
+        br.addElement("    });");
         br.addItem("Base Table");
         br.addElement(tableDbName);
         if (specifiedColumnMap != null) { // basically true
@@ -426,6 +417,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyExceptColumnAlreadySpecifiedColumnException(msg);
     }
 
+    // TODO jflute exception: CB message
     public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String relationName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Bad location to call specify() for relation.");

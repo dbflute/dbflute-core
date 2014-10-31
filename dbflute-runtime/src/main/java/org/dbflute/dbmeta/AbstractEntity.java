@@ -29,7 +29,8 @@ import org.dbflute.dbmeta.accessory.EntityDerivedMap;
 import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
 import org.dbflute.dbmeta.accessory.EntityUniqueDrivenProperties;
 import org.dbflute.jdbc.ClassificationMeta;
-import org.dbflute.optional.OptionalProperty;
+import org.dbflute.optional.OptionalScalar;
+import org.dbflute.twowaysql.DisplaySqlBuilder;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
@@ -68,6 +69,12 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     protected boolean __createdBySelect;
 
     // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    // TODO jflute 
+    //protected abstract boolean isDomainEntity();
+
+    // ===================================================================================
     //                                                                    Derived Mappable
     //                                                                    ================
     /** {@inheritDoc} */
@@ -79,7 +86,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     }
 
     /** {@inheritDoc} */
-    public <VALUE> OptionalProperty<VALUE> derived(String aliasName, Class<VALUE> propertyType) {
+    public <VALUE> OptionalScalar<VALUE> derived(String aliasName, Class<VALUE> propertyType) {
         if (__derivedMap == null) {
             // process of finding has existence check of the alias
             // so if called here, exception in the map
@@ -209,7 +216,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     //                                              equals()
     //                                              --------
     /**
-     * Determine the object is equal with this. <br />
+     * Determine the object is equal with this. <br>
      * If primary-keys or columns of the other are same as this one, returns true.
      * @param obj The object as other entity. (NullAllowed: if null, returns false fixedly)
      * @return Comparing result.
@@ -309,7 +316,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
         // actually, Oracle's date needs time-parts
         // but not important point and LocalDate is main since 1.1
         // so simple logic here
-        return "yyyy-MM-dd"; // as default
+        return DisplaySqlBuilder.DEFAULT_DATE_FORMAT; // as default
     }
 
     protected TimeZone mytimeZone() {

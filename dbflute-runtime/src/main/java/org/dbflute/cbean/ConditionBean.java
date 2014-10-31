@@ -63,7 +63,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                           SqlClause
     //                                                                           =========
     /**
-     * Get SQL clause instance. {Internal}<br />
+     * Get SQL clause instance. {Internal}<br>
      * @return The object for SQL clause. (NotNull)
      */
     SqlClause getSqlClause();
@@ -114,7 +114,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     ConditionQuery localCQ();
 
     /**
-     * Enable to auto-detect joins that can be inner-join. (back to default) <br />
+     * Enable to auto-detect joins that can be inner-join. (back to default) <br>
      * <pre>
      * o You should call this before registrations of where clause.
      * o Union and SubQuery and other sub condition-bean inherit this.
@@ -124,7 +124,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     void enableInnerJoinAutoDetect();
 
     /**
-     * Disable auto-detecting inner-join. (default is enabled) <br />
+     * Disable auto-detecting inner-join. (default is enabled) <br>
      * You should call this before registrations of where clause.
      */
     void disableInnerJoinAutoDetect();
@@ -163,28 +163,28 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     boolean xisDreamCruiseShip();
 
     /**
-     * Get the departure port of dream cruise? <br />
+     * Get the departure port of dream cruise? <br>
      * (condition-bean creating the condition-bean)
      * @return The base condition-bean for Dream Cruise. (NullAllowed: when not dream cruise)
      */
     ConditionBean xgetDreamCruiseDeparturePort();
 
     /**
-     * Do you have a Dream Cruise ticket? <br />
+     * Do you have a Dream Cruise ticket? <br>
      * (whether this CB has the specified column by dream cruise or not)
      * @return The determination, true or false.
      */
     boolean xhasDreamCruiseTicket();
 
     /**
-     * Show me your Dream Cruise ticket. <br />
+     * Show me your Dream Cruise ticket. <br>
      * (get the specified column by Dream Cruise)
      * @return The information of specified column. (NullAllowed)
      */
     SpecifiedColumn xshowDreamCruiseTicket();
 
     /**
-     * Keep journey log-book of Dream Cruise. <br /> 
+     * Keep journey log-book of Dream Cruise. <br> 
      * (save the relation trace by Dream Cruise)
      * @param relationPath The path of relation. (NotNull)
      */
@@ -210,7 +210,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                       Invalid Query
     //                                                                       =============
     /**
-     * Ignore null-or-empty check for query when query is set. (default is checked) <br />
+     * Ignore null-or-empty check for query when query is set. (default is checked) <br>
      * (no condition if set query is invalid)
      * <pre>
      * <span style="color: #0000C0">memberBhv</span>.selectList(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
@@ -220,45 +220,45 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
      *     <span style="color: #553000">cb</span>.query().setMemberName_Equal(" ");  <span style="color: #3F7E5E">// valid (MEMBER_NAME = ' ')</span>
      * });
      * </pre>
-     * You should call this before registrations of where clause and other queries. <br />
+     * You should call this before registrations of where clause and other queries. <br>
      * And Union and SubQuery and other sub condition-bean inherit this.
      */
     void ignoreNullOrEmptyQuery(); // no mode-query because of high use and wide scope
 
     /**
-     * Check null or empty value for query when query is set. (back to default) <br />
-     * (it throws exception if set query is invalid, e.g. null, empty string, empty list) <br />
-     * You should call this before registrations of where clause and other queries. <br />
+     * Check null or empty value for query when query is set. (back to default) <br>
+     * (it throws exception if set query is invalid, e.g. null, empty string, empty list) <br>
+     * You should call this before registrations of where clause and other queries. <br>
      * Union and SubQuery and other sub condition-bean inherit this.
      */
     void checkNullOrEmptyQuery();
 
     /**
-     * Enable empty string for query. (default is disabled) <br />
-     * (you can use an empty string as condition) <br />
-     * You should call this before registrations of where clause and other queries. <br />
+     * Enable empty string for query. (default is disabled) <br>
+     * (you can use an empty string as condition) <br>
+     * You should call this before registrations of where clause and other queries. <br>
      * Union and SubQuery and other sub condition-bean inherit this.
      * @param noArgInLambda The callback for empty-string query. (NotNull)
      */
     void enableEmptyStringQuery(ModeQuery noArgInLambda);
 
     /**
-     * Disable empty string for query. (back to default) <br />
+     * Disable empty string for query. (back to default) <br>
      * The empty string for query is treated as invalid data, like null.
      */
     void disableEmptyStringQuery();
 
     /**
-     * Enable overriding query. (default is disabled) <br />
-     * (you can override existing value as condition) <br />
-     * You should call this before registrations of where clause and other queries. <br />
+     * Enable overriding query. (default is disabled) <br>
+     * (you can override existing value as condition) <br>
+     * You should call this before registrations of where clause and other queries. <br>
      * Union and SubQuery and other sub condition-bean inherit this.
      * @param noArgInLambda The callback for overriding query. (NotNull)
      */
     void enableOverridingQuery(ModeQuery noArgInLambda);
 
     /**
-     * Disable overriding query. (back to default) <br />
+     * Disable overriding query. (back to default) <br>
      * You should set query to same column and same condition once.
      */
     void disableOverridingQuery();
@@ -267,15 +267,15 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                      Paging Setting
     //                                                                      ==============
     /**
-     * Enable paging count-least-join, which means least joined on count select. (back to default) <br />
+     * Enable paging count-least-join, which means least joined on count select. (back to default) <br>
      * You can use it by default on DBFlute so you don't need to call this basically.
-     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
+     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br>
      * You should call this before execution of selectPage().
      */
     void enablePagingCountLeastJoin();
 
     /**
-     * Disable paging count-least-join, which means least joined on count select. (default is enabled) <br />
+     * Disable paging count-least-join, which means least joined on count select. (default is enabled) <br>
      * You should call this before execution of selectPage().
      */
     void disablePagingCountLeastJoin();
@@ -290,8 +290,8 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                        Lock Setting
     //                                                                        ============
     /**
-     * Lock for update. <br />
-     * If you call this, your SQL lock target records for update. <br />
+     * Lock for update. <br>
+     * If you call this, your SQL lock target records for update. <br>
      * It depends whether this method supports this on the database type.
      * @return this. (NotNull)
      */
@@ -347,13 +347,13 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                        Query Update
     //                                                                        ============
     /**
-     * Enable checking record count before QueryUpdate (contains QueryDelete). (default is disabled) <br />
+     * Enable checking record count before QueryUpdate (contains QueryDelete). (default is disabled) <br>
      * No query update if zero count. (basically for MySQL's deadlock by next-key lock)
      */
     void enableQueryUpdateCountPreCheck();
 
     /**
-     * Disable checking record count before QueryUpdate (contains QueryDelete). (back to default) <br />
+     * Disable checking record count before QueryUpdate (contains QueryDelete). (back to default) <br>
      * Executes query update even if zero count. (normal specification)
      */
     void disableQueryUpdateCountPreCheck();
@@ -384,7 +384,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                      ==============
     // no need to use it as interface method so comment out
     ///**
-    // * Disable (entity instance) cache of relation mapping. <br />
+    // * Disable (entity instance) cache of relation mapping. <br>
     // * Basically you don't need this. This is for accidents.
     // */
     //void disableRelationMappingCache();
@@ -396,7 +396,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     boolean canRelationMappingCache();
 
     /**
-     * Enable access to non-specified column. (default is disabled) <br />
+     * Enable access to non-specified column. (default is disabled) <br>
      * You can get columns of base-point or setup-select using SpecifyColumn but non-specified column.
      * <pre>
      * <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> -&gt; {
@@ -414,7 +414,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     void enableNonSpecifiedColumnAccess();
 
     /**
-     * Disable the check of access to non-specified column. (back to default) <br />
+     * Disable the check of access to non-specified column. (back to default) <br>
      * You cannot get columns of base-point or setup-select using SpecifyColumn but non-specified column.
      * <pre>
      * <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> -&gt; {
@@ -462,20 +462,20 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                       Meta Handling
     //                                                                       =============
     /**
-     * Does it have where clause on the base query? <br />
+     * Does it have where clause on the base query? <br>
      * Clauses on union queries and in-line views are not concerned.
      * @return The determination, true or false. 
      */
     boolean hasWhereClauseOnBaseQuery();
 
     /**
-     * Clear where clauses where clause on the base query. <br />
+     * Clear where clauses where clause on the base query. <br>
      * Clauses on union queries and in-line views are not concerned.
      */
     void clearWhereClauseOnBaseQuery();
 
     /**
-     * Does it have select-all possible? <br />
+     * Does it have select-all possible? <br>
      * The elements for possible are:
      * <pre>
      * o no where clause on base query
@@ -487,7 +487,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     boolean hasSelectAllPossible();
 
     /**
-     * Does it have order-by clauses? <br />
+     * Does it have order-by clauses? <br>
      * Whether that order-by is effective or not has no influence.
      * @return The determination, true or false.
      */
@@ -505,7 +505,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                 Reflection Invoking
     //                                                                 ===================
     /**
-     * Invoke the method 'setupSelect_Xxx()' and 'withXxx()' by the path of foreign property name. <br />
+     * Invoke the method 'setupSelect_Xxx()' and 'withXxx()' by the path of foreign property name. <br>
      * For example, if this is based on PURCHASE, 'member.memberStatus' means as follows:
      * <pre>
      * PurchaseCB cb = new PurchaseCB();
@@ -518,7 +518,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     void invokeSetupSelect(String foreignPropertyNamePath);
 
     /**
-     * Invoke the method 'specify().columnXxx()' by the path of column name. <br />
+     * Invoke the method 'specify().columnXxx()' by the path of column name. <br>
      * For example, if this is based on PURCHASE, 'purchaseDatetime' means as follows:
      * <pre>
      * PurchaseCB cb = new PurchaseCB();
@@ -536,14 +536,14 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     SpecifiedColumn invokeSpecifyColumn(String columnNamePath);
 
     /**
-     * Invoke the method 'orScopeQuery()' by the query callback. <br />
+     * Invoke the method 'orScopeQuery()' by the query callback. <br>
      * @param orQuery The callback for or-query. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
     void invokeOrScopeQuery(OrQuery<ConditionBean> orQuery);
 
     /**
-     * Invoke the method 'orScopeQueryAndPart()' by the query callback. <br />
+     * Invoke the method 'orScopeQueryAndPart()' by the query callback. <br>
      * @param andQuery The callback for and-query. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
@@ -553,7 +553,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                  Query Synchronizer
     //                                                                  ==================
     /**
-     * Register union-query synchronizer. {Internal} <br />
+     * Register union-query synchronizer. {Internal} <br>
      * Basically for reflecting LoadReferrer's InScope condition to union-queries in condition-bean set-upper.
      * @param unionQuerySynchronizer The synchronizer of union query. (NullAllowed)
      */
@@ -563,7 +563,7 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                    Derived Mappable
     //                                                                    ================
     /**
-     * Get the handler of derived type for derived mappable entity (for (Specify)DerivedReferrer). <br />
+     * Get the handler of derived type for derived mappable entity (for (Specify)DerivedReferrer). <br>
      * Called by internal mapping process, so should be fixed instance.
      * @return The handler of derived type. (NotNull)
      */

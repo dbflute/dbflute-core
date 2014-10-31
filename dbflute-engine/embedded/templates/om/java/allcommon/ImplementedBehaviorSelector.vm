@@ -36,15 +36,9 @@ import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 #if ($database.isTargetContainerSpring())
 import org.springframework.context.ApplicationContext;
 #end
-#if ($database.isTargetContainerLucy())
-import org.t2framework.lucy.Lucy;
-#end
 #if ($database.isTargetContainerGuice())
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-#end
-#if ($database.isTargetContainerSlim3())
-import org.slim3.container.S3Container;
 #end
 #if ($database.isTargetContainerCDI())
 import javax.enterprise.context.spi.CreationalContext;
@@ -78,17 +72,9 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     /** The container of Spring. */
     protected ApplicationContext _container;
 #end
-#if ($database.isTargetContainerLucy())
-    /** The container of Lucy. */
-    protected Lucy _container;
-#end
 #if ($database.isTargetContainerGuice())
     /** The container of Guice. */
     protected Injector _container;
-#end
-#if ($database.isTargetContainerSlim3())
-    /** The container of Slim3. */
-    protected S3Container _container;
 #end
 #if ($database.isTargetContainerCDI())
     /** The container of CDI. */
@@ -193,7 +179,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     // ===================================================================================
     //                                                                           Component
     //                                                                           =========
-#if ($database.isTargetContainerSeasar() || $database.isTargetContainerSpring() || $database.isTargetContainerLucy() || $database.isTargetContainerCDI())
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerSpring() || $database.isTargetContainerCDI())
     @SuppressWarnings("unchecked")
 #end
     protected <COMPONENT> COMPONENT getComponent(Class<COMPONENT> componentType) { // only for behavior
@@ -217,14 +203,8 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #if ($database.isTargetContainerSpring())
 		return (COMPONENT)_container.getBean(replace(initUncap(toClassTitle(componentType)), "${database.dollar}", ""));
 #end
-#if ($database.isTargetContainerLucy())
-		return (COMPONENT)_container.get(initUncap(toClassTitle(componentType)));
-#end
 #if ($database.isTargetContainerGuice())
 		return _container.getInstance(componentType);
-#end
-#if ($database.isTargetContainerSlim3())
-		return _container.lookup(toClassTitle(componentType));
 #end
 #if ($database.isTargetContainerCDI())
         COMPONENT result = null;
@@ -266,9 +246,9 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     //                                         -------------
     /**
      * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @throws IllegalArgumentException
+     * @param variableName The variable name for message. (NotNull)
+     * @param value The value the checked variable. (NotNull)
+     * @throws IllegalArgumentException When the variable name or the variable is null.
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
@@ -286,8 +266,9 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     //                                         -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
+     * @param variableName The variable name for message. (NotNull)
+     * @param value The value the checked variable. (NotNull)
+     * @throws IllegalArgumentException When the argument is null or empty.
      */
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);
@@ -311,19 +292,9 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
         this._container = container;
     }
 #end
-#if ($database.isTargetContainerLucy())
-    public void setContainer(Lucy container) {
-        this._container = container;
-    }
-#end
 #if ($database.isTargetContainerGuice())
     @Inject
     public void setContainer(Injector container) {
-        this._container = container;
-    }
-#end
-#if ($database.isTargetContainerSlim3())
-    public void setContainer(S3Container container) {
         this._container = container;
     }
 #end

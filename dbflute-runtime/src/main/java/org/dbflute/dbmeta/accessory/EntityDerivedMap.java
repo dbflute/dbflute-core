@@ -26,7 +26,7 @@ import org.dbflute.exception.SpecifyDerivedReferrerPropertyValueNotFoundExceptio
 import org.dbflute.exception.SpecifyDerivedReferrerUnknownAliasNameException;
 import org.dbflute.exception.SpecifyDerivedReferrerUnmatchedPropertyTypeException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.optional.OptionalProperty;
+import org.dbflute.optional.OptionalScalar;
 
 /**
  * The derived map of entity. (basically for Framework)
@@ -68,12 +68,12 @@ public class EntityDerivedMap implements Serializable {
      * @param entity The entity that has the derived value, basically for logging. (NotNull)
      * @param aliasName The alias name of derived-referrer. (NotNull)
      * @param propertyType The type of the derived property, should match as rule. (NotNull)
-     * @return The optional property for derived value found in the map. (NotNull, EmptyAllowed: when null selected)
+     * @return The optional scalar for derived value found in the map. (NotNull, EmptyAllowed: when null selected)
      * @throws SpecifyDerivedReferrerInvalidAliasNameException When the alias name does not start with '$'.
      * @throws SpecifyDerivedReferrerUnknownAliasNameException When the alias name is unknown, no derived.
      * @throws SpecifyDerivedReferrerUnmatchedPropertyTypeException When the property type is unmatched with actual type.
      */
-    public <VALUE> OptionalProperty<VALUE> findDerivedValue(Entity entity, String aliasName, Class<VALUE> propertyType) {
+    public <VALUE> OptionalScalar<VALUE> findDerivedValue(Entity entity, String aliasName, Class<VALUE> propertyType) {
         if (aliasName == null) {
             throw new IllegalArgumentException("The argument 'aliasName' should not be null.");
         }
@@ -91,7 +91,7 @@ public class EntityDerivedMap implements Serializable {
             @SuppressWarnings("unchecked")
             final VALUE found = (VALUE) derivedMap.get(aliasName);
             final String tableDbName = entity.getTableDbName(); // not to have reference to entity in optional
-            return OptionalProperty.ofNullable(found, () -> {
+            return OptionalScalar.ofNullable(found, () -> {
                 throwDerivedPropertyValueNotFoundException(tableDbName, aliasName);
             }); // null allowed
         } catch (ClassCastException e) {

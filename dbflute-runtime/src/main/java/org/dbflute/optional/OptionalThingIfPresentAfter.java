@@ -19,10 +19,10 @@ package org.dbflute.optional;
  * The consumer of optional value.
  * <pre>
  * opt.<span style="color: #CC4747">ifPresent</span>(member -&gt; {
- *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
+ *     <span style="color: #3F7E5E">// called if value exists, or not called</span>
  *     ... = member.getMemberName();
- * }).<span style="color: #CC4747">orElse</span>(() =&gt; {
- *     <span style="color: #3F7E5E">// *here: called if value does not exist</span>
+ * }).<span style="color: #CC4747">orElse</span>(() -&gt; {
+ *     <span style="color: #3F7E5E">// *here: called if no value</span>
  * });
  * </pre>
  * @author jflute
@@ -33,6 +33,14 @@ public interface OptionalThingIfPresentAfter {
 
     /**
      * Execute the process when the thing is none.
+     * <pre>
+     * opt.<span style="color: #994747">ifPresent</span>(member -&gt; {
+     *     <span style="color: #3F7E5E">// called if value exists, or not called</span>
+     *     ... = member.getMemberName();
+     * }).<span style="color: #CC4747">orElse</span>(() -&gt; {
+     *     <span style="color: #3F7E5E">// *here: called if no value</span>
+     * });
+     * </pre>
      * @param noArgLambda The callback to run the process when the thing is none. (NotNull)
      */
     void orElse(OptionalThingNoneProcessor noArgLambda);

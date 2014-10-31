@@ -24,7 +24,7 @@ import org.dbflute.cbean.scoping.ScalarQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.clause.SelectClauseType;
 import org.dbflute.dbmeta.info.ColumnInfo;
-import org.dbflute.optional.OptionalThing;
+import org.dbflute.optional.OptionalScalar;
 
 /**
  * The function for scalar select. 
@@ -64,7 +64,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     //                                                                            Function
     //                                                                            ========
     /**
-     * Select the count value. <br />
+     * Select the count value. <br>
      * You can also get same result by selectCount(cb) method.
      * <pre>
      * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">count</span>(new ScalarQuery(MemberCB cb) {
@@ -104,7 +104,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     }
 
     /**
-     * Select the count-distinct value. <br />
+     * Select the count-distinct value. <br>
      * You can also get same result by selectCount(cb) method.
      * <pre>
      * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
@@ -152,9 +152,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * });
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
-     * @return The optional thing for maximum value calculated by function. (NullAllowed)
+     * @return The optional scalar for maximum value calculated by function. (NullAllowed)
      */
-    public OptionalThing<RESULT> max(ScalarQuery<CB> cbLambda) {
+    public OptionalScalar<RESULT> max(ScalarQuery<CB> cbLambda) {
         return doMax(cbLambda, null);
     }
 
@@ -168,16 +168,16 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
      * @param opLambda The callback for option of scalar. (NotNull)
-     * @return The optional thing for maximum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
+     * @return The optional scalar for maximum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public OptionalThing<RESULT> max(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
+    public OptionalScalar<RESULT> max(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
         final ScalarSelectOption option = createScalarSelectOption();
         opLambda.callback(option);
         assertScalarSelectOption(option);
         return doMax(cbLambda, option);
     }
 
-    protected OptionalThing<RESULT> doMax(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    protected OptionalScalar<RESULT> doMax(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
         assertScalarQuery(scalarQuery);
         return optionalOf("max", exec(scalarQuery, SelectClauseType.MAX, option));
     }
@@ -191,9 +191,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * });
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
-     * @return The optional thing for minimum value calculated by function. (NullAllowed)
+     * @return The optional scalar for minimum value calculated by function. (NullAllowed)
      */
-    public OptionalThing<RESULT> min(ScalarQuery<CB> cbLambda) {
+    public OptionalScalar<RESULT> min(ScalarQuery<CB> cbLambda) {
         return doMin(cbLambda, null);
     }
 
@@ -207,16 +207,16 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
      * @param opLambda The callback for option of scalar. (NotNull)
-     * @return The optional thing for minimum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
+     * @return The optional scalar for minimum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public OptionalThing<RESULT> min(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
+    public OptionalScalar<RESULT> min(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
         final ScalarSelectOption option = createScalarSelectOption();
         opLambda.callback(option);
         assertScalarSelectOption(option);
         return doMin(cbLambda, option);
     }
 
-    protected OptionalThing<RESULT> doMin(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    protected OptionalScalar<RESULT> doMin(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
         assertScalarQuery(scalarQuery);
         return optionalOf("min", exec(scalarQuery, SelectClauseType.MIN, option));
     }
@@ -230,9 +230,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * });
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
-     * @return The optional thing for summary value calculated by function. (NullAllowed)
+     * @return The optional scalar for summary value calculated by function. (NullAllowed)
      */
-    public OptionalThing<RESULT> sum(ScalarQuery<CB> cbLambda) {
+    public OptionalScalar<RESULT> sum(ScalarQuery<CB> cbLambda) {
         return doSum(cbLambda, null);
     }
 
@@ -246,16 +246,16 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
      * @param opLambda The callback for option of scalar. (NotNull)
-     * @return The optional thing for summary value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
+     * @return The optional scalar for summary value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public OptionalThing<RESULT> sum(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
+    public OptionalScalar<RESULT> sum(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
         final ScalarSelectOption option = createScalarSelectOption();
         opLambda.callback(option);
         assertScalarSelectOption(option);
         return doSum(cbLambda, option);
     }
 
-    protected OptionalThing<RESULT> doSum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    protected OptionalScalar<RESULT> doSum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
         assertScalarQuery(scalarQuery);
         return optionalOf("sum", exec(scalarQuery, SelectClauseType.SUM, option));
     }
@@ -269,9 +269,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * });
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
-     * @return The optional thing for average value calculated by function. (NullAllowed)
+     * @return The optional scalar for average value calculated by function. (NullAllowed)
      */
-    public OptionalThing<RESULT> avg(ScalarQuery<CB> cbLambda) {
+    public OptionalScalar<RESULT> avg(ScalarQuery<CB> cbLambda) {
         return doAvg(cbLambda, null);
     }
 
@@ -285,22 +285,22 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
      * @param opLambda The callback for option of scalar. (NotNull)
-     * @return The optional thing for average value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
+     * @return The optional scalar for average value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
-    public OptionalThing<RESULT> avg(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
+    public OptionalScalar<RESULT> avg(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
         final ScalarSelectOption option = createScalarSelectOption();
         opLambda.callback(option);
         assertScalarSelectOption(option);
         return doAvg(cbLambda, option);
     }
 
-    protected OptionalThing<RESULT> doAvg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+    protected OptionalScalar<RESULT> doAvg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
         assertScalarQuery(scalarQuery);
         return optionalOf("avg", exec(scalarQuery, SelectClauseType.AVG, option));
     }
 
-    protected OptionalThing<RESULT> optionalOf(String title, RESULT result) {
-        return OptionalThing.ofNullable(result, () -> {
+    protected OptionalScalar<RESULT> optionalOf(String title, RESULT result) {
+        return OptionalScalar.ofNullable(result, () -> {
             throwScalarSelectValueNotFoundException(title);
         });
     }

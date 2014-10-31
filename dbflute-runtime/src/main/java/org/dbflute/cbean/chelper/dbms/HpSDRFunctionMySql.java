@@ -26,7 +26,7 @@ import org.dbflute.cbean.scoping.SubQuery;
 import org.dbflute.dbmeta.DBMetaProvider;
 
 /**
- * The MySQL function for (Specify)DerivedReferrer. <br />
+ * The MySQL function for (Specify)DerivedReferrer. <br>
  * <span style="color: #CC4747">This is base implementation for #future needs.</span>
  * @param <REFERRER_CB> The type of referrer condition-bean.
  * @param <LOCAL_CQ> The type of local condition-query.

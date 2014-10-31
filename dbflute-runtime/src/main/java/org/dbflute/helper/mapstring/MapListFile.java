@@ -64,9 +64,9 @@ public class MapListFile {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the map string file. <br />
-     * If the type of values is various type, this method is available. <br />
-     * A trimmed line that starts with '#' is treated as line comment. <br />
+     * Read the map string file. <br>
+     * If the type of values is various type, this method is available. <br>
+     * A trimmed line that starts with '#' is treated as line comment. <br>
      * This is the most basic method in the map-handling methods.
      * <pre>
      * map:{
@@ -78,7 +78,7 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     public Map<String, Object> readMap(InputStream ins) throws IOException {
         final String mapString = readString(ins);
@@ -90,8 +90,8 @@ public class MapListFile {
     }
 
     /**
-     * Read the map string file as string value. <br />
-     * If the type of all values is string type, this method is available. <br />
+     * Read the map string file as string value. <br>
+     * If the type of all values is string type, this method is available. <br>
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
      * e.g.
@@ -103,7 +103,7 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     public Map<String, String> readMapAsStringValue(InputStream ins) throws IOException {
         final Map<String, String> resultMap = new LinkedHashMap<String, String>();
@@ -116,8 +116,8 @@ public class MapListFile {
     }
 
     /**
-     * Read the map string file as string list value. <br />
-     * If the type of all values is string list type, this method is available. <br />
+     * Read the map string file as string list value. <br>
+     * If the type of all values is string list type, this method is available. <br>
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
      * e.g.
@@ -129,7 +129,7 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string list. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     @SuppressWarnings("unchecked")
     public Map<String, List<String>> readMapAsStringListValue(InputStream ins) throws IOException {
@@ -143,8 +143,8 @@ public class MapListFile {
     }
 
     /**
-     * Read the map string file as string map value. <br />
-     * If the type of all values is string map type, this method is available. <br />
+     * Read the map string file as string map value. <br>
+     * If the type of all values is string map type, this method is available. <br>
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
      * e.g.
@@ -156,7 +156,7 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string map. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     @SuppressWarnings("unchecked")
     public Map<String, Map<String, String>> readMapAsStringMapValue(InputStream ins) throws IOException {
@@ -185,9 +185,9 @@ public class MapListFile {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the list string file. <br />
-     * If the type of values is various type, this method is available. <br />
-     * A trimmed line that starts with '#' is treated as line comment. <br />
+     * Read the list string file. <br>
+     * If the type of values is various type, this method is available. <br>
+     * A trimmed line that starts with '#' is treated as line comment. <br>
      * <pre>
      * list:{
      *     ; element1
@@ -198,7 +198,7 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read list. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     public List<Object> readList(InputStream ins) throws IOException {
         final String listString = readString(ins);
@@ -225,11 +225,11 @@ public class MapListFile {
     //                                                  Read
     //                                                  ----
     /**
-     * Read the string file. <br />
+     * Read the string file. <br>
      * A trimmed line that starts with '#' is treated as line comment.
      * @param ins The input stream for DBFlute property file. (NotNull)
      * @return The read string. (NotNull)
-     * @throws IOException 
+     * @throws IOException When it fails to handle the IO.
      */
     public String readString(InputStream ins) throws IOException {
         final String encoding = getFileEncoding();
