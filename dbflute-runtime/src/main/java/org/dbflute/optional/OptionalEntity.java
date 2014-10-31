@@ -26,14 +26,14 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
  * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
  * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
  *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
- *     <span style="color: #553000">cb</span>.query().setMemberId_Equal(1);
+ *     <span style="color: #553000">cb</span>.query().setMemberId_Equal(<span style="color: #2A00FF">1</span>);
  * }).<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
  *     <span style="color: #3F7E5E">// called if present, or exception</span>
  *     ... = <span style="color: #553000">member</span>.getMemberName();
  * });
  * 
  * <span style="color: #3F7E5E">// if it might be no data, ...</span>
- * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(1)).<span style="color: #CC4747">ifPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+ * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(<span style="color: #2A00FF">1</span>)).<span style="color: #CC4747">ifPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
  *     <span style="color: #3F7E5E">// called if present</span>
  *     ... = <span style="color: #553000">member</span>.getMemberName();
  * }).<span style="color: #994747">orElse</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
@@ -172,11 +172,16 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * You should call this if null entity handling is unnecessary (do nothing if null). <br>
      * If exception is preferred when null entity, use required().
      * <pre>
-     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(1)).<span style="color: #CC4747">ifPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
-     *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
+     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.setupSelect_MemberWithdrawal();
+     *     <span style="color: #553000">cb</span>.query().setMemberId_Equal(<span style="color: #2A00FF">1</span>);
+     * }).<span style="color: #CC4747">ifPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> { <span style="color: #3F7E5E">// called if value exists, or not called</span>
      *     ... = <span style="color: #553000">member</span>.getMemberName();
+     *     <span style="color: #553000">member</span>.getMemberWithdrawal().<span style="color: #CC4747">ifPresent</span>(<span style="color: #553000">withdrawal</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> { <span style="color: #3F7E5E">// also relation</span>
+     *         ... = <span style="color: #553000">withdrawal</span>.getWithdrawalDatetime();
+     *     });
      * }).<span style="color: #994747">orElse</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
-     *     <span style="color: #3F7E5E">// called if value does not exist</span>
+     *     <span style="color: #3F7E5E">// called if no value</span>
      * });
      * </pre>
      * @param entityLambda The callback interface to consume the optional entity. (NotNull)
@@ -210,7 +215,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * <pre>
      * OptionalEntity&lt;Member&gt; <span style="color: #553000">optMember</span> = <span style="color: #0000C0">memberBhv</span>.selectEntity(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
-     *     <span style="color: #553000">cb</span>.query().setMemberId_Equal(1);
+     *     <span style="color: #553000">cb</span>.query().setMemberId_Equal(<span style="color: #2A00FF">1</span>);
      * });
      *
      * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
@@ -233,7 +238,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     /**
      * Filter the entity by the predicate.
      * <pre>
-     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(1)).<span style="color: #CC4747">filter</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(<span style="color: #2A00FF">1</span>)).<span style="color: #CC4747">filter</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
      *     return <span style="color: #553000">member</span>.getMemberId() % 2 == 0;
      * }).<span style="color: #994747">ifPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
@@ -257,9 +262,9 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     /**
      * Apply the mapping of entity to result object.
      * <pre>
-     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(1)).<span style="color: #CC4747">map</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(<span style="color: #2A00FF">1</span>)).<span style="color: #CC4747">map</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
-     *     return new MemberWebBean(<span style="color: #553000">member</span>);
+     *     <span style="color: #70226C">return new</span> MemberWebBean(<span style="color: #553000">member</span>);
      * }).<span style="color: #994747">alwaysPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     ...
      * });
@@ -283,9 +288,9 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     /**
      * Apply the flat-mapping of entity to result object.
      * <pre>
-     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(1)).<span style="color: #CC4747">flatMap</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(<span style="color: #2A00FF">1</span>)).<span style="color: #CC4747">flatMap</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #3F7E5E">// called if value exists, not called if not present</span>
-     *     return <span style="color: #553000">member</span>.getMemberWithdrawal();
+     *     <span style="color: #70226C">return</span> <span style="color: #553000">member</span>.getMemberWithdrawal();
      * }).<span style="color: #994747">ifPresent</span>(<span style="color: #553000">withdrawal</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     ...
      * });
@@ -326,9 +331,14 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     /**
      * Handle the entity in the optional object or exception if not present.
      * <pre>
-     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(1)).<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
-     *     <span style="color: #3F7E5E">// called if value exists, or exception if not present</span>
+     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.setupSelect_MemberStatus();
+     *     <span style="color: #553000">cb</span>.query().setMemberId_Equal(<span style="color: #2A00FF">1</span>);
+     * }).<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> { <span style="color: #3F7E5E">// called if value exists, or exception</span>
      *     ... = <span style="color: #553000">member</span>.getMemberName();
+     *     <span style="color: #553000">member</span>.getMemberStatus().<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">status</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> { <span style="color: #3F7E5E">// also relation</span>
+     *         ... = <span style="color: #553000">status</span>.getMemberStatusName();
+     *     });
      * });
      * </pre>
      * @param entityLambda The callback interface to consume the optional value. (NotNull)
