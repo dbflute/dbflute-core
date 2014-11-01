@@ -109,6 +109,23 @@ public class PagingResultBeanTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
+    public void test_existsPreviousPage_basic() {
+        assertTrue(createTarget(4, 5, 20).existsPreviousPage());
+        assertTrue(createTarget(4, 4, 20).existsPreviousPage());
+        assertTrue(createTarget(4, 3, 20).existsPreviousPage());
+        assertTrue(createTarget(4, 2, 20).existsPreviousPage());
+        assertFalse(createTarget(4, 1, 20).existsPreviousPage());
+    }
+
+    public void test_existsNextPage_basic() {
+        assertTrue(createTarget(4, 1, 20).existsNextPage());
+        assertTrue(createTarget(4, 2, 20).existsNextPage());
+        assertTrue(createTarget(4, 3, 20).existsNextPage());
+        assertTrue(createTarget(4, 4, 20).existsNextPage());
+        assertFalse(createTarget(4, 5, 20).existsNextPage());
+    }
+
+    @SuppressWarnings("deprecation")
     public void test_isExistPrePage_basic() {
         assertTrue(createTarget(4, 5, 20).isExistPrePage());
         assertTrue(createTarget(4, 4, 20).isExistPrePage());
@@ -117,6 +134,7 @@ public class PagingResultBeanTest extends RuntimeTestCase {
         assertFalse(createTarget(4, 1, 20).isExistPrePage());
     }
 
+    @SuppressWarnings("deprecation")
     public void test_isExistNextPage_basic() {
         assertTrue(createTarget(4, 1, 20).isExistNextPage());
         assertTrue(createTarget(4, 2, 20).isExistNextPage());

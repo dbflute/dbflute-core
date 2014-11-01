@@ -127,7 +127,8 @@ public class PageRangeBean implements Serializable {
     //                                                                       Determination
     //                                                                       =============
     /**
-     * Is existing previous page range?
+     * Does the previous range exist? <br>
+     * Using values are currentPageNumber and pageRangeSize and allPageCount.
      * <pre>
      * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
@@ -137,13 +138,50 @@ public class PageRangeBean implements Serializable {
      * </pre>
      * @return The determination, true or false.
      */
-    public boolean isExistPrePageRange() {
+    public boolean existsPreviousRange() {
         assertPageRangeValid();
         final List<Integer> ls = createPageNumberList();
         if (ls.isEmpty()) {
             return false;
         }
         return ls.get(0) > 1;
+    }
+
+    /**
+     * Does the next range exist? <br>
+     * Using values are currentPageNumber and pageRangeSize and allPageCount.
+     * <pre>
+     * e.g. range-size=5, current-page=8 
+     *  8 / 23 pages (453 records)
+     * previous 3 4 5 6 7 8 9 10 11 12 13 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #CC4747">14</span>
+     * </pre>
+     * @return The determination, true or false.
+     */
+    public boolean existsNextRange() {
+        assertPageRangeValid();
+        final List<Integer> ls = createPageNumberList();
+        if (ls.isEmpty()) {
+            return false;
+        }
+        return ls.get(ls.size() - 1) < _allPageCount;
+    }
+
+    /**
+     * Is existing previous page range?
+     * <pre>
+     * e.g. range-size=5, current-page=8 
+     *  8 / 23 pages (453 records)
+     * previous 3 4 5 6 7 8 9 10 11 12 13 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #CC4747">2</span>
+     * </pre>
+     * @return The determination, true or false.
+     * @deprecated use existsPreviousRange()
+     */
+    public boolean isExistPrePageRange() {
+        return existsPreviousRange();
     }
 
     /**
@@ -156,14 +194,10 @@ public class PageRangeBean implements Serializable {
      * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #CC4747">14</span>
      * </pre>
      * @return The determination, true or false.
+     * @deprecated use existsNextRange()
      */
     public boolean isExistNextPageRange() {
-        assertPageRangeValid();
-        final List<Integer> ls = createPageNumberList();
-        if (ls.isEmpty()) {
-            return false;
-        }
-        return ls.get(ls.size() - 1) < _allPageCount;
+        return existsNextRange();
     }
 
     // ===================================================================================

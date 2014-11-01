@@ -78,7 +78,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     //                                                                       Determination
     //                                                                       =============
     /**
-     * Is existing previous page?
+     * Does the previous page exist? <br>
      * Using values are currentPageNumber.
      * <pre>
      * e.g. range-size=5, current-page=8 
@@ -87,8 +87,37 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * </pre>
      * @return The determination, true or false.
      */
-    public boolean isExistPrePage() {
+    public boolean existsPreviousPage() {
         return (_allRecordCount > 0 && _currentPageNumber > 1);
+    }
+
+    /**
+     * Does the next page exist? <br>
+     * Using values are currentPageNumber and allPageCount.
+     * <pre>
+     * e.g. range-size=5, current-page=8 
+     *  8 / 23 pages (453 records)
+     * previous 3 4 5 6 7 8 <span style="color: #CC4747">9</span> 10 11 12 13 <span style="color: #CC4747">next</span>
+     * </pre>
+     * @return The determination, true or false.
+     */
+    public boolean existsNextPage() {
+        return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());
+    }
+
+    /**
+     * Is existing previous page?
+     * Using values are currentPageNumber.
+     * <pre>
+     * e.g. range-size=5, current-page=8 
+     *  8 / 23 pages (453 records)
+     * <span style="color: #CC4747">previous</span> 3 4 5 6 <span style="color: #CC4747">7</span> 8 9 10 11 12 13 next
+     * </pre>
+     * @return The determination, true or false.
+     * @deprecated use existsPreviousPage()
+     */
+    public boolean isExistPrePage() {
+        return existsPreviousPage();
     }
 
     /**
@@ -100,9 +129,10 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * previous 3 4 5 6 7 8 <span style="color: #CC4747">9</span> 10 11 12 13 <span style="color: #CC4747">next</span>
      * </pre>
      * @return The determination, true or false.
+     * @deprecated use existsNextPage()
      */
     public boolean isExistNextPage() {
-        return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());
+        return existsNextPage();
     }
 
     // ===================================================================================

@@ -131,7 +131,7 @@ public class PageGroupBean implements Serializable {
     //                                                                       Determination
     //                                                                       =============
     /**
-     * Is existing previous page-group?
+     * Does the previous group exist? <br>
      * Using values are currentPageNumber and pageGroupSize.
      * <pre>
      * e.g. group-size=10, current-page=12
@@ -142,9 +142,50 @@ public class PageGroupBean implements Serializable {
      * </pre>
      * @return The determination, true or false.
      */
-    public boolean isExistPrePageGroup() {
+    public boolean existsPreviousGroup() {
         assertPageGroupValid();
         return (_currentPageNumber > _pageGroupOption.getPageGroupSize());
+    }
+
+    /**
+     * Does the next group exist? <br>
+     * Using values are currentPageNumber and pageGroupSize and allPageCount.
+     * <pre>
+     * e.g. group-size=10, current-page=12
+     *  12 / 23 pages (453 records)
+     * previous 11 12 13 14 15 16 17 18 19 20 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #CC4747">21</span>
+     * </pre>
+     * @return The determination, true or false.
+     */
+    public boolean existsNextGroup() {
+        assertPageGroupValid();
+        final int currentStartPageNumber = calculateStartPageNumber();
+        if (!(currentStartPageNumber > 0)) {
+            String msg = "currentStartPageNumber should be greater than 0. {> 0} But:";
+            msg = msg + " currentStartPageNumber=" + currentStartPageNumber;
+            throw new IllegalStateException(msg);
+        }
+        final int nextStartPageNumber = currentStartPageNumber + _pageGroupOption.getPageGroupSize();
+        return (nextStartPageNumber <= _allPageCount);
+    }
+
+    /**
+     * Is existing previous page-group?
+     * Using values are currentPageNumber and pageGroupSize.
+     * <pre>
+     * e.g. group-size=10, current-page=12
+     *  12 / 23 pages (453 records)
+     * previous 11 12 13 14 15 16 17 18 19 20 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #CC4747">10</span>
+     * </pre>
+     * @return The determination, true or false.
+     * @deprecated use existsPreviousGroup()
+     */
+    public boolean isExistPrePageGroup() {
+        return existsPreviousGroup();
     }
 
     /**
@@ -158,17 +199,10 @@ public class PageGroupBean implements Serializable {
      * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #CC4747">21</span>
      * </pre>
      * @return The determination, true or false.
+     * @deprecated use existsNextGroup()
      */
     public boolean isExistNextPageGroup() {
-        assertPageGroupValid();
-        final int currentStartPageNumber = calculateStartPageNumber();
-        if (!(currentStartPageNumber > 0)) {
-            String msg = "currentStartPageNumber should be greater than 0. {> 0} But:";
-            msg = msg + " currentStartPageNumber=" + currentStartPageNumber;
-            throw new IllegalStateException(msg);
-        }
-        final int nextStartPageNumber = currentStartPageNumber + _pageGroupOption.getPageGroupSize();
-        return (nextStartPageNumber <= _allPageCount);
+        return existsNextGroup();
     }
 
     // ===================================================================================
