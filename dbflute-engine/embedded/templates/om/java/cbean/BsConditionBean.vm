@@ -691,6 +691,24 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 #end
 
+    // ===================================================================================
+    //                                                                        Dream Cruise
+    //                                                                        ============
+    /**
+     * Welcome to the Dream Cruise for condition-bean deep world. <br>
+     * This is very specialty so you can get the frontier spirit. Bon voyage!
+     * @return The condition-bean for dream cruise, which is linked to main condition-bean.
+     */
+    public ${myConditionBeanClassName} dreamCruiseCB() {
+        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+        cb.xsetupForDreamCruise((${myConditionBeanClassName}) this);
+        return cb;
+    }
+
+    protected ConditionBean xdoCreateDreamCruiseCB() {
+        return dreamCruiseCB();
+    }
+
     // [DBFlute-0.9.5.3]
     // ===================================================================================
     //                                                                        Column Query
@@ -732,24 +750,6 @@ public class ${myClassName} extends AbstractConditionBean {
         ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
         cb.xsetupForColumnQuery((${myConditionBeanClassName})this);
         return cb;
-    }
-
-    // ===================================================================================
-    //                                                                        Dream Cruise
-    //                                                                        ============
-    /**
-     * Welcome to the Dream Cruise for condition-bean deep world. <br>
-     * This is very specialty so you can get the frontier spirit. Bon voyage!
-     * @return The condition-bean for dream cruise, which is linked to main condition-bean.
-     */
-    public ${myConditionBeanClassName} dreamCruiseCB() {
-        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-        cb.xsetupForDreamCruise((${myConditionBeanClassName}) this);
-        return cb;
-    }
-
-    protected ConditionBean xdoCreateDreamCruiseCB() {
-        return dreamCruiseCB();
     }
 
     // [DBFlute-0.9.6.3]
