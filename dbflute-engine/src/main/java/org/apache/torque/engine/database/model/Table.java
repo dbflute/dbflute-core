@@ -3589,6 +3589,11 @@ public class Table {
         return prop.isCompatibleOutsideSqlFacadeChainOldStyle();
     }
 
+    public boolean isCompatibleSelectScalarOldName() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleSelectScalarOldName();
+    }
+
     // -----------------------------------------------------
     //                                   Optional Properties
     //                                   -------------------

@@ -563,6 +563,24 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * Select the scalar value derived by a function from uniquely-selected records. <br>
      * You should call a function method after this method called like as follows:
      * <pre>
+     * <span style="color: #0000C0">${myEntityVariableName}Bhv</span>.<span style="color: #CC4747">selectScalar</span>(Date.class).max(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">column...</span>; <span style="color: #3F7E5E">// required for the function</span>
+     *     <span style="color: #553000">cb</span>.query().set...
+     * });
+     * </pre>
+     * @param <RESULT> The type of result.
+     * @param resultType The type of result. (NotNull)
+     * @return The scalar function object to specify function for scalar value. (NotNull)
+     */
+    public <RESULT> HpSLSFunction<${myConditionBeanClassName}, RESULT> selectScalar(Class<RESULT> resultType) {
+        return facadeScalarSelect(resultType);
+    }
+#if ($table.isCompatibleSelectScalarOldName())
+
+    /**
+     * Select the scalar value derived by a function from uniquely-selected records. <br>
+     * You should call a function method after this method called like as follows:
+     * <pre>
      * <span style="color: #0000C0">${myEntityVariableName}Bhv</span>.<span style="color: #CC4747">scalarSelect</span>(Date.class).max(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">column...</span>; <span style="color: #3F7E5E">// required for the function</span>
      *     <span style="color: #553000">cb</span>.query().set...
@@ -575,6 +593,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     public <RESULT> HpSLSFunction<${myConditionBeanClassName}, RESULT> scalarSelect(Class<RESULT> resultType) {
         return facadeScalarSelect(resultType);
     }
+#end
 
     // ===================================================================================
     //                                                                            Sequence
