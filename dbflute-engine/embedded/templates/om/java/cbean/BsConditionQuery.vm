@@ -432,11 +432,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($relationMethodIdentityName = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
 #set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
@@ -445,7 +447,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * {exists (select ... from ${referrer.table.tableDbName} where ...)}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
-    public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    public void exists${relationMethodIdentityName}(SubQuery<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
@@ -465,11 +467,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($relationMethodIdentityName = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
 #set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
@@ -478,7 +482,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * {not exists (select ... from ${referrer.table.tableDbName} where ...)}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not exists'. (NotNull)
      */
-    public void notExists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+    public void notExists${relationMethodIdentityName}(SubQuery<${relatedCBClassName}> subQuery) {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this);
         try { lock(); subQuery.query(cb); } finally { unlock(); }
@@ -541,11 +545,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (${referrer.isOneToOne()})
 #set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($relationMethodIdentityName = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
 #set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($relationMethodIdentityName = "${referrer.referrerConditionMethodIdentityName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
@@ -554,7 +560,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br>
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #CC4747">derived${referrer.referrerPropertyNameInitCap}()</span>.<span style="color: #CC4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     * cb.query().<span style="color: #CC4747">derived${relationMethodIdentityName}()</span>.<span style="color: #CC4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
      *     public void query(${relatedCBClassName} subCB) {
      *         subCB.specify().<span style="color: #CC4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
@@ -563,7 +569,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * </pre>
      * @return The object to set up a function for referrer table. (NotNull)
      */
-    public HpQDRFunction<${relatedCBClassName}> derived${relationPropertyNameInitCap}() {
+    public HpQDRFunction<${relatedCBClassName}> derived${relationMethodIdentityName}() {
         return xcreateQDRFunction${relationPropertyNameInitCap}();
     }
     protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${relationPropertyNameInitCap}() {
