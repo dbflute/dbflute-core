@@ -4,6 +4,7 @@ ant -f build.xml reflect-to-test-active-dockside
 ant -f build.xml reflect-to-test-active-hanger
 ant -f build.xml reflect-to-test-dbms-mysql
 ant -f build.xml reflect-to-test-dbms-postgresql
+ant -f build.xml reflect-to-test-dbms-oracle
 ant -f build.xml reflect-to-test-option-compatible10x
 
 cd ..
@@ -32,10 +33,9 @@ mvn -e compile
 
 cd ../dbflute-test-dbms-mysql/dbflute_maihamadb
 rm ./log/*.log
-# not replace-schema because of big data
 . nextdb-renewal.sh
 . slave-replace-schema.sh
-. manage.sh regenerate
+. manage.sh renewal
 cd ..
 mvn -e compile
 
@@ -43,6 +43,14 @@ cd ../dbflute-test-dbms-postgresql/dbflute_maihamadb
 rm ./log/*.log
 # not replace-schema because of big data
 . manage.sh regenerate
+cd ..
+mvn -e compile
+
+cd ../dbflute-test-dbms-oracle/dbflute_maihamadb
+rm ./log/*.log
+. nextschema-renewal.sh
+. manage.sh renewal
+. diffworld-test.sh
 cd ..
 mvn -e compile
 
