@@ -281,7 +281,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #if ($table.isAvailableSelectEntityPlainReturn())
     protected Entity doReadEntity(ConditionBean cb) { return facadeSelectEntity(downcast(cb)); }
 #else
-    protected Entity doReadEntity(ConditionBean cb) { return facadeSelectEntity(downcast(cb)).orElseNull(); }
+    protected Entity doReadEntity(ConditionBean cb) { return facadeSelectEntity(downcast(cb)).orElse(null); }
 #end
 #if ($table.isMakeCallbackConditionBeanSetup())
 
