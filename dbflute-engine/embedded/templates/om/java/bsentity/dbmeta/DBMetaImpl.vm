@@ -60,7 +60,11 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                       Column Property
     //                                       ---------------
     protected final Map<String, PropertyGateway> _epgMap = newHashMap();
-    {
+    { xsetupEpg(); }
+#if ($table.hasListColumn())
+    @SuppressWarnings("unchecked")
+#end
+    protected void xsetupEpg() {
 #foreach ($col in $table.columns)
 #set ($reader = "et -> ((${myExtendedObjectClassName})et).get${col.javaName}()")
 #set ($writerLambda = "(et, vl) -> ")
