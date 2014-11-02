@@ -276,7 +276,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 extractor.suppressExceptTarget();
 
                 final DatabaseMetaData dbMetaData = conn.getMetaData();
-                final Map<String, DfForeignKeyMeta> foreignKeyMetaInfoMap = extractor.getForeignKeyMap(dbMetaData, tableMeta);
+                final Map<String, DfForeignKeyMeta> foreignKeyMetaInfoMap = extractor.getForeignKeyMap(conn, dbMetaData, tableMeta);
                 final Set<String> keySet = foreignKeyMetaInfoMap.keySet();
                 for (String foreignKeyName : keySet) {
                     final DfForeignKeyMeta foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);

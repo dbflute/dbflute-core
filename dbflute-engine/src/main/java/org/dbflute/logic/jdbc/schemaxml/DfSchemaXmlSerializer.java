@@ -531,7 +531,7 @@ public class DfSchemaXmlSerializer {
             tableElement.appendChild(columnElement);
         }
 
-        processForeignKey(metaData, tableMeta, tableElement);
+        processForeignKey(conn, metaData, tableMeta, tableElement);
         final Map<String, Map<Integer, String>> uniqueKeyMap = processUniqueKey(metaData, tableMeta, pkInfo, tableElement);
         processIndex(metaData, tableMeta, tableElement, uniqueKeyMap);
 
@@ -637,8 +637,9 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                            ForeignKey
     //                                            ----------
-    protected void processForeignKey(DatabaseMetaData metaData, DfTableMeta tableMeta, Element tableElement) throws SQLException {
-        final Map<String, DfForeignKeyMeta> foreignKeyMap = getForeignKeys(metaData, tableMeta);
+    protected void processForeignKey(Connection conn, DatabaseMetaData metaData, DfTableMeta tableMeta, Element tableElement)
+            throws SQLException {
+        final Map<String, DfForeignKeyMeta> foreignKeyMap = getForeignKeys(conn, metaData, tableMeta);
         if (foreignKeyMap.isEmpty()) {
             return;
         }
@@ -1271,13 +1272,15 @@ public class DfSchemaXmlSerializer {
     //                                           -----------
     /**
      * Retrieves a list of foreign key columns for a given table.
+     * @param conn The connection for the foreign keys, basically for info cannot be provided from meta data, e.g. to-UQ FK. (NotNull)
      * @param metaData The meta data of a database. (NotNull)
      * @param tableMeta The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException When it fails to handle the SQL.
      */
-    protected Map<String, DfForeignKeyMeta> getForeignKeys(DatabaseMetaData metaData, DfTableMeta tableMeta) throws SQLException {
-        final Map<String, DfForeignKeyMeta> foreignKeyMap = _foreignKeyExtractor.getForeignKeyMap(metaData, tableMeta);
+    protected Map<String, DfForeignKeyMeta> getForeignKeys(Connection conn, DatabaseMetaData metaData, DfTableMeta tableMeta)
+            throws SQLException {
+        final Map<String, DfForeignKeyMeta> foreignKeyMap = _foreignKeyExtractor.getForeignKeyMap(conn, metaData, tableMeta);
         if (!canHandleSynonym(tableMeta) || !foreignKeyMap.isEmpty()) {
             return foreignKeyMap;
         }

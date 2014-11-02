@@ -15,6 +15,7 @@
  */
 package org.dbflute.logic.jdbc.metadata.basic;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,12 +28,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.sql.DataSource;
-
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.StringKeyMap;
-import org.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.logic.jdbc.metadata.supplement.DfUniqueKeyFkExtractor;
@@ -66,42 +64,45 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                                                         ===========
     /**
      * Retrieves a map of foreign key columns for a given table. (the key is FK name)
+     * @param conn The connection for the foreign keys, basically for info cannot be provided from meta data, e.g. to-UQ FK. (NotNull)
      * @param metaData JDBC meta data. (NotNull)
      * @param tableInfo The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException When it fails to handle the SQL.
      */
-    public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo) throws SQLException {
+    public Map<String, DfForeignKeyMeta> getForeignKeyMap(Connection conn, DatabaseMetaData metaData, DfTableMeta tableInfo)
+            throws SQLException {
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
-        return getForeignKeyMap(metaData, unifiedSchema, tableName);
+        return getForeignKeyMap(conn, metaData, unifiedSchema, tableName);
     }
 
     /**
      * Retrieves a map of foreign key columns for a given table. (the key is FK name)
+     * @param conn The connection for the foreign keys, basically for info cannot be provided from meta data, e.g. to-UQ FK. (NotNull)
      * @param metaData JDBC meta data. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @param tableName The name of table. (NotNull, CaseInsensitiveByOption)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException When it fails to handle the SQL.
      */
-    public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
-            throws SQLException {
+    public Map<String, DfForeignKeyMeta> getForeignKeyMap(Connection conn, DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName) throws SQLException {
         final String translatedName = translateTableCaseName(tableName);
-        Map<String, DfForeignKeyMeta> map = doGetForeignKeyMap(metaData, unifiedSchema, translatedName, false);
+        Map<String, DfForeignKeyMeta> map = doGetForeignKeyMap(conn, metaData, unifiedSchema, translatedName, false);
         if (isRetryCaseInsensitiveForeignKey()) {
             if (map.isEmpty() && !translatedName.equals(translatedName.toLowerCase())) { // retry by lower case
-                map = doGetForeignKeyMap(metaData, unifiedSchema, translatedName.toLowerCase(), true);
+                map = doGetForeignKeyMap(conn, metaData, unifiedSchema, translatedName.toLowerCase(), true);
             }
             if (map.isEmpty() && !translatedName.equals(translatedName.toUpperCase())) { // retry by upper case
-                map = doGetForeignKeyMap(metaData, unifiedSchema, translatedName.toUpperCase(), true);
+                map = doGetForeignKeyMap(conn, metaData, unifiedSchema, translatedName.toUpperCase(), true);
             }
         }
         return map;
     }
 
-    protected Map<String, DfForeignKeyMeta> doGetForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
-            boolean retry) throws SQLException {
+    protected Map<String, DfForeignKeyMeta> doGetForeignKeyMap(Connection conn, DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName, boolean retry) throws SQLException {
         final Map<String, DfForeignKeyMeta> fkMap = newTableConstraintMap();
         if (isForeignKeyExtractingUnsupported()) {
             return fkMap;
@@ -196,7 +197,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                 rs.close();
             }
         }
-        reflectUniqueKeyFk(unifiedSchema, tableName, fkMap);
+        reflectUniqueKeyFk(conn, unifiedSchema, tableName, fkMap);
         handleExceptedForeignKey(exceptedFKMap, tableName);
         return immobilizeOrder(filterSameStructureForeignKey(fkMap));
     }
@@ -323,8 +324,8 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                        UniqueKey FK
     //                                                                        ============
-    protected void reflectUniqueKeyFk(UnifiedSchema unifiedSchema, String tableName, Map<String, DfForeignKeyMeta> fkMap) {
-        final List<DfForeignKeyMeta> uniqueKeyFkMetaList = findUniqueKeyFkMetaList(unifiedSchema, tableName);
+    protected void reflectUniqueKeyFk(Connection conn, UnifiedSchema unifiedSchema, String tableName, Map<String, DfForeignKeyMeta> fkMap) {
+        final List<DfForeignKeyMeta> uniqueKeyFkMetaList = findUniqueKeyFkMetaList(conn, unifiedSchema, tableName);
         if (uniqueKeyFkMetaList == null) {
             return;
         }
@@ -338,7 +339,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    protected List<DfForeignKeyMeta> findUniqueKeyFkMetaList(UnifiedSchema unifiedSchema, String tableName) {
+    protected List<DfForeignKeyMeta> findUniqueKeyFkMetaList(Connection conn, UnifiedSchema unifiedSchema, String tableName) {
         final Map<String, List<DfForeignKeyMeta>> tableMap = _uniqueKeyFkMap.get(unifiedSchema);
         if (tableMap != null) {
             return tableMap.get(tableName);
@@ -349,15 +350,15 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             if (retryMap != null) {
                 return retryMap.get(tableName);
             }
-            prepareUniqueKeyFkCache(unifiedSchema);
+            prepareUniqueKeyFkCache(conn, unifiedSchema);
             return _uniqueKeyFkMap.get(unifiedSchema).get(tableName);
         }
     }
 
-    protected void prepareUniqueKeyFkCache(UnifiedSchema unifiedSchema) {
+    protected void prepareUniqueKeyFkCache(Connection conn, UnifiedSchema unifiedSchema) {
         // preparing unique-key FK info of the schema
         final Map<String, List<DfForeignKeyMeta>> tableMap = StringKeyMap.createAsFlexibleConcurrent();
-        final DfUniqueKeyFkExtractor extractor = createUniqueKeyFkExtractor(unifiedSchema);
+        final DfUniqueKeyFkExtractor extractor = createUniqueKeyFkExtractor(conn, unifiedSchema);
         if (extractor == null) { // no need to extract in this DBMS
             _uniqueKeyFkMap.put(unifiedSchema, new ConcurrentHashMap<String, List<DfForeignKeyMeta>>());
             return;
@@ -401,14 +402,9 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    protected DfUniqueKeyFkExtractor createUniqueKeyFkExtractor(UnifiedSchema unifiedSchema) {
-        final DataSource dataSource = DfDataSourceContext.getDataSource(); // uses thread data source
-        if (dataSource == null) {
-            String msg = "Not found thread data source for unique-key FK extracting: " + unifiedSchema;
-            throw new IllegalStateException(msg);
-        }
+    protected DfUniqueKeyFkExtractor createUniqueKeyFkExtractor(Connection conn, UnifiedSchema unifiedSchema) {
         final DfDatabaseTypeFacadeProp facadeProp = new DfDatabaseTypeFacadeProp(getBasicProperties());
-        final DfUniqueKeyFkExtractorFactory factory = new DfUniqueKeyFkExtractorFactory(dataSource, unifiedSchema, facadeProp);
+        final DfUniqueKeyFkExtractorFactory factory = new DfUniqueKeyFkExtractorFactory(conn, unifiedSchema, facadeProp);
         return factory.createUniqueKeyFkExtractor();
     }
 

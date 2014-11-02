@@ -240,7 +240,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             info.setUniqueKeyMap(uqMap);
         }
         {
-            final Map<String, DfForeignKeyMeta> fkMap = getFKMap(md, tableOwner, tableName);
+            final Map<String, DfForeignKeyMeta> fkMap = getFKMap(conn, md, tableOwner, tableName);
             info.setForeignKeyMap(fkMap); // It's tentative information at this timing!
         }
         {
@@ -308,9 +308,10 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
     }
 
-    protected Map<String, DfForeignKeyMeta> getFKMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName) {
+    protected Map<String, DfForeignKeyMeta> getFKMap(Connection conn, DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName) {
         try {
-            return _foreignKeyExtractor.getForeignKeyMap(metaData, unifiedSchema, tableName);
+            return _foreignKeyExtractor.getForeignKeyMap(conn, metaData, unifiedSchema, tableName);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
