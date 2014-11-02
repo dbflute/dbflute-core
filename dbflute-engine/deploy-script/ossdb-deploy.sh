@@ -1,29 +1,22 @@
 cd ..
-ant -f build.xml reflect-to-mysql
-ant -f build.xml reflect-to-postgresql
-ant -f build.xml reflect-to-sqlite
+ant -f build.xml dist
+ant -f build.xml reflect-to-test-dbms-mysql
+ant -f build.xml reflect-to-test-dbms-postgresql
 
-cd ../../dbflute-example-database/dbflute-mysql-example/dbflute_exampledb
-rm ./log/*.log
-. jdbc.sh
-. doc.sh
-. generate.sh
-. sql2entity.sh
-. outside-sql-test.sh
+cd ..
+export answer=y
 
-cd ../../dbflute-postgresql-example/dbflute_exampledb
+cd ../dbflute-test-dbms-mysql/dbflute_maihamadb
 rm ./log/*.log
-. jdbc.sh
-. doc.sh
-. generate.sh
-. sql2entity.sh
-. outside-sql-test.sh
+. nextdb-renewal.sh
+. slave-replace-schema.sh
+. manage.sh renewal
+cd ..
+mvn -e compile
 
-cd ../../dbflute-sqlite-example/dbflute_exampledb
+cd ../dbflute-test-dbms-postgresql/dbflute_maihamadb
 rm ./log/*.log
-. jdbc.sh
-. doc.sh
-. generate.sh
-. sql2entity.sh
-# unsupported at SQLite
-#. outside-sql-test.sh
+# not replace-schema because of big data
+. manage.sh regenerate
+cd ..
+mvn -e compile
