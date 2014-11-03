@@ -33,7 +33,7 @@ map:{
     #  Your possible choices are:
     #
     #    mysql, postgresql, oracle, db2, sqlserver,
-    #    h2, derby, (sqlite, msaccess, firebird)
+    #    h2, derby, (sqlite, firebird, msaccess)
     #
     ; database = @database@
     # - - - - - - - - - -/
