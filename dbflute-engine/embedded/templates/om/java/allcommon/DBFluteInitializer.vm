@@ -15,10 +15,16 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+#if ($database.isTargetContainerSeasar())
 import org.dbflute.bhv.core.context.ConditionBeanContext;
+#end
 import org.dbflute.dbway.DBDef;
+#if ($database.isTargetContainerSpring())
 import org.dbflute.jdbc.DataSourceHandler;
+#end
+#if ($database.isTargetContainerSeasar())
 import org.dbflute.s2dao.extension.TnSqlLogRegistry;
+#end
 import org.dbflute.system.DBFluteSystem;
 
 import org.slf4j.Logger;
@@ -105,6 +111,7 @@ public class ${glDBFluteInitializer} {
     // ===================================================================================
     //                                                                            Contents
     //                                                                            ========
+#if ($database.isTargetContainerSeasar())
     protected void handleSqlLogRegistry() { // for S2Container
         if (${glDBFluteConfig}.getInstance().isUseSqlLogRegistry()) {
             final StringBuilder sb = new StringBuilder();
@@ -129,6 +136,8 @@ public class ${glDBFluteInitializer} {
         ConditionBeanContext.loadCoolClasses(); // against the ClassLoader Headache!
     }
 
+#end
+#if ($database.isTargetContainerSpring())
     /**
      * Set up the handler of data source to the configuration of DBFlute. <br>
      * If it uses commons-DBCP, it needs to arrange some for transaction.
@@ -153,6 +162,7 @@ public class ${glDBFluteInitializer} {
         }
     }
 
+#end
     /**
      * Adjust DBFlute system if it needs.
      */

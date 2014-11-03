@@ -155,29 +155,15 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                Java8Time and JodaTime
     //                                ----------------------
-    // Java8-Time and JodaTime support
+    // Java8-Time support:
     // DfTypeMappingProperties.java, Column.java
-    // DBFluteConfig.vm, AbstractBsConditionQuery.vm, BsParameterBean.vm
-    public boolean isAvailableNextTimeEntity() {
-        final boolean java8Time = isAvailableJava8TimeEntity();
-        final boolean jodaTime = isAvailableJodaTimeEntity();
-        if (java8Time && jodaTime) {
-            String msg = "Both Java8Time and JodaTime are available, choose either!";
-            throw new DfIllegalPropertySettingException(msg);
-        }
-        return java8Time || jodaTime;
-    }
-
-    public boolean isAvailableNextTimeLocalDateEntity() {
-        return isAvailableJava8TimeLocalDateEntity() || isAvailableJodaTimeLocalDateEntity();
-    }
-
+    // DBFluteConfig.vm, AbstractBsConditionQuery.vm, BsParameterBean.vm and so on...
     public boolean isAvailableJava8TimeEntity() { // closet
         return isAvailableJava8TimeLocalDateEntity() || isAvailableJava8TimeZonedDateEntity();
     }
 
     public boolean isAvailableJava8TimeLocalDateEntity() { // closet
-        if (isAvailableJava8TimeZonedDateEntity() || isAvailableJodaTimeEntity()) {
+        if (isAvailableJava8TimeZonedDateEntity()) {
             return false;
         }
         final DfLanguageImplStyle implStyle = getLanguageDependency().getLanguageImplStyle();
@@ -188,7 +174,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return false;
     }
 
-    public boolean isAvailableJava8TimeZonedDateEntity() { // closet
+    // protected for now because of not supported yet
+    protected boolean isAvailableJava8TimeZonedDateEntity() { // closet
         final String key = "isAvailableJava8TimeZonedDateEntity";
         final boolean property = isProperty(key, false);
         if (property) {
@@ -199,21 +186,36 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     // basically use Java8-Time instead of JodaTime since 1.1
     //  => *unsupported since 1.1
-    public boolean isAvailableJodaTimeEntity() {
-        return isAvailableJodaTimeLocalDateEntity() || isAvailableJodaTimeZonedDateEntity();
-    }
+    //public boolean isAvailableJodaTimeEntity() {
+    //    return isAvailableJodaTimeLocalDateEntity() || isAvailableJodaTimeZonedDateEntity();
+    //}
+    //
+    //public boolean isAvailableJodaTimeLocalDateEntity() { // closet
+    //    return isProperty("isAvailableJodaTimeLocalDateEntity", false);
+    //}
+    //
+    //public boolean isAvailableJodaTimeZonedDateEntity() { // closet
+    //    final String key = "isAvailableJodaTimeZonedDateEntity";
+    //    final boolean property = isProperty(key, false);
+    //    if (property) {
+    //        throw new IllegalStateException("Unsupported for now: " + key);
+    //    }
+    //    return property;
+    //}
 
-    public boolean isAvailableJodaTimeLocalDateEntity() { // closet
-        return isProperty("isAvailableJodaTimeLocalDateEntity", false);
-    }
-
-    public boolean isAvailableJodaTimeZonedDateEntity() { // closet
-        final String key = "isAvailableJodaTimeZonedDateEntity";
-        final boolean property = isProperty(key, false);
-        if (property) {
-            throw new IllegalStateException("Unsupported for now: " + key);
+    public boolean needsDateTreatedAsLocalDateTime() {
+        if (isAvailableJava8TimeLocalDateEntity()) {
+            return false;
         }
-        return property;
+        final DfBasicProperties basicProp = getBasicProperties();
+        if (basicProp.isDatabaseOracle()) {
+            return !isOracleDateTreatedAsDate();
+        }
+        return false;
+    }
+
+    protected boolean isOracleDateTreatedAsDate() { // closet
+        return isProperty("isOracleDateTreatedAsDate", false);
     }
 
     // -----------------------------------------------------

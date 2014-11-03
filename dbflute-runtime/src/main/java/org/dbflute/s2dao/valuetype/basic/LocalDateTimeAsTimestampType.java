@@ -15,87 +15,18 @@
  */
 package org.dbflute.s2dao.valuetype.basic;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.LocalDateTime;
-import java.util.TimeZone;
 
-import org.dbflute.bhv.core.context.ResourceContext;
-import org.dbflute.s2dao.valuetype.TnAbstractValueType;
-import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
  * @since 1.1.0 (2014/09/29 Monday)
  */
-public class LocalDateTimeAsTimestampType extends TnAbstractValueType {
+public class LocalDateTimeAsTimestampType extends LocalDateAsTimestampType {
 
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected final TimestampType _timestampType = new TimestampType();
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public LocalDateTimeAsTimestampType() {
-        super(Types.TIMESTAMP);
-    }
-
-    // ===================================================================================
-    //                                                                           Get Value
-    //                                                                           =========
-    public Object getValue(ResultSet rs, int index) throws SQLException {
-        return toLocalDateTime(_timestampType.getValue(rs, index));
-    }
-
-    public Object getValue(ResultSet rs, String columnName) throws SQLException {
-        return toLocalDateTime(_timestampType.getValue(rs, columnName));
-    }
-
-    public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return toLocalDateTime(_timestampType.getValue(cs, index));
-    }
-
-    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return toLocalDateTime(_timestampType.getValue(cs, parameterName));
-    }
-
-    // ===================================================================================
-    //                                                                          Bind Value
-    //                                                                          ==========
-    public void bindValue(Connection conn, PreparedStatement ps, int index, Object value) throws SQLException {
-        _timestampType.bindValue(conn, ps, index, toTimestamp(value));
-    }
-
-    public void bindValue(Connection conn, CallableStatement cs, String parameterName, Object value) throws SQLException {
-        _timestampType.bindValue(conn, cs, parameterName, toTimestamp(value));
-    }
-
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected LocalDateTime toLocalDateTime(Object date) {
+    @Override
+    protected LocalDateTime toLocalDate(Object date) {
         return DfTypeUtil.toLocalDateTime(date, getTimeZone());
-    }
-
-    protected Timestamp toTimestamp(Object date) {
-        return DfTypeUtil.toTimestamp(date, getTimeZone());
-    }
-
-    protected TimeZone getTimeZone() {
-        if (ResourceContext.isExistResourceContextOnThread()) {
-            final TimeZone provided = ResourceContext.provideMappingDateTimeZone();
-            if (provided != null) {
-                return provided;
-            }
-        }
-        return DBFluteSystem.getFinalTimeZone();
     }
 }

@@ -38,10 +38,14 @@ import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
+#if ($database.isDatabaseOracle())
 import org.dbflute.s2dao.valuetype.plugin.OracleAgent;
-import org.dbflute.s2dao.valuetype.plugin.OracleDateType;
 import org.dbflute.s2dao.valuetype.plugin.OracleArrayType;
+import org.dbflute.s2dao.valuetype.plugin.OracleDateAsDateType;
+import org.dbflute.s2dao.valuetype.plugin.OracleDateAsTimestampType;
+import org.dbflute.s2dao.valuetype.plugin.OracleDateType;
 import org.dbflute.s2dao.valuetype.plugin.OracleStructType;
+#end
 import org.dbflute.system.QLog;
 import org.dbflute.system.XLog;
 import org.dbflute.twowaysql.DisplaySqlBuilder;
@@ -157,9 +161,17 @@ public class ${glDBFluteConfig} {
             _logTimestampPattern = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";
         }
 #if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+#set ($implementedOracleDate = "")
+#if ($database.needsDateTreatedAsLocalDateTime())
+## basically here, it should be treated as time-stamp
+#set ($implementedOracleDate = "ImplementedOracleDateAsTimestampType")
+#else
+#set ($implementedOracleDate = "ImplementedOracleDateAsDateType")
+#end
 
         // treats as uses Oracle date of database native JDBC to get best performances
         TnValueTypes.registerBasicValueType(DBDef.Oracle, java.util.Date.class, new ImplementedOracleDateType());
+        TnValueTypes.registerPluginValueType(DBDef.Oracle, "oracleDateType", new ${implementedOracleDate}());
 #end
     }
 
@@ -831,6 +843,7 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                   Implemented Class
     //                                                                   =================
+#if ($database.isTargetContainerSpring())
     // -----------------------------------------------------
     //                                                Spring
     //                                                ------
@@ -846,22 +859,17 @@ public class ${glDBFluteConfig} {
         }
 
         public Connection getConnectionFromUtils(DataSource ds) {
-#if ($database.isTargetContainerSpring())
             return DataSourceUtils.getConnection(ds);
-#else
-            throw new IllegalStateException("This method is only for Spring Framework.");
-#end
         }
 
         public boolean isConnectionTransactional(Connection conn, DataSource ds) {
-#if ($database.isTargetContainerSpring())
             return DataSourceUtils.isConnectionTransactional(conn, ds);
-#else
-            throw new IllegalStateException("This method is only for Spring Framework.");
-#end
         }
     }
 
+#end
+#if ($database.isDatabaseOracle())
+## even if option false, output codes for easy compile-level testable
     // -----------------------------------------------------
     //                                                Oracle
     //                                                ------
@@ -942,11 +950,27 @@ public class ${glDBFluteConfig} {
     }
 #end
 
+    public static class ImplementedOracleDateAsDateType extends OracleDateAsDateType {
+
+        @Override
+        protected OracleAgent createOracleAgent() {
+            return createImplementedOracleAgent();
+        }
+    }
+
+    public static class ImplementedOracleDateAsTimestampType extends OracleDateAsTimestampType {
+
+        @Override
+        protected OracleAgent createOracleAgent() {
+            return createImplementedOracleAgent();
+        }
+    }
+
     public static class ImplementedOracleDateType extends OracleDateType {
 
         @Override
         protected OracleAgent createOracleAgent() {
-            return new ImplementedOracleAgent();
+            return createImplementedOracleAgent();
         }
     }
 
@@ -958,7 +982,7 @@ public class ${glDBFluteConfig} {
 
         @Override
         protected OracleAgent createOracleAgent() {
-            return new ImplementedOracleAgent();
+            return createImplementedOracleAgent();
         }
     }
 
@@ -970,10 +994,15 @@ public class ${glDBFluteConfig} {
 
         @Override
         protected OracleAgent createOracleAgent() {
-            return new ImplementedOracleAgent();
+            return createImplementedOracleAgent();
         }
     }
 
+    protected static ImplementedOracleAgent createImplementedOracleAgent() {
+        return new ImplementedOracleAgent();
+    }
+
+#end
     // -----------------------------------------------------
     //                                   Physical Connection
     //                                   -------------------
@@ -981,7 +1010,9 @@ public class ${glDBFluteConfig} {
 
         public Connection digUp(Connection conn) throws SQLException {
             Connection digged = unwrap(conn);
+#if ($database.isTargetContainerSeasar())
             digged = resolveS2DBCP(digged);
+#end
             digged = resolveCommonsDBCP(digged);
             return digged;
         }
@@ -992,15 +1023,15 @@ public class ${glDBFluteConfig} {
             }
             return conn;
         }
+#if ($database.isTargetContainerSeasar())
 
         protected Connection resolveS2DBCP(Connection conn) {
-#if ($database.isTargetContainerSeasar())
             if (conn instanceof ConnectionWrapper) {
                 return ((ConnectionWrapper)conn).getPhysicalConnection();
             }
-#end
             return conn;
         }
+#end
 
         protected Connection resolveCommonsDBCP(Connection conn) {
             Connection resolved = conn;
@@ -1025,28 +1056,30 @@ public class ${glDBFluteConfig} {
     public static class ImplementedSQLExceptionDigger implements SQLExceptionDigger {
 
         public SQLException digUp(Throwable cause) {
-            SQLException found = resolveS2DBCP(cause);
-            if (found != null) {
-                return found;
+#if ($database.isTargetContainerSeasar())
+            SQLException s2found = resolveS2DBCP(cause);
+            if (s2found != null) {
+                return s2found;
             }
-            found = resolveDefault(cause);
-            if (found != null) {
-                return found;
+#end
+            SQLException defaultFound = resolveDefault(cause);
+            if (defaultFound != null) {
+                return defaultFound;
             }
             return null;
         }
+#if ($database.isTargetContainerSeasar())
 
         protected SQLException resolveS2DBCP(Throwable cause) {
-#if ($database.isTargetContainerSeasar())
             if (cause instanceof SQLRuntimeException) {
                 Throwable nestedCause = ((SQLRuntimeException)cause).getCause();
                 if (nestedCause instanceof SQLException) {
                     return (SQLException)nestedCause;
                 }
             }
-#end
             return null;
         }
+#end
 
         protected SQLException resolveDefault(Throwable cause) {
             Throwable nestedCause = cause.getCause();
@@ -1056,4 +1089,12 @@ public class ${glDBFluteConfig} {
             return null;
         }
     }
+
+    // ===================================================================================
+    //                                                                       Very Internal
+    //                                                                       =============
+    // very internal (for suppressing warn about 'Not Use Import')
+    protected String xTms() { return Timestamp.class.getName(); }
+    protected String xDSc() { return DataSource.class.getName(); }
+    protected String xSQLEx() { return SQLException.class.getName(); }
 }
