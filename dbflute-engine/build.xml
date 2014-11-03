@@ -6,9 +6,9 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1.0" />
-	<property name="build.version" value="${version}-pilotB-SNAPSHOT" />
+	<property name="build.version" value="${version}-pilotC-SNAPSHOT" />
 	<property name="runtime.version" value="1.1.0" />
-	<property name="runtime.build.version" value="${runtime.version}-pilotB-SNAPSHOT" />
+	<property name="runtime.build.version" value="${runtime.version}-pilotC-SNAPSHOT" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
@@ -18,12 +18,7 @@
 	<property name="test.active.stage.base" value="${workspace.base}" />
 	<property name="test.dbms.stage.base" value="${workspace.base}" />
 	<property name="test.option.stage.base" value="${workspace.base}" />
-	<property name="example.container.base" value="${workspace.base}/dbflute-example-container" />
-	<property name="example.database.base" value="${workspace.base}/dbflute-example-database" />
-	<property name="example.multipledb.base" value="${workspace.base}/dbflute-example-multipledb" />
 	<property name="example.subproject.base" value="${workspace.base}/dbflute-example-subproject" />
-	<property name="example.friends.frank.base" value="${workspace.base}/dbflute-example-friends-frank" />
-	<property name="example.friends.guest.base" value="${workspace.base}/dbflute-example-friends-guest" />
 	<property name="tryout.base" value="${workspace.base}/dbflute-tryout" />
 
 	<!-- Point Directories -->
