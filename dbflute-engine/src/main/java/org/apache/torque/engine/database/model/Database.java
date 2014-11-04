@@ -2425,29 +2425,6 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                                   S2JDBC Properties
-    //                                                                   =================
-    public boolean hasS2jdbcDefinition() {
-        return getProperties().getS2jdbcProperties().hasS2jdbcDefinition();
-    }
-
-    public String getS2jdbcBaseEntityPackage() {
-        return getProperties().getS2jdbcProperties().getBaseEntityPackage();
-    }
-
-    public String getS2jdbcExtendedEntityPackage() {
-        return getProperties().getS2jdbcProperties().getExtendedEntityPackage();
-    }
-
-    public String getS2jdbcBaseEntityPrefix() {
-        return getProperties().getS2jdbcProperties().getBaseEntityPrefix();
-    }
-
-    public boolean isSuppressPublicField() {
-        return getProperties().getS2jdbcProperties().isSuppressPublicField();
-    }
-
-    // ===================================================================================
     //                                                  Component Name Helper for Template
     //                                                  ==================================
     // -----------------------------------------------------
