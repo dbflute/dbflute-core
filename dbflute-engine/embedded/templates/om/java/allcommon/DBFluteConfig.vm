@@ -1103,4 +1103,5 @@ public class ${glDBFluteConfig} {
     protected String xTms() { return Timestamp.class.getName(); }
     protected String xDSc() { return DataSource.class.getName(); }
     protected String xSQLEx() { return SQLException.class.getName(); }
+    protected String xDSqB() { return DisplaySqlBuilder.class.getName(); }
 }
