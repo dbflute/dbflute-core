@@ -1355,7 +1355,34 @@ public final class DfTypeUtil {
      * @return The determination, true or false.
      */
     public static boolean isAnyLocalDate(Object obj) {
-        return obj instanceof LocalDate || obj instanceof LocalDateTime || obj instanceof LocalTime;
+        return isLocalDateOrDateTime(obj) || obj instanceof LocalTime;
+    }
+
+    /**
+     * Is the object local date or local date-time?
+     * @param obj The object to be judged. (NotNull)
+     * @return The determination, true or false.
+     */
+    public static boolean isLocalDateOrDateTime(Object obj) {
+        return obj instanceof LocalDate || obj instanceof LocalDateTime;
+    }
+
+    /**
+     * Is the type local date or local date-time or local time?
+     * @param type The class type to be judged. (NotNull)
+     * @return The determination, true or false.
+     */
+    public static boolean isAnyLocalDateType(Class<?> type) {
+        return isLocalDateOrDateTimeType(type) || LocalTime.class.isAssignableFrom(type);
+    }
+
+    /**
+     * Is the type local date or local date-time?
+     * @param type The class type to be judged. (NotNull)
+     * @return The determination, true or false.
+     */
+    public static boolean isLocalDateOrDateTimeType(Class<?> type) {
+        return LocalDate.class.isAssignableFrom(type) || LocalDateTime.class.isAssignableFrom(type);
     }
 
     // -----------------------------------------------------
@@ -1374,22 +1401,30 @@ public final class DfTypeUtil {
     //                                                                          ==========
     /**
      * Convert to point date object.
+     * @param <DATE> The type of date.
      * @param obj The resource of number. (NullAllowed: if null, returns null)
      * @param type The type of number. (NotNull)
      * @return The point date object from resource. (NullAllowed: if type is not date, returns null)
      */
-    public static Date toPointDate(Object obj, Class<?> type) {
+    @SuppressWarnings("unchecked")
+    public static <DATE> DATE toPointDate(Object obj, Class<DATE> type) {
         if (obj == null) {
             return null;
         }
-        if (java.sql.Date.class.isAssignableFrom(type)) {
-            return toSqlDate(obj);
+        if (java.sql.Date.class.isAssignableFrom(type)) { // #dateParade
+            return (DATE) toSqlDate(obj);
         } else if (java.sql.Timestamp.class.isAssignableFrom(type)) {
-            return toTimestamp(obj);
+            return (DATE) toTimestamp(obj);
         } else if (java.sql.Time.class.isAssignableFrom(type)) {
-            return toTime(obj);
+            return (DATE) toTime(obj);
         } else if (Date.class.isAssignableFrom(type)) {
-            return toDate(obj);
+            return (DATE) toDate(obj);
+        } else if (LocalDate.class.isAssignableFrom(type)) {
+            return (DATE) toLocalDate(obj);
+        } else if (LocalDateTime.class.isAssignableFrom(type)) {
+            return (DATE) toLocalDateTime(obj);
+        } else if (LocalTime.class.isAssignableFrom(type)) {
+            return (DATE) toLocalTime(obj);
         }
         return null; // could not convert
     }

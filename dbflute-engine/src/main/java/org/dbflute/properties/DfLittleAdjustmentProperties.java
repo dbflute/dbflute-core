@@ -204,6 +204,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //}
 
     public boolean needsDateTreatedAsLocalDateTime() {
+        // basically for Oracle, actually supported Oracle only for now (2014/11/04)
         if (isAvailableJava8TimeLocalDateEntity()) {
             return false;
         }

@@ -152,15 +152,20 @@ public class ${glDBFluteConfig} {
     private ${glDBFluteConfig}() { // adjusts default settings
         _physicalConnectionDigger = new ImplementedPhysicalConnectionDigger();
         _sqlExceptionDigger = new ImplementedSQLExceptionDigger();
+#if ($database.isDatabaseOracle())
 
         if (isCurrentDBDef(DBDef.Oracle)) {
             // date formatting has two points:
             //   o the DATE type of Oracle has seconds  
             //   o it uses a date literal of Oracle
+#if ($database.needsDateTreatedAsLocalDateTime())
             _logDatePattern = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
+#else
+            _logDatePattern = "date $df:{yyyy-MM-dd}"; // but treated as date by your setting
+#end
             _logTimestampPattern = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";
         }
-#if ($database.isDatabaseOracle() && $database.isAvailableDatabaseNativeJDBC())
+#if ($database.isAvailableDatabaseNativeJDBC())
 #set ($implementedOracleDate = "")
 #if ($database.needsDateTreatedAsLocalDateTime())
 ## basically here, it should be treated as time-stamp
@@ -172,6 +177,7 @@ public class ${glDBFluteConfig} {
         // treats as uses Oracle date of database native JDBC to get best performances
         TnValueTypes.registerBasicValueType(DBDef.Oracle, java.util.Date.class, new ImplementedOracleDateType());
         TnValueTypes.registerPluginValueType(DBDef.Oracle, "oracleDateType", new ${implementedOracleDate}());
+#end
 #end
     }
 
