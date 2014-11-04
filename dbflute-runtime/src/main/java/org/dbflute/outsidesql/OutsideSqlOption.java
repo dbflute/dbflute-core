@@ -144,6 +144,9 @@ public class OutsideSqlOption {
         } else {
             sb.append(", config=default");
         }
+        if (_tableDbName != null) {
+            sb.append(", related to table");
+        }
         sb.append("}");
         return sb.toString();
         // not show formatSql and other comment adjustments because of not important
