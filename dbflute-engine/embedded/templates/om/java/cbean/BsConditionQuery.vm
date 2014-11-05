@@ -319,6 +319,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      */
     public ${foreignCQClassName} query${fk.foreignPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
 #if ($fk.hasDynamicFixedCondition())
+## cannot check duplicate, both setupSelect and query might be called and current date might be small changed in second call
         Map<String, Object> parameterMap = xdfgetParameterMap${fk.foreignPropertyNameInitCap}();
         ${fk.dynamicFixedConditionParameterMapSetup}
         xassertFCDP("${fk.foreignPropertyName}", parameterMap);
