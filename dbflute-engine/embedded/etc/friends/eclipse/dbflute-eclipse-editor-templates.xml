@@ -58,7 +58,7 @@
     cb.${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for SpecifyColumn" enabled="true" name="colCBLambda">colCB -&gt; {
     colCB.specify().column${newName}
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for DerivedReferrer" enabled="true" name="derivedCBLambda">${var}CB -&gt; {
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Configuration" enabled="true" name="confLambda">conf -&gt; conf.${newName}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for DerivedReferrer" enabled="true" name="derivedCBLambda">${var}CB -&gt; {
     ${var}CB.specify().column${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Entity" enabled="true" name="entityLambda">${var} -&gt; {
     ${var}.${newName}
