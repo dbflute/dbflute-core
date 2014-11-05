@@ -6,6 +6,7 @@ ant -f build.xml reflect-to-test-dbms-mysql
 ant -f build.xml reflect-to-test-dbms-postgresql
 ant -f build.xml reflect-to-test-dbms-oracle
 ant -f build.xml reflect-to-test-dbms-db2
+ant -f build.xml reflect-to-test-dbms-sqlserver
 ant -f build.xml reflect-to-test-option-compatible10x
 
 cd ..
@@ -54,6 +55,12 @@ cd ..
 mvn -e compile
 
 cd ../dbflute-test-dbms-db2/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal
+cd ..
+mvn -e compile
+
+cd ../dbflute-test-dbms-sqlserver/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
 cd ..
