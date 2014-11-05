@@ -21,12 +21,14 @@ import java.util.Set;
 
 import org.dbflute.Entity;
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.coption.StatementConfigCall;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.UniqueInfo;
 import org.dbflute.exception.BatchInsertColumnModifiedPropertiesFragmentedException;
+import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.SpecifyUpdateColumnInvalidException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.StatementConfig;
@@ -422,11 +424,35 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                           Configure
     //                                                                           =========
     /**
-     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
-     * @param insertStatementConfig The configuration of statement for insert. (NullAllowed)
+     * Configure statement JDBC options. e.g. queryTimeout, fetchSize, ... (only one-time call)
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.varyingInsert(member, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">configure</span>(<span style="color: #553000">conf</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">conf</span>.<span style="color: #994747">queryTimeout</span>(<span style="color: #2A00FF">3</span>)));
+     * </pre>
+     * @param confLambda The callback for configuration of statement for insert. (NotNull)
      */
-    public void configure(StatementConfig insertStatementConfig) {
-        _insertStatementConfig = insertStatementConfig;
+    public void configure(StatementConfigCall<StatementConfig> confLambda) {
+        assertStatementConfigNotDuplicated(confLambda);
+        _insertStatementConfig = createStatementConfig(confLambda);
+    }
+
+    protected void assertStatementConfigNotDuplicated(StatementConfigCall<StatementConfig> configCall) {
+        if (_insertStatementConfig != null) {
+            String msg = "Already registered the configuration: existing=" + _insertStatementConfig + ", new=" + configCall;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+    }
+
+    protected StatementConfig createStatementConfig(StatementConfigCall<StatementConfig> configCall) {
+        if (configCall == null) {
+            throw new IllegalArgumentException("The argument 'confLambda' should not be null.");
+        }
+        final StatementConfig config = newStatementConfig();
+        configCall.callback(config);
+        return config;
+    }
+
+    protected StatementConfig newStatementConfig() {
+        return new StatementConfig();
     }
 
     public StatementConfig getInsertStatementConfig() {

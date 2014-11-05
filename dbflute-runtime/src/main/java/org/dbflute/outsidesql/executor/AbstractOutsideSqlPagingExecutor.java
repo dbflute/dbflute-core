@@ -51,9 +51,6 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
     /** The current database definition. (NotNull) */
     protected final DBDef _currentDBDef;
 
-    /** The default configuration of statement. (NullAllowed) */
-    protected final StatementConfig _defaultStatementConfig;
-
     /** The option of outside-SQL. (NotNull) */
     protected final OutsideSqlOption _outsideSqlOption;
 
@@ -64,11 +61,10 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
     //                                                                         Constructor
     //                                                                         ===========
     public AbstractOutsideSqlPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
-            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+            OutsideSqlOption outsideSqlOption, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
         _tableDbName = tableDbName;
         _currentDBDef = currentDBDef;
-        _defaultStatementConfig = defaultStatementConfig;
         _outsideSqlOption = outsideSqlOption;
         _outsideSqlExecutorFactory = outsideSqlExecutorFactory;
     }
@@ -192,8 +188,7 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
 
     protected OutsideSqlEntityExecutor<BEHAVIOR> createCountExecutor() {
         final OutsideSqlOption countOption = _outsideSqlOption.copyOptionForPagingCount();
-        return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _defaultStatementConfig,
-                countOption);
+        return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef, countOption);
     }
 
     protected <ENTITY> void throwPagingCountSelectNotCountException(String path, PagingBean pmb, Class<ENTITY> entityType,
@@ -211,9 +206,6 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
         }
         StatementConfig statementConfig = _outsideSqlOption.getStatementConfig();
         if (statementConfig != null && statementConfig.hasResultSetType()) {
-            return;
-        }
-        if (_defaultStatementConfig != null && _defaultStatementConfig.hasResultSetType()) {
             return;
         }
         if (statementConfig == null) {
@@ -305,8 +297,7 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
     }
 
     protected OutsideSqlBasicExecutor<BEHAVIOR> createBasicExecutor() {
-        return _outsideSqlExecutorFactory.createBasic(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _defaultStatementConfig,
-                _outsideSqlOption);
+        return _outsideSqlExecutorFactory.createBasic(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _outsideSqlOption);
     }
 
     // ===================================================================================

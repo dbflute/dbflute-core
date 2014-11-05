@@ -58,9 +58,6 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     /** The current database definition. (NotNull) */
     protected final DBDef _currentDBDef;
 
-    /** The default configuration of statement. (NullAllowed) */
-    protected final StatementConfig _defaultStatementConfig;
-
     /** The option of outside-SQL. (NotNull) */
     protected final OutsideSqlOption _outsideSqlOption;
 
@@ -73,19 +70,15 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     /** The factory of outside-SQL executor. (NotNull) */
     protected final OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
 
-    /** The configuration of statement. (NullAllowed) */
-    protected StatementConfig _statementConfig;
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public OutsideSqlBasicExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
-            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption, OutsideSqlContextFactory outsideSqlContextFactory,
-            OutsideSqlFilter outsideSqlFilter, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+            OutsideSqlOption outsideSqlOption, OutsideSqlContextFactory outsideSqlContextFactory, OutsideSqlFilter outsideSqlFilter,
+            OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
         _tableDbName = tableDbName;
         _currentDBDef = currentDBDef;
-        _defaultStatementConfig = defaultStatementConfig;
         if (outsideSqlOption != null) { // for nested call (inherits options)
             _outsideSqlOption = outsideSqlOption;
         } else { // for entry call (initializes an option instance)
@@ -347,8 +340,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     protected OutsideSqlEntityExecutor<BEHAVIOR> createOutsideSqlEntityExecutor() {
-        return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _defaultStatementConfig,
-                _outsideSqlOption);
+        return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _outsideSqlOption);
     }
 
     // -----------------------------------------------------
@@ -376,8 +368,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     protected OutsideSqlManualPagingExecutor<BEHAVIOR> createOutsideSqlManualPagingExecutor() {
-        return _outsideSqlExecutorFactory.createManualPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _defaultStatementConfig,
-                _outsideSqlOption);
+        return _outsideSqlExecutorFactory.createManualPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _outsideSqlOption);
     }
 
     /**
@@ -402,8 +393,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     protected OutsideSqlAutoPagingExecutor<BEHAVIOR> createOutsideSqlAutoPagingExecutor() {
-        return _outsideSqlExecutorFactory.createAutoPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _defaultStatementConfig,
-                _outsideSqlOption);
+        return _outsideSqlExecutorFactory.createAutoPaging(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _outsideSqlOption);
     }
 
     // -----------------------------------------------------
@@ -492,5 +482,12 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
             String msg = "The argument 'pmb' (typed parameter-bean) should not be null.";
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public OutsideSqlOption getOutsideSqlOption() {
+        return _outsideSqlOption;
     }
 }
