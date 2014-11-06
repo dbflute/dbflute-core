@@ -664,7 +664,9 @@ public class ${myClassName} extends AbstractConditionBean {
          */
         public ${table.specifyDerivedReferrerFunctionClassName}<${tmpCBClassName}, ${tmpLocalCQClassName}> derived${tmpMethodIdentityName}() {
             assertDerived("${tmpPropertyName}"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
-            return cHSDRF(_baseCB, _qyCall.qy(), (fn, sq, cq, al, op) -> cq.xsderive${referrer.referrerPropertyNameInitCap}(fn, sq, al, op), _dbmetaProvider);
+## IntelliJ IDEA 13 cannot resolve generic type of the variable 'sq' so avoid it for now
+            return cHSDRF(_baseCB, _qyCall.qy(), (String fn, SubQuery<${tmpCBClassName}> sq, ${tmpLocalCQClassName} cq, String al, DerivedReferrerOption op)
+                    -> cq.xsderive${referrer.referrerPropertyNameInitCap}(fn, sq, al, op), _dbmetaProvider);
         }
 #end
 #if ($table.hasSinglePrimaryKey())
@@ -675,7 +677,8 @@ public class ${myClassName} extends AbstractConditionBean {
          */
         public ${table.specifyDerivedReferrerFunctionClassName}<${myConditionBeanClassName}, ${myConditionQueryClassName}> myselfDerived() {
             assertDerived("myselfDerived"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
-            return cHSDRF(_baseCB, _qyCall.qy(), (fn, sq, cq, al, op) -> cq.xsmyselfDerive(fn, sq, al, op), _dbmetaProvider);
+            return cHSDRF(_baseCB, _qyCall.qy(), (String fn, SubQuery<${myConditionBeanClassName}> sq, ${myConditionQueryClassName} cq, String al, DerivedReferrerOption op)
+                    -> cq.xsmyselfDerive(fn, sq, al, op), _dbmetaProvider);
         }
 #end
 #end
