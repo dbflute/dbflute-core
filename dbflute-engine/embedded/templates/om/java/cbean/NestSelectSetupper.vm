@@ -27,7 +27,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ${myConditionQueryClassName} _query;
+    protected final ${myConditionQueryClassName} _query;
     public ${myClassName}(${myConditionQueryClassName} query) { _query = query; }
     public boolean hasConditionQuery() { return _query != null; }
 
