@@ -181,9 +181,9 @@
 			<zipfileset prefix="templates/om/java" dir="${embedded}/templates/om/java">
 				<exclude name="**/*---.txt" />
 			</zipfileset>
-			<zipfileset prefix="templates/om/scala" dir="${embedded}/templates/om/scala">
-				<exclude name="**/*---.txt" />
-			</zipfileset>
+			<!-- until Scala support
+			<zipfileset prefix="templates/om/scala" ...>
+			-->
 			<zipfileset prefix="ant" dir="${embedded}/ant" />
 			<zipfileset prefix="" dir="${embedded}">
 				<include name="build-torque.xml" />
