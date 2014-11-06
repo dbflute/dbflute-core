@@ -165,12 +165,12 @@ map:{
     #   o isOverrideExistingDataFile: Does it output to existing files? (NotRequired - Default false)
     #   o isSynchronizeOriginDate: Does it synchronize origin date for date adjustment? (NotRequired - Default false)
     #
-    #; loadDataReverseMap = map:{
-    #    ; recordLimit = -1
-    #    ; isReplaceSchemaDirectUse = false
-    #    ; isOverrideExistingDataFile = false
-    #    ; isSynchronizeOriginDate = false
-    #}
+    ; loadDataReverseMap = map:{
+        ; recordLimit = -1
+        ; isReplaceSchemaDirectUse = true
+        ; isOverrideExistingDataFile = false
+        ; isSynchronizeOriginDate = false
+    }
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
