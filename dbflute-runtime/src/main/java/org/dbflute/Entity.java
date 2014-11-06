@@ -64,6 +64,13 @@ public interface Entity {
     Set<String> mymodifiedProperties(); // 'my' take on unique-driven
 
     /**
+     * Modify the property without setting value. (basically for Framework) <br>
+     * The property name needs to be according to Java Beans rule.
+     * @param propertyName The property name of modified column. (NotNull)
+     */
+    void mymodifyProperty(String propertyName);
+
+    /**
      * Clear the information of modified properties. (basically for Framework)
      */
     void clearModifiedInfo();
@@ -89,6 +96,13 @@ public interface Entity {
      * @return The set of property name for specified columns, read-only. (NotNull: if empty, no check)
      */
     Set<String> myspecifiedProperties(); // 'my' take on unique-driven
+
+    /**
+     * Specify the property without setting value. (basically for Framework) <br>
+     * The property name needs to be according to Java Beans rule.
+     * @param propertyName The property name of specified column. (NotNull)
+     */
+    void myspecifyProperty(String propertyName); // e.g. called by null object handling
 
     /**
      * Clear the information of specified properties. (basically for Framework) <br>

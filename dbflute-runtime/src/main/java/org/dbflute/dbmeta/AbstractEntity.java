@@ -69,12 +69,6 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     protected boolean __createdBySelect;
 
     // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
-    // TODO jflute 
-    //protected abstract boolean isDomainEntity();
-
-    // ===================================================================================
     //                                                                    Derived Mappable
     //                                                                    ================
     /** {@inheritDoc} */
@@ -108,6 +102,11 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     /** {@inheritDoc} */
     public Set<String> mymodifiedProperties() {
         return __modifiedProperties.getPropertyNames();
+    }
+
+    /** {@inheritDoc} */
+    public void mymodifyProperty(String propertyName) {
+        registerModifiedProperty(propertyName);
     }
 
     /** {@inheritDoc} */
@@ -148,6 +147,11 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
             return __specifiedProperties.getPropertyNames();
         }
         return DfCollectionUtil.emptySet();
+    }
+
+    /** {@inheritDoc} */
+    public void myspecifyProperty(String propertyName) {
+        registerSpecifiedProperty(propertyName);
     }
 
     public void clearSpecifiedInfo() {

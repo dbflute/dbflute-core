@@ -227,14 +227,14 @@ public interface SqlClause {
 
     /**
      * Translate selected relation path (foreignRelationPath: relationNoSuffix) to relation property name (foreignPropertyName).
-     * @param foreignRelationPath The relation path of foreign property (relationNoSuffix). (NotNull)
+     * @param foreignRelationPath The relation path of foreign property (relationNoSuffix). e.g. _3, _7_2 (NotNull)
      * @return The name of foreign property, (foreignPropertyName). (NotNull)
      */
     String translateSelectedRelationPathToPropName(String foreignRelationPath);
 
     /**
      * Translate selected relation path (foreignRelationPath: relationNoSuffix) to foreign table alias name (foreignTableAliasName).
-     * @param foreignRelationPath The relation path of foreign property (relationNoSuffix). (NotNull)
+     * @param foreignRelationPath The relation path of foreign property (relationNoSuffix). e.g. _3, _7_2 (NotNull)
      * @return The alias name of foreign table (foreignTableAliasName). (NotNull)
      */
     String translateSelectedRelationPathToTableAlias(String foreignRelationPath);
@@ -1426,6 +1426,20 @@ public interface SqlClause {
      * @return The determination, true or false.
      */
     boolean isUseInScopeSubQueryForExistsReferrer();
+
+    // ===================================================================================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    // TODO jflute impl: null object (SqlClause)
+    boolean hasColumnNullObject();
+
+    boolean isColumnNullObjectTable(String tableDbName);
+
+    void registerNullObjectColumn(String tableDbName, String columnDbName);
+
+    List<String> getLocalSpecifiedNullObjectColumnList();
+
+    List<String> getRelationSpecifiedNullObjectColumnList(String relationNoSuffix);
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================

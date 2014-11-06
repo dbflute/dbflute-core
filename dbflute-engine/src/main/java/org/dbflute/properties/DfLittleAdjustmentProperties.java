@@ -785,8 +785,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                              Relational Null Object
-    //                                                              ======================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    // TODO jflute impl: null object (dfprop)
+
+    // ===================================================================================
+    //                                                               Relational NullObject
+    //                                                               =====================
     protected Map<String, Object> _relationalNullObjectMap;
 
     protected Map<String, Object> getRelationalNullObjectMap() {

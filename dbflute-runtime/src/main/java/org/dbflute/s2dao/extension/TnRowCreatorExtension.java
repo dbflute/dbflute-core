@@ -369,6 +369,21 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             final Entity entity = (Entity) row;
             if (checkNonSp) { // contains enabled by CB and using SpecifyColumn
                 entity.modifiedToSpecified();
+                // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+                // column null object handling
+                // e.g. A, B and cached C
+                // when specifyA, specifyC => no specified-property so *set dummy property here
+                // when specifyA, specifyB => C should be checked, actually checked so no action here
+                // when non-SpecifyColumm => can get so no action here
+                // when specifyA, specifyC but allowed => can get so no action here
+                // when specifyA, specifyB but allowed => should be no cache logically, but rare case so no action here
+                // _/_/_/_/_/_/_/_/_/_/
+                // TODO jflute impl: null object (row creator)
+                //if (cb.getSqlClause().isColumnNullObjectTable(entity)) {
+                //    for (ColumnInfo columnInfo : cb.getSqlClause().getSpecifiedNullObjectColumnList(entity)) {
+                //        entity.myspecifyProperty(columnInfo.getPropertyName());
+                //    }
+                //}
             }
             entity.clearModifiedInfo();
             entity.markAsSelect();

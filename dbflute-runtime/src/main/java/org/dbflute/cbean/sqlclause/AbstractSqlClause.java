@@ -17,12 +17,12 @@ package org.dbflute.cbean.sqlclause;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -629,6 +629,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             validSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
         }
 
+        final boolean columnNullObject = hasColumnNullObject(); // normally false
         int selectIndex = 0; // because 1 origin in JDBC
         boolean needsDelimiter = false;
         for (ColumnInfo columnInfo : columnInfoList) {
@@ -638,9 +639,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             if (_pkOnlySelectForcedlyEnabled && !columnInfo.isPrimary()) {
                 continue;
             }
-
             if (validSpecifiedLocal && !localSpecifiedMap.containsKey(columnDbName)) {
-                // a case for scalar-select has been already resolved here
+                continue; // a case for scalar-select has been already resolved here
+            }
+            if (columnNullObject && isNullObjectColumn(_tableDbName, columnDbName)) {
                 continue;
             }
 
@@ -677,20 +679,23 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_pkOnlySelectForcedlyEnabled) {
             return selectIndex;
         }
+        final boolean columnNullObject = hasColumnNullObject(); // normally false
         for (Entry<String, Map<String, SelectedRelationColumn>> entry : getSelectedRelationColumnMap().entrySet()) {
             final String tableAliasName = entry.getKey();
-            final Map<String, SelectedRelationColumn> map = entry.getValue();
-            final Collection<SelectedRelationColumn> selectColumnInfoList = map.values();
+            final Map<String, SelectedRelationColumn> relationColumnMap = entry.getValue();
             Map<String, SpecifiedColumn> foreginSpecifiedMap = null;
             if (_specifiedSelectColumnMap != null) {
                 foreginSpecifiedMap = _specifiedSelectColumnMap.get(tableAliasName);
             }
             final boolean validSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
             boolean finishedForeignIndent = false;
-            for (SelectedRelationColumn selectColumnInfo : selectColumnInfoList) {
+            for (SelectedRelationColumn selectColumnInfo : relationColumnMap.values()) {
                 final ColumnInfo columnInfo = selectColumnInfo.getColumnInfo();
                 final String columnDbName = columnInfo.getColumnDbName();
                 if (validSpecifiedForeign && !foreginSpecifiedMap.containsKey(columnDbName)) {
+                    continue;
+                }
+                if (columnNullObject && isNullObjectColumn(columnInfo.getDBMeta().getTableDbName(), columnDbName)) {
                     continue;
                 }
 
@@ -2743,6 +2748,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _backupSpecifiedSelectColumnMap = null;
     }
 
+    public void removeSpecifiedSelectColumn(String tableAliasName) {
+        if (_specifiedSelectColumnMap != null) {
+            _specifiedSelectColumnMap.remove(tableAliasName);
+        }
+    }
+
     public void clearSpecifiedSelectColumn() {
         if (_specifiedSelectColumnMap != null) {
             _specifiedSelectColumnMap.clear();
@@ -3650,12 +3661,59 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // ===================================================================================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    // TODO jflute impl: null object (AbstractSqlClause)
+    protected Map<String, Set<String>> _columnNullObjectMap;
+
+    protected Map<String, Set<String>> getColumnNullObjectMap() {
+        return _columnNullObjectMap;
+    }
+
+    public boolean hasColumnNullObject() {
+        return _columnNullObjectMap != null;
+    }
+
+    public boolean isColumnNullObjectTable(String tableDbName) {
+        return _columnNullObjectMap != null && _columnNullObjectMap.containsKey(tableDbName);
+    }
+
+    public void registerNullObjectColumn(String tableDbName, String columnDbName) { // called by creator
+        if (_columnNullObjectMap == null) {
+            _columnNullObjectMap = new LinkedHashMap<String, Set<String>>();
+        }
+        Set<String> columnSet = _columnNullObjectMap.get(tableDbName);
+        if (columnSet == null) {
+            columnSet = new LinkedHashSet<String>();
+        }
+        columnSet.add(columnDbName);
+    }
+
+    public List<String> getLocalSpecifiedNullObjectColumnList() {
+        return null;
+    }
+
+    public List<String> getRelationSpecifiedNullObjectColumnList(String relationNoSuffix) {
+        return null;
+    }
+
+    protected boolean isNullObjectColumn(String tableDbName, String columnDbName) {
+        if (_columnNullObjectMap == null) {
+            return false;
+        }
+        final Set<String> columnSet = _columnNullObjectMap.get(tableDbName);
+        if (columnSet == null) {
+            return false;
+        }
+        return columnSet.contains(columnDbName);
+    }
+
+    // ===================================================================================
     //                                                                       DBMeta Helper
     //                                                                       =============
     protected DBMeta getDBMeta() {
         if (_dbmeta == null) {
-            String msg = "The DB meta of local table should not be null when using getDBMeta():";
-            msg = msg + " tableDbName=" + _tableDbName;
+            String msg = "The DB meta of local table should not be null when using getDBMeta(): " + _tableDbName;
             throw new IllegalStateException(msg);
         }
         return _dbmeta;
@@ -3667,8 +3725,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             return dbmeta;
         }
         if (_dbmetaProvider == null) {
-            String msg = "The DB meta provider should not be null when using findDBMeta():";
-            msg = msg + " tableDbName=" + tableDbName;
+            String msg = "The DB meta provider should not be null when using findDBMeta(): " + tableDbName;
             throw new IllegalStateException(msg);
         }
         dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);

@@ -240,6 +240,15 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             if (!relSelector.isNonSpecifiedColumnAccessAllowed(relationNoSuffix) // not allowed
                     && relSelector.isUsingSpecifyColumnInRelation(relationNoSuffix)) { // and use SpecifyColumn
                 entity.modifiedToSpecified(); // so check it
+
+                // column null object handling
+                // *similar implementation for base-point row exists, see it for the details
+                // TODO jflute impl: null object (relation row creator)
+                //if (relSelector.isColumnNullObjectTable(entity)) {
+                //    for (ColumnInfo columnInfo : relSelector.getSpecifiedNullObjectColumnList(entity, relationNoSuffix)) {
+                //        entity.myspecifyProperty(columnInfo.getPropertyName());
+                //    }
+                //}
             }
             entity.clearModifiedInfo();
             entity.markAsSelect();
