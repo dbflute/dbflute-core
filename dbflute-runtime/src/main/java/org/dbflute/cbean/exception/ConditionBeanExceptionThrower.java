@@ -417,7 +417,6 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyExceptColumnAlreadySpecifiedColumnException(msg);
     }
 
-    // TODO jflute exception: CB message
     public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB, String relationName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Bad location to call specify() for relation.");
@@ -426,7 +425,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("Because this is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (ScalarSelect)");
-        br.addElement("    memberBhv.scalarSelect(Date.class).max(cb -> {");
+        br.addElement("    memberBhv.selectScalar(Date.class).max(cb -> {");
         br.addElement("        cb.specify().specifyMemberStatus().col.. // *NG");
         br.addElement("    });");
         br.addElement("  (x): (ScalarCondition)");
@@ -434,7 +433,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("        scalarCB.specify().specifyMemberStatusName().col..; // *NG");
         br.addElement("    });");
         br.addElement("  (x): (VaryingUpdate)");
-        br.addElement("    UpdateOption option = new UpdateOption().self(colCB -> {");
+        br.addElement("    memberBhv.varyingUpdate(member, op -> op.self(colCB -> {");
         br.addElement("        colCB.specify().specifyMemberStatus().col.. // *NG");
         br.addElement("    });");
         br.addElement("  (o): (ScalarSelect)");
@@ -476,6 +475,7 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyDerivedReferrerIllegalPurposeException(msg);
     }
 
+    // TODO jflute impl: CB message
     public void throwSpecifyDerivedReferrerTwoOrMoreException(HpCBPurpose purpose, ConditionBean baseCB, String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The two-or-more derived-referrers was specifed.");
