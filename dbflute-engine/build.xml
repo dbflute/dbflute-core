@@ -18,7 +18,7 @@
 	<property name="test.active.stage.base" value="${workspace.base}" />
 	<property name="test.dbms.stage.base" value="${workspace.base}" />
 	<property name="test.option.stage.base" value="${workspace.base}" />
-	<property name="example.subproject.base" value="${workspace.base}/dbflute-example-subproject" />
+	<property name="example.on.stage.base" value="${workspace.base}" />
 	<property name="tryout.base" value="${workspace.base}/dbflute-tryout" />
 
 	<!-- Point Directories -->
@@ -55,10 +55,7 @@
 	<property name="test.option.compatible10x.dir" value="${test.option.stage.base}/dbflute-test-option-compatible10x" />
 
 	<!-- SubProject Examples -->
-	<property name="bhvap.seasar.example.dir" value="${example.subproject.base}/dbflute-bhvap-seasar-example" />
-	<property name="bhvap.spring.example.dir" value="${example.subproject.base}/dbflute-bhvap-spring-example" />
-	<property name="bhvap.guice.example.dir" value="${example.subproject.base}/dbflute-bhvap-guice-example" />
-	<property name="sqlap.example.dir" value="${example.subproject.base}/dbflute-sqlap-example" />
+	<property name="example.on.springboot.dir" value="${example.on.stage.base}/dbflute-example-on-springboot" />
 
 	<!-- ============================================================================= -->
 	<!--                                                        C O M P I L E  T A S K -->
@@ -310,6 +307,15 @@
 			description="==> reflect to test of option for compatible10x">
 		<delete dir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-example-on-springboot" depends="prepare-reflection"
+			description="==> reflect to example on SpringBoot">
+		<delete dir="${example.on.springboot.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${example.on.springboot.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />

@@ -8,6 +8,7 @@ ant -f build.xml reflect-to-test-dbms-oracle
 ant -f build.xml reflect-to-test-dbms-db2
 ant -f build.xml reflect-to-test-dbms-sqlserver
 ant -f build.xml reflect-to-test-option-compatible10x
+ant -f build.xml reflect-to-example-on-springboot
 
 cd ..
 export answer=y
@@ -67,6 +68,12 @@ cd ..
 mvn -e compile
 
 cd ../dbflute-test-option-compatible10x/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal
+cd ..
+mvn -e compile
+
+cd ../dbflute-example-on-springboot/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
 cd ..
