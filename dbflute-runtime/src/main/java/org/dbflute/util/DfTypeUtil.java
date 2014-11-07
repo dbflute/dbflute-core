@@ -125,8 +125,8 @@ public final class DfTypeUtil {
      *  byte array :: encode as base64.
      *  exception  :: convert to stack-trace.
      * </pre>
-     * @param obj The parsed object. (NullAllowed)
-     * @return The instance of string. (NullAllowed)
+     * @param obj The parsed object. (NullAllowed: if null, returns null)
+     * @return The converted string. (NullAllowed: when the argument is null)
      */
     public static String toString(Object obj) {
         return doConvertToString(obj, (String) null);
@@ -140,9 +140,9 @@ public final class DfTypeUtil {
      *  byte array :: encode as base64.
      *  exception  :: convert to stack-trace.
      * </pre>
-     * @param obj The parsed object. (NullAllowed)
+     * @param obj The parsed object. (NullAllowed: if null, returns null)
      * @param pattern The pattern format to parse for e.g. number, date. (NotNull)
-     * @return The instance of string. (NullAllowed)
+     * @return The converted string. (NullAllowed: when the argument is null)
      */
     public static String toString(Object obj, String pattern) {
         assertPatternNotNull("toString()", pattern);
@@ -152,7 +152,8 @@ public final class DfTypeUtil {
     protected static String doConvertToString(Object obj, String pattern) {
         if (obj == null) {
             return null;
-        } else if (obj instanceof String) {
+        }
+        if (obj instanceof String) {
             return (String) obj;
         } else if (obj instanceof Number) {
             return doConvertToStringNumber((Number) obj, pattern);
@@ -180,24 +181,33 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                        Specified Type
     //                                        --------------
-    public static String toStringNumber(Number value, String pattern) {
-        assertPatternNotNull("toDispNumber()", pattern);
-        return doConvertToStringNumber(value, pattern);
+    /**
+     * Convert the number to the instance that is string by the pattern.
+     * @param number The parsed number to be string. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse as number. (NotNull)
+     * @return The converted string. (NullAllowed: when the argument is null)
+     */
+    public static String toStringNumber(Number number, String pattern) {
+        assertPatternNotNull("toStringNumber()", pattern);
+        return number != null ? doConvertToStringNumber(number, pattern) : null;
     }
 
     protected static String doConvertToStringNumber(Number value, String pattern) {
-        if (value == null) {
-            return null;
-        }
         if (pattern != null) {
             return createDecimalFormat(pattern).format(value);
         }
         return value.toString();
     }
 
-    public static String toStringLocalDate(LocalDate value, String pattern) {
-        assertPatternNotNull("toDispDate()", pattern);
-        return doConvertToStringLocalDate(value, pattern);
+    /**
+     * Convert the local date to the instance that is string by the pattern.
+     * @param date The parsed local date to be string. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse as local date. (NotNull)
+     * @return The converted string. (NullAllowed: when the argument is null)
+     */
+    public static String toStringDate(LocalDate date, String pattern) {
+        assertPatternNotNull("toStringDate()", pattern);
+        return date != null ? doConvertToStringLocalDate(date, pattern) : null;
     }
 
     protected static String doConvertToStringLocalDate(LocalDate value, String pattern) {
@@ -205,9 +215,15 @@ public final class DfTypeUtil {
         return value.format(DateTimeFormatter.ofPattern(realPattern));
     }
 
-    public static String toStringLocalDateTime(LocalDateTime value, String pattern) {
-        assertPatternNotNull("toDispDate()", pattern);
-        return doConvertToStringLocalDateTime(value, pattern);
+    /**
+     * Convert the local date-time to the instance that is string by the pattern.
+     * @param date The parsed local date-time to be string. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse as local date-time. (NotNull)
+     * @return The converted string. (NullAllowed: when the argument is null)
+     */
+    public static String toStringDate(LocalDateTime date, String pattern) {
+        assertPatternNotNull("toStringDate()", pattern);
+        return date != null ? doConvertToStringLocalDateTime(date, pattern) : null;
     }
 
     protected static String doConvertToStringLocalDateTime(LocalDateTime value, String pattern) {
@@ -215,9 +231,15 @@ public final class DfTypeUtil {
         return value.format(DateTimeFormatter.ofPattern(realPattern));
     }
 
-    public static String toStringLocalTime(LocalTime value, String pattern) {
-        assertPatternNotNull("toDispDate()", pattern);
-        return doConvertToStringLocalTime(value, pattern);
+    /**
+     * Convert the local time to the instance that is string by the pattern.
+     * @param date The parsed local time to be string. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse as local time. (NotNull)
+     * @return The converted string. (NullAllowed: when the argument is null)
+     */
+    public static String toStringDate(LocalTime date, String pattern) {
+        assertPatternNotNull("toStringDate()", pattern);
+        return date != null ? doConvertToStringLocalTime(date, pattern) : null;
     }
 
     protected static String doConvertToStringLocalTime(LocalTime value, String pattern) {
@@ -226,19 +248,19 @@ public final class DfTypeUtil {
     }
 
     public static String toStringDate(Date value, String pattern, TimeZone timeZone) {
-        assertPatternNotNull("toDispNumber()", pattern);
-        assertTimeZoneNotNull("toDispNumber()", timeZone);
-        return doConvertToStringDate(value, pattern, timeZone);
+        assertPatternNotNull("toStringDate()", pattern);
+        assertTimeZoneNotNull("toStringDate()", timeZone);
+        return value != null ? doConvertToStringDate(value, pattern, timeZone) : null;
     }
 
     protected static String doConvertToStringDate(Date value, String pattern, TimeZone timeZone) {
         final String realPattern;
-        if (value != null && value instanceof Time && pattern == null) {
+        if (value instanceof Time && pattern == null) {
             realPattern = DEFAULT_TIME_PATTERN;
         } else {
             realPattern = pattern; // null or specified (if null, default pattern of formatter)
         }
-        return value != null ? doCreateDateFormat(realPattern, timeZone, false).format(value) : null;
+        return doCreateDateFormat(realPattern, timeZone, false).format(value);
     }
 
     public static String toStringStackTrace(Throwable cause) {
@@ -251,7 +273,7 @@ public final class DfTypeUtil {
             if (sw != null) {
                 try {
                     sw.close();
-                } catch (IOException e) {}
+                } catch (IOException ignored) {}
             }
         }
     }
@@ -300,12 +322,15 @@ public final class DfTypeUtil {
     //                                                Encode
     //                                                ------
     public static String encodeAsBase64(final byte[] inData) {
-        if (inData == null || inData.length == 0) {
+        if (inData == null) {
+            return null;
+        }
+        if (inData.length == 0) {
             return "";
         }
-        int mod = inData.length % 3;
-        int num = inData.length / 3;
-        char[] outData = null;
+        final int mod = inData.length % 3;
+        final int num = inData.length / 3;
+        final char[] outData;
         if (mod != 0) {
             outData = new char[(num + 1) * 4];
         } else {

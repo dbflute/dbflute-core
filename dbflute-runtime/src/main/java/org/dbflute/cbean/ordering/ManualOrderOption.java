@@ -754,13 +754,13 @@ public class ManualOrderOption implements ColumnCalculator {
     protected String buildLiteralDateExpression(Object plainValue) {
         if (plainValue instanceof LocalDate) { // local date cannot use time-part so check it
             final String pattern = DisplaySqlBuilder.DEFAULT_DATE_FORMAT;
-            return doBuildLiteralDateExpression(DfTypeUtil.toStringLocalDate((LocalDate) plainValue, pattern));
+            return doBuildLiteralDateExpression(DfTypeUtil.toStringDate((LocalDate) plainValue, pattern));
         } else if (plainValue instanceof LocalDateTime) {
             final String pattern = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
-            return doBuildLiteralDateExpression(DfTypeUtil.toStringLocalDateTime((LocalDateTime) plainValue, pattern));
+            return doBuildLiteralDateExpression(DfTypeUtil.toStringDate((LocalDateTime) plainValue, pattern));
         } else if (plainValue instanceof LocalTime) {
             final String pattern = DisplaySqlBuilder.DEFAULT_TIME_FORMAT;
-            return doBuildLiteralDateExpression(DfTypeUtil.toStringLocalTime((LocalTime) plainValue, pattern));
+            return doBuildLiteralDateExpression(DfTypeUtil.toStringDate((LocalTime) plainValue, pattern));
         } else { // instance of util.Date, as time-stamp fixedly (since 1.0.x)
             final String pattern = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
             return doBuildLiteralDateExpression(DfTypeUtil.toString(plainValue, pattern));
