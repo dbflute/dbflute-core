@@ -472,7 +472,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}) {
-#if ($database.isAvailableNextTimeLocalDateEntity())
+#if ($database.isAvailableJava8TimeLocalDateEntity())
         ${variableName} = toLocalDate(createFromToOption().compareAsDate().filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = createFromToOption().compareAsDate().filterFromDate(${argumentName});
@@ -491,7 +491,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
-#if ($database.isAvailableNextTimeLocalDateEntity())
+#if ($database.isAvailableJava8TimeLocalDateEntity())
         ${variableName} = toLocalDate(${argumentName}Option.filterFromDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = ${argumentName}Option.filterFromDate(${argumentName});
@@ -508,7 +508,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}) {
-#if ($database.isAvailableNextTimeLocalDateEntity())
+#if ($database.isAvailableJava8TimeLocalDateEntity())
         ${variableName} = toLocalDate(createFromToOption().compareAsDate().filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = createFromToOption().compareAsDate().filterToDate(${argumentName});
@@ -527,7 +527,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
         assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
-#if ($database.isAvailableNextTimeLocalDateEntity())
+#if ($database.isAvailableJava8TimeLocalDateEntity())
         ${variableName} = toLocalDate(${argumentName}Option.filterToDate(toUtilDate(${argumentName})), ${propertyType}.class);
 #else
         ${variableName} = ${argumentName}Option.filterToDate(${argumentName});

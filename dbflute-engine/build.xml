@@ -6,9 +6,9 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1.0" />
-	<property name="build.version" value="${version}-pilotB-SNAPSHOT" />
+	<property name="build.version" value="${version}-pilotC-SNAPSHOT" />
 	<property name="runtime.version" value="1.1.0" />
-	<property name="runtime.build.version" value="${runtime.version}-pilotB-SNAPSHOT" />
+	<property name="runtime.build.version" value="${runtime.version}-pilotC-SNAPSHOT" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
@@ -18,12 +18,7 @@
 	<property name="test.active.stage.base" value="${workspace.base}" />
 	<property name="test.dbms.stage.base" value="${workspace.base}" />
 	<property name="test.option.stage.base" value="${workspace.base}" />
-	<property name="example.container.base" value="${workspace.base}/dbflute-example-container" />
-	<property name="example.database.base" value="${workspace.base}/dbflute-example-database" />
-	<property name="example.multipledb.base" value="${workspace.base}/dbflute-example-multipledb" />
 	<property name="example.subproject.base" value="${workspace.base}/dbflute-example-subproject" />
-	<property name="example.friends.frank.base" value="${workspace.base}/dbflute-example-friends-frank" />
-	<property name="example.friends.guest.base" value="${workspace.base}/dbflute-example-friends-guest" />
 	<property name="tryout.base" value="${workspace.base}/dbflute-tryout" />
 
 	<!-- Point Directories -->
@@ -51,41 +46,19 @@
 	<!-- Test: DBMS Stage -->
 	<property name="test.dbms.mysql.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-mysql" />
 	<property name="test.dbms.postgresql.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-postgresql" />
+	<property name="test.dbms.oracle.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-oracle" />
+	<property name="test.dbms.db2.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-db2" />
+	<property name="test.dbms.sqlserver.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-sqlserver" />
+	<property name="test.dbms.sqlite.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-sqlite" />
 
 	<!-- Test: Option Stage -->
 	<property name="test.option.compatible10x.dir" value="${test.option.stage.base}/dbflute-test-option-compatible10x" />
-
-	<!-- Database Examples -->
-	<property name="mysql.example.dir" value="${example.database.base}/dbflute-mysql-example" />
-	<property name="postgresql.example.dir" value="${example.database.base}/dbflute-postgresql-example" />
-	<property name="oracle.example.dir" value="${example.database.base}/dbflute-oracle-example" />
-	<property name="sqlserver.example.dir" value="${example.database.base}/dbflute-sqlserver-example" />
-	<property name="db2.example.dir" value="${example.database.base}/dbflute-db2-example" />
-	<property name="sqlite.example.dir" value="${example.database.base}/dbflute-sqlite-example" />
-	<property name="msaccess.example.dir" value="${example.database.base}/dbflute-msaccess-example" />
-
-	<!-- MultipleDB Examples -->
-	<property name="multipledb.seasar.example.dir" value="${example.multipledb.base}/dbflute-multipledb-seasar-example" />
-	<property name="multipledb.spring.example.dir" value="${example.multipledb.base}/dbflute-multipledb-spring-example" />
 
 	<!-- SubProject Examples -->
 	<property name="bhvap.seasar.example.dir" value="${example.subproject.base}/dbflute-bhvap-seasar-example" />
 	<property name="bhvap.spring.example.dir" value="${example.subproject.base}/dbflute-bhvap-spring-example" />
 	<property name="bhvap.guice.example.dir" value="${example.subproject.base}/dbflute-bhvap-guice-example" />
 	<property name="sqlap.example.dir" value="${example.subproject.base}/dbflute-sqlap-example" />
-
-	<!-- Friends Frank Examples -->
-	<property name="ymir.example.dir" value="${example.friends.frank.base}/dbflute-ymir-example" />
-	<property name="sastruts.example.dir" value="${example.friends.frank.base}/dbflute-sastruts-example" />
-	<property name="flex.example.dir" value="${example.friends.frank.base}/dbflute-flexserver-example" />
-
-	<!-- Friends Guest Examples -->
-	<property name="doma.example.dir" value="${example.friends.guest.base}/dbflute-doma-example" />
-	<property name="hibernate.example.dir" value="${example.friends.guest.base}/dbflute-hibernate-example" />
-	<property name="s2jdbc.example.dir" value="${example.friends.guest.base}/dbflute-s2jdbc-example" />
-
-	<!-- Tryout -->
-	<property name="javatry.dir" value="${tryout.base}/javatry" />
 
 	<!-- ============================================================================= -->
 	<!--                                                        C O M P I L E  T A S K -->
@@ -208,9 +181,9 @@
 			<zipfileset prefix="templates/om/java" dir="${embedded}/templates/om/java">
 				<exclude name="**/*---.txt" />
 			</zipfileset>
-			<zipfileset prefix="templates/om/scala" dir="${embedded}/templates/om/scala">
-				<exclude name="**/*---.txt" />
-			</zipfileset>
+			<!-- until Scala support
+			<zipfileset prefix="templates/om/scala" ...>
+			-->
 			<zipfileset prefix="ant" dir="${embedded}/ant" />
 			<zipfileset prefix="" dir="${embedded}">
 				<include name="build-torque.xml" />
@@ -297,114 +270,46 @@
 		<delete dir="${extraction.dir}" />
 	</target>
 
+	<target name="reflect-to-test-dbms-oracle" depends="prepare-reflection"
+			description="==> reflect to test of DBMS Oracle">
+		<delete dir="${test.dbms.oracle.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.dbms.oracle.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-test-dbms-db2" depends="prepare-reflection"
+			description="==> reflect to test of DBMS DB2">
+		<delete dir="${test.dbms.db2.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.dbms.db2.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-test-dbms-sqlserver" depends="prepare-reflection"
+			description="==> reflect to test of DBMS SQLServer">
+		<delete dir="${test.dbms.sqlserver.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.dbms.sqlserver.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-test-dbms-sqlite" depends="prepare-reflection"
+			description="==> reflect to test of DBMS SQLite">
+		<delete dir="${test.dbms.sqlite.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.dbms.sqlite.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
 	<target name="reflect-to-test-option-compatible10x" depends="prepare-reflection"
 			description="==> reflect to test of option for compatible10x">
 		<delete dir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-mysql" depends="prepare-reflection" description="==> reflect to mysql example">
-		<delete dir="${mysql.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${mysql.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-postgresql" depends="prepare-reflection" description="==> reflect to postgresql example">
-		<delete dir="${postgresql.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${postgresql.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-oracle" depends="prepare-reflection" description="==> reflect to oracle example">
-		<delete dir="${oracle.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${oracle.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-db2" depends="prepare-reflection" description="==> reflect to db2 example">
-		<delete dir="${db2.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${db2.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-sqlserver" depends="prepare-reflection" description="==> reflect to sqlserver example">
-		<delete dir="${sqlserver.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${sqlserver.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-sqlite" depends="prepare-reflection" description="==> reflect to sqlite example">
-		<delete dir="${sqlite.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${sqlite.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-msaccess" depends="prepare-reflection" description="==> reflect to msaccess example">
-		<delete dir="${msaccess.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${msaccess.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-flex" depends="prepare-reflection" description="==> reflect to flex example">
-		<delete dir="${flex.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${flex.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-ymir" depends="prepare-reflection" description="==> reflect to ymir example">
-		<delete dir="${ymir.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${ymir.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-sastruts" depends="prepare-reflection" description="==> reflect to sastruts example">
-		<delete dir="${sastruts.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${sastruts.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-hibernate" depends="prepare-reflection" description="==> reflect to hibernate example">
-		<delete dir="${hibernate.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${hibernate.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-s2jdbc" depends="prepare-reflection" description="==> reflect to s2jdbc example">
-		<delete dir="${s2jdbc.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${s2jdbc.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-doma" depends="prepare-reflection" description="==> reflect to flex example">
-		<delete dir="${doma.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${doma.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />
@@ -420,37 +325,5 @@
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />
-	</target>
-
-	<target name="reflect-to-javatry" depends="prepare-reflection" description="==> reflect to java try">
-		<copy file="${dist}/${runtime.jar}" tofile="${javatry.dir}/lib/${runtime.nonversion.jar}" overwrite="true" />
-		<copy file="${dist}/${runtime.sources.jar}" tofile="${javatry.dir}/lib/sources/${runtime.sources.nonversion.jar}" overwrite="true" />
-	</target>
-
-	<!-- = = = = = = = = = = -->
-	<!-- Reflection for Mac  -->
-	<!-- = = = = = = = = = = -->
-
-	<target name="reflect-to-all-regulars" depends="prepare-reflection" description="==> reflect to all examples">
-		<antcall target="reflect-to-seasar" />
-		<antcall target="reflect-to-spring" />
-		<antcall target="reflect-to-guice" />
-		<antcall target="reflect-to-cdi" />
-		<antcall target="reflect-to-mysql" />
-		<antcall target="reflect-to-postgresql" />
-		<antcall target="reflect-to-db2" />
-
-		<!-- in virtual machine
-		<antcall target="reflect-to-oracle" />
-		<antcall target="reflect-to-sqlserver" />
-		-->
-
-		<antcall target="reflect-to-msaccess" />
-		<antcall target="reflect-to-sqlite" />
-		<antcall target="reflect-to-multipledb" />
-		<antcall target="reflect-to-flex" />
-		<antcall target="reflect-to-sastruts" />
-		<antcall target="reflect-to-ymir" />
-		<antcall target="reflect-to-javatry" />
 	</target>
 </project>

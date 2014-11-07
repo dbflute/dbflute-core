@@ -16,11 +16,14 @@
 package org.dbflute.outsidesql.executor;
 
 import org.dbflute.bhv.exception.BehaviorExceptionThrower;
+import org.dbflute.cbean.coption.StatementConfigCall;
 import org.dbflute.cbean.result.ListResultBean;
 import org.dbflute.cbean.result.PagingResultBean;
+import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.jdbc.CursorHandler;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.optional.OptionalEntity;
+import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.outsidesql.ProcedurePmb;
 import org.dbflute.outsidesql.typed.AutoPagingHandlingPmb;
 import org.dbflute.outsidesql.typed.CursorHandlingPmb;
@@ -405,16 +408,44 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
     //                                       StatementConfig
     //                                       ---------------
     /**
-     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
-     * @param statementConfig The configuration of statement. (NotNull)
+     * Configure statement JDBC options. e.g. queryTimeout, fetchSize, ... (only one-time call)
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.outsideSql().<span style="color: #CC4747">configure</span>(<span style="color: #553000">conf</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">conf</span>.<span style="color: #994747">queryTimeout</span>(<span style="color: #2A00FF">3</span>)).selectList(...);
+     * </pre>
+     * @param confLambda The callback for configuration of statement. (NotNull)
      * @return this. (NotNull)
      */
-    public OutsideSqlAllFacadeExecutor<BEHAVIOR> configure(StatementConfig statementConfig) {
-        if (statementConfig == null) {
-            throw new IllegalArgumentException("The argument 'statementConfig' should not be null.");
+    public OutsideSqlAllFacadeExecutor<BEHAVIOR> configure(StatementConfigCall<StatementConfig> confLambda) {
+        if (confLambda == null) {
+            throw new IllegalArgumentException("The argument 'confLambda' should not be null.");
         }
-        _basicExecutor.configure(statementConfig);
+        assertStatementConfigNotDuplicated(confLambda);
+        _basicExecutor.configure(createStatementConfig(confLambda));
         return this;
+    }
+
+    protected void assertStatementConfigNotDuplicated(StatementConfigCall<StatementConfig> configCall) {
+        final OutsideSqlOption option = _basicExecutor.getOutsideSqlOption();
+        if (option != null) {
+            final StatementConfig existingConfig = option.getStatementConfig();
+            if (existingConfig != null) {
+                String msg = "Already registered the configuration: existing=" + existingConfig + ", new=" + configCall;
+                throw new IllegalConditionBeanOperationException(msg);
+            }
+        }
+    }
+
+    protected StatementConfig createStatementConfig(StatementConfigCall<StatementConfig> configCall) {
+        if (configCall == null) {
+            throw new IllegalArgumentException("The argument 'confLambda' should not be null.");
+        }
+        final StatementConfig config = newStatementConfig();
+        configCall.callback(config);
+        return config;
+    }
+
+    protected StatementConfig newStatementConfig() {
+        return new StatementConfig();
     }
 
     // ===================================================================================

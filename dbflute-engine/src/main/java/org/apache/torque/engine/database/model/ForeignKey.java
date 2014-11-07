@@ -1897,9 +1897,11 @@ public class ForeignKey implements Constraint {
     }
 
     protected String doGetRelationalNullObjectProviderExp(Table table, String getterCommaString) {
-        final String exp = table.getRelationalNullObjectProviderForeignExp();
-        final String resolvedExp = replace(exp, "$$PrimaryKey$$", getterCommaString);
-        return resolvedExp;
+        String exp = table.getRelationalNullObjectProviderForeignExp();
+        exp = replace(exp, "$$PrimaryKey$$", getterCommaString); // for compatible (1.0.x)
+        exp = replace(exp, "$$primaryKey$$", getterCommaString);
+        exp = replace(exp, "$$foreignPropertyName$$", getForeignJavaBeansRulePropertyName());
+        return exp;
     }
 
     // ===================================================================================

@@ -180,7 +180,9 @@ public abstract class GreatWallOfOracleType implements ValueType {
         }
         if (Number.class.isAssignableFrom(propertyType)) {
             value = DfTypeUtil.toNumber(value, propertyType);
-        } else if (java.util.Date.class.isAssignableFrom(propertyType)) {
+        } else if (java.util.Date.class.isAssignableFrom(propertyType)) { // #dateParade
+            value = DfTypeUtil.toPointDate(value, propertyType);
+        } else if (DfTypeUtil.isAnyLocalDateType(propertyType)) {
             value = DfTypeUtil.toPointDate(value, propertyType);
         }
         return value;
@@ -323,7 +325,10 @@ public abstract class GreatWallOfOracleType implements ValueType {
             return null;
         }
         final Class<? extends Object> propertyType = value.getClass();
-        if (java.util.Date.class.equals(propertyType)) {
+        if (java.util.Date.class.equals(propertyType)) { // #dateParade
+            return DfTypeUtil.toTimestamp(value);
+        }
+        if (DfTypeUtil.isLocalDateOrDateTimeType(propertyType)) {
             return DfTypeUtil.toTimestamp(value);
         }
         return value;

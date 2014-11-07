@@ -16,6 +16,8 @@
 package org.dbflute.bhv.writable;
 
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.coption.StatementConfigCall;
+import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.util.DfTypeUtil;
 
@@ -95,11 +97,35 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                           Configure
     //                                                                           =========
     /**
-     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
-     * @param deleteStatementConfig The configuration of statement for delete. (NullAllowed)
+     * Configure statement JDBC options. e.g. queryTimeout, fetchSize, ... (only one-time call)
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.varyingDelete(member, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">configure</span>(<span style="color: #553000">conf</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">conf</span>.<span style="color: #994747">queryTimeout</span>(<span style="color: #2A00FF">3</span>)));
+     * </pre>
+     * @param confLambda The callback for configuration of statement for delete. (NotNull)
      */
-    public void configure(StatementConfig deleteStatementConfig) {
-        _deleteStatementConfig = deleteStatementConfig;
+    public void configure(StatementConfigCall<StatementConfig> confLambda) {
+        assertStatementConfigNotDuplicated(confLambda);
+        _deleteStatementConfig = createStatementConfig(confLambda);
+    }
+
+    protected void assertStatementConfigNotDuplicated(StatementConfigCall<StatementConfig> configCall) {
+        if (_deleteStatementConfig != null) {
+            String msg = "Already registered the configuration: existing=" + _deleteStatementConfig + ", new=" + configCall;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+    }
+
+    protected StatementConfig createStatementConfig(StatementConfigCall<StatementConfig> configCall) {
+        if (configCall == null) {
+            throw new IllegalArgumentException("The argument 'confLambda' should not be null.");
+        }
+        final StatementConfig config = newStatementConfig();
+        configCall.callback(config);
+        return config;
+    }
+
+    protected StatementConfig newStatementConfig() {
+        return new StatementConfig();
     }
 
     public StatementConfig getDeleteStatementConfig() {

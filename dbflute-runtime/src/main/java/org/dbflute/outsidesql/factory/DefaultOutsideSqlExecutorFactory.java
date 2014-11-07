@@ -17,7 +17,6 @@ package org.dbflute.outsidesql.factory;
 
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.dbway.DBDef;
-import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.outsidesql.OutsideSqlFilter;
 import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.outsidesql.executor.OutsideSqlAllFacadeExecutor;
@@ -43,11 +42,11 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
      * {@inheritDoc}
      */
     public <BEHAVIOR> OutsideSqlBasicExecutor<BEHAVIOR> createBasic(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
+            DBDef currentDBDef, OutsideSqlOption outsideSqlOption) {
         final OutsideSqlContextFactory factory = createOutsideSqlContextFactory();
         final OutsideSqlFilter filter = createOutsideSqlExecutionFilter();
-        return new OutsideSqlBasicExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig,
-                outsideSqlOption, factory, filter, this);
+        return new OutsideSqlBasicExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef, outsideSqlOption, factory, filter,
+                this);
     }
 
     /**
@@ -83,26 +82,23 @@ public class DefaultOutsideSqlExecutorFactory implements OutsideSqlExecutorFacto
      * {@inheritDoc}
      */
     public <BEHAVIOR> OutsideSqlEntityExecutor<BEHAVIOR> createEntity(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
-            DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
-        return new OutsideSqlEntityExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig,
-                outsideSqlOption, this);
+            DBDef currentDBDef, OutsideSqlOption outsideSqlOption) {
+        return new OutsideSqlEntityExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef, outsideSqlOption, this);
     }
 
     /**
      * {@inheritDoc}
      */
     public <BEHAVIOR> OutsideSqlManualPagingExecutor<BEHAVIOR> createManualPaging(BehaviorCommandInvoker behaviorCommandInvoker,
-            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
-        return new OutsideSqlManualPagingExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig,
-                outsideSqlOption, this);
+            String tableDbName, DBDef currentDBDef, OutsideSqlOption outsideSqlOption) {
+        return new OutsideSqlManualPagingExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef, outsideSqlOption, this);
     }
 
     /**
      * {@inheritDoc}
      */
     public <BEHAVIOR> OutsideSqlAutoPagingExecutor<BEHAVIOR> createAutoPaging(BehaviorCommandInvoker behaviorCommandInvoker,
-            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption) {
-        return new OutsideSqlAutoPagingExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig,
-                outsideSqlOption, this);
+            String tableDbName, DBDef currentDBDef, OutsideSqlOption outsideSqlOption) {
+        return new OutsideSqlAutoPagingExecutor<BEHAVIOR>(behaviorCommandInvoker, tableDbName, currentDBDef, outsideSqlOption, this);
     }
 }

@@ -46,16 +46,6 @@ public class DfLanguagePropertyPackageResolverScala extends DfLanguagePropertyPa
         protected String getJava8LocalDateTime() {
             return "java.time.LocalDateTime";
         }
-
-        @Override
-        protected String getJodaLocalDate() {
-            return "org.joda.time.LocalDate";
-        }
-
-        @Override
-        protected String getJodaLocalDateTime() {
-            return "org.joda.time.LocalDateTime";
-        }
     };
 
     protected String processLanguageType(String typeName, boolean exceptUtil) {

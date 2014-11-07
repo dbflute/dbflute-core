@@ -26,10 +26,12 @@ import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.ordering.ManualOrderOption;
+import org.dbflute.dbmeta.accessory.DerivedMappable;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -320,7 +322,12 @@ public class OrderByElement implements Serializable {
             String msg = "The attribute[columnName] should not be null.";
             throw new IllegalStateException(msg);
         }
-        sb.append(_columnName);
+        final String derivedMappingAliasPrefix = DerivedMappable.MAPPING_ALIAS_PREFIX;
+        if (_derivedOrderBy && _columnName.startsWith(derivedMappingAliasPrefix)) {
+            sb.append(Srl.substringFirstRear(_columnName, derivedMappingAliasPrefix));
+        } else {
+            sb.append(_columnName);
+        }
         return sb.toString();
     }
 

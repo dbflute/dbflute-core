@@ -162,15 +162,14 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     }
 
     protected void prepareJava8OrJodaTimeMappingIfNeeds(final Map<String, String> jdbcToJavaNativeMap) {
-        if (getLittleAdjustmentProperties().isAvailableJava8TimeLocalDateEntity()) {
-            jdbcToJavaNativeMap.put("DATE", "java.time.LocalDate");
-            jdbcToJavaNativeMap.put("TIMESTAMP", "java.time.LocalDateTime");
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        if (prop.isAvailableJava8TimeLocalDateEntity()) {
+            final String localDate = "java.time.LocalDate";
+            final String localDateTime = "java.time.LocalDateTime";
+            final String dateType = prop.needsDateTreatedAsLocalDateTime() ? localDateTime : localDate;
+            jdbcToJavaNativeMap.put("DATE", dateType);
+            jdbcToJavaNativeMap.put("TIMESTAMP", localDateTime);
             jdbcToJavaNativeMap.put("TIME", "java.time.LocalTime");
-        }
-        if (getLittleAdjustmentProperties().isAvailableJodaTimeLocalDateEntity()) {
-            jdbcToJavaNativeMap.put("DATE", "org.joda.time.LocalDate");
-            jdbcToJavaNativeMap.put("TIMESTAMP", "org.joda.time.LocalDateTime");
-            jdbcToJavaNativeMap.put("TIME", "org.joda.time.LocalTime");
         }
     }
 

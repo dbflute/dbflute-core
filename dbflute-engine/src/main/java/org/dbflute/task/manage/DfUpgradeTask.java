@@ -124,8 +124,7 @@ public class DfUpgradeTask extends DfAbstractTask {
         if (isVersionSpecified()) {
             return _version;
         }
-        // TODO jflute setting: formal version after release
-        final String latestVersion = dfprop.getDBFluteLatestSnapshotVersion();
+        final String latestVersion = dfprop.getDBFluteLatestVersion();
         if (latestVersion == null) {
             String msg = "Not found the latest version for DBFlute in publicMap.";
             throw new IllegalStateException(msg);

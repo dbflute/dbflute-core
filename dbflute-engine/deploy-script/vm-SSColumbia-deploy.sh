@@ -1,6 +1,6 @@
 cd ..
-ant -f build.xml reflect-to-sqlserver
+ant -f build.xml reflect-to-test-dbms-sqlserver
 
-cd ../../dbflute-example-database/dbflute-sqlserver-example/dbflute_exampledb
+cd ../dbflute-test-dbms-sqlserver/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal

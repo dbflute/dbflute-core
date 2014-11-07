@@ -35,8 +35,8 @@ public class OutsideSqlAutoPagingExecutor<BEHAVIOR> extends AbstractOutsideSqlPa
     //                                                                         Constructor
     //                                                                         ===========
     public OutsideSqlAutoPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
-            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
-        super(behaviorCommandInvoker, tableDbName, currentDBDef, defaultStatementConfig, outsideSqlOption, outsideSqlExecutorFactory);
+            OutsideSqlOption outsideSqlOption, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+        super(behaviorCommandInvoker, tableDbName, currentDBDef, outsideSqlOption, outsideSqlExecutorFactory);
     }
 
     // ===================================================================================

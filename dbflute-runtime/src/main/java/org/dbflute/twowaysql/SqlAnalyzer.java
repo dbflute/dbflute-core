@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import org.dbflute.exception.ParameterCommentNotAllowedInitialCharacterException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
@@ -203,6 +204,9 @@ public class SqlAnalyzer {
                 parseCommentBindVariable();
             }
         } else if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) { // plain comment
+            if (isFrequentlyMistakePattern(comment)) {
+                throwParameterCommentNotAllowedInitialCharacterException(comment);
+            }
             final String before = _tokenizer.getBefore();
             final String content = before.substring(before.lastIndexOf("/*"));
             peek().addChild(createSqlPartsNode(content));
@@ -213,12 +217,42 @@ public class SqlAnalyzer {
         if (Srl.is_Null_or_TrimmedEmpty(comment)) {
             return false;
         }
-        if (!comment.startsWith(ForNode.CURRENT_VARIABLE)) { // except current variable from check
-            if (!Character.isJavaIdentifierStart(comment.charAt(0))) {
-                return false;
-            }
+        if (!isSpecialInitChar(comment) && !isTargetCommentFirstChar(comment)) {
+            return false;
         }
         return true;
+    }
+
+    protected boolean isSpecialInitChar(String comment) {
+        return comment.startsWith(ForNode.CURRENT_VARIABLE); // except current variable from check
+    }
+
+    protected boolean isTargetCommentFirstChar(String comment) {
+        return Character.isJavaIdentifierStart(comment.charAt(0));
+    }
+
+    protected boolean isFrequentlyMistakePattern(String comment) {
+        return comment.startsWith(" pmb."); // e.g. /* pmb.memberName */
+    }
+
+    protected void throwParameterCommentNotAllowedInitialCharacterException(String comment) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The initial character in the parameter comment was not allowed.");
+        br.addItem("Advice");
+        br.addElement("The parameter comment should start with identifier.");
+        br.addElement("Fix like this:");
+        br.addElement("  (x) - /* pmb.memberName */");
+        br.addElement("  (o) - /*pmb.memberName*/");
+        br.addElement("");
+        br.addElement("Or rewrite your plain comment:");
+        br.addElement("  (x) - /* pmb. so ...(as plain comment) */");
+        br.addElement("  (o) - /* this is pmb. so ...(as plain comment) */");
+        br.addItem("Checked Comment");
+        br.addElement("/*" + comment + "*/");
+        br.addItem("Specified SQL");
+        br.addElement(_specifiedSql);
+        final String msg = br.buildExceptionMessage();
+        throw new ParameterCommentNotAllowedInitialCharacterException(msg);
     }
 
     // ===================================================================================

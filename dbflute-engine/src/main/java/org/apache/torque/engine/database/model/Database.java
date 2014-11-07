@@ -1951,14 +1951,6 @@ public class Database {
         return isDatabaseOracle() && isAvailableDatabaseNativeJDBC();
     }
 
-    public boolean isAvailableNextTimeEntity() {
-        return getLittleAdjustmentProperties().isAvailableNextTimeEntity();
-    }
-
-    public boolean isAvailableNextTimeLocalDateEntity() {
-        return getLittleAdjustmentProperties().isAvailableNextTimeLocalDateEntity();
-    }
-
     public boolean isAvailableJava8TimeEntity() {
         return getLittleAdjustmentProperties().isAvailableJava8TimeEntity();
     }
@@ -1967,18 +1959,14 @@ public class Database {
         return getLittleAdjustmentProperties().isAvailableJava8TimeLocalDateEntity();
     }
 
-    public boolean isAvailableJodaTimeEntity() {
-        return getLittleAdjustmentProperties().isAvailableJodaTimeEntity();
-    }
-
-    public boolean isAvailableJodaTimeLocalDateEntity() {
-        return getLittleAdjustmentProperties().isAvailableJodaTimeLocalDateEntity();
-    }
-
     // unsupported for now
     //public boolean isAvailableJodaTimeDateTimeEntity() {
     //    return getLittleAdjustmentProperties().isAvailableJodaTimeDateTimeEntity();
     //}
+
+    public boolean needsDateTreatedAsLocalDateTime() {
+        return getLittleAdjustmentProperties().needsDateTreatedAsLocalDateTime();
+    }
 
     public boolean isMakeDeprecated() {
         return getLittleAdjustmentProperties().isMakeDeprecated();
@@ -2434,29 +2422,6 @@ public class Database {
 
     public String getHibernateOneToManyFetch() {
         return getProperties().getHibernateProperties().getOneToManyFetch();
-    }
-
-    // ===================================================================================
-    //                                                                   S2JDBC Properties
-    //                                                                   =================
-    public boolean hasS2jdbcDefinition() {
-        return getProperties().getS2jdbcProperties().hasS2jdbcDefinition();
-    }
-
-    public String getS2jdbcBaseEntityPackage() {
-        return getProperties().getS2jdbcProperties().getBaseEntityPackage();
-    }
-
-    public String getS2jdbcExtendedEntityPackage() {
-        return getProperties().getS2jdbcProperties().getExtendedEntityPackage();
-    }
-
-    public String getS2jdbcBaseEntityPrefix() {
-        return getProperties().getS2jdbcProperties().getBaseEntityPrefix();
-    }
-
-    public boolean isSuppressPublicField() {
-        return getProperties().getS2jdbcProperties().isSuppressPublicField();
     }
 
     // ===================================================================================

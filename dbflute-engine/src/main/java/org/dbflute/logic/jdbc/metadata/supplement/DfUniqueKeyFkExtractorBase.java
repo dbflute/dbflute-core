@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
@@ -45,7 +43,7 @@ public abstract class DfUniqueKeyFkExtractorBase extends DfAbstractMetaDataExtra
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DataSource _dataSource;
+    protected Connection _conn;
     protected UnifiedSchema _unifiedSchema;
 
     // ===================================================================================
@@ -53,10 +51,8 @@ public abstract class DfUniqueKeyFkExtractorBase extends DfAbstractMetaDataExtra
     //                                                                                ====
     public Map<String, Map<String, List<UserUniqueFkColumn>>> extractUniqueKeyFkMap() {
         final Map<String, Map<String, List<UserUniqueFkColumn>>> resultMap = StringKeyMap.createAsFlexible();
-        Connection conn = null;
         try {
-            conn = _dataSource.getConnection();
-            final List<UserUniqueFkColumn> userTabCommentsList = selectUserUniqueFkList(conn);
+            final List<UserUniqueFkColumn> userTabCommentsList = selectUserUniqueFkList(_conn);
             for (UserUniqueFkColumn userUniqueFk : userTabCommentsList) {
                 final String foreignKeyName = userUniqueFk.getForeignKeyName();
                 final String localTableName = userUniqueFk.getLocalTableName();
@@ -74,17 +70,9 @@ public abstract class DfUniqueKeyFkExtractorBase extends DfAbstractMetaDataExtra
                 columnList.add(userUniqueFk);
             }
             return resultMap;
-        } catch (SQLException e) {
+        } catch (RuntimeException e) {
             String msg = "Failed to extract unique-key FK: unifiedSchema=" + _unifiedSchema;
             throw new IllegalStateException(msg, e);
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                    _log.info("conn.close() threw the exception!", ignored);
-                }
-            }
         }
     }
 
@@ -137,8 +125,8 @@ public abstract class DfUniqueKeyFkExtractorBase extends DfAbstractMetaDataExtra
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setDataSource(DataSource dataSource) {
-        _dataSource = dataSource;
+    public void setConnection(Connection conn) {
+        _conn = conn;
     }
 
     public UnifiedSchema getUnifiedSchema() {
@@ -146,6 +134,6 @@ public abstract class DfUniqueKeyFkExtractorBase extends DfAbstractMetaDataExtra
     }
 
     public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
-        this._unifiedSchema = unifiedSchema;
+        _unifiedSchema = unifiedSchema;
     }
 }

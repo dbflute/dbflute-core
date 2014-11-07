@@ -34,6 +34,7 @@ import org.dbflute.s2dao.valuetype.basic.DoubleType;
 import org.dbflute.s2dao.valuetype.basic.FloatType;
 import org.dbflute.s2dao.valuetype.basic.IntegerType;
 import org.dbflute.s2dao.valuetype.basic.LocalDateAsSqlDateType;
+import org.dbflute.s2dao.valuetype.basic.LocalDateAsTimestampType;
 import org.dbflute.s2dao.valuetype.basic.LocalDateTimeAsTimestampType;
 import org.dbflute.s2dao.valuetype.basic.LocalTimeAsTimeType;
 import org.dbflute.s2dao.valuetype.basic.LongType;
@@ -78,6 +79,7 @@ public class TnValueTypes {
     public static final ValueType TIME = new TimeType();
     public static final ValueType SQLDATE = new SqlDateType();
     public static final ValueType LOCALDATE_AS_SQLDATE = new LocalDateAsSqlDateType();
+    public static final ValueType LOCALDATE_AS_TIMESTAMP = new LocalDateAsTimestampType();
     public static final ValueType LOCALDATETIME_AS_TIMESTAMP = new LocalDateTimeAsTimestampType();
     public static final ValueType LOCALTIME_AS_TIME = new LocalTimeAsTimeType();
     public static final ValueType UTILDATE_AS_SQLDATE = new UtilDateAsSqlDateType();
@@ -128,6 +130,8 @@ public class TnValueTypes {
         {
             final TnPlainValueTypes valueTypes = createValueTypes();
             valueTypes.registerBasicValueType(java.util.Date.class, UTILDATE_AS_TIMESTAMP);
+            valueTypes.registerBasicValueType(java.time.LocalDate.class, LOCALDATE_AS_TIMESTAMP);
+            valueTypes.registerBasicValueType(java.time.LocalDateTime.class, LOCALDATETIME_AS_TIMESTAMP);
             _valueTypesMap.put(DBDef.Oracle, valueTypes);
         }
         _valueTypesMap.put(DBDef.DB2, createValueTypes());

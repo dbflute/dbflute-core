@@ -23,6 +23,7 @@ import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpColumnSpHandler;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.coption.StatementConfigCall;
 import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.ordering.OrderByBean;
 import org.dbflute.cbean.paging.PagingBean;
@@ -58,7 +59,7 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public void configure(StatementConfig statementConfig) {
+    public void configure(StatementConfigCall<StatementConfig> confCall) {
     }
 
     public SqlClause getSqlClause() {

@@ -15,7 +15,7 @@
  */
 package org.dbflute.logic.jdbc.metadata.supplement.factory;
 
-import javax.sql.DataSource;
+import java.sql.Connection;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.logic.jdbc.metadata.supplement.DfUniqueKeyFkExtractor;
@@ -31,7 +31,7 @@ public class DfUniqueKeyFkExtractorFactory {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DataSource _dataSource;
+    protected final Connection _conn;
     protected final UnifiedSchema _unifiedSchema;
     protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
 
@@ -39,12 +39,12 @@ public class DfUniqueKeyFkExtractorFactory {
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * @param dataSource The data source. (NotNull)
+     * @param conn The connection to extract. (NotNull)
      * @param unifiedSchema The unified schema to extract. (NullAllowed)
      * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      */
-    public DfUniqueKeyFkExtractorFactory(DataSource dataSource, UnifiedSchema unifiedSchema, DfDatabaseTypeFacadeProp databaseTypeFacadeProp) {
-        _dataSource = dataSource;
+    public DfUniqueKeyFkExtractorFactory(Connection conn, UnifiedSchema unifiedSchema, DfDatabaseTypeFacadeProp databaseTypeFacadeProp) {
+        _conn = conn;
         _unifiedSchema = unifiedSchema;
         _databaseTypeFacadeProp = databaseTypeFacadeProp;
     }
@@ -59,7 +59,7 @@ public class DfUniqueKeyFkExtractorFactory {
         if (_databaseTypeFacadeProp.isDatabaseOracle()) {
             // Oracle JDBC driver does not return unique-key FK so it needs to select data dictionary
             final DfUniqueKeyFkExtractorOracle extractor = new DfUniqueKeyFkExtractorOracle();
-            extractor.setDataSource(_dataSource);
+            extractor.setConnection(_conn);
             extractor.setUnifiedSchema(_unifiedSchema);
             return extractor;
         }

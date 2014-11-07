@@ -21,6 +21,7 @@ import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpColumnSpHandler;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.coption.StatementConfigCall;
 import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.dream.WelcomeToDreamCruise;
 import org.dbflute.cbean.paging.PagingBean;
@@ -368,10 +369,13 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     //                                                                     StatementConfig
     //                                                                     ===============
     /**
-     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
-     * @param statementConfig The configuration of statement. (NullAllowed)
+     * Configure statement JDBC options. e.g. queryTimeout, fetchSize, ... (only one-time call)
+     * <pre>
+     * cb.<span style="color: #CC4747">configure</span>(<span style="color: #553000">conf</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">conf</span>.<span style="color: #994747">queryTimeout</span>(<span style="color: #2A00FF">3</span>));
+     * </pre>
+     * @param confLambda The callback for configuration of statement. (NotNull)
      */
-    void configure(StatementConfig statementConfig);
+    void configure(StatementConfigCall<StatementConfig> confLambda);
 
     /**
      * Get the configuration of statement that is set through configure().

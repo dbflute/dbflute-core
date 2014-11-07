@@ -58,7 +58,7 @@
     cb.${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for SpecifyColumn" enabled="true" name="colCBLambda">colCB -&gt; {
     colCB.specify().column${newName}
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for DerivedReferrer" enabled="true" name="derivedCBLambda">${var}CB -&gt; {
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Configuration" enabled="true" name="confLambda">conf -&gt; conf.${newName}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for DerivedReferrer" enabled="true" name="derivedCBLambda">${var}CB -&gt; {
     ${var}CB.specify().column${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Entity" enabled="true" name="entityLambda">${var} -&gt; {
     ${var}.${newName}
@@ -85,7 +85,7 @@
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Referrer" enabled="true" name="refCBLambda">${var}CB -&gt; {
     ${var}CB.query().addOrderBy_${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ScalarCondition" enabled="true" name="scalarCBLambda">${var}CB -&gt; {
-    ${var}CB.specify().column{newName}
+    ${var}CB.specify().column${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for SubQuery" enabled="true" name="subCBLambda">${var}CB -&gt; {
     ${var}CB.query().set${newName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Union" enabled="true" name="unionCBLambda">unionCB -&gt; {

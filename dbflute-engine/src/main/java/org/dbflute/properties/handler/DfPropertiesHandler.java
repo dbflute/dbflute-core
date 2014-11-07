@@ -40,7 +40,6 @@ import org.dbflute.properties.DfOptimisticLockProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfRefreshProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
-import org.dbflute.properties.DfS2jdbcProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
 import org.dbflute.properties.DfSqlLogRegistryProperties;
@@ -351,18 +350,6 @@ public final class DfPropertiesHandler {
             _replaceSchemaPropertiess = new DfReplaceSchemaProperties(prop);
         }
         return _replaceSchemaPropertiess;
-    }
-
-    // -----------------------------------------------------
-    //                                         S2JDBC Entity
-    //                                         -------------
-    protected DfS2jdbcProperties _s2jdbcProperties;
-
-    public DfS2jdbcProperties getS2JdbcProperties(Properties prop) {
-        if (_s2jdbcProperties == null) {
-            _s2jdbcProperties = new DfS2jdbcProperties(prop);
-        }
-        return _s2jdbcProperties;
     }
 
     // -----------------------------------------------------

@@ -194,7 +194,12 @@ public class DfLanguageGrammarJava implements DfLanguageGrammar {
     }
 
     public String escapeJavaDocString(String comment) {
+        final String amptmpvar = "$$df:amptmpvar$$";
+        final String escapedAmp = "&amp;";
         String work = comment;
+        work = Srl.replace(work, escapedAmp, amptmpvar);
+        work = Srl.replace(work, "&", escapedAmp); // should be before other escapes
+        work = Srl.replace(work, amptmpvar, escapedAmp);
         work = Srl.replace(work, "<", "&lt;");
         work = Srl.replace(work, ">", "&gt;");
         work = Srl.replace(work, "*/", "&#42;/"); // avoid JavaDoc breaker

@@ -48,9 +48,6 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     /** The current database definition. (NotNull) */
     protected final DBDef _currentDBDef;
 
-    /** The default configuration of statement. (NullAllowed) */
-    protected final StatementConfig _defaultStatementConfig;
-
     /** The option of outside-SQL. (NotNull) */
     protected final OutsideSqlOption _outsideSqlOption;
 
@@ -61,11 +58,10 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     //                                                                         Constructor
     //                                                                         ===========
     public OutsideSqlEntityExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName, DBDef currentDBDef,
-            StatementConfig defaultStatementConfig, OutsideSqlOption outsideSqlOption, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
+            OutsideSqlOption outsideSqlOption, OutsideSqlExecutorFactory outsideSqlExecutorFactory) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
         _tableDbName = tableDbName;
         _currentDBDef = currentDBDef;
-        _defaultStatementConfig = defaultStatementConfig;
         _outsideSqlOption = outsideSqlOption;
         _outsideSqlExecutorFactory = outsideSqlExecutorFactory;
     }
@@ -194,8 +190,7 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
     }
 
     protected OutsideSqlBasicExecutor<BEHAVIOR> createBasicExecutor() {
-        return _outsideSqlExecutorFactory.createBasic(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _defaultStatementConfig,
-                _outsideSqlOption);
+        return _outsideSqlExecutorFactory.createBasic(_behaviorCommandInvoker, _tableDbName, _currentDBDef, _outsideSqlOption);
     }
 
     // ===================================================================================

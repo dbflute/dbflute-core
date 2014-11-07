@@ -51,7 +51,17 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
     protected Integer selectNextVal(Statement st, String sequenceName) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = st.executeQuery("select " + sequenceName + ".nextval from dual");
+            // rear line separator is bad fix by jflute (2014/11/02)
+            //  select SYNONYM_NEXT_SEQUENCE.nextval from dual => ORA-00942
+            //  select SYNONYM_NEXT_SEQUENCE.nextval from dual\n => OK
+            // direct executing also has same result, don't know why
+            // so add separator to rear (basically no problem for other executions)
+            //final String sql = "select " + sequenceName + ".nextval from dual\n";
+            // ...
+            // after that, resolved by Oracle reboot
+            // (might be XE restriction error...!? has the error before those operations)
+            final String sql = "select " + sequenceName + ".nextval from dual";
+            rs = st.executeQuery(sql);
             rs.next();
             return rs.getInt(1);
         } finally {

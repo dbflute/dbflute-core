@@ -86,9 +86,10 @@ public interface InvokerAssistant {
     SqlAnalyzerFactory assistSqlAnalyzerFactory();
 
     /**
+     * @param tableDbName The DB name of table to be related to. (NotNull)
      * @return The first option of outside-SQL. (NullAllowed: if null, lazy-loaded)
      */
-    OutsideSqlOption assistFirstOutsideSqlOption();
+    OutsideSqlOption assistFirstOutsideSqlOption(String tableDbName);
 
     /**
      * Assist the factory of outside-SQL executor.

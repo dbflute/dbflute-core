@@ -52,6 +52,9 @@ public class MockEntity implements Entity {
         return Collections.emptySet();
     }
 
+    public void mymodifyProperty(String propertyName) {
+    }
+
     public void clearModifiedInfo() {
     }
 
@@ -64,6 +67,9 @@ public class MockEntity implements Entity {
 
     public Set<String> myspecifiedProperties() {
         return null;
+    }
+
+    public void myspecifyProperty(String propertyName) {
     }
 
     public void clearSpecifiedInfo() {

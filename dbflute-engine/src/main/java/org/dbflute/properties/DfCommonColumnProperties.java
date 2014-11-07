@@ -334,7 +334,6 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
                 value = DfStringUtil.replace(value, allcommonExp, baseCommonPackage);
             }
             value = doFilterJava8TimeLocalDate(accessDateExp, accessTimestampExp, value);
-            value = doFilterJodaTimeLocalDate(accessDateExp, accessTimestampExp, value);
             if (value != null && value.contains(accessContextExp)) {
                 final String accessContext = getAccessContextFqcn();
                 value = DfStringUtil.replace(value, accessContextExp, accessContext);
@@ -363,18 +362,6 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         //        value = DfTypeUtil.class.getName() + ".toLocalDateTime(" + value + ")";
         //    }
         //}
-        return value;
-    }
-
-    protected String doFilterJodaTimeLocalDate(String accessDateExp, String accessTimestampExp, String value) {
-        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
-        if (value != null && littleProp.isAvailableJodaTimeLocalDateEntity()) {
-            if (value.equals(accessDateExp)) {
-                value = "org.joda.time.LocalDate.fromDateFields(" + value + ")";
-            } else if (value.equals(accessTimestampExp)) {
-                value = "org.joda.time.LocalDateTime.fromDateFields(" + value + ")";
-            }
-        }
         return value;
     }
 

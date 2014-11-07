@@ -1587,7 +1587,7 @@ public class Column {
 
     public String getFromToJavaNativeDate() { // in condition-bean
         final String definedDate;
-        if (getLittleAdjustmentProperties().isAvailableNextTimeEntity()) {
+        if (getLittleAdjustmentProperties().isAvailableJava8TimeEntity()) {
             definedDate = getJavaNative();
         } else { // normally here
             definedDate = "Date"; // java.util.Date, package already imported
@@ -1786,7 +1786,7 @@ public class Column {
     //                                    ValueType Handling
     //                                    ------------------
     public boolean needsMappingValueType() {
-        return needsStringClobHandling() || needsBytesOidHandling();
+        return needsStringClobHandling() || needsBytesOidHandling() || needsOracleDateHandling();
     }
 
     public boolean needsStringClobHandling() {
@@ -1795,6 +1795,15 @@ public class Column {
 
     public boolean needsBytesOidHandling() {
         return isDbTypeBytesOid();
+    }
+
+    public boolean needsOracleDateHandling() {
+        // also see DBFluteConfig.vm
+        final boolean oracle = getBasicProperties().isDatabaseOracle();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final boolean java8LocalDate = prop.isAvailableJava8TimeLocalDateEntity();
+        final boolean nativeJDBC = prop.isAvailableDatabaseNativeJDBC();
+        return oracle && nativeJDBC && java8LocalDate && isDbTypeOracleDate();
     }
 
     // -----------------------------------------------------

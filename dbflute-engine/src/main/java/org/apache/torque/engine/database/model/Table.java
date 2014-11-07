@@ -802,6 +802,15 @@ public class Table {
         return false;
     }
 
+    public boolean hasListColumn() { // e.g. Oracle's array type of structure
+        for (Column column : _columnList) {
+            if (column.isJavaNativeUtilList()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ===================================================================================
     //                                                                         Primary Key
     //                                                                         ===========
@@ -3587,6 +3596,11 @@ public class Table {
     public boolean isCompatibleOutsideSqlFacadeChainOldStyle() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.isCompatibleOutsideSqlFacadeChainOldStyle();
+    }
+
+    public boolean isCompatibleSelectScalarOldName() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCompatibleSelectScalarOldName();
     }
 
     // -----------------------------------------------------

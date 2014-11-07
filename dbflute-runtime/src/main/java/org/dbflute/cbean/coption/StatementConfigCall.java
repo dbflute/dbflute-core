@@ -13,20 +13,21 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.s2dao.valuetype.basic;
+package org.dbflute.cbean.coption;
 
-import java.time.LocalDateTime;
-
-import org.dbflute.util.DfTypeUtil;
+import org.dbflute.jdbc.StatementConfig;
 
 /**
+ * The callback interface of statement configuration.
+ * @param <CONF> The type of statement configuration to be set up.
  * @author jflute
- * @since 1.1.0 (2014/09/29 Monday)
+ * @since 1.1.0 (2014/11/05 Wednesday)
  */
-public class LocalDateTimeAsTimestampType extends LocalDateAsTimestampType {
+@FunctionalInterface
+public interface StatementConfigCall<CONF extends StatementConfig> {
 
-    @Override
-    protected LocalDateTime toLocalDate(Object date) {
-        return DfTypeUtil.toLocalDateTime(date, getTimeZone());
-    }
+    /**
+     * @param conf The configuration of JDBC statement to be set up. (NotNull)
+     */
+    void callback(CONF conf);
 }

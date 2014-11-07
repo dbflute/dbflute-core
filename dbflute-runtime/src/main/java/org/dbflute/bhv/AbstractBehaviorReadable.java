@@ -542,6 +542,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                         Main Entrance
     //                                         -------------
+    // internal name is ScalarSelect
     protected <RESULT> HpSLSFunction<CB, RESULT> facadeScalarSelect(Class<RESULT> resultType) {
         return doScalarSelect(resultType, newConditionBean());
     }

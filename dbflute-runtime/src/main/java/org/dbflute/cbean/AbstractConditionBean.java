@@ -42,6 +42,7 @@ import org.dbflute.cbean.coption.DerivedReferrerOption;
 import org.dbflute.cbean.coption.DerivedReferrerOptionFactory;
 import org.dbflute.cbean.coption.SVOptionCall;
 import org.dbflute.cbean.coption.ScalarSelectOption;
+import org.dbflute.cbean.coption.StatementConfigCall;
 import org.dbflute.cbean.dream.ColumnCalculator;
 import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
@@ -517,6 +518,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
         if (dreamCruiseTicket == null) {
             String msg = "The argument 'dreamCruiseColumn' should not be null.";
             throw new IllegalArgumentException(msg);
+        }
+        if (_dreamCruiseTicket != null) {
+            String msg = "The other dream cruise ticket already exists: " + _dreamCruiseTicket;
+            throw new IllegalConditionBeanOperationException(msg);
         }
         if (!dreamCruiseTicket.isDreamCruiseTicket()) {
             String msg = "The specified column was not dream cruise ticket: " + dreamCruiseTicket;
@@ -1341,9 +1346,30 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void configure(StatementConfig statementConfig) {
+    public void configure(StatementConfigCall<StatementConfig> confLambda) {
         assertOptionThatBadTiming("configure()");
-        _statementConfig = statementConfig;
+        assertStatementConfigNotDuplicated(confLambda);
+        _statementConfig = createStatementConfig(confLambda);
+    }
+
+    protected void assertStatementConfigNotDuplicated(StatementConfigCall<StatementConfig> configCall) {
+        if (_statementConfig != null) {
+            String msg = "Already registered the configuration: existing=" + _statementConfig + ", new=" + configCall;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+    }
+
+    protected StatementConfig createStatementConfig(StatementConfigCall<StatementConfig> configCall) {
+        if (configCall == null) {
+            throw new IllegalArgumentException("The argument 'confLambda' should not be null.");
+        }
+        final StatementConfig config = newStatementConfig();
+        configCall.callback(config);
+        return config;
+    }
+
+    protected StatementConfig newStatementConfig() {
+        return new StatementConfig();
     }
 
     /**

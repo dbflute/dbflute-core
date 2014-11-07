@@ -279,7 +279,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         msg = msg + ln();
         msg = msg + "[Table Data Max]" + ln() + actualValue + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new IllegalStateException(msg);
+        throw new IllegalStateException(msg, e);
     }
 
     // ===================================================================================

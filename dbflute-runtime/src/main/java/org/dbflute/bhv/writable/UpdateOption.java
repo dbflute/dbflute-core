@@ -23,6 +23,7 @@ import java.util.Set;
 import org.dbflute.Entity;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpCalcSpecification;
+import org.dbflute.cbean.coption.StatementConfigCall;
 import org.dbflute.cbean.dream.ColumnCalculator;
 import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.scoping.SpecifyQuery;
@@ -672,11 +673,35 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     //                                                                           Configure
     //                                                                           =========
     /**
-     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
-     * @param updateStatementConfig The configuration of statement for update. (NullAllowed)
+     * Configure statement JDBC options. e.g. queryTimeout, fetchSize, ... (only one-time call)
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.varyingUpdate(member, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">configure</span>(<span style="color: #553000">conf</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">conf</span>.<span style="color: #994747">queryTimeout</span>(<span style="color: #2A00FF">3</span>)));
+     * </pre>
+     * @param confLambda The callback for configuration of statement for update. (NotNull)
      */
-    public void configure(StatementConfig updateStatementConfig) {
-        _updateStatementConfig = updateStatementConfig;
+    public void configure(StatementConfigCall<StatementConfig> confLambda) {
+        assertStatementConfigNotDuplicated(confLambda);
+        _updateStatementConfig = createStatementConfig(confLambda);
+    }
+
+    protected void assertStatementConfigNotDuplicated(StatementConfigCall<StatementConfig> configCall) {
+        if (_updateStatementConfig != null) {
+            String msg = "Already registered the configuration: existing=" + _updateStatementConfig + ", new=" + configCall;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+    }
+
+    protected StatementConfig createStatementConfig(StatementConfigCall<StatementConfig> configCall) {
+        if (configCall == null) {
+            throw new IllegalArgumentException("The argument 'confLambda' should not be null.");
+        }
+        final StatementConfig config = newStatementConfig();
+        configCall.callback(config);
+        return config;
+    }
+
+    protected StatementConfig newStatementConfig() {
+        return new StatementConfig();
     }
 
     public StatementConfig getUpdateStatementConfig() {

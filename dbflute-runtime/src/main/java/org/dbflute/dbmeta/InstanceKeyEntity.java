@@ -80,6 +80,10 @@ public class InstanceKeyEntity implements Entity {
         return _actualEntity.mymodifiedProperties();
     }
 
+    public void mymodifyProperty(String propertyName) {
+        _actualEntity.mymodifyProperty(propertyName);
+    }
+
     public void clearModifiedInfo() {
         _actualEntity.clearModifiedInfo();
     }
@@ -94,6 +98,10 @@ public class InstanceKeyEntity implements Entity {
 
     public Set<String> myspecifiedProperties() {
         return _actualEntity.myspecifiedProperties();
+    }
+
+    public void myspecifyProperty(String propertyName) {
+        _actualEntity.myspecifyProperty(propertyName);
     }
 
     @Override

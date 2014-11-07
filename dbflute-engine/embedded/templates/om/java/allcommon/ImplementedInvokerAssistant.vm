@@ -279,13 +279,15 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     //                               First OutsideSql Option
     //                               -----------------------
     /** {@inheritDoc} */
-    public OutsideSqlOption assistFirstOutsideSqlOption() {
-        return prepareFirstOutsideSqlOption();
+    public OutsideSqlOption assistFirstOutsideSqlOption(String tableDbName) {
+        return prepareFirstOutsideSqlOption(tableDbName);
     }
 
-    protected OutsideSqlOption prepareFirstOutsideSqlOption() {
+    protected OutsideSqlOption prepareFirstOutsideSqlOption(String tableDbName) {
 #if ($database.isNonSpecifiedColumnAccessAllowed())
-        return new OutsideSqlOption().enableNonSpecifiedColumnAccess();
+        OutsideSqlOption option = new OutsideSqlOption();
+        option.setTableDbName(tableDbName);
+        return option.enableNonSpecifiedColumnAccess();
 #else
         return null; // no instance (lazy-loaded) as default
 #end
