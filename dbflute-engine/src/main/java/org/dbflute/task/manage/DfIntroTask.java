@@ -17,7 +17,7 @@ package org.dbflute.task.manage;
 
 import java.io.File;
 
-import org.dbflute.infra.dfprop.DfPropPublicMap;
+import org.dbflute.infra.dfprop.DfPublicProperties;
 import org.dbflute.properties.DfInfraProperties;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
@@ -89,7 +89,7 @@ public class DfIntroTask extends DfAbstractTask {
         if (specified != null) {
             return specified;
         }
-        final DfPropPublicMap dfprop = preparePublicMap();
+        final DfPublicProperties dfprop = preparePublicProperties();
         final String downloadUrl = dfprop.getIntroDownloadUrl();
         if (downloadUrl == null) {
             String msg = "Not found the download URL for DBFlute Intro in publicMap.";

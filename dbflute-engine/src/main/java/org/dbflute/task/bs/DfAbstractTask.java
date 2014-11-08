@@ -26,7 +26,7 @@ import org.dbflute.helper.filesystem.FileURL;
 import org.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
-import org.dbflute.infra.dfprop.DfPropPublicMap;
+import org.dbflute.infra.dfprop.DfPublicProperties;
 import org.dbflute.logic.DfDBFluteTaskUtil;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.dbflute.properties.DfBasicProperties;
@@ -275,12 +275,21 @@ public abstract class DfAbstractTask extends Task {
         return Srl.substringLastFront(filtered, "/"); // e.g. ../mydbflute
     }
 
-    protected DfPropPublicMap preparePublicMap() {
-        final DfInfraProperties prop = getInfraProperties();
-        final String publicMapUrl = prop.getPublicMapUrl();
-        final DfPropPublicMap dfprop = new DfPropPublicMap().specifyUrl(publicMapUrl);
-        dfprop.loadMap();
+    protected DfPublicProperties preparePublicProperties() {
+        final DfPublicProperties dfprop = createPublicProperties();
+        _log.info("...Loading " + DfPublicProperties.PUBLIC_PROP_URL);
+        dfprop.load();
         return dfprop;
+    }
+
+    protected DfPublicProperties createPublicProperties() {
+        final DfInfraProperties prop = getInfraProperties();
+        final String publicPropUrl = prop.getPublicPropUrl();
+        return newPublicProperties().specifyUrl(publicPropUrl);
+    }
+
+    protected DfPublicProperties newPublicProperties() {
+        return new DfPublicProperties();
     }
 
     protected void download(String downloadUrl, String locationPath) {

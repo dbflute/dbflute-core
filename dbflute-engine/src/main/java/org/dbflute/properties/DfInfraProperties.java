@@ -18,6 +18,7 @@ package org.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
+import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
 /**
@@ -55,10 +56,10 @@ public final class DfInfraProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                     Detail Property
-    //                                                                     ===============
-    public String getPublicMapUrl() {
-        final String prop = getInfraProperty("publicMapUrl");
+    //                                                                Version and Download
+    //                                                                ====================
+    public String getPublicPropUrl() {
+        final String prop = getInfraProperty("publicPropUrl");
         return Srl.is_NotNull_and_NotTrimmedEmpty(prop) ? prop : null;
     }
 
@@ -79,5 +80,18 @@ public final class DfInfraProperties extends DfAbstractHelperProperties {
 
     protected String getInfraProperty(String key) {
         return (String) getInfraDefinitionMap().get(key);
+    }
+
+    // ===================================================================================
+    //                                                                             Upgrade
+    //                                                                             =======
+    public long getDBFluteUpgradeMessageWaitMillis() {
+        return getDBFluteUpgradeMessageWait() * 1000L;
+    }
+
+    protected int getDBFluteUpgradeMessageWait() {
+        final String prop = getInfraProperty("dbfluteUpgradeMessageWait"); // seconds
+        final int defaultValue = 3;
+        return Srl.is_NotNull_and_NotTrimmedEmpty(prop) ? DfTypeUtil.toInteger(prop) : defaultValue;
     }
 }
