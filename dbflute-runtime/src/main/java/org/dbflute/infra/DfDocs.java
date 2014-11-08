@@ -19,9 +19,10 @@ package org.dbflute.infra;
  * The interface only for document.
  * <pre>
  * [HashTag in SourceCode]
- * #extPoint : extension point for users
- * #forNow   : pending deep implementation
- * #hope     : expects future implementation
+ * #extPoint   : extension point for users
+ * #forNow     : pending deep implementation
+ * #hope       : expects future implementation
+ * #dateParade : handling point of (many) date types e.g. LocalDate
  * </pre>
  * @author jflute
  * @since 1.1.0 (2014/10/18 Saturday)
