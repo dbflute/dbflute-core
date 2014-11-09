@@ -18,11 +18,14 @@ package org.dbflute.infra;
 /**
  * The interface only for document.
  * <pre>
+ * TODO jflute impl: hash-tag management
  * [HashTag in SourceCode]
- * #extPoint   : extension point for users
- * #forNow     : pending deep implementation
- * #hope       : expects future implementation
- * #dateParade : handling point of (many) date types e.g. LocalDate
+ * hope     : expects future implementation
+ * forNow   : pending deep implementation
+ * needsFix : needs fix, refactoring or formal implementation
+ * 
+ * extPoint   : extension point for users
+ * dateParade : handling point of (many) date types e.g. LocalDate
  * </pre>
  * @author jflute
  * @since 1.1.0 (2014/10/18 Saturday)
