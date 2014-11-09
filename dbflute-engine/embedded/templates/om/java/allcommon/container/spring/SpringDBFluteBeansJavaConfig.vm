@@ -40,8 +40,10 @@ public class ${glDBFluteBeansJavaConfig} {
     // *according to dependency order
     // and all injections use 'Resource' annotation to keep the order
     // probably 'Resource' is processed before 'Autowired'
+    // besides, 'Resource' finds by name (specified or field name) first
+    // but secondly finds by type (only once so not case with small performance)
     @Resource
-    protected ApplicationContext _container;
+    protected ApplicationContext _xcontainer;
 
     // injections are on name basic here for multiple DB
     @Resource(name="${database.DBFluteBeansDataSourceName}")
@@ -92,7 +94,7 @@ public class ${glDBFluteBeansJavaConfig} {
     @Bean(name="${database.behaviorSelectorComponentName}")
     public ${glImplementedBehaviorSelector} createImplementedBehaviorSelector() {
         ${glImplementedBehaviorSelector} selector = newImplementedBehaviorSelector();
-        selector.setContainer(_container);
+        selector.setContainer(_xcontainer);
         return selector;
     }
 
