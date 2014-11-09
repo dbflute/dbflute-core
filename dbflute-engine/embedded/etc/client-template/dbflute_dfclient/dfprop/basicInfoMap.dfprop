@@ -54,7 +54,7 @@ map:{
     #  If your target language is 'csharp', you can specify 'seasar' only.
     #  Your possible choices are:
     #
-    #       seasar, spring, guice, cdi
+    #       spring, guice, seasar, cdi
     #
     ; targetContainer = @targetContainer@
     # - - - - - - - - - -/
@@ -68,13 +68,13 @@ map:{
     #  If this property is specified and detail package properties is not specified, 
     #  Then the packages of generated class are as follows:
     #
-    #  e.g. packageBase = com.example.dbflute.basic.dbflute
-    #      --> com.example.dbflute.basic.dbflute.allcommon
-    #      --> com.example.dbflute.basic.dbflute.bsbhv
-    #      --> com.example.dbflute.basic.dbflute.bsentity
-    #      --> com.example.dbflute.basic.dbflute.cbean
-    #      --> com.example.dbflute.basic.dbflute.exbhv
-    #      --> com.example.dbflute.basic.dbflute.exentity
+    #  e.g. packageBase = org.docksidestage.dbflute
+    #      --> org.docksidestage.dbflute.allcommon
+    #      --> org.docksidestage.dbflute.bsbhv
+    #      --> org.docksidestage.dbflute.bsentity
+    #      --> org.docksidestage.dbflute.cbean
+    #      --> org.docksidestage.dbflute.exbhv
+    #      --> org.docksidestage.dbflute.exentity
     #
     ; packageBase = @packageBase@
     # - - - - - - - - - -/
