@@ -33,6 +33,7 @@ import org.dbflute.util.Srl;
  * </pre>
  * @author jflute
  * @since 1.0.5K (2014/08/15 Friday)
+ * @deprecated use public.properties
  */
 public class DfPropPublicMap {
 

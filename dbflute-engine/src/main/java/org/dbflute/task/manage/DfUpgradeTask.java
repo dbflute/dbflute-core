@@ -21,7 +21,7 @@ import java.io.FileFilter;
 import org.dbflute.helper.filesystem.FileTextIO;
 import org.dbflute.helper.filesystem.FileTextLineFilter;
 import org.dbflute.helper.io.compress.DfZipArchiver;
-import org.dbflute.infra.dfprop.DfPropPublicMap;
+import org.dbflute.infra.dfprop.DfPublicProperties;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTask;
@@ -74,11 +74,11 @@ public class DfUpgradeTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        final DfPropPublicMap dfprop = preparePublicMap();
+        final DfPublicProperties dfprop = preparePublicProperties();
         final String upgradeVersion = findUpgradeVersion(dfprop);
         final String archivePath = findArchivePath(dfprop);
-        downloadModule(dfprop, upgradeVersion, archivePath);
-        extractModule(upgradeVersion, archivePath);
+        downloadEngine(dfprop, upgradeVersion, archivePath);
+        extractEngine(upgradeVersion, archivePath);
         deleteDownloadedArchive(archivePath);
         replaceDBFluteClientReference(upgradeVersion);
         refreshResources();
@@ -88,7 +88,7 @@ public class DfUpgradeTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                        Archive Path
     //                                                                        ============
-    protected String findArchivePath(DfPropPublicMap dfprop) {
+    protected String findArchivePath(DfPublicProperties dfprop) {
         final String mydbfluteDir = getMyDBFluteDir();
         if (mydbfluteDir == null) { // basically no way (just in case)
             String msg = "Not found the mydbflute directory: DBFLUTE_HOME=" + getDBFluteHome();
@@ -99,17 +99,17 @@ public class DfUpgradeTask extends DfAbstractTask {
     }
 
     // ===================================================================================
-    //                                                                     Download Module
+    //                                                                     Download Engine
     //                                                                     ===============
-    protected void downloadModule(DfPropPublicMap dfprop, String upgradeVersion, String archivePath) {
+    protected void downloadEngine(DfPublicProperties dfprop, String upgradeVersion, String archivePath) {
         final String downloadUrl = findDownloadUrl(dfprop, upgradeVersion);
         checkAlreadyExists(archivePath);
-        _log.info("...Downloading DBFlute Module to " + archivePath);
+        _log.info("...Downloading DBFlute Engine to " + archivePath);
         _log.info("    from " + downloadUrl);
         download(downloadUrl, archivePath);
     }
 
-    protected String findDownloadUrl(DfPropPublicMap dfprop, String upgradeVersion) {
+    protected String findDownloadUrl(DfPublicProperties dfprop, String upgradeVersion) {
         return dfprop.getDBFluteDownloadUrl(upgradeVersion);
     }
 
@@ -120,11 +120,11 @@ public class DfUpgradeTask extends DfAbstractTask {
         }
     }
 
-    protected String findUpgradeVersion(DfPropPublicMap dfprop) {
+    protected String findUpgradeVersion(DfPublicProperties dfprop) {
         if (isVersionSpecified()) {
             return _version;
         }
-        final String latestVersion = dfprop.getDBFluteLatestVersion();
+        final String latestVersion = dfprop.getDBFluteLatestReleaseVersion();
         if (latestVersion == null) {
             String msg = "Not found the latest version for DBFlute in publicMap.";
             throw new IllegalStateException(msg);
@@ -137,9 +137,9 @@ public class DfUpgradeTask extends DfAbstractTask {
     }
 
     // ===================================================================================
-    //                                                                      Extract Module
+    //                                                                      Extract Engine
     //                                                                      ==============
-    protected void extractModule(String upgradeVersion, String archivePath) {
+    protected void extractEngine(String upgradeVersion, String archivePath) {
         final DfZipArchiver archiver = new DfZipArchiver(new File(archivePath));
         final String baseDir = getMyDBFluteDir() + "/dbflute-" + upgradeVersion;
         _log.info("...Extracting zip archive to " + baseDir);
@@ -202,7 +202,8 @@ public class DfUpgradeTask extends DfAbstractTask {
 
     protected void waitAfterFinalMessage() {
         try {
-            Thread.sleep(3000L); // to get runtime version notification looked at
+            final long waitMillis = getInfraProperties().getDBFluteUpgradeMessageWaitMillis();
+            Thread.sleep(waitMillis); // to get runtime version notification looked at
         } catch (InterruptedException ignored) {}
     }
 

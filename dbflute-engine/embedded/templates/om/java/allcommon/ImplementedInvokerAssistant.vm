@@ -433,7 +433,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     protected ResourceParameter createResourceParameter() {
         ResourceParameter parameter = newResourceParameter();
         parameter.setOutsideSqlPackage(${glDBFluteConfig}.getInstance().getOutsideSqlPackage());
-        parameter.setMappingDateTimeZoneProvider(DBFluteConfig.getInstance().getMappingDateTimeZoneProvider());
+        parameter.setMappingDateTimeZoneProvider(${glDBFluteConfig}.getInstance().getMappingDateTimeZoneProvider());
         parameter.setLogDatePattern(${glDBFluteConfig}.getInstance().getLogDatePattern());
         parameter.setLogTimestampPattern(${glDBFluteConfig}.getInstance().getLogTimestampPattern());
         parameter.setLogTimePattern(${glDBFluteConfig}.getInstance().getLogTimePattern());

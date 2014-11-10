@@ -93,4 +93,12 @@ public class HandlingDataSourceWrapper implements DataSource {
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         return null;
     }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return super.toString() + ":{" + _dataSource + "}";
+    }
 }

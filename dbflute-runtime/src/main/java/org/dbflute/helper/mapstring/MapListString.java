@@ -812,7 +812,12 @@ public class MapListString {
     // ===================================================================================
     //                                                                              Escape
     //                                                                              ======
-    protected String escapeControlMark(Object value) {
+    /**
+     * Escape control marks as plain string in the value.
+     * @param value The value, might contain control marks. (NullAllowed: if null, return null)
+     * @return The escaped string of the value. (NullAllowed: when the value is null)
+     */
+    public String escapeControlMark(Object value) { // public for tools
         if (value == null) {
             return null;
         }
@@ -827,7 +832,12 @@ public class MapListString {
         return filtered;
     }
 
-    protected String unescapeControlMark(String value) {
+    /**
+     * Un-escape control marks as plain string in the value.
+     * @param value The value, might contain escaped control marks. (NullAllowed: if null, return null)
+     * @return The un-escaped string of the value. (NullAllowed: when the value is null)
+     */
+    public String unescapeControlMark(String value) { // public for tools
         if (value == null) {
             return null;
         }

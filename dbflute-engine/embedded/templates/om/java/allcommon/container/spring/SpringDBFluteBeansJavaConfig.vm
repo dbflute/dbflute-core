@@ -18,7 +18,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
@@ -39,22 +38,27 @@ public class ${glDBFluteBeansJavaConfig} {
     //                                                                           Attribute
     //                                                                           =========
     // *according to dependency order
-    @Autowired
-    protected ApplicationContext _container;
+    // and all injections use 'Resource' annotation to keep the order
+    // probably 'Resource' is processed before 'Autowired'
+    // besides, 'Resource' finds by name (specified or field name) first
+    // but secondly finds by type (only once so not case with small performance)
+    @Resource
+    protected ApplicationContext _xcontainer;
 
+    // injections are on name basic here for multiple DB
     @Resource(name="${database.DBFluteBeansDataSourceName}")
     protected DataSource dataSource;
 
-    @Autowired
+    @Resource(name="${database.invokerAssistantComponentName}")
     protected InvokerAssistant invokerAssistant;
 
-    @Autowired
+    @Resource(name="${database.behaviorCommandInvokerComponentName}")
     protected BehaviorCommandInvoker behaviorCommandInvoker;
 
-    @Autowired
+    @Resource(name="${database.behaviorSelectorComponentName}")
     protected BehaviorSelector behaviorSelector;
 
-    @Autowired
+    @Resource(name="${database.commonColumnAutoSetupperComponentName}")
     protected CommonColumnAutoSetupper commonColumnAutoSetupper;
 
     // ===================================================================================
@@ -90,7 +94,7 @@ public class ${glDBFluteBeansJavaConfig} {
     @Bean(name="${database.behaviorSelectorComponentName}")
     public ${glImplementedBehaviorSelector} createImplementedBehaviorSelector() {
         ${glImplementedBehaviorSelector} selector = newImplementedBehaviorSelector();
-        selector.setContainer(_container);
+        selector.setContainer(_xcontainer);
         return selector;
     }
 
@@ -116,7 +120,7 @@ public class ${glDBFluteBeansJavaConfig} {
 #else
 
 #end
-    @Bean(name={"${table.behaviorComponentName}"})
+    @Bean(name="${table.behaviorComponentName}")
     public ${table.extendedBehaviorClassName} create${table.extendedBehaviorClassName}() {
         ${table.extendedBehaviorClassName} bhv = new${table.extendedBehaviorClassName}();
         bhv.setBehaviorCommandInvoker(behaviorCommandInvoker); bhv.setBehaviorSelector(behaviorSelector);

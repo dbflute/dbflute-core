@@ -280,21 +280,21 @@ public class DisplaySqlBuilder {
 
     protected String processLocalDateDisplay(LocalDate date, String format) {
         final DateFormatResource resource = analyzeDateFormat(format);
-        String disp = DfTypeUtil.toStringLocalDate(date, resource.getFormat());
+        String disp = DfTypeUtil.toStringDate(date, resource.getFormat());
         disp = filterBCPrefix(disp, () -> isBCPrefixTarget(date, resource));
         return quote(disp, resource);
     }
 
     protected String processLocalDateTimeDisplay(LocalDateTime date, String format) {
         final DateFormatResource resource = analyzeDateFormat(format);
-        String disp = DfTypeUtil.toStringLocalDateTime(date, resource.getFormat());
+        String disp = DfTypeUtil.toStringDate(date, resource.getFormat());
         disp = filterBCPrefix(disp, () -> isBCPrefixTarget(date, resource));
         return quote(disp, resource);
     }
 
     protected String processLocalTimeDisplay(LocalTime date, String format) {
         final DateFormatResource resource = analyzeDateFormat(format);
-        final String disp = DfTypeUtil.toStringLocalTime(date, resource.getFormat());
+        final String disp = DfTypeUtil.toStringDate(date, resource.getFormat());
         return quote(disp, resource);
     }
 

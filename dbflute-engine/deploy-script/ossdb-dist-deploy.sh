@@ -4,10 +4,7 @@ ant -f build.xml reflect-to-test-active-dockside
 ant -f build.xml reflect-to-test-active-hanger
 ant -f build.xml reflect-to-test-dbms-mysql
 ant -f build.xml reflect-to-test-dbms-postgresql
-ant -f build.xml reflect-to-test-dbms-oracle
-ant -f build.xml reflect-to-test-dbms-db2
-ant -f build.xml reflect-to-test-dbms-sqlserver
-ant -f build.xml reflect-to-test-option-compatible10x
+ant -f build.xml reflect-to-test-dbms-sqlite
 
 cd ..
 export answer=y
@@ -38,6 +35,9 @@ rm ./log/*.log
 . nextdb-renewal.sh
 . slave-replace-schema.sh
 . manage.sh renewal
+cd ../dbflute_resortlinedb
+rm ./log/*.log
+. manage.sh renewal
 cd ..
 mvn -e compile
 
@@ -48,25 +48,7 @@ rm ./log/*.log
 cd ..
 mvn -e compile
 
-cd ../dbflute-test-dbms-oracle/dbflute_maihamadb
-rm ./log/*.log
-. manage.sh renewal
-cd ..
-mvn -e compile
-
-cd ../dbflute-test-dbms-db2/dbflute_maihamadb
-rm ./log/*.log
-. manage.sh renewal
-cd ..
-mvn -e compile
-
-cd ../dbflute-test-dbms-sqlserver/dbflute_maihamadb
-rm ./log/*.log
-. manage.sh renewal
-cd ..
-mvn -e compile
-
-cd ../dbflute-test-option-compatible10x/dbflute_maihamadb
+cd ../dbflute-test-dbms-sqlite/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
 cd ..

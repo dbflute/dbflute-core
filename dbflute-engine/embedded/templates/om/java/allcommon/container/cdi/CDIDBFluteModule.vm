@@ -50,13 +50,13 @@ import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
 import javax.sql.DataSource;
 
-import org.dbflute.BehaviorSelector;
 import org.dbflute.bhv.AbstractBehaviorReadable;
 import org.dbflute.bhv.AbstractBehaviorWritable;
+import org.dbflute.bhv.BehaviorSelector;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.dbflute.bhv.core.CommonColumnAutoSetupper;
 import org.dbflute.bhv.core.InvokerAssistant;
 import org.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.hook.CommonColumnAutoSetupper;
 
 import ${glPackageExtendedBhv}.*;
 
@@ -238,7 +238,6 @@ public class ${glDBFluteModule} implements Extension {
             this(beanManager, beanClass, (List<Class<? super T>>) null);
         }
 
-        @SuppressWarnings("unchecked")
         public DBFluteBean(final BeanManager beanManager, final Class<T> beanClass, final Class<? super T> superType) {
             this(beanManager, beanClass, new ArrayList<Class<? super T>>(Arrays.asList(superType)));
         }
