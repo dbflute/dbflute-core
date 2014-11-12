@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.dbflute.bhv.core.BehaviorCommand;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.ResourceContext;
@@ -50,6 +51,7 @@ public class TnStatementFactoryImpl implements StatementFactory {
     protected StatementConfig _defaultStatementConfig;
     protected boolean _internalDebug;
     protected Integer _cursorSelectFetchSize;
+    protected Integer _entitySelectFetchSize;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -126,27 +128,23 @@ public class TnStatementFactoryImpl implements StatementFactory {
         return ResultSet.CONCUR_READ_ONLY;
     }
 
-    // -----------------------------------------------------
-    //                                  Statement Reflection
-    //                                  --------------------
+    // ===================================================================================
+    //                                                                Statement Reflection
+    //                                                                ====================
+    // deep logic here
     protected void reflectStatementOptions(PreparedStatement ps, StatementConfig config) {
         final StatementConfig actualConfig = getActualStatementConfig(config);
         doReflectStatementOptions(ps, actualConfig);
     }
 
     protected StatementConfig getActualStatementConfig(StatementConfig config) {
-        final boolean existsRequest = config != null;
-
         final StatementConfig defaultConfig = getActualDefaultConfig(config);
-        final boolean existsDefault = defaultConfig != null;
+        final Integer cursorSelectFetchSize = chooseCursorSelectFetchSize(config);
+        final Integer entitySelectFetchSize = chooseEntitySelectFetchSize(config);
 
-        final Integer cursorSelectFetchSize = getActualCursorSelectFetchSize(config);
-        final boolean existsCursor = cursorSelectFetchSize != null;
-
-        final Integer queryTimeout = getActualQueryTimeout(config, existsRequest, defaultConfig, existsDefault);
-        final Integer fetchSize =
-                getActualFetchSize(config, existsRequest, cursorSelectFetchSize, existsCursor, defaultConfig, existsDefault);
-        final Integer maxRows = getActualMaxRows(config, existsRequest, defaultConfig, existsDefault);
+        final Integer queryTimeout = getActualQueryTimeout(config, defaultConfig);
+        final Integer fetchSize = getActualFetchSize(config, cursorSelectFetchSize, entitySelectFetchSize, defaultConfig);
+        final Integer maxRows = getActualMaxRows(config, defaultConfig);
         if (queryTimeout == null && fetchSize == null && maxRows == null) {
             return null;
         }
@@ -154,67 +152,6 @@ public class TnStatementFactoryImpl implements StatementFactory {
         final StatementConfig actualConfig = new StatementConfig();
         actualConfig.queryTimeout(queryTimeout).fetchSize(fetchSize).maxRows(maxRows);
         return actualConfig;
-    }
-
-    protected StatementConfig getActualDefaultConfig(StatementConfig config) {
-        final StatementConfig defaultConfig;
-        if (_defaultStatementConfig != null) {
-            if (config != null && config.isSuppressDefault()) {
-                defaultConfig = null; // suppressed
-            } else {
-                defaultConfig = _defaultStatementConfig.createSnapshot(); // snapshot just in case
-            }
-        } else {
-            defaultConfig = null;
-        }
-        return defaultConfig;
-    }
-
-    protected Integer getActualCursorSelectFetchSize(StatementConfig config) {
-        if (config != null && config.isSuppressDefault()) {
-            return null; // suppressed
-        }
-        return _cursorSelectFetchSize;
-    }
-
-    protected Integer getActualQueryTimeout(StatementConfig config, boolean existsRequest, StatementConfig defaultConfig,
-            boolean existsDefault) {
-        final Integer queryTimeout;
-        if (existsRequest && config.hasQueryTimeout()) { // priority 1
-            queryTimeout = config.getQueryTimeout();
-        } else if (existsDefault && defaultConfig.hasQueryTimeout()) { // priority 2
-            queryTimeout = defaultConfig.getQueryTimeout();
-        } else {
-            queryTimeout = null;
-        }
-        return queryTimeout;
-    }
-
-    protected Integer getActualFetchSize(StatementConfig config, boolean existsRequest, Integer cursorSelectFetchSize,
-            boolean existsCursor, StatementConfig defaultConfig, boolean existsDefault) {
-        final Integer fetchSize;
-        if (existsRequest && config.hasFetchSize()) { // priority 1
-            fetchSize = config.getFetchSize();
-        } else if (existsCursor && isSelectCursorCommand()) { // priority 2
-            fetchSize = cursorSelectFetchSize;
-        } else if (existsDefault && defaultConfig.hasFetchSize()) { // priority 3
-            fetchSize = defaultConfig.getFetchSize();
-        } else {
-            fetchSize = null;
-        }
-        return fetchSize;
-    }
-
-    protected Integer getActualMaxRows(StatementConfig config, boolean existsRequest, StatementConfig defaultConfig, boolean existsDefault) {
-        final Integer maxRows;
-        if (existsRequest && config.hasMaxRows()) { // priority 1
-            maxRows = config.getMaxRows();
-        } else if (existsDefault && defaultConfig.hasMaxRows()) { // priority 2
-            maxRows = defaultConfig.getMaxRows();
-        } else {
-            maxRows = null;
-        }
-        return maxRows;
     }
 
     protected void doReflectStatementOptions(PreparedStatement ps, StatementConfig actualConfig) {
@@ -248,6 +185,102 @@ public class TnStatementFactoryImpl implements StatementFactory {
             resource.setNotice("Failed to set the JDBC parameter.");
             handleSQLException(e, resource);
         }
+    }
+
+    // -----------------------------------------------------
+    //                                 Default Configuration
+    //                                 ---------------------
+    protected StatementConfig getActualDefaultConfig(StatementConfig config) {
+        final StatementConfig defaultConfig;
+        if (_defaultStatementConfig != null) {
+            if (config != null && config.isSuppressDefault()) {
+                defaultConfig = null; // suppressed
+            } else {
+                defaultConfig = _defaultStatementConfig.createSnapshot(); // snapshot just in case
+            }
+        } else {
+            defaultConfig = null;
+        }
+        return defaultConfig;
+    }
+
+    // -----------------------------------------------------
+    //                                CursorSelect FetchSize
+    //                                ----------------------
+    protected Integer chooseCursorSelectFetchSize(StatementConfig config) {
+        if (config != null && config.isSuppressDefault()) {
+            return null; // suppressed
+        }
+        return _cursorSelectFetchSize;
+    }
+
+    // -----------------------------------------------------
+    //                                EntitySelect FetchSize
+    //                                ----------------------
+    protected Integer chooseEntitySelectFetchSize(StatementConfig config) {
+        if (config != null && config.isSuppressDefault()) {
+            return null; // suppressed
+        }
+        return _entitySelectFetchSize;
+    }
+
+    // -----------------------------------------------------
+    //                                  Actual Query Timeout
+    //                                  --------------------
+    protected Integer getActualQueryTimeout(StatementConfig config, StatementConfig defaultConfig) {
+        final Integer queryTimeout;
+        if (config != null && config.hasQueryTimeout()) { // priority 1
+            queryTimeout = config.getQueryTimeout();
+        } else if (defaultConfig != null && defaultConfig.hasQueryTimeout()) { // priority 2
+            queryTimeout = defaultConfig.getQueryTimeout();
+        } else {
+            queryTimeout = null;
+        }
+        return queryTimeout;
+    }
+
+    // -----------------------------------------------------
+    //                                     Actual Fetch Size
+    //                                     -----------------
+    protected Integer getActualFetchSize(StatementConfig config, Integer cursorSelectFetchSize, Integer entitySelectFetchSize,
+            StatementConfig defaultConfig) {
+        final Integer fetchSize;
+        if (config != null && config.hasFetchSize()) { // priority 1
+            fetchSize = config.getFetchSize();
+        } else {
+            final Integer nextToRequestPriorityFetchSize = getNextToRequestPriorityFetchSize();
+            if (nextToRequestPriorityFetchSize != null) { // priority 2
+                fetchSize = nextToRequestPriorityFetchSize;
+            } else if (cursorSelectFetchSize != null && isSelectCursorCommand()) { // priority 3
+                fetchSize = cursorSelectFetchSize;
+            } else if (entitySelectFetchSize != null && canUseEntitySelectFetchSizeCommand()) { // priority 4
+                fetchSize = entitySelectFetchSize;
+            } else if (defaultConfig != null && defaultConfig.hasFetchSize()) { // priority 5
+                fetchSize = defaultConfig.getFetchSize();
+            } else {
+                fetchSize = null;
+            }
+        }
+        return fetchSize;
+    }
+
+    protected Integer getNextToRequestPriorityFetchSize() { // customize point
+        return null;
+    }
+
+    // -----------------------------------------------------
+    //                                       Actual Max Rows
+    //                                       ---------------
+    protected Integer getActualMaxRows(StatementConfig config, StatementConfig defaultConfig) {
+        final Integer maxRows;
+        if (config != null && config.hasMaxRows()) { // priority 1
+            maxRows = config.getMaxRows();
+        } else if (defaultConfig != null && defaultConfig.hasMaxRows()) { // priority 2
+            maxRows = defaultConfig.getMaxRows();
+        } else {
+            maxRows = null;
+        }
+        return maxRows;
     }
 
     // ===================================================================================
@@ -301,6 +334,31 @@ public class TnStatementFactoryImpl implements StatementFactory {
         return ResourceContext.behaviorCommand().isSelectCursor();
     }
 
+    protected boolean canUseEntitySelectFetchSizeCommand() {
+        if (!ResourceContext.isExistResourceContextOnThread()) {
+            return false;
+        }
+        final BehaviorCommand<?> command = ResourceContext.behaviorCommand();
+        return isConditionBeanSafetyMaxOneSelectCommand(command);
+    }
+
+    protected boolean isConditionBeanSafetyMaxOneSelectCommand(BehaviorCommand<?> command) {
+        if (command.isConditionBean() && command.isSelect() && !command.isSelectCount()) {
+            if (ConditionBeanContext.isExistConditionBeanOnThread()) {
+                final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+                final int safetyMaxResultSize = cb.getSafetyMaxResultSize();
+
+                // cannot determine entity or list by command so it determines from safety max result size
+                // the logic is not bad, should be checked if size is one
+                //
+                // selectEntity() or can be treated as selectEntity()
+                // selectByPK(), selectByUniqueOf() calls selectEntity() internally so OK
+                return safetyMaxResultSize == 1;
+            }
+        }
+        return false;
+    }
+
     // ===================================================================================
     //                                                                      Internal Debug
     //                                                                      ==============
@@ -321,5 +379,9 @@ public class TnStatementFactoryImpl implements StatementFactory {
 
     public void setCursorSelectFetchSize(Integer cursorSelectFetchSize) {
         _cursorSelectFetchSize = cursorSelectFetchSize;
+    }
+
+    public void setEntitySelectFetchSize(Integer entitySelectFetchSize) {
+        _entitySelectFetchSize = entitySelectFetchSize;
     }
 }

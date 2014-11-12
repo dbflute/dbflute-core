@@ -2012,6 +2012,14 @@ public class Database {
         return getLittleAdjustmentProperties().getCursorSelectFetchSize();
     }
 
+    public boolean isEntitySelectFetchSizeValid() {
+        return getLittleAdjustmentProperties().isEntitySelectFetchSizeValid();
+    }
+
+    public String getEntitySelectFetchSize() {
+        return getLittleAdjustmentProperties().getEntitySelectFetchSize();
+    }
+
     public boolean isBatchInsertColumnModifiedPropertiesFragmentedDisallowed() {
         return getLittleAdjustmentProperties().isBatchInsertColumnModifiedPropertiesFragmentedDisallowed();
     }

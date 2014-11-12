@@ -4,6 +4,7 @@ ant -f build.xml reflect-to-test-active-dockside
 ant -f build.xml reflect-to-test-active-hanger
 ant -f build.xml reflect-to-test-dbms-mysql
 ant -f build.xml reflect-to-test-dbms-postgresql
+ant -f build.xml reflect-to-test-dbms-derby
 ant -f build.xml reflect-to-test-dbms-sqlite
 
 cd ..
@@ -45,6 +46,12 @@ cd ../dbflute-test-dbms-postgresql/dbflute_maihamadb
 rm ./log/*.log
 # not replace-schema because of big data
 . manage.sh regenerate
+cd ..
+mvn -e compile
+
+cd ../dbflute-test-dbms-derby/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal
 cd ..
 mvn -e compile
 

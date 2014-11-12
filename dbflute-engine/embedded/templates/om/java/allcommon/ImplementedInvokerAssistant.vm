@@ -189,6 +189,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         factory.setDefaultStatementConfig(assistDefaultStatementConfig());
         factory.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         factory.setCursorSelectFetchSize(${glDBFluteConfig}.getInstance().getCursorSelectFetchSize());
+        factory.setEntitySelectFetchSize(${glDBFluteConfig}.getInstance().getEntitySelectFetchSize());
         return factory;
     }
 
