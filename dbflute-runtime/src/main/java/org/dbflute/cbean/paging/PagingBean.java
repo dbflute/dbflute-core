@@ -154,7 +154,7 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     int getFetchStartIndex();
 
     /**
-     * Get fetch size.
+     * Get fetch size of paging, also called page size.
      * @return The size of fetching rows.
      */
     int getFetchSize();

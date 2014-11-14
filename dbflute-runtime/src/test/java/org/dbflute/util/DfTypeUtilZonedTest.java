@@ -61,6 +61,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import junit.framework.TestCase;
@@ -359,6 +360,7 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
 
         // ## Act ##
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        Locale locale = Locale.US;
         LocalDateTime ldt = toLocalDateTime(strDate, gmt2hour);
 
         // ## Assert ##
@@ -368,13 +370,13 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
 
         // e.g. 1 hour is 3600000L, 7 hours is 25200000L, 9 hours is 32400000L
         Date reversedDate = DfTypeUtil.toDate(ldt, gmt2hour);
-        String reversedStrDate = DfTypeUtil.toStringDate(reversedDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
+        String reversedStrDate = DfTypeUtil.toStringDate(reversedDate, gmt2hour, "yyyy/MM/dd HH:mm:ss.SSS", locale);
         log("reversed  : " + reversedStrDate + ", " + reversedDate.getTime());
         assertEquals("1970/01/01 09:00:06.789", reversedStrDate);
 
         TimeZone gmtZone = TimeZone.getTimeZone("GMT");
         Date gmt7hour = toDate("1970/01/01 07:00:06.789", gmtZone);
-        log("emg7hour  : " + toStringDate(gmt7hour, "yyyy/MM/dd HH:mm:ss.SSS", gmtZone));
+        log("emg7hour  : " + toStringDate(gmt7hour, gmtZone, "yyyy/MM/dd HH:mm:ss.SSS", locale));
         assertEquals(gmt7hour.getTime(), reversedDate.getTime());
     }
 
@@ -578,7 +580,8 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
     public void test_toDate_LocalDateTime_basic() {
         // ## Arrange ##
         TimeZone gmt9hour = TimeZone.getTimeZone("GMT+9");
-        DateFormat dfmil = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS", gmt9hour);
+        Locale locale = Locale.US;
+        DateFormat dfmil = DfTypeUtil.createDateFormat(gmt9hour, "yyyy/MM/dd HH:mm:ss.SSS", locale, false);
 
         // ## Act ##
         TimeZone gmtZone = TimeZone.getTimeZone("GMT");
@@ -752,12 +755,13 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
         // ## Arrange ##
         String strDate = "1970-01-01 09:00:06.789";
         TimeZone timeZone = TimeZone.getTimeZone("GMT+2");
+        Locale locale = Locale.US;
 
         // ## Act ##
         Date actual = toDate(strDate, timeZone); // expects 7 hour for GMT
 
         // ## Assert ##
-        String reversed = toStringDate(actual, "yyyy/MM/dd HH:mm:ss.SSS", timeZone);
+        String reversed = toStringDate(actual, timeZone, "yyyy/MM/dd HH:mm:ss.SSS", locale);
         Date gmt7hour = toDate("1970-01-01 07:00:06.789", TimeZone.getTimeZone("GMT"));
         log(reversed + ", " + actual.getTime() + ", " + gmt7hour.getTime());
         assertEquals(gmt7hour.getTime(), actual.getTime());

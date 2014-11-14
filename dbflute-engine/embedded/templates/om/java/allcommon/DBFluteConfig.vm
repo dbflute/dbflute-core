@@ -102,24 +102,14 @@ public class ${glDBFluteConfig} {
 
     // environment
     protected StatementConfig _defaultStatementConfig;
-#if (${database.isCursorSelectFetchSizeValid()})
-    protected Integer _cursorSelectFetchSize = ${database.cursorSelectFetchSize};
-#else
-    protected Integer _cursorSelectFetchSize;
-#end
-#if (${database.isEntitySelectFetchSizeValid()})
-    protected Integer _entitySelectFetchSize = ${database.entitySelectFetchSize};
-#else
-    protected Integer _entitySelectFetchSize;
-#end
+    protected Integer _cursorSelectFetchSize = ${database.cursorSelectFetchSizeExp};
+    protected Integer _entitySelectFetchSize = ${database.entitySelectFetchSizeExp};
+    protected boolean _usePagingByCursorSkipSynchronizedFetchSize = ${database.isUsePagingByCursorSkipSynchronizedFetchSize()};
+    protected Integer _fixedPagingByCursorSkipSynchronizedFetchSize = ${database.fixedPagingByCursorSkipSynchronizedFetchSizeExp};
     protected DataSourceHandler _dataSourceHandler;
     protected PhysicalConnectionDigger _physicalConnectionDigger;
     protected SQLExceptionDigger _sqlExceptionDigger;
-#if ($database.isOutsideSqlPackageValid())
-    protected String _outsideSqlPackage = "${database.outsideSqlPackage}";
-#else
-    protected String _outsideSqlPackage;
-#end
+    protected String _outsideSqlPackage = ${database.outsideSqlPackageExp};
     protected boolean _useSqlLogRegistry = ${database.isSqlLogRegistryValid()};
     protected MappingDateTimeZoneProvider _mappingDateTimeZoneProvider;
 
@@ -501,6 +491,33 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting entitySelectFetchSize: " + entitySelectFetchSize);
         }
         _entitySelectFetchSize = entitySelectFetchSize;
+    }
+
+    // ===================================================================================
+    //                                                              PagingSelect FetchSize
+    //                                                              ======================
+    public boolean isUsePagingByCursorSkipSynchronizedFetchSize() {
+        return _usePagingByCursorSkipSynchronizedFetchSize;
+    }
+
+    public void setUsePagingByCursorSkipSynchronizedFetchSize(boolean usePagingByCursorSkipSynchronizedFetchSize) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting usePagingByCursorSkipSynchronizedFetchSize: " + usePagingByCursorSkipSynchronizedFetchSize);
+        }
+        _usePagingByCursorSkipSynchronizedFetchSize = usePagingByCursorSkipSynchronizedFetchSize;
+    }
+
+    public Integer getFixedPagingByCursorSkipSynchronizedFetchSize() {
+        return _fixedPagingByCursorSkipSynchronizedFetchSize;
+    }
+
+    public void setFixedPagingByCursorSkipSynchronizedFetchSize(Integer fixedPagingByCursorSkipSynchronizedFetchSize) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting fixedPagingByCursorSkipSynchronizedFetchSize: " + fixedPagingByCursorSkipSynchronizedFetchSize);
+        }
+        _fixedPagingByCursorSkipSynchronizedFetchSize = fixedPagingByCursorSkipSynchronizedFetchSize;
     }
 
     // [DBFlute-0.9.0]

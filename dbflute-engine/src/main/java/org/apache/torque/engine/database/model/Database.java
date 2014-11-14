@@ -2004,6 +2004,10 @@ public class Database {
         return getLittleAdjustmentProperties().getShortCharHandlingModeCode();
     }
 
+    public String getCursorSelectFetchSizeExp() {
+        return isCursorSelectFetchSizeValid() ? getCursorSelectFetchSize() : "null";
+    }
+
     public boolean isCursorSelectFetchSizeValid() {
         return getLittleAdjustmentProperties().isCursorSelectFetchSizeValid();
     }
@@ -2012,12 +2016,32 @@ public class Database {
         return getLittleAdjustmentProperties().getCursorSelectFetchSize();
     }
 
+    public String getEntitySelectFetchSizeExp() {
+        return isEntitySelectFetchSizeValid() ? getEntitySelectFetchSize() : "null";
+    }
+
     public boolean isEntitySelectFetchSizeValid() {
         return getLittleAdjustmentProperties().isEntitySelectFetchSizeValid();
     }
 
     public String getEntitySelectFetchSize() {
         return getLittleAdjustmentProperties().getEntitySelectFetchSize();
+    }
+
+    public boolean isUsePagingByCursorSkipSynchronizedFetchSize() {
+        return getLittleAdjustmentProperties().isUsePagingByCursorSkipSynchronizedFetchSize();
+    }
+
+    public String getFixedPagingByCursorSkipSynchronizedFetchSizeExp() {
+        return isFixedPagingByCursorSkipSynchronizedFetchSizeValid() ? getFixedPagingByCursorSkipSynchronizedFetchSize() : "null";
+    }
+
+    public boolean isFixedPagingByCursorSkipSynchronizedFetchSizeValid() {
+        return getLittleAdjustmentProperties().isFixedPagingByCursorSkipSynchronizedFetchSizeValid();
+    }
+
+    public String getFixedPagingByCursorSkipSynchronizedFetchSize() {
+        return getLittleAdjustmentProperties().getFixedPagingByCursorSkipSynchronizedFetchSize();
     }
 
     public boolean isBatchInsertColumnModifiedPropertiesFragmentedDisallowed() {
@@ -2127,6 +2151,10 @@ public class Database {
 
     public String getSqlFileEncoding() {
         return getProperties().getOutsideSqlProperties().getSqlFileEncoding();
+    }
+
+    public String getOutsideSqlPackageExp() {
+        return isOutsideSqlPackageValid() ? ("\"" + getOutsideSqlPackage() + "\"") : "null";
     }
 
     public boolean isOutsideSqlPackageValid() {

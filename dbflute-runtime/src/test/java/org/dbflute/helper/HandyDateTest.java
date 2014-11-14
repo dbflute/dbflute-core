@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.dbflute.helper.secretary.BusinessDayDeterminer;
@@ -32,6 +33,32 @@ import org.dbflute.util.DfTypeUtil;
  * @author jflute
  */
 public class HandyDateTest extends RuntimeTestCase {
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public void test_constructor() throws Exception {
+        // ## Arrange ##
+        String exp = "2014/11/13 12:34:56";
+        String pattern = "yyyy/MM/dd HH:mm:ss";
+        String rfc1126 = "EEE, dd MMM yyyy HH:mm:ss zzz";
+        TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+        Locale usLoc = Locale.US;
+
+        // ## Act ##
+        // ## Assert ##
+        assertEquals(exp, new HandyDate(toDate(exp)).toDisp(pattern));
+        assertEquals("2014/11/13 00:00:00", new HandyDate(toLocalDate(exp)).toDisp(pattern));
+        assertEquals(exp, new HandyDate(toLocalDateTime(exp)).toDisp(pattern));
+        assertEquals(exp, new HandyDate(exp).toDisp(pattern));
+        assertEquals("2014/11/13 00:00:00", new HandyDate(toLocalDate(exp), gmtZone).toDisp(pattern));
+        assertEquals(exp, new HandyDate(toLocalDateTime(exp), gmtZone).toDisp(pattern));
+        assertEquals(exp, new HandyDate(exp, pattern).toDisp(pattern));
+        assertEquals(exp, new HandyDate(exp, gmtZone).toDisp(pattern));
+        assertEquals(exp, new HandyDate(exp, gmtZone, pattern, usLoc).toDisp(pattern));
+        // TODO jflute impl: HandyDate RFC Date
+        assertEquals(exp, new HandyDate("Thu, 13 Nov 2014 12:34:56 GMT", gmtZone, rfc1126, usLoc).toDisp(pattern));
+    }
 
     // ===================================================================================
     //                                                                            Add Date
@@ -819,13 +846,14 @@ public class HandyDateTest extends RuntimeTestCase {
     public void test_new_by_LocalDate_before2hour() throws Exception {
         // ## Arrange ##
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        Locale locale = Locale.US;
 
         // ## Act ##
         HandyDate handyDate = new HandyDate(LocalDate.of(1970, 1, 1), gmt2hour);
 
         // ## Assert ##
         Date utilDate = handyDate.getDate();
-        String strDate = DfTypeUtil.toStringDate(utilDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
+        String strDate = DfTypeUtil.toStringDate(utilDate, gmt2hour, "yyyy/MM/dd HH:mm:ss.SSS", locale);
         log(strDate);
         assertEquals("1970/01/01 00:00:00.000", strDate);
         assertEquals(-7200000L, utilDate.getTime()); // 2 hours before in GMT
@@ -855,13 +883,14 @@ public class HandyDateTest extends RuntimeTestCase {
     public void test_new_by_LocalDateTime_before1hour() throws Exception {
         // ## Arrange ##
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        Locale locale = Locale.US;
 
         // ## Act ##
         HandyDate handyDate = new HandyDate(LocalDateTime.of(1970, 1, 1, 1, 0, 0), gmt2hour);
 
         // ## Assert ##
         Date utilDate = handyDate.getDate();
-        String strDate = DfTypeUtil.toStringDate(utilDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
+        String strDate = DfTypeUtil.toStringDate(utilDate, gmt2hour, "yyyy/MM/dd HH:mm:ss.SSS", locale);
         log(strDate);
         assertEquals("1970/01/01 01:00:00.000", strDate);
         assertEquals(-3600000L, utilDate.getTime()); // 1 hour before in GMT
@@ -872,13 +901,14 @@ public class HandyDateTest extends RuntimeTestCase {
     public void test_new_by_LocalDateTime_just() throws Exception {
         // ## Arrange ##
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        Locale locale = Locale.US;
 
         // ## Act ##
         HandyDate handyDate = new HandyDate(LocalDateTime.of(1970, 1, 1, 2, 0, 0), gmt2hour);
 
         // ## Assert ##
         Date utilDate = handyDate.getDate();
-        String strDate = DfTypeUtil.toStringDate(utilDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
+        String strDate = DfTypeUtil.toStringDate(utilDate, gmt2hour, "yyyy/MM/dd HH:mm:ss.SSS", locale);
         log(strDate);
         assertEquals("1970/01/01 02:00:00.000", strDate);
         assertEquals(0L, utilDate.getTime());

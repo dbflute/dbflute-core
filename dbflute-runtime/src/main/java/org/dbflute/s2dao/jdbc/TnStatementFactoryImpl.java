@@ -28,9 +28,12 @@ import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.exception.SQLExceptionHandler;
 import org.dbflute.bhv.exception.SQLExceptionResource;
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.sqlclause.SqlClause;
+import org.dbflute.jdbc.FetchBean;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
+import org.dbflute.outsidesql.typed.AutoPagingHandlingPmb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +55,8 @@ public class TnStatementFactoryImpl implements StatementFactory {
     protected boolean _internalDebug;
     protected Integer _cursorSelectFetchSize;
     protected Integer _entitySelectFetchSize;
+    protected boolean _usePagingByCursorSkipSynchronizedFetchSize;
+    protected Integer _fixedPagingByCursorSkipSynchronizedFetchSize;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -139,11 +144,8 @@ public class TnStatementFactoryImpl implements StatementFactory {
 
     protected StatementConfig getActualStatementConfig(StatementConfig config) {
         final StatementConfig defaultConfig = getActualDefaultConfig(config);
-        final Integer cursorSelectFetchSize = chooseCursorSelectFetchSize(config);
-        final Integer entitySelectFetchSize = chooseEntitySelectFetchSize(config);
-
         final Integer queryTimeout = getActualQueryTimeout(config, defaultConfig);
-        final Integer fetchSize = getActualFetchSize(config, cursorSelectFetchSize, entitySelectFetchSize, defaultConfig);
+        final Integer fetchSize = getActualFetchSize(config, defaultConfig);
         final Integer maxRows = getActualMaxRows(config, defaultConfig);
         if (queryTimeout == null && fetchSize == null && maxRows == null) {
             return null;
@@ -205,26 +207,6 @@ public class TnStatementFactoryImpl implements StatementFactory {
     }
 
     // -----------------------------------------------------
-    //                                CursorSelect FetchSize
-    //                                ----------------------
-    protected Integer chooseCursorSelectFetchSize(StatementConfig config) {
-        if (config != null && config.isSuppressDefault()) {
-            return null; // suppressed
-        }
-        return _cursorSelectFetchSize;
-    }
-
-    // -----------------------------------------------------
-    //                                EntitySelect FetchSize
-    //                                ----------------------
-    protected Integer chooseEntitySelectFetchSize(StatementConfig config) {
-        if (config != null && config.isSuppressDefault()) {
-            return null; // suppressed
-        }
-        return _entitySelectFetchSize;
-    }
-
-    // -----------------------------------------------------
     //                                  Actual Query Timeout
     //                                  --------------------
     protected Integer getActualQueryTimeout(StatementConfig config, StatementConfig defaultConfig) {
@@ -242,26 +224,39 @@ public class TnStatementFactoryImpl implements StatementFactory {
     // -----------------------------------------------------
     //                                     Actual Fetch Size
     //                                     -----------------
-    protected Integer getActualFetchSize(StatementConfig config, Integer cursorSelectFetchSize, Integer entitySelectFetchSize,
-            StatementConfig defaultConfig) {
-        final Integer fetchSize;
+    protected Integer getActualFetchSize(StatementConfig config, StatementConfig defaultConfig) {
         if (config != null && config.hasFetchSize()) { // priority 1
-            fetchSize = config.getFetchSize();
-        } else {
-            final Integer nextToRequestPriorityFetchSize = getNextToRequestPriorityFetchSize();
-            if (nextToRequestPriorityFetchSize != null) { // priority 2
-                fetchSize = nextToRequestPriorityFetchSize;
-            } else if (cursorSelectFetchSize != null && isSelectCursorCommand()) { // priority 3
-                fetchSize = cursorSelectFetchSize;
-            } else if (entitySelectFetchSize != null && canUseEntitySelectFetchSizeCommand()) { // priority 4
-                fetchSize = entitySelectFetchSize;
-            } else if (defaultConfig != null && defaultConfig.hasFetchSize()) { // priority 5
-                fetchSize = defaultConfig.getFetchSize();
-            } else {
-                fetchSize = null;
-            }
+            return config.getFetchSize();
         }
-        return fetchSize;
+        final Integer nextToRequestPriorityFetchSize = getNextToRequestPriorityFetchSize();
+        if (nextToRequestPriorityFetchSize != null) { // priority 2
+            return nextToRequestPriorityFetchSize;
+        }
+        final Integer commandFetchSize = deriveCommandFetchSize(config);
+        if (commandFetchSize != null) { // priority 3
+            return commandFetchSize;
+        }
+        if (defaultConfig != null && defaultConfig.hasFetchSize()) { // priority 4
+            return defaultConfig.getFetchSize();
+        }
+        return null;
+    }
+
+    protected Integer deriveCommandFetchSize(StatementConfig config) {
+        final BehaviorCommand<?> command = getBehaviorCommand();
+        final Integer cursorSelectFetchSize = chooseCursorSelectFetchSize(config);
+        if (cursorSelectFetchSize != null && isSelectCursorFetchSizeCommand(command)) {
+            return cursorSelectFetchSize;
+        }
+        final Integer entitySelectFetchSize = chooseEntitySelectFetchSize(config);
+        if (entitySelectFetchSize != null && canUseEntitySelectFetchSizeCommand(command)) {
+            return entitySelectFetchSize;
+        }
+        final Integer pagingByCursorSkipSynchronizedFetchSize = extractPagingByCursorSkipSynchronizedFetchSize(config, command);
+        if (pagingByCursorSkipSynchronizedFetchSize != null) {
+            return pagingByCursorSkipSynchronizedFetchSize;
+        }
+        return null;
     }
 
     protected Integer getNextToRequestPriorityFetchSize() { // customize point
@@ -325,38 +320,121 @@ public class TnStatementFactoryImpl implements StatementFactory {
     }
 
     // ===================================================================================
-    //                                                                        Command Info
-    //                                                                        ============
-    protected boolean isSelectCursorCommand() {
-        if (!ResourceContext.isExistResourceContextOnThread()) {
-            return false;
-        }
-        return ResourceContext.behaviorCommand().isSelectCursor();
+    //                                                                   Command FetchSize
+    //                                                                   =================
+    protected BehaviorCommand<?> getBehaviorCommand() {
+        return ResourceContext.isExistResourceContextOnThread() ? ResourceContext.behaviorCommand() : null;
     }
 
-    protected boolean canUseEntitySelectFetchSizeCommand() {
-        if (!ResourceContext.isExistResourceContextOnThread()) {
-            return false;
+    // -----------------------------------------------------
+    //                                          CursorSelect
+    //                                          ------------
+    protected Integer chooseCursorSelectFetchSize(StatementConfig config) {
+        if (config != null && config.isSuppressDefault()) {
+            return null; // suppressed
         }
-        final BehaviorCommand<?> command = ResourceContext.behaviorCommand();
-        return isConditionBeanSafetyMaxOneSelectCommand(command);
+        return _cursorSelectFetchSize;
     }
 
-    protected boolean isConditionBeanSafetyMaxOneSelectCommand(BehaviorCommand<?> command) {
-        if (command.isConditionBean() && command.isSelect() && !command.isSelectCount()) {
-            if (ConditionBeanContext.isExistConditionBeanOnThread()) {
+    protected boolean isSelectCursorFetchSizeCommand(BehaviorCommand<?> command) {
+        return command.isSelectCursor();
+    }
+
+    // -----------------------------------------------------
+    //                                          EntitySelect
+    //                                          ------------
+
+    protected Integer chooseEntitySelectFetchSize(StatementConfig config) {
+        if (config != null && config.isSuppressDefault()) {
+            return null; // suppressed
+        }
+        return _entitySelectFetchSize;
+    }
+
+    protected boolean canUseEntitySelectFetchSizeCommand(BehaviorCommand<?> command) {
+        return isFetchBeanSafetyMaxOneSelectCommand(command);
+    }
+
+    protected boolean isFetchBeanSafetyMaxOneSelectCommand(BehaviorCommand<?> command) {
+        if (isConditionBeanSelectRows(command)) {
+            if (ConditionBeanContext.isExistConditionBeanOnThread()) { // basically true, just in case
                 final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-                final int safetyMaxResultSize = cb.getSafetyMaxResultSize();
-
-                // cannot determine entity or list by command so it determines from safety max result size
-                // the logic is not bad, should be checked if size is one
-                //
-                // selectEntity() or can be treated as selectEntity()
-                // selectByPK(), selectByUniqueOf() calls selectEntity() internally so OK
-                return safetyMaxResultSize == 1;
+                return judgeFetchBeanSafetyMaxOneSelectCommand(command, cb);
+            }
+        } else if (command.isOutsideSql()) {
+            final Object pmb = command.getParameterBean();
+            if (pmb instanceof FetchBean) { // basically true if generated parameter-bean
+                return judgeFetchBeanSafetyMaxOneSelectCommand(command, ((FetchBean) pmb));
             }
         }
         return false;
+    }
+
+    protected boolean judgeFetchBeanSafetyMaxOneSelectCommand(BehaviorCommand<?> command, FetchBean fetchBean) {
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // cannot determine entity or list by command so it determines from safety max result size
+        // the logic is not bad, should be checked if size is one
+        //
+        // if condition-bean:
+        //  selectEntity() or can be treated as selectEntity()
+        //  selectByPK(), selectByUniqueOf() calls selectEntity() internally so OK
+        //
+        // if outsideSql:
+        //  selectEntity()
+        //
+        // or specified as one in other commands
+        // _/_/_/_/_/_/_/_/_/_/
+        final int safetyMaxResultSize = fetchBean.getSafetyMaxResultSize();
+        return safetyMaxResultSize == 1;
+    }
+
+    protected boolean isConditionBeanSelectRows(BehaviorCommand<?> command) {
+        return command.isConditionBean() && command.isSelect() && !command.isSelectCount();
+    }
+
+    // -----------------------------------------------------
+    //                                          PagingSelect
+    //                                          ------------
+    protected Integer extractPagingByCursorSkipSynchronizedFetchSize(StatementConfig config, BehaviorCommand<?> command) {
+        if (config != null && config.isSuppressDefault()) {
+            return null; // suppressed
+        }
+        if (!isUsePagingByCursorSkipSynchronizedFetchSize()) { // e.g. Oracle, DB2, SQLServer
+            return null; // no need to set
+        }
+        // e.g. MySQL, PostgreSQL here, set if cursor-skip
+        Integer cursorSkipFetchSize = null;
+        if (isConditionBeanSelectRows(command)) {
+            if (ConditionBeanContext.isExistConditionBeanOnThread()) { // basically true, just in case
+                final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+                if (mightBeCursorSkipConditionBean(cb)) {
+                    cursorSkipFetchSize = cb.getFetchSize();
+                }
+            }
+        } else if (command.isOutsideSql()) {
+            final Object pmb = command.getParameterBean();
+            if (pmb instanceof AutoPagingHandlingPmb) { // using cursor-skip
+                cursorSkipFetchSize = ((AutoPagingHandlingPmb<?, ?>) pmb).getFetchSize();
+            }
+        }
+        if (cursorSkipFetchSize != null && cursorSkipFetchSize > 0) { // means paging
+            final Integer fixedSize = getFixedPagingByCursorSkipSynchronizedFetchSize();
+            return fixedSize != null ? fixedSize : cursorSkipFetchSize;
+        }
+        return null;
+    }
+
+    protected boolean mightBeCursorSkipConditionBean(ConditionBean cb) {
+        final SqlClause sqlClause = cb.getSqlClause();
+        return !sqlClause.isFetchStartIndexSupported() || !sqlClause.isFetchSizeSupported();
+    }
+
+    protected boolean isUsePagingByCursorSkipSynchronizedFetchSize() { // e.g. MySQL, PostgreSQL
+        return _usePagingByCursorSkipSynchronizedFetchSize;
+    }
+
+    protected Integer getFixedPagingByCursorSkipSynchronizedFetchSize() { // e.g. Integer.MIN_VALUE (of MySQL)
+        return _fixedPagingByCursorSkipSynchronizedFetchSize;
     }
 
     // ===================================================================================
@@ -383,5 +461,13 @@ public class TnStatementFactoryImpl implements StatementFactory {
 
     public void setEntitySelectFetchSize(Integer entitySelectFetchSize) {
         _entitySelectFetchSize = entitySelectFetchSize;
+    }
+
+    public void setUsePagingByCursorSkipSynchronizedFetchSize(boolean usePagingByCursorSkipSynchronizedFetchSize) {
+        _usePagingByCursorSkipSynchronizedFetchSize = usePagingByCursorSkipSynchronizedFetchSize;
+    }
+
+    public void setFixedPagingByCursorSkipSynchronizedFetchSize(Integer fixedPagingByCursorSkipSynchronizedFetchSize) {
+        _fixedPagingByCursorSkipSynchronizedFetchSize = fixedPagingByCursorSkipSynchronizedFetchSize;
     }
 }

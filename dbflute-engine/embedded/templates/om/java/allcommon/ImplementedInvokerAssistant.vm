@@ -187,9 +187,12 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     protected StatementFactory createStatementFactory() {
         final TnStatementFactoryImpl factory = newStatementFactoryImpl();
         factory.setDefaultStatementConfig(assistDefaultStatementConfig());
-        factory.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
-        factory.setCursorSelectFetchSize(${glDBFluteConfig}.getInstance().getCursorSelectFetchSize());
-        factory.setEntitySelectFetchSize(${glDBFluteConfig}.getInstance().getEntitySelectFetchSize());
+        ${glDBFluteConfig} config = ${glDBFluteConfig}.getInstance();
+        factory.setInternalDebug(config.isInternalDebug());
+        factory.setCursorSelectFetchSize(config.getCursorSelectFetchSize());
+        factory.setEntitySelectFetchSize(config.getEntitySelectFetchSize());
+        factory.setUsePagingByCursorSkipSynchronizedFetchSize(config.isUsePagingByCursorSkipSynchronizedFetchSize());
+        factory.setFixedPagingByCursorSkipSynchronizedFetchSize(config.getFixedPagingByCursorSkipSynchronizedFetchSize());
         return factory;
     }
 

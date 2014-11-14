@@ -61,6 +61,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import junit.framework.TestCase;
@@ -221,6 +222,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals(LocalDate.of(1582, 10, 04), toLocalDate("1582-10-04 01:23:45.123"));
         assertEquals(LocalDate.of(0001, 10, 04), toLocalDate("0001-10-04 01:23:45.123"));
         assertEquals(LocalDate.of(2014, 10, 28), toLocalDate("2014/10/28 12:34:56.789"));
+        assertEquals(LocalDate.of(2009, 12, 13), toLocalDate("2009-12-13T01:23:45.123"));
     }
 
     public void test_toLocalDate_fromStringDate_pattern() {
@@ -326,6 +328,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals(LocalDateTime.of(0001, 10, 04, 14, 23, 45, 89000000), toLocalDateTime("0001-10-04 14:23:45.89"));
         assertEquals(LocalDateTime.of(0001, 10, 04, 14, 23, 45, 678900000), toLocalDateTime("0001-10-04 14:23:45.6789"));
         assertEquals(LocalDateTime.of(0001, 10, 04, 14, 23, 45, 123456789), toLocalDateTime("0001-10-04 14:23:45.123456789"));
+        assertEquals(LocalDateTime.of(0001, 10, 04, 14, 23, 45, 789000000), toLocalDateTime("0001-10-04T14:23:45.789"));
         try {
             toLocalDateTime("0001-10-04 14:23:45.123456789123");
             fail();
@@ -345,6 +348,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
         // ## Act ##
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
+        Locale locale = Locale.US;
         LocalDateTime ldt = toLocalDateTime(strDate, gmt2hour);
 
         // ## Assert ##
@@ -354,13 +358,13 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
 
         // e.g. 1 hour is 3600000L, 7 hours is 25200000L, 9 hours is 32400000L
         Date reversedDate = DfTypeUtil.toDate(ldt, gmt2hour);
-        String reversedStrDate = DfTypeUtil.toStringDate(reversedDate, "yyyy/MM/dd HH:mm:ss.SSS", gmt2hour);
+        String reversedStrDate = DfTypeUtil.toStringDate(reversedDate, gmt2hour, "yyyy/MM/dd HH:mm:ss.SSS", locale);
         log("reversed  : " + reversedStrDate + ", " + reversedDate.getTime());
         assertEquals("1970/01/01 09:00:06.789", reversedStrDate);
 
         TimeZone gmtZone = TimeZone.getTimeZone("GMT");
         Date gmt7hour = toDate("1970/01/01 07:00:06.789", gmtZone);
-        log("emg7hour  : " + toStringDate(gmt7hour, "yyyy/MM/dd HH:mm:ss.SSS", gmtZone));
+        log("emg7hour  : " + toStringDate(gmt7hour, gmtZone, "yyyy/MM/dd HH:mm:ss.SSS", locale));
         assertEquals(gmt7hour.getTime(), reversedDate.getTime());
     }
 
@@ -459,6 +463,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals("2009/11/01 00:00:00", df.format(toDate("200911", "yyyyMM")));
         assertEquals("2009/01/01 00:00:00", df.format(toDate("2009", "yyyy")));
         assertEquals("2009/01/01 00:00:00", df.format(toDate("2009", "yyyy")));
+        assertEquals("2008/12/30 12:34:56", df.format(toDate("2008-12-30T12:34:56"))); // local date style
         // illegal patterns were implemented at test_toDate_illegal()
         //assertEquals("2009/11/30 00:00:00", df.format(toDate("2009113012", "yyyyMMdd")));
     }
@@ -564,7 +569,8 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     public void test_toDate_LocalDateTime_basic() {
         // ## Arrange ##
         TimeZone gmt9hour = TimeZone.getTimeZone("GMT+9");
-        DateFormat dfmil = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS", gmt9hour);
+        Locale locale = Locale.US;
+        DateFormat dfmil = DfTypeUtil.createDateFormat(gmt9hour, "yyyy/MM/dd HH:mm:ss.SSS", locale, false);
 
         // ## Act ##
         TimeZone gmtZone = TimeZone.getTimeZone("GMT");
@@ -738,12 +744,13 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         // ## Arrange ##
         String strDate = "1970-01-01 09:00:06.789";
         TimeZone timeZone = TimeZone.getTimeZone("GMT+2");
+        Locale locale = Locale.US;
 
         // ## Act ##
         Date actual = toDate(strDate, timeZone); // expects 7 hour for GMT
 
         // ## Assert ##
-        String reversed = toStringDate(actual, "yyyy/MM/dd HH:mm:ss.SSS", timeZone);
+        String reversed = toStringDate(actual, timeZone, "yyyy/MM/dd HH:mm:ss.SSS", locale);
         Date gmt7hour = toDate("1970-01-01 07:00:06.789", TimeZone.getTimeZone("GMT"));
         log(reversed + ", " + actual.getTime() + ", " + gmt7hour.getTime());
         assertEquals(gmt7hour.getTime(), actual.getTime());
@@ -1057,6 +1064,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals("2008/12/30 12:34:56.009", df.format(toTimestamp(" date A.D.2008-12-30 12:34:56.9 ")));
         assertEquals("2008/12/30 12:34:56.123", df.format(toTimestamp(" date A.D.2008-12-30 12:34:56.1234")));
         assertEquals("2008/12/30 12:34:56.987", df.format(toTimestamp(" date A.D.2008-12-30 12:34:56.98765432")));
+        assertEquals("2008/12/30 12:34:56.789", df.format(toTimestamp("2008/12/30T12:34:56.789"))); // local date style
         assertNotSame(java.util.Date.class, DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789").getClass());
         assertNotSame(java.sql.Date.class, DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789").getClass());
         assertEquals(java.sql.Timestamp.class, DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789").getClass());

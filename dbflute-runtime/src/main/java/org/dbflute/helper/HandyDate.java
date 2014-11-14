@@ -95,7 +95,7 @@ public class HandyDate implements Serializable {
      */
     public HandyDate(LocalDate localDate) { // #dateParade
         assertConstructorArgNotNull("localDate", localDate);
-        _cal = createCalendar(null); // means default zone
+        _cal = createCalendar(null, null); // means default zone
         prepareDefaultBeginAttribute();
         _cal.setTime(DfTypeUtil.toDate(localDate));
     }
@@ -112,7 +112,7 @@ public class HandyDate implements Serializable {
     public HandyDate(LocalDate localDate, TimeZone timeZone) {
         assertConstructorArgNotNull("localDate", localDate);
         assertConstructorArgNotNull("timeZone", timeZone);
-        _cal = createCalendar(timeZone);
+        _cal = createCalendar(timeZone, null);
         prepareDefaultBeginAttribute();
         _cal.setTime(DfTypeUtil.toDate(localDate, timeZone));
     }
@@ -127,7 +127,7 @@ public class HandyDate implements Serializable {
      */
     public HandyDate(LocalDateTime localDateTime) {
         assertConstructorArgNotNull("localDateTime", localDateTime);
-        _cal = createCalendar(null); // means default zone
+        _cal = createCalendar(null, null); // means default zone
         prepareDefaultBeginAttribute();
         _cal.setTime(DfTypeUtil.toDate(localDateTime));
     }
@@ -144,7 +144,7 @@ public class HandyDate implements Serializable {
     public HandyDate(LocalDateTime localDateTime, TimeZone timeZone) {
         assertConstructorArgNotNull("localDateTime", localDateTime);
         assertConstructorArgNotNull("timeZone", timeZone);
-        _cal = createCalendar(timeZone);
+        _cal = createCalendar(timeZone, null);
         prepareDefaultBeginAttribute();
         _cal.setTime(DfTypeUtil.toDate(localDateTime, timeZone));
     }
@@ -166,7 +166,7 @@ public class HandyDate implements Serializable {
      */
     public HandyDate(Date date) {
         assertConstructorArgNotNull("date", date);
-        _cal = createCalendar(null); // means default zone
+        _cal = createCalendar(null, null); // means default zone
         prepareDefaultBeginAttribute();
         _cal.setTime(date);
     }
@@ -186,7 +186,7 @@ public class HandyDate implements Serializable {
      */
     public HandyDate(String exp) {
         assertConstructorArgNotNullAndNotEmpty("exp", exp);
-        _cal = createCalendar(null); // means default zone
+        _cal = createCalendar(null, null); // means default zone
         prepareDefaultBeginAttribute();
         try {
             _cal.setTime(DfTypeUtil.toDate(exp));
@@ -213,7 +213,7 @@ public class HandyDate implements Serializable {
     public HandyDate(String exp, TimeZone timeZone) {
         assertConstructorArgNotNullAndNotEmpty("exp", exp);
         assertConstructorArgNotNull("timeZone", timeZone);
-        _cal = createCalendar(timeZone);
+        _cal = createCalendar(timeZone, null);
         prepareDefaultBeginAttribute();
         try {
             _cal.setTime(DfTypeUtil.toDate(exp, timeZone));
@@ -235,11 +235,35 @@ public class HandyDate implements Serializable {
     public HandyDate(String exp, String pattern) {
         assertConstructorArgNotNullAndNotEmpty("exp", exp);
         assertConstructorArgNotNullAndNotEmpty("pattern", pattern);
-        final TimeZone timeZone = null;
-        _cal = createCalendar(timeZone);
+        _cal = createCalendar(null, null); // means default zone
         prepareDefaultBeginAttribute();
         try {
-            _cal.setTime(DfTypeUtil.toDate(exp, pattern, timeZone));
+            _cal.setTime(DfTypeUtil.toDate(exp, pattern));
+        } catch (ParseDateException e) {
+            throwParseDateExpressionFailureException(exp, e);
+        }
+    }
+
+    /**
+     * Construct the handy date by the string expression for the default time-zone. <br>
+     * <pre>
+     * e.g.
+     *  Locale locale = ...
+     *  new HandyDate("20010101", "yyyyMMdd", locale): 2001-01-01 00:00:00.000
+     * </pre>
+     * @param exp The string expression of the date. (NotNull, NotEmpty)
+     * @param pattern The pattern to parse as date. (NotNull, NotEmpty)
+     * @param locale The locale to parse the date expression. (NotNull)
+     * @throws ParseDateExpressionFailureException When it fails to parse the expression.
+     */
+    public HandyDate(String exp, String pattern, Locale locale) {
+        assertConstructorArgNotNullAndNotEmpty("exp", exp);
+        assertConstructorArgNotNullAndNotEmpty("pattern", pattern);
+        assertConstructorArgNotNull("locale", locale);
+        _cal = createCalendar(null, locale); // means default zone
+        prepareDefaultBeginAttribute();
+        try {
+            _cal.setTime(DfTypeUtil.toDate(exp, pattern, locale));
         } catch (ParseDateException e) {
             throwParseDateExpressionFailureException(exp, e);
         }
@@ -250,21 +274,24 @@ public class HandyDate implements Serializable {
      * <pre>
      * e.g.
      *  TimeZone timeZone = ...
-     *  new HandyDate("20010101", "yyyyMMdd", timeZone): 2001-01-01 00:00:00.000
+     *  Locale locale = ...
+     *  new HandyDate("20010101", "yyyyMMdd", timeZone, locale): 2001-01-01 00:00:00.000
      * </pre>
      * @param exp The string expression of the date. (NotNull, NotEmpty)
      * @param pattern The pattern to parse as date. (NotNull, NotEmpty)
+     * @param locale The locale to parse the date expression. (NotNull)
      * @param timeZone The time-zone to parse as date and for internal calendar. (NotNull)
      * @throws ParseDateExpressionFailureException When it fails to parse the expression.
      */
-    public HandyDate(String exp, String pattern, TimeZone timeZone) {
+    public HandyDate(String exp, TimeZone timeZone, String pattern, Locale locale) {
         assertConstructorArgNotNullAndNotEmpty("exp", exp);
-        assertConstructorArgNotNullAndNotEmpty("pattern", pattern);
         assertConstructorArgNotNull("timeZone", timeZone);
-        _cal = createCalendar(timeZone);
+        assertConstructorArgNotNullAndNotEmpty("pattern", pattern);
+        assertConstructorArgNotNull("locale", locale);
+        _cal = createCalendar(timeZone, locale);
         prepareDefaultBeginAttribute();
         try {
-            _cal.setTime(DfTypeUtil.toDate(exp, pattern, timeZone));
+            _cal.setTime(DfTypeUtil.toDate(exp, timeZone, pattern, locale));
         } catch (ParseDateException e) {
             throwParseDateExpressionFailureException(exp, e);
         }
@@ -288,13 +315,13 @@ public class HandyDate implements Serializable {
         }
     }
 
-    protected Calendar createCalendar(TimeZone timeZone) {
+    protected Calendar createCalendar(TimeZone timeZone, Locale locale) {
         // locale has no setting point so null
         // basically only for week data and basically no use in HandyDate
         // so unneeded but just in case
-        final Locale locale = chooseRealLocale(null);
         final TimeZone realZone = chooseRealZone(timeZone);
-        return Calendar.getInstance(realZone, locale);
+        final Locale realLocale = chooseRealLocale(locale);
+        return Calendar.getInstance(realZone, realLocale);
     }
 
     protected Locale chooseRealLocale(Locale locale) { // also called by toDisp()

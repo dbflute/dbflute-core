@@ -17,6 +17,7 @@ package org.dbflute;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
@@ -63,12 +64,13 @@ public class FunCustodial {
         return DfTypeUtil.toBoolean(obj);
     }
 
-    public static String toStringDate(Date date, String pattern, TimeZone timeZone) {
+    public static String toStringDate(Date date, TimeZone timeZone, String pattern) {
         if (date == null) {
             return null;
         }
         final TimeZone realZone = timeZone != null ? timeZone : DBFluteSystem.getFinalTimeZone();
-        final String str = DfTypeUtil.toStringDate(date, pattern, realZone);
+        final Locale realLocale = DBFluteSystem.getFinalLocale(); // no specified because of basically debug string
+        final String str = DfTypeUtil.toStringDate(date, realZone, pattern, realLocale);
         return (DfTypeUtil.isDateBC(date) ? "BC" : "") + str;
     }
 
