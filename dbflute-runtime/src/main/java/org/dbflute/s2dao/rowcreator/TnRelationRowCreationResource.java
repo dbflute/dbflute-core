@@ -47,7 +47,7 @@ public class TnRelationRowCreationResource {
     /** Relation property type. (NotNull) */
     protected TnRelationPropertyType _relationPropertyType;
 
-    /** The name map of select column. (NotNull) */
+    /** The name map of select column (exists in select clause). (NotNull) */
     protected Map<String, String> _selectColumnMap;
 
     /** The map of select index. map:{ localAlias or relationNoSuffix = map:{ selectColumnKeyName = selectIndex } } (NullAllowed) */
@@ -143,7 +143,7 @@ public class TnRelationRowCreationResource {
     //                                                                       Select Column
     //                                                                       =============
     /**
-     * Does the column name contain in selected columns?
+     * Does the column name contain in selected columns? (exists in select clause?)
      * @param columnKeyName The key name of column. e.g. FOO, FOO_0_2 (NotNull)
      * @return The determination, true or false.
      */
@@ -463,7 +463,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setRelPropCache(Map<String, Map<String, TnPropertyMapping>> relPropCache) {
-        this._relPropCache = relPropCache;
+        _relPropCache = relPropCache;
     }
 
     public TnRelationRowCache getRelRowCache() {
@@ -471,7 +471,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setRelRowCache(TnRelationRowCache relRowCache) {
-        this._relRowCache = relRowCache;
+        _relRowCache = relRowCache;
     }
 
     public String getBaseSuffix() {
@@ -479,7 +479,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setBaseSuffix(String baseSuffix) {
-        this._baseSuffix = baseSuffix;
+        _baseSuffix = baseSuffix;
     }
 
     public String getRelationNoSuffix() {
@@ -487,7 +487,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setRelationNoSuffix(String relationNoSuffix) {
-        this._relationNoSuffix = relationNoSuffix;
+        _relationNoSuffix = relationNoSuffix;
     }
 
     public int getLimitRelationNestLevel() {
@@ -495,7 +495,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setLimitRelationNestLevel(int limitRelationNestLevel) {
-        this._limitRelationNestLevel = limitRelationNestLevel;
+        _limitRelationNestLevel = limitRelationNestLevel;
     }
 
     public int getCurrentRelationNestLevel() {
@@ -503,7 +503,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setCurrentRelationNestLevel(int currentRelationNestLevel) {
-        this._currentRelationNestLevel = currentRelationNestLevel;
+        _currentRelationNestLevel = currentRelationNestLevel;
     }
 
     public TnPropertyMapping getCurrentPropertyMapping() {
@@ -511,7 +511,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setCurrentPropertyType(TnPropertyMapping propertyType) {
-        this._currentPropertyMapping = propertyType;
+        _currentPropertyMapping = propertyType;
     }
 
     public boolean isCreateDeadLink() {
@@ -519,7 +519,7 @@ public class TnRelationRowCreationResource {
     }
 
     public void setCreateDeadLink(boolean createDeadLink) {
-        this._createDeadLink = createDeadLink;
+        _createDeadLink = createDeadLink;
     }
 
     public TnRelationSelector getRelationSelector() {

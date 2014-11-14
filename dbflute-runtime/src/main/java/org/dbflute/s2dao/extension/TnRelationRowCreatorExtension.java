@@ -142,8 +142,11 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         }
         if (value != null) {
             res.incrementValidValueCount();
-            doRegisterRelationValue(res, mapping, value);
         }
+        // null is also set to trace modified properties for specified properties
+        // little performance cost because only setupSelect and specified columns are here
+        // (no setupSelect relation does not come here: old days, S2Dao might be possible)
+        doRegisterRelationValue(res, mapping, value);
     }
 
     protected void doRegisterRelationValue(TnRelationRowCreationResource res, TnPropertyMapping mapping, Object value) {
@@ -315,7 +318,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     //                                                                     ===============
     @Override
     protected boolean isCreateDeadLink() {
-        return false;
+        return false; // DBFlute does not create dead-link relation, treated as null
     }
 
     @Override
