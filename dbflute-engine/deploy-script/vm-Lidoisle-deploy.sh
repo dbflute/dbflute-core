@@ -3,6 +3,7 @@ ant -f build.xml reflect-to-test-dbms-oracle
 
 cd ../dbflute-test-dbms-oracle/dbflute_maihamadb
 rm ./log/*.log
+. nextschema-renewal.sh
 . manage.sh renewal
 . diffworld-test.sh
 cd ../dbflute_resortlinedb
