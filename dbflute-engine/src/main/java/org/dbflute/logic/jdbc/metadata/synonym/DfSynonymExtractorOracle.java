@@ -557,28 +557,29 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     protected DfPrimaryKeyMeta getDBLinkSynonymPKInfo(Connection conn, String tableName, String dbLinkName) throws SQLException {
         final DfPrimaryKeyMeta pkInfo = new DfPrimaryKeyMeta();
         StringBuilder sb = new StringBuilder();
-        sb.append("select cols.OWNER, cols.CONSTRAINT_NAME, cols.TABLE_NAME, cols.COLUMN_NAME");
+        sb.append("select cols.OWNER, cols.CONSTRAINT_NAME, cols.TABLE_NAME, cols.COLUMN_NAME, cols.POSITION");
         sb.append("  from USER_CONS_COLUMNS@" + dbLinkName + " cols");
         sb.append("    left outer join USER_CONSTRAINTS@" + dbLinkName + " cons");
         sb.append("      on cols.CONSTRAINT_NAME = cons.CONSTRAINT_NAME");
         sb.append(" where cols.TABLE_NAME = '").append(tableName).append("'");
         sb.append("   and cons.CONSTRAINT_TYPE = 'P'");
         sb.append(" order by cols.POSITION");
-        Statement statement = null;
+        Statement st = null;
         ResultSet rs = null;
         try {
-            statement = conn.createStatement();
-            rs = statement.executeQuery(sb.toString());
+            st = conn.createStatement();
+            rs = st.executeQuery(sb.toString());
             while (rs.next()) {
-                String columnName = rs.getString("COLUMN_NAME");
-                String pkName = rs.getString("CONSTRAINT_NAME");
-                pkInfo.addPrimaryKey(columnName, pkName);
+                final String columnName = rs.getString("COLUMN_NAME");
+                final String pkName = rs.getString("CONSTRAINT_NAME");
+                final Integer pkPosition = rs.getInt("POSITION");
+                pkInfo.addPrimaryKey(columnName, pkName, pkPosition);
             }
             return pkInfo;
         } finally {
-            if (statement != null) {
+            if (st != null) {
                 try {
-                    statement.close();
+                    st.close();
                 } catch (SQLException ignored) {}
             }
             if (rs != null) {

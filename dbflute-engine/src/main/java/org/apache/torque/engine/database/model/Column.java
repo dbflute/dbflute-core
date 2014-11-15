@@ -153,6 +153,7 @@ import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfTypeMappingProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
@@ -194,6 +195,7 @@ public class Column {
     //                                           -----------
     protected boolean _isPrimaryKey;
     protected String _primaryKeyName;
+    protected Integer _primaryKeyPosition;
     protected boolean _additionalPrimaryKey;
 
     // -----------------------------------------------------
@@ -241,6 +243,7 @@ public class Column {
         // primary key
         _isPrimaryKey = ("true".equals(attrib.getValue("primaryKey")));
         _primaryKeyName = attrib.getValue("pkName");
+        _primaryKeyPosition = DfTypeUtil.toInteger(attrib.getValue("pkPosition"));
 
         // data type and size
         _jdbcType = attrib.getValue("type");
@@ -771,6 +774,14 @@ public class Column {
 
     public void setPrimaryKeyName(String primaryKeyName) {
         _primaryKeyName = primaryKeyName;
+    }
+
+    public Integer getPrimaryKeyPosition() {
+        return _primaryKeyPosition;
+    }
+
+    public void setPrimaryKeyPosition(Integer primaryKeyPosition) {
+        _primaryKeyPosition = primaryKeyPosition;
     }
 
     public boolean isAdditionalPrimaryKey() {

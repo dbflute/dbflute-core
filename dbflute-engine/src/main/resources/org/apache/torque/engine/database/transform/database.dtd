@@ -87,6 +87,7 @@ Java class or method name.
   required (true|false) "false"
   primaryKey (true|false) "false"
   pkName CDATA #IMPLIED
+  pkPosition CDATA #IMPLIED
   comment CDATA #IMPLIED
   default CDATA #IMPLIED
   autoIncrement (true|false) "false"

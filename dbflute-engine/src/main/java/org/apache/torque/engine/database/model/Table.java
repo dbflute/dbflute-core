@@ -136,6 +136,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
@@ -209,6 +210,11 @@ public class Table {
     protected final List<Column> _columnList = new ArrayList<Column>();
     protected final List<String> _columnNameList = new ArrayList<String>();
     protected final StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexible(); // only used as key-value
+
+    // -----------------------------------------------------
+    //                                           Primary Key
+    //                                           -----------
+    protected List<Column> _primaryKeyList; // lazy-loaded
 
     // -----------------------------------------------------
     //                                           Foreign Key
@@ -827,16 +833,26 @@ public class Table {
     /**
      * Returns the collection of Columns which make up the single primary
      * key for this table.
-     * @return A list of the primary key parts.
+     * @return A list of the primary key parts. (NotNull)
      */
     public List<Column> getPrimaryKey() {
-        final List<Column> pk = new ArrayList<Column>(_columnList.size());
+        if (_primaryKeyList != null) {
+            return _primaryKeyList;
+        }
+        final TreeMap<Integer, Column> treeMap = new TreeMap<Integer, Column>();
+        int justInCasePosition = 100001;
         for (Column column : _columnList) {
             if (column.isPrimaryKey()) {
-                pk.add(column);
+                Integer position = column.getPrimaryKeyPosition();
+                if (position == null) {
+                    position = justInCasePosition;
+                    ++justInCasePosition;
+                }
+                treeMap.put(position, column);
             }
         }
-        return pk;
+        _primaryKeyList = new ArrayList<Column>(treeMap.values());
+        return _primaryKeyList;
     }
 
     public Column getPrimaryKeyAsOne() {

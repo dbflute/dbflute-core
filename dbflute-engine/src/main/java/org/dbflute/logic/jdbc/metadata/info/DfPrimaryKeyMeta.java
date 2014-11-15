@@ -28,7 +28,7 @@ public class DfPrimaryKeyMeta {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, String> _primaryKeyMap = new LinkedHashMap<String, String>();
+    protected final Map<String, Map<String, Object>> _primaryKeyMap = new LinkedHashMap<String, Map<String, Object>>();
 
     // ===================================================================================
     //                                                                         Easy-to-Use
@@ -45,14 +45,24 @@ public class DfPrimaryKeyMeta {
         return new ArrayList<String>(_primaryKeyMap.keySet());
     }
 
-    public void addPrimaryKey(String columnName, String pkName) {
+    public void addPrimaryKey(String columnName, String pkName, Integer pkPosition) {
         // basically same PK name at any columns
-        // but meta data treats PK name per column 
-        _primaryKeyMap.put(columnName, pkName);
+        // but meta data treats PK name per column
+        final Map<String, Object> elementMap = new LinkedHashMap<String, Object>();
+        elementMap.put("columnName", columnName);
+        elementMap.put("pkName", pkName); // almost not null, but might be null
+        elementMap.put("pkPosition", pkPosition); // basically not null but consider null just in case
+        _primaryKeyMap.put(columnName, elementMap);
     }
 
     public String getPrimaryKeyName(String columnName) {
-        return _primaryKeyMap.get(columnName);
+        final Map<String, Object> elementMap = _primaryKeyMap.get(columnName);
+        return elementMap != null ? (String) elementMap.get("pkName") : null;
+    }
+
+    public Integer getPrimaryKeyPosition(String columnName) {
+        final Map<String, Object> elementMap = _primaryKeyMap.get(columnName);
+        return elementMap != null ? (Integer) elementMap.get("pkPosition") : null;
     }
 
     // ===================================================================================

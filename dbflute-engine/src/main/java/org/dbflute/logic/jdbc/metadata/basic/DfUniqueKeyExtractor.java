@@ -102,7 +102,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             // getting ordinal was implemented recently (1.0.5G) so it has just-in-case process
             final TreeMap<Integer, String> positionColumnNameMap = new TreeMap<Integer, String>();
             final Map<Integer, String> positionPkNameMap = new HashMap<Integer, String>();
-            int justInCaseIndex = 999;
+            int justInCaseIndex = 100001;
             while (rs.next()) {
                 final String metaTableName = rs.getString(3);
                 if (checkMetaTableDiffIfNeeds(tableName, metaTableName)) {
@@ -123,9 +123,10 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                 positionPkNameMap.put(ordinalPosition, pkName);
             }
             for (Entry<Integer, String> entry : positionColumnNameMap.entrySet()) {
+                final Integer pkPosition = entry.getKey();
                 final String columnName = entry.getValue();
-                final String pkName = positionPkNameMap.get(entry.getKey());
-                info.addPrimaryKey(columnName, pkName);
+                final String pkName = positionPkNameMap.get(pkPosition);
+                info.addPrimaryKey(columnName, pkName, pkPosition);
             }
         } finally {
             if (rs != null) {
@@ -190,7 +191,8 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         }
         final Set<Entry<Integer, String>> entrySet = pkMap.entrySet();
         for (Entry<Integer, String> entry : entrySet) {
-            info.addPrimaryKey(entry.getValue(), pkName);
+            final Integer pkPosition = entry.getKey();
+            info.addPrimaryKey(entry.getValue(), pkName, pkPosition);
         }
         return info;
     }

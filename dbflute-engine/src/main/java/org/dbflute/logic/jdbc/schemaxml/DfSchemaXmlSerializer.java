@@ -605,7 +605,11 @@ public class DfSchemaXmlSerializer {
             columnElement.setAttribute("primaryKey", "true");
             final String pkName = pkInfo.getPrimaryKeyName(columnName);
             if (pkName != null && pkName.trim().length() > 0) {
-                columnElement.setAttribute("pkName", pkInfo.getPrimaryKeyName(columnName));
+                columnElement.setAttribute("pkName", pkName);
+            }
+            final Integer pkPosition = pkInfo.getPrimaryKeyPosition(columnName);
+            if (pkPosition != null) {
+                columnElement.setAttribute("pkPosition", String.valueOf(pkPosition));
             }
         }
     }
