@@ -73,17 +73,22 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         final TnBeanMetaData yourBmd = rpt.getYourBeanMetaData();
         final DBMeta dbmeta = yourBmd.getDBMeta();
         if (!res.hasRowInstance()) { // always no instance here (check just in case)
-            final Object row;
-            if (dbmeta != null) {
-                row = dbmeta.newEntity();
-            } else { // no way (relation of DBFlute entity is only supported)
-                row = newRelationRow(rpt);
-            }
+            final Object row = newRelationRow(rpt, dbmeta);
             res.setRow(row);
         }
     }
 
-    protected Object newRelationRow(TnRelationPropertyType rpt) { // for non DBFlute entity
+    protected Object newRelationRow(TnRelationPropertyType rpt, DBMeta dbmeta) {
+        final Object row;
+        if (dbmeta != null) {
+            row = dbmeta.newEntity();
+        } else { // no way (relation of DBFlute entity is only supported)
+            row = newNonEntityRelationRow(rpt);
+        }
+        return row;
+    }
+
+    protected Object newNonEntityRelationRow(TnRelationPropertyType rpt) { // for non DBFlute entity
         return DfReflectionUtil.newInstance(rpt.getPropertyDesc().getPropertyType());
     }
 
@@ -140,6 +145,10 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
                 value = valueType.getValue(rs, columnName);
             }
         }
+        handleRelationValueRegistration(res, mapping, value);
+    }
+
+    protected void handleRelationValueRegistration(TnRelationRowCreationResource res, TnPropertyMapping mapping, Object value) {
         if (value != null) {
             res.incrementValidValueCount();
         }
