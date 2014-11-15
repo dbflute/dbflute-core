@@ -1394,13 +1394,13 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return invoke(createSelectCountCBCommand(cb, false));
     }
 
+    protected <RESULT extends ENTITY> List<RESULT> delegateSelectList(ConditionBean cb, Class<? extends RESULT> entityType) {
+        return invoke(createSelectListCBCommand(cb, entityType));
+    }
+
     protected <RESULT extends ENTITY> void delegateSelectCursor(ConditionBean cb, EntityRowHandler<RESULT> handler,
             Class<? extends RESULT> entityType) {
         invoke(createSelectCursorCBCommand(cb, handler, entityType));
-    }
-
-    protected <RESULT extends ENTITY> List<RESULT> delegateSelectList(ConditionBean cb, Class<? extends RESULT> entityType) {
-        return invoke(createSelectListCBCommand(cb, entityType));
     }
 
     protected <RESULT> RESULT delegateSelectNextVal(Class<RESULT> resultType) {
@@ -1461,6 +1461,20 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return new SelectCountCBCommand();
     }
 
+    protected <RESULT extends ENTITY> SelectListCBCommand<RESULT> createSelectListCBCommand(ConditionBean cb,
+            Class<? extends RESULT> entityType) {
+        assertBehaviorCommandInvoker("createSelectListCBCommand");
+        final SelectListCBCommand<RESULT> cmd = newSelectListCBCommand();
+        xsetupSelectCommand(cmd);
+        cmd.setConditionBean(cb);
+        cmd.setEntityType(entityType);
+        return cmd;
+    }
+
+    protected <RESULT extends ENTITY> SelectListCBCommand<RESULT> newSelectListCBCommand() {
+        return new SelectListCBCommand<RESULT>();
+    }
+
     protected <RESULT extends ENTITY> SelectCursorCBCommand<RESULT> createSelectCursorCBCommand(ConditionBean cb,
             EntityRowHandler<RESULT> entityRowHandler, Class<? extends RESULT> entityType) {
         assertBehaviorCommandInvoker("createSelectCursorCBCommand");
@@ -1474,20 +1488,6 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
 
     protected <RESULT extends ENTITY> SelectCursorCBCommand<RESULT> newSelectCursorCBCommand() {
         return new SelectCursorCBCommand<RESULT>();
-    }
-
-    protected <RESULT extends ENTITY> SelectListCBCommand<RESULT> createSelectListCBCommand(ConditionBean cb,
-            Class<? extends RESULT> entityType) {
-        assertBehaviorCommandInvoker("createSelectListCBCommand");
-        final SelectListCBCommand<RESULT> cmd = newSelectListCBCommand();
-        xsetupSelectCommand(cmd);
-        cmd.setConditionBean(cb);
-        cmd.setEntityType(entityType);
-        return cmd;
-    }
-
-    protected <RESULT extends ENTITY> SelectListCBCommand<RESULT> newSelectListCBCommand() {
-        return new SelectListCBCommand<RESULT>();
     }
 
     protected <RESULT> SelectNextValCommand<RESULT> createSelectNextValCommand(Class<RESULT> resultType) {
