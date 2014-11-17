@@ -56,7 +56,6 @@ public class HandyDateTest extends RuntimeTestCase {
         assertEquals(exp, new HandyDate(exp, pattern).toDisp(pattern));
         assertEquals(exp, new HandyDate(exp, gmtZone).toDisp(pattern));
         assertEquals(exp, new HandyDate(exp, gmtZone, pattern, usLoc).toDisp(pattern));
-        // TODO jflute impl: HandyDate RFC Date
         assertEquals(exp, new HandyDate("Thu, 13 Nov 2014 12:34:56 GMT", gmtZone, rfc1126, usLoc).toDisp(pattern));
     }
 
