@@ -17,6 +17,7 @@ package org.dbflute.cbean.sqlclause;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.dbflute.cbean.chelper.HpCBPurpose;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
@@ -1430,16 +1431,46 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                   Column NullObject
     //                                                                   =================
-    // TODO jflute impl: null object (SqlClause)
-    boolean hasColumnNullObject();
+    /**
+     * Enable the handling of column null object. (default is disabled)
+     */
+    void enableColumnNullObject(); // called by condition-bean
 
-    boolean isColumnNullObjectTable(String tableDbName);
+    /**
+     * Disable the handling of column null object. (back to default)
+     */
+    void disableColumnNullObject(); // called by condition-bean
 
-    void registerNullObjectColumn(String tableDbName, String columnDbName);
+    /**
+     * Is the handling of column null object enabled?
+     * @return The determination, true or false.
+     */
+    boolean isColumnNullObjectAllowed(); // called by result set handler
 
-    List<String> getLocalSpecifiedNullObjectColumnList();
+    /**
+     * Enable the handling of column null object geared to specify. (default is disabled, means checked)
+     */
+    void enableColumnNullObjectGearedToSpecify(); // called by SQL-clause creator
 
-    List<String> getRelationSpecifiedNullObjectColumnList(String relationNoSuffix);
+    /**
+     * Disable the handling of column null object geared to specify. (back to default)
+     */
+    void disableColumnNullObjectGearedToSpecify(); // called by SQL-clause creator
+
+    /**
+     * Get the set of column specified as null object for the local table. <br>
+     * Basically for synchronization with non-specified access check.
+     * @return The set of column info. (NotNull, EmptyAllowed)
+     */
+    Set<ColumnInfo> getLocalSpecifiedNullObjectColumnSet(); // called by row creator
+
+    /**
+     * Get the set of column specified as null object for the relation. <br>
+     * Basically for synchronization with non-specified access check.
+     * @param relationNoSuffix The suffix of relation No, same as foreign relation path. (NotNull)  
+     * @return The set of column info. (NotNull, EmptyAllowed)
+     */
+    Set<ColumnInfo> getRelationSpecifiedNullObjectColumnSet(String relationNoSuffix); // called by relation row creator
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================

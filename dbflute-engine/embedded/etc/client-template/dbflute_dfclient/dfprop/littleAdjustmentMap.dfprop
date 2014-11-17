@@ -22,6 +22,7 @@
 # o shortCharHandlingMode: (NotRequired - Default NONE)
 # o quoteTableNameList: (NotRequired - Default list:{})
 # o quoteColumnNameList: (NotRequired - Default list:{})
+# o columnNullObjectMap: (NotRequired - Default map:{})
 # o relationalNullObjectMap: (NotRequired - Default map:{})
 # o cursorSelectFetchSize: (NotRequired - Default null)
 #
@@ -239,14 +240,33 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o columnNullObjectMap: (NotRequired - Default map:{})
+    #  You can get a null object when the column is null.
+    #
+    #; columnNullObjectMap = map:{
+    #    ; providerPackage = $$packageBase$$.nogen.cache
+    #    ; isGearedToSpecify = true
+    #    ; columnMap = map:{
+    #        ; MEMBER_STATUS = map:{
+    #            ; DESCRIPTION = CachedMemberStatus.get(this, "$$columnName$$", $$primaryKey$$)
+    #        }
+    #        ; MEMBER_SECURITY = map:{
+    #            ; REMINDER_ANSWER = CachedMemberSecurity.get(this, "$$columnName$$", $$primaryKey$$)
+    #            ; REMINDER_QUESTION = CachedMemberSecurity.get(this, "$$columnName$$", $$primaryKey$$)
+    #        }
+    #    }
+    #}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o relationalNullObjectMap: (NotRequired - Default map:{})
     #  You can get a null object when the relation is null.
     #
     #; relationalNullObjectMap = map:{
     #    ; providerPackage = $$packageBase$$.nogen.cache
     #    ; foreignMap = map:{
-    #        ; MEMBER_STATUS = CachedMemberStatus.get($$PrimaryKey$$)
-    #        ; MEMBER_SECURITY = CachedMemberSecurity.get($$PrimaryKey$$)
+    #        ; MEMBER_STATUS = CachedMemberStatus.get(this, "$$foreignPropertyName$$", $$primaryKey$$)
+    #        ; MEMBER_SECURITY = CachedMemberSecurity.get(this, "$$foreignPropertyName$$", $$primaryKey$$)
     #    }
     #}
     # - - - - - - - - - -/

@@ -380,6 +380,12 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
+    public void enableColumnNullObject() {
+    }
+
+    public void disableColumnNullObject() {
+    }
+
     public void enableQueryUpdateCountPreCheck() {
     }
 

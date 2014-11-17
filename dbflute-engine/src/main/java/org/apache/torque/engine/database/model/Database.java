@@ -1051,6 +1051,7 @@ public class Database {
         // give up because all mark provides complex structure and also for Sql2Entity case
         // so cost-benefit performance is low (to suppress degrading is prior)
         //prop.getClassificationProperties().checkProperties(tableDeterminer);
+        prop.getLittleAdjustmentProperties().checkDefinition(tableDeterminer);
         prop.getSequenceIdentityProperties().checkDefinition(tableDeterminer);
 
         getBasicProperties().checkDirectoryPackage();
@@ -2042,6 +2043,14 @@ public class Database {
 
     public String getFixedPagingByCursorSkipSynchronizedFetchSize() {
         return getLittleAdjustmentProperties().getFixedPagingByCursorSkipSynchronizedFetchSize();
+    }
+
+    public boolean isColumnNullObjectAllowed() {
+        return getLittleAdjustmentProperties().isColumnNullObjectAllowed();
+    }
+
+    public boolean isColumnNullObjectGearedToSpecify() {
+        return getLittleAdjustmentProperties().isColumnNullObjectGearedToSpecify();
     }
 
     public boolean isBatchInsertColumnModifiedPropertiesFragmentedDisallowed() {

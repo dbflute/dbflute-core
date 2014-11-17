@@ -299,7 +299,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             , String columnDbType, Integer columnSize, Integer decimalDigits, String defaultValue // column type
             , boolean commonColumn, OptimisticLockType optimisticLockType, String columnComment // column others
             , String foreignListExp, String referrerListExp // relation property
-            , ClassificationMeta classificationMeta // various info
+            , ClassificationMeta classificationMeta, boolean canBeNullObject // various info
     ) { // createColumnInfo()
         final Class<?> realPt = chooseColumnPropertyAccessType(objectNativeType, propertyName, propertyAccessType);
         final String delimiter = ",";
@@ -314,7 +314,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         final PropertyMethodFinder propertyMethodFinder = createColumnPropertyMethodFinder();
         return new ColumnInfo(this, columnDbName, columnSqlName, columnSynonym, columnAlias, objectNativeType, propertyName, realPt,
                 primary, autoIncrement, notNull, columnDbType, columnSize, decimalDigits, defaultValue, commonColumn, optimisticLockType,
-                columnComment, foreignPropList, referrerPropList, classificationMeta, propertyMethodFinder);
+                columnComment, foreignPropList, referrerPropList, classificationMeta, canBeNullObject, propertyMethodFinder);
     }
 
     protected Class<?> chooseColumnPropertyAccessType(Class<?> objectNativeType, String propertyName, Class<?> propertyAccessType) {
@@ -492,13 +492,13 @@ public abstract class AbstractDBMeta implements DBMeta {
             , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, Class<?> propertyAccessType // relation attribute
             , boolean oneToOne, boolean bizOneToOne, boolean referrerAsOne, boolean additionalFK // relation type
             , String fixedCondition, List<String> dynamicParameterList, boolean fixedInline // fixed condition
-            , String reversePropertyName // various info
+            , String reversePropertyName, boolean canBeNullObject // various info
     ) { // createForeignInfo()
         final Class<?> realPt = chooseForeignPropertyAccessType(foreignDbm, propertyAccessType);
         final PropertyMethodFinder propertyMethodFinder = createForeignPropertyMethodFinder();
         return new ForeignInfo(constraintName, foreignPropertyName, localDbm, foreignDbm, localForeignColumnInfoMap, relationNo, realPt,
                 oneToOne, bizOneToOne, referrerAsOne, additionalFK, fixedCondition, dynamicParameterList, fixedInline, reversePropertyName,
-                propertyMethodFinder);
+                canBeNullObject, propertyMethodFinder);
     }
 
     protected Class<?> chooseForeignPropertyAccessType(DBMeta foreignDbm, Class<?> specifiedType) {

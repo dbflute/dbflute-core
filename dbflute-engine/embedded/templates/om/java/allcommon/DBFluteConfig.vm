@@ -89,6 +89,8 @@ public class ${glDBFluteConfig} {
     protected boolean _emptyStringParameterAllowed;
     protected boolean _overridingQueryAllowed = ${database.isOverridingQueryAllowed()};
     protected boolean _nonSpecifiedColumnAccessAllowed = ${database.isNonSpecifiedColumnAccessAllowed()};
+    protected boolean _columnNullObjectAllowed = ${database.isColumnNullObjectAllowed()};
+    protected boolean _columnNullObjectGearedToSpecify = ${database.isColumnNullObjectGearedToSpecify()};
     protected boolean _disableSelectIndex;
     protected boolean _queryUpdateCountPreCheck = ${database.isQueryUpdateCountPreCheck()};
 
@@ -339,6 +341,43 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting nonSpecifiedColumnAccessAllowed: " + nonSpecifiedColumnAccessAllowed);
         }
         _nonSpecifiedColumnAccessAllowed = nonSpecifiedColumnAccessAllowed;
+    }
+
+    // ===================================================================================
+    //                                                                  Column Null Object
+    //                                                                  ==================
+    public boolean isColumnNullObjectAllowed() {
+        return _columnNullObjectAllowed;
+    }
+
+    /**
+     * Set whether column null object is allowed or not. <br>
+     * This configuration is only for ConditionBean.
+     * @param columnNullObjectAllowed The determination, true or false.
+     */
+    public void setColumnNullObjectAllowed(boolean columnNullObjectAllowed) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting columnNullObjectAllowed: " + columnNullObjectAllowed);
+        }
+        _columnNullObjectAllowed = columnNullObjectAllowed;
+    }
+
+    public boolean isColumnNullObjectGearedToSpecify() {
+        return _columnNullObjectGearedToSpecify;
+    }
+
+    /**
+     * Set whether column null object is geared to specify or not. <br>
+     * This configuration is only for ConditionBean.
+     * @param columnNullObjectGearedToSpecify The determination, true or false.
+     */
+    public void setColumnNullObjectGearedToSpecify(boolean columnNullObjectGearedToSpecify) {
+        assertUnlocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting columnNullObjectGearedToSpecify: " + columnNullObjectGearedToSpecify);
+        }
+        _columnNullObjectGearedToSpecify = columnNullObjectGearedToSpecify;
     }
 
     // ===================================================================================

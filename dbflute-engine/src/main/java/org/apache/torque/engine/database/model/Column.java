@@ -2700,6 +2700,20 @@ public class Column {
     //}
 
     // ===================================================================================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    public boolean canBeColumnNullObject() {
+        return getLittleAdjustmentProperties().hasColumnNullObject(getTable().getTableDbName(), getName());
+    }
+
+    public String getColumnNullObjectProviderExp() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final Table table = getTable();
+        final String pkExp = table.getPrimaryKeyGetterCommaString();
+        return prop.buildColumnNullObjectProviderExp(table.getTableDbName(), getName(), pkExp);
+    }
+
+    // ===================================================================================
     //                                                                          Simple DTO
     //                                                                          ==========
     public String getSimpleDtoVariableName() {

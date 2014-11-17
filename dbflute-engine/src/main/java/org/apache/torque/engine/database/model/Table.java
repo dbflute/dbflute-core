@@ -3765,25 +3765,51 @@ public class Table {
     }
 
     // ===================================================================================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    public boolean canBeColumnNullObject() {
+        return getLittleAdjustmentProperties().hasColumnNullObject(getTableDbName());
+    }
+
+    public boolean hasColumnNullObjectProviderImport() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final String providerPackage = prop.getColumnNullObjectProviderPackage();
+        return providerPackage != null && hasColumnNullObjectColumn();
+    }
+
+    public String getColumnNullObjectProviderPackage() {
+        return getLittleAdjustmentProperties().getColumnNullObjectProviderPackage();
+    }
+
+    protected boolean hasColumnNullObjectColumn() {
+        for (Column col : getColumnList()) {
+            if (col.canBeColumnNullObject()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                              Relational Null Object
     //                                                              ======================
     public boolean canBeRelationalNullObjectForeign() {
         return getLittleAdjustmentProperties().hasRelationalNullObjectForeign(getTableDbName());
     }
 
-    public String getRelationalNullObjectProviderForeignExp() {
+    public String buildRelationalNullObjectProviderForeignExp(String foreignProperty, String beansRuleProperty, String pkExp) {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        return prop.getRelationalNullObjectProviderForeignExp(getTableDbName());
+        return prop.buildRelationalNullObjectProviderForeignExp(getTableDbName(), foreignProperty, beansRuleProperty, pkExp);
     }
 
     public boolean hasRelationalNullObjectProviderImport() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        final String providerPackage = prop.getNullObjectProviderPackage();
+        final String providerPackage = prop.getRelationalNullObjectProviderPackage();
         return providerPackage != null && hasRelationalNullObjectForeignKey();
     }
 
     public String getRelationalNullObjectProviderPackage() {
-        return getLittleAdjustmentProperties().getNullObjectProviderPackage();
+        return getLittleAdjustmentProperties().getRelationalNullObjectProviderPackage();
     }
 
     protected boolean hasRelationalNullObjectForeignKey() {

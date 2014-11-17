@@ -100,7 +100,6 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     // -----------------------------------------------------
     //                                      ResultSetHandler
     //                                      ----------------
-    // TODO jflute impl: factory for result set handler
     protected TnResultSetHandler createBeanListResultSetHandler(TnBeanMetaData bmd) {
         return _resultSetHandlerFactory.createBeanListResultSetHandler(bmd, _beanMetaDataFactory.getRelationRowOptionalHandler());
     }

@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.dbflute.bhv.core.context.ResourceContext;
+import org.dbflute.cbean.ConditionBean;
 import org.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
@@ -135,10 +136,12 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * Adjust created row for base-point table.
      * @param row The row of result list. (NotNull)
      * @param checkNonSp Does is use the check of access to non-specified column?
+     * @param colNullObj Does is use the handling of column null object?
      * @param basePointBmd The bean meta data of the row for base-point table. (NotNull)
+     * @param cb The condition-bean for the select. (NullAllowed: when not condition-bean select)
      */
-    protected void adjustCreatedRow(final Object row, boolean checkNonSp, TnBeanMetaData basePointBmd) {
-        TnRowCreatorExtension.adjustCreatedRow(row, checkNonSp, basePointBmd);
+    protected void adjustCreatedRow(Object row, boolean checkNonSp, boolean colNullObj, TnBeanMetaData basePointBmd, ConditionBean cb) {
+        TnRowCreatorExtension.adjustCreatedRow(row, checkNonSp, colNullObj, basePointBmd, cb);
     }
 
     /**
@@ -148,7 +151,7 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @param relSelector The selector of relation, which has various determination. (NotNull)
      * @param rpt The property type of the relation. (NotNull)
      */
-    protected void adjustCreatedRelationRow(final Object relationRow, String relationNoSuffix, TnRelationSelector relSelector,
+    protected void adjustCreatedRelationRow(Object relationRow, String relationNoSuffix, TnRelationSelector relSelector,
             TnRelationPropertyType rpt) {
         TnRelationRowCreatorExtension.adjustCreatedRelationRow(relationRow, relationNoSuffix, relSelector, rpt);
     }

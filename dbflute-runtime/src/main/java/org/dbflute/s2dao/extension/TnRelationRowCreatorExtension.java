@@ -20,10 +20,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.accessory.ColumnNullObjectable;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -249,20 +251,28 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         // *similar implementation for base-point row exists, see it for the details
         if (relationRow instanceof Entity) {
             final Entity entity = (Entity) relationRow;
+
+            // check access to non-specified-column
             if (!relSelector.isNonSpecifiedColumnAccessAllowed(relationNoSuffix) // not allowed
                     && relSelector.isUsingSpecifyColumnInRelation(relationNoSuffix)) { // and use SpecifyColumn
                 entity.modifiedToSpecified(); // so check it
 
-                // column null object handling
-                // *similar implementation for base-point row exists, see it for the details
-                // TODO jflute impl: null object (relation row creator)
-                //if (relSelector.isColumnNullObjectTable(entity)) {
-                //    for (ColumnInfo columnInfo : relSelector.getSpecifiedNullObjectColumnList(entity, relationNoSuffix)) {
-                //        entity.myspecifyProperty(columnInfo.getPropertyName());
-                //    }
-                //}
+                // adjust specification for column null object handling
+                final Set<ColumnInfo> nullObjectColumnSet = relSelector.getRelationSpecifiedNullObjectColumnSet(relationNoSuffix);
+                for (ColumnInfo columnInfo : nullObjectColumnSet) { // might be empty loop if no null object
+                    entity.myspecifyProperty(columnInfo.getPropertyName());
+                }
             }
+            // enable the handling of column null object if allowed and object-able
+            if (relSelector.isColumnNullObjectEnabled(relationNoSuffix) && entity instanceof ColumnNullObjectable) {
+                ((ColumnNullObjectable) entity).enableColumnNullObject();
+            }
+
+            // clear modified properties for update process using selected entity
             entity.clearModifiedInfo();
+
+            // mark as select to determine the entity is selected or user-created
+            // basically for e.g. determine columns of batch insert
             entity.markAsSelect();
         } else { // not DBFlute entity
             // actually any bean meta data can be accepted

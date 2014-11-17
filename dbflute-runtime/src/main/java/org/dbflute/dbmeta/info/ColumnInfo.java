@@ -100,6 +100,7 @@ public class ColumnInfo {
     protected final List<String> _referrerPropList;
     protected final boolean _foreignKey;
     protected final ClassificationMeta _classificationMeta;
+    protected final boolean _canBeNullObject;
     protected final PropertyGateway _propertyGateway;
     protected final PropertyMethodFinder _propertyMethodFinder;
     protected final Method _readMethod;
@@ -115,7 +116,7 @@ public class ColumnInfo {
             , String columnDbType, Integer columnSize, Integer decimalDigits, String defaultValue // column type
             , boolean commonColumn, OptimisticLockType optimisticLockType, String columnComment // column others
             , List<String> foreignPropList, List<String> referrerPropList // relation property
-            , ClassificationMeta classificationMeta, PropertyMethodFinder propertyMethodFinder // various info
+            , ClassificationMeta classificationMeta, boolean canBeNullObject, PropertyMethodFinder propertyMethodFinder // various info
     ) { // big constructor
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
@@ -146,6 +147,7 @@ public class ColumnInfo {
         _referrerPropList = referrerPropList != null ? referrerPropList : EMPTY_LIST;
         _foreignKey = foreignPropList != null && !foreignPropList.isEmpty();
         _classificationMeta = classificationMeta;
+        _canBeNullObject = canBeNullObject;
         _propertyGateway = findPropertyGateway();
         _propertyMethodFinder = propertyMethodFinder; // before finding
         _readMethod = findReadMethod();
@@ -697,5 +699,13 @@ public class ColumnInfo {
      */
     public ClassificationMeta getClassificationMeta() {
         return _classificationMeta;
+    }
+
+    /**
+     * Can the column be null object?
+     * @return The determination, true or false.
+     */
+    public boolean canBeNullObject() {
+        return _canBeNullObject;
     }
 }

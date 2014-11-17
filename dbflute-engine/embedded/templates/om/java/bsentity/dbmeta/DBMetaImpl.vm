@@ -178,7 +178,7 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                         Column Info
     //                                                                         ===========
 #foreach ($col in $table.columns)
-    protected final ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.columnSqlName}", ${col.synonymSettingExpression}, ${col.aliasSettingExpression}, ${col.javaNativeTypeLiteral}, "${col.javaBeansRulePropertyName}", ${col.propertyAccessTypeLiteral}, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, ${col.isNotNull()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.defaultValueSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression}, ${col.classificationMetaSettingExpression});
+    protected final ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", "${col.columnSqlName}", ${col.synonymSettingExpression}, ${col.aliasSettingExpression}, ${col.javaNativeTypeLiteral}, "${col.javaBeansRulePropertyName}", ${col.propertyAccessTypeLiteral}, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, ${col.isNotNull()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.defaultValueSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression}, ${col.classificationMetaSettingExpression}, ${col.canBeColumnNullObject()});
 #end
 
 #foreach ($col in $table.columns)
@@ -250,7 +250,7 @@ public class ${myClassName} extends AbstractDBMeta {
         mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cfi("${fk.name}", "${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}.getInstance(), mp, ${table.resolveForeignIndex($fk)}, ${fk.foreignPropertyAccessTypeMetaLiteral}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, false, ${fk.isAdditionalForeignKey()}, ${fk.fixedConditionArg}, ${fk.dynamicFixedConditionDBMetaSetupList}, ${fk.isFixedInline()}, ${fk.foreignReverseRelationPropertyNameArg});
+        return cfi("${fk.name}", "${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}.getInstance(), mp, ${table.resolveForeignIndex($fk)}, ${fk.foreignPropertyAccessTypeMetaLiteral}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, false, ${fk.isAdditionalForeignKey()}, ${fk.fixedConditionArg}, ${fk.dynamicFixedConditionDBMetaSetupList}, ${fk.isFixedInline()}, ${fk.foreignReverseRelationPropertyNameArg}, ${fk.canBeRelationalNullObjectForeign()});
     }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
@@ -270,7 +270,7 @@ public class ${myClassName} extends AbstractDBMeta {
         mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cfi("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), mp, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.referrerPropertyAccessTypeMetaLiteralAsOne}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, true, ${referrer.isAdditionalForeignKey()}, ${referrer.fixedConditionArg}, ${referrer.dynamicFixedConditionDBMetaSetupList}, ${referrer.isFixedInline()}, ${referrer.referrerReverseRelationPropertyNameArg});
+        return cfi("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), mp, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.referrerPropertyAccessTypeMetaLiteralAsOne}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, true, ${referrer.isAdditionalForeignKey()}, ${referrer.fixedConditionArg}, ${referrer.dynamicFixedConditionDBMetaSetupList}, ${referrer.isFixedInline()}, ${referrer.referrerReverseRelationPropertyNameArg}, ${referrer.canBeRelationalNullObjectForeign()});
     }
 #end
 

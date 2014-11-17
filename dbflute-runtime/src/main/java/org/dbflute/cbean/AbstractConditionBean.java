@@ -159,8 +159,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** The max result size of safety select. {Internal} */
     protected int _safetyMaxResultSize;
 
-    /** Does it check record count before QueryUpdate? (contains QueryDelete) {Internal} */
-    protected boolean _queryUpdateCountPreCheck;
+    /** The option of cursor select. {Internal} (NullAllowed) */
+    protected CursorSelectOption _cursorSelectOption; // set by sub-class
 
     /** The configuration of statement. {Internal} (NullAllowed) */
     protected StatementConfig _statementConfig;
@@ -171,8 +171,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** Does it allow access to non-specified column? {Internal} */
     protected boolean _nonSpecifiedColumnAccessAllowed; // the default is on the DBFlute generator (false @since 1.1)
 
-    /** The option of cursor select. {Internal} (NullAllowed) */
-    protected CursorSelectOption _cursorSelectOption; // set by sub-class
+    /** Does it check record count before QueryUpdate? (contains QueryDelete) {Internal} */
+    protected boolean _queryUpdateCountPreCheck;
 
     /** The handler of derived type. {Internal} (NullAllowed: lazy-loaded) */
     protected DerivedTypeHandler _derivedTypeHandler;
@@ -1315,34 +1315,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // ===================================================================================
-    //                                                                        Query Update
-    //                                                                        ============
-    /**
-     * {@inheritDoc}
-     */
-    public void enableQueryUpdateCountPreCheck() {
-        assertOptionThatBadTiming("enableQueryUpdateCountPreCheck()");
-        _queryUpdateCountPreCheck = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void disableQueryUpdateCountPreCheck() {
-        assertOptionThatBadTiming("disableQueryUpdateCountPreCheck()");
-        _queryUpdateCountPreCheck = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isQueryUpdateCountPreCheck() {
-        return _queryUpdateCountPreCheck;
-    }
-
-    // ===================================================================================
-    //                                                                     StatementConfig
-    //                                                                     ===============
+    //                                                             Statement Configuration
+    //                                                             =======================
     /**
      * {@inheritDoc}
      */
@@ -1411,6 +1385,45 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** {@inheritDoc} */
     public boolean isNonSpecifiedColumnAccessAllowed() {
         return _nonSpecifiedColumnAccessAllowed;
+    }
+
+    // ===================================================================================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    /** {@inheritDoc} */
+    public void enableColumnNullObject() {
+        assertOptionThatBadTiming("enableColumnNullObject()");
+        getSqlClause().enableColumnNullObject();
+    }
+
+    /** {@inheritDoc} */
+    public void disableColumnNullObject() { // e.g. called by cache method in application
+        assertOptionThatBadTiming("disableColumnNullObject()");
+        getSqlClause().disableColumnNullObject();
+    }
+
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    /** {@inheritDoc} */
+    public void enableQueryUpdateCountPreCheck() {
+        assertOptionThatBadTiming("enableQueryUpdateCountPreCheck()");
+        _queryUpdateCountPreCheck = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void disableQueryUpdateCountPreCheck() {
+        assertOptionThatBadTiming("disableQueryUpdateCountPreCheck()");
+        _queryUpdateCountPreCheck = false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isQueryUpdateCountPreCheck() {
+        return _queryUpdateCountPreCheck;
     }
 
     // ===================================================================================

@@ -24,6 +24,9 @@ import org.dbflute.Entity;
 #end
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.AbstractEntity;
+#if (${table.canBeColumnNullObject()})
+import org.dbflute.dbmeta.accessory.ColumnNullObjectable;
+#end
 #if ($isSql2Entity)
 import org.dbflute.dbmeta.accessory.CustomizeEntity;
 #else
@@ -48,6 +51,9 @@ import ${myExtendedEntityPackageName}.*;
 #if ($table.isLoadableCustomizeEntity())
 import ${glPackageExtendedEntity}.*;
 #end
+#if ($table.hasColumnNullObjectProviderImport())
+import ${table.columnNullObjectProviderPackage}.*;
+#end
 #if ($table.hasRelationalNullObjectProviderImport())
 import ${table.relationalNullObjectProviderPackage}.*;
 #end
@@ -59,6 +65,9 @@ import ${table.relationalNullObjectProviderPackage}.*;
 #end
 #if (${table.hasAllCommonColumn()})
 #set ($myEntityInterfaceDef = "${myEntityInterfaceDef}, ${glEntityDefinedCommonColumn}")
+#end
+#if (${table.canBeColumnNullObject()})
+#set ($myEntityInterfaceDef = "${myEntityInterfaceDef}, ColumnNullObjectable")
 #end
 
 /**
@@ -120,6 +129,11 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #foreach ($col in $table.columns)
     /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
     protected ${col.javaNative} _${col.uncapitalisedJavaName};
+
+#end
+#if (${table.canBeColumnNullObject()})
+    /** Is the handling of column null object enabled? */
+    protected boolean _columnNullObjectEnabled;
 
 #end
     // ===================================================================================
@@ -322,7 +336,6 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
     //                                                                    Foreign Property
     //                                                                    ================
 #foreach ($fk in $table.foreignKeys)
-#set ($foreignTable = $fk.foreignTable)
 #set ($foreignEntityClassName = "${fk.foreignPropertyEntityDefinitionType}")
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
     /** ${fk.foreignSimpleDisp}. */
@@ -338,11 +351,15 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #end
      */
     public ${foreignEntityClassName} get${fk.foreignJavaBeansRulePropertyNameInitCap}() {
-#if ($foreignTable.canBeRelationalNullObjectForeign())
-        if (${foreignVariableName} == null) { ${foreignVariableName} = ${fk.relationalNullObjectProviderForeignExp}; }
-#end
 #if ($fk.isForeignPropertyOptionalEntity())
         if (${foreignVariableName} == null) { ${foreignVariableName} = ${database.relationOptionalEntitySimpleName}.relationEmpty(this, "${fk.foreignJavaBeansRulePropertyName}"); }
+#end
+#if ($fk.canBeRelationalNullObjectForeign())
+#if ($fk.isForeignPropertyOptionalEntity())
+        if (${foreignVariableName}.${fk.relationalNullObjectForeignEmptyExp}) { ${foreignVariableName} = ${fk.relationalNullObjectForeignProviderExp}; }
+#else
+        if (${foreignVariableName} == null) { ${foreignVariableName} = ${fk.relationalNullObjectForeignProviderExp}; }
+#end
 #end
         return ${foreignVariableName};
     }
@@ -357,7 +374,6 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 
 #end
 #foreach ($referrer in $table.referrerAsOneList)
-#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerPropertyEntityDefinitionTypeAsOne}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
     /** ${referrer.referrerSimpleDispAsOne}. */
@@ -373,11 +389,15 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #end
      */
     public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
-#if ($referrerTable.canBeRelationalNullObjectForeign())
-        if (${referrerVariableName} == null) { ${referrerVariableName} = ${referrer.relationalNullObjectProviderReferrerExp}; }
-#end
 #if ($referrer.isReferrerPropertyOptionalEntityAsOne())
         if (${referrerVariableName} == null) { ${referrerVariableName} = ${database.relationOptionalEntitySimpleName}.relationEmpty(this, "${referrer.referrerJavaBeansRulePropertyNameAsOne}"); }
+#end
+#if ($referrer.canBeRelationalNullObjectReferrerAsOne())
+#if ($referrer.isForeignPropertyOptionalEntity())
+        if (${referrerVariableName}.${referrer.relationalNullObjectReferrerAsOneEmptyExp}) { ${referrerVariableName} = ${referrer.relationalNullObjectReferrerAsOneProviderExp}; }
+#else
+        if (${referrerVariableName} == null) { ${referrerVariableName} = ${referrer.relationalNullObjectReferrerAsOneProviderExp}; }
+#end
 #end
         return ${referrerVariableName};
     }
@@ -395,7 +415,6 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
     //                                                                   Referrer Property
     //                                                                   =================
 #foreach ($referrer in $table.referrerAsManyList)
-#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
     /** ${referrer.referrerSimpleDisp}. */
@@ -454,7 +473,6 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
     }
 
 #foreach ($referrer in $domain.referrerAsManyList)
-#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
     /**
      * ${referrer.referrerDispForJavaDoc}
@@ -472,6 +490,21 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
     protected <ELEMENT> List<ELEMENT> newReferrerList() {
         return new ArrayList<ELEMENT>();
     }
+#if (${table.canBeColumnNullObject()})
+
+    // ===================================================================================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    /** {@inheritDoc} */
+    public void enableColumnNullObject() {
+        _columnNullObjectEnabled = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableColumnNullObject() {
+        _columnNullObjectEnabled = true;
+    }
+#end
 
     // ===================================================================================
     //                                                                      Basic Override
@@ -628,6 +661,14 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #end
     public ${col.javaNative} get${col.javaName}() {
         checkSpecifiedProperty("${col.javaBeansRulePropertyName}");
+#if ($col.canBeColumnNullObject())
+#if ($col.isEntityConvertEmptyStringToNull())
+        if (_columnNullObjectEnabled && convertEmptyToNull(_${col.uncapitalisedJavaName}) == null)
+        { _${col.uncapitalisedJavaName} = ${col.columnNullObjectProviderExp}; }
+#else
+        if (_${col.uncapitalisedJavaName} == null) { _${col.uncapitalisedJavaName} = ${col.columnNullObjectProviderExp}; }
+#end
+#end
 #if ($col.isEntityConvertEmptyStringToNull())
         return convertEmptyToNull(_${col.uncapitalisedJavaName});
 #else
