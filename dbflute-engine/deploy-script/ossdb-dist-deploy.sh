@@ -6,6 +6,8 @@ ant -f build.xml reflect-to-test-dbms-mysql
 ant -f build.xml reflect-to-test-dbms-postgresql
 ant -f build.xml reflect-to-test-dbms-derby
 ant -f build.xml reflect-to-test-dbms-sqlite
+ant -f build.xml reflect-to-test-option-compatible10x
+ant -f build.xml reflect-to-example-on-springboot
 
 cd ..
 export answer=y
@@ -56,6 +58,18 @@ cd ..
 mvn -e compile
 
 cd ../dbflute-test-dbms-sqlite/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal
+cd ..
+mvn -e compile
+
+cd ../dbflute-test-option-compatible10x/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal
+cd ..
+mvn -e compile
+
+cd ../dbflute-example-on-springboot/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
 cd ..
