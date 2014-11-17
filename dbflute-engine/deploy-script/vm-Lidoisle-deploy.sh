@@ -1,6 +1,8 @@
 cd ..
 ant -f build.xml reflect-to-test-dbms-oracle
 
+export answer=y
+
 cd ../dbflute-test-dbms-oracle/dbflute_maihamadb
 rm ./log/*.log
 . nextschema-renewal.sh
