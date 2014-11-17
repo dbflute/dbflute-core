@@ -212,11 +212,6 @@ public class Table {
     protected final StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexible(); // only used as key-value
 
     // -----------------------------------------------------
-    //                                           Primary Key
-    //                                           -----------
-    protected List<Column> _primaryKeyList; // lazy-loaded
-
-    // -----------------------------------------------------
     //                                           Foreign Key
     //                                           -----------
     // map style because of removing in the final initialization
@@ -836,9 +831,6 @@ public class Table {
      * @return A list of the primary key parts. (NotNull)
      */
     public List<Column> getPrimaryKey() {
-        if (_primaryKeyList != null) {
-            return _primaryKeyList;
-        }
         final TreeMap<Integer, Column> treeMap = new TreeMap<Integer, Column>();
         int justInCasePosition = 100001;
         for (Column column : _columnList) {
@@ -851,17 +843,18 @@ public class Table {
                 treeMap.put(position, column);
             }
         }
-        _primaryKeyList = new ArrayList<Column>(treeMap.values());
-        return _primaryKeyList;
+        // cannot cache it because of additional primary key
+        return new ArrayList<Column>(treeMap.values());
     }
 
     public Column getPrimaryKeyAsOne() {
-        if (getPrimaryKey().size() != 1) {
+        final List<Column> pkList = getPrimaryKey();
+        if (pkList.size() != 1) {
             String msg = "This method is for only-one primary-key:";
-            msg = msg + " getPrimaryKey().size()=" + getPrimaryKey().size() + " table=" + getTableDbName();
+            msg = msg + " getPrimaryKey().size()=" + pkList.size() + " table=" + getTableDbName();
             throw new IllegalStateException(msg);
         }
-        return getPrimaryKey().get(0);
+        return pkList.get(0);
     }
 
     public String getPrimaryKeyNameAsOne() {

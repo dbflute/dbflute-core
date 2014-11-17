@@ -243,7 +243,7 @@ public class Column {
         // primary key
         _isPrimaryKey = ("true".equals(attrib.getValue("primaryKey")));
         _primaryKeyName = attrib.getValue("pkName");
-        _primaryKeyPosition = DfTypeUtil.toInteger(attrib.getValue("pkPosition"));
+        _primaryKeyPosition = DfTypeUtil.toInteger(attrib.getValue("pkPosition")); // null allowed for compatible
 
         // data type and size
         _jdbcType = attrib.getValue("type");
