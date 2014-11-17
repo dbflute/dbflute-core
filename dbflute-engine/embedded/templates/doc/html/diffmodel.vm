@@ -328,7 +328,7 @@ ${selector.historyHtmlJavaScriptEmbedded}
 
 <h2>Thanks</h2>
 <p>
-	Created by DBFlute(AutoGenerator)
+	Created by <a href="http://dbflute.org/">DBFlute(AutoGenerator)</a>
 </p>
 </body>
 </html>

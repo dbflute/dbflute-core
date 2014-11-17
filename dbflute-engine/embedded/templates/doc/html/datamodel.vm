@@ -512,7 +512,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 <h2>Thanks</h2>
 <p>
-	Created by DBFlute(AutoGenerator)
+	Created by <a href="http://dbflute.org/">DBFlute(AutoGenerator)</a>
 </p>
 <script>
 /**
