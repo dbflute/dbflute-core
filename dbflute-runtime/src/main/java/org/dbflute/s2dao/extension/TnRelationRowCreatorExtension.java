@@ -47,17 +47,17 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final TnRelationRowOptionalHandler _optionalFactory;
+    protected final TnRelationRowOptionalHandler _optionalHandler;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnRelationRowCreatorExtension(TnRelationRowOptionalHandler optionalFactory) {
-        _optionalFactory = optionalFactory;
+    public TnRelationRowCreatorExtension(TnRelationRowOptionalHandler optionalHandler) {
+        _optionalHandler = optionalHandler;
     }
 
-    public static TnRelationRowCreatorExtension createRelationRowCreator(TnRelationRowOptionalHandler optionalFactory) {
-        return new TnRelationRowCreatorExtension(optionalFactory);
+    public static TnRelationRowCreatorExtension createRelationRowCreator(TnRelationRowOptionalHandler optionalHandler) {
+        return new TnRelationRowCreatorExtension(optionalHandler);
     }
 
     // ===================================================================================
@@ -342,6 +342,6 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     //                                                                   Optional Handling
     //                                                                   =================
     public Object filterOptionalRelationRowIfNeeds(Object row, TnRelationPropertyType rpt, Object relationRow) {
-        return _optionalFactory.filterOptionalRelationRowIfNeeds(row, rpt, relationRow);
+        return _optionalHandler.filterOptionalRelationRowIfNeeds(row, rpt, relationRow);
     }
 }
