@@ -372,7 +372,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 </table>
 
 #foreach ($table in $database.tableDisplaySortedList)
-  $generator.parse("doc/html/table.vm", null, "table", $table)
+$generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 
 #if ($database.hasClassificationDefinition())
@@ -510,6 +510,10 @@ ${database.schemaHtmlJavaScriptEmbedded}
 </dl>
 #end
 #end
+<h2>Thanks</h2>
+<p>
+	Created by DBFlute(AutoGenerator)
+</p>
 <script>
 /**
  * Incremental Search contributed by makotot (Thanks!)
