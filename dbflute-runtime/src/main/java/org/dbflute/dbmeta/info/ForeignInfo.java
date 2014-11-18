@@ -55,6 +55,7 @@ public class ForeignInfo implements RelationInfo {
     protected final List<String> _dynamicParameterList;
     protected final boolean _fixedInline;
     protected final String _reversePropertyName;
+    protected final boolean _canBeNullObject;
     protected final PropertyGateway _propertyGateway;
     protected final PropertyMethodFinder _propertyMethodFinder;
     protected final Method _readMethod;
@@ -69,7 +70,7 @@ public class ForeignInfo implements RelationInfo {
             , Class<?> propertyAccessType // property info (object native type is provided by DB meta)
             , boolean oneToOne, boolean bizOneToOne, boolean referrerAsOne, boolean additionalFK // relation type
             , String fixedCondition, List<String> dynamicParameterList, boolean fixedInline // fixed condition
-            , String reversePropertyName, PropertyMethodFinder propertyMethodFinder // various info
+            , String reversePropertyName, boolean canBeNullObject, PropertyMethodFinder propertyMethodFinder // various info
     ) { // big constructor
         assertObjectNotNull("constraintName", constraintName);
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
@@ -103,6 +104,7 @@ public class ForeignInfo implements RelationInfo {
             _dynamicParameterList = Collections.emptyList();
         }
         _reversePropertyName = reversePropertyName;
+        _canBeNullObject = canBeNullObject;
         _propertyGateway = findPropertyGateway();
         _propertyMethodFinder = propertyMethodFinder;
         _readMethod = findReadMethod();
@@ -440,6 +442,14 @@ public class ForeignInfo implements RelationInfo {
      */
     public RelationInfo getReverseRelation() {
         return _reversePropertyName != null ? _foreignDBMeta.findRelationInfo(_reversePropertyName) : null;
+    }
+
+    /**
+     * Can the relation be null object?
+     * @return The determination, true or false.
+     */
+    public boolean canBeNullObject() { // for future, nobody calls when first
+        return _canBeNullObject;
     }
 
     // -----------------------------------------------------

@@ -128,14 +128,9 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     //                                                                          Table name
     //                                                                          ==========
     /** {@inheritDoc} */
-    public String getTableDbName() {
-        return getDBMeta().getTableDbName();
-    }
-
-    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public ENTITY newEntity() {
-        return (ENTITY) getDBMeta().newEntity();
+        return (ENTITY) asDBMeta().newEntity();
     }
 
     protected CB createCB(CBCall<CB> cbCall) { // CB from callback
@@ -362,7 +357,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     }
 
     protected <RESULT extends Entity> ListResultBean<RESULT> createListResultBean(ConditionBean cb, List<RESULT> selectedList) {
-        return new ResultBeanBuilder<RESULT>(getTableDbName()).buildListResultBean(cb, selectedList);
+        return new ResultBeanBuilder<RESULT>(asTableDbName()).buildListResultBean(cb, selectedList);
     }
 
     // -----------------------------------------------------
@@ -446,7 +441,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     }
 
     protected <RESULT extends ENTITY> PagingInvoker<RESULT> createPagingInvoker(CB cb) {
-        return cb.createPagingInvoker(getTableDbName());
+        return cb.createPagingInvoker(asTableDbName());
     }
 
     // -----------------------------------------------------
@@ -530,7 +525,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             final OrderByClause orderByClause = cb.getOrderByComponent();
             final OrderByElement orderByFirstElement = orderByClause.getOrderByFirstElement();
             if (orderByFirstElement == null || !orderByFirstElement.getColumnInfo().isPrimary()) {
-                String msg = "The cursor select by paging needs order by primary key: " + cb.getTableDbName();
+                String msg = "The cursor select by paging needs order by primary key: " + cb.asTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
         }
@@ -606,7 +601,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      */
     protected <BEHAVIOR extends BehaviorReadable> OutsideSqlAllFacadeExecutor<BEHAVIOR> doOutsideSql() {
         assertBehaviorCommandInvoker("outsideSql");
-        return _behaviorCommandInvoker.createOutsideSqlAllFacadeExecutor(getTableDbName());
+        return _behaviorCommandInvoker.createOutsideSqlAllFacadeExecutor(asTableDbName());
     }
 
     // ===================================================================================
@@ -648,7 +643,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     protected <LOCAL_ENTITY extends Entity, KEY, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> // generic
     NestedReferrerListGateway<REFERRER_ENTITY> doHelpLoadReferrerInternally(List<LOCAL_ENTITY> localEntityList,
             LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption, final String referrerProperty) {
-        final DBMeta dbmeta = getDBMeta();
+        final DBMeta dbmeta = asDBMeta();
         final ReferrerInfo referrerInfo = dbmeta.findReferrerInfo(referrerProperty);
         final BehaviorReadable referrerBhv = xfindReferrerBehavior(referrerInfo);
         final Set<ColumnInfo> pkColSet = referrerInfo.getLocalReferrerColumnInfoMap().keySet(); // might be unique key
@@ -1007,7 +1002,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         if (referrerPropertyName == null) {
             return null;
         }
-        final DBMeta localDBMeta = getDBMeta();
+        final DBMeta localDBMeta = asDBMeta();
         if (!localDBMeta.hasReferrer(referrerPropertyName)) { // one-to-one referrer
             return null;
         }
@@ -1150,7 +1145,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         br.addElement("Please confirm the definition of the selector at your component configuration of DBFlute.");
         br.addElement("It is precondition that '" + methodName + "()' needs the selector instance.");
         br.addItem("Behavior");
-        br.addElement("Behavior for " + getTableDbName());
+        br.addElement("Behavior for " + asTableDbName());
         br.addItem("Attribute");
         br.addElement("behaviorCommandInvoker   : " + _behaviorCommandInvoker);
         br.addElement("behaviorSelector         : " + _behaviorSelector);
@@ -1171,7 +1166,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             List<LOCAL_ENTITY> localEntityList, String foreignPropertyName) {
         assertObjectNotNull("localEntityList", localEntityList);
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
-        final DBMeta dbmeta = getDBMeta();
+        final DBMeta dbmeta = asDBMeta();
         final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
         final RelationInfo reverseInfo = foreignInfo.getReverseRelation();
         final boolean existsReferrer = reverseInfo != null;
@@ -1361,7 +1356,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             List<LOCAL_ENTITY> localEntityList, String propertyName, COLLECTION collection) {
         assertObjectNotNull("localEntityList", localEntityList);
         assertObjectNotNull("propertyName", propertyName);
-        final ColumnInfo columnInfo = getDBMeta().findColumnInfo(propertyName);
+        final ColumnInfo columnInfo = asDBMeta().findColumnInfo(propertyName);
         for (LOCAL_ENTITY entity : localEntityList) {
             final COLUMN column = columnInfo.read(entity);
             if (column != null) {
@@ -1394,13 +1389,13 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return invoke(createSelectCountCBCommand(cb, false));
     }
 
+    protected <RESULT extends ENTITY> List<RESULT> delegateSelectList(ConditionBean cb, Class<? extends RESULT> entityType) {
+        return invoke(createSelectListCBCommand(cb, entityType));
+    }
+
     protected <RESULT extends ENTITY> void delegateSelectCursor(ConditionBean cb, EntityRowHandler<RESULT> handler,
             Class<? extends RESULT> entityType) {
         invoke(createSelectCursorCBCommand(cb, handler, entityType));
-    }
-
-    protected <RESULT extends ENTITY> List<RESULT> delegateSelectList(ConditionBean cb, Class<? extends RESULT> entityType) {
-        return invoke(createSelectListCBCommand(cb, entityType));
     }
 
     protected <RESULT> RESULT delegateSelectNextVal(Class<RESULT> resultType) {
@@ -1438,7 +1433,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         }
         {
             @SuppressWarnings("unchecked")
-            final Class<? extends ENTITY> entityType = (Class<? extends ENTITY>) getDBMeta().getEntityType();
+            final Class<? extends ENTITY> entityType = (Class<? extends ENTITY>) asDBMeta().getEntityType();
             final SelectListCBCommand<? extends ENTITY> cmd = createSelectListCBCommand(newConditionBean(), entityType);
             cmd.setInitializeOnly(true);
             invoke(cmd);
@@ -1461,6 +1456,20 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return new SelectCountCBCommand();
     }
 
+    protected <RESULT extends ENTITY> SelectListCBCommand<RESULT> createSelectListCBCommand(ConditionBean cb,
+            Class<? extends RESULT> entityType) {
+        assertBehaviorCommandInvoker("createSelectListCBCommand");
+        final SelectListCBCommand<RESULT> cmd = newSelectListCBCommand();
+        xsetupSelectCommand(cmd);
+        cmd.setConditionBean(cb);
+        cmd.setEntityType(entityType);
+        return cmd;
+    }
+
+    protected <RESULT extends ENTITY> SelectListCBCommand<RESULT> newSelectListCBCommand() {
+        return new SelectListCBCommand<RESULT>();
+    }
+
     protected <RESULT extends ENTITY> SelectCursorCBCommand<RESULT> createSelectCursorCBCommand(ConditionBean cb,
             EntityRowHandler<RESULT> entityRowHandler, Class<? extends RESULT> entityType) {
         assertBehaviorCommandInvoker("createSelectCursorCBCommand");
@@ -1476,26 +1485,12 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return new SelectCursorCBCommand<RESULT>();
     }
 
-    protected <RESULT extends ENTITY> SelectListCBCommand<RESULT> createSelectListCBCommand(ConditionBean cb,
-            Class<? extends RESULT> entityType) {
-        assertBehaviorCommandInvoker("createSelectListCBCommand");
-        final SelectListCBCommand<RESULT> cmd = newSelectListCBCommand();
-        xsetupSelectCommand(cmd);
-        cmd.setConditionBean(cb);
-        cmd.setEntityType(entityType);
-        return cmd;
-    }
-
-    protected <RESULT extends ENTITY> SelectListCBCommand<RESULT> newSelectListCBCommand() {
-        return new SelectListCBCommand<RESULT>();
-    }
-
     protected <RESULT> SelectNextValCommand<RESULT> createSelectNextValCommand(Class<RESULT> resultType) {
         assertBehaviorCommandInvoker("createSelectNextValCommand");
         final SelectNextValCommand<RESULT> cmd = newSelectNextValCommand();
         xsetupSelectCommand(cmd);
         cmd.setResultType(resultType);
-        cmd.setDBMeta(getDBMeta());
+        cmd.setDBMeta(asDBMeta());
         cmd.setSequenceCacheHandler(_behaviorCommandInvoker.getSequenceCacheHandler());
         return cmd;
     }
@@ -1510,9 +1505,9 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         final SelectNextValSubCommand<RESULT> cmd = newSelectNextValSubCommand();
         xsetupSelectCommand(cmd);
         cmd.setResultType(resultType);
-        cmd.setDBMeta(getDBMeta());
+        cmd.setDBMeta(asDBMeta());
         cmd.setSequenceCacheHandler(_behaviorCommandInvoker.getSequenceCacheHandler());
-        cmd.setColumnInfo(getDBMeta().findColumnInfo(columnDbName));
+        cmd.setColumnInfo(asDBMeta().findColumnInfo(columnDbName));
         cmd.setSequenceName(sequenceName);
         cmd.setIncrementSize(incrementSize);
         cmd.setCacheSize(cacheSize);
@@ -1539,7 +1534,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     }
 
     protected void xsetupSelectCommand(AbstractBehaviorCommand<?> cmd) {
-        cmd.setTableDbName(getTableDbName());
+        cmd.setTableDbName(asTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
     }
 
@@ -1560,7 +1555,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     }
 
     protected void xsetupEntityCommand(AbstractEntityCommand cmd, Entity entity) {
-        cmd.setTableDbName(getTableDbName());
+        cmd.setTableDbName(asTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setEntity(entity);
     }
@@ -1589,7 +1584,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         br.addElement("Please confirm the definition of the set-upper at your component configuration of DBFlute.");
         br.addElement("It is precondition that '" + methodName + "()' needs the invoker instance.");
         br.addItem("Behavior");
-        br.addElement("Behavior for " + getTableDbName());
+        br.addElement("Behavior for " + asTableDbName());
         br.addItem("Attribute");
         br.addElement("behaviorCommandInvoker   : " + _behaviorCommandInvoker);
         br.addElement("behaviorSelector         : " + _behaviorSelector);
@@ -1753,7 +1748,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      */
     protected void assertEntityNotNull(Entity entity) {
         if (entity == null) {
-            String msg = "The entity should not be null: table=" + getTableDbName();
+            String msg = "The entity should not be null: table=" + asTableDbName();
             throw new IllegalArgumentException(msg);
         }
     }
@@ -1771,7 +1766,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             }
         } else { // unique-driven
             for (String prop : uniqueDrivenPropSet) {
-                final ColumnInfo columnInfo = getDBMeta().findColumnInfo(prop);
+                final ColumnInfo columnInfo = asDBMeta().findColumnInfo(prop);
                 if (columnInfo != null) {
                     final Object value = columnInfo.read(entity);
                     if (value == null) {
@@ -1788,7 +1783,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      */
     protected void assertEntityListNotNull(List<? extends Entity> entityList) {
         if (entityList == null) {
-            String msg = "The list of entity should not be null: table=" + getTableDbName();
+            String msg = "The list of entity should not be null: table=" + asTableDbName();
             throw new IllegalArgumentException(msg);
         }
     }
@@ -1807,7 +1802,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
      */
     protected void assertCBNotNull(ConditionBean cb) {
         if (cb == null) {
-            String msg = "The condition-bean should not be null: table=" + getTableDbName();
+            String msg = "The condition-bean should not be null: table=" + asTableDbName();
             throw new IllegalArgumentException(msg);
         }
     }

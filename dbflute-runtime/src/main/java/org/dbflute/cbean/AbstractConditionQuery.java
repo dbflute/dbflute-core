@@ -251,7 +251,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return The instance of local DB meta. (NotNull)
      */
     protected DBMeta xgetLocalDBMeta() {
-        return findDBMeta(getTableDbName());
+        return findDBMeta(asTableDbName());
     }
 
     // ===================================================================================
@@ -425,7 +425,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String foreignTableAliasName = callback.qf().xgetAliasName();
         final String localRelationPath = xgetRelationPath();
         final String foreignRelationPath = callback.qf().xgetRelationPath();
-        xgetSqlClause().registerSelectedRelation(foreignTableAliasName, getTableDbName(), foreignPropertyName, localRelationPath,
+        xgetSqlClause().registerSelectedRelation(foreignTableAliasName, asTableDbName(), foreignPropertyName, localRelationPath,
                 foreignRelationPath);
     }
 
@@ -460,9 +460,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             joinOnMap.put(toColumnRealName(local), foreignCQ.toColumnRealName(foreign));
         }
         final String foreignAlias = foreignCQ.xgetAliasName();
-        final String foreignTable = foreignCQ.getTableDbName();
+        final String foreignTable = foreignCQ.asTableDbName();
         final String localAlias = xgetAliasName();
-        final String localTable = getTableDbName();
+        final String localTable = asTableDbName();
         final String fixedCondition = foreignInfo.getFixedCondition();
         final boolean fixedInline = foreignInfo.isFixedInline();
         final FixedConditionResolver resolver = createForeignFixedConditionResolver(foreignCQ);
@@ -534,7 +534,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 notFound = true;
             }
             if (notFound) {
-                final String tableDbName = getTableDbName();
+                final String tableDbName = asTableDbName();
                 final String fixedCondition = foreignInfo.getFixedCondition();
                 createCBExThrower().throwFixedConditionParameterNotFoundException(tableDbName, property, fixedCondition, parameterMap);
             }
@@ -897,7 +897,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             // as 'or' condition
             if (isOrScopeQueryAndPartEffective()) {
                 // limit because of so complex
-                String msg = "The AsOrSplit in and-part is unsupported: " + getTableDbName();
+                String msg = "The AsOrSplit in and-part is unsupported: " + asTableDbName();
                 throw new OrScopeQueryAndPartUnsupportedOperationException(msg);
             }
             final boolean needsNewOrScope = !isOrScopeQueryEffective();
@@ -922,7 +922,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwLikeSearchOptionNotFoundException(String columnDbName, String value) {
-        final DBMeta dbmeta = xgetDBMetaProvider().provideDBMeta(getTableDbName());
+        final DBMeta dbmeta = xgetDBMetaProvider().provideDBMeta(asTableDbName());
         createCBExThrower().throwLikeSearchOptionNotFoundException(columnDbName, value, dbmeta);
     }
 
@@ -1206,7 +1206,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (!prepareQueryChecked(key, value, cvalue, columnDbName).newClause()) {
             return;
         }
-        final DBMeta dbmeta = xgetDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        final DBMeta dbmeta = xgetDBMetaProvider().provideDBMetaChecked(asTableDbName());
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
@@ -1253,7 +1253,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 return subQuery.toColumnSqlName(columnDbName);
             }
         };
-        final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final ExistsReferrer existsReferrer =
                 new ExistsReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
@@ -1336,7 +1336,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 return subQuery.toColumnSqlName(columnDbName);
             }
         };
-        final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final boolean suppressLocalAliasName = isInScopeRelationSuppressLocalAliasName();
         final InScopeRelation inScopeRelation =
@@ -1398,7 +1398,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 return subQuery.toColumnSqlName(columnDbName);
             }
         };
-        final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
         final SpecifyDerivedReferrer derivedReferrer =
@@ -1474,7 +1474,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 return subQuery.toColumnSqlName(columnDbName);
             }
         };
-        final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
         final String parameterPath = xgetLocation(parameterPropertyName);
@@ -1571,7 +1571,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 return subQuery.toColumnSqlName(columnDbName);
             }
         };
-        final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
         final PartitionByProvider partitionByProvider = new ScalarCondition.PartitionByProvider() {
@@ -1624,7 +1624,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 relatedColumnDbName = specifiedDbName;
             } else { // as default
                 // this function is only allowed when only-one PK
-                final UniqueInfo primaryUniqueInfo = findDBMeta(subQuery.getTableDbName()).getPrimaryUniqueInfo();
+                final UniqueInfo primaryUniqueInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryUniqueInfo();
                 final ColumnInfo primaryColumnInfo = primaryUniqueInfo.getFirstColumn();
                 relatedColumnDbName = primaryColumnInfo.getColumnDbName();
             }
@@ -1643,7 +1643,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 relatedColumnDbName = specifiedDbName;
             } else { // as default
                 // this function is only allowed when only-one PK
-                final UniqueInfo primaryUniqueInfo = findDBMeta(subQuery.getTableDbName()).getPrimaryUniqueInfo();
+                final UniqueInfo primaryUniqueInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryUniqueInfo();
                 final ColumnInfo primaryColumnInfo = primaryUniqueInfo.getFirstColumn();
                 relatedColumnDbName = primaryColumnInfo.getColumnDbName();
             }
@@ -1777,7 +1777,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             br.addElement("  (x) - cb.query().innerJoin();");
             br.addElement("  (o) - cb.query().queryMemberStatus().innerJoin();");
             br.addItem("Base Table");
-            br.addElement(getTableDbName());
+            br.addElement(asTableDbName());
             final String msg = br.buildExceptionMessage();
             throw new IllegalConditionBeanOperationException(msg);
         }
@@ -1814,7 +1814,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwOrderByIllegalPurposeException(String columnDbName) {
-        createCBExThrower().throwOrderByIllegalPurposeException(xgetSqlClause().getPurpose(), xgetBaseCB(), getTableDbName(), columnDbName);
+        createCBExThrower().throwOrderByIllegalPurposeException(xgetSqlClause().getPurpose(), xgetBaseCB(), asTableDbName(), columnDbName);
     }
 
     // -----------------------------------------------------
@@ -1856,7 +1856,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void assertManualOrderOpCallNotNull(ManualOrderOptionCall opCall) {
         if (opCall == null) {
-            throw new IllegalArgumentException("The argument 'opLambda' should not be null: " + getTableDbName());
+            throw new IllegalArgumentException("The argument 'opLambda' should not be null: " + asTableDbName());
         }
     }
 
@@ -2041,7 +2041,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final PropertyNameCQContainer container = xhelpExtractingPropertyNameCQContainer(colName);
         final String flexibleName = container.getFlexibleName();
         final ConditionQuery cq = container.getConditionQuery();
-        final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
+        final DBMeta dbmeta = findDBMeta(cq.asTableDbName());
         final ColumnInfo columnInfo;
         try {
             columnInfo = dbmeta.findColumnInfo(flexibleName);
@@ -2172,7 +2172,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
         br.addItem("Table");
-        br.addElement(getTableDbName());
+        br.addElement(asTableDbName());
         br.addItem("columnFlexibleName");
         br.addElement(columnFlexibleName);
         br.addItem("conditionKeyName");
@@ -2221,7 +2221,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String flexibleName = container.getFlexibleName();
         final ConditionQuery cq = container.getConditionQuery();
         final String ascDesc = isAsc ? "Asc" : "Desc";
-        final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
+        final DBMeta dbmeta = findDBMeta(cq.asTableDbName());
         final String columnCapPropName = initCap(dbmeta.findColumnInfo(flexibleName).getPropertyName());
         final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
         final Method method = xhelpGettingCQMethod(cq, methodName, (Class<?>[]) null);
@@ -2239,7 +2239,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the method for adding the order-by condition.");
         br.addItem("Table");
-        br.addElement(getTableDbName());
+        br.addElement(asTableDbName());
         br.addItem("columnFlexibleName");
         br.addElement(columnFlexibleName);
         br.addItem("isAsc");
@@ -2255,7 +2255,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to invoke the method for setting the order-by condition.");
         br.addItem("Table");
-        br.addElement(getTableDbName());
+        br.addElement(asTableDbName());
         br.addItem("columnFlexibleName");
         br.addElement(columnFlexibleName);
         br.addItem("isAsc");
@@ -2300,7 +2300,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the method for getting a foreign condition query.");
         br.addItem("Table");
-        br.addElement(getTableDbName());
+        br.addElement(asTableDbName());
         br.addItem("foreignPropertyName");
         br.addElement(foreignPropertyName);
         br.addItem("Method");
@@ -2314,7 +2314,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to invoke the method for setting a condition(query).");
         br.addItem("Table");
-        br.addElement(getTableDbName());
+        br.addElement(asTableDbName());
         br.addItem("foreignPropertyName");
         br.addElement(foreignPropertyName);
         br.addItem("Method");
@@ -2352,7 +2352,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Not found the method for determining a foreign condition query.");
             br.addItem("Table");
-            br.addElement(cq.getTableDbName());
+            br.addElement(cq.asTableDbName());
             br.addItem("foreignPropertyName");
             br.addElement(foreignPropertyName);
             br.addItem("methodName");
@@ -2367,7 +2367,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         } catch (ReflectionFailureException e) {
             String msg = "Failed to invoke the method for determining a condition(query):";
             msg = msg + " foreignPropertyName=" + foreignPropertyName;
-            msg = msg + " methodName=" + methodName + " table=" + getTableDbName();
+            msg = msg + " methodName=" + methodName + " table=" + asTableDbName();
             throw new ConditionInvokingFailureException(msg, e);
         }
     }
@@ -2659,7 +2659,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             return; // ignored according to condition-bean rule
         }
         final String clause =
-                ((SqlClauseMySql) xgetSqlClause()).buildMatchCondition(textColumnList, conditionValue, modifier, getTableDbName(),
+                ((SqlClauseMySql) xgetSqlClause()).buildMatchCondition(textColumnList, conditionValue, modifier, asTableDbName(),
                         xgetAliasName());
         registerWhereClause(clause);
     }
@@ -2684,8 +2684,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     continue;
                 }
                 final String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
-                if (!tableOfColumn.equalsIgnoreCase(getTableDbName())) {
-                    String msg = "The table of the text column should be '" + getTableDbName() + "'";
+                if (!tableOfColumn.equalsIgnoreCase(asTableDbName())) {
+                    String msg = "The table of the text column should be '" + asTableDbName() + "'";
                     msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
                     throw new IllegalArgumentException(msg);
                 }

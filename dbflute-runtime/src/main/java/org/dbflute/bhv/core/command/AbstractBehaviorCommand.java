@@ -27,18 +27,10 @@ import org.dbflute.bhv.core.context.InternalMapContext.InvokePathProvider;
 import org.dbflute.bhv.core.execution.OutsideSqlExecuteExecution;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.jdbc.ValueType;
-import org.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
-import org.dbflute.s2dao.extension.TnRelationRowOptionalHandler;
-import org.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
+import org.dbflute.s2dao.jdbc.TnResultSetHandlerFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
-import org.dbflute.s2dao.rshandler.TnBeanCursorResultSetHandler;
-import org.dbflute.s2dao.rshandler.TnBeanListResultSetHandler;
-import org.dbflute.s2dao.rshandler.TnScalarDynamicResultSetHandler;
-import org.dbflute.s2dao.rshandler.TnScalarListResultSetHandler;
-import org.dbflute.s2dao.rshandler.TnScalarResultSetHandler;
-import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.util.DfTypeUtil;
 import org.dbflute.util.Srl;
 
@@ -63,9 +55,11 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     // -----------------------------------------------------
     //                                   Injection Component
     //                                   -------------------
+    // these are not null
     protected DataSource _dataSource;
     protected StatementFactory _statementFactory;
     protected TnBeanMetaDataFactory _beanMetaDataFactory;
+    protected TnResultSetHandlerFactory _resultSetHandlerFactory;
     protected String _sqlFileEncoding;
 
     // ===================================================================================
@@ -107,48 +101,27 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     //                                      ResultSetHandler
     //                                      ----------------
     protected TnResultSetHandler createBeanListResultSetHandler(TnBeanMetaData bmd) {
-        final TnRowCreatorExtension rowCreator = createRowCreator(bmd);
-        final TnRelationRowCreatorExtension relationRowCreator = createRelationRowCreator(bmd);
-        return new TnBeanListResultSetHandler(bmd, rowCreator, relationRowCreator);
+        return _resultSetHandlerFactory.createBeanListResultSetHandler(bmd, _beanMetaDataFactory.getRelationRowOptionalHandler());
     }
 
     protected TnResultSetHandler createBeanCursorResultSetHandler(TnBeanMetaData bmd) {
-        final TnRowCreatorExtension rowCreator = createRowCreator(bmd);
-        final TnRelationRowCreatorExtension relationRowCreator = createRelationRowCreator(bmd);
-        return new TnBeanCursorResultSetHandler(bmd, rowCreator, relationRowCreator);
+        return _resultSetHandlerFactory.createBeanCursorResultSetHandler(bmd, _beanMetaDataFactory.getRelationRowOptionalHandler());
     }
 
     protected TnResultSetHandler createScalarResultSetHandler(Class<?> objectType) {
-        final ValueType valueType = TnValueTypes.getValueType(objectType);
-        return new TnScalarResultSetHandler(valueType);
+        return _resultSetHandlerFactory.createScalarResultSetHandler(objectType);
     }
 
     protected TnResultSetHandler createScalarListResultSetHandler(Class<?> objectType) {
-        final ValueType valueType = TnValueTypes.getValueType(objectType);
-        return createScalarListResultSetHandler(valueType);
-    }
-
-    protected TnResultSetHandler createDynamicScalarResultSetHandler(Class<?> objectType) {
-        final ValueType valueType = TnValueTypes.getValueType(objectType);
-        return new TnScalarDynamicResultSetHandler(valueType);
+        return _resultSetHandlerFactory.createScalarListResultSetHandler(objectType);
     }
 
     protected TnResultSetHandler createScalarListResultSetHandler(ValueType valueType) {
-        return new TnScalarListResultSetHandler(valueType);
+        return _resultSetHandlerFactory.createScalarListResultSetHandler(valueType);
     }
 
-    protected TnRowCreatorExtension createRowCreator(TnBeanMetaData bmd) {
-        final Class<?> clazz = bmd != null ? bmd.getBeanClass() : null;
-        return TnRowCreatorExtension.createRowCreator(clazz);
-    }
-
-    protected TnRelationRowCreatorExtension createRelationRowCreator(TnBeanMetaData bmd) {
-        final TnRelationRowOptionalHandler optionalFactory = createRelationOptionalFactory();
-        return TnRelationRowCreatorExtension.createRelationRowCreator(optionalFactory);
-    }
-
-    protected TnRelationRowOptionalHandler createRelationOptionalFactory() {
-        return _beanMetaDataFactory.getRelationRowOptionalHandler();
+    protected TnResultSetHandler createDynamicScalarResultSetHandler(Class<?> objectType) {
+        return _resultSetHandlerFactory.createDynamicScalarResultSetHandler(objectType);
     }
 
     // ===================================================================================
@@ -177,6 +150,9 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
         }
         if (_beanMetaDataFactory == null) {
             throw new IllegalStateException(buildAssertMessage("_beanMetaDataFactory", methodName));
+        }
+        if (_resultSetHandlerFactory == null) {
+            throw new IllegalStateException(buildAssertMessage("_resultSetHandlerFactory", methodName));
         }
         if (_sqlFileEncoding == null) {
             throw new IllegalStateException(buildAssertMessage("_sqlFileEncoding", methodName));
@@ -232,6 +208,10 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
 
     public void setBeanMetaDataFactory(TnBeanMetaDataFactory beanMetaDataFactory) {
         _beanMetaDataFactory = beanMetaDataFactory;
+    }
+
+    public void setResultSetHandlerFactory(TnResultSetHandlerFactory resultSetHandlerFactory) {
+        _resultSetHandlerFactory = resultSetHandlerFactory;
     }
 
     public void setSqlFileEncoding(String sqlFileEncoding) {

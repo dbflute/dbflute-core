@@ -168,7 +168,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         if (columnDbName == null) {
             throwVaryingUpdateInvalidColumnSpecificationException(cb);
         }
-        final ColumnInfo columnInfo = cb.getDBMeta().findColumnInfo(columnDbName);
+        final ColumnInfo columnInfo = cb.asDBMeta().findColumnInfo(columnDbName);
         if (columnInfo.isPrimary()) {
             throwVaryingUpdatePrimaryKeySpecificationException(columnInfo);
         }
@@ -212,7 +212,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         br.addElement("        }");
         br.addElement("    });");
         br.addItem("Target Table");
-        br.addElement(cb.getTableDbName());
+        br.addElement(cb.asTableDbName());
         final String msg = br.buildExceptionMessage();
         throw new VaryingUpdateInvalidColumnSpecificationException(msg);
     }
@@ -402,7 +402,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     }
 
     protected void xacceptCommonColumnForcedSpecification(CB cb) { // internal
-        final List<ColumnInfo> beforeUpdateList = cb.getDBMeta().getCommonColumnInfoBeforeUpdateList();
+        final List<ColumnInfo> beforeUpdateList = cb.asDBMeta().getCommonColumnInfoBeforeUpdateList();
         if (beforeUpdateList == null || beforeUpdateList.isEmpty()) {
             return;
         }
@@ -437,7 +437,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         }
         final Entity firstEntity = entityList.get(0);
         final Set<String> targetProps = xgatherUpdateColumnModifiedProperties(entityList, firstEntity);
-        final DBMeta dbmeta = firstEntity.getDBMeta();
+        final DBMeta dbmeta = firstEntity.asDBMeta();
         specify(new SpecifyQuery<CB>() {
             public void specify(CB cb) {
                 // you don't need to specify primary key because primary key has special handling
@@ -528,11 +528,11 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         br.addElement("        memberBhv.update(member); // keep or update new value of MEMBER_STATUS_CODE");
         br.addElement("    }");
         br.addItem("Update Table");
-        br.addElement(entity.getDBMeta().getTableDbName());
+        br.addElement(entity.asDBMeta().getTableDbName());
         br.addItem("Base Properties");
         br.addElement(baseProps);
         br.addItem("Fragmented Entity");
-        br.addElement(entity.getDBMeta().extractPrimaryKeyMap(entity));
+        br.addElement(entity.asDBMeta().extractPrimaryKeyMap(entity));
         br.addItem("Fragmented Properties");
         br.addElement(entity.mymodifiedProperties());
         final String msg = br.buildExceptionMessage();
@@ -561,7 +561,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         assertUpdateColumnSpecifiedCB();
         final CB cb = _updateColumnSpecifiedCB;
         final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
-        final DBMeta dbmeta = cb.getDBMeta();
+        final DBMeta dbmeta = cb.asDBMeta();
         if (dbmeta.hasPrimaryKey()) {
             final UniqueInfo pkInfo = dbmeta.getPrimaryUniqueInfo();
             final List<ColumnInfo> pkList = pkInfo.getUniqueColumnList();

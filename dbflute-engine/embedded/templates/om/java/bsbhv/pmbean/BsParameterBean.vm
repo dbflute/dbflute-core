@@ -333,7 +333,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($propertyType.equals("Date") || $propertyType.equals("java.util.Date"))
-        sb.append(dm).append(PmbCustodial.formatUtilDate(${variableName}, "${database.utilDateDisplayPattern}", _timeZone));
+        sb.append(dm).append(PmbCustodial.formatUtilDate(${variableName}, _timeZone, "${database.utilDateDisplayPattern}"));
 #elseif ($propertyType.equals("byte[]"))
         sb.append(dm).append(PmbCustodial.formatByteArray(${variableName}));
 #else

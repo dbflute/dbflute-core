@@ -164,11 +164,12 @@ public final class DfTypeUtil {
         } else if (obj instanceof LocalTime) {
             return doConvertToStringLocalTime((LocalTime) obj, pattern);
         } else if (obj instanceof Time) {
-            return doConvertToStringDate((Time) obj, pattern != null ? pattern : DEFAULT_TIME_PATTERN, null);
+            final String realPattern = pattern != null ? pattern : DEFAULT_TIME_PATTERN;
+            return doConvertToStringDate((Time) obj, (TimeZone) null, realPattern, (Locale) null);
         } else if (obj instanceof Date) {
-            return doConvertToStringDate((Date) obj, pattern, null);
+            return doConvertToStringDate((Date) obj, (TimeZone) null, pattern, (Locale) null);
         } else if (obj instanceof Calendar) {
-            return doConvertToStringDate(((Calendar) obj).getTime(), pattern, null);
+            return doConvertToStringDate(((Calendar) obj).getTime(), (TimeZone) null, pattern, (Locale) null);
         } else if (obj instanceof byte[]) {
             return encodeAsBase64((byte[]) obj);
         } else if (obj instanceof Throwable) {
@@ -247,20 +248,21 @@ public final class DfTypeUtil {
         return value.format(DateTimeFormatter.ofPattern(realPattern));
     }
 
-    public static String toStringDate(Date value, String pattern, TimeZone timeZone) {
-        assertPatternNotNull("toStringDate()", pattern);
+    public static String toStringDate(Date value, TimeZone timeZone, String pattern, Locale locale) {
         assertTimeZoneNotNull("toStringDate()", timeZone);
-        return value != null ? doConvertToStringDate(value, pattern, timeZone) : null;
+        assertPatternNotNull("toStringDate()", pattern);
+        assertLocaleNotNull("toStringDate()", locale);
+        return value != null ? doConvertToStringDate(value, timeZone, pattern, locale) : null;
     }
 
-    protected static String doConvertToStringDate(Date value, String pattern, TimeZone timeZone) {
+    protected static String doConvertToStringDate(Date value, TimeZone timeZone, String pattern, Locale locale) {
         final String realPattern;
         if (value instanceof Time && pattern == null) {
             realPattern = DEFAULT_TIME_PATTERN;
         } else {
             realPattern = pattern; // null or specified (if null, default pattern of formatter)
         }
-        return doCreateDateFormat(realPattern, timeZone, false).format(value);
+        return doCreateDateFormat(realPattern, timeZone, locale, false).format(value);
     }
 
     public static String toStringStackTrace(Throwable cause) {
@@ -1462,32 +1464,14 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
-     * @param obj The parsed object. (NullAllowed)
-     * @return The instance of date. (NullAllowed)
+     * @param obj The parsed object. (NullAllowed: if null, returns null)
+     * @return The instance of date. (NullAllowed: when the date is null)
      * @throws ParseDateException When it failed to parse the string to date.
      * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
      */
     public static Date toDate(Object obj) {
-        return doConvertToDate(obj, (String) null, (TimeZone) null);
-    }
-
-    /**
-     * Convert the object to the instance that is date. <br>
-     * Even if it's the sub class type, it returns a new instance. <br>
-     * This method uses specified date pattern when the pattern is not null
-     * if the object is string type. If it's null, it uses default date pattern
-     * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
-     * @param obj The parsed object. (NullAllowed)
-     * @param pattern The pattern format to parse when the object is string. (NotNull)
-     * @return The instance of date. (NullAllowed)
-     * @throws ParseDateException When it failed to parse the string to date.
-     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
-     * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
-     */
-    public static Date toDate(Object obj, String pattern) {
-        assertPatternNotNull("toDate()", pattern);
-        return doConvertToDate(obj, pattern, (TimeZone) null);
+        return doConvertToDate(obj, (TimeZone) null, (String) null, (Locale) null);
     }
 
     /**
@@ -1495,43 +1479,75 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br>
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
-     * @param obj The parsed object. (NullAllowed)
+     * @param obj The parsed object. (NullAllowed: if null, returns null)
      * @param timeZone The time-zone to parse the string expression. (NotNull)
-     * @return The instance of date. (NullAllowed)
+     * @return The instance of date. (NullAllowed: when the date is null)
      * @throws ParseDateException When it failed to parse the string to date.
      * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
      */
     public static Date toDate(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toDate()", timeZone);
-        return doConvertToDate(obj, (String) null, timeZone);
+        return doConvertToDate(obj, timeZone, (String) null, (Locale) null);
     }
 
     /**
      * Convert the object to the instance that is date. <br>
-     * Even if it's the sub class type, it returns a new instance. <br>
-     * This method uses specified date pattern when the pattern is not null
-     * if the object is string type. If it's null, it uses default date pattern
-     * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
-     * @param obj The parsed object. (NullAllowed)
+     * Even if it's the sub class type, it returns a new instance.
+     * @param obj The parsed object. (NullAllowed: if null, returns null)
      * @param pattern The pattern format to parse when the object is string. (NotNull)
-     * @param timeZone The time-zone to parse the string expression. (NotNull)
-     * @return The instance of date. (NullAllowed)
+     * @return The instance of date. (NullAllowed: when the date is null)
      * @throws ParseDateException When it failed to parse the string to date.
      * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
      */
-    public static Date toDate(Object obj, String pattern, TimeZone timeZone) {
+    public static Date toDate(Object obj, String pattern) {
         assertPatternNotNull("toDate()", pattern);
-        assertTimeZoneNotNull("toDate()", timeZone);
-        return doConvertToDate(obj, pattern, timeZone);
+        return doConvertToDate(obj, (TimeZone) null, pattern, (Locale) null);
     }
 
-    protected static Date doConvertToDate(Object obj, String pattern, TimeZone timeZone) {
+    /**
+     * Convert the object to the instance that is date. <br>
+     * Even if it's the sub class type, it returns a new instance.
+     * @param obj The parsed object. (NullAllowed: if null, returns null)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @param locale The locale to parse the date expression. (NotNull)
+     * @return The instance of date. (NullAllowed: when the date is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
+     */
+    public static Date toDate(Object obj, String pattern, Locale locale) {
+        assertPatternNotNull("toDate()", pattern);
+        assertLocaleNotNull("toDate()", locale);
+        return doConvertToDate(obj, (TimeZone) null, pattern, locale);
+    }
+
+    /**
+     * Convert the object to the instance that is date. <br>
+     * Even if it's the sub class type, it returns a new instance.
+     * @param obj The parsed object. (NullAllowed: if null, returns null)
+     * @param timeZone The time-zone to parse the string expression. (NotNull)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @param locale The locale to parse the date expression. (NotNull)
+     * @return The instance of date. (NullAllowed: when the date is null)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
+     */
+    public static Date toDate(Object obj, TimeZone timeZone, String pattern, Locale locale) {
+        assertTimeZoneNotNull("toDate()", timeZone);
+        assertPatternNotNull("toDate()", pattern);
+        assertLocaleNotNull("toDate()", locale);
+        return doConvertToDate(obj, timeZone, pattern, locale);
+    }
+
+    protected static Date doConvertToDate(Object obj, TimeZone timeZone, String pattern, Locale locale) {
         if (obj == null) {
             return null;
-        } else if (obj instanceof String) {
-            return doParseStringAsDate((String) obj, pattern, timeZone);
+        }
+        if (obj instanceof String) {
+            return doParseStringAsDate((String) obj, timeZone, pattern, locale);
         } else if (obj instanceof LocalDate) {
             final LocalDate localDate = (LocalDate) obj;
             return doParseLocalDateAsDate(localDate, timeZone);
@@ -1552,11 +1568,11 @@ public final class DfTypeUtil {
         } else if (obj instanceof Long) {
             return new Date((Long) obj);
         } else {
-            return doParseStringAsDate(obj.toString(), pattern, timeZone);
+            return doParseStringAsDate(obj.toString(), timeZone, pattern, locale);
         }
     }
 
-    protected static Date doParseStringAsDate(String str, String pattern, TimeZone timeZone) {
+    protected static Date doParseStringAsDate(String str, TimeZone timeZone, String pattern, Locale locale) {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
@@ -1571,7 +1587,7 @@ public final class DfTypeUtil {
         } else {
             strict = true;
         }
-        final DateFormat df = doCreateDateFormat(pattern, timeZone, strict);
+        final DateFormat df = doCreateDateFormat(pattern, timeZone, locale, strict);
         try {
             return df.parse(str);
         } catch (ParseException e) {
@@ -1683,19 +1699,34 @@ public final class DfTypeUtil {
         formatDateElementAsNumber(mm, "MM", pureStr); // check only
 
         final String dateTimeDlm = " ";
+        final String dateTimeNextDlm = "T"; // for LocalDate
         final String timeDlm = ":";
         final String timeMilliDlm = ".";
 
         final String startsDay = startsMon.substring(monthEndIndex + dateDlm.length());
-        final int dayEndIndex = startsDay.indexOf(dateTimeDlm);
-        String dd = dayEndIndex >= 0 ? startsDay.substring(0, dayEndIndex) : startsDay;
+        int dayEndIndex = startsDay.indexOf(dateTimeDlm);
+        final int dateTimeDlmLength;
+        String dd;
+        if (dayEndIndex >= 0) { // e.g. 2014/11/14 12:34:56
+            dd = startsDay.substring(0, dayEndIndex);
+            dateTimeDlmLength = dateTimeDlm.length();
+        } else {
+            dayEndIndex = startsDay.indexOf(dateTimeNextDlm);
+            if (dayEndIndex >= 0) { // e.g. 2014/11/14T12:34:56
+                dd = startsDay.substring(0, dayEndIndex);
+                dateTimeDlmLength = dateTimeNextDlm.length();
+            } else { // e.g. 2014/11/14
+                dd = startsDay;
+                dateTimeDlmLength = -1; // unused
+            }
+        }
         dd = resolveDateElementZeroPrefix(dd, 2 - dd.length());
         formatDateElementAsNumber(dd, "dd", pureStr); // check only
         final String yyyy_MM_dd = yyyy + dateDlm + mm + dateDlm + dd;
 
         if (includeTime) {
             if (dayEndIndex >= 0) { // has time parts
-                final String time = startsDay.substring(dayEndIndex + dateTimeDlm.length());
+                final String time = startsDay.substring(dayEndIndex + dateTimeDlmLength);
 
                 // check whether it can filter
                 if (!time.contains(timeDlm) || (time.indexOf(timeDlm) == time.lastIndexOf(timeDlm))) {
@@ -2331,24 +2362,19 @@ public final class DfTypeUtil {
     //                                            ----------
     public static DateFormat createDateFormat(String pattern) { // as lenient
         assertPatternNotNull("createDateFormat()", pattern);
-        return doCreateDateFormat(pattern, (TimeZone) null, false);
+        return doCreateDateFormat(pattern, (TimeZone) null, (Locale) null, false);
     }
 
-    public static DateFormat createDateFormat(String pattern, TimeZone timeZone) { // as lenient
+    public static DateFormat createDateFormat(TimeZone timeZone, String pattern, Locale locale, boolean strict) {
         assertPatternNotNull("createDateFormat()", pattern);
         assertTimeZoneNotNull("createDateFormat()", timeZone);
-        return doCreateDateFormat(pattern, timeZone, false);
+        assertLocaleNotNull("createDateFormat()", locale);
+        return doCreateDateFormat(pattern, timeZone, locale, strict);
     }
 
-    public static DateFormat createDateFormat(String pattern, TimeZone timeZone, boolean strict) {
-        assertPatternNotNull("createDateFormat()", pattern);
-        assertTimeZoneNotNull("createDateFormat()", timeZone);
-        return doCreateDateFormat(pattern, timeZone, strict);
-    }
-
-    protected static DateFormat doCreateDateFormat(String pattern, TimeZone timeZone, boolean strict) {
+    protected static DateFormat doCreateDateFormat(String pattern, TimeZone timeZone, Locale locale, boolean strict) {
         final String realPattern = pattern != null ? pattern : DEFAULT_TIMESTAMP_PATTERN;
-        final Locale realLocale = chooseRealLocale(null); // no setting point so null
+        final Locale realLocale = chooseRealLocale(locale);
         final SimpleDateFormat sdf = new SimpleDateFormat(realPattern, realLocale);
         final TimeZone realZone = chooseRealZone(timeZone);
         sdf.setTimeZone(realZone);
@@ -2371,25 +2397,7 @@ public final class DfTypeUtil {
      * @throws ParseTimestampOutOfCalendarException When the time-stamp was out of calendar. (if BC, not thrown)
      */
     public static Timestamp toTimestamp(Object obj) {
-        return doConvertToTimestamp(obj, (String) null, (TimeZone) null);
-    }
-
-    /**
-     * Convert the object to the instance that is time-stamp. <br>
-     * Even if it's the sub class type, it returns a new instance. <br>
-     * This method uses specified time-stamp pattern when the pattern is not null
-     * if the object is string type. If it's null, it uses default time-stamp pattern
-     * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
-     * @param obj The parsed object. (NullAllowed)
-     * @param pattern The pattern format to parse when the object is string. (NotNull)
-     * @return The instance of time-stamp. (NullAllowed: If the value is null or empty, it returns null.)
-     * @throws ParseTimestampException When it failed to parse the string to time-stamp.
-     * @throws ParseTimestampNumberFormatException When it failed to format the elements as number.
-     * @throws ParseTimestampOutOfCalendarException When the time-stamp was out of calendar. (if BC, not thrown)
-     */
-    public static Timestamp toTimestamp(Object obj, String pattern) {
-        assertPatternNotNull("toTimestamp()", pattern);
-        return doConvertToTimestamp(obj, pattern, (TimeZone) null);
+        return doConvertToTimestamp(obj, (TimeZone) null, (String) null, (Locale) null);
     }
 
     /**
@@ -2406,30 +2414,61 @@ public final class DfTypeUtil {
      */
     public static Timestamp toTimestamp(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toTimestamp()", timeZone);
-        return doConvertToTimestamp(obj, (String) null, timeZone);
+        return doConvertToTimestamp(obj, timeZone, (String) null, (Locale) null);
     }
 
     /**
      * Convert the object to the instance that is time-stamp. <br>
-     * Even if it's the sub class type, it returns a new instance. <br>
-     * This method uses specified time-stamp pattern when the pattern is not null
-     * if the object is string type. If it's null, it uses default time-stamp pattern
-     * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
+     * Even if it's the sub class type, it returns a new instance.
      * @param obj The parsed object. (NullAllowed)
      * @param pattern The pattern format to parse when the object is string. (NotNull)
-     * @param timeZone The time-zone to parse the string expression. (NotNull)
      * @return The instance of time-stamp. (NullAllowed: If the value is null or empty, it returns null.)
      * @throws ParseTimestampException When it failed to parse the string to time-stamp.
      * @throws ParseTimestampNumberFormatException When it failed to format the elements as number.
      * @throws ParseTimestampOutOfCalendarException When the time-stamp was out of calendar. (if BC, not thrown)
      */
-    public static Timestamp toTimestamp(Object obj, String pattern, TimeZone timeZone) {
+    public static Timestamp toTimestamp(Object obj, String pattern) {
         assertPatternNotNull("toTimestamp()", pattern);
-        assertTimeZoneNotNull("toTimestamp()", timeZone);
-        return doConvertToTimestamp(obj, pattern, timeZone);
+        return doConvertToTimestamp(obj, (TimeZone) null, pattern, (Locale) null);
     }
 
-    protected static Timestamp doConvertToTimestamp(Object obj, String pattern, TimeZone timeZone) {
+    /**
+     * Convert the object to the instance that is time-stamp. <br>
+     * Even if it's the sub class type, it returns a new instance.
+     * @param obj The parsed object. (NullAllowed)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @param locale The locale to parse the date expression. (NotNull)
+     * @return The instance of time-stamp. (NullAllowed: If the value is null or empty, it returns null.)
+     * @throws ParseTimestampException When it failed to parse the string to time-stamp.
+     * @throws ParseTimestampNumberFormatException When it failed to format the elements as number.
+     * @throws ParseTimestampOutOfCalendarException When the time-stamp was out of calendar. (if BC, not thrown)
+     */
+    public static Timestamp toTimestamp(Object obj, String pattern, Locale locale) {
+        assertPatternNotNull("toTimestamp()", pattern);
+        assertLocaleNotNull("toTimestamp()", locale);
+        return doConvertToTimestamp(obj, (TimeZone) null, pattern, locale);
+    }
+
+    /**
+     * Convert the object to the instance that is time-stamp. <br>
+     * Even if it's the sub class type, it returns a new instance.
+     * @param obj The parsed object. (NullAllowed)
+     * @param timeZone The time-zone to parse the string expression. (NotNull)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @param locale The locale to parse the date expression. (NotNull)
+     * @return The instance of time-stamp. (NullAllowed: If the value is null or empty, it returns null.)
+     * @throws ParseTimestampException When it failed to parse the string to time-stamp.
+     * @throws ParseTimestampNumberFormatException When it failed to format the elements as number.
+     * @throws ParseTimestampOutOfCalendarException When the time-stamp was out of calendar. (if BC, not thrown)
+     */
+    public static Timestamp toTimestamp(Object obj, TimeZone timeZone, String pattern, Locale locale) {
+        assertTimeZoneNotNull("toTimestamp()", timeZone);
+        assertPatternNotNull("toTimestamp()", pattern);
+        assertLocaleNotNull("toTimestamp()", locale);
+        return doConvertToTimestamp(obj, timeZone, pattern, locale);
+    }
+
+    protected static Timestamp doConvertToTimestamp(Object obj, TimeZone timeZone, String pattern, Locale locale) {
         if (obj == null) {
             return null;
         } else if (obj instanceof Timestamp) {
@@ -2449,7 +2488,7 @@ public final class DfTypeUtil {
         } else if (obj instanceof Date) {
             return new Timestamp(((Date) obj).getTime());
         } else if (obj instanceof String) {
-            return doParseStringAsTimestamp((String) obj, pattern, timeZone);
+            return doParseStringAsTimestamp((String) obj, timeZone, pattern, locale);
         } else if (obj instanceof Calendar) {
             return new Timestamp(((Calendar) obj).getTime().getTime());
         } else if (obj instanceof byte[]) {
@@ -2457,11 +2496,11 @@ public final class DfTypeUtil {
         } else if (obj instanceof Long) {
             return new Timestamp((Long) obj);
         } else {
-            return doParseStringAsTimestamp(obj.toString(), pattern, timeZone);
+            return doParseStringAsTimestamp(obj.toString(), timeZone, pattern, locale);
         }
     }
 
-    protected static Timestamp doParseStringAsTimestamp(String str, String pattern, TimeZone timeZone) {
+    protected static Timestamp doParseStringAsTimestamp(String str, TimeZone timeZone, String pattern, Locale locale) {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
@@ -2473,7 +2512,7 @@ public final class DfTypeUtil {
         } else {
             strict = true;
         }
-        final DateFormat df = doCreateDateFormat(pattern, timeZone, strict);
+        final DateFormat df = doCreateDateFormat(pattern, timeZone, locale, strict);
         try {
             return new Timestamp(df.parse(str).getTime());
         } catch (ParseException e) {
@@ -2545,25 +2584,7 @@ public final class DfTypeUtil {
      * @throws ParseTimeOutOfCalendarException When the time is out of calendar.
      */
     public static Time toTime(Object obj) {
-        return doConvertToTime(obj, (String) null, (TimeZone) null);
-    }
-
-    /**
-     * Convert the object to the instance that is time. <br>
-     * Even if it's the sub class type, it returns a new instance. <br>
-     * This method uses specified time pattern when the pattern is not null
-     * if the object is string type. If it's null, it uses default time pattern
-     * with flexible-parsing based on 'HH:mm:ss'.
-     * @param obj The parsed object. (NullAllowed)
-     * @param pattern The pattern format to parse when the object is string. (NotNull)
-     * @return The instance of time. (NullAllowed: If the value is null or empty, it returns null.)
-     * @throws ParseTimeException When it failed to parse the string to time.
-     * @throws ParseTimeNumberFormatException When it failed to format the elements as number.
-     * @throws ParseTimeOutOfCalendarException When the time is out of calendar.
-     */
-    public static Time toTime(Object obj, String pattern) {
-        assertPatternNotNull("toTime()", pattern);
-        return doConvertToTime(obj, pattern, (TimeZone) null);
+        return doConvertToTime(obj, (TimeZone) null, (String) null, (Locale) null);
     }
 
     /**
@@ -2580,34 +2601,66 @@ public final class DfTypeUtil {
      */
     public static Time toTime(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toTime()", timeZone);
-        return doConvertToTime(obj, (String) null, timeZone);
+        return doConvertToTime(obj, timeZone, (String) null, (Locale) null);
     }
 
     /**
      * Convert the object to the instance that is time. <br>
-     * Even if it's the sub class type, it returns a new instance. <br>
-     * This method uses specified time pattern when the pattern is not null
-     * if the object is string type. If it's null, it uses default time pattern
-     * with flexible-parsing based on 'HH:mm:ss'.
+     * Even if it's the sub class type, it returns a new instance.
      * @param obj The parsed object. (NullAllowed)
      * @param pattern The pattern format to parse when the object is string. (NotNull)
-     * @param timeZone The time-zone to parse the string expression. (NotNull)
      * @return The instance of time. (NullAllowed: If the value is null or empty, it returns null.)
      * @throws ParseTimeException When it failed to parse the string to time.
      * @throws ParseTimeNumberFormatException When it failed to format the elements as number.
      * @throws ParseTimeOutOfCalendarException When the time is out of calendar.
      */
-    public static Time toTime(Object obj, String pattern, TimeZone timeZone) {
+    public static Time toTime(Object obj, String pattern) {
         assertPatternNotNull("toTime()", pattern);
-        assertTimeZoneNotNull("toTime()", timeZone);
-        return doConvertToTime(obj, pattern, timeZone);
+        return doConvertToTime(obj, (TimeZone) null, pattern, (Locale) null);
     }
 
-    protected static Time doConvertToTime(Object obj, String pattern, TimeZone timeZone) {
+    /**
+     * Convert the object to the instance that is time. <br>
+     * Even if it's the sub class type, it returns a new instance.
+     * @param obj The parsed object. (NullAllowed)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @param locale The locale to parse the date expression. (NotNull)
+     * @return The instance of time. (NullAllowed: If the value is null or empty, it returns null.)
+     * @throws ParseTimeException When it failed to parse the string to time.
+     * @throws ParseTimeNumberFormatException When it failed to format the elements as number.
+     * @throws ParseTimeOutOfCalendarException When the time is out of calendar.
+     */
+    public static Time toTime(Object obj, String pattern, Locale locale) {
+        assertPatternNotNull("toTime()", pattern);
+        assertLocaleNotNull("toTime()", locale);
+        return doConvertToTime(obj, (TimeZone) null, pattern, locale);
+    }
+
+    /**
+     * Convert the object to the instance that is time. <br>
+     * Even if it's the sub class type, it returns a new instance.
+     * @param obj The parsed object. (NullAllowed)
+     * @param timeZone The time-zone to parse the string expression. (NotNull)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @param locale The locale to parse the date expression. (NotNull)
+     * @return The instance of time. (NullAllowed: If the value is null or empty, it returns null.)
+     * @throws ParseTimeException When it failed to parse the string to time.
+     * @throws ParseTimeNumberFormatException When it failed to format the elements as number.
+     * @throws ParseTimeOutOfCalendarException When the time is out of calendar.
+     */
+    public static Time toTime(Object obj, TimeZone timeZone, String pattern, Locale locale) {
+        assertTimeZoneNotNull("toTime()", timeZone);
+        assertPatternNotNull("toTime()", pattern);
+        assertLocaleNotNull("toTime()", locale);
+        return doConvertToTime(obj, timeZone, pattern, locale);
+    }
+
+    protected static Time doConvertToTime(Object obj, TimeZone timeZone, String pattern, Locale locale) {
         if (obj == null) {
             return null;
-        } else if (obj instanceof String) {
-            return doParseStringAsTime((String) obj, pattern, timeZone);
+        }
+        if (obj instanceof String) {
+            return doParseStringAsTime((String) obj, timeZone, pattern, locale);
         } else if (obj instanceof Time) {
             final Time paramTime = (Time) obj;
             if (Time.class.equals(paramTime.getClass())) { // pure time
@@ -2620,13 +2673,13 @@ public final class DfTypeUtil {
             final String localTimePattern = DEFAULT_TIME_PATTERN;
             if (obj instanceof LocalDate) {
                 final String strTime = ((LocalDate) obj).format(DateTimeFormatter.ofPattern(localTimePattern));
-                return doParseStringAsTime(strTime, pattern, timeZone);
+                return doParseStringAsTime(strTime, timeZone, pattern, locale);
             } else if (obj instanceof LocalDateTime) {
                 final String strTime = ((LocalDateTime) obj).format(DateTimeFormatter.ofPattern(localTimePattern));
-                return doParseStringAsTime(strTime, pattern, timeZone);
+                return doParseStringAsTime(strTime, timeZone, pattern, locale);
             } else if (obj instanceof LocalTime) {
                 final String strTime = ((LocalTime) obj).format(DateTimeFormatter.ofPattern(localTimePattern));
-                return doParseStringAsTime(strTime, pattern, timeZone);
+                return doParseStringAsTime(strTime, timeZone, pattern, locale);
             } else { // no way
                 throw new IllegalStateException("Unknown local date: type=" + obj.getClass() + ", value=" + obj);
             }
@@ -2649,11 +2702,11 @@ public final class DfTypeUtil {
         } else if (obj instanceof Long) {
             return toTime(toDate((Long) obj));
         } else {
-            return doParseStringAsTime(obj.toString(), pattern, timeZone);
+            return doParseStringAsTime(obj.toString(), timeZone, pattern, locale);
         }
     }
 
-    protected static Time doParseStringAsTime(String str, String pattern, TimeZone timeZone) {
+    protected static Time doParseStringAsTime(String str, TimeZone timeZone, String pattern, Locale locale) {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
@@ -2663,7 +2716,7 @@ public final class DfTypeUtil {
             str = filterTimeStringValueFlexibly(str, includeMillis, keepMillisMore);
             pattern = DEFAULT_TIME_PATTERN;
         }
-        final DateFormat df = doCreateDateFormat(pattern, timeZone, true);
+        final DateFormat df = doCreateDateFormat(pattern, timeZone, locale, true);
         try {
             return new Time(df.parse(str).getTime());
         } catch (ParseException e) {
@@ -2738,25 +2791,7 @@ public final class DfTypeUtil {
      * @throws ParseSqlDateOutOfCalendarException When the time is out of calendar.
      */
     public static java.sql.Date toSqlDate(Object obj) {
-        return doConvertToSqlDate(obj, (String) null, (TimeZone) null);
-    }
-
-    /**
-     * Convert the object to the instance that is SQL-date cleared seconds. <br>
-     * Even if it's the sub class type, it returns a new instance. <br>
-     * This method uses specified SQL-date pattern when the pattern is not null
-     * if the object is string type. If it's null, it uses default SQL-date pattern
-     * with flexible-parsing based on 'yyyy-MM-dd'.
-     * @param obj The parsed object. (NullAllowed)
-     * @param pattern The pattern format to parse when the object is string. (NotNull)
-     * @return The instance of SQL date. (NullAllowed)
-     * @throws ParseSqlDateException When it failed to parse the string to SQL date.
-     * @throws ParseSqlDateNumberFormatException When it failed to format the elements as number.
-     * @throws ParseSqlDateOutOfCalendarException When the time is out of calendar.
-     */
-    public static java.sql.Date toSqlDate(Object obj, String pattern) {
-        assertPatternNotNull("toSqlDate()", pattern);
-        return doConvertToSqlDate(obj, pattern, (TimeZone) null);
+        return doConvertToSqlDate(obj, (TimeZone) null, (String) null, (Locale) null);
     }
 
     /**
@@ -2773,30 +2808,61 @@ public final class DfTypeUtil {
      */
     public static java.sql.Date toSqlDate(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toSqlDate()", timeZone);
-        return doConvertToSqlDate(obj, (String) null, timeZone);
+        return doConvertToSqlDate(obj, timeZone, (String) null, (Locale) null);
     }
 
     /**
      * Convert the object to the instance that is SQL-date cleared seconds. <br>
-     * Even if it's the sub class type, it returns a new instance. <br>
-     * This method uses specified SQL-date pattern when the pattern is not null
-     * if the object is string type. If it's null, it uses default SQL-date pattern
-     * with flexible-parsing based on 'yyyy-MM-dd'.
+     * Even if it's the sub class type, it returns a new instance.
      * @param obj The parsed object. (NullAllowed)
      * @param pattern The pattern format to parse when the object is string. (NotNull)
-     * @param timeZone The time-zone to parse the string expression. (NotNull)
      * @return The instance of SQL date. (NullAllowed)
      * @throws ParseSqlDateException When it failed to parse the string to SQL date.
      * @throws ParseSqlDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseSqlDateOutOfCalendarException When the time is out of calendar.
      */
-    public static java.sql.Date toSqlDate(Object obj, String pattern, TimeZone timeZone) {
+    public static java.sql.Date toSqlDate(Object obj, String pattern) {
         assertPatternNotNull("toSqlDate()", pattern);
-        assertTimeZoneNotNull("toSqlDate()", timeZone);
-        return doConvertToSqlDate(obj, pattern, timeZone);
+        return doConvertToSqlDate(obj, (TimeZone) null, pattern, (Locale) null);
     }
 
-    protected static java.sql.Date doConvertToSqlDate(Object obj, String pattern, TimeZone timeZone) {
+    /**
+     * Convert the object to the instance that is SQL-date cleared seconds. <br>
+     * Even if it's the sub class type, it returns a new instance.
+     * @param obj The parsed object. (NullAllowed)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @param locale The locale to parse the date expression. (NotNull) 
+     * @return The instance of SQL date. (NullAllowed)
+     * @throws ParseSqlDateException When it failed to parse the string to SQL date.
+     * @throws ParseSqlDateNumberFormatException When it failed to format the elements as number.
+     * @throws ParseSqlDateOutOfCalendarException When the time is out of calendar.
+     */
+    public static java.sql.Date toSqlDate(Object obj, String pattern, Locale locale) {
+        assertPatternNotNull("toSqlDate()", pattern);
+        assertLocaleNotNull("toSqlDate()", locale);
+        return doConvertToSqlDate(obj, (TimeZone) null, pattern, locale);
+    }
+
+    /**
+     * Convert the object to the instance that is SQL-date cleared seconds. <br>
+     * Even if it's the sub class type, it returns a new instance.
+     * @param obj The parsed object. (NullAllowed)
+     * @param timeZone The time-zone to parse the string expression. (NotNull)
+     * @param pattern The pattern format to parse when the object is string. (NotNull)
+     * @param locale The locale to parse the date expression. (NotNull)
+     * @return The instance of SQL date. (NullAllowed)
+     * @throws ParseSqlDateException When it failed to parse the string to SQL date.
+     * @throws ParseSqlDateNumberFormatException When it failed to format the elements as number.
+     * @throws ParseSqlDateOutOfCalendarException When the time is out of calendar.
+     */
+    public static java.sql.Date toSqlDate(Object obj, TimeZone timeZone, String pattern, Locale locale) {
+        assertTimeZoneNotNull("toSqlDate()", timeZone);
+        assertPatternNotNull("toSqlDate()", pattern);
+        assertLocaleNotNull("toSqlDate()", locale);
+        return doConvertToSqlDate(obj, timeZone, pattern, locale);
+    }
+
+    protected static java.sql.Date doConvertToSqlDate(Object obj, TimeZone timeZone, String pattern, Locale locale) {
         if (obj == null) {
             return null;
         }
@@ -2814,18 +2880,18 @@ public final class DfTypeUtil {
         }
         final Date date;
         try {
-            date = doConvertToDate(obj, pattern, timeZone);
+            date = doConvertToDate(obj, timeZone, pattern, locale);
         } catch (ParseDateNumberFormatException e) {
             String msg = "Failed to format the time as number:";
-            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone;
+            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone + " locale=" + locale;
             throw new ParseSqlDateNumberFormatException(msg, e);
         } catch (ParseDateOutOfCalendarException e) {
             String msg = "The SQL-date expression is out of calendar:";
-            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone;
+            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone + " locale=" + locale;
             throw new ParseSqlDateOutOfCalendarException(msg, e);
         } catch (ParseDateException e) {
             String msg = "Failed to parse the object to SQL-date:";
-            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone;
+            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone + " locale=" + locale;
             throw new ParseSqlDateException(msg, e);
         }
         if (date != null) {
@@ -2863,29 +2929,36 @@ public final class DfTypeUtil {
     //                                                                            Calendar
     //                                                                            ========
     public static Calendar toCalendar(Object obj) {
-        return doConvertToCalendar(obj, (String) null, (TimeZone) null);
-    }
-
-    public static Calendar toCalendar(Object obj, String pattern) {
-        assertPatternNotNull("toCalendar()", pattern);
-        return doConvertToCalendar(obj, pattern, (TimeZone) null);
+        return doConvertToCalendar(obj, (TimeZone) null, (String) null, (Locale) null);
     }
 
     public static Calendar toCalendar(Object obj, TimeZone timeZone) {
         assertTimeZoneNotNull("toCalendar()", timeZone);
-        return doConvertToCalendar(obj, (String) null, timeZone);
+        return doConvertToCalendar(obj, timeZone, (String) null, (Locale) null);
     }
 
-    public static Calendar toCalendar(Object obj, String pattern, TimeZone timeZone) {
+    public static Calendar toCalendar(Object obj, String pattern) {
         assertPatternNotNull("toCalendar()", pattern);
-        assertTimeZoneNotNull("toCalendar()", timeZone);
-        return doConvertToCalendar(obj, pattern, timeZone);
+        return doConvertToCalendar(obj, (TimeZone) null, pattern, (Locale) null);
     }
 
-    protected static Calendar doConvertToCalendar(Object obj, String pattern, TimeZone timeZone) {
+    public static Calendar toCalendar(Object obj, String pattern, Locale locale) {
+        assertPatternNotNull("toCalendar()", pattern);
+        assertLocaleNotNull("toCalendar()", locale);
+        return doConvertToCalendar(obj, (TimeZone) null, pattern, locale);
+    }
+
+    public static Calendar toCalendar(Object obj, TimeZone timeZone, String pattern, Locale locale) {
+        assertTimeZoneNotNull("toCalendar()", timeZone);
+        assertPatternNotNull("toCalendar()", pattern);
+        assertLocaleNotNull("toCalendar()", locale);
+        return doConvertToCalendar(obj, timeZone, pattern, locale);
+    }
+
+    protected static Calendar doConvertToCalendar(Object obj, TimeZone timeZone, String pattern, Locale locale) {
         if (obj instanceof Calendar) {
             final Calendar original = ((Calendar) obj);
-            final Calendar cal = Calendar.getInstance();
+            final Calendar cal = Calendar.getInstance(locale); // not use original's one, specified is prior
             cal.setTimeInMillis(original.getTimeInMillis());
             cal.setTimeZone(original.getTimeZone());
             return cal; // new instance
@@ -2893,18 +2966,18 @@ public final class DfTypeUtil {
         final TimeZone realZone = chooseRealZone(timeZone);
         final Date date;
         try {
-            date = doConvertToDate(obj, pattern, timeZone);
+            date = doConvertToDate(obj, timeZone, pattern, locale);
         } catch (ParseDateNumberFormatException e) {
             String msg = "Failed to format the calendar as number:";
-            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone;
+            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone + " locale=" + locale;
             throw new ParseCalendarNumberFormatException(msg, e);
         } catch (ParseDateOutOfCalendarException e) {
             String msg = "The calendar expression is out of calendar:";
-            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone;
+            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone + " locale=" + locale;
             throw new ParseCalendarOutOfCalendarException(msg, e);
         } catch (ParseDateException e) {
             String msg = "Failed to parse the object to calendar:";
-            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone;
+            msg = msg + " obj=" + obj + " pattern=" + pattern + " timeZone=" + timeZone + " locale=" + locale;
             throw new ParseCalendarException(msg, e);
         }
         if (date != null) {
@@ -3671,6 +3744,13 @@ public final class DfTypeUtil {
     protected static void assertPatternNotNull(String methodName, String pattern) {
         if (pattern == null) {
             String msg = "The argument 'pattern' should not be null: method=" + methodName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected static void assertLocaleNotNull(String methodName, Locale locale) {
+        if (locale == null) {
+            String msg = "The argument 'locale' should not be null: method=" + methodName;
             throw new IllegalArgumentException(msg);
         }
     }

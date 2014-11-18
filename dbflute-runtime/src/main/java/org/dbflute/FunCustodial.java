@@ -17,6 +17,7 @@ package org.dbflute;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
@@ -63,12 +64,13 @@ public class FunCustodial {
         return DfTypeUtil.toBoolean(obj);
     }
 
-    public static String toStringDate(Date date, String pattern, TimeZone timeZone) {
+    public static String toStringDate(Date date, TimeZone timeZone, String pattern) {
         if (date == null) {
             return null;
         }
         final TimeZone realZone = timeZone != null ? timeZone : DBFluteSystem.getFinalTimeZone();
-        final String str = DfTypeUtil.toStringDate(date, pattern, realZone);
+        final Locale realLocale = DBFluteSystem.getFinalLocale(); // no specified because of basically debug string
+        final String str = DfTypeUtil.toStringDate(date, realZone, pattern, realLocale);
         return (DfTypeUtil.isDateBC(date) ? "BC" : "") + str;
     }
 
@@ -188,9 +190,9 @@ public class FunCustodial {
 
     protected static void buildExceptionTableInfo(ExceptionMessageBuilder br, Entity entity) {
         br.addItem("Table");
-        br.addElement(entity.getTableDbName());
+        br.addElement(entity.asTableDbName());
         try {
-            br.addElement(entity.getDBMeta().extractPrimaryKeyMap(entity));
+            br.addElement(entity.asDBMeta().extractPrimaryKeyMap(entity));
         } catch (RuntimeException continued) { // just in case
             br.addElement("*Failed to get PK info:");
             br.addElement(continued.getMessage());
@@ -211,7 +213,7 @@ public class FunCustodial {
         if (meta.codeOf(code) != null) {
             return;
         }
-        handleUndefinedClassificationCode(entity.getTableDbName(), columnDbName, meta, code);
+        handleUndefinedClassificationCode(entity.asTableDbName(), columnDbName, meta, code);
     }
 
     public static void handleUndefinedClassificationCode(String tableDbName, String columnDbName, ClassificationMeta meta, Object code) {

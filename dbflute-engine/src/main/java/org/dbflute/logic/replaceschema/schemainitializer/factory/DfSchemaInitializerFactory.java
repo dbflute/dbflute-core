@@ -165,6 +165,7 @@ public class DfSchemaInitializerFactory {
             final UnifiedSchema unifiedSchema = getAdditionalDropSchema(_additionalDropMap);
             initializer.setUnifiedSchema(unifiedSchema);
             initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(_additionalDropMap));
+            initializer.setSuppressConnectionFailure(isSuppressAdditionalDropSchemaConnectionFailure(_additionalDropMap));
             // unsupported for additional
             //initializer.setInitializeFirstSqlList(null);
             //initializer.setDropTableExceptList(null);
@@ -204,6 +205,10 @@ public class DfSchemaInitializerFactory {
 
     protected List<String> getAdditionalDropObjectTypeList(Map<String, Object> map) {
         return _replaceSchemaProperties.getAdditionalDropObjectTypeList(map);
+    }
+
+    protected boolean isSuppressAdditionalDropSchemaConnectionFailure(Map<String, Object> map) {
+        return _replaceSchemaProperties.isSuppressAdditionalDropSchemaConnectionFailure(map);
     }
 
     public Map<String, Object> getAdditionalDropMap() {

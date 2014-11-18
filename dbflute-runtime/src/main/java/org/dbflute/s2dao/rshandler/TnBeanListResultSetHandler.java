@@ -20,12 +20,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.accessory.DomainEntity;
+import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -36,6 +38,7 @@ import org.dbflute.s2dao.rowcreator.TnRelationRowCache;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.dbflute.s2dao.rowcreator.TnRelationSelector;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author modified by jflute (originated in S2Dao)
@@ -83,16 +86,24 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         TnRelationSelector relSelector = null;
 
         final TnBeanMetaData basePointBmd = getBeanMetaData();
+
+        // condition-bean info (variable for minimum thread local access)
         final boolean hasCB = hasConditionBean();
+        final ConditionBean cb = hasCB ? getConditionBean() : null;
+
+        // outsideSql info (also variable for minimum thread local access)
         final boolean hasOql = hasOutsideSqlContext();
-        final boolean checkNonSp = checkNonSpecifiedColumnAccess(hasCB, hasOql);
+        final OutsideSqlContext oqlCtx = OutsideSqlContext.getOutsideSqlContextOnThread();
+
+        final boolean checkNonSp = checkNonSpecifiedColumnAccess(hasCB, cb, hasOql, oqlCtx);
+        final boolean colNullObj = isUseColumnNullObjectHandling(hasCB, cb);
         final boolean skipRelationLoop;
         {
-            final boolean emptyRelationCB = hasCB && isSelectedRelationEmpty();
-            final boolean specifiedOutsideSql = hasOql && isSpecifiedOutsideSql();
+            final boolean emptyRelationCB = hasCB && isSelectedRelationEmpty(cb);
+            final boolean specifiedOutsideSql = hasOql && isSpecifiedOutsideSql(oqlCtx);
 
             // if it has condition-bean that has no relation to get
-            // or it has outside SQL context that is specified-outside-sql,
+            // or it has outside SQL context that is specified outside-SQL,
             // they are unnecessary to do relation loop
             skipRelationLoop = emptyRelationCB || specifiedOutsideSql;
         }
@@ -110,19 +121,19 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             final Object row = createRow(rs, selectIndexMap, propertyCache);
 
             if (skipRelationLoop) {
-                adjustCreatedRow(row, checkNonSp, basePointBmd);
+                adjustCreatedRow(row, checkNonSp, colNullObj, basePointBmd, cb);
                 handler.handle(row);
                 continue;
             }
 
             if (relSelector == null) {
-                relSelector = createRelationSelector(hasCB);
+                relSelector = createRelationSelector(hasCB, cb);
             }
             if (relPropCache == null) {
                 relPropCache = createRelationPropertyCache(selectColumnMap, selectIndexMap, relSelector);
             }
             if (relRowCache == null) {
-                relRowCache = createRelationRowCache(hasCB);
+                relRowCache = createRelationRowCache(hasCB, cb);
             }
             final List<TnRelationPropertyType> rptList = basePointBmd.getRelationPropertyTypeList();
             for (TnRelationPropertyType rpt : rptList) {
@@ -131,7 +142,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 }
                 mappingFirstRelation(rs, row, rpt, selectColumnMap, selectIndexMap, relPropCache, relRowCache, relSelector);
             }
-            adjustCreatedRow(row, checkNonSp, basePointBmd);
+            adjustCreatedRow(row, checkNonSp, colNullObj, basePointBmd, cb);
             handler.handle(row);
         }
     }
@@ -139,33 +150,34 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     /**
      * Create the selector of relation.
      * @param hasCB Does the select use condition-bean? 
+     * @param cb The condition-bean for the select. (NullAllowed: not condition-bean select)
      * @return The created selector instance. (NotNull)
      */
-    protected TnRelationSelector createRelationSelector(final boolean hasCB) {
-        final ConditionBean cb = hasCB ? ConditionBeanContext.getConditionBeanOnThread() : null;
+    protected TnRelationSelector createRelationSelector(final boolean hasCB, ConditionBean cb) {
+        final boolean colNullObj = isUseColumnNullObjectHandling(hasCB, cb);
         return new TnRelationSelector() {
             public boolean isNonLimitMapping() {
                 return hasCB;
             }
 
             public boolean isNonSelectedRelation(String relationNoSuffix) {
-                return cb != null && !cb.getSqlClause().hasSelectedRelation(relationNoSuffix);
+                return hasCB && !cb.getSqlClause().hasSelectedRelation(relationNoSuffix);
             }
 
             public boolean isNonSelectedNextConnectingRelation(String relationNoSuffix) {
-                return cb != null && !cb.getSqlClause().isSelectedNextConnectingRelation(relationNoSuffix);
+                return hasCB && !cb.getSqlClause().isSelectedNextConnectingRelation(relationNoSuffix);
             }
 
             public boolean canUseRelationCache(String relationNoSuffix) {
-                return cb != null && cb.getSqlClause().canUseRelationCache(relationNoSuffix);
+                return hasCB && cb.getSqlClause().canUseRelationCache(relationNoSuffix);
             }
 
             public boolean isNonSpecifiedColumnAccessAllowed(String relationNoSuffix) {
-                return cb != null && cb.isNonSpecifiedColumnAccessAllowed();
+                return hasCB && cb.isNonSpecifiedColumnAccessAllowed();
             }
 
             public boolean isUsingSpecifyColumnInRelation(String relationNoSuffix) {
-                if (cb == null) {
+                if (!hasCB) {
                     return false;
                 }
                 final SqlClause sqlClause = cb.getSqlClause();
@@ -175,20 +187,32 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 }
                 return sqlClause.hasSpecifiedSelectColumn(tableAlias);
             }
+
+            public Set<ColumnInfo> getRelationSpecifiedNullObjectColumnSet(String relationNoSuffix) {
+                if (!hasCB) {
+                    return DfCollectionUtil.emptySet();
+                }
+                return cb.getSqlClause().getRelationSpecifiedNullObjectColumnSet(relationNoSuffix);
+            }
+
+            public boolean isColumnNullObjectEnabled(String relationNoSuffix) {
+                return colNullObj;
+            }
         };
     }
 
     /**
      * Create the cache of relation row.
      * @param hasCB Does the select use condition-bean?
+     * @param cb The condition-bean for the select. (NullAllowed: not condition-bean select)
      * @return The cache of relation row. (NotNull)
      */
-    protected TnRelationRowCache createRelationRowCache(boolean hasCB) {
+    protected TnRelationRowCache createRelationRowCache(boolean hasCB, ConditionBean cb) {
         final int relSize;
         {
             final int defaultRelSize = 4; // as default
             if (hasCB) { // mainly here
-                final int selectedRelationCount = getSelectedRelationCount();
+                final int selectedRelationCount = getSelectedRelationCount(cb);
                 if (selectedRelationCount > 0) {
                     relSize = selectedRelationCount;
                 } else { // basically no way (if no count, cache is not created)
@@ -200,7 +224,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         }
         final boolean canRowCache;
         if (hasCB) { // mainly here
-            canRowCache = canRelationMappingCache();
+            canRowCache = canRelationMappingCache(cb);
         } else { // basically no way (only relation of DBFlute entity is supported)
             canRowCache = true;
         }
@@ -269,24 +293,24 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     /**
      * Does it check access to non-specified column in base-point table?
      * @param hasCB Does it have condition-bean context in thread local?
-     * @param hasOql Does it have outside-SQL context in thread local?
+     * @param cb The condition-bean for the select. (NullAllowed: when not condition-bean select)
+     * @param hasOql Does it have outsideSql context in thread local?
+     * @param oqlCtx The context of outsideSql. (NullAllowed: when not outsideSql select)
      * @return The determination, true or false.
      */
-    protected boolean checkNonSpecifiedColumnAccess(boolean hasCB, boolean hasOql) {
+    protected boolean checkNonSpecifiedColumnAccess(boolean hasCB, ConditionBean cb, boolean hasOql, OutsideSqlContext oqlCtx) {
         if (hasCB) {
-            final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
             if (cb.isNonSpecifiedColumnAccessAllowed()) {
                 return false;
             }
             final String aliasName = cb.getSqlClause().getBasePointAliasName();
             return cb.getSqlClause().hasSpecifiedSelectColumn(aliasName);
         } else if (hasOql) {
-            final OutsideSqlContext context = OutsideSqlContext.getOutsideSqlContextOnThread();
-            final Class<?> resultType = context.getResultType();
+            final Class<?> resultType = oqlCtx.getResultType();
             if (resultType == null) { // basically no way, just in case
                 return false;
             }
-            return isOutsideSqlNonSpecifiedColumnAccessChecked(context, resultType);
+            return isOutsideSqlNonSpecifiedColumnAccessChecked(oqlCtx, resultType);
         }
         return false;
     }
@@ -303,6 +327,13 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         return DomainEntity.class.isAssignableFrom(resultType);
     }
 
+    // -----------------------------------------------------
+    //                                    Column Null Object
+    //                                    ------------------
+    protected boolean isUseColumnNullObjectHandling(boolean hasCB, ConditionBean cb) {
+        return hasCB && cb.getSqlClause().isColumnNullObjectAllowed(); // condition-bean only
+    }
+
     // ===================================================================================
     //                                                                       ConditionBean
     //                                                                       =============
@@ -315,32 +346,40 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     }
 
     /**
+     * Get the condition-bean on the thread if it exists.
+     * @return The condition-bean for the select. (NullAllowed)
+     */
+    protected ConditionBean getConditionBean() {
+        return ConditionBeanContext.getConditionBeanOnThread();
+    }
+
+    /**
      * Is the selected relation empty? <br>
      * You should call {@link #hasConditionBean()} before calling this.
+     * @param cb The condition-bean for the select. (NotNull)
      * @return The determination, true or false.
      */
-    protected boolean isSelectedRelationEmpty() {
-        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+    protected boolean isSelectedRelationEmpty(ConditionBean cb) {
         return cb.getSqlClause().isSelectedRelationEmpty();
     }
 
     /**
      * Get the count of selected relation. <br>
      * You should call {@link #hasConditionBean()} before calling this.
+     * @param cb The condition-bean for the select. (NotNull)
      * @return The integer of the count. (NotMinus)
      */
-    protected int getSelectedRelationCount() {
-        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+    protected int getSelectedRelationCount(ConditionBean cb) {
         return cb.getSqlClause().getSelectedRelationCount();
     }
 
     /**
      * Can the relation mapping (entity instance) cache? <br>
      * You should call {@link #hasConditionBean()} before calling this.
+     * @param cb The condition-bean for the select. (NotNull)
      * @return The determination, true or false.
      */
-    protected boolean canRelationMappingCache() {
-        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+    protected boolean canRelationMappingCache(ConditionBean cb) {
         return cb.canRelationMappingCache();
     }
 
@@ -351,11 +390,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         return OutsideSqlContext.isExistOutsideSqlContextOnThread();
     }
 
-    protected boolean isSpecifiedOutsideSql() {
-        if (!hasOutsideSqlContext()) {
-            return false;
-        }
-        final OutsideSqlContext context = OutsideSqlContext.getOutsideSqlContextOnThread();
+    protected boolean isSpecifiedOutsideSql(OutsideSqlContext context) {
         return context.isSpecifiedOutsideSql();
     }
 }

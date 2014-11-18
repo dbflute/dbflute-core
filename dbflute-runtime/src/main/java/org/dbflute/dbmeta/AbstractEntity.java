@@ -313,7 +313,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     protected abstract String doBuildRelationString(String dm);
 
     protected String xfUD(Date date) { // formatUtilDate()
-        return FunCustodial.toStringDate(date, myutilDatePattern(), mytimeZone());
+        return FunCustodial.toStringDate(date, mytimeZone(), myutilDatePattern());
     }
 
     protected String myutilDatePattern() {

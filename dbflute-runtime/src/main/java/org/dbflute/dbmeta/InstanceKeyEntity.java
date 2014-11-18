@@ -61,16 +61,12 @@ public class InstanceKeyEntity implements Entity {
     // ===================================================================================
     //                                                                          Delegation
     //                                                                          ==========
-    public DBMeta getDBMeta() {
-        return _actualEntity.getDBMeta();
+    public DBMeta asDBMeta() {
+        return _actualEntity.asDBMeta();
     }
 
-    public String getTableDbName() {
-        return _actualEntity.getTableDbName();
-    }
-
-    public String getTablePropertyName() {
-        return _actualEntity.getTablePropertyName();
+    public String asTableDbName() {
+        return _actualEntity.asTableDbName();
     }
 
     // ===================================================================================

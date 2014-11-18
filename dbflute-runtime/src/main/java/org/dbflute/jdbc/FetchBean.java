@@ -24,13 +24,13 @@ public interface FetchBean {
     /**
      * Check whether the result size is safety or not. <br>
      * If the result size is in Danger Zone, the select method throws DangerousResultSizeException.
-     * @param safetyMaxResultSize The max size of safety result. (If zero or minus, checking is invalid)
+     * @param safetyMaxResultSize The max size of safety result. (if zero or minus, checking is invalid)
      */
     void checkSafetyResult(int safetyMaxResultSize);
 
     /**
      * Get the max size of safety result.
-     * @return The max size of safety result.
+     * @return The max size of safety result. (zero means no check)
      */
     int getSafetyMaxResultSize();
 }

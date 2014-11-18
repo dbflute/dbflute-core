@@ -159,8 +159,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** The max result size of safety select. {Internal} */
     protected int _safetyMaxResultSize;
 
-    /** Does it check record count before QueryUpdate? (contains QueryDelete) {Internal} */
-    protected boolean _queryUpdateCountPreCheck;
+    /** The option of cursor select. {Internal} (NullAllowed) */
+    protected CursorSelectOption _cursorSelectOption; // set by sub-class
 
     /** The configuration of statement. {Internal} (NullAllowed) */
     protected StatementConfig _statementConfig;
@@ -171,24 +171,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** Does it allow access to non-specified column? {Internal} */
     protected boolean _nonSpecifiedColumnAccessAllowed; // the default is on the DBFlute generator (false @since 1.1)
 
-    /** The option of cursor select. {Internal} (NullAllowed) */
-    protected CursorSelectOption _cursorSelectOption; // set by sub-class
+    /** Does it check record count before QueryUpdate? (contains QueryDelete) {Internal} */
+    protected boolean _queryUpdateCountPreCheck;
 
     /** The handler of derived type. {Internal} (NullAllowed: lazy-loaded) */
     protected DerivedTypeHandler _derivedTypeHandler;
 
     /** The display style of date for logging, overriding default style. (NullAllowed: configured default style) */
     protected BoundDateDisplayStyle _logDateDisplayStyle;
-
-    // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
-    /**
-     * {@inheritDoc}
-     */
-    public DBMeta getDBMeta() {
-        return getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-    }
 
     // ===================================================================================
     //                                                                           SqlClause
@@ -207,8 +197,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected abstract SqlClause createSqlClause();
 
     // ===================================================================================
-    //                                                                     DBMeta Provider
-    //                                                                     ===============
+    //                                                                             DB Meta
+    //                                                                             =======
+    /**
+     * {@inheritDoc}
+     */
+    public DBMeta asDBMeta() { // not to depend on concrete entity (but little merit any more?)
+        return getDBMetaProvider().provideDBMetaChecked(asTableDbName());
+    }
+
     /**
      * Get the provider of DB meta.
      * @return The provider of DB meta. (NotNull)
@@ -226,7 +223,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         final String foreignTableAliasName = callback.qf().xgetAliasName();
         final String localRelationPath = localCQ().xgetRelationPath();
         final String foreignRelationPath = callback.qf().xgetRelationPath();
-        getSqlClause().registerSelectedRelation(foreignTableAliasName, getTableDbName(), foreignPropertyName, localRelationPath,
+        getSqlClause().registerSelectedRelation(foreignTableAliasName, asTableDbName(), foreignPropertyName, localRelationPath,
                 foreignRelationPath);
     }
 
@@ -647,7 +644,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         for (String relationPath : _dreamCruiseJourneyLogBook) {
             final List<String> splitList = Srl.splitList(relationPath, "_"); // e.g. _2_5
             final StringBuilder sb = new StringBuilder();
-            DBMeta currentMeta = getDBMeta();
+            DBMeta currentMeta = asDBMeta();
             int index = 0;
             for (String element : splitList) {
                 if ("".equals(element)) {
@@ -708,7 +705,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         assertQueryPurpose();
         if (getSqlClause().isOrScopeQueryAndPartEffective()) {
             // limit because of so complex
-            String msg = "The OrScopeQuery in and-part is unsupported: " + getTableDbName();
+            String msg = "The OrScopeQuery in and-part is unsupported: " + asTableDbName();
             throw new OrScopeQueryAndPartUnsupportedOperationException(msg);
         }
         xdoOrSQ(cb, orQuery);
@@ -852,13 +849,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
-        if (!getDBMeta().hasPrimaryKey()) {
-            String msg = "The table has no primary-keys: " + getTableDbName();
+        if (!asDBMeta().hasPrimaryKey()) {
+            String msg = "The table has no primary-keys: " + asTableDbName();
             throw new IllegalConditionBeanOperationException(msg);
         }
-        final Entity entity = getDBMeta().newEntity();
-        getDBMeta().acceptPrimaryKeyMap(entity, primaryKeyMap);
-        final Map<String, Object> filteredMap = getDBMeta().extractPrimaryKeyMap(entity);
+        final Entity entity = asDBMeta().newEntity();
+        asDBMeta().acceptPrimaryKeyMap(entity, primaryKeyMap);
+        final Map<String, Object> filteredMap = asDBMeta().extractPrimaryKeyMap(entity);
         for (Entry<String, Object> entry : filteredMap.entrySet()) {
             localCQ().invokeQuery(entry.getKey(), "equal", entry.getValue());
         }
@@ -993,9 +990,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void enablePagingSelectAndQuerySplit() {
         assertOptionThatBadTiming("enablePagingSelectAndQuerySplit()");
-        final DBMeta dbmeta = getDBMeta();
+        final DBMeta dbmeta = asDBMeta();
         if (!dbmeta.hasPrimaryKey() || dbmeta.getPrimaryUniqueInfo().isTwoOrMore()) {
-            String msg = "The PagingSelectAndQuerySplit needs only-one column key table: " + getTableDbName();
+            String msg = "The PagingSelectAndQuerySplit needs only-one column key table: " + asTableDbName();
             throw new IllegalConditionBeanOperationException(msg);
         }
         // MySQL's rows calculation is not fit with this function
@@ -1315,34 +1312,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // ===================================================================================
-    //                                                                        Query Update
-    //                                                                        ============
-    /**
-     * {@inheritDoc}
-     */
-    public void enableQueryUpdateCountPreCheck() {
-        assertOptionThatBadTiming("enableQueryUpdateCountPreCheck()");
-        _queryUpdateCountPreCheck = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void disableQueryUpdateCountPreCheck() {
-        assertOptionThatBadTiming("disableQueryUpdateCountPreCheck()");
-        _queryUpdateCountPreCheck = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isQueryUpdateCountPreCheck() {
-        return _queryUpdateCountPreCheck;
-    }
-
-    // ===================================================================================
-    //                                                                     StatementConfig
-    //                                                                     ===============
+    //                                                             Statement Configuration
+    //                                                             =======================
     /**
      * {@inheritDoc}
      */
@@ -1411,6 +1382,45 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** {@inheritDoc} */
     public boolean isNonSpecifiedColumnAccessAllowed() {
         return _nonSpecifiedColumnAccessAllowed;
+    }
+
+    // ===================================================================================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    /** {@inheritDoc} */
+    public void enableColumnNullObject() {
+        assertOptionThatBadTiming("enableColumnNullObject()");
+        getSqlClause().enableColumnNullObject();
+    }
+
+    /** {@inheritDoc} */
+    public void disableColumnNullObject() { // e.g. called by cache method in application
+        assertOptionThatBadTiming("disableColumnNullObject()");
+        getSqlClause().disableColumnNullObject();
+    }
+
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    /** {@inheritDoc} */
+    public void enableQueryUpdateCountPreCheck() {
+        assertOptionThatBadTiming("enableQueryUpdateCountPreCheck()");
+        _queryUpdateCountPreCheck = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void disableQueryUpdateCountPreCheck() {
+        assertOptionThatBadTiming("disableQueryUpdateCountPreCheck()");
+        _queryUpdateCountPreCheck = false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isQueryUpdateCountPreCheck() {
+        return _queryUpdateCountPreCheck;
     }
 
     // ===================================================================================

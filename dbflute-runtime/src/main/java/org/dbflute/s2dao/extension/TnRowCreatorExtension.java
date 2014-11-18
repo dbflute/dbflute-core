@@ -30,6 +30,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.accessory.ColumnNullObjectable;
 import org.dbflute.dbmeta.accessory.DerivedMappable;
 import org.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.dbflute.dbmeta.info.ColumnInfo;
@@ -97,7 +98,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
         // getting from entity because the bean may be customize entity.
         final Object instance = newInstance(beanClass); // only when initialization
-        return ((Entity) instance).getDBMeta();
+        return ((Entity) instance).asDBMeta();
     }
 
     protected static Object newInstance(Class<?> clazz) {
@@ -215,7 +216,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             if (typeHandler == null) {
                 typeHandler = cb.xgetDerivedTypeHandler(); // basically fixed instance returned
                 if (typeHandler == null) { // no way, just in case
-                    String msg = "Not found the type handler from condition-bean: " + cb.getTableDbName();
+                    String msg = "Not found the type handler from condition-bean: " + cb.asTableDbName();
                     throw new IllegalStateException(msg);
                 }
             }
@@ -306,7 +307,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             if (dbmeta != null) {
                 return dbmeta;
             }
-            dbmeta = entity.getDBMeta();
+            dbmeta = entity.asDBMeta();
             cacheDBMeta(entity, dbmeta);
             return dbmeta;
         }
@@ -353,9 +354,12 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
      * Adjust created row. (clearing modified info, ...)
      * @param row The row of result list. (NotNull)
      * @param checkNonSp Does is use the check of access to non-specified column?
+     * @param colNullObj Does is use the handling of column null object?
      * @param basePointBmd The bean meta data of the row for base-point table. (NotNull)
+     * @param cb The condition-bean for the select. (NullAllowed: when not condition-bean select)
      */
-    public static void adjustCreatedRow(final Object row, boolean checkNonSp, TnBeanMetaData basePointBmd) {
+    public static void adjustCreatedRow(final Object row, boolean checkNonSp, boolean colNullObj, TnBeanMetaData basePointBmd,
+            ConditionBean cb) {
         // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
         // static for handler calling
         // however no other callers now so unnecessary, exists once...
@@ -367,25 +371,44 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         // _/_/_/_/_/_/_/_/_/_/
         if (row instanceof Entity) {
             final Entity entity = (Entity) row;
+
+            // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+            // check access to non-specified-column
+            // modified properties matches specified properties so copy it
+            // so should be before clearing modified info
+            // _/_/_/_/_/_/_/_/_/_/
             if (checkNonSp) { // contains enabled by CB and using SpecifyColumn
                 entity.modifiedToSpecified();
-                // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-                // column null object handling
+
+                // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+                // adjust specification for column null object handling
+                // null object target is not specified but it should be able to be called
+                // so add dummy to specified properties
                 // e.g. A, B and cached C
                 // when specifyA, specifyC => no specified-property so *set dummy property here
                 // when specifyA, specifyB => C should be checked, actually checked so no action here
-                // when non-SpecifyColumm => can get so no action here
+                // when non-SpecifyColumm  => can get so no action here
                 // when specifyA, specifyC but allowed => can get so no action here
                 // when specifyA, specifyB but allowed => should be no cache logically, but rare case so no action here
                 // _/_/_/_/_/_/_/_/_/_/
-                // TODO jflute impl: null object (row creator)
-                //if (cb.getSqlClause().isColumnNullObjectTable(entity)) {
-                //    for (ColumnInfo columnInfo : cb.getSqlClause().getSpecifiedNullObjectColumnList(entity)) {
-                //        entity.myspecifyProperty(columnInfo.getPropertyName());
-                //    }
-                //}
+                if (colNullObj && cb != null) { // check 'cb' just in case
+                    final SqlClause sqlClause = cb.getSqlClause();
+                    for (ColumnInfo columnInfo : sqlClause.getLocalSpecifiedNullObjectColumnSet()) {
+                        entity.myspecifyProperty(columnInfo.getPropertyName());
+                    }
+                }
             }
+            // enable the handling of column null object if allowed and object-able
+            // only table that has null object target column is object-able (generated as it)
+            if (colNullObj && entity instanceof ColumnNullObjectable) {
+                ((ColumnNullObjectable) entity).enableColumnNullObject();
+            }
+
+            // clear modified properties for update process using selected entity
             entity.clearModifiedInfo();
+
+            // mark as select to determine the entity is selected or user-created
+            // basically for e.g. determine columns of batch insert
             entity.markAsSelect();
         } else { // not DBFlute entity
             // actually any bean meta data can be accepted

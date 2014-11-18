@@ -13,27 +13,24 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.infra;
+package org.dbflute.dbmeta.accessory;
 
 /**
- * The interface only for document.
- * <pre>
- * [Official Site]
- * http://dbflute.org/
- * 
- * [Github]
- * https://github.com/dbflute
- * 
- * [HashTag in SourceCode]
- * hope     : expects future implementation
- * forNow   : pending deep implementation
- * needsFix : needs fix, refactoring or formal implementation
- * 
- * extPoint   : extension point for users
- * dateParade : handling point of (many) date types e.g. LocalDate
- * </pre>
+ * The interface of column null object.
  * @author jflute
- * @since 1.1.0 (2014/10/18 Saturday)
+ * @since 1.1.0 (2014/11/17 Monday)
  */
-public interface DfDocs {
+public interface ColumnNullObjectable {
+
+    /**
+     * Enable the handling of column null object. (default is disabled) <br>
+     * The handling is available if the null object target column in selected entity.
+     */
+    void enableColumnNullObject();
+
+    /**
+     * Disable the handling of column null object. (back to default) <br>
+     * You can get null from selected entity even if null object target column.
+     */
+    void disableColumnNullObject();
 }

@@ -130,7 +130,7 @@ public class OutsideSqlOption {
         sb.append("{").append("paging=").append(_pagingRequestType);
         if (_statementConfig != null) {
             if (_statementConfig.hasResultSetType()) {
-                sb.append(", rs-type=").append(_statementConfig.buildResultSetTypeDisp());
+                sb.append(", resultSet=").append(_statementConfig.buildResultSetTypeDisp());
             }
             if (_statementConfig.hasQueryTimeout()) {
                 sb.append(", timeout=").append(_statementConfig.getQueryTimeout());

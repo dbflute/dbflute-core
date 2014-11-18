@@ -144,7 +144,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     protected abstract String getTableDbName();
 
     protected SpecifiedColumn createSpecifiedColumn(String columnName, String tableAliasName) {
-        final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(_query.getTableDbName());
+        final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(_query.asTableDbName());
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnName);
         return new SpecifiedColumn(tableAliasName, columnInfo, _baseCB);
     }
@@ -253,7 +253,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     //                                         Assist Helper
     //                                         -------------
     protected List<ColumnInfo> getColumnInfoList() {
-        final String tableDbName = _query.getTableDbName();
+        final String tableDbName = _query.asTableDbName();
         final DBMeta dbmeta = _dbmetaProvider.provideDBMeta(tableDbName);
         return dbmeta.getColumnInfoList();
     }
@@ -357,22 +357,22 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     }
 
     protected void throwSpecifyColumnAlreadySpecifiedEveryColumnException(String columnName) {
-        final String tableDbName = _baseCB.getTableDbName();
+        final String tableDbName = _baseCB.asTableDbName();
         createCBExThrower().throwSpecifyColumnAlreadySpecifiedEveryColumnException(tableDbName, columnName);
     }
 
     protected void throwSpecifyColumnAlreadySpecifiedExceptColumnException(String columnName) {
-        final String tableDbName = _baseCB.getTableDbName();
+        final String tableDbName = _baseCB.asTableDbName();
         createCBExThrower().throwSpecifyColumnAlreadySpecifiedExceptColumnException(tableDbName, columnName);
     }
 
     protected void throwSpecifyEveryColumnAlreadySpecifiedColumnException() {
-        final String tableDbName = _baseCB.getTableDbName();
+        final String tableDbName = _baseCB.asTableDbName();
         createCBExThrower().throwSpecifyEveryColumnAlreadySpecifiedColumnException(tableDbName, _specifiedColumnMap);
     }
 
     protected void throwSpecifyExceptColumnAlreadySpecifiedColumnException() {
-        final String tableDbName = _baseCB.getTableDbName();
+        final String tableDbName = _baseCB.asTableDbName();
         createCBExThrower().throwSpecifyExceptColumnAlreadySpecifiedColumnException(tableDbName, _specifiedColumnMap);
     }
 

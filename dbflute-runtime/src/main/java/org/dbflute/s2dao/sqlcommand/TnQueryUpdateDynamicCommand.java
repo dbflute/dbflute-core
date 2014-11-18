@@ -164,7 +164,7 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
     protected String buildQueryUpdateTwoWaySql(Entity entity, ConditionBean cb, final UpdateOption<ConditionBean> option,
             List<TnPropertyType> boundPropTypeList) {
         final Map<String, Object> columnParameterMap = new LinkedHashMap<String, Object>();
-        final DBMeta dbmeta = entity.getDBMeta();
+        final DBMeta dbmeta = entity.asDBMeta();
         final Set<String> modifiedPropertyNames = entity.mymodifiedProperties();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         for (final ColumnInfo columnInfo : columnInfoList) {

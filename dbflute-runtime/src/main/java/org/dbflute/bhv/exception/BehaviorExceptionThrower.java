@@ -74,15 +74,17 @@ public class BehaviorExceptionThrower {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("Duplicate entity by the condition. (should be the only one)");
         br.addItem("Advice");
-        br.addElement("Confirm your search condition. Does it really select the only one?");
+        br.addElement("Confirm your search condition. Is it really for the only one?");
         br.addElement("And confirm your database. Does it really exist the only one?");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    cb.query().setMemberName_PrefisSearch(\"S\");");
-        br.addElement("    ... = memberBhv.selectEntity(cb);");
+        br.addElement("    memberBhv.selectEntity(cb -> {");
+        br.addElement("        cb.query().setMemberName_LikeSearch(\"S\", op -> op.likePrefix());");
+        br.addElement("    }).alwaysPresent(...)");
         br.addElement("  (o):");
-        br.addElement("    cb.query().setMemberId_Equal(3);");
-        br.addElement("    ... = memberBhv.selectEntity(cb);");
+        br.addElement("    memberBhv.selectEntity(cb -> {");
+        br.addElement("        cb.query().setMemberId_Equal(3);");
+        br.addElement("    }).alwaysPresent(...)");
         br.addItem("Result Count");
         br.addElement(resultCountExp);
         setupSearchKeyElement(br, searchKey);
@@ -271,7 +273,7 @@ public class BehaviorExceptionThrower {
     //                                                                              ======
     public void throwEntityPrimaryKeyNotFoundException(Entity entity) {
         final String classTitle = DfTypeUtil.toClassTitle(entity);
-        final String behaviorName = Srl.substringLastRear(entity.getDBMeta().getBehaviorTypeName(), ".");
+        final String behaviorName = Srl.substringLastRear(entity.asDBMeta().getBehaviorTypeName(), ".");
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The primary-key value in the entity was not found.");
         br.addItem("Advice");
@@ -298,7 +300,7 @@ public class BehaviorExceptionThrower {
 
     public void throwEntityUniqueKeyNotFoundException(Entity entity) {
         final String classTitle = DfTypeUtil.toClassTitle(entity);
-        final String behaviorName = Srl.substringLastRear(entity.getDBMeta().getBehaviorTypeName(), ".");
+        final String behaviorName = Srl.substringLastRear(entity.asDBMeta().getBehaviorTypeName(), ".");
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The unique-key value in the entity was not found.");
         br.addItem("Advice");
@@ -463,7 +465,7 @@ public class BehaviorExceptionThrower {
         try {
             br.addElement(entity.toStringWithRelation());
         } catch (RuntimeException continued) {
-            final String tableDbName = entity.getTableDbName();
+            final String tableDbName = entity.asTableDbName();
             final String msg = "*Failed to build string from the entity for debug: " + tableDbName;
             if (_log.isDebugEnabled()) {
                 _log.debug(msg);

@@ -157,7 +157,7 @@ public class TnRelationRowOptionalHandler {
             try {
                 br.addElement(entity.toStringWithRelation());
             } catch (RuntimeException continued) {
-                final String tableDbName = entity.getTableDbName();
+                final String tableDbName = entity.asTableDbName();
                 final String msg = "*Failed to build string from the entity for debug: " + tableDbName;
                 if (_log.isDebugEnabled()) {
                     _log.debug(msg);
@@ -182,7 +182,7 @@ public class TnRelationRowOptionalHandler {
                 final String displaySql = cb.toDisplaySql();
                 br.addElement(displaySql);
             } catch (RuntimeException continued) {
-                final String tableDbName = cb.getTableDbName();
+                final String tableDbName = cb.asTableDbName();
                 final String msg = "*Failed to get display SQL from the condition-bean for debug: " + tableDbName;
                 if (_log.isDebugEnabled()) {
                     _log.debug(msg);

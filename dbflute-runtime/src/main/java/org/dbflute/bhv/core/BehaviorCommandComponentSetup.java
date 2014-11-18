@@ -18,6 +18,7 @@ package org.dbflute.bhv.core;
 import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
+import org.dbflute.s2dao.jdbc.TnResultSetHandlerFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 
 /**
@@ -30,6 +31,8 @@ public interface BehaviorCommandComponentSetup {
     void setStatementFactory(StatementFactory statementFactory);
 
     void setBeanMetaDataFactory(TnBeanMetaDataFactory beanMetaDataFactory);
+
+    void setResultSetHandlerFactory(TnResultSetHandlerFactory resultSetHandlerFactory);
 
     void setSqlFileEncoding(String sqlFileEncoding);
 }

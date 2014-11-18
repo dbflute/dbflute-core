@@ -36,19 +36,19 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
     // -----------------------------------------------------
     //                                     Basic Information
     //                                     -----------------
-    /** The path of outside-SQL. (Required) */
+    /** The path of outside-SQL. (NotNull: after initialization) */
     protected String _outsideSqlPath;
 
-    /** The parameter-bean. (Required to set, but Nullable) */
+    /** The parameter-bean. (NullAllowed) */
     protected Object _parameterBean;
 
-    /** The option of outside-SQL. (Required) */
+    /** The option of outside-SQL. (NotNull: after initialization) */
     protected OutsideSqlOption _outsideSqlOption;
 
-    /** The current database definition. (Required) */
+    /** The current database definition. (NotNull: after initialization) */
     protected DBDef _currentDBDef;
 
-    /** The factory of outside-SQL context. (NotNull) */
+    /** The factory of outside-SQL context. (NotNull: after initialization) */
     protected OutsideSqlContextFactory _outsideSqlContextFactory;
 
     /** The filter of outside-SQL. (NullAllowed) */

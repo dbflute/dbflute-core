@@ -6,9 +6,9 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1.0" />
-	<property name="build.version" value="${version}-pilotC-SNAPSHOT" />
+	<property name="build.version" value="${version}-pilotD-SNAPSHOT" />
 	<property name="runtime.version" value="1.1.0" />
-	<property name="runtime.build.version" value="${runtime.version}-pilotC-SNAPSHOT" />
+	<property name="runtime.build.version" value="${runtime.version}-pilotD-SNAPSHOT" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
@@ -49,6 +49,7 @@
 	<property name="test.dbms.oracle.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-oracle" />
 	<property name="test.dbms.db2.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-db2" />
 	<property name="test.dbms.sqlserver.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-sqlserver" />
+	<property name="test.dbms.derby.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-derby" />
 	<property name="test.dbms.sqlite.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-sqlite" />
 
 	<!-- Test: Option Stage -->
@@ -289,6 +290,15 @@
 			description="==> reflect to test of DBMS SQLServer">
 		<delete dir="${test.dbms.sqlserver.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${test.dbms.sqlserver.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-test-dbms-derby" depends="prepare-reflection"
+			description="==> reflect to test of DBMS SQLServer">
+		<delete dir="${test.dbms.derby.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.dbms.derby.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />

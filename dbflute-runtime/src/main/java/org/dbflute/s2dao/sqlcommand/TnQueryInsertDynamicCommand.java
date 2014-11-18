@@ -189,7 +189,7 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
             InsertOption<ConditionBean> option, List<TnPropertyType> boundPropTypeList) {
         final StringKeyMap<String> fixedValueQueryExpMap = StringKeyMap.createAsFlexibleOrdered();
         final Set<String> modifiedProperties = entity.mymodifiedProperties();
-        final DBMeta dbmeta = entity.getDBMeta();
+        final DBMeta dbmeta = entity.asDBMeta();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
             final String propertyName = columnInfo.getPropertyName();
@@ -207,12 +207,12 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
     //                                                                            Identity
     //                                                                            ========
     protected void disableIdentityGeneration(Entity entity) {
-        final String tableDbName = entity.getTableDbName();
+        final String tableDbName = entity.asTableDbName();
         TnAbstractEntityHandler.delegateDisableIdentityGeneration(tableDbName, _dataSource, _statementFactory);
     }
 
     protected void enableIdentityGeneration(Entity entity) {
-        final String tableDbName = entity.getTableDbName();
+        final String tableDbName = entity.asTableDbName();
         TnAbstractEntityHandler.delegateEnableIdentityGeneration(tableDbName, _dataSource, _statementFactory);
     }
 

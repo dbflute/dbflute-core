@@ -31,6 +31,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.optional.RelationOptionalFactory;
 import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
+import org.dbflute.s2dao.jdbc.TnResultSetHandlerFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 
@@ -71,6 +72,11 @@ public interface InvokerAssistant {
      * @return The factory of bean meta data. (NotNull)
      */
     TnBeanMetaDataFactory assistBeanMetaDataFactory();
+
+    /**
+     * @return The factory of result set handler. (NotNull)
+     */
+    TnResultSetHandlerFactory assistResultSetHandlerFactory();
 
     /**
      * @return The factory of relation optional. (NotNull)

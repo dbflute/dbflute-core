@@ -7,6 +7,7 @@ ant -f build.xml reflect-to-test-dbms-postgresql
 ant -f build.xml reflect-to-test-dbms-oracle
 ant -f build.xml reflect-to-test-dbms-db2
 ant -f build.xml reflect-to-test-dbms-sqlserver
+ant -f build.xml reflect-to-test-dbms-derby
 ant -f build.xml reflect-to-test-dbms-sqlite
 ant -f build.xml reflect-to-test-option-compatible10x
 ant -f build.xml reflect-to-example-on-springboot
@@ -70,6 +71,12 @@ cd ..
 mvn -e compile
 
 cd ../dbflute-test-dbms-sqlserver/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal
+cd ..
+mvn -e compile
+
+cd ../dbflute-test-dbms-derby/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
 cd ..

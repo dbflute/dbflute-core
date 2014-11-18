@@ -63,7 +63,7 @@ public class TnDBMetaPropertyTypeFactory extends TnAbstractPropertyTypeFactory {
     protected DBMeta findDBMeta() {
         try {
             final Entity entity = (Entity) _beanClass.newInstance();
-            return entity.getDBMeta();
+            return entity.asDBMeta();
         } catch (Exception e) {
             String msg = "beanClass.newInstance() threw the exception: beanClass=" + _beanClass;
             throw new IllegalStateException(msg, e);

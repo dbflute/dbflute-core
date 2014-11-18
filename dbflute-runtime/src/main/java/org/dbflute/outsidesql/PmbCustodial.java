@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.dbflute.FunCustodial;
@@ -111,8 +112,10 @@ public class PmbCustodial {
         return null; // unreachable
     }
 
-    public static String formatUtilDate(Date date, String pattern, TimeZone specifiedZone) {
-        return DfTypeUtil.toStringDate(date, pattern, chooseRealTimeZone(specifiedZone));
+    public static String formatUtilDate(Date date, TimeZone specifiedZone, String pattern) {
+        final TimeZone realZone = chooseRealTimeZone(specifiedZone);
+        final Locale realLocale = DBFluteSystem.getFinalLocale(); // no specified because of basically debug string
+        return DfTypeUtil.toStringDate(date, realZone, pattern, realLocale);
     }
 
     public static void assertFromToOptionValid(String name, FromToOption option) {

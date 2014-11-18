@@ -136,6 +136,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
@@ -827,25 +828,33 @@ public class Table {
     /**
      * Returns the collection of Columns which make up the single primary
      * key for this table.
-     * @return A list of the primary key parts.
+     * @return A list of the primary key parts. (NotNull)
      */
     public List<Column> getPrimaryKey() {
-        final List<Column> pk = new ArrayList<Column>(_columnList.size());
+        final TreeMap<Integer, Column> treeMap = new TreeMap<Integer, Column>();
+        int justInCasePosition = 100001;
         for (Column column : _columnList) {
             if (column.isPrimaryKey()) {
-                pk.add(column);
+                Integer position = column.getPrimaryKeyPosition();
+                if (position == null) {
+                    position = justInCasePosition;
+                    ++justInCasePosition;
+                }
+                treeMap.put(position, column);
             }
         }
-        return pk;
+        // cannot cache it because of additional primary key
+        return new ArrayList<Column>(treeMap.values());
     }
 
     public Column getPrimaryKeyAsOne() {
-        if (getPrimaryKey().size() != 1) {
+        final List<Column> pkList = getPrimaryKey();
+        if (pkList.size() != 1) {
             String msg = "This method is for only-one primary-key:";
-            msg = msg + " getPrimaryKey().size()=" + getPrimaryKey().size() + " table=" + getTableDbName();
+            msg = msg + " getPrimaryKey().size()=" + pkList.size() + " table=" + getTableDbName();
             throw new IllegalStateException(msg);
         }
-        return getPrimaryKey().get(0);
+        return pkList.get(0);
     }
 
     public String getPrimaryKeyNameAsOne() {
@@ -3756,25 +3765,51 @@ public class Table {
     }
 
     // ===================================================================================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    public boolean canBeColumnNullObject() {
+        return getLittleAdjustmentProperties().hasColumnNullObject(getTableDbName());
+    }
+
+    public boolean hasColumnNullObjectProviderImport() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final String providerPackage = prop.getColumnNullObjectProviderPackage();
+        return providerPackage != null && hasColumnNullObjectColumn();
+    }
+
+    public String getColumnNullObjectProviderPackage() {
+        return getLittleAdjustmentProperties().getColumnNullObjectProviderPackage();
+    }
+
+    protected boolean hasColumnNullObjectColumn() {
+        for (Column col : getColumnList()) {
+            if (col.canBeColumnNullObject()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                              Relational Null Object
     //                                                              ======================
     public boolean canBeRelationalNullObjectForeign() {
         return getLittleAdjustmentProperties().hasRelationalNullObjectForeign(getTableDbName());
     }
 
-    public String getRelationalNullObjectProviderForeignExp() {
+    public String buildRelationalNullObjectProviderForeignExp(String foreignProperty, String beansRuleProperty, String pkExp) {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        return prop.getRelationalNullObjectProviderForeignExp(getTableDbName());
+        return prop.buildRelationalNullObjectProviderForeignExp(getTableDbName(), foreignProperty, beansRuleProperty, pkExp);
     }
 
     public boolean hasRelationalNullObjectProviderImport() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        final String providerPackage = prop.getNullObjectProviderPackage();
+        final String providerPackage = prop.getRelationalNullObjectProviderPackage();
         return providerPackage != null && hasRelationalNullObjectForeignKey();
     }
 
     public String getRelationalNullObjectProviderPackage() {
-        return getLittleAdjustmentProperties().getNullObjectProviderPackage();
+        return getLittleAdjustmentProperties().getRelationalNullObjectProviderPackage();
     }
 
     protected boolean hasRelationalNullObjectForeignKey() {

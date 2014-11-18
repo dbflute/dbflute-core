@@ -78,6 +78,7 @@ import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfAssertUtil;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
 /**
@@ -273,7 +274,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected List<HpInvalidQueryInfo> _invalidQueryList;
 
     /** Does it accept an empty string for query? (save-only attribute) */
-    protected boolean _emptyStringQueryEnabled;
+    protected boolean _emptyStringQueryAllowed;
 
     /** Does it allow overriding query? (save-only attribute) */
     protected boolean _overridingQueryAllowed;
@@ -361,6 +362,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                    ------------------
     /** Does it use in-scope sub-query for exists-referrer? (save-only attribute) */
     protected boolean _useInScopeSubQueryForExistsReferrer;
+
+    // -----------------------------------------------------
+    //                                     Column NullObject
+    //                                     -----------------
+    /** Does it allow the handling of column null object? */
+    protected boolean _columnNullObjectAllowed;
+
+    /** Is column null object geared to specify? */
+    protected boolean _columnNullObjectGearedToSpecify;
+
+    /** The map of specified column null object. map:{ alias-name = set:{ column-info } } (NullAllowed: lazy-loaded) */
+    protected Map<String, Set<ColumnInfo>> _columnNullObjectSpecifiedMap;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -629,7 +642,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             validSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
         }
 
-        final boolean columnNullObject = hasColumnNullObject(); // normally false
         int selectIndex = 0; // because 1 origin in JDBC
         boolean needsDelimiter = false;
         for (ColumnInfo columnInfo : columnInfoList) {
@@ -642,7 +654,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             if (validSpecifiedLocal && !localSpecifiedMap.containsKey(columnDbName)) {
                 continue; // a case for scalar-select has been already resolved here
             }
-            if (columnNullObject && isNullObjectColumn(_tableDbName, columnDbName)) {
+            if (canBeNullObjectSpecifiedColumn(columnInfo)) {
+                registerColumnNullObject(basePointAliasName, columnInfo);
                 continue;
             }
 
@@ -679,7 +692,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_pkOnlySelectForcedlyEnabled) {
             return selectIndex;
         }
-        final boolean columnNullObject = hasColumnNullObject(); // normally false
         for (Entry<String, Map<String, SelectedRelationColumn>> entry : getSelectedRelationColumnMap().entrySet()) {
             final String tableAliasName = entry.getKey();
             final Map<String, SelectedRelationColumn> relationColumnMap = entry.getValue();
@@ -695,7 +707,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 if (validSpecifiedForeign && !foreginSpecifiedMap.containsKey(columnDbName)) {
                     continue;
                 }
-                if (columnNullObject && isNullObjectColumn(columnInfo.getDBMeta().getTableDbName(), columnDbName)) {
+                if (canBeNullObjectSpecifiedColumn(columnInfo)) {
+                    registerColumnNullObject(tableAliasName, columnInfo);
                     continue;
                 }
 
@@ -2976,15 +2989,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                          Empty String
     //                                          ------------
     public void enableEmptyStringQuery() {
-        _emptyStringQueryEnabled = true;
+        _emptyStringQueryAllowed = true;
     }
 
     public void disableEmptyStringQuery() {
-        _emptyStringQueryEnabled = false;
+        _emptyStringQueryAllowed = false;
     }
 
     public boolean isEmptyStringQueryAllowed() {
-        return _emptyStringQueryEnabled;
+        return _emptyStringQueryAllowed;
     }
 
     // -----------------------------------------------------
@@ -3619,6 +3632,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                       InScope Limit
     //                                                                       =============
+    /** {@inheritDoc} */
     public int getInScopeLimit() {
         return 0; // as default
     }
@@ -3627,6 +3641,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                               LikeSearch Adjustment
     //                                                               =====================
+    /** {@inheritDoc} */
     public void adjustLikeSearchDBWay(LikeSearchOption option) {
         final DBWay dbway = dbway();
         option.acceptOriginalWildCardList(dbway.getOriginalWildCardList());
@@ -3638,6 +3653,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                 CursorSelect Option
     //                                                                 ===================
+    /** {@inheritDoc} */
     public boolean isCursorSelectByPagingAllowed() {
         return false; // not allowed as default (e.g. MySQL overrides this)
     }
@@ -3646,16 +3662,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                     Exists Referrer
     //                                                                     ===============
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void useInScopeSubQueryForExistsReferrer() {
         _useInScopeSubQueryForExistsReferrer = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean isUseInScopeSubQueryForExistsReferrer() {
         return _useInScopeSubQueryForExistsReferrer;
     }
@@ -3663,49 +3675,76 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                   Column NullObject
     //                                                                   =================
-    // TODO jflute impl: null object (AbstractSqlClause)
-    protected Map<String, Set<String>> _columnNullObjectMap;
-
-    protected Map<String, Set<String>> getColumnNullObjectMap() {
-        return _columnNullObjectMap;
+    /** {@inheritDoc} */
+    public void enableColumnNullObject() {
+        _columnNullObjectAllowed = true;
     }
 
-    public boolean hasColumnNullObject() {
-        return _columnNullObjectMap != null;
+    /** {@inheritDoc} */
+    public void disableColumnNullObject() {
+        _columnNullObjectAllowed = false;
     }
 
-    public boolean isColumnNullObjectTable(String tableDbName) {
-        return _columnNullObjectMap != null && _columnNullObjectMap.containsKey(tableDbName);
+    /** {@inheritDoc} */
+    public boolean isColumnNullObjectAllowed() {
+        return _columnNullObjectAllowed;
     }
 
-    public void registerNullObjectColumn(String tableDbName, String columnDbName) { // called by creator
-        if (_columnNullObjectMap == null) {
-            _columnNullObjectMap = new LinkedHashMap<String, Set<String>>();
+    /** {@inheritDoc} */
+    public void enableColumnNullObjectGearedToSpecify() {
+        _columnNullObjectGearedToSpecify = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableColumnNullObjectGearedToSpecify() {
+        _columnNullObjectGearedToSpecify = false;
+    }
+
+    protected boolean isColumnNullObjectGearedToSpecify() {
+        return _columnNullObjectAllowed && _columnNullObjectGearedToSpecify;
+    }
+
+    /** {@inheritDoc} */
+    public Set<ColumnInfo> getLocalSpecifiedNullObjectColumnSet() {
+        if (_columnNullObjectSpecifiedMap == null) { // direct look for performance
+            return DfCollectionUtil.emptySet();
         }
-        Set<String> columnSet = _columnNullObjectMap.get(tableDbName);
+        final Set<ColumnInfo> columnSet = _columnNullObjectSpecifiedMap.get(getBasePointAliasName());
+        return columnSet != null ? columnSet : DfCollectionUtil.emptySet();
+    }
+
+    /** {@inheritDoc} */
+    public Set<ColumnInfo> getRelationSpecifiedNullObjectColumnSet(String relationNoSuffix) {
+        if (_columnNullObjectSpecifiedMap == null) { // direct look for performance
+            return DfCollectionUtil.emptySet();
+        }
+        final String tableAlias = translateSelectedRelationPathToTableAlias(relationNoSuffix);
+        final Set<ColumnInfo> columnSet = _columnNullObjectSpecifiedMap.get(tableAlias);
+        return columnSet != null ? columnSet : DfCollectionUtil.emptySet();
+    }
+
+    protected Map<String, Set<ColumnInfo>> getColumnNullObjectSpecifiedMap() {
+        if (_columnNullObjectSpecifiedMap == null) {
+            _columnNullObjectSpecifiedMap = new LinkedHashMap<String, Set<ColumnInfo>>();
+        }
+        return _columnNullObjectSpecifiedMap;
+    }
+
+    // -----------------------------------------------------
+    //                                      Specify Handling
+    //                                      ----------------
+    protected boolean canBeNullObjectSpecifiedColumn(ColumnInfo columnInfo) {
+        return isColumnNullObjectGearedToSpecify() && columnInfo.canBeNullObject();
+    }
+
+    protected void registerColumnNullObject(String tableAliasName, ColumnInfo columnInfo) {
+        final Map<String, Set<ColumnInfo>> specifiedMap = getColumnNullObjectSpecifiedMap();
+        Set<ColumnInfo> columnSet = specifiedMap.get(tableAliasName);
         if (columnSet == null) {
-            columnSet = new LinkedHashSet<String>();
+            columnSet = new LinkedHashSet<ColumnInfo>();
+            specifiedMap.put(tableAliasName, columnSet);
         }
-        columnSet.add(columnDbName);
-    }
-
-    public List<String> getLocalSpecifiedNullObjectColumnList() {
-        return null;
-    }
-
-    public List<String> getRelationSpecifiedNullObjectColumnList(String relationNoSuffix) {
-        return null;
-    }
-
-    protected boolean isNullObjectColumn(String tableDbName, String columnDbName) {
-        if (_columnNullObjectMap == null) {
-            return false;
-        }
-        final Set<String> columnSet = _columnNullObjectMap.get(tableDbName);
-        if (columnSet == null) {
-            return false;
-        }
-        return columnSet.contains(columnDbName);
+        columnSet.add(columnInfo);
     }
 
     // ===================================================================================

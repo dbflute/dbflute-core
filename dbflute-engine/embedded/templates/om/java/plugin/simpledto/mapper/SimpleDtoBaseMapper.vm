@@ -555,7 +555,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
     protected void reflectDerivedProperty(Entity entity, Object dto, boolean toDto) {
         DfBeanDesc entityDesc = DfBeanDescFactory.getBeanDesc(entity.getClass());
         DfBeanDesc dtoDesc = DfBeanDescFactory.getBeanDesc(dto.getClass());
-        DBMeta dbmeta = entity.getDBMeta();
+        DBMeta dbmeta = entity.asDBMeta();
         for (String propertyName : entityDesc.getProppertyNameList()) {
             if (isOutOfDerivedPropertyName(entity, dto, toDto, dbmeta, entityDesc, dtoDesc, propertyName)) {
                 continue;

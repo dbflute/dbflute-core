@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.function.BooleanSupplier;
 
@@ -300,7 +301,9 @@ public class DisplaySqlBuilder {
 
     protected String processDateDisplay(java.util.Date date, String format) {
         final DateFormatResource resource = analyzeDateFormat(format);
-        String disp = DfTypeUtil.toStringDate(date, resource.getFormat(), getTimeZone());
+        final TimeZone realZone = getRealTimeZone();
+        final Locale realLocale = getRealLocale();
+        String disp = DfTypeUtil.toStringDate(date, realZone, resource.getFormat(), realLocale);
         disp = filterBCPrefix(disp, () -> isBCPrefixTarget(date, resource));
         return quote(disp, resource);
     }
@@ -345,13 +348,21 @@ public class DisplaySqlBuilder {
         return timePattern != null ? timePattern : DEFAULT_TIME_FORMAT;
     }
 
-    protected TimeZone getTimeZone() {
+    protected TimeZone getRealTimeZone() {
         final BoundDateDisplayTimeZoneProvider provider = _dateDisplayStyle.getTimeZoneProvider();
         return provider != null ? provider.provide() : getDBFluteSystemFinalTimeZone();
     }
 
     protected TimeZone getDBFluteSystemFinalTimeZone() {
         return DBFluteSystem.getFinalTimeZone();
+    }
+
+    protected Locale getRealLocale() {
+        return getDBFluteSystemFinalLocale(); // no provider because of basically debug string
+    }
+
+    protected Locale getDBFluteSystemFinalLocale() {
+        return DBFluteSystem.getFinalLocale();
     }
 
     // -----------------------------------------------------

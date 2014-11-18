@@ -22,9 +22,11 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.dbflute.exception.DfColumnNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.exception.DfTableColumnNameNonCompilableConnectorException;
+import org.dbflute.exception.DfTableNotFoundException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -33,6 +35,7 @@ import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.framework.DfLanguageFramework;
 import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.optional.OptionalEntity;
+import org.dbflute.properties.assistant.DfTableDeterminer;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
@@ -40,6 +43,11 @@ import org.dbflute.util.Srl;
  * @author jflute
  */
 public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperties {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP = "Integer.MIN_VALUE";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -69,6 +77,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isProperty(String key, boolean defaultValue) {
         return isPropertyIfNotExistsFromBuildProp(key, defaultValue, getLittleAdjustmentMap());
+    }
+
+    // -----------------------------------------------------
+    //                                      Check Definition
+    //                                      ----------------
+    public void checkDefinition(DfTableDeterminer determiner) {
+        checkColumnNullObjectTableColumn(determiner);
+        checkRelationalNullObjectTableColumn(determiner);
     }
 
     // ===================================================================================
@@ -787,11 +803,111 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                   Column NullObject
     //                                                                   =================
-    // TODO jflute impl: null object (dfprop)
+    // you can get the handling of geared to specify by isGearedToSpecify
+    protected Map<String, Object> _columnNullObjectMap;
+
+    protected Map<String, Object> getColumnNullObjectMap() {
+        if (_columnNullObjectMap != null) {
+            return _columnNullObjectMap;
+        }
+        final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
+        final Object obj = littleAdjustmentMap.get("columnNullObjectMap");
+        if (obj != null) {
+            _columnNullObjectMap = castToMap(obj, "littleAdjustmentMap.columnNullObjectMap");
+        } else {
+            _columnNullObjectMap = newLinkedHashMap();
+        }
+        return _columnNullObjectMap;
+    }
+
+    public boolean isColumnNullObjectAllowed() {
+        return !getColumnNullObjectColumnMap().isEmpty();
+    }
+
+    public boolean hasColumnNullObject(String tableName) {
+        return getColumnNullObjectColumnMap().get(tableName) != null;
+    }
+
+    public boolean hasColumnNullObject(String tableName, String columnName) {
+        final Map<String, String> providerMap = getColumnNullObjectColumnMap().get(tableName);
+        return providerMap != null && providerMap.get(columnName) != null;
+    }
+
+    public String getColumnNullObjectProviderPackage() {
+        final String pkg = (String) getColumnNullObjectMap().get("providerPackage");
+        if (pkg == null) {
+            return null;
+        }
+        final String packageBase = getBasicProperties().getPackageBase();
+        return Srl.replace(pkg, "$$packageBase$$", packageBase);
+    }
+
+    public boolean isColumnNullObjectGearedToSpecify() {
+        return isProperty("isGearedToSpecify", false, getColumnNullObjectMap());
+    }
+
+    public String buildColumnNullObjectProviderExp(String tableName, String columnName, String pkExp) {
+        String exp = getColumnNullObjectProviderExp(tableName, columnName);
+        exp = replace(exp, "$$columnName$$", columnName);
+        exp = replace(exp, "$$primaryKey$$", pkExp);
+        return exp;
+    }
+
+    protected String getColumnNullObjectProviderExp(String tableName, String columnName) {
+        final Map<String, Map<String, String>> columnMap = getColumnNullObjectColumnMap();
+        final Map<String, String> providerMap = columnMap.get(tableName);
+        return providerMap != null ? providerMap.get(columnName) : null;
+    }
+
+    protected Map<String, Map<String, String>> _columnNullObjectColumnMap;
+
+    public Map<String, Map<String, String>> getColumnNullObjectColumnMap() {
+        if (_columnNullObjectColumnMap != null) {
+            return _columnNullObjectColumnMap;
+        }
+        final Map<String, Object> nullObjectMap = getColumnNullObjectMap();
+        final Object obj = nullObjectMap.get("columnMap");
+        final Map<String, Map<String, String>> plainMap;
+        if (obj != null) {
+            plainMap = castToMap(obj, "littleAdjustmentMap.columnNullObjectMap.columnMap");
+        } else {
+            plainMap = newLinkedHashMap();
+        }
+        _columnNullObjectColumnMap = StringKeyMap.createAsFlexibleOrdered();
+        for (Entry<String, Map<String, String>> entry : plainMap.entrySet()) {
+            final String tableName = entry.getKey();
+            final Map<String, String> providerMap = entry.getValue();
+            final Map<String, String> flexibleMap = StringKeyMap.createAsFlexibleOrdered();
+            flexibleMap.putAll(providerMap);
+            _columnNullObjectColumnMap.put(tableName, flexibleMap);
+        }
+        return _columnNullObjectColumnMap;
+    }
+
+    protected void checkColumnNullObjectTableColumn(DfTableDeterminer determiner) {
+        final Map<String, Map<String, String>> nullObjectColumnMap = getColumnNullObjectColumnMap();
+        final String location = "littleAdjustmentMap.columnNullObjectMap.columnMap";
+        for (Entry<String, Map<String, String>> entry : nullObjectColumnMap.entrySet()) {
+            final String tableName = entry.getKey();
+            if (!determiner.hasTable(tableName)) {
+                String msg = "The table was not found in the " + location + ": " + tableName;
+                throw new DfTableNotFoundException(msg);
+            }
+            final Map<String, String> providerMap = entry.getValue();
+            for (String columnName : providerMap.keySet()) {
+                if (!determiner.hasTableColumn(tableName, columnName)) {
+                    String msg = "The column was not found in the " + location + ": " + tableName + "." + columnName;
+                    throw new DfColumnNotFoundException(msg);
+                }
+            }
+        }
+    }
 
     // ===================================================================================
     //                                                               Relational NullObject
     //                                                               =====================
+    // no geared to setupSelect because too complex
+    // (e.g. needs to think nested relation tables)
     protected Map<String, Object> _relationalNullObjectMap;
 
     protected Map<String, Object> getRelationalNullObjectMap() {
@@ -811,10 +927,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // foreignMap is only supported now (2011/11/13)
 
     public boolean hasRelationalNullObjectForeign(String tableName) {
-        return getRelationalNullObjectProviderForeignMap().get(tableName) != null;
+        return getRelationalNullObjectForeignMap().get(tableName) != null;
     }
 
-    public String getNullObjectProviderPackage() {
+    public String getRelationalNullObjectProviderPackage() {
         final String pkg = (String) getRelationalNullObjectMap().get("providerPackage");
         if (pkg == null) {
             return null;
@@ -823,11 +939,26 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return Srl.replace(pkg, "$$packageBase$$", packageBase);
     }
 
-    protected Map<String, String> _relationalNullObjectProviderForeignMap;
+    public String getRelationalNullObjectOptionalEmptyExp() {
+        final String defaultValue = "orElse(null) == null"; // fixedly java style for now
+        return getProperty("optionalEmptyExp", defaultValue, getRelationalNullObjectMap());
+    }
 
-    protected Map<String, String> getRelationalNullObjectProviderForeignMap() {
-        if (_relationalNullObjectProviderForeignMap != null) {
-            return _relationalNullObjectProviderForeignMap;
+    public String buildRelationalNullObjectProviderForeignExp(String tableName, String foreignProperty, String beansRuleProperty,
+            String pkExp) {
+        String exp = getRelationalNullObjectForeignMap().get(tableName);
+        exp = replace(exp, "$$foreignPropertyName$$", beansRuleProperty);
+        exp = replace(exp, "$$foreignVariable$$", "_" + foreignProperty);
+        exp = replace(exp, "$$PrimaryKey$$", pkExp); // for compatible (1.0.x)
+        exp = replace(exp, "$$primaryKey$$", pkExp);
+        return exp;
+    }
+
+    protected Map<String, String> _relationalNullObjectForeignMap;
+
+    protected Map<String, String> getRelationalNullObjectForeignMap() {
+        if (_relationalNullObjectForeignMap != null) {
+            return _relationalNullObjectForeignMap;
         }
         final Map<String, Object> nullObjectMap = getRelationalNullObjectMap();
         final Object obj = nullObjectMap.get("foreignMap");
@@ -837,24 +968,50 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         } else {
             plainMap = newLinkedHashMap();
         }
-        _relationalNullObjectProviderForeignMap = StringKeyMap.createAsFlexibleOrdered();
-        _relationalNullObjectProviderForeignMap.putAll(plainMap);
-        return _relationalNullObjectProviderForeignMap;
+        _relationalNullObjectForeignMap = StringKeyMap.createAsFlexibleOrdered();
+        _relationalNullObjectForeignMap.putAll(plainMap);
+        return _relationalNullObjectForeignMap;
     }
 
-    public String getRelationalNullObjectProviderForeignExp(String tableName) {
-        return getRelationalNullObjectProviderForeignMap().get(tableName);
+    protected void checkRelationalNullObjectTableColumn(DfTableDeterminer determiner) {
+        final String foreignLocation = "littleAdjustmentMap.relationalNullObjectMap.foreignMap";
+        final Map<String, String> foreignMap = getRelationalNullObjectForeignMap();
+        for (Entry<String, String> entry : foreignMap.entrySet()) {
+            final String tableName = entry.getKey();
+            if (!determiner.hasTable(tableName)) {
+                String msg = "The table was not found in the " + foreignLocation + ": " + tableName;
+                throw new DfTableNotFoundException(msg);
+            }
+        }
     }
 
     // ===================================================================================
-    //                                                                        CursorSelect
-    //                                                                        ============
+    //                                                                     JDBC Fetch Size
+    //                                                                     ===============
+    // -----------------------------------------------------
+    //                                    CursorSelect Fetch
+    //                                    ------------------
     public boolean isCursorSelectFetchSizeValid() {
         return getCursorSelectFetchSize() != null;
     }
 
     public String getCursorSelectFetchSize() {
-        return getProperty("cursorSelectFetchSize", null);
+        return getProperty("cursorSelectFetchSize", getDefaultCursorSelectFetchSize());
+    }
+
+    protected String getDefaultCursorSelectFetchSize() {
+        final String defaultValue;
+        final DfBasicProperties prop = getBasicProperties();
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // also MySQL is all data fetching, but MIN_VALUE has the adverse effect
+        // e.g. you cannot select in cursor callback when MIN_VALUE
+        // _/_/_/_/_/_/_/_/_/_/
+        if (prop.isDatabasePostgreSQL()) { // is all data fetching as default
+            defaultValue = "100";
+        } else {
+            defaultValue = null;
+        }
+        return defaultValue;
     }
 
     public boolean isCursorSelectOptionAllowed() {
@@ -866,7 +1023,70 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         if (!isCursorSelectFetchSizeValid()) {
             return false;
         }
-        return "Integer.MIN_VALUE".equals(getCursorSelectFetchSize());
+        return MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP.equals(getCursorSelectFetchSize());
+    }
+
+    // -----------------------------------------------------
+    //                                    EntitySelect Fetch
+    //                                    ------------------
+    public boolean isEntitySelectFetchSizeValid() {
+        return getEntitySelectFetchSize() != null;
+    }
+
+    public String getEntitySelectFetchSize() {
+        final String defaultValue = getDefaultEntitySelectFetchSize();
+        return getProperty("entitySelectFetchSize", defaultValue);
+    }
+
+    protected String getDefaultEntitySelectFetchSize() {
+        // several databases fetch all records when the result set is created
+        // and the check of fetching the illegal second record does not work
+        // so enable real fetching when entity select
+        final String defaultValue;
+        final DfBasicProperties prop = getBasicProperties();
+        if (prop.isDatabaseMySQL()) {
+            defaultValue = MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP;
+        } else if (prop.isDatabasePostgreSQL()) {
+            defaultValue = "1";
+        } else {
+            defaultValue = null;
+        }
+        return defaultValue;
+    }
+
+    // -----------------------------------------------------
+    //                                    PagingSelect Fetch
+    //                                    ------------------
+    // cursor-skip only (because manual paging is no memory problem)
+    public boolean isUsePagingByCursorSkipSynchronizedFetchSize() {
+        final boolean defaultValue = determineDefaultUsePagingByCursorSkipSynchronizedFetchSize();
+        return isProperty("isUsePagingByCursorSkipSynchronizedFetchSize", defaultValue);
+    }
+
+    protected boolean determineDefaultUsePagingByCursorSkipSynchronizedFetchSize() {
+        final DfBasicProperties prop = getBasicProperties();
+        return prop.isDatabaseMySQL() || prop.isDatabasePostgreSQL(); // are all data fetching as default
+    }
+
+    public boolean isFixedPagingByCursorSkipSynchronizedFetchSizeValid() {
+        return getFixedPagingByCursorSkipSynchronizedFetchSize() != null;
+    }
+
+    public String getFixedPagingByCursorSkipSynchronizedFetchSize() {
+        // this size is used when isUsePagingByCursorSkipSynchronizedFetchSize is true
+        final String defaultValue = getDefaultFixedPagingByCursorSkipSynchronizedFetchSize();
+        return getProperty("fixedPagingSynchronizedFetchSize", defaultValue);
+    }
+
+    protected String getDefaultFixedPagingByCursorSkipSynchronizedFetchSize() {
+        final String defaultValue;
+        final DfBasicProperties prop = getBasicProperties();
+        if (prop.isDatabaseMySQL()) { // MySQL cannot set normal fetch size e.g. 1, 20 so magic size
+            defaultValue = MYSQL_DYNAMIC_ROW_MAGIC_FETCH_SIZE_EXP;
+        } else {
+            defaultValue = null;
+        }
+        return defaultValue;
     }
 
     // ===================================================================================
@@ -1313,5 +1533,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                            ========
     protected DfLanguageDependency getLanguageDependency() {
         return getBasicProperties().getLanguageDependency();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String replace(String text, String fromText, String toText) {
+        return Srl.replace(text, fromText, toText);
     }
 }

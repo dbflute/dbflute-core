@@ -36,7 +36,7 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 	 * @return SQL clause. (NotNull)
 	 */
     public SqlClause createSqlClause(ConditionBean cb) {
-        String tableDbName = cb.getTableDbName();
+        String tableDbName = cb.asTableDbName();
 		SqlClause sqlClause = createSqlClause(tableDbName);
         return sqlClause;
     }
@@ -154,25 +154,67 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
     //                                                                              Option
     //                                                                              ======
     protected void setupSqlClauseOption(SqlClause sqlClause) {
+        doSetupSqlClauseInnerJoinAutoDetect(sqlClause);
+        doSetupSqlClauseThatsBadTimingDetect(sqlClause);
+        doSetupSqlClauseNullOrEmptyQuery(sqlClause);
+        doSetupSqlClauseEmptyStringQuery(sqlClause);
+        doSetupSqlClauseOverridingQuery(sqlClause);
+        doSetupSqlClauseColumnNullObject(sqlClause);
+        doSetupSqlClauseColumnNullObjectGearedToSpecify(sqlClause);
+        doSetupSqlClauseSelectIndex(sqlClause);
+    }
+
+    protected void doSetupSqlClauseInnerJoinAutoDetect(SqlClause sqlClause) {
         if (isInnerJoinAutoDetect()) {
             sqlClause.enableInnerJoinAutoDetect();
         }
+    }
+
+    protected void doSetupSqlClauseThatsBadTimingDetect(SqlClause sqlClause) {
         if (isThatsBadTimingDetect()) {
             sqlClause.enableThatsBadTimingDetect();
         }
+    }
+
+    protected void doSetupSqlClauseNullOrEmptyQuery(SqlClause sqlClause) {
         if (isNullOrEmptyQueryAllowed()) { // default for 1.0.5
             sqlClause.ignoreNullOrEmptyQuery();
         } else { // default for 1.1
             sqlClause.checkNullOrEmptyQuery();
         }
+    }
+
+    protected void doSetupSqlClauseEmptyStringQuery(SqlClause sqlClause) {
         if (isEmptyStringQueryAllowed()) {
             sqlClause.enableEmptyStringQuery();
         }
+    }
+
+    protected void doSetupSqlClauseOverridingQuery(SqlClause sqlClause) {
         if (isOverridingQueryAllowed()) { // default for 1.0.5
             sqlClause.enableOverridingQuery();
         } else { // default for 1.1
             sqlClause.disableOverridingQuery();
         }
+    }
+
+    protected void doSetupSqlClauseColumnNullObject(SqlClause sqlClause) {
+        if (isColumnNullObjectAllowed()) {
+            sqlClause.enableColumnNullObject();
+        } else {
+            sqlClause.disableColumnNullObject();
+        }
+    }
+
+    protected void doSetupSqlClauseColumnNullObjectGearedToSpecify(SqlClause sqlClause) {
+        if (isColumnNullObjectGearedToSpecify()) {
+            sqlClause.enableColumnNullObjectGearedToSpecify();
+        } else {
+            sqlClause.disableColumnNullObjectGearedToSpecify();
+        }
+    }
+
+    protected void doSetupSqlClauseSelectIndex(SqlClause sqlClause) {
         if (isDisableSelectIndex()) {
             sqlClause.disableSelectIndex();
         }
@@ -203,6 +245,14 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 
     protected boolean isOverridingQueryAllowed() {
 	    return ${glDBFluteConfig}.getInstance().isOverridingQueryAllowed();
+    }
+
+    protected boolean isColumnNullObjectAllowed() {
+	    return ${glDBFluteConfig}.getInstance().isColumnNullObjectAllowed();
+    }
+
+    protected boolean isColumnNullObjectGearedToSpecify() {
+	    return ${glDBFluteConfig}.getInstance().isColumnNullObjectGearedToSpecify();
     }
 
     protected boolean isDisableSelectIndex() {

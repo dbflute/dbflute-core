@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.readable.EntityRowHandler;
+import org.dbflute.cbean.ConditionBean;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCache;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
@@ -66,7 +67,7 @@ public class TnBeanCursorResultSetHandler extends TnBeanListResultSetHandler {
     }
 
     @Override
-    protected TnRelationRowCache createRelationRowCache(boolean hasCB) {
+    protected TnRelationRowCache createRelationRowCache(boolean hasCB, ConditionBean cb) {
         // cursor select is for save memory so it should not cache instances
         return new TnRelationRowCache(-1, false);
     }

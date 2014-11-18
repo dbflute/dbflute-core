@@ -43,22 +43,19 @@ import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
 
     // ===================================================================================
-    //                                                                          Table Name
-    //                                                                          ==========
+    //                                                                             DB Meta
+    //                                                                             =======
     /**
-     * Get table DB-name.
-     * @return The DB-name of the table. (NotNull)
+     * Handle the meta as DBMeta, that has all info of the table.
+     * @return The (singleton) instance of DB meta for the table. (NotNull)
      */
-    String getTableDbName();
+    DBMeta asDBMeta();
 
-    // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
     /**
-     * Get the instance of DBMeta.
-     * @return The instance of DBMeta. (NotNull)
+     * Handle the meta as table DB name, that can be identity of table..
+     * @return The (fixed) DB name of the table. (NotNull)
      */
-    DBMeta getDBMeta();
+    String asTableDbName();
 
     // ===================================================================================
     //                                                                           SqlClause
@@ -345,29 +342,8 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     void xacceptScalarSelectOption(ScalarSelectOption option);
 
     // ===================================================================================
-    //                                                                        Query Update
-    //                                                                        ============
-    /**
-     * Enable checking record count before QueryUpdate (contains QueryDelete). (default is disabled) <br>
-     * No query update if zero count. (basically for MySQL's deadlock by next-key lock)
-     */
-    void enableQueryUpdateCountPreCheck();
-
-    /**
-     * Disable checking record count before QueryUpdate (contains QueryDelete). (back to default) <br>
-     * Executes query update even if zero count. (normal specification)
-     */
-    void disableQueryUpdateCountPreCheck();
-
-    /**
-     * Does it check record count before QueryUpdate (contains QueryDelete)?
-     * @return The determination, true or false.
-     */
-    boolean isQueryUpdateCountPreCheck();
-
-    // ===================================================================================
-    //                                                                     StatementConfig
-    //                                                                     ===============
+    //                                                             Statement Configuration
+    //                                                             =======================
     /**
      * Configure statement JDBC options. e.g. queryTimeout, fetchSize, ... (only one-time call)
      * <pre>
@@ -440,6 +416,42 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
      * @return The determination, true or false.
      */
     boolean isNonSpecifiedColumnAccessAllowed();
+
+    // ===================================================================================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    /**
+     * Enable the handling of column null object. (default is disabled) <br>
+     * The handling is available if the null object target column in selected entity.
+     */
+    void enableColumnNullObject();
+
+    /**
+     * Disable the handling of column null object. (back to default) <br>
+     * You can get null from selected entity even if null object target column.
+     */
+    void disableColumnNullObject();
+
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    /**
+     * Enable checking record count before QueryUpdate (contains QueryDelete). (default is disabled) <br>
+     * No query update if zero count. (basically for MySQL's deadlock by next-key lock)
+     */
+    void enableQueryUpdateCountPreCheck();
+
+    /**
+     * Disable checking record count before QueryUpdate (contains QueryDelete). (back to default) <br>
+     * Executes query update even if zero count. (normal specification)
+     */
+    void disableQueryUpdateCountPreCheck();
+
+    /**
+     * Does it check record count before QueryUpdate (contains QueryDelete)?
+     * @return The determination, true or false.
+     */
+    boolean isQueryUpdateCountPreCheck();
 
     // ===================================================================================
     //                                                                         Display SQL

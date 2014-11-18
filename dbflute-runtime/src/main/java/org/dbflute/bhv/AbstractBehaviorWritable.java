@@ -90,14 +90,14 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected void assertInsertOptionStatus(InsertOption<? extends ConditionBean> option) {
-        if (option.isCommonColumnAutoSetupDisabled() && !getDBMeta().hasCommonColumn()) {
+        if (option.isCommonColumnAutoSetupDisabled() && !asDBMeta().hasCommonColumn()) {
             String msg = "The common column auto-setup disabling was set to the table not defined common columns:";
-            msg = msg + " table=" + getTableDbName() + " option=" + option;
+            msg = msg + " table=" + asTableDbName() + " option=" + option;
             throw new IllegalStateException(msg);
         }
-        if (option.isPrimaryKeyIdentityDisabled() && !getDBMeta().hasIdentity()) {
+        if (option.isPrimaryKeyIdentityDisabled() && !asDBMeta().hasIdentity()) {
             String msg = "The identity disabling was set to the table not defined identity:";
-            msg = msg + " table=" + getTableDbName() + " option=" + option;
+            msg = msg + " table=" + asTableDbName() + " option=" + option;
             throw new IllegalStateException(msg);
         }
     }
@@ -202,9 +202,9 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected void assertUpdateOptionStatus(UpdateOption<? extends ConditionBean> option) {
-        if (option.isCommonColumnAutoSetupDisabled() && !getDBMeta().hasCommonColumn()) {
+        if (option.isCommonColumnAutoSetupDisabled() && !asDBMeta().hasCommonColumn()) {
             String msg = "The common column auto-setup disabling was set to the table not defined common columns:";
-            msg = msg + " table=" + getTableDbName() + " option=" + option;
+            msg = msg + " table=" + asTableDbName() + " option=" + option;
             throw new IllegalStateException(msg);
         }
     }
@@ -246,7 +246,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected void doModifyNonstrict(Entity entity, UpdateOption<? extends ConditionBean> option) {
-        if (getDBMeta().hasOptimisticLock()) {
+        if (asDBMeta().hasOptimisticLock()) {
             doUpdateNonstrict(downcast(entity), downcast(option));
         } else {
             doUpdate(downcast(entity), downcast(option));
@@ -290,13 +290,13 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         final Set<String> uniqueDrivenProperties = entity.myuniqueDrivenProperties();
         if (uniqueDrivenProperties != null && !uniqueDrivenProperties.isEmpty()) {
             for (String prop : uniqueDrivenProperties) {
-                final DBMeta dbmeta = entity.getDBMeta();
+                final DBMeta dbmeta = entity.asDBMeta();
                 final ColumnInfo columnInfo = dbmeta.findColumnInfo(prop);
                 final Object value = columnInfo.read(entity); // already checked in update process
                 cb.localCQ().invokeQueryEqual(columnInfo.getColumnDbName(), value);
             }
         } else {
-            cb.acceptPrimaryKeyMap(getDBMeta().extractPrimaryKeyMap(entity));
+            cb.acceptPrimaryKeyMap(asDBMeta().extractPrimaryKeyMap(entity));
         }
         if (readCount(cb) == 0) { // anyway if not found, insert
             doCreate(entity, insOption);
@@ -353,7 +353,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     protected void doCreateOrModifyNonstrict(Entity entity, InsertOption<? extends ConditionBean> insertOption,
             UpdateOption<? extends ConditionBean> updateOption) {
-        if (getDBMeta().hasOptimisticLock()) {
+        if (asDBMeta().hasOptimisticLock()) {
             doInsertOrUpdateNonstrict(downcast(entity), downcast(insertOption), downcast(updateOption));
         } else {
             doInsertOrUpdate(downcast(entity), downcast(insertOption), downcast(updateOption));
@@ -453,7 +453,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected void doRemoveNonstrict(Entity entity, DeleteOption<? extends ConditionBean> option) {
-        if (getDBMeta().hasOptimisticLock()) {
+        if (asDBMeta().hasOptimisticLock()) {
             doDeleteNonstrict(downcast(entity), downcast(option));
         } else {
             doDelete(downcast(entity), downcast(option));
@@ -604,7 +604,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected int[] doLumpModifyNonstrict(List<Entity> entityList, UpdateOption<? extends ConditionBean> option) {
-        if (getDBMeta().hasOptimisticLock()) {
+        if (asDBMeta().hasOptimisticLock()) {
             return doBatchUpdateNonstrict(downcast(entityList), downcast(option));
         } else {
             return doBatchUpdate(downcast(entityList), downcast(option));
@@ -652,7 +652,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected int[] doLumpRemoveNonstrict(List<Entity> entityList, DeleteOption<? extends ConditionBean> option) {
-        if (getDBMeta().hasOptimisticLock()) {
+        if (asDBMeta().hasOptimisticLock()) {
             return doBatchDeleteNonstrict(downcast(entityList), downcast(option));
         } else {
             return doBatchDelete(downcast(entityList), downcast(option));
@@ -774,7 +774,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         if (!processBeforeUpdate(entity, option)) {
             return 0;
         }
-        if (getDBMeta().hasOptimisticLock()) {
+        if (asDBMeta().hasOptimisticLock()) {
             return invoke(createUpdateEntityCommand(entity, option));
         } else {
             return delegateUpdateNonstrict(entity, option);
@@ -792,7 +792,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         if (!processBeforeDelete(entity, option)) {
             return 0;
         }
-        if (getDBMeta().hasOptimisticLock()) {
+        if (asDBMeta().hasOptimisticLock()) {
             return invoke(createDeleteEntityCommand(entity, option));
         } else {
             return delegateDeleteNonstrict(entity, option);
@@ -820,7 +820,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         if (entityList.isEmpty()) {
             return new int[] {};
         }
-        if (getDBMeta().hasOptimisticLock()) {
+        if (asDBMeta().hasOptimisticLock()) {
             return invoke(createBatchUpdateCommand(processBatchInternally(entityList, option, false), option));
         } else {
             return delegateBatchUpdateNonstrict(entityList, option);
@@ -838,7 +838,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         if (entityList.isEmpty()) {
             return new int[] {};
         }
-        if (getDBMeta().hasOptimisticLock()) {
+        if (asDBMeta().hasOptimisticLock()) {
             return invoke(createBatchDeleteCommand(processBatchInternally(entityList, option, false), option));
         } else {
             return delegateBatchDeleteNonstrict(entityList, option);
@@ -897,7 +897,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         // check primary key after filtering at an insert process
         // because a primary key value may be set in filtering process
         // (for example, sequence)
-        if (!entity.getDBMeta().hasIdentity()) { // identity does not need primary key value here
+        if (!entity.asDBMeta().hasIdentity()) { // identity does not need primary key value here
             assertEntityNotNullAndHasPrimaryKeyValue(entity);
         }
         return true;
@@ -918,7 +918,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         assertObjectNotNull("intoCB", intoCB);
         if (resourceCB == null) {
             String msg = "The set-upper of query-insert should return a condition-bean for resource table:";
-            msg = msg + " inserted=" + entity.getTableDbName();
+            msg = msg + " inserted=" + entity.asTableDbName();
             throw new IllegalConditionBeanOperationException(msg);
         }
         frameworkFilterEntityOfInsert(entity, option);
@@ -929,7 +929,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected void setupExclusiveControlColumnOfQueryInsert(Entity entity) {
-        final DBMeta dbmeta = getDBMeta();
+        final DBMeta dbmeta = asDBMeta();
         if (dbmeta.hasVersionNo()) {
             final ColumnInfo columnInfo = dbmeta.getVersionNoColumnInfo();
             columnInfo.write(entity, InsertOption.VERSION_NO_FIRST_VALUE);
@@ -973,7 +973,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         br.addItem("Advice");
         br.addElement("Please confirm the definition of the set-upper at your component configuration of DBFlute.");
         br.addItem("Behavior");
-        br.addElement("Behavior for " + getTableDbName());
+        br.addElement("Behavior for " + asTableDbName());
         br.addItem("Attribute");
         br.addElement("behaviorCommandInvoker   : " + _behaviorCommandInvoker);
         br.addElement("behaviorSelector         : " + _behaviorSelector);
@@ -1161,7 +1161,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                                Common
     //                                                ------
     protected void injectSequenceToPrimaryKeyIfNeeds(Entity entity) {
-        final DBMeta dbmeta = entity.getDBMeta();
+        final DBMeta dbmeta = entity.asDBMeta();
         if (!dbmeta.hasSequence() || dbmeta.hasCompoundPrimaryKey() || entity.hasPrimaryKeyValue()) {
             return;
         }
@@ -1176,7 +1176,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected void assertEntityHasVersionNoValue(Entity entity) {
-        if (!getDBMeta().hasVersionNo()) {
+        if (!asDBMeta().hasVersionNo()) {
             return;
         }
         if (hasVersionNoValue(entity)) {
@@ -1190,7 +1190,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected void assertEntityHasUpdateDateValue(Entity entity) {
-        if (!getDBMeta().hasUpdateDate()) {
+        if (!asDBMeta().hasUpdateDate()) {
             return;
         }
         if (hasUpdateDateValue(entity)) {
@@ -1381,7 +1381,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
             String msg = "The argument 'entityList' should not be empty: " + entityList;
             throw new IllegalStateException(msg);
         }
-        command.setTableDbName(getTableDbName());
+        command.setTableDbName(asTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setEntityType(entityList.get(0).getClass()); // *The list should not be empty!
         command.setEntityList(entityList);
@@ -1394,7 +1394,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
             InsertOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createQueryInsertCBCommand");
         final QueryInsertCBCommand cmd = new QueryInsertCBCommand();
-        cmd.setTableDbName(getTableDbName());
+        cmd.setTableDbName(asTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setEntity(entity);
         cmd.setIntoConditionBean(intoCB);
@@ -1406,7 +1406,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     protected QueryUpdateCBCommand createQueryUpdateCBCommand(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createQueryUpdateCBCommand");
         final QueryUpdateCBCommand cmd = new QueryUpdateCBCommand();
-        cmd.setTableDbName(getTableDbName());
+        cmd.setTableDbName(asTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setEntity(entity);
         cmd.setConditionBean(cb);
@@ -1417,7 +1417,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     protected QueryDeleteCBCommand createQueryDeleteCBCommand(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createQueryDeleteCBCommand");
         final QueryDeleteCBCommand cmd = new QueryDeleteCBCommand();
-        cmd.setTableDbName(getTableDbName());
+        cmd.setTableDbName(asTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setConditionBean(cb);
         cmd.setDeleteOption(option);

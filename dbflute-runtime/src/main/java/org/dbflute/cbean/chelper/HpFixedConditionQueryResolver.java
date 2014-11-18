@@ -406,7 +406,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
 
                 if (!resource.hasJoinInfo()) { // first analyze
                     final List<String> splitList = Srl.splitList(targetRelation, ".");
-                    DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
+                    DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.asTableDbName());
                     for (String element : splitList) {
                         final ForeignInfo foreignInfo = currentDBMeta.findForeignInfo(element);
                         resource.addJoinInfo(foreignInfo);
@@ -432,7 +432,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                     if (referrerQuery == null) { // means not found
                         break;
                     }
-                    if (Srl.equalsPlain(pointDBMeta.getTableDbName(), referrerQuery.getTableDbName())) {
+                    if (Srl.equalsPlain(pointDBMeta.getTableDbName(), referrerQuery.asTableDbName())) {
                         break;
                     }
                     referrerQuery = referrerQuery.xgetReferrerQuery();
@@ -758,7 +758,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         br.addItem("Fixed Condition");
         br.addElement(fixedCondition);
         br.addItem("BizOneToOne's Local");
-        br.addElement(_localCQ.getTableDbName());
+        br.addElement(_localCQ.asTableDbName());
         final String msg = br.buildExceptionMessage();
         throw new FixedConditionIllegalOverRelationException(msg, e);
     }

@@ -134,7 +134,7 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
         if (!cb.isFetchScopeEffective()) {
             return null;
         }
-        final DBMeta dbmeta = cb.getDBMeta();
+        final DBMeta dbmeta = cb.asDBMeta();
         final UniqueInfo primaryUniqueInfo = dbmeta.getPrimaryUniqueInfo();
         if (primaryUniqueInfo.isTwoOrMore()) { // basically no way, already checked
             return null;

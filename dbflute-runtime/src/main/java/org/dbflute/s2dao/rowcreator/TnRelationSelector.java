@@ -15,6 +15,10 @@
  */
 package org.dbflute.s2dao.rowcreator;
 
+import java.util.Set;
+
+import org.dbflute.dbmeta.info.ColumnInfo;
+
 /**
  * @author jflute
  */
@@ -60,4 +64,18 @@ public interface TnRelationSelector {
      * @return The determination, true or false.
      */
     boolean isUsingSpecifyColumnInRelation(String relationNoSuffix);
+
+    /**
+     * Get the set of column specified as null object for the relation.
+     * @param relationNoSuffix The suffix of relation No, same as foreign relation path. (NotNull)  
+     * @return The set of column info. (NotNull, EmptyAllowed)
+     */
+    Set<ColumnInfo> getRelationSpecifiedNullObjectColumnSet(String relationNoSuffix);
+
+    /**
+     * Is the handling of column null object enabled?
+     * @param relationNoSuffix The suffix of relation No, same as foreign relation path. (NotNull)  
+     * @return The determination, true or false.
+     */
+    boolean isColumnNullObjectEnabled(String relationNoSuffix);
 }

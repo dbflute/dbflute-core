@@ -1888,21 +1888,59 @@ public class ForeignKey implements Constraint {
     // ===================================================================================
     //                                                              Relational Null Object
     //                                                              ======================
-    public String getRelationalNullObjectProviderForeignExp() {
-        return doGetRelationalNullObjectProviderExp(getForeignTable(), getLocalColumnGetterCommaString());
+    // -----------------------------------------------------
+    //                                               Foreign
+    //                                               -------
+    public boolean canBeRelationalNullObjectForeign() {
+        return getForeignTable().canBeRelationalNullObjectForeign();
     }
 
-    public String getRelationalNullObjectProviderReferrerExp() {
-        return doGetRelationalNullObjectProviderExp(getTable(), getForeignColumnGetterCommaString());
+    public String getRelationalNullObjectForeignProviderExp() {
+        return doGetRelationalNullObjectForeignProviderExp(getForeignTable(), getLocalColumnGetterCommaString());
     }
 
-    protected String doGetRelationalNullObjectProviderExp(Table table, String getterCommaString) {
-        String exp = table.getRelationalNullObjectProviderForeignExp();
-        exp = replace(exp, "$$PrimaryKey$$", getterCommaString); // for compatible (1.0.x)
-        exp = replace(exp, "$$primaryKey$$", getterCommaString);
-        exp = replace(exp, "$$foreignPropertyName$$", getForeignJavaBeansRulePropertyName());
-        return exp;
+    protected String doGetRelationalNullObjectForeignProviderExp(Table table, String getterCommaString) {
+        final String foreignProperty = getForeignPropertyName();
+        final String beansRuleProperty = getForeignJavaBeansRulePropertyName();
+        return table.buildRelationalNullObjectProviderForeignExp(foreignProperty, beansRuleProperty, getterCommaString);
     }
+
+    public String getRelationalNullObjectForeignEmptyExp() {
+        return getLittleAdjustmentProperties().getRelationalNullObjectOptionalEmptyExp();
+    }
+
+    // -----------------------------------------------------
+    //                                       Referrer as One
+    //                                       ---------------
+    public boolean canBeRelationalNullObjectReferrerAsOne() {
+        return getTable().canBeRelationalNullObjectForeign();
+    }
+
+    public String getRelationalNullObjectReferrerAsOneProviderExp() {
+        return doGetRelationalNullObjectReferrerAsOneProviderExp(getTable(), getForeignColumnGetterCommaString());
+    }
+
+    protected String doGetRelationalNullObjectReferrerAsOneProviderExp(Table table, String getterCommaString) {
+        final String foreignProperty = getReferrerPropertyNameAsOne();
+        final String beansRuleProperty = getReferrerJavaBeansRulePropertyNameAsOne();
+        return table.buildRelationalNullObjectProviderForeignExp(foreignProperty, beansRuleProperty, getterCommaString);
+    }
+
+    public String getRelationalNullObjectReferrerAsOneEmptyExp() {
+        return getLittleAdjustmentProperties().getRelationalNullObjectOptionalEmptyExp();
+    }
+
+    // -----------------------------------------------------
+    //                                      Referrer as Many
+    //                                      ----------------
+    // unsupported for now
+    //public String getRelationalNullObjectReferrerProviderExp() {
+    //    return doGetRelationalNullObjectProviderExp(getTable(), getForeignColumnGetterCommaString());
+    //}
+    //
+    //public String getRelationalNullObjectReferrerEmptyExp() {
+    //    return getLittleAdjustmentProperties().getRelationalNullObjectOptionalEmptyExp();
+    //}
 
     // ===================================================================================
     //                                                                          Properties
