@@ -166,7 +166,7 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
-        return entity.getDBMeta();
+        return entity.asDBMeta();
     }
 
     /**

@@ -137,28 +137,21 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 
 #end
     // ===================================================================================
-    //                                                                          Table Name
-    //                                                                          ==========
+    //                                                                             DB Meta
+    //                                                                             =======
     /** {@inheritDoc} */
-    public String getTableDbName() {
-        return "${table.tableDbName}";
-    }
-
-    /** {@inheritDoc} */
-    public String getTablePropertyName() {
-        return "${table.javaBeansRulePropertyName}";
-    }
-
-    // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
-    /** {@inheritDoc} */
-    public DBMeta getDBMeta() {
+    public DBMeta asDBMeta() {
 #if ($isSql2Entity)
         return ${myDBMetaPackageName}.${myDBMetaClassName}.getInstance();
 #else
-        return ${glDBMetaInstanceHandler}.findDBMeta(getTableDbName());
+## not to depend on concrete DB meta (but little merit any more?)
+        return ${glDBMetaInstanceHandler}.findDBMeta(asTableDbName());
 #end
+    }
+
+    /** {@inheritDoc} */
+    public String asTableDbName() {
+        return "${table.tableDbName}";
     }
 
     // ===================================================================================
@@ -525,7 +518,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
     @Override
     protected int doHashCode(int initial) {
         int hs = initial;
-        hs = xCH(hs, getTableDbName());
+        hs = xCH(hs, asTableDbName());
 #foreach ($col in $table.equalsHashcodeColumnList)
         hs = xCH(hs, _${col.uncapitalisedJavaName});
 #end

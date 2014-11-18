@@ -44,7 +44,7 @@ import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
  */
 public class MockConditionBean implements ConditionBean {
 
-    public DBMeta getDBMeta() {
+    public DBMeta asDBMeta() {
         return null;
     }
 
@@ -70,7 +70,7 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
-    public String getTableDbName() {
+    public String asTableDbName() {
         return null;
     }
 

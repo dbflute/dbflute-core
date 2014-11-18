@@ -273,7 +273,7 @@ public class BehaviorExceptionThrower {
     //                                                                              ======
     public void throwEntityPrimaryKeyNotFoundException(Entity entity) {
         final String classTitle = DfTypeUtil.toClassTitle(entity);
-        final String behaviorName = Srl.substringLastRear(entity.getDBMeta().getBehaviorTypeName(), ".");
+        final String behaviorName = Srl.substringLastRear(entity.asDBMeta().getBehaviorTypeName(), ".");
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The primary-key value in the entity was not found.");
         br.addItem("Advice");
@@ -300,7 +300,7 @@ public class BehaviorExceptionThrower {
 
     public void throwEntityUniqueKeyNotFoundException(Entity entity) {
         final String classTitle = DfTypeUtil.toClassTitle(entity);
-        final String behaviorName = Srl.substringLastRear(entity.getDBMeta().getBehaviorTypeName(), ".");
+        final String behaviorName = Srl.substringLastRear(entity.asDBMeta().getBehaviorTypeName(), ".");
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The unique-key value in the entity was not found.");
         br.addItem("Advice");
@@ -465,7 +465,7 @@ public class BehaviorExceptionThrower {
         try {
             br.addElement(entity.toStringWithRelation());
         } catch (RuntimeException continued) {
-            final String tableDbName = entity.getTableDbName();
+            final String tableDbName = entity.asTableDbName();
             final String msg = "*Failed to build string from the entity for debug: " + tableDbName;
             if (_log.isDebugEnabled()) {
                 _log.debug(msg);

@@ -27,28 +27,19 @@ import org.dbflute.dbmeta.DBMeta;
 public interface Entity {
 
     // ===================================================================================
-    //                                                                          Table Name
-    //                                                                          ==========
+    //                                                                             DB Meta
+    //                                                                             =======
     /**
-     * Get table DB name, can be identity of table.
-     * @return The string for name. (NotNull)
+     * Handle the meta as DBMeta, that has all info of the table.
+     * @return The (singleton) instance of DB meta for the table. (NotNull)
      */
-    String getTableDbName();
+    DBMeta asDBMeta();
 
     /**
-     * Get table property name according to Java Beans rule.
-     * @return The string for name. (NotNull)
+     * Handle the meta as table DB name, that can be identity of table.
+     * @return The (fixed) DB name of the table. (NotNull)
      */
-    String getTablePropertyName();
-
-    // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
-    /**
-     * Get the target DB meta.
-     * @return The instance of DBMeta type. (NotNull)
-     */
-    DBMeta getDBMeta();
+    String asTableDbName(); // not use 'get' for quiet
 
     // ===================================================================================
     //                                                                 Modified Properties

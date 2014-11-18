@@ -69,7 +69,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
             _beanDesc = null;
         } else { // mainly here for DBFlute
             _fieldBeanAnnotationReader = null;
-            _dbmeta = ((Entity) DfReflectionUtil.newInstance(beanClass)).getDBMeta();
+            _dbmeta = ((Entity) DfReflectionUtil.newInstance(beanClass)).asDBMeta();
             _beanDesc = DfBeanDescFactory.getBeanDesc(beanClass);
         }
     }

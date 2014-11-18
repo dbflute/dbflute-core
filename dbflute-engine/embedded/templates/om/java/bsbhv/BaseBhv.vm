@@ -91,10 +91,12 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     ${database.behaviorQueryPathEndMark}
 
     // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
+    //                                                                             DB Meta
+    //                                                                             =======
     /** {@inheritDoc} */
-    public ${myDBMetaClassName} getDBMeta() { return ${myDBMetaClassName}.getInstance(); }
+    public ${myDBMetaClassName} asDBMeta() { return ${myDBMetaClassName}.getInstance(); }
+    /** {@inheritDoc} */
+    public String asTableDbName() { return "${table.tableDbName}"; }
 #if ($table.isCompatibleNewMyEntityConditionBean())
 
     /** @return The instance of DBMeta as my table type. (NotNull) */
@@ -623,7 +625,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #if ($table.isUseSequence())
         return facadeSelectNextVal();
 #else
-        String msg = "This table is NOT related to sequence: " + getTableDbName();
+        String msg = "This table is NOT related to sequence: " + asTableDbName();
         throw new UnsupportedOperationException(msg);
 #end
     }

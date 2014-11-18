@@ -34,10 +34,10 @@ public interface ConditionQuery {
     //                                                                  Important Accessor
     //                                                                  ==================
     /**
-     * Get table DB name.
-     * @return Table DB name. (NotNull)
+     * Handle the meta as table DB name, that can be identity of table..
+     * @return The (fixed) DB name of the table. (NotNull)
      */
-    String getTableDbName();
+    String asTableDbName();
 
     // internal getter methods start with 'x'
     // not to be same as column names 

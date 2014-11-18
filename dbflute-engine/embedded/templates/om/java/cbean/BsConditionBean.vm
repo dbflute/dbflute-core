@@ -83,17 +83,14 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     // ===================================================================================
-    //                                                                     DBMeta Provider
-    //                                                                     ===============
+    //                                                                             DB Meta
+    //                                                                             =======
     @Override
     protected DBMetaProvider getDBMetaProvider() {
         return ${glDBMetaInstanceHandler}.getProvider(); // as default
     }
 
-    // ===================================================================================
-    //                                                                          Table Name
-    //                                                                          ==========
-    public String getTableDbName() {
+    public String asTableDbName() {
         return "${table.tableDbName}";
     }
 
@@ -147,7 +144,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #end
         return this;
 #else
-        String msg = "The table has no primary-keys: " + getTableDbName();
+        String msg = "The table has no primary-keys: " + asTableDbName();
         throw new UnsupportedOperationException(msg);
 #end
     }
@@ -159,7 +156,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #end
         return this;
 #else
-        String msg = "The table has no primary-keys: " + getTableDbName();
+        String msg = "The table has no primary-keys: " + asTableDbName();
         throw new UnsupportedOperationException(msg);
 #end
     }

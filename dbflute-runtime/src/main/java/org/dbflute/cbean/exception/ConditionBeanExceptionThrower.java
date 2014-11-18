@@ -246,7 +246,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Specified Column");
-        br.addElement(baseCB.getTableDbName() + "." + columnName);
+        br.addElement(baseCB.asTableDbName() + "." + columnName);
         final String msg = br.buildExceptionMessage();
         throw new SpecifyColumnTwoOrMoreColumnException(msg);
     }
@@ -270,7 +270,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Specified Column");
-        br.addElement(baseCB.getTableDbName() + "." + columnName);
+        br.addElement(baseCB.asTableDbName() + "." + columnName);
         final String msg = br.buildExceptionMessage();
         throw new SpecifyColumnNotSetupSelectColumnException(msg);
     }
@@ -300,7 +300,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + baseCB.getPurpose() + ")");
         br.addItem("Specified Column");
-        br.addElement(baseCB.getTableDbName() + "." + columnName);
+        br.addElement(baseCB.asTableDbName() + "." + columnName);
         br.addItem("Derived Referrer");
         br.addElement(referrerName);
         final String msg = br.buildExceptionMessage();
@@ -572,7 +572,7 @@ public class ConditionBeanExceptionThrower {
         br.addElement("        }");
         br.addElement("    }, Member.ALIAS_latestPurchaseDatetime); // OK");
         br.addItem("Local Table");
-        br.addElement(localCQ.getTableDbName());
+        br.addElement(localCQ.asTableDbName());
         final String msg = br.buildExceptionMessage();
         throw new SpecifyDerivedReferrerInvalidAliasNameException(msg);
     }
@@ -697,7 +697,7 @@ public class ConditionBeanExceptionThrower {
         br.addItem("Function");
         br.addElement(function);
         br.addItem("Referrer");
-        br.addElement(subQuery.getTableDbName());
+        br.addElement(subQuery.asTableDbName());
         br.addItem("Alias Name");
         br.addElement(aliasName);
         final String msg = br.buildExceptionMessage();
@@ -812,7 +812,7 @@ public class ConditionBeanExceptionThrower {
         br.addItem("Function");
         br.addElement(function);
         br.addItem("Referrer");
-        br.addElement(subQuery.getTableDbName());
+        br.addElement(subQuery.asTableDbName());
         final String msg = br.buildExceptionMessage();
         throw new QueryDerivedReferrerSelectAllPossibleException(msg);
     }

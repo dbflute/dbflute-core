@@ -98,7 +98,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
         // getting from entity because the bean may be customize entity.
         final Object instance = newInstance(beanClass); // only when initialization
-        return ((Entity) instance).getDBMeta();
+        return ((Entity) instance).asDBMeta();
     }
 
     protected static Object newInstance(Class<?> clazz) {
@@ -216,7 +216,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             if (typeHandler == null) {
                 typeHandler = cb.xgetDerivedTypeHandler(); // basically fixed instance returned
                 if (typeHandler == null) { // no way, just in case
-                    String msg = "Not found the type handler from condition-bean: " + cb.getTableDbName();
+                    String msg = "Not found the type handler from condition-bean: " + cb.asTableDbName();
                     throw new IllegalStateException(msg);
                 }
             }
@@ -307,7 +307,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             if (dbmeta != null) {
                 return dbmeta;
             }
-            dbmeta = entity.getDBMeta();
+            dbmeta = entity.asDBMeta();
             cacheDBMeta(entity, dbmeta);
             return dbmeta;
         }

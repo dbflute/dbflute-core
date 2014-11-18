@@ -145,7 +145,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     }
 
     protected void xacceptCommonColumnForcedSpecification(CB cb) { // internal
-        final List<ColumnInfo> beforeInsertList = cb.getDBMeta().getCommonColumnInfoBeforeInsertList();
+        final List<ColumnInfo> beforeInsertList = cb.asDBMeta().getCommonColumnInfoBeforeInsertList();
         if (beforeInsertList == null || beforeInsertList.isEmpty()) {
             return;
         }
@@ -181,7 +181,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
         if (firstEntity.createdBySelect()) { // all columns e.g. copy insert
             specify(new SpecifyQuery<CB>() {
                 public void specify(CB cb) {
-                    final List<ColumnInfo> infoList = firstEntity.getDBMeta().getColumnInfoList();
+                    final List<ColumnInfo> infoList = firstEntity.asDBMeta().getColumnInfoList();
                     for (ColumnInfo info : infoList) {
                         if (!info.isPrimary()) { // except PK
                             cb.localSp().xspecifyColumn(info.getColumnDbName());
@@ -191,7 +191,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
             });
         } else { // least common multiple or same-set columns
             final Set<String> targetProps = xgatherInsertColumnModifiedProperties(entityList, firstEntity);
-            final DBMeta dbmeta = firstEntity.getDBMeta();
+            final DBMeta dbmeta = firstEntity.asDBMeta();
             specify(new SpecifyQuery<CB>() {
                 public void specify(CB cb) {
                     // you don't need to specify primary key because primary key has special handling
@@ -274,11 +274,11 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
         br.addElement("    }");
         br.addElement("    memberBhv.batchInsert(memberList); // current date or null without default");
         br.addItem("Insert Table");
-        br.addElement(entity.getDBMeta().getTableDbName());
+        br.addElement(entity.asDBMeta().getTableDbName());
         br.addItem("Base Properties");
         br.addElement(baseProps);
         br.addItem("Fragmented Entity");
-        br.addElement(entity.getDBMeta().extractPrimaryKeyMap(entity));
+        br.addElement(entity.asDBMeta().extractPrimaryKeyMap(entity));
         br.addItem("Fragmented Properties");
         br.addElement(entity.mymodifiedProperties());
         final String msg = br.buildExceptionMessage();
@@ -316,7 +316,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
         assertInsertColumnSpecifiedCB();
         final CB cb = _insertColumnSpecifiedCB;
         final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
-        final DBMeta dbmeta = cb.getDBMeta();
+        final DBMeta dbmeta = cb.asDBMeta();
         if (dbmeta.hasPrimaryKey()) {
             final UniqueInfo pkInfo = dbmeta.getPrimaryUniqueInfo();
             final List<ColumnInfo> pkList = pkInfo.getUniqueColumnList();

@@ -190,9 +190,9 @@ public class FunCustodial {
 
     protected static void buildExceptionTableInfo(ExceptionMessageBuilder br, Entity entity) {
         br.addItem("Table");
-        br.addElement(entity.getTableDbName());
+        br.addElement(entity.asTableDbName());
         try {
-            br.addElement(entity.getDBMeta().extractPrimaryKeyMap(entity));
+            br.addElement(entity.asDBMeta().extractPrimaryKeyMap(entity));
         } catch (RuntimeException continued) { // just in case
             br.addElement("*Failed to get PK info:");
             br.addElement(continued.getMessage());
@@ -213,7 +213,7 @@ public class FunCustodial {
         if (meta.codeOf(code) != null) {
             return;
         }
-        handleUndefinedClassificationCode(entity.getTableDbName(), columnDbName, meta, code);
+        handleUndefinedClassificationCode(entity.asTableDbName(), columnDbName, meta, code);
     }
 
     public static void handleUndefinedClassificationCode(String tableDbName, String columnDbName, ClassificationMeta meta, Object code) {

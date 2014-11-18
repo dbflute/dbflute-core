@@ -141,7 +141,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
             String msg = "The entityType should be entity instance or entity type: " + entityType;
             throw new IllegalArgumentException(msg);
         }
-        final DBMeta dbmeta = prototype.getDBMeta();
+        final DBMeta dbmeta = prototype.asDBMeta();
         final Object[] attrs = toStandardStructAttributes(oracleStruct);
         return doMappingOracleStructToEntity(dbmeta, attrs);
     }
@@ -278,7 +278,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
     }
 
     protected Object mappingEntityToOracleStruct(Connection conn, Object paramExp, Entity entity) throws SQLException {
-        final DBMeta dbmeta = entity.getDBMeta();
+        final DBMeta dbmeta = entity.asDBMeta();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         final List<Object> attrList = new ArrayList<Object>();
         for (ColumnInfo columnInfo : columnInfoList) {

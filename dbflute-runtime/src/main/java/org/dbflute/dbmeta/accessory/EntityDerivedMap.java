@@ -90,7 +90,7 @@ public class EntityDerivedMap implements Serializable {
         try {
             @SuppressWarnings("unchecked")
             final VALUE found = (VALUE) derivedMap.get(aliasName);
-            final String tableDbName = entity.getTableDbName(); // not to have reference to entity in optional
+            final String tableDbName = entity.asTableDbName(); // not to have reference to entity in optional
             return OptionalScalar.ofNullable(found, () -> {
                 throwDerivedPropertyValueNotFoundException(tableDbName, aliasName);
             }); // null allowed
@@ -239,9 +239,9 @@ public class EntityDerivedMap implements Serializable {
 
     protected void buildExceptionTableInfo(ExceptionMessageBuilder br, Entity entity) {
         br.addItem("Table");
-        br.addElement(entity.getTableDbName());
+        br.addElement(entity.asTableDbName());
         try {
-            br.addElement(entity.getDBMeta().extractPrimaryKeyMap(entity));
+            br.addElement(entity.asDBMeta().extractPrimaryKeyMap(entity));
         } catch (RuntimeException continued) { // just in case
             br.addElement("*Failed to get PK info:");
             br.addElement(continued.getMessage());

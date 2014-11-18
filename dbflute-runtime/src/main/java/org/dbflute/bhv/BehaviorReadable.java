@@ -30,22 +30,19 @@ import org.dbflute.outsidesql.executor.OutsideSqlAllFacadeExecutor;
 public interface BehaviorReadable {
 
     // ===================================================================================
-    //                                                                          Table name
-    //                                                                          ==========
+    //                                                                             DB Meta
+    //                                                                             =======
     /**
-     * Get table DB name.
-     * @return Table DB name. (NotNull)
+     * Handle the meta as DBMeta, that has all info of the table.
+     * @return The (singleton) instance of DB meta for the table. (NotNull)
      */
-    String getTableDbName();
+    DBMeta asDBMeta();
 
-    // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
     /**
-     * Get the instance of DBMeta.
-     * @return The instance of DBMeta. (NotNull)
+     * Handle the meta as table DB name, that can be identity of table.
+     * @return The (fixed) DB name of the table. (NotNull)
      */
-    DBMeta getDBMeta();
+    String asTableDbName();
 
     // ===================================================================================
     //                                                                        New Instance
