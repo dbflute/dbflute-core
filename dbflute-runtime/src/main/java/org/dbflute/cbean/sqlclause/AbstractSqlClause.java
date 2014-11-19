@@ -596,7 +596,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public String getSelectClause() {
         reflectClauseLazilyIfExists();
         if (isSelectClauseNonUnionScalar()) {
-            return buildSelectClauseScalar(getBasePointAliasName());
+            final String specifiedColumnTableAliasName = getSpecifiedColumnTableAliasNameAsOne(); // not null here
+            return buildSelectClauseScalar(specifiedColumnTableAliasName);
         }
         // if it's a scalar-select, it always has union-query since here
         final StringBuilder sb = new StringBuilder();
@@ -620,7 +621,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
         final List<ColumnInfo> columnInfoList;
         final boolean validSpecifiedLocal;
-        if (isSelectClauseTypeUniqueScalar()) {
+        final boolean selectClauseTypeUniqueScalar = isSelectClauseTypeUniqueScalar();
+        ColumnInfo specifiedUniqueScalarColumnInfo = null; // unique scalar, has PK, specified scalar, specified column
+        if (selectClauseTypeUniqueScalar) {
             // it always has union-query because it's handled before this process
             if (dbmeta.hasPrimaryKey()) {
                 columnInfoList = new ArrayList<ColumnInfo>();
@@ -628,6 +631,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 if (isSelectClauseTypeSpecifiedScalar()) {
                     final ColumnInfo specifiedColumn = getSpecifiedColumnInfoAsOne();
                     if (specifiedColumn != null && !specifiedColumn.isPrimary()) {
+                        specifiedUniqueScalarColumnInfo = specifiedColumn;
                         columnInfoList.add(specifiedColumn);
                     }
                     // derivingSubQuery is handled after this process
@@ -667,7 +671,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 sb.append(" ");
                 needsDelimiter = true;
             }
-            final String realColumnName = basePointAliasName + "." + columnSqlName;
+            final String realAliasName;
+            if (selectClauseTypeUniqueScalar) {
+                if (specifiedUniqueScalarColumnInfo != null && columnInfo.equals(specifiedUniqueScalarColumnInfo)) {
+                    // has PK, specified column in unique scalar
+                    realAliasName = getSpecifiedColumnTableAliasNameAsOne(); // might be relation column
+                } else { // has no PK
+                    realAliasName = basePointAliasName;
+                }
+            } else {
+                realAliasName = basePointAliasName;
+            }
+            final String realColumnName = realAliasName + "." + columnSqlName;
             final String onQueryName;
             ++selectIndex;
             if (_useSelectIndex) {

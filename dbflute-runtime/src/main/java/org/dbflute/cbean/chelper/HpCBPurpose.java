@@ -36,7 +36,7 @@ public enum HpCBPurpose {
             .noSpecifyDerivedReferrerTwoOrMore().noOrderBy().subQuery()) // DerivedReferrer
 
     , SCALAR_SELECT(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
-            .noSpecifyDerivedReferrerTwoOrMore().noSpecifyRelation().noOrderBy()) // ScalarSelect
+            .noSpecifyDerivedReferrerTwoOrMore().noOrderBy()) // ScalarSelect
 
     , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation().noSpecifyDerivedReferrer().noOrderBy()
             .subQuery()) // ScalarCondition

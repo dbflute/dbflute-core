@@ -475,7 +475,6 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyDerivedReferrerIllegalPurposeException(msg);
     }
 
-    // TODO jflute impl: CB message
     public void throwSpecifyDerivedReferrerTwoOrMoreException(HpCBPurpose purpose, ConditionBean baseCB, String referrerName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The two-or-more derived-referrers was specifed.");
@@ -484,17 +483,13 @@ public class ConditionBeanExceptionThrower {
         br.addElement("Because this is for " + purpose + ".");
         br.addElement("For example:");
         br.addElement("  (x): (ColumnQuery)");
-        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB> {");
-        br.addElement("        public void query(MemberCB cb) {");
-        br.addElement("            cb.specify().derivedPurchaseList().max(...);");
-        br.addElement("            cb.specify().derivedPurchaseList().max(...); // *NG");
-        br.addElement("        }");
+        br.addElement("    cb.columnQuery(colCB -> {");
+        br.addElement("        colCB.specify().derivedPurchase().max(...);");
+        br.addElement("        colCB.specify().derivedPurchase().max(...); // *NG");
         br.addElement("    }).greaterEqual(...);");
         br.addElement("  (o): (ColumnQuery)");
-        br.addElement("    cb.columnQuery(new SpecifyQuery<MemberCB> {");
-        br.addElement("        public void query(MemberCB cb) {");
-        br.addElement("            cb.specify().derivedPurchaseList().max(...); // OK");
-        br.addElement("        }");
+        br.addElement("    cb.columnQuery(colCB -> {");
+        br.addElement("        colCB.specify().derivedPurchase().max(...); // OK");
         br.addElement("    }).greaterEqual(...);");
         // don't use displaySql because of illegal CB's state
         br.addItem("ConditionBean");
@@ -517,26 +512,20 @@ public class ConditionBeanExceptionThrower {
         br.addElement("For example:");
         br.addElement("");
         br.addElement("  (x): (empty)");
-        br.addElement("    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {");
-        br.addElement("        public void query(MemberCB cb) {");
-        br.addElement("            // *NG, it should not be empty");
-        br.addElement("        }");
+        br.addElement("    memberBhv.selectScalar(LocalDate.class).max(cb -> {");
+        br.addElement("        // *NG, it should not be empty");
         br.addElement("    });");
         br.addElement("");
         br.addElement("  (x): (duplicated)");
-        br.addElement("    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {");
-        br.addElement("        public void query(MemberCB cb) {");
-        br.addElement("            // *NG, it should be the only one");
-        br.addElement("            cb.specify().columnMemberBirthday();");
-        br.addElement("            cb.specify().columnRegisterDatetime();");
-        br.addElement("        }");
+        br.addElement("    memberBhv.selectScalar(LocalDate.class).max(cb -> {");
+        br.addElement("        // *NG, it should be the only one");
+        br.addElement("        cb.specify().columnBirthdate();");
+        br.addElement("        cb.specify().columnRegisterDatetime();");
         br.addElement("    });");
         br.addElement("");
         br.addElement("  (o):");
-        br.addElement("    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {");
-        br.addElement("        public void query(MemberCB cb) {");
-        br.addElement("            cb.specify().columnMemberBirthday(); // OK");
-        br.addElement("        }");
+        br.addElement("    memberBhv.selectScalar(LocalDate.class).max(cb -> {");
+        br.addElement("        cb.specify().columnBirthdate(); // OK");
         br.addElement("    });");
         br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(cb.getClass().getName());
@@ -547,6 +536,7 @@ public class ConditionBeanExceptionThrower {
         throw new ScalarSelectInvalidColumnSpecificationException(msg);
     }
 
+    // TODO jflute impl: CB message
     // ===================================================================================
     //                                                            Specify Derived Referrer
     //                                                            ========================
