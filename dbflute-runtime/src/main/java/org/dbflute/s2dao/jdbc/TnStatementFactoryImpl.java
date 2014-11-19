@@ -327,8 +327,8 @@ public class TnStatementFactoryImpl implements StatementFactory {
     }
 
     // -----------------------------------------------------
-    //                                          CursorSelect
-    //                                          ------------
+    //                                         Cursor Select
+    //                                         -------------
     protected Integer chooseCursorSelectFetchSize(StatementConfig config) {
         if (config != null && config.isSuppressDefault()) {
             return null; // suppressed
@@ -341,9 +341,8 @@ public class TnStatementFactoryImpl implements StatementFactory {
     }
 
     // -----------------------------------------------------
-    //                                          EntitySelect
-    //                                          ------------
-
+    //                                         Entity Select
+    //                                         -------------
     protected Integer chooseEntitySelectFetchSize(StatementConfig config) {
         if (config != null && config.isSuppressDefault()) {
             return null; // suppressed
@@ -393,8 +392,8 @@ public class TnStatementFactoryImpl implements StatementFactory {
     }
 
     // -----------------------------------------------------
-    //                                          PagingSelect
-    //                                          ------------
+    //                                         Paging Select
+    //                                         -------------
     protected Integer extractPagingByCursorSkipSynchronizedFetchSize(StatementConfig config, BehaviorCommand<?> command) {
         if (config != null && config.isSuppressDefault()) {
             return null; // suppressed
