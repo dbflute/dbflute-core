@@ -283,7 +283,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
         _tableExceptList = new ArrayList<String>();
         _tableExceptGenOnlyList = new ArrayList<String>();
-        setupTableOrColumnExceptList(plainList, _tableExceptList, _tableExceptGenOnlyList);
+        setupTableOrColumnExceptList(resultList, _tableExceptList, _tableExceptGenOnlyList);
         return _tableExceptList;
     }
 
