@@ -44,15 +44,11 @@ public class HpSSQDecorator<CB extends ConditionBean> {
      * Partition the scope of condition by the specified query. <br>
      * You can add a correlation condition to the sub-query.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True();
-     *     }
-     * }).<span style="color: #CC4747">partitionBy</span>(new SpecifyQuery&lt;PurchaseCB&gt;() {
-     *     public void specify(PurchaseCB cb) {
-     *         cb.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// *Point!</span>
-     *     }
+     * cb.query().scalar_Equal().<span style="color: #994747">max</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #994747">columnPurchasePrice</span>();
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
+     * }).<span style="color: #CC4747">partitionBy</span>(<span style="color: #553000">colCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">colCB</span>.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// *Point!</span>
      * });
      * </pre>
      * @param colCBLambda The callback for query to specify the partition column. (NotNull)

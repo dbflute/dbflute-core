@@ -67,9 +67,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * Select the count value. <br>
      * You can also get same result by selectCount(cb) method.
      * <pre>
-     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">count</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
-     *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">count</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+     *     <span style="color: #553000">cb</span>.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
@@ -82,10 +82,10 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     /**
      * Select the count value with function conversion option.
      * <pre>
-     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">count</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().columnMemberId(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
-     *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
+     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">count</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().columnMemberId(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+     *     <span style="color: #553000">cb</span>.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+     * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
      * @param opLambda The callback for option of scalar. (NotNull)
@@ -107,9 +107,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * Select the count-distinct value. <br>
      * You can also get same result by selectCount(cb) method.
      * <pre>
-     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
-     *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">countDistinct</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+     *     <span style="color: #553000">cb</span>.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
@@ -122,10 +122,10 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     /**
      * Select the count-distinct value with function conversion option.
      * <pre>
-     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().columnMemberId(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
-     *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
+     * memberBhv.scalarSelect(Integer.class).<span style="color: #CC4747">countDistinct</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().columnMemberId(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+     *     <span style="color: #553000">cb</span>.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+     * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
      * @param opLambda The callback for option of scalar. (NotNull)
@@ -146,9 +146,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     /**
      * Select the maximum value.
      * <pre>
-     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">max</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-     *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">max</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     *     <span style="color: #553000">cb</span>.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
@@ -161,10 +161,10 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     /**
      * Select the maximum value with function conversion option.
      * <pre>
-     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">max</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-     *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
+     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">max</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     *     <span style="color: #553000">cb</span>.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+     * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
      * @param opLambda The callback for option of scalar. (NotNull)
@@ -185,9 +185,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     /**
      * Select the minimum value.
      * <pre>
-     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">min</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-     *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">min</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     *     <span style="color: #553000">cb</span>.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
@@ -200,10 +200,10 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     /**
      * Select the minimum value with function conversion option.
      * <pre>
-     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">min</span>(new ScalarQuery(MemberCB cb) {
-     *     cb.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-     *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
+     * memberBhv.scalarSelect(Date.class).<span style="color: #CC4747">min</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     *     <span style="color: #553000">cb</span>.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+     * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
      * @param opLambda The callback for option of scalar. (NotNull)
@@ -224,9 +224,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     /**
      * Select the summary value.
      * <pre>
-     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
-     *     cb.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-     *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
+     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">sum</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     *     <span style="color: #553000">cb</span>.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
@@ -239,10 +239,10 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     /**
      * Select the summary value with function conversion option.
      * <pre>
-     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
-     *     cb.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-     *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
+     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">sum</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     *     <span style="color: #553000">cb</span>.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
+     * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
      * @param opLambda The callback for option of scalar. (NotNull)
@@ -263,9 +263,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     /**
      * Select the average value.
      * <pre>
-     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
-     *     cb.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-     *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
+     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">avg</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     *     <span style="color: #553000">cb</span>.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
      * });
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
@@ -278,10 +278,10 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     /**
      * Select the average value.
      * <pre>
-     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
-     *     cb.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
-     *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
-     * }, new ScalarSelectOption().<span style="color: #CC4747">coalesce</span>(0));
+     * purchaseBhv.scalarSelect(Integer.class).<span style="color: #CC4747">avg</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.specify().<span style="color: #CC4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+     *     <span style="color: #553000">cb</span>.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
+     * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
      * @param cbLambda The callback to select scalar value. (NotNull)
      * @param opLambda The callback for option of scalar. (NotNull)
