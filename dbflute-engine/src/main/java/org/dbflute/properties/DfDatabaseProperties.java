@@ -310,6 +310,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     //                                     Table Target List
     //                                     -----------------
     protected List<String> _tableTargetList;
+    protected List<String> _tableTargetGenOnlyList; // getting meta data but no generating classes
 
     public List<String> getTableTargetList() { // for main schema
         if (_tableTargetList != null) {
@@ -326,8 +327,29 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
                 resultList.add((String) object);
             }
         }
-        _tableTargetList = resultList;
+        _tableTargetList = new ArrayList<String>();
+        _tableTargetGenOnlyList = new ArrayList<String>();
+        setupTableOrColumnTargetList(resultList, _tableTargetList, _tableTargetGenOnlyList);
         return _tableTargetList;
+    }
+
+    public List<String> getTableTargetGenOnlyList() { // for main schema
+        if (_tableTargetGenOnlyList != null) {
+            return _tableTargetGenOnlyList;
+        }
+        getTableTargetList(); // initialize
+        return _tableTargetGenOnlyList;
+    }
+
+    protected void setupTableOrColumnTargetList(List<String> plainList, List<String> targetList, List<String> targetGenOnlyList) {
+        final String genOnlySuffix = "@gen";
+        for (String element : plainList) {
+            if (Srl.endsWithIgnoreCase(element, genOnlySuffix)) {
+                targetGenOnlyList.add(Srl.substringLastFrontIgnoreCase(element, genOnlySuffix));
+            } else {
+                targetList.add(element);
+            }
+        }
     }
 
     // -----------------------------------------------------
@@ -497,15 +519,21 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         final Object obj = elementMap.get("tableTargetList");
         if (obj == null) {
             final List<String> tableTargetList = DfCollectionUtil.emptyList();
+            final List<String> tableTargetGenOnlyList = DfCollectionUtil.emptyList();
             info.setTableTargetList(tableTargetList);
+            info.setTableTargetGenOnlyList(tableTargetGenOnlyList);
         } else if (!(obj instanceof List<?>)) {
             String msg = "The type of tableTargetList in the property 'additionalSchemaMap' should be List:";
             msg = msg + " type=" + DfTypeUtil.toClassTitle(obj) + " value=" + obj;
             throw new DfIllegalPropertyTypeException(msg);
         } else {
             @SuppressWarnings("unchecked")
-            final List<String> tableTargetList = (List<String>) obj;
+            final List<String> plainList = (List<String>) obj;
+            final List<String> tableTargetList = new ArrayList<String>();
+            final List<String> tableTargetGenOnlyList = new ArrayList<String>();
+            setupTableOrColumnTargetList(plainList, tableTargetList, tableTargetGenOnlyList);
             info.setTableTargetList(tableTargetList);
+            info.setTableTargetGenOnlyList(tableTargetGenOnlyList);
         }
     }
 
