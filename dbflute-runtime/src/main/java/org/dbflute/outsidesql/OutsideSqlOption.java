@@ -33,11 +33,8 @@ public class OutsideSqlOption {
     protected String _pagingRequestType = "non";
 
     protected boolean _removeBlockComment;
-
     protected boolean _removeLineComment;
-
     protected boolean _formatSql;
-
     protected boolean _nonSpecifiedColumnAccessAllowed;
 
     /** The configuration of statement specified by configure(). (NullAllowed) */
