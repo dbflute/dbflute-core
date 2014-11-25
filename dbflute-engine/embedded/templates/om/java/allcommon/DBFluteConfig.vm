@@ -85,8 +85,8 @@ public class ${glDBFluteConfig} {
     protected boolean _innerJoinAutoDetect = ${database.isInnerJoinAutoDetect()};
     protected boolean _thatsBadTimingDetect = ${database.isThatsBadTimingDetect()};
     protected boolean _nullOrEmptyQueryAllowed = ${database.isNullOrEmptyQueryAllowed()};
-    protected boolean _emptyStringQueryAllowed;
-    protected boolean _emptyStringParameterAllowed;
+    protected boolean _emptyStringQueryAllowed = ${database.isEmptyStringQueryAllowed()};
+    protected boolean _emptyStringParameterAllowed = ${database.isEmptyStringParameterAllowed()};
     protected boolean _overridingQueryAllowed = ${database.isOverridingQueryAllowed()};
     protected boolean _nonSpecifiedColumnAccessAllowed = ${database.isNonSpecifiedColumnAccessAllowed()};
     protected boolean _columnNullObjectAllowed = ${database.isColumnNullObjectAllowed()};

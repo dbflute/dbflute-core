@@ -15,12 +15,16 @@
  */
 package org.dbflute.logic.outsidesqltest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.dbflute.exception.DfCustomizeEntityMarkInvalidException;
 import org.dbflute.exception.DfParameterBeanMarkInvalidException;
 import org.dbflute.exception.DfRequiredOutsideSqlDescriptionNotFoundException;
+import org.dbflute.exception.DfRequiredOutsideSqlDescriptionSameWithOtherSqlException;
 import org.dbflute.exception.DfRequiredOutsideSqlTitleNotFoundException;
+import org.dbflute.exception.DfRequiredOutsideSqlTitleSameWithOtherSqlException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
 import org.dbflute.twowaysql.SqlAnalyzer;
@@ -46,7 +50,11 @@ public class DfOutsideSqlChecker {
     //                                                                           =========
     protected boolean _ifCommentExpressionCheck;
     protected boolean _requiredTitleCheck;
+    protected boolean _suppressTitleUniqueCheck;
     protected boolean _requiredDescriptionCheck;
+    protected boolean _suppressDescriptionUniqueCheck;
+    protected final Map<String, String> _outsideSqlTitleSet = new HashMap<String, String>();
+    protected final Map<String, String> _outsideSqlDescriptionSet = new HashMap<String, String>();
 
     // ===================================================================================
     //                                                                             Checker
@@ -83,23 +91,6 @@ public class DfOutsideSqlChecker {
             } else if (line.contains("!df;pmb!") || line.contains("!df:entity!") || line.contains("!df:pnb!")) {
                 throwParameterBeanMarkInvalidException(line, fileName, sql);
             }
-        }
-    }
-
-    // ===================================================================================
-    //                                                                IfComment Expression
-    //                                                                ====================
-    protected void checkIfCommentExpression(List<String> ifCommentList, String sql) {
-        if (!_ifCommentExpressionCheck) {
-            return;
-        }
-        for (String expr : ifCommentList) {
-            final IfCommentEvaluator evaluator = new IfCommentEvaluator(new ParameterFinder() {
-                public Object find(String name) {
-                    return null;
-                }
-            }, expr, sql, null);
-            evaluator.assertExpression();
         }
     }
 
@@ -144,6 +135,23 @@ public class DfOutsideSqlChecker {
     }
 
     // ===================================================================================
+    //                                                                IfComment Expression
+    //                                                                ====================
+    protected void checkIfCommentExpression(List<String> ifCommentList, String sql) {
+        if (!_ifCommentExpressionCheck) {
+            return;
+        }
+        for (String expr : ifCommentList) {
+            final IfCommentEvaluator evaluator = new IfCommentEvaluator(new ParameterFinder() {
+                public Object find(String name) {
+                    return null;
+                }
+            }, expr, sql, null);
+            evaluator.assertExpression();
+        }
+    }
+
+    // ===================================================================================
     //                                                                Required SQL Comment
     //                                                                ====================
     public void checkRequiredSqlComment(String fileName, String sql) { // basically for Sql2Entity task
@@ -151,6 +159,9 @@ public class DfOutsideSqlChecker {
         checkRequiredDescription(fileName, sql);
     }
 
+    // -----------------------------------------------------
+    //                                        Required Title
+    //                                        --------------
     protected void checkRequiredTitle(String fileName, String sql) {
         if (!_requiredTitleCheck) {
             return;
@@ -159,6 +170,13 @@ public class DfOutsideSqlChecker {
         final String title = analyzer.getTitle(sql);
         if (isInvalidTitle(title)) {
             throwRequiredOutsideSqlTitleNotFoundException(title, fileName, sql);
+        }
+        if (!_suppressTitleUniqueCheck) {
+            final String otherFileName = _outsideSqlTitleSet.get(title);
+            if (otherFileName != null) {
+                throwRequiredOutsideSqlTitleSameWithOtherSqlException(title, otherFileName, fileName, sql);
+            }
+            _outsideSqlTitleSet.put(title, fileName);
         }
     }
 
@@ -194,7 +212,7 @@ public class DfOutsideSqlChecker {
         br.addElement("");
         br.addElement("If you need to remove the check,");
         br.addElement("change the property in your outsideSqlDefinitionMap.dfprop.");
-        br.addElement("Fro example:");
+        br.addElement("For example:");
         br.addElement("    ; isRequiredSqlTitle = false");
         br.addItem("Title");
         br.addElement(title);
@@ -206,6 +224,27 @@ public class DfOutsideSqlChecker {
         throw new DfRequiredOutsideSqlTitleNotFoundException(msg);
     }
 
+    protected void throwRequiredOutsideSqlTitleSameWithOtherSqlException(String title, String otherFileName, String yourFileName, String sql) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The outsideSql title was same with the other SQL.");
+        br.addItem("Advice");
+        br.addElement("OutsideSql title should be unique in all SQL files.");
+        br.addElement("Make sure your [df:title] in your outsideSql.");
+        br.addItem("Title");
+        br.addElement(title);
+        br.addItem("Other SQL File");
+        br.addElement(otherFileName);
+        br.addItem("Your SQL File");
+        br.addElement(yourFileName);
+        br.addItem("Your SQL");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
+        throw new DfRequiredOutsideSqlTitleSameWithOtherSqlException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                  Required Description
+    //                                  --------------------
     protected void checkRequiredDescription(String fileName, String sql) {
         if (!_requiredDescriptionCheck) {
             return;
@@ -214,6 +253,13 @@ public class DfOutsideSqlChecker {
         final String desc = analyzer.getDescription(sql);
         if (isInvalidDescription(desc)) {
             throwRequiredOutsideSqlDescriptionNotFoundException(desc, fileName, sql);
+        }
+        if (!_suppressDescriptionUniqueCheck) {
+            final String otherFileName = _outsideSqlDescriptionSet.get(desc);
+            if (otherFileName != null) {
+                throwRequiredOutsideSqlDescriptionSameWithOtherSqlException(desc, otherFileName, fileName, sql);
+            }
+            _outsideSqlDescriptionSet.put(desc, fileName);
         }
     }
 
@@ -248,7 +294,7 @@ public class DfOutsideSqlChecker {
         br.addElement("");
         br.addElement("If you need to remove the check,");
         br.addElement("change the property in your outsideSqlDefinitionMap.dfprop.");
-        br.addElement("Fro example:");
+        br.addElement("For example:");
         br.addElement("    ; isRequiredSqlDescription = false");
         br.addItem("SQL File");
         br.addElement(fileName);
@@ -258,6 +304,25 @@ public class DfOutsideSqlChecker {
         br.addElement(sql);
         final String msg = br.buildExceptionMessage();
         throw new DfRequiredOutsideSqlDescriptionNotFoundException(msg);
+    }
+
+    protected void throwRequiredOutsideSqlDescriptionSameWithOtherSqlException(String desc, String otherFileName, String yourFileName,
+            String sql) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The outsideSql description was same with the other SQL.");
+        br.addItem("Advice");
+        br.addElement("OutsideSql description should be unique in all SQL files.");
+        br.addElement("Make sure your [df:description] in your outsideSql.");
+        br.addItem("Description");
+        br.addElement(desc);
+        br.addItem("Other SQL File");
+        br.addElement(otherFileName);
+        br.addItem("Your SQL File");
+        br.addElement(yourFileName);
+        br.addItem("Your SQL");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
+        throw new DfRequiredOutsideSqlDescriptionSameWithOtherSqlException(msg);
     }
 
     // ===================================================================================
@@ -284,5 +349,13 @@ public class DfOutsideSqlChecker {
 
     public void enableRequiredDescriptionCheck() {
         _requiredDescriptionCheck = true;
+    }
+
+    public void suppressDescriptionUniqueCheck() {
+        _suppressDescriptionUniqueCheck = true;
+    }
+
+    public void suppressTitleUniqueCheck() {
+        _suppressTitleUniqueCheck = true;
     }
 }

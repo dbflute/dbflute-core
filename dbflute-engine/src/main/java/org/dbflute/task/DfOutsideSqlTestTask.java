@@ -32,6 +32,7 @@ import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.dbflute.logic.outsidesqltest.DfOutsideSqlChecker;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.dbflute.properties.DfOutsideSqlProperties;
@@ -148,6 +149,9 @@ public class DfOutsideSqlTestTask extends DfAbstractTask {
         final String nonTargetMark = "df:x";
         final DBDef currentDBDef = getDatabaseTypeFacadeProp().getCurrentDBDef();
         return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
+
+            protected DfOutsideSqlChecker _outsideSqlChecker;
+
             @Override
             protected String filterSql(String sql) {
                 // /- - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -226,25 +230,39 @@ public class DfOutsideSqlTestTask extends DfAbstractTask {
                 }
                 return resultList;
             }
+
+            protected void checkParameterComment(File sqlFile, String sql) {
+                final DfOutsideSqlProperties outsideSqlProp = getOutsideSqlProperties();
+                if (outsideSqlProp.isSuppressParameterCommentCheck()) {
+                    return;
+                }
+                if (_outsideSqlChecker == null) {
+                    _outsideSqlChecker = createOutsideSqlChecker(outsideSqlProp);
+                }
+                _outsideSqlChecker.check(sqlFile.getName(), sql);
+            }
         };
     }
 
-    protected void checkParameterComment(File sqlFile, String sql) {
-        final DfOutsideSqlProperties outsideSqlProp = getOutsideSqlProperties();
-        if (outsideSqlProp.isSuppressParameterCommentCheck()) {
-            return;
-        }
+    protected DfOutsideSqlChecker createOutsideSqlChecker(DfOutsideSqlProperties outsideSqlProp) {
         final DfOutsideSqlChecker checker = new DfOutsideSqlChecker();
         if (outsideSqlProp.isRequiredSqlTitle()) {
             checker.enableRequiredTitleCheck();
         }
+        if (outsideSqlProp.isSuppressSqlTitleUniqueCheck()) {
+            checker.suppressTitleUniqueCheck();
+        }
         if (outsideSqlProp.isRequiredSqlDescription()) {
             checker.enableRequiredDescriptionCheck();
         }
-        if (getBasicProperties().getLanguageDependency().getLanguageImplStyle().isIfCommentExpressionCheckEnabled()) {
+        if (outsideSqlProp.isSuppressSqlDescriptionUniqueCheck()) {
+            checker.suppressDescriptionUniqueCheck();
+        }
+        final DfLanguageImplStyle languageImplStyle = getBasicProperties().getLanguageDependency().getLanguageImplStyle();
+        if (languageImplStyle.isIfCommentExpressionCheckEnabled()) {
             checker.enableIfCommentExpressionCheck(); // might be different specification between language
         }
-        checker.check(sqlFile.getName(), sql);
+        return checker;
     }
 
     protected boolean isAutoCommit() {

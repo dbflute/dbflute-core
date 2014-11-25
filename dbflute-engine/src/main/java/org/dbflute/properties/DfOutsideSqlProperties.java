@@ -272,9 +272,17 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return isProperty("isRequiredSqlTitle", defaultValue);
     }
 
+    public boolean isSuppressSqlTitleUniqueCheck() { // closet
+        return isProperty("isSuppressSqlTitleUniqueCheck", false);
+    }
+
     public boolean isRequiredSqlDescription() {
         final boolean defaultValue = !isCompatibleOutsideSqlSqlCommentCheckDefault();
         return isProperty("isRequiredSqlDescription", defaultValue);
+    }
+
+    public boolean isSuppressSqlDescriptionUniqueCheck() { // closet
+        return isProperty("isSuppressSqlDescriptionUniqueCheck", false);
     }
 
     protected boolean isCompatibleOutsideSqlSqlCommentCheckDefault() {

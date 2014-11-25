@@ -1936,6 +1936,14 @@ public class Database {
         return getLittleAdjustmentProperties().isNullOrEmptyQueryAllowed();
     }
 
+    public boolean isEmptyStringQueryAllowed() {
+        return getLittleAdjustmentProperties().isEmptyStringQueryAllowed();
+    }
+
+    public boolean isEmptyStringParameterAllowed() {
+        return getLittleAdjustmentProperties().isEmptyStringParameterAllowed();
+    }
+
     public boolean isOverridingQueryAllowed() {
         return getLittleAdjustmentProperties().isOverridingQueryAllowed();
     }

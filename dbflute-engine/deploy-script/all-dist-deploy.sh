@@ -11,6 +11,7 @@ ant -f build.xml reflect-to-test-dbms-derby
 ant -f build.xml reflect-to-test-dbms-sqlite
 ant -f build.xml reflect-to-test-option-compatible10x
 ant -f build.xml reflect-to-example-on-springboot
+ant -f build.xml reflect-to-example-with-doma
 
 cd ..
 export answer=y
@@ -18,11 +19,8 @@ export answer=y
 cd ../dbflute-test-active-dockside/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh replace-schema
-. manage.sh jdbc
-. manage.sh doc
-. manage.sh generate
-. manage.sh sql2entity
-. manage.sh outside-sql-test
+. manage.sh jdbc,doc
+. manage.sh generate,outside-sql-test,sql2entity
 cd ..
 mvn -e compile
 
@@ -97,5 +95,13 @@ mvn -e compile
 cd ../dbflute-example-on-springboot/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
+cd ..
+mvn -e compile
+
+cd ../dbflute-example-with-doma/dbflute_domadb
+rm ./log/*.log
+. manage.sh replace-schema
+. manage.sh jdbc
+. manage.sh doc
 cd ..
 mvn -e compile
