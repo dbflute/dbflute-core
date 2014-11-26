@@ -376,10 +376,10 @@ public class ColumnInfo {
             return false;
         }
         final ColumnInfo target = (ColumnInfo) obj;
-        if (!this._dbmeta.equals(target.getDBMeta())) {
+        if (!_dbmeta.equals(target.getDBMeta())) {
             return false;
         }
-        if (!this._columnDbName.equals(target.getColumnDbName())) {
+        if (!_columnDbName.equals(target.getColumnDbName())) {
             return false;
         }
         return true;

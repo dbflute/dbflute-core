@@ -65,11 +65,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'count'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">count</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      * }, Member.<span style="color: #CC4747">ALIAS_purchaseCount</span>);
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -82,12 +80,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for count() with an option. So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
-     * }, Member.<span style="color: #CC4747">ALIAS_purchaseCount</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">count</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #994747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// basically PK to count records</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
+     * }, Member.<span style="color: #994747">ALIAS_purchaseCount</span>, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -109,11 +105,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'count-distinct'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">countDistinct</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      * }, Member.<span style="color: #CC4747">ALIAS_productKindCount</span>);
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -126,12 +120,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for count() with an option. So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
-     * }, Member.<span style="color: #CC4747">ALIAS_productKindCount</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">countDistinct</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #994747">columnProductId</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
+     * }, Member.<span style="color: #994747">ALIAS_productKindCount</span>, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -154,11 +146,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'max'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">max</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      * }, Member.<span style="color: #CC4747">ALIAS_latestPurchaseDatetime</span>);
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -171,12 +161,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for max() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
-     * }, Member.<span style="color: #CC4747">ALIAS_latestPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>("2011-06-07"));
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">max</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #994747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
+     * }, Member.<span style="color: #994747">ALIAS_latestPurchaseDatetime</span>, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>("2011-06-07"));
      * </pre>
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -198,11 +186,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'min'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">min</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      * }, Member.<span style="color: #CC4747">ALIAS_firstPurchaseDatetime</span>);
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -215,12 +201,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for min() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
-     * }, Member.<span style="color: #CC4747">ALIAS_firstPurchaseDatetime</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>("2011-06-07"));
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">min</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #994747">columnPurchaseDatetime</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
+     * }, Member.<span style="color: #994747">ALIAS_firstPurchaseDatetime</span>, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>("2011-06-07"));
      * </pre>
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -242,11 +226,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'sum'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">sum</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceSummary</span>);
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -259,12 +241,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for sum() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
-     * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceSummary</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">sum</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
+     * }, Member.<span style="color: #994747">ALIAS_purchasePriceSummary</span>, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -286,11 +266,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * Set up the sub query of referrer for the scalar 'avg'.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">avg</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceAverage</span>);
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -303,12 +281,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     /**
      * An overload method for avg() with an option. So refer to the method's java-doc.
      * <pre>
-     * cb.specify().derivePurchaseList().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     protected void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
-     *     }
-     * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceAverage</span>, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
+     * cb.specify().derivePurchaseList().<span style="color: #CC4747">avg</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// derived column by function</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
+     * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceAverage</span>, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre>
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)

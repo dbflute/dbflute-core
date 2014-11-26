@@ -13,5 +13,5 @@ cd ..
 
 cd ../dbflute-test-active-hanger/dbflute_maihamadb
 rm ./log/*.log
-. manage.sh regenerate
+. manage.sh jdbc,doc,generate,outside-sql-test,sql2entity
 cd ..

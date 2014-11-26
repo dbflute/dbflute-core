@@ -43,10 +43,10 @@ public class HpSSQFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of myself for the scalar 'max'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">max</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True();
+     *         <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
      * </pre> 
@@ -63,10 +63,10 @@ public class HpSSQFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of myself for the scalar 'min'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().scalar_Equal().<span style="color: #CC4747">min</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True();
+     *         <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *         <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
      * </pre> 
@@ -83,11 +83,9 @@ public class HpSSQFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of myself for the scalar 'sum'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True();
-     *     }
+     * cb.query().scalar_Equal().<span style="color: #CC4747">sum</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      * });
      * </pre> 
      * @param scalarCBLambda The callback for sub-query of myself. (NotNull)
@@ -103,11 +101,9 @@ public class HpSSQFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of myself for the scalar 'avg'.
      * <pre>
-     * cb.query().scalar_Equal().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True();
-     *     }
+     * cb.query().scalar_Equal().<span style="color: #CC4747">avg</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point!</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      * });
      * </pre> 
      * @param scalarCBLambda The callback for sub-query of myself. (NotNull)

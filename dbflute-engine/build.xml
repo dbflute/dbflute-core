@@ -6,9 +6,9 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1.0" />
-	<property name="build.version" value="${version}-pilotD-SNAPSHOT" />
+	<property name="build.version" value="${version}-RC1" />
 	<property name="runtime.version" value="1.1.0" />
-	<property name="runtime.build.version" value="${runtime.version}-pilotD-SNAPSHOT" />
+	<property name="runtime.build.version" value="${runtime.version}-RC1" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
@@ -57,6 +57,7 @@
 
 	<!-- SubProject Examples -->
 	<property name="example.on.springboot.dir" value="${example.on.stage.base}/dbflute-example-on-springboot" />
+	<property name="example.with.doma.dir" value="${example.on.stage.base}/dbflute-example-with-doma" />
 
 	<!-- ============================================================================= -->
 	<!--                                                        C O M P I L E  T A S K -->
@@ -331,13 +332,10 @@
 		<delete dir="${extraction.dir}" />
 	</target>
 
-	<target name="reflect-to-multipledb" depends="prepare-reflection" description="==> reflect to multipledb example">
-		<delete dir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<delete dir="${multipledb.spring.example.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
-			<fileset dir="${extraction.dir}" />
-		</copy>
-		<copy todir="${multipledb.spring.example.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+	<target name="reflect-to-example-with-doma" depends="prepare-reflection"
+			description="==> reflect to example with Doma">
+		<delete dir="${example.with.doma.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${example.with.doma.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />

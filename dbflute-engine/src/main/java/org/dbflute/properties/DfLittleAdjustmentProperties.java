@@ -376,6 +376,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isNullOrEmptyQueryAllowed", !defaultValue);
     }
 
+    public boolean isEmptyStringQueryAllowed() { // closet
+        return isProperty("isEmptyStringQueryAllowed", false);
+    }
+
+    public boolean isEmptyStringParameterAllowed() { // closet
+        return isProperty("isEmptyStringParameterAllowed", false);
+    }
+
     public boolean isOverridingQueryAllowed() { // closet
         return isProperty("isOverridingQueryAllowed", isCompatibleBeforeJava8());
     }

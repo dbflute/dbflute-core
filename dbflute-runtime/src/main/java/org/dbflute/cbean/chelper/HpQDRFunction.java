@@ -48,11 +48,9 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'count'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// *Point</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True();
-     *     }
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">count</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchaseId</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -65,11 +63,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for count(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">count</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         ...
-     *     }
-     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">count</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #994747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
+     * }).<span style="color: #994747">greaterEqual</span>(123, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
@@ -90,11 +87,9 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'count(with distinct)'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True();
-     *     }
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">countDistinct</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -107,11 +102,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for countDistinct(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">countDistinct</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         ...
-     *     }
-     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">countDistinct</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #994747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
+     * }).<span style="color: #994747">greaterEqual</span>(123, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
@@ -132,11 +126,9 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'max'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True();
-     *     }
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">max</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -149,11 +141,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for max(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">max</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         ...
-     *     }
-     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">max</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #994747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
+     * }).<span style="color: #994747">greaterEqual</span>(123, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
@@ -174,11 +165,9 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'min'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True();
-     *     }
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">min</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -191,11 +180,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for min(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">min</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         ...
-     *     }
-     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">min</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #994747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
+     * }).<span style="color: #994747">greaterEqual</span>(123, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
@@ -216,11 +204,9 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'sum'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True();
-     *     }
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">sum</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -233,11 +219,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for sum(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">sum</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         ...
-     *     }
-     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">sum</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #994747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
+     * }).<span style="color: #994747">greaterEqual</span>(123, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
@@ -258,11 +243,9 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'avg'.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
-     *         subCB.query().setPaymentCompleteFlg_Equal_True();
-     *     }
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">avg</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #CC4747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
@@ -275,11 +258,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for avg(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().derivedPurchaseList().<span style="color: #CC4747">avg</span>(new SubQuery&lt;PurchaseCB&gt;() {
-     *     public void query(PurchaseCB subCB) {
-     *         ...
-     *     }
-     * }).<span style="color: #CC4747">greaterEqual</span>(123, new DerivedReferrerOption().<span style="color: #CC4747">coalesce</span>(0));
+     * cb.query().derivedPurchaseList().<span style="color: #CC4747">avg</span>(<span style="color: #553000">purchaseCB</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">purchaseCB</span>.specify().<span style="color: #994747">columnPurchasePrice</span>(); <span style="color: #3F7E5E">// *Point</span>
+     *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
+     * }).<span style="color: #994747">greaterEqual</span>(123, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">op</span>.<span style="color: #CC4747">coalesce</span>(0));
      * </pre> 
      * @param derivedCBLambda The callback for sub-query of referrer. (NotNull)
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)

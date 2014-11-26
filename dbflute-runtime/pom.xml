@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dbflute</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>1.1.0-pilotD-SNAPSHOT</version>
+	<version>1.1.0-pilotF-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>DBFlute Runtime</name>
@@ -59,6 +58,7 @@
 	</scm>
 
 	<parent>
+		<!-- http://repo.maven.apache.org/maven2/org/sonatype/oss/oss-parent/9/oss-parent-9.pom -->
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
 		<version>9</version>
@@ -109,7 +109,7 @@
                            					<goal>enforce</goal>
                         				</goals>
                     				</pluginExecutionFilter>
-                    				<action><ignore/></action>
+                    				<action><ignore /></action>
                 				</pluginExecution>
                 			</pluginExecutions>
                 		</lifecycleMappingMetadata>
@@ -158,6 +158,24 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!--
+			 'xxx.jar.asc' file can be created by this plug-in
+			 you can deploy by 'mvn -e clean deploy -Dgpg.keyname=xxx -Dgpg.passphrase="xxx"'
+			 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 

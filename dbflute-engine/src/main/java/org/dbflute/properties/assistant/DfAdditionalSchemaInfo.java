@@ -30,9 +30,10 @@ public class DfAdditionalSchemaInfo {
     protected List<String> _objectTypeTargetList;
     protected List<String> _tableExceptList;
     protected List<String> _tableExceptGenOnlyList;
-    protected Map<String, List<String>> _columnExceptGenOnlyMap;
     protected List<String> _tableTargetList;
+    protected List<String> _tableTargetGenOnlyList;
     protected Map<String, List<String>> _columnExceptMap;
+    protected Map<String, List<String>> _columnExceptGenOnlyMap;
     protected boolean _suppressCommonColumn;
     protected boolean _suppressProcedure;
     protected Map<String, String> _supplementaryConnectionMap;
@@ -60,7 +61,7 @@ public class DfAdditionalSchemaInfo {
     }
 
     public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
-        this._unifiedSchema = unifiedSchema;
+        _unifiedSchema = unifiedSchema;
     }
 
     public List<String> getObjectTypeTargetList() {
@@ -68,7 +69,7 @@ public class DfAdditionalSchemaInfo {
     }
 
     public void setObjectTypeTargetList(List<String> objectTypeTargetList) {
-        this._objectTypeTargetList = objectTypeTargetList;
+        _objectTypeTargetList = objectTypeTargetList;
     }
 
     public List<String> getTableExceptList() {
@@ -76,7 +77,7 @@ public class DfAdditionalSchemaInfo {
     }
 
     public void setTableExceptList(List<String> tableExceptList) {
-        this._tableExceptList = tableExceptList;
+        _tableExceptList = tableExceptList;
     }
 
     public List<String> getTableExceptGenOnlyList() {
@@ -84,7 +85,7 @@ public class DfAdditionalSchemaInfo {
     }
 
     public void setTableExceptGenOnlyList(List<String> tableExceptGenOnlyList) {
-        this._tableExceptGenOnlyList = tableExceptGenOnlyList;
+        _tableExceptGenOnlyList = tableExceptGenOnlyList;
     }
 
     public List<String> getTableTargetList() {
@@ -92,7 +93,15 @@ public class DfAdditionalSchemaInfo {
     }
 
     public void setTableTargetList(List<String> tableTargetList) {
-        this._tableTargetList = tableTargetList;
+        _tableTargetList = tableTargetList;
+    }
+
+    public List<String> getTableTargetGenOnlyList() {
+        return _tableTargetGenOnlyList;
+    }
+
+    public void setTableTargetGenOnlyList(List<String> tableTargetGenOnlyList) {
+        _tableTargetGenOnlyList = tableTargetGenOnlyList;
     }
 
     public Map<String, List<String>> getColumnExceptMap() {
@@ -100,15 +109,15 @@ public class DfAdditionalSchemaInfo {
     }
 
     public void setColumnExceptMap(Map<String, List<String>> columnExceptMap) {
-        this._columnExceptMap = columnExceptMap;
+        _columnExceptMap = columnExceptMap;
     }
 
     public Map<String, List<String>> getColumnExceptGenOnlyMap() {
         return _columnExceptGenOnlyMap;
     }
 
-    public void setColumnExceptGenOnlyMap(Map<String, List<String>> _columnExceptGenOnlyMap) {
-        this._columnExceptGenOnlyMap = _columnExceptGenOnlyMap;
+    public void setColumnExceptGenOnlyMap(Map<String, List<String>> columnExceptGenOnlyMap) {
+        _columnExceptGenOnlyMap = columnExceptGenOnlyMap;
     }
 
     public boolean isSuppressCommonColumn() {
@@ -116,7 +125,7 @@ public class DfAdditionalSchemaInfo {
     }
 
     public void setSuppressCommonColumn(boolean suppressCommonColumn) {
-        this._suppressCommonColumn = suppressCommonColumn;
+        _suppressCommonColumn = suppressCommonColumn;
     }
 
     public boolean isSuppressProcedure() {
@@ -124,7 +133,7 @@ public class DfAdditionalSchemaInfo {
     }
 
     public void setSuppressProcedure(boolean suppressProcedure) {
-        this._suppressProcedure = suppressProcedure;
+        _suppressProcedure = suppressProcedure;
     }
 
     public Map<String, String> getSupplementaryConnectionMap() {
@@ -132,6 +141,6 @@ public class DfAdditionalSchemaInfo {
     }
 
     public void setSupplementaryConnectionMap(Map<String, String> supplementaryConnectionMap) {
-        this._supplementaryConnectionMap = supplementaryConnectionMap;
+        _supplementaryConnectionMap = supplementaryConnectionMap;
     }
 }

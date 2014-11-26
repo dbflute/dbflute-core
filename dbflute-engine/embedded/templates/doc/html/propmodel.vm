@@ -406,5 +406,10 @@ ${manager.javaScriptEmbedded}
 </table>
 <p class="tablesupplement">*uq: Unique No (same value, same No)</p>
 #end
+
+<h2>Thanks</h2>
+<p>
+	Created by <a href="http://dbflute.org/">DBFlute(AutoGenerator)</a>
+</p>
 </body>
 </html>

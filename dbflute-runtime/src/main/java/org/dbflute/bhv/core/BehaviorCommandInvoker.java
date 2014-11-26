@@ -702,8 +702,8 @@ public class BehaviorCommandInvoker {
     public <BEHAVIOR> OutsideSqlAllFacadeExecutor<BEHAVIOR> createOutsideSqlAllFacadeExecutor(String tableDbName) {
         final OutsideSqlExecutorFactory factory = _invokerAssistant.assistOutsideSqlExecutorFactory();
         final DBDef dbdef = _invokerAssistant.assistCurrentDBDef();
-        final OutsideSqlOption outsideSqlOption = _invokerAssistant.assistFirstOutsideSqlOption(tableDbName); // might be null
-        return factory.createAllFacade(factory.createBasic(this, tableDbName, dbdef, outsideSqlOption));
+        final OutsideSqlOption option = _invokerAssistant.assistFirstOutsideSqlOption(tableDbName); // might be null
+        return factory.createAllFacade(factory.createBasic(this, tableDbName, dbdef, option));
     }
 
     // ===================================================================================
