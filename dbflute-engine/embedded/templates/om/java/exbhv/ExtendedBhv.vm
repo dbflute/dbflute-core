@@ -19,7 +19,7 @@ ${database.allClassCopyright}package ${myExtendedBhvPackageName};
 import ${myBaseBhvPackageName}.${myBaseBhvClassName};
 
 /**
- * The behavior of ${table.tableDbName}.
+ * The behavior of ${table.tableDispName}.
  * <p>
  * You can implement your original methods here.
  * This class remains when re-generating.
