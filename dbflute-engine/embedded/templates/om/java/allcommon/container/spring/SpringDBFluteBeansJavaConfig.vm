@@ -22,6 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
+#if ($database.isDBFluteBeansJavaConfigLazy())
+import org.springframework.context.annotation.Lazy;
+#end
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.bhv.core.InvokerAssistant;
 import ${database.DBFluteInitializerClass};
@@ -48,11 +51,17 @@ public class ${glDBFluteBeansJavaConfig} {
     //                                                                   Runtime Component
     //                                                                   =================
     @Bean(name="${database.DBFluteInitializerComponentName}")
+#if ($database.isDBFluteBeansJavaConfigLazy())
+    @Lazy
+#end
     public ${glDBFluteInitializer} createDBFluteInitializer() {
         return new ${database.DBFluteInitializerClass}(_dataSource);
     }
 
     @Bean(name="${database.invokerAssistantComponentName}")
+#if ($database.isDBFluteBeansJavaConfigLazy())
+    @Lazy
+#end
     public InvokerAssistant createImplementedInvokerAssistant() {
         ${glImplementedInvokerAssistant} assistant = newImplementedInvokerAssistant();
         assistant.setDataSource(_dataSource);
@@ -64,6 +73,9 @@ public class ${glDBFluteBeansJavaConfig} {
     }
 
     @Bean(name="${database.behaviorCommandInvokerComponentName}")
+#if ($database.isDBFluteBeansJavaConfigLazy())
+    @Lazy
+#end
     public BehaviorCommandInvoker createBehaviorCommandInvoker() {
         BehaviorCommandInvoker invoker = newBehaviorCommandInvoker();
         invoker.setInvokerAssistant(createImplementedInvokerAssistant());
@@ -75,6 +87,9 @@ public class ${glDBFluteBeansJavaConfig} {
     }
 
     @Bean(name="${database.behaviorSelectorComponentName}")
+#if ($database.isDBFluteBeansJavaConfigLazy())
+    @Lazy
+#end
     public ${glImplementedBehaviorSelector} createImplementedBehaviorSelector() {
         ${glImplementedBehaviorSelector} selector = newImplementedBehaviorSelector();
         selector.setContainer(_container);
@@ -86,6 +101,9 @@ public class ${glDBFluteBeansJavaConfig} {
     }
 
     @Bean(name="${database.commonColumnAutoSetupperComponentName}")
+#if ($database.isDBFluteBeansJavaConfigLazy())
+    @Lazy
+#end
     public ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
         return newImplementedCommonColumnAutoSetupper();
     }
@@ -104,6 +122,9 @@ public class ${glDBFluteBeansJavaConfig} {
 
 #end
     @Bean(name="${table.behaviorComponentName}")
+#if ($database.isDBFluteBeansJavaConfigLazy())
+    @Lazy
+#end
     public ${table.extendedBehaviorClassName} create${table.extendedBehaviorClassName}() {
         ${table.extendedBehaviorClassName} bhv = new${table.extendedBehaviorClassName}();
         bhv.setBehaviorCommandInvoker(createBehaviorCommandInvoker()); bhv.setBehaviorSelector(createImplementedBehaviorSelector());

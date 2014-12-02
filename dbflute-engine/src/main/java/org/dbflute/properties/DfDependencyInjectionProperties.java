@@ -228,6 +228,10 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         return isProperty("isDBFluteBeansGeneratedAsJavaConfig", !prop.isCompatibleBeforeJava8());
     }
 
+    public boolean isDBFluteBeansJavaConfigLazy() { // closet, Java Only
+        return isProperty("isDBFluteBeansJavaConfigLazy", true); // default: lazy
+    }
+
     // ===================================================================================
     //                                                             Quill DataSource(Quill)
     //                                                             =======================
