@@ -1365,7 +1365,7 @@ public final class DfTypeUtil {
         if (zonedResourceDate == null) {
             return null;
         }
-        final ZoneId zoneId = ZoneId.of(timeZone.getID());
+        final ZoneId zoneId = timeZone.toZoneId();
         return ZonedDateTime.ofInstant(zonedResourceDate.toInstant(), zoneId);
     }
 
@@ -1851,7 +1851,7 @@ public final class DfTypeUtil {
             return null;
         }
         final TimeZone realZone = chooseRealZone(timeZone);
-        final ZoneId zoneId = timeZone != null ? ZoneId.of(realZone.getID()) : ZoneId.systemDefault();
+        final ZoneId zoneId = timeZone != null ? realZone.toZoneId() : ZoneId.systemDefault();
         return Date.from(localDateTime.toInstant(zoneId.getRules().getOffset(localDateTime)));
     }
 
@@ -1868,7 +1868,7 @@ public final class DfTypeUtil {
             return null;
         }
         final TimeZone realZone = chooseRealZone(timeZone);
-        final ZoneId zoneId = timeZone != null ? ZoneId.of(realZone.getID()) : ZoneId.systemDefault();
+        final ZoneId zoneId = timeZone != null ? realZone.toZoneId() : ZoneId.systemDefault();
         return Timestamp.from(localDateTime.toInstant(zoneId.getRules().getOffset(localDateTime)));
     }
 
