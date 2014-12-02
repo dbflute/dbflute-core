@@ -24,16 +24,18 @@ public class LineMakingOption {
     //                                                                           Attribute
     //                                                                           =========
     protected String _delimiter;
-
     protected boolean _quoteAll;
-
     protected boolean _quoteMinimally;
-
     protected boolean _trimSpace;
 
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
+    public LineMakingOption delimitateBy(String delimiter) {
+        _delimiter = delimiter;
+        return this;
+    }
+
     public LineMakingOption delimitateByComma() {
         _delimiter = ",";
         return this;
@@ -66,10 +68,6 @@ public class LineMakingOption {
     //                                                                            ========
     public String getDelimiter() {
         return _delimiter;
-    }
-
-    public void setDelimiter(String delimiter) {
-        _delimiter = delimiter;
     }
 
     public boolean isQuoteAll() {

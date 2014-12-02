@@ -29,20 +29,38 @@ public class LineToken {
     // ===================================================================================
     //                                                                       Tokenize Line
     //                                                                       =============
-    public List<String> tokenize(String lineString, LineTokenizingOption lineTokenizingOption) {
-        final String delimiter = lineTokenizingOption.getDelimiter();
+    /**
+     * Tokenize the line.
+     * @param lineString The line string to tokenize. (NotNull)
+     * @param opLambda The callback for the option of line-tokenizing. (NotNull)
+     * @return The list of token. (NotNull)
+     */
+    public List<String> tokenize(String lineString, LineTokenOptionCall<LineTokenizingOption> opLambda) {
+        final LineTokenizingOption option = createLineTokenizingOption(opLambda);
+        final String delimiter = option.getDelimiter();
         final List<String> list = new ArrayList<String>();
         int elementIndex = 0;
         int delimiterIndex = lineString.indexOf(delimiter);
         while (delimiterIndex >= 0) {
             final String value = lineString.substring(elementIndex, delimiterIndex);
-            list.add(filterHandlingEmptyAsNull(value, lineTokenizingOption));
+            list.add(filterHandlingEmptyAsNull(value, option));
             elementIndex = delimiterIndex + delimiter.length();
             delimiterIndex = lineString.indexOf(delimiter, elementIndex);
         }
         final String lastElement = lineString.substring(elementIndex);
-        list.add(filterHandlingEmptyAsNull(lastElement, lineTokenizingOption));
+        list.add(filterHandlingEmptyAsNull(lastElement, option));
         return list;
+    }
+
+    protected LineTokenizingOption createLineTokenizingOption(LineTokenOptionCall<LineTokenizingOption> opLambda) {
+        assertObjectNotNull("opLambda", opLambda);
+        final LineTokenizingOption op = newLineTokenizingOption();
+        opLambda.callback(op);
+        return op;
+    }
+
+    protected LineTokenizingOption newLineTokenizingOption() {
+        return new LineTokenizingOption();
     }
 
     protected String filterHandlingEmptyAsNull(String target, LineTokenizingOption lineTokenizingOption) {
@@ -58,13 +76,30 @@ public class LineToken {
     // ===================================================================================
     //                                                                           Make Line
     //                                                                           =========
-    public String make(Collection<String> valueList, LineMakingOption lineMakingOption) {
+    /**
+     * Make the line by the value list.
+     * @param valueList The list of value to be line. (NotNull)
+     * @param opLambda The callback for the option of line-making. (NotNull)
+     * @return The line string from the value list. (NotNull)
+     */
+    public String make(Collection<String> valueList, LineTokenOptionCall<LineMakingOption> opLambda) {
+        final LineMakingOption option = createLineMakingOption(opLambda);
         assertObjectNotNull("valueList", valueList);
-        assertObjectNotNull("lineMakingOption", lineMakingOption);
-        final String delimiter = lineMakingOption.getDelimiter();
+        assertObjectNotNull("lineMakingOption", option);
+        final String delimiter = option.getDelimiter();
         assertObjectNotNull("lineMakingOption.getDelimiter()", delimiter);
-        return createLineString(valueList, delimiter, lineMakingOption.isQuoteAll(), lineMakingOption.isQuoteMinimally(),
-                lineMakingOption.isTrimSpace());
+        return createLineString(valueList, delimiter, option.isQuoteAll(), option.isQuoteMinimally(), option.isTrimSpace());
+    }
+
+    protected LineMakingOption createLineMakingOption(LineTokenOptionCall<LineMakingOption> opLambda) {
+        assertObjectNotNull("opLambda", opLambda);
+        final LineMakingOption op = newLineMakingOption();
+        opLambda.callback(op);
+        return op;
+    }
+
+    protected LineMakingOption newLineMakingOption() {
+        return new LineMakingOption();
     }
 
     protected String createLineString(Collection<String> valueList, String delimiter, boolean quoteAll, boolean quoteMinimamlly,

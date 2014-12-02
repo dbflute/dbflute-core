@@ -88,13 +88,13 @@ public class JavaPropertiesReader {
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
-    public JavaPropertiesReader extendsProperties(String title, JavaPropertiesStreamProvider extendsStreamProvider) {
+    public JavaPropertiesReader extendsProperties(String title, JavaPropertiesStreamProvider noArgLambda) {
         if (_extendsProviderMap.containsKey(title)) {
             String msg = "The argument 'title' has already been registered:";
             msg = msg + " title=" + title + " registered=" + _extendsProviderMap.keySet();
             throw new IllegalArgumentException(msg);
         }
-        _extendsProviderMap.put(title, extendsStreamProvider);
+        _extendsProviderMap.put(title, noArgLambda);
         return this;
     }
 

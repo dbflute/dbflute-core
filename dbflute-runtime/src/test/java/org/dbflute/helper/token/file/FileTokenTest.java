@@ -103,7 +103,7 @@ public class FileTokenTest extends RuntimeTestCase {
 
                 ++index;
             }
-        }, new FileTokenizingOption().delimitateByComma().encodeAsUTF8());
+        }, op -> op.delimitateByComma().encodeAsUTF8());
         assertTrue(markSet.contains("done"));
     }
 
@@ -154,7 +154,7 @@ public class FileTokenTest extends RuntimeTestCase {
 
                 ++index;
             }
-        }, new FileTokenizingOption().beginFirstLine().delimitateByComma().encodeAsUTF8());
+        }, op -> op.beginFirstLine().delimitateByComma().encodeAsUTF8());
         assertTrue(markSet.contains("done"));
     }
 
@@ -192,7 +192,7 @@ public class FileTokenTest extends RuntimeTestCase {
                 }
                 ++index;
             }
-        }, new FileTokenizingOption().beginFirstLine().delimitateByTab().encodeAsUTF8());
+        }, op -> op.beginFirstLine().delimitateByTab().encodeAsUTF8());
         assertTrue(markSet.contains("done"));
     }
 
@@ -237,7 +237,7 @@ public class FileTokenTest extends RuntimeTestCase {
                     valueList.clear();
                 }
             }
-        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().headerInfo(columnNameList));
+        }, op -> op.delimitateByComma().encodeAsUTF8().separateByLf().headerInfo(columnNameList));
 
         // ## Assert ##
         String actual = ous.toString();
@@ -288,7 +288,7 @@ public class FileTokenTest extends RuntimeTestCase {
                     valueList.clear();
                 }
             }
-        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf());
+        }, op -> op.delimitateByComma().encodeAsUTF8().separateByLf());
 
         // ## Assert ##
         String actual = ous.toString();
@@ -338,7 +338,7 @@ public class FileTokenTest extends RuntimeTestCase {
                     valueList.clear();
                 }
             }
-        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally());
+        }, op -> op.delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally());
 
         // ## Assert ##
         String actual = ous.toString();
@@ -388,7 +388,7 @@ public class FileTokenTest extends RuntimeTestCase {
                         writer.writeRow(valueList);
                     }
                 }
-            }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally().headerInfo(columnNameList));
+            }, op -> op.delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally().headerInfo(columnNameList));
 
             // ## Assert ##
             fail();
@@ -434,9 +434,7 @@ public class FileTokenTest extends RuntimeTestCase {
                     writer.writeRow(valueList);
                 }
             }
-        },
-                new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally().suppressValueCountCheck()
-                        .headerInfo(columnNameList));
+        }, op -> op.delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally().suppressValueCountCheck().headerInfo(columnNameList));
 
         // ## Assert ##
         String actual = ous.toString();
@@ -486,7 +484,7 @@ public class FileTokenTest extends RuntimeTestCase {
                     writer.writeRow(valueMap);
                 }
             }
-        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf());
+        }, op -> op.delimitateByComma().encodeAsUTF8().separateByLf());
 
         // ## Assert ##
         String actual = ous.toString();

@@ -24,12 +24,16 @@ public class LineTokenizingOption {
     //                                                                           Attribute
     //                                                                           =========
     protected String _delimiter;
-
     protected boolean _handleEmtpyAsNull;
 
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
+    public LineTokenizingOption delimitateBy(String delimiter) {
+        _delimiter = delimiter;
+        return this;
+    }
+
     public LineTokenizingOption delimitateByComma() {
         _delimiter = ",";
         return this;
@@ -50,10 +54,6 @@ public class LineTokenizingOption {
     //                                                                            ========
     public String getDelimiter() {
         return _delimiter;
-    }
-
-    public void setDelimiter(String delimiter) {
-        _delimiter = delimiter;
     }
 
     public boolean isHandleEmtpyAsNull() {

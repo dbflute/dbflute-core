@@ -21,6 +21,7 @@ import java.io.InputStream;
 /**
  * @author jflute
  */
+@FunctionalInterface
 public interface JavaPropertiesStreamProvider {
 
     /**

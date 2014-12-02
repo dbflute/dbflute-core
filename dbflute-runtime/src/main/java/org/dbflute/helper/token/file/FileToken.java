@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -41,7 +42,6 @@ import org.dbflute.helper.token.file.exception.FileMakingSQLHandlingFailureExcep
 import org.dbflute.helper.token.file.exception.FileTokenizingSQLHandlingFailureException;
 import org.dbflute.helper.token.line.LineMakingOption;
 import org.dbflute.helper.token.line.LineToken;
-import org.dbflute.helper.token.line.LineTokenizingOption;
 import org.dbflute.util.Srl;
 
 /**
@@ -51,26 +51,22 @@ import org.dbflute.util.Srl;
  * e.g. Tokenize (read)
  *  File tsvFile = ... <span style="color: #3F7E5E">// input file</span>
  *  FileToken fileToken = new FileToken();
- *  fileToken.tokenize(new FileInputStream(tsvFile), new FileTokenizingCallback() {
- *      public void handleRowResource(FileTokenizingRowResource resource) {
- *          ... = resource.getHeaderInfo();
- *          ... = resource.<span style="color: #AD4747">getValueList()</span>;
- *          ... = resource.<span style="color: #AD4747">toColumnValueMap()</span>;
- *      }
- *  }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8());
+ *  fileToken.tokenize(new FileInputStream(tsvFile), <span style="color: #553000">resource</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+ *      ... = resource.getHeaderInfo();
+ *      ... = resource.<span style="color: #AD4747">getValueList()</span>;
+ *      ... = resource.<span style="color: #AD4747">toColumnValueMap()</span>;
+ *  }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.delimitateByTab().encodeAsUTF8());
  * 
  * e.g. Make (write)
  * File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
  * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
  * FileToken fileToken = new FileToken();
- * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
- *     public void write(FileMakingRowWriter writer) throws IOException, SQLException {
- *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
- *             List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
- *             writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
- *         }
+ * fileToken.make(new FileOutputStream(tsvFile), <span style="color: #553000">writer</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+ *     for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
+ *         List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
+ *         writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
  *     }
- * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+ * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
  * </pre>
  * @author jflute
  */
@@ -100,29 +96,27 @@ public class FileToken {
      * <pre>
      * File tsvFile = ... <span style="color: #3F7E5E">// input file</span>
      * FileToken fileToken = new FileToken();
-     * fileToken.tokenize(new FileInputStream(tsvFile), new FileTokenizingCallback() {
-     *     public void handleRow(FileTokenizingRowResource resource) {
-     *         ... = resource.getHeaderInfo();
-     *         ... = resource.<span style="color: #AD4747">getValueList()</span>;
-     *         ... = resource.<span style="color: #AD4747">toColumnValueMap()</span>;
-     *     }
-     * }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
+     * fileToken.tokenize(new FileInputStream(tsvFile), <span style="color: #553000">resource</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ... = resource.getHeaderInfo();
+     *     ... = resource.<span style="color: #AD4747">getValueList()</span>;
+     *     ... = resource.<span style="color: #AD4747">toColumnValueMap()</span>;
+     * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
      * </pre>
      * @param filePath The path of file name to read. (NotNull)
-     * @param callback The callback for file-tokenizing. (NotNull)
-     * @param option The option for file-tokenizing. (NotNull, Required{delimiter, encoding})
+     * @param oneArgLambda The callback for file-tokenizing. (NotNull)
+     * @param opLambda The callback for option for file-tokenizing. (NotNull, Required{delimiter, encoding})
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file reading failed.
      * @throws FileTokenizingSQLHandlingFailureException When the SQL handling fails in the row handling process.
      */
-    public void tokenize(String filePath, FileTokenizingCallback callback, FileTokenizingOption option) throws FileNotFoundException,
-            IOException {
+    public void tokenize(String filePath, FileTokenizingCallback oneArgLambda, FileTokenOptionCall<FileTokenizingOption> opLambda)
+            throws FileNotFoundException, IOException {
         assertStringNotNullAndNotTrimmedEmpty("filePath", filePath);
-
+        assertObjectNotNull("oneArgLambda(FileTokenizingCallback)", oneArgLambda);
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(filePath);
-            tokenize(fis, callback, option);
+            doTokenize(fis, oneArgLambda, opLambda);
         } finally {
             if (fis != null) {
                 try {
@@ -130,6 +124,17 @@ public class FileToken {
                 } catch (IOException ignored) {}
             }
         }
+    }
+
+    protected FileTokenizingOption createFileTokenizingOption(FileTokenOptionCall<FileTokenizingOption> opLambda) {
+        assertObjectNotNull("opLambda", opLambda);
+        final FileTokenizingOption op = newFileTokenizingOption();
+        opLambda.callback(op);
+        return op;
+    }
+
+    protected FileTokenizingOption newFileTokenizingOption() {
+        return new FileTokenizingOption();
     }
 
     /**
@@ -140,25 +145,28 @@ public class FileToken {
      * <pre>
      * File tsvFile = ... <span style="color: #3F7E5E">// input file</span>
      * FileToken fileToken = new FileToken();
-     * fileToken.tokenize(new FileInputStream(tsvFile), new FileTokenizingCallback() {
-     *     public void handleRowResource(FileTokenizingRowResource resource) {
-     *         ... = resource.getHeaderInfo();
-     *         ... = resource.<span style="color: #AD4747">getValueList()</span>;
-     *     }
-     * }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
+     * fileToken.tokenize(new FileInputStream(tsvFile), <span style="color: #553000">resource</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ... = resource.getHeaderInfo();
+     *     ... = resource.<span style="color: #AD4747">getValueList()</span>;
+     * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
      * </pre>
      * @param ins The input stream for writing. This stream is closed after writing automatically. (NotNull)
-     * @param callback The callback for file-tokenizing. (NotNull)
-     * @param option The option for file-tokenizing. (NotNull, Required{delimiter, encoding})
+     * @param oneArgLambda The callback for file-tokenizing. (NotNull)
+     * @param opLambda The callback for option for file-tokenizing. (NotNull, Required{delimiter, encoding})
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file reading failed.
      * @throws FileTokenizingSQLHandlingFailureException When the SQL handling fails in the row handling process. 
      */
-    public void tokenize(InputStream ins, FileTokenizingCallback callback, FileTokenizingOption option) throws FileNotFoundException,
-            IOException {
+    public void tokenize(InputStream ins, FileTokenizingCallback oneArgLambda, FileTokenOptionCall<FileTokenizingOption> opLambda)
+            throws FileNotFoundException, IOException {
         assertObjectNotNull("ins", ins);
-        assertObjectNotNull("callback", callback);
-        assertObjectNotNull("option", option);
+        assertObjectNotNull("oneArgLambda(FileTokenizingCallback)", oneArgLambda);
+        doTokenize(ins, oneArgLambda, opLambda);
+    }
+
+    protected void doTokenize(InputStream ins, FileTokenizingCallback handlingCall, FileTokenOptionCall<FileTokenizingOption> opLambda)
+            throws UnsupportedEncodingException, IOException {
+        final FileTokenizingOption option = createFileTokenizingOption(opLambda);
         final String delimiter = option.getDelimiter();
         final String encoding = option.getEncoding();
         assertObjectNotNull("delimiter", delimiter);
@@ -237,7 +245,7 @@ public class FileToken {
                     resource.setRowString(realRowString);
                     resource.setRowNumber(rowNumber);
                     resource.setLineNumber(lineNumber);
-                    callback.handleRow(resource);
+                    handlingCall.handleRow(resource);
                 } finally {
                     ++rowNumber;
                     temporaryValueList.clear();
@@ -262,9 +270,7 @@ public class FileToken {
 
         // Don't use split!
         //final String[] values = lineString.split(delimiter);
-        final LineTokenizingOption tokenizingOption = new LineTokenizingOption();
-        tokenizingOption.setDelimiter(delimiter);
-        final List<String> list = _lineToken.tokenize(lineString, tokenizingOption);
+        final List<String> list = _lineToken.tokenize(lineString, op -> op.delimitateBy(delimiter));
         final String[] values = (String[]) list.toArray(new String[list.size()]);
         for (int i = 0; i < values.length; i++) {
             valueList.add(values[i]);
@@ -441,29 +447,29 @@ public class FileToken {
      * String tsvFile = ... <span style="color: #3F7E5E">// output file</span>
      * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
      * FileToken fileToken = new FileToken();
-     * fileToken.make(tsvFile, new FileMakingCallback() {
-     *     public void write(FileMakingRowWriter writer) throws IOException, SQLException {
-     *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
-     *             List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
-     *             writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
-     *         }
+     * fileToken.make(tsvFile, <span style="color: #553000">writer</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
+     *         List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
+     *         writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
      *     }
-     * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+     * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
      * </pre>
      * @param filePath The path of token file to write. (NotNull)
-     * @param callback The callback for file-making with writer. (NotNull)
-     * @param option The option for file-making. (NotNull, Required: delimiter, encoding)
+     * @param oneArgLambda The callback for file-making with writer. (NotNull)
+     * @param opLambda The callback for option for file-making. (NotNull, Required: delimiter, encoding)
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file writing failed.
      * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
      * @throws FileMakingSQLHandlingFailureException When the SQL handling fails in the row writing process.
      */
-    public void make(String filePath, FileMakingCallback callback, FileMakingOption option) throws FileNotFoundException, IOException {
+    public void make(String filePath, FileMakingCallback oneArgLambda, FileTokenOptionCall<FileMakingOption> opLambda)
+            throws FileNotFoundException, IOException {
         assertStringNotNullAndNotTrimmedEmpty("filePath", filePath);
+        assertObjectNotNull("oneArgLambda(FileMakingCallback)", oneArgLambda);
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(filePath);
-            doMake(fos, callback, option);
+            doMake(fos, oneArgLambda, opLambda);
         } finally {
             if (fos != null) {
                 try {
@@ -481,31 +487,32 @@ public class FileToken {
      * File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
      * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
      * FileToken fileToken = new FileToken();
-     * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
-     *     public void write(FileMakingRowWriter writer) throws IOException, SQLException {
-     *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
-     *             List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
-     *             writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
-     *         }
+     * fileToken.make(new FileOutputStream(tsvFile), <span style="color: #553000">writer</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
+     *         List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
+     *         writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
      *     }
-     * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+     * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
      * </pre>
      * @param ous The output stream for writing. This stream is closed after writing automatically. (NotNull)
-     * @param callback The callback for file-making with writer. (NotNull)
-     * @param option The option for file-making. (NotNull, Required: delimiter, encoding)
+     * @param oneArgLambda The callback for file-making with writer. (NotNull)
+     * @param opLambda The callback for option for file-making. (NotNull, Required: delimiter, encoding)
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file writing failed.
      * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
      * @throws FileMakingSQLHandlingFailureException When the SQL handling fails in the row writing process.
      */
-    public void make(OutputStream ous, FileMakingCallback callback, FileMakingOption option) throws FileNotFoundException, IOException {
-        doMake(ous, callback, option);
+    public void make(OutputStream ous, FileMakingCallback oneArgLambda, FileTokenOptionCall<FileMakingOption> opLambda)
+            throws FileNotFoundException, IOException {
+        assertObjectNotNull("oneArgLambda(FileMakingCallback)", oneArgLambda);
+        doMake(ous, oneArgLambda, opLambda);
     }
 
-    protected void doMake(OutputStream ous, FileMakingCallback callback, final FileMakingOption option) throws FileNotFoundException,
-            IOException {
+    protected void doMake(OutputStream ous, FileMakingCallback handlingCall, FileTokenOptionCall<FileMakingOption> opLambda)
+            throws FileNotFoundException, IOException {
         assertObjectNotNull("ous", ous);
-        assertObjectNotNull("callback", callback);
+        assertObjectNotNull("callback", handlingCall);
+        final FileMakingOption option = createFileMakingOption(opLambda);
         assertObjectNotNull("option", option);
         assertMakingDelimiter(option);
         assertMakingEncoding(option);
@@ -523,9 +530,8 @@ public class FileToken {
             }
 
             // write data row
-            final LineMakingOption lineOption = prepareWritingLineOption(option);
             final String lineSep = prepareWritingLineSeparator(option);
-            callbackDataRowWriter(callback, option, lineSep, lineOption, writer, doneMarkSet);
+            callbackDataRowWriter(handlingCall, option, lineSep, writer, doneMarkSet);
             writer.flush();
         } finally {
             if (writer != null) {
@@ -534,17 +540,28 @@ public class FileToken {
         }
     }
 
+    protected FileMakingOption createFileMakingOption(FileTokenOptionCall<FileMakingOption> opLambda) {
+        assertObjectNotNull("opLambda", opLambda);
+        final FileMakingOption op = newFileMakingOption();
+        opLambda.callback(op);
+        return op;
+    }
+
+    protected FileMakingOption newFileMakingOption() {
+        return new FileMakingOption();
+    }
+
     protected void doWriterHeader(Writer writer, List<String> columnNameList, FileMakingOption option, Set<String> doneMarkSet)
             throws IOException {
         if (doneMarkSet.contains(HEADER_DONE_MARK)) { // basically no way but just in case
             return;
         }
         if (columnNameList != null && !columnNameList.isEmpty()) {
-            final LineMakingOption lineMakingOption = new LineMakingOption();
-            lineMakingOption.setDelimiter(option.getDelimiter());
-            lineMakingOption.trimSpace(); // trimming is header only
-            reflectQuoteMinimally(option, lineMakingOption);
-            final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
+            final String columnHeaderString = _lineToken.make(columnNameList, lineOp -> {
+                lineOp.delimitateBy(option.getDelimiter());
+                lineOp.trimSpace(); /* trimming is header only */
+                reflectQuoteMinimally(option, lineOp);
+            });
             writer.write(columnHeaderString);
             doneMarkSet.add(HEADER_DONE_MARK);
             doneMarkSet.add(FIRST_LINE_DONE_MARK);
@@ -552,7 +569,7 @@ public class FileToken {
     }
 
     protected void callbackDataRowWriter(FileMakingCallback callback, final FileMakingOption option, final String lineSep,
-            final LineMakingOption lineOption, final Writer writer, final Set<String> doneMarkSet) throws IOException {
+            final Writer writer, final Set<String> doneMarkSet) throws IOException {
         final FileMakingRowResource resource = new FileMakingRowResource();
         try {
             callback.write(new FileMakingRowWriter() {
@@ -566,7 +583,7 @@ public class FileToken {
 
                 protected void writeRow(FileMakingRowResource resource) throws IOException {
                     assertRowResourceOfWriter(resource);
-                    doWriteDataRow(writer, resource, option, lineOption, lineSep, doneMarkSet);
+                    doWriteDataRow(writer, resource, option, lineSep, doneMarkSet);
                 }
 
                 protected void assertRowResourceOfWriter(FileMakingRowResource resource) {
@@ -582,8 +599,8 @@ public class FileToken {
         }
     }
 
-    protected void doWriteDataRow(Writer writer, FileMakingRowResource resource, FileMakingOption option, LineMakingOption lineOption,
-            String lineSep, Set<String> doneMarkSet) throws IOException {
+    protected void doWriteDataRow(Writer writer, FileMakingRowResource resource, FileMakingOption option, String lineSep,
+            Set<String> doneMarkSet) throws IOException {
         if (!resource.hasRowData()) {
             return;
         }
@@ -610,7 +627,7 @@ public class FileToken {
             throw new IllegalStateException(msg);
         }
         checkValueCount(option, valueList);
-        final String lineString = _lineToken.make(valueList, lineOption);
+        final String lineString = _lineToken.make(valueList, lineOp -> prepareWritingLineOption(option, lineOp));
         final String actualLine;
         if (doneMarkSet.contains(FIRST_LINE_DONE_MARK)) { // second or more line
             actualLine = lineSep + lineString;
@@ -632,20 +649,18 @@ public class FileToken {
         return lineSep;
     }
 
-    protected LineMakingOption prepareWritingLineOption(FileMakingOption option) {
+    protected void prepareWritingLineOption(FileMakingOption option, LineMakingOption lineOp) {
         // create line option here to recycle instance only for data row
         // (header has original line option so not use this)
-        final LineMakingOption lineOption = new LineMakingOption();
-        lineOption.setDelimiter(option.getDelimiter());
-        reflectQuoteMinimally(option, lineOption);
-        return lineOption;
+        lineOp.delimitateBy(option.getDelimiter());
+        reflectQuoteMinimally(option, lineOp);
     }
 
-    protected void reflectQuoteMinimally(FileMakingOption fileMakingOption, LineMakingOption lineMakingOption) {
-        if (fileMakingOption.isQuoteMinimally()) {
-            lineMakingOption.quoteMinimally();
+    protected void reflectQuoteMinimally(FileMakingOption option, LineMakingOption lineOp) {
+        if (option.isQuoteMinimally()) {
+            lineOp.quoteMinimally();
         } else {
-            lineMakingOption.quoteAll(); // default
+            lineOp.quoteAll(); // default
         }
     }
 

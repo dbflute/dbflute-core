@@ -19,6 +19,7 @@ package org.dbflute.helper.filesystem;
  * @author jflute
  * @since 1.0.5K (2014/08/15 Friday)
  */
+@FunctionalInterface
 public interface FileTextWholeFilter {
 
     /**
