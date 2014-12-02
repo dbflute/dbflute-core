@@ -260,6 +260,11 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
         assertEquals(LocalDate.of(2009, 12, 13), toLocalDate("01:23:45.123$13-12-2009", "HH:mm:ss.SSS$dd-MM-yyyy"));
     }
 
+    public void test_toLocalDate_withTimeZone() {
+        TimeZone jstZone = TimeZone.getTimeZone("JST");
+        assertEquals(LocalDateTime.of(2014, 01, 01, 0, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
+    }
+
     public void test_toLocalDate_illegal() {
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
         assertNotNull(toLocalDate("2009-12-13 01:23:45.123", gmt2hour));
@@ -378,6 +383,11 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
         Date gmt7hour = toDate("1970/01/01 07:00:06.789", gmtZone);
         log("emg7hour  : " + toStringDate(gmt7hour, gmtZone, "yyyy/MM/dd HH:mm:ss.SSS", locale));
         assertEquals(gmt7hour.getTime(), reversedDate.getTime());
+    }
+
+    public void test_toLocalDateTime_withTimeZone() {
+        TimeZone jstZone = TimeZone.getTimeZone("JST");
+        assertEquals(LocalDateTime.of(2014, 01, 01, 0, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
     }
 
     public void test_toLocalDateTime_illegal() {
