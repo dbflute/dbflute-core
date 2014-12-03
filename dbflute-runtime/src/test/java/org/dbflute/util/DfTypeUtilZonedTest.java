@@ -262,7 +262,7 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
 
     public void test_toLocalDate_withTimeZone() {
         TimeZone jstZone = TimeZone.getTimeZone("JST");
-        assertEquals(LocalDateTime.of(2014, 01, 01, 0, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
+        assertEquals(LocalDateTime.of(2014, 01, 01, 9, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
     }
 
     public void test_toLocalDate_illegal() {
@@ -387,7 +387,7 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
 
     public void test_toLocalDateTime_withTimeZone() {
         TimeZone jstZone = TimeZone.getTimeZone("JST");
-        assertEquals(LocalDateTime.of(2014, 01, 01, 0, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
+        assertEquals(LocalDateTime.of(2014, 01, 01, 9, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
     }
 
     public void test_toLocalDateTime_illegal() {
