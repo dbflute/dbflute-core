@@ -132,6 +132,7 @@ public class BehaviorCommandInvoker {
      */
     public void injectComponentProperty(BehaviorCommandComponentSetup behaviorCommand) {
         assertInvokerAssistant();
+        behaviorCommand.setDBMetaProvider(_invokerAssistant.assistDBMetaProvider());
         behaviorCommand.setDataSource(_invokerAssistant.assistDataSource());
         behaviorCommand.setStatementFactory(_invokerAssistant.assistStatementFactory());
         behaviorCommand.setBeanMetaDataFactory(_invokerAssistant.assistBeanMetaDataFactory());

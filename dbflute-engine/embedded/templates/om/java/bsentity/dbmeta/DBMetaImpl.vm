@@ -47,6 +47,7 @@ public class ${myClassName} extends AbstractDBMeta {
     // ===================================================================================
     //                                                                       Current DBDef
     //                                                                       =============
+    public String getProjectName() { return ${glDBCurrent}.getInstance().projectName(); }
     public DBDef getCurrentDBDef() { return ${glDBCurrent}.getInstance().currentDBDef(); }
 
     // ===================================================================================

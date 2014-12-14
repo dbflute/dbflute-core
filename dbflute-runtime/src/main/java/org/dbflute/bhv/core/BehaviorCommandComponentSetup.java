@@ -17,6 +17,7 @@ package org.dbflute.bhv.core;
 
 import javax.sql.DataSource;
 
+import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.jdbc.TnResultSetHandlerFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
@@ -25,6 +26,8 @@ import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
  * @author jflute
  */
 public interface BehaviorCommandComponentSetup {
+
+    void setDBMetaProvider(DBMetaProvider dbmetaProvider);
 
     void setDataSource(DataSource dataSource);
 

@@ -35,6 +35,10 @@ import org.dbflute.dbway.DBDef;
  */
 public class MockDBMeta extends AbstractDBMeta {
 
+    public String getProjectName() {
+        return null;
+    }
+
     public DBDef getCurrentDBDef() {
         return null;
     }
