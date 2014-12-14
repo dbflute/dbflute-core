@@ -567,7 +567,7 @@ public class CallbackContext {
      * @param sqlLogHandler The handler of SQL log. (NullAllowed)
      */
     public void setSqlLogHandler(SqlLogHandler sqlLogHandler) {
-        this._sqlLogHandler = sqlLogHandler;
+        _sqlLogHandler = sqlLogHandler;
     }
 
     // -----------------------------------------------------
@@ -590,7 +590,7 @@ public class CallbackContext {
      * @param sqlResultHandler The handler of SQL result. (NullAllowed)
      */
     public void setSqlResultHandler(SqlResultHandler sqlResultHandler) {
-        this._sqlResultHandler = sqlResultHandler;
+        _sqlResultHandler = sqlResultHandler;
     }
 
     // -----------------------------------------------------
@@ -613,6 +613,6 @@ public class CallbackContext {
      * @param sqlStringFilter The filter of SQL string. (NullAllowed)
      */
     public void setSqlStringFilter(SqlStringFilter sqlStringFilter) {
-        this._sqlStringFilter = sqlStringFilter;
+        _sqlStringFilter = sqlStringFilter;
     }
 }
