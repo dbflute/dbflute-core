@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.token.line.LineToken;
-import org.dbflute.helper.token.line.LineTokenizingOption;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfStringUtil;
@@ -489,9 +488,7 @@ public class DfClassificationResourceAnalyzer {
 
     protected List<String> tokenize(String value, String delimiter) {
         final LineToken lineToken = new LineToken();
-        final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
-        lineTokenizingOption.setDelimiter(delimiter);
-        return lineToken.tokenize(value, lineTokenizingOption);
+        return lineToken.tokenize(value, op -> op.delimitateBy(delimiter));
     }
 
     // ===================================================================================

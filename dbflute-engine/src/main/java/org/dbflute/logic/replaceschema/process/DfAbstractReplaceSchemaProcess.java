@@ -22,7 +22,6 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.jdbc.DfRunnerInformation;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.dbflute.helper.token.line.LineToken;
-import org.dbflute.helper.token.line.LineTokenizingOption;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDocumentProperties;
@@ -103,9 +102,7 @@ public class DfAbstractReplaceSchemaProcess {
         final String detailMessage = fireResult.getDetailMessage();
         if (detailMessage != null && detailMessage.trim().length() > 0) {
             final LineToken lineToken = new LineToken();
-            final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
-            lineTokenizingOption.setDelimiter(ln());
-            final List<String> tokenizedList = lineToken.tokenize(detailMessage, lineTokenizingOption);
+            final List<String> tokenizedList = lineToken.tokenize(detailMessage, op -> op.delimitateBy(ln()));
             for (String tokenizedElement : tokenizedList) {
                 detailMessageList.add(tokenizedElement);
             }

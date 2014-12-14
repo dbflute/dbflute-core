@@ -23,7 +23,6 @@ import org.dbflute.exception.DfAlterCheckAlterScriptSQLException;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
 import org.dbflute.helper.token.line.LineToken;
-import org.dbflute.helper.token.line.LineTokenizingOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,9 +140,7 @@ public class DfSqlFileFireMan {
             if (sqlEx != null && message != null) {
                 message = message.trim();
                 final LineToken lineToken = new LineToken();
-                final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
-                lineTokenizingOption.setDelimiter(ln());
-                final List<String> tokenizedList = lineToken.tokenize(message, lineTokenizingOption);
+                final List<String> tokenizedList = lineToken.tokenize(message, op -> op.delimitateBy(ln()));
                 int elementIndex = 0;
                 for (String element : tokenizedList) {
                     if (elementIndex == 0) {
