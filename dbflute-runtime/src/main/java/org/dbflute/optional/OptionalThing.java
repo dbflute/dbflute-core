@@ -88,11 +88,14 @@ public interface OptionalThing<THING> {
      */
     THING orElseGet(OptionalThingSupplier<THING> noArgLambda);
 
-    // unsupported because of almost no needed, alwaysPresent() or get() to use prepared thrower
-    // or you can use the method of standard optional instead
-    //public ENTITY orElseThrow(...) {
-    //    return ...;
-    //}
+    /**
+     * Get the thing or throw the exception.
+     * @param <CAUSE> The type of cause.
+     * @param supplier The supplier of exception if null. (NotNull)
+     * @return The object instance wrapped in this optional object. (NotNull: if null, exception)
+     * @throws CAUSE When the value is null.
+     */
+    <CAUSE extends Throwable> THING orElseThrow(OptionalThingSupplier<? extends CAUSE> supplier) throws CAUSE;
 
     // ===================================================================================
     //                                                                   Standard Optional

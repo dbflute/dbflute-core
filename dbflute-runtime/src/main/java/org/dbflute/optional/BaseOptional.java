@@ -136,6 +136,24 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
         return exists() ? _obj : supplier.get();
     }
 
+    /**
+     * @param <CAUSE> The type of cause.
+     * @param supplier The supplier of exception if null. (NotNull)
+     * @return The object instance wrapped in this optional object. (NotNull: if null, exception)
+     * @throws CAUSE When the value is null.
+     */
+    protected <CAUSE extends Throwable> OBJ directlyGetOrElseThrow(OptionalThingSupplier<? extends CAUSE> supplier) throws CAUSE {
+        if (supplier == null) {
+            String msg = "The argument 'supplier' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (exists()) {
+            return directlyGet();
+        } else {
+            throw supplier.get();
+        }
+    }
+
     // -----------------------------------------------------
     //                                              filter()
     //                                              --------

@@ -18,8 +18,6 @@ package org.dbflute.optional;
 import org.dbflute.Entity;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.mock.MockEntity;
-import org.dbflute.optional.OptionalEntity;
-import org.dbflute.optional.OptionalThingExceptionThrower;
 import org.dbflute.unit.RuntimeTestCase;
 
 /**
@@ -74,6 +72,16 @@ public class OptionalEntityTest extends RuntimeTestCase {
             log(e.getMessage());
         }
         assertEquals(OptionalEntity.empty(), empty);
+    }
+
+    public void test_orElseThrow() throws Exception {
+        try {
+            prepareOpt(null).orElseThrow(() -> new IllegalStateException("sea"));
+        } catch (IllegalStateException e) {
+            assertEquals("sea", e.getMessage());
+        }
+        MockEntity entity = new MockEntity();
+        assertEquals(entity, prepareOpt(entity).orElseThrow(() -> new IllegalStateException("sea")));
     }
 
     // ===================================================================================

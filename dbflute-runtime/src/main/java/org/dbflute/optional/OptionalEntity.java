@@ -320,10 +320,11 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
         return directlyGetOrElseGet(noArgLambda);
     }
 
-    // unsupported because of almost no needed, see the comment on OptionalThing for the details
-    //public ENTITY orElseThrow(...) {
-    //    return ...;
-    //}
+    /** {@inheritDoc} */
+    @Override
+    public <CAUSE extends Throwable> ENTITY orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
+        return directlyGetOrElseThrow(noArgLambda);
+    }
 
     // ===================================================================================
     //                                                                   DBFlute Extension
