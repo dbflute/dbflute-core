@@ -26,6 +26,7 @@ public class SQLFailureException extends RuntimeException {
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
+    /** The cause of SQL failure. (NotNull) */
     protected final SQLException _sqlEx;
 
     /**
