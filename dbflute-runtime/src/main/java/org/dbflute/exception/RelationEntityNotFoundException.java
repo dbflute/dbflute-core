@@ -19,7 +19,7 @@ package org.dbflute.exception;
  * The exception of when the relation entity is not found.
  * @author jflute
  */
-public class RelationEntityNotFoundException extends RecordHasAlreadyBeenDeletedException {
+public class RelationEntityNotFoundException extends RuntimeException {
 
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;

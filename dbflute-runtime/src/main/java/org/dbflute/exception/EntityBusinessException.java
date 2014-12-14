@@ -16,20 +16,8 @@
 package org.dbflute.exception;
 
 /**
- * The exception when the record has already been deleted (by other thread). <br>
- * This class is old.
+ * The marker interface that means business exception about entity e.g. EntityAlreadyDeletedException.
  * @author jflute
  */
-public class RecordHasAlreadyBeenDeletedException extends RuntimeException {
-
-    /** The serial version UID for object serialization. (Default) */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Constructor.
-     * @param msg The message of the exception. (NotNull)
-     */
-    public RecordHasAlreadyBeenDeletedException(String msg) {
-        super(msg);
-    }
+public interface EntityBusinessException {
 }

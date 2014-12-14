@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * The exception of when the entity already exists on the database.
  * @author jflute
  */
-public class EntityAlreadyExistsException extends SQLFailureException {
+public class EntityAlreadyExistsException extends SQLFailureException implements EntityBusinessException {
 
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;

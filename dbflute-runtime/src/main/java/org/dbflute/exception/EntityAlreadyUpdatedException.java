@@ -19,7 +19,7 @@ package org.dbflute.exception;
  * The exception of when the entity has already been updated by other thread.
  * @author jflute
  */
-public class EntityAlreadyUpdatedException extends SQLFailureException {
+public class EntityAlreadyUpdatedException extends RuntimeException implements EntityBusinessException {
 
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
@@ -29,7 +29,6 @@ public class EntityAlreadyUpdatedException extends SQLFailureException {
     //                                                                           =========
     // legacy of S2Dao
     private Object _bean;
-
     private int _rows;
 
     // ===================================================================================
@@ -42,8 +41,8 @@ public class EntityAlreadyUpdatedException extends SQLFailureException {
      */
     public EntityAlreadyUpdatedException(Object bean, int rows) {
         super("The entity has already been updated: rows=" + rows + ", bean=" + bean, null);
-        this._bean = bean;
-        this._rows = rows;
+        _bean = bean;
+        _rows = rows;
     }
 
     // ===================================================================================
