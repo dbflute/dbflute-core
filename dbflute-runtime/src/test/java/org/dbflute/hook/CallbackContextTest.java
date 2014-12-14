@@ -15,9 +15,8 @@
  */
 package org.dbflute.hook;
 
-import org.dbflute.hook.CallbackContext;
-import org.dbflute.hook.SqlLogHandler;
-import org.dbflute.hook.SqlLogInfo;
+import org.dbflute.bhv.core.BehaviorCommandHook;
+import org.dbflute.bhv.core.BehaviorCommandMeta;
 import org.dbflute.hook.CallbackContext.CallbackContextHolder;
 import org.dbflute.unit.RuntimeTestCase;
 
@@ -26,6 +25,90 @@ import org.dbflute.unit.RuntimeTestCase;
  * @since 1.0.5F (2014/05/05 Monday)
  */
 public class CallbackContextTest extends RuntimeTestCase {
+
+    // ===================================================================================
+    //                                                                 BehaviorCommandHook
+    //                                                                 ===================
+    public void test_BehaviorCommandHook_twiceSet_default() throws Exception {
+        // ## Arrange ##
+        CallbackContext context = new CallbackContext();
+        assertNull(context.getBehaviorCommandHook());
+
+        // ## Act ##
+        context.setBehaviorCommandHook(new BehaviorCommandHook() {
+            public void hookBefore(BehaviorCommandMeta meta) {
+                fail();
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+                fail();
+            }
+        });
+        context.setBehaviorCommandHook(new BehaviorCommandHook() {
+            public void hookBefore(BehaviorCommandMeta meta) {
+                log("2");
+                markHere("secondBefore");
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+                log("3");
+                markHere("secondFinally");
+            }
+        });
+
+        // ## Assert ##
+        BehaviorCommandHook hook = context.getBehaviorCommandHook();
+        assertFalse(hook.inheritsExistingHook());
+        hook.hookBefore(null);
+        hook.hookFinally(null, null);
+        assertMarked("secondBefore");
+        assertMarked("secondFinally");
+    }
+
+    public void test_BehaviorCommandHook_twiceSet_inherits() throws Exception {
+        // ## Arrange ##
+        CallbackContext context = new CallbackContext();
+        assertNull(context.getBehaviorCommandHook());
+
+        // ## Act ##
+        context.setBehaviorCommandHook(new BehaviorCommandHook() {
+            public void hookBefore(BehaviorCommandMeta meta) {
+                log("1");
+                markHere("firstBefore");
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+                log("4");
+                markHere("firstFinally");
+            }
+        });
+        context.setBehaviorCommandHook(new BehaviorCommandHook() {
+            public void hookBefore(BehaviorCommandMeta meta) {
+                log("2");
+                markHere("secondBefore");
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+                log("3");
+                markHere("secondFinally");
+            }
+
+            @Override
+            public boolean inheritsExistingHook() {
+                return true;
+            }
+        });
+
+        // ## Assert ##
+        BehaviorCommandHook hook = context.getBehaviorCommandHook();
+        assertFalse(hook.inheritsExistingHook());
+        hook.hookBefore(null);
+        hook.hookFinally(null, null);
+        assertMarked("firstBefore");
+        assertMarked("secondBefore");
+        assertMarked("secondFinally");
+        assertMarked("firstFinally");
+    }
 
     // ===================================================================================
     //                                                                          Management

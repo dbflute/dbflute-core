@@ -16,6 +16,7 @@
 package org.dbflute.hook;
 
 import org.dbflute.bhv.core.BehaviorCommandHook;
+import org.dbflute.bhv.core.BehaviorCommandMeta;
 import org.dbflute.util.DfTypeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -464,10 +465,8 @@ public class CallbackContext {
     }
 
     /**
-     * Set the hook interface of behavior commands. <br>
+     * Set the hook interface of behavior commands. (overriding existing hook as default) <br>
      * This hook interface is called back before executing behavior commands and finally. <br> 
-     * The hook methods may be called by nested process
-     * so you should pay attention to it when you implements this.
      * <pre>
      * context.setBehaviorCommandHook(new BehaviorCommandHook() {
      *     public void hookBefore(BehaviorCommandMeta meta) {
@@ -478,10 +477,45 @@ public class CallbackContext {
      *     }
      * });
      * </pre>
+     * <p>The hook methods may be called by nested process so you should pay attention to it when you implements this.</p>
+     * <p>Also you can inherit the existing hook with your hook by overriding isInheritExistingHook().</p>
      * @param behaviorCommandHook The hook interface of behavior commands. (NullAllowed)
      */
     public void setBehaviorCommandHook(BehaviorCommandHook behaviorCommandHook) {
-        this._behaviorCommandHook = behaviorCommandHook;
+        if (behaviorCommandHook != null && behaviorCommandHook.inheritsExistingHook()) {
+            _behaviorCommandHook = createInheritableBehaviorCommandHook(behaviorCommandHook);
+        } else {
+            _behaviorCommandHook = behaviorCommandHook;
+        }
+    }
+
+    protected InheritableBehaviorCommandHook createInheritableBehaviorCommandHook(BehaviorCommandHook behaviorCommandHook) {
+        return new InheritableBehaviorCommandHook(_behaviorCommandHook, behaviorCommandHook);
+    }
+
+    protected static class InheritableBehaviorCommandHook implements BehaviorCommandHook {
+
+        protected final BehaviorCommandHook _originally; // might be null
+        protected final BehaviorCommandHook _yourHook;
+
+        public InheritableBehaviorCommandHook(BehaviorCommandHook originally, BehaviorCommandHook yourHook) {
+            _originally = originally;
+            _yourHook = yourHook;
+        }
+
+        public void hookBefore(BehaviorCommandMeta meta) {
+            if (_originally != null) {
+                _originally.hookBefore(meta);
+            }
+            _yourHook.hookBefore(meta);
+        }
+
+        public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+            _yourHook.hookFinally(meta, cause);
+            if (_originally != null) {
+                _originally.hookFinally(meta, cause);
+            }
+        }
     }
 
     // -----------------------------------------------------
@@ -509,7 +543,7 @@ public class CallbackContext {
      * @param sqlFireHook The hook interface of SQL fires. (NullAllowed)
      */
     public void setSqlFireHook(SqlFireHook sqlFireHook) {
-        this._sqlFireHook = sqlFireHook;
+        _sqlFireHook = sqlFireHook;
     }
 
     // -----------------------------------------------------
