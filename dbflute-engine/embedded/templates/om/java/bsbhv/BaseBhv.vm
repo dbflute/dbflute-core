@@ -1009,7 +1009,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #else
      * Delete the entity. (ZeroUpdateException, NonExclusiveControl) <br>
 #end
-     * By PK as default, and also you can update by unique keys using entity's uniqueOf().
+     * By PK as default, and also you can delete by unique keys using entity's uniqueOf().
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = <span style="color: #70226C">new</span> ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
@@ -1037,7 +1037,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 
     /**
      * Delete the entity non-strictly. {ZeroUpdateException, NonExclusiveControl} <br>
-     * By PK as default, and also you can update by unique keys using entity's uniqueOf().
+     * By PK as default, and also you can delete by unique keys using entity's uniqueOf().
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = <span style="color: #70226C">new</span> ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
