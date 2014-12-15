@@ -17,6 +17,8 @@ package org.dbflute.logic.generate.refresh;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.manage.refresh.DfRefreshResourceRequest;
@@ -34,6 +36,9 @@ public class DfRefreshResourceProcess {
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
     private static final Logger _log = LoggerFactory.getLogger(DfRefreshResourceProcess.class);
+
+    protected static final String BASIC_REQUEST_URL = "http://localhost:8386/";
+    protected static final String SECONDARY_REQUEST_URL = "http://localhost:8387/";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -60,12 +65,46 @@ public class DfRefreshResourceProcess {
         if (!isRefresh()) {
             return;
         }
-        _log.info("...Refreshing: " + _projectNameList); // not null here
+        _log.info("...Refreshing " + _projectNameList + " by " + _requestUrl); // not null here
+        final DfRefreshResourceRequest request = createRefreshResourceRequest(_requestUrl);
         try {
-            new DfRefreshResourceRequest(_projectNameList, _requestUrl).refreshResources();
+            final Map<String, Map<String, Object>> resultMap = request.refreshResources();
+            final boolean existsSuccess = existsSuccess(resultMap);
+            handleNotFoundProject(existsSuccess);
         } catch (IOException e) {
-            final String msg = buildIOExceptionMessage(e);
-            _log.info(msg);
+            handleRefreshIOException(e);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                      NotFound Project
+    //                                      ----------------
+    protected void handleNotFoundProject(boolean existsSuccess) {
+        if (!existsSuccess) {
+            final boolean retrySuccess = retrySecondary();
+            if (!retrySuccess) {
+                _log.info(buildNotFoundProjectMessage());
+            }
+        }
+    }
+
+    protected String buildNotFoundProjectMessage() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the projects in the Eclipse.");
+        br.addItem("Project List");
+        br.addElement(_projectNameList);
+        br.addItem("Request URL");
+        br.addElement(_requestUrl);
+        return br.buildExceptionMessage();
+    }
+
+    // -----------------------------------------------------
+    //                                   Refresh IOExpcetion
+    //                                   -------------------
+    protected void handleRefreshIOException(IOException e) {
+        final boolean retrySuccess = retrySecondary();
+        if (!retrySuccess) {
+            _log.info(buildIOExceptionMessage(e));
         }
     }
 
@@ -81,6 +120,53 @@ public class DfRefreshResourceProcess {
         br.addElement(ioEx.getClass().getSimpleName());
         br.addElement(ioMsg != null ? ioMsg.trim() : null);
         return br.buildExceptionMessage();
+    }
+
+    // -----------------------------------------------------
+    //                                       Retry Secondary
+    //                                       ---------------
+    protected boolean retrySecondary() {
+        if (isBasicRequestUrl()) {
+            try {
+                _log.info("...Retrying refreshing by secondary URL " + SECONDARY_REQUEST_URL);
+                final DfRefreshResourceRequest request = createRefreshResourceRequest(SECONDARY_REQUEST_URL);
+                final Map<String, Map<String, Object>> resultMap = request.refreshResources();
+                final boolean success = existsSuccess(resultMap);
+                if (success) {
+                    _log.info("*Success of the retry refreshing");
+                }
+                return success;
+            } catch (IOException ignored) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    protected boolean isBasicRequestUrl() {
+        return BASIC_REQUEST_URL.equals(_requestUrl);
+    }
+
+    // -----------------------------------------------------
+    //                                        Analyze Result
+    //                                        --------------
+    protected boolean existsSuccess(final Map<String, Map<String, Object>> resultMap) {
+        boolean existsSuccess = false;
+        for (Entry<String, Map<String, Object>> entry : resultMap.entrySet()) {
+            final Map<String, Object> elementMap = entry.getValue();
+            final String body = (String) elementMap.get(DfRefreshResourceRequest.KEY_BODY);
+            if (body != null && Srl.is_NotNull_and_NotTrimmedEmpty(body)) {
+                existsSuccess = true;
+            }
+        }
+        return existsSuccess;
+    }
+
+    // -----------------------------------------------------
+    //                                        Create Request
+    //                                        --------------
+    protected DfRefreshResourceRequest createRefreshResourceRequest(String requestUrl) {
+        return new DfRefreshResourceRequest(_projectNameList, requestUrl);
     }
 
     // ===================================================================================
