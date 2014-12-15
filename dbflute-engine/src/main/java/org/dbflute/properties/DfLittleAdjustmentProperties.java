@@ -145,8 +145,22 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isMakeCallbackConditionBeanSetup", !isCompatibleBeforeJava8());
     }
 
-    public boolean isMakeDirectConditionBeanSetup() { // closet
+    protected boolean isMakeDirectConditionBeanSetup() { // closet
         return isProperty("isMakeDirectConditionBeanSetup", isCompatibleBeforeJava8());
+    }
+
+    public boolean isMakeDirectConditionBeanSetupTable(String tableName) { // closet
+        if (!isMakeDirectConditionBeanSetup()) {
+            return false;
+        }
+        final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
+        final String key = "makeDirectConditionBeanSetupTableList";
+        @SuppressWarnings("unchecked")
+        final List<String> tableList = (List<String>) littleAdjustmentMap.get(key);
+        if (tableList == null || tableList.isEmpty()) { // no name specification
+            return true; // all table make
+        }
+        return isTargetByHint(tableName, tableList, DfCollectionUtil.emptyList());
     }
 
     public boolean isMakeBatchUpdateSpecifyColumn() { // closet
