@@ -45,7 +45,7 @@ public interface EntityRowHandler<ENTITY> {
      *         }
      *     }
      *     public boolean <span style="color: #CC4747">isBreakCursor</span>() {
-     *         return <span style="color: #0000C0">breakCursor<span>;
+     *         return <span style="color: #0000C0">breakCursor</span>;
      *     }
      * });
      * </pre>
