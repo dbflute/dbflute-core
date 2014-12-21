@@ -28,4 +28,30 @@ public interface EntityRowHandler<ENTITY> {
      * @param entity The entity as row. (NotNull)
      */
     void handle(ENTITY entity);
+
+    /**
+     * Does it break the cursor? (skip next rows?)<br>
+     * You can skip next records by your overriding. <br>
+     * (cannot skip the first record, this determination is after one row handling)
+     * <pre>
+     * <span style="color: #0000C0">memberBhv</span>.<span style="color: #CC4747">selectCursor</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.query().set...
+     * }, new EntityRowHandler&lt;Member&gt;() { <span style="color: #3F7E5E">// not lambda for override</span>
+     *     private boolean <span style="color: #0000C0">breakCursor</span>;
+     *     public void handle(Member <span style="color: #553000">member</span>) {
+     *         ...
+     *         if (...) { <span style="color: #3F7E5E">// means the final row</span>
+     *             <span style="color: #0000C0">breakCursor</span> = true; <span style="color: #3F7E5E">// skip the next records</span>
+     *         }
+     *     }
+     *     public boolean <span style="color: #CC4747">isBreakCursor</span>() {
+     *         return <span style="color: #0000C0">breakCursor<span>;
+     *     }
+     * });
+     * </pre>
+     * @return The determination, true or false.
+     */
+    default boolean isBreakCursor() {
+        return false;
+    }
 }
