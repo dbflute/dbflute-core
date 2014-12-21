@@ -30,7 +30,7 @@ public class DfSql2EntityMark {
     }
 
     public void setContent(String content) {
-        this._content = content;
+        _content = content;
     }
 
     public String getComment() {
@@ -38,6 +38,6 @@ public class DfSql2EntityMark {
     }
 
     public void setComment(String comment) {
-        this._comment = comment;
+        _comment = comment;
     }
 }

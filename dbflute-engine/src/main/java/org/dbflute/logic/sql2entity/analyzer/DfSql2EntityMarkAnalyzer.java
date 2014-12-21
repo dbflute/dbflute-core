@@ -245,6 +245,59 @@ public class DfSql2EntityMarkAnalyzer {
         return commentMap;
     }
 
+    public Map<String, String> getFloatingParameterCommentMap(String sql) {
+        final Map<String, String> commentMap = StringKeyMap.createAsFlexible();
+        final List<String> splitList = Srl.splitList(sql, "\n");
+        final String lineCommentMark = " --";
+        final String columnCommentMark = " //";
+        final String pmbMark = "pmb.";
+        final String bindVariableBeginMark = "/*" + pmbMark;
+        final String ifCommentBeginMark = "/*IF " + pmbMark;
+        final String forCommentBeginMark = "/*FOR " + pmbMark;
+        final String parameterEndMark = "*/";
+        for (String line : splitList) {
+            if (!Srl.containsAll(line, lineCommentMark, columnCommentMark)) {
+                continue;
+            }
+            if (!Srl.containsAny(line, bindVariableBeginMark, ifCommentBeginMark, forCommentBeginMark)) {
+                continue;
+            }
+            if (Srl.count(line, pmbMark) >= 2) {
+                continue;
+            }
+            ScopeInfo scopeInfo = Srl.extractScopeFirst(line, bindVariableBeginMark, parameterEndMark);
+            if (scopeInfo == null) {
+                scopeInfo = Srl.extractScopeFirst(line, ifCommentBeginMark, parameterEndMark);
+                if (scopeInfo == null) {
+                    scopeInfo = Srl.extractScopeFirst(line, forCommentBeginMark, parameterEndMark);
+                    if (scopeInfo == null) {
+                        continue;
+                    }
+                }
+            }
+            final String property = Srl.substringFirstFront(scopeInfo.getContent().trim(), " ", ".", "=", "!", "<", ">");
+            final String lineComment = Srl.substringFirstRear(line, lineCommentMark);
+            if (!lineComment.contains(columnCommentMark)) {
+                continue;
+            }
+            final String columnComment = Srl.substringFirstRear(lineComment, columnCommentMark);
+            if (Srl.is_Null_or_TrimmedEmpty(columnComment)) {
+                continue;
+            }
+            // e.g. ... = /*pmb.memberName*/'S%' -- // comment
+            final String trimmedComment = columnComment.trim();
+            final String existingComment = commentMap.get(property);
+            final String realComment;
+            if (existingComment != null) {
+                realComment = existingComment + " / " + trimmedComment;
+            } else {
+                realComment = trimmedComment;
+            }
+            commentMap.put(property, realComment);
+        }
+        return commentMap;
+    }
+
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============

@@ -258,6 +258,7 @@ public class DfParameterBeanResolver {
                 propertyNameOptionMap.put(propertyName, optionDef);
             }
         }
+        processFloatingParameterComment(sql, propertyNameTypeMap, propertyNameOptionMap);
         final Map<String, Map<String, String>> bqpMap = _bqpSetupper.extractBasicBqpMap(createOutsideSqlPackAsOne());
         if (!bqpMap.isEmpty()) {
             final Map<String, String> bqpElementMap = bqpMap.values().iterator().next();
@@ -273,6 +274,30 @@ public class DfParameterBeanResolver {
         final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
         final DfLanguagePropertyPackageResolver resolver = lang.getLanguagePropertyPackageResolver();
         return resolver.resolvePackageNameExceptUtil(typeName);
+    }
+
+    protected void processFloatingParameterComment(String sql, Map<String, String> propertyNameTypeMap,
+            Map<String, String> propertyNameOptionMap) {
+        final Map<String, String> commentMap = _outsideSqlMarkAnalyzer.getFloatingParameterCommentMap(sql);
+        final Map<String, String> renewalOptionMap = new LinkedHashMap<String, String>();
+        final String commentOptionPrefix = "comment(";
+        final String commentOptionSuffix = ")";
+        for (String propertyName : propertyNameTypeMap.keySet()) {
+            final String option = propertyNameOptionMap.get(propertyName);
+            if (option != null && option.contains(commentOptionPrefix)) { // already exists
+                continue;
+            }
+            final String comment = commentMap.get(propertyName);
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(option)) {
+                    final String filteredOption = option + "|" + commentOptionPrefix + comment + commentOptionSuffix;
+                    renewalOptionMap.put(propertyName, filteredOption);
+                } else {
+                    renewalOptionMap.put(propertyName, commentOptionPrefix + comment + commentOptionSuffix);
+                }
+            }
+        }
+        propertyNameOptionMap.putAll(renewalOptionMap);
     }
 
     protected DfOutsideSqlPack createOutsideSqlPackAsOne() {

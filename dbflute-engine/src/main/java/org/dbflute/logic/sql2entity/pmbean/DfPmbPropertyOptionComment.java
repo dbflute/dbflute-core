@@ -78,10 +78,11 @@ public class DfPmbPropertyOptionComment {
             }
             option = firstOption;
         }
+        final String commentMark = "// ";
         final int commentIdx = OPTION_PREFIX.length();
         final int commentEndIdx = option.length() - OPTION_SUFFIX.length();
         try {
-            return option.substring(commentIdx, commentEndIdx);
+            return commentMark + option.substring(commentIdx, commentEndIdx);
         } catch (StringIndexOutOfBoundsException e) {
             String msg = "Look at the message below:" + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
