@@ -274,9 +274,9 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     @SuppressWarnings("unchecked")
-    public <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super ENTITY, ? extends RESULT> entityLambda) {
+    public <RESULT> OptionalEntity<RESULT> map(OptionalThingFunction<? super ENTITY, ? extends RESULT> entityLambda) {
         assertEntityLambdaNotNull(entityLambda);
-        return (OptionalThing<RESULT>) callbackMapping(entityLambda); // downcast allowed because factory is overridden
+        return (OptionalEntity<RESULT>) callbackMapping(entityLambda); // downcast allowed because factory is overridden
     }
 
     /** {@inheritDoc} */
