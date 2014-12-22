@@ -86,7 +86,7 @@ h4 {
 }
 .sistersublink {
 	margin-top: 0.6em;
-	font-size: 80%;
+	font-size: 85%;
 }
 
 /* keyword search */
@@ -300,20 +300,42 @@ ${database.schemaHtmlJavaScriptEmbedded}
 <p class="mainschema">generated from <strong>${database.databaseSchema.catalogSchema}</strong></p>
 #end
 <div class="navilinkarea">
+#if ($database.hasClassificationDefinition() || $database.isSchemaHtmlOutsideSqlValid() || $database.isSchemaHtmlProcedureValid())
+#set ($linkDelimiter = "")
+<p>
 #if ($database.hasClassificationDefinition())
-<p class="sublink"><a href="#cdef">Classification Definition</a></p>
+${linkDelimiter} <span class="sublink"><a href="#cdef">Classification Definition</a></span>
+#set ($linkDelimiter = "|")
 #end
 #if ($database.isSchemaHtmlOutsideSqlValid())
-<p class="sublink"><a href="#outsidesql">OutsideSql List</a></p>
+${linkDelimiter} <span class="sublink"><a href="#outsidesql">OutsideSql List</a></span>
+#set ($linkDelimiter = "|")
 #end
 #if ($database.isSchemaHtmlProcedureValid())
-<p class="sublink"><a href="#procedure">Procedure List</a></p>
+${linkDelimiter} <span class="sublink"><a href="#procedure">Procedure List</a></span>
 #end
+</p>
+#end
+#if ($selector.isSchemaHtmlToHistoryHtmlLink() || $selector.isSchemaHtmlToPropertiesHtmlLink())
+<p>
+## HistoryHtml is on fixed location
 #if ($selector.isSchemaHtmlToHistoryHtmlLink())
 <p class="sisterlink"><a href="./${selector.historyHtmlFileName}">to HistoryHTML</a></p>
 #end
+## PropertiesHtml is minor case
 #if ($selector.isSchemaHtmlToPropertiesHtmlLink())
 <p class="sistersublink"><a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a></p>
+#end
+</p>
+#end
+#if ($selector.hasNeighborhoodSchemaHtml())
+#set ($linkDelimiter = "")
+<p>
+#foreach ($schemaHtmlKey in $selector.neighborhoodSchemaHtmlKeyList)
+${linkDelimiter} <p class="sistersublink"><a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKey)}">to ${schemaHtmlKey}</a></p>
+#set ($linkDelimiter = "|")
+#end
+</p>
 #end
 </div>
 
