@@ -17,10 +17,13 @@ package org.dbflute.infra.manage.refresh;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.dbflute.util.Srl;
 
@@ -39,8 +42,14 @@ public class DfRefreshResourceRequest {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** The mark of auto-detect, e.g. searching Eclipse .project file. */
+    /** The mark of auto-detect, e.g. searching Eclipse .project file. (NotNull) */
     public static final String AUTO_DETECT_MARK = "$$AutoDetect$$"; // basically for engine
+
+    /** The key of result map for response body. (NotNull) */
+    public static final String KEY_BODY = "body";
+
+    /** The key of result map for header fields. (NotNull) */
+    public static final String KEY_HEADER_FIELDS = "headerFields";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -73,21 +82,24 @@ public class DfRefreshResourceRequest {
     //                                                                             =======
     /**
      * Refresh resources. (request to synchronizer)
+     * @return The map of result. map:{projectName = map:{body = ...}} (NotNull)
      * @throws IOException When the refresh failed.
      */
-    public void refreshResources() throws IOException {
+    public Map<String, Map<String, Object>> refreshResources() throws IOException {
+        final Map<String, Map<String, Object>> resultMap = new LinkedHashMap<String, Map<String, Object>>();
         for (String projectName : _projectNameList) {
-            doRefreshResources(projectName);
+            resultMap.put(projectName, doRefreshResources(projectName));
         }
+        return resultMap;
     }
 
-    protected void doRefreshResources(String projectName) throws IOException {
+    protected Map<String, Object> doRefreshResources(String projectName) throws IOException {
         final StringBuilder sb = new StringBuilder();
         sb.append("refresh?").append(projectName).append("=INFINITE");
 
         final URL url = createRefreshRequestURL(sb.toString());
         if (url == null) {
-            return;
+            return null;
         }
 
         InputStream ins = null;
@@ -96,6 +108,12 @@ public class DfRefreshResourceRequest {
             conn.setReadTimeout(getRefreshRequestReadTimeout());
             conn.connect();
             ins = conn.getInputStream();
+            final Map<String, Object> elementMap = new LinkedHashMap<String, Object>();
+            final String body = buildResult(ins);
+            elementMap.put(KEY_BODY, body);
+            elementMap.put(KEY_HEADER_FIELDS, conn.getHeaderFields());
+            handleConnectedConnection(conn, elementMap);
+            return elementMap;
         } finally {
             if (ins != null) {
                 try {
@@ -103,6 +121,16 @@ public class DfRefreshResourceRequest {
                 } catch (IOException ignored) {}
             }
         }
+    }
+
+    protected String buildResult(InputStream ins) throws IOException, UnsupportedEncodingException {
+        final byte[] body = new byte[1024];
+        ins.read(body);
+        return new String(body, "UTF-8");
+    }
+
+    protected void handleConnectedConnection(URLConnection conn, Map<String, Object> elementMap) throws IOException {
+        // do nothing as default: for overriding
     }
 
     // ===================================================================================

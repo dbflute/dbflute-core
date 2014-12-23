@@ -39,7 +39,6 @@ import org.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
 import org.dbflute.helper.jdbc.facade.DfJFadCursorHandler;
 import org.dbflute.helper.jdbc.facade.DfJFadResultSetWrapper;
 import org.dbflute.helper.token.file.FileMakingCallback;
-import org.dbflute.helper.token.file.FileMakingOption;
 import org.dbflute.helper.token.file.FileMakingRowWriter;
 import org.dbflute.helper.token.file.FileToken;
 import org.dbflute.properties.DfAdditionalTableProperties;
@@ -255,8 +254,6 @@ public class DfLReverseOutputHandler {
         }
         final File delimiterDir = new File(_delimiterDataDir);
         final String ext = "tsv"; // fixed
-        final FileMakingOption option = new FileMakingOption().encodeAsUTF8().separateByLf();
-        option.delimitateByTab();
         final String outputInfo = "...Outputting the over-xls-limit table: " + table.getTableDispName();
         _log.info(outputInfo);
         sectionInfoList.add(outputInfo);
@@ -273,7 +270,6 @@ public class DfLReverseOutputHandler {
             }
             columnNameList.add(column.getName());
         }
-        option.headerInfo(columnNameList);
         final DfJFadCursorCallback cursorCallback = templateDataResult.getCursorCallback();
         cursorCallback.select(new DfJFadCursorHandler() {
             int count = 0;
@@ -294,7 +290,7 @@ public class DfLReverseOutputHandler {
                                 ++count;
                             }
                         }
-                    }, option);
+                    }, op -> op.encodeAsUTF8().separateByLf().delimitateByTab().headerInfo(columnNameList));
                 } catch (IOException e) {
                     handleDelimiterDataFailureException(table, delimiterFilePath, e);
                 }

@@ -273,7 +273,7 @@ public class PageRangeBean implements Serializable {
      * @return The value of preRangeNearestPageNumber.
      */
     public int getPreRangeNearestPageNumber() {
-        if (!isExistPrePageRange()) {
+        if (!existsPreviousRange()) {
             String msg = "The previous page range should exist when you use preRangeNearestPageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
             msg = msg + " pageRangeOption=" + _pageRangeOption;
@@ -295,7 +295,7 @@ public class PageRangeBean implements Serializable {
      * @return The value of nextRangeNearestPageNumber.
      */
     public int getNextRangeNearestPageNumber() {
-        if (!isExistNextPageRange()) {
+        if (!existsNextRange()) {
             String msg = "The next page range should exist when you use nextRangeNearestPageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
             msg = msg + " pageRangeOption=" + _pageRangeOption;

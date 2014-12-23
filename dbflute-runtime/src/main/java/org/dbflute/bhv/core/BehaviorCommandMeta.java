@@ -16,6 +16,7 @@
 package org.dbflute.bhv.core;
 
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.outsidesql.OutsideSqlOption;
 
 /**
@@ -28,6 +29,18 @@ public interface BehaviorCommandMeta {
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
+    /**
+     * Get project name of the database (DBFlute client) for the table.
+     * @return The project name e.g. maihamadb (NotNull)
+     */
+    String getProjectName();
+
+    /**
+     * Get the DB meta instance for the table.
+     * @return The (singleton) instance of DB meta for the table. (NotNull)
+     */
+    DBMeta getDBMeta();
+
     /**
      * Get the DB name of table corresponding to the executed behavior.
      * @return The DB name of table. (NotNull)

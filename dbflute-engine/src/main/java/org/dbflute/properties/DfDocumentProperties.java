@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Properties;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
+import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
@@ -440,6 +442,46 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                           -----------
     public boolean isSuppressSchemaHtmlToSisterLink() { // closet
         return isProperty("isSuppressSchemaHtmlToSisterLink", false, getDocumentDefinitionMap());
+    }
+
+    // -----------------------------------------------------
+    //                               Neighborhood SchemaHtml
+    //                               -----------------------
+    protected Map<String, Map<String, Object>> _neighborhoodSchemaHtmlMap;
+
+    protected Map<String, Map<String, Object>> getNeighborhoodSchemaHtmlMap() { // closet
+        if (_neighborhoodSchemaHtmlMap != null) {
+            return _neighborhoodSchemaHtmlMap;
+        }
+        final String key = "neighborhoodSchemaHtmlMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) getDocumentDefinitionMap().get(key);
+        if (map != null) {
+            _neighborhoodSchemaHtmlMap = map;
+        } else {
+            _neighborhoodSchemaHtmlMap = DfCollectionUtil.emptyMap();
+        }
+        return _neighborhoodSchemaHtmlMap;
+    }
+
+    public boolean hasNeighborhoodSchemaHtml() {
+        return !getNeighborhoodSchemaHtmlMap().isEmpty();
+    }
+
+    public List<String> getNeighborhoodSchemaHtmlKeyList() {
+        return new ArrayList<String>(getNeighborhoodSchemaHtmlMap().keySet());
+    }
+
+    public String getNeighborhoodSchemaHtmlPath(String key) {
+        Map<String, Object> elementMap = getNeighborhoodSchemaHtmlMap().get(key);
+        if (elementMap == null) { // mistake of system
+            throw new IllegalStateException("Unknown key of neighborhood: " + key);
+        }
+        final String path = (String) elementMap.get("path");
+        if (path == null) {
+            throw new DfIllegalPropertySettingException("Not found path of neighborhood: " + key);
+        }
+        return path;
     }
 
     // ===================================================================================

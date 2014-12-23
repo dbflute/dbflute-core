@@ -63,8 +63,9 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     public Object handle(ResultSet rs) throws SQLException {
         final List<Object> list = new ArrayList<Object>();
         mappingBean(rs, new BeanRowHandler() {
-            public void handle(Object row) throws SQLException {
+            public boolean handle(Object row) throws SQLException {
                 list.add(row);
+                return true; // continue to next records
             }
         });
         return list;
@@ -74,7 +75,13 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     //                                                                             Mapping
     //                                                                             =======
     protected static interface BeanRowHandler {
-        void handle(Object row) throws SQLException;
+
+        /**
+         * @param row The row instance as entity. (NotNull)
+         * @return Does it continue to the next row?
+         * @throws SQLException When the SQL fails.
+         */
+        boolean handle(Object row) throws SQLException;
     }
 
     protected void mappingBean(ResultSet rs, BeanRowHandler handler) throws SQLException {
@@ -122,7 +129,10 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
 
             if (skipRelationLoop) {
                 adjustCreatedRow(row, checkNonSp, colNullObj, basePointBmd, cb);
-                handler.handle(row);
+                final boolean continueToNext = handler.handle(row);
+                if (!continueToNext) {
+                    break; // skip rear records (basically for cursor select)
+                }
                 continue;
             }
 
@@ -143,7 +153,10 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 mappingFirstRelation(rs, row, rpt, selectColumnMap, selectIndexMap, relPropCache, relRowCache, relSelector);
             }
             adjustCreatedRow(row, checkNonSp, colNullObj, basePointBmd, cb);
-            handler.handle(row);
+            final boolean continueToNext = handler.handle(row);
+            if (!continueToNext) {
+                break; // skip rear records (basically for cursor select)
+            }
         }
     }
 

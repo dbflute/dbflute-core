@@ -238,6 +238,21 @@ public class DfDocumentSelector {
         return !isSuppressPropertiesHtmlToSisterLink() && isHistoryHtml() && existsSchemaHistory();
     }
 
+    // -----------------------------------------------------
+    //                                          Neighborhood
+    //                                          ------------
+    public boolean hasNeighborhoodSchemaHtml() {
+        return getDocumentProperties().hasNeighborhoodSchemaHtml();
+    }
+
+    public List<String> getNeighborhoodSchemaHtmlKeyList() {
+        return getDocumentProperties().getNeighborhoodSchemaHtmlKeyList();
+    }
+
+    public String getNeighborhoodSchemaHtmlPath(String key) {
+        return getDocumentProperties().getNeighborhoodSchemaHtmlPath(key);
+    }
+
     // ===================================================================================
     //                                                                              Design
     //                                                                              ======

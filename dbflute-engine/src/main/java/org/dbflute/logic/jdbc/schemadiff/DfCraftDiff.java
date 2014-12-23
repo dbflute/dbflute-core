@@ -30,7 +30,6 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.token.file.FileToken;
 import org.dbflute.helper.token.file.FileTokenizingCallback;
 import org.dbflute.helper.token.file.FileTokenizingHeaderInfo;
-import org.dbflute.helper.token.file.FileTokenizingOption;
 import org.dbflute.helper.token.file.FileTokenizingRowResource;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.DfCollectionUtil;
@@ -144,7 +143,7 @@ public class DfCraftDiff extends DfAbstractDiff {
                 assertUniqueCraftKey(craftKeyName, metaFile, resource, _craftKeyNameSet);
                 craftValueList.add(createCraftValue(craftKeyName, columnValueList));
             }
-        }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
+        }, op -> op.delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
     }
 
     // -----------------------------------------------------

@@ -3590,7 +3590,7 @@ public class Table {
     }
 
     public boolean isMakeDirectConditionBeanSetup() {
-        return getLittleAdjustmentProperties().isMakeDirectConditionBeanSetup();
+        return getLittleAdjustmentProperties().isMakeDirectConditionBeanSetupTable(getTableDbName());
     }
 
     public boolean isMakeBatchUpdateSpecifyColumn() {

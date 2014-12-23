@@ -31,7 +31,6 @@ import org.dbflute.exception.DfCraftDiffIllegalCraftKeyNameException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.token.file.FileMakingCallback;
-import org.dbflute.helper.token.file.FileMakingOption;
 import org.dbflute.helper.token.file.FileMakingRowWriter;
 import org.dbflute.helper.token.file.FileToken;
 import org.dbflute.properties.DfDocumentProperties;
@@ -221,7 +220,7 @@ public class DfCraftDiffAssertHandler {
                         writer.writeRow(map);
                     }
                 }
-            }, new FileMakingOption().delimitateByTab().encodeAsUTF8());
+            }, op -> op.delimitateByTab().encodeAsUTF8());
         } catch (IOException e) {
             String msg = "Failed to make file: " + nextDataFile.getPath();
             throw new IllegalStateException(msg, e);

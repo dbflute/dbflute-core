@@ -13,23 +13,19 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.exception;
+package org.dbflute.helper.token.file;
 
 /**
- * The exception when the record has already been deleted (by other thread). <br>
- * This class is old.
+ * The callback interface of file-token option.
+ * @param <OP> The type of file-token option to be set up.
  * @author jflute
+ * @since 1.1.0 (2014/12/02 Tuesday)
  */
-public class RecordHasAlreadyBeenDeletedException extends RuntimeException {
-
-    /** The serial version UID for object serialization. (Default) */
-    private static final long serialVersionUID = 1L;
+@FunctionalInterface
+public interface FileTokenOptionCall<OP> {
 
     /**
-     * Constructor.
-     * @param msg The message of the exception. (NotNull)
+     * @param op The option of file-token to be set up. (NotNull)
      */
-    public RecordHasAlreadyBeenDeletedException(String msg) {
-        super(msg);
-    }
+    void callback(OP op);
 }

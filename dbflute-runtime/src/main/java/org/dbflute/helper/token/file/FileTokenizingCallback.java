@@ -21,6 +21,7 @@ import java.sql.SQLException;
 /**
  * @author jflute
  */
+@FunctionalInterface
 public interface FileTokenizingCallback {
 
     /**

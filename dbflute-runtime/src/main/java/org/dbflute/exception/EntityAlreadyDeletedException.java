@@ -19,7 +19,7 @@ package org.dbflute.exception;
  * The exception of when the entity has already been deleted by other thread.
  * @author jflute
  */
-public class EntityAlreadyDeletedException extends RecordHasAlreadyBeenDeletedException {
+public class EntityAlreadyDeletedException extends RuntimeException implements EntityBusinessException {
 
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;

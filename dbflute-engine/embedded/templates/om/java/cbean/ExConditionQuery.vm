@@ -21,7 +21,7 @@ import org.dbflute.cbean.sqlclause.SqlClause;
 import ${glPackageBaseCQ}.${myBaseConditionQueryClassName};
 
 /**
- * The condition-query of ${table.tableDbName}.
+ * The condition-query of ${table.tableDispName}.
  * <p>
  * You can implement your original methods here.
  * This class remains when re-generating.

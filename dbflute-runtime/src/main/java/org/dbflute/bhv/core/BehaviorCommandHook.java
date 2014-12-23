@@ -36,4 +36,13 @@ public interface BehaviorCommandHook {
      * @param cause The exception if the behavior command was failed. (NullAllowed)
      */
     void hookFinally(BehaviorCommandMeta meta, RuntimeException cause);
+
+    /**
+     * Does it inherit the existing hook? <br>
+     * Completely overriding as default but you can inherit it by this determination.
+     * @return The determination, true or false.
+     */
+    default boolean inheritsExistingHook() {
+        return false;
+    }
 }

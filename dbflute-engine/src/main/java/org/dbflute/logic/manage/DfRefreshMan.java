@@ -51,6 +51,7 @@ public class DfRefreshMan {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected boolean _specified;
     protected String _specifiedRefreshProject; // e.g. from command line argument
 
     // ===================================================================================
@@ -59,15 +60,21 @@ public class DfRefreshMan {
     public void refresh() {
         final List<String> refreshList = getRefreshProjectList();
         if (refreshList.isEmpty()) {
-            String msg = "No refresh project specified.";
-            throw new IllegalStateException(msg);
+            if (_specified) { // e.g. refresh task
+                _log.info("*No refresh project");
+            }
+            return; // no settings
         }
         final String requestUrl = getRefreshRequestUrl();
         if (requestUrl == null || requestUrl.trim().length() == 0) {
             String msg = "No refresh request URL specified.";
             throw new IllegalStateException(msg);
         }
-        new DfRefreshResourceProcess(refreshList, requestUrl).refreshResources();
+        createResourceProcess(refreshList, requestUrl).refreshResources();
+    }
+
+    protected DfRefreshResourceProcess createResourceProcess(List<String> refreshList, String requestUrl) {
+        return new DfRefreshResourceProcess(refreshList, requestUrl);
     }
 
     protected List<String> getRefreshProjectList() {
@@ -170,6 +177,7 @@ public class DfRefreshMan {
     //                                                                            Accessor
     //                                                                            ========
     public DfRefreshMan specifyRefreshProject(String refreshProject) {
+        _specified = true;
         _specifiedRefreshProject = refreshProject;
         return this;
     }

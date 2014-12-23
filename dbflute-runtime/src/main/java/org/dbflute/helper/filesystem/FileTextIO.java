@@ -81,15 +81,15 @@ public class FileTextIO {
 
     /**
      * @param textPath The path to the text file. (NotNull)
-     * @param filter The filter of text line. (NotNull)
+     * @param oneArgLambda The filter of text line. (NotNull)
      * @return The filtered read text. (NotNull)
      */
-    public String readFilteringLine(String textPath, FileTextLineFilter filter) {
+    public String readFilteringLine(String textPath, FileTextLineFilter oneArgLambda) {
         assertState();
         assertStringNotNullAndNotTrimmedEmpty("textPath", textPath);
-        assertObjectNotNull("filter", filter);
+        assertObjectNotNull("oneArgLambda(filter)", oneArgLambda);
         try {
-            return filterAsLine(readTextClosed(createFileInputStream(textPath)), filter);
+            return filterAsLine(readTextClosed(createFileInputStream(textPath)), oneArgLambda);
         } catch (IOException e) {
             return handleTextFileReadFailureException(textPath, e);
         }
@@ -97,15 +97,15 @@ public class FileTextIO {
 
     /**
      * @param ins The input stream for the text. (NotNull)
-     * @param filter The filter of text line. (NotNull)
+     * @param oneArgLambda The filter of text line. (NotNull)
      * @return The filtered read text. (NotNull)
      */
-    public String readFilteringLine(InputStream ins, FileTextLineFilter filter) {
+    public String readFilteringLine(InputStream ins, FileTextLineFilter oneArgLambda) {
         assertState();
         assertObjectNotNull("ins", ins);
-        assertObjectNotNull("filter", filter);
+        assertObjectNotNull("oneArgLambda(filter)", oneArgLambda);
         try {
-            return filterAsLine(readTextClosed(ins), filter);
+            return filterAsLine(readTextClosed(ins), oneArgLambda);
         } catch (IOException e) {
             return handleInputStreamReadFailureException(ins, e);
         }
@@ -113,15 +113,15 @@ public class FileTextIO {
 
     /**
      * @param textPath The path to the text file. (NotNull)
-     * @param filter The filter of whole text. (NotNull)
+     * @param oneArgLambda The filter of whole text. (NotNull)
      * @return The filtered read text. (NotNull)
      */
-    public String readFilteringWhole(String textPath, FileTextWholeFilter filter) {
+    public String readFilteringWhole(String textPath, FileTextWholeFilter oneArgLambda) {
         assertState();
         assertStringNotNullAndNotTrimmedEmpty("textPath", textPath);
-        assertObjectNotNull("filter", filter);
+        assertObjectNotNull("oneArgLambda(filter)", oneArgLambda);
         try {
-            return filterAsWhole(readTextClosed(createFileInputStream(textPath)), filter);
+            return filterAsWhole(readTextClosed(createFileInputStream(textPath)), oneArgLambda);
         } catch (IOException e) {
             return handleTextFileReadFailureException(textPath, e);
         }
@@ -129,15 +129,15 @@ public class FileTextIO {
 
     /**
      * @param ins The input stream for the text. (NotNull)
-     * @param filter The filter of whole text. (NotNull)
+     * @param oneArgLambda The filter of whole text. (NotNull)
      * @return The filtered read text. (NotNull)
      */
-    public String readFilteringWhole(InputStream ins, FileTextWholeFilter filter) {
+    public String readFilteringWhole(InputStream ins, FileTextWholeFilter oneArgLambda) {
         assertState();
         assertObjectNotNull("ins", ins);
-        assertObjectNotNull("filter", filter);
+        assertObjectNotNull("oneArgLambda(filter)", oneArgLambda);
         try {
-            return filterAsWhole(readTextClosed(ins), filter);
+            return filterAsWhole(readTextClosed(ins), oneArgLambda);
         } catch (IOException e) {
             return handleInputStreamReadFailureException(ins, e);
         }
@@ -148,28 +148,28 @@ public class FileTextIO {
     //                                                                             =======
     /**
      * @param textPath The path to the text file. (NotNull)
-     * @param filter The filter of text line. (NotNull)
+     * @param oneArgLambda The filter of text line. (NotNull)
      * @return The filtered written text. (NotNull)
      */
-    public String rewriteFilteringLine(String textPath, FileTextLineFilter filter) {
+    public String rewriteFilteringLine(String textPath, FileTextLineFilter oneArgLambda) {
         assertState();
         assertStringNotNullAndNotTrimmedEmpty("textPath", textPath);
-        assertObjectNotNull("filter", filter);
-        final String read = readFilteringLine(textPath, filter);
+        assertObjectNotNull("oneArgLambda(filter)", oneArgLambda);
+        final String read = readFilteringLine(textPath, oneArgLambda);
         write(textPath, read);
         return read;
     }
 
     /**
      * @param textPath The path to the text file. (NotNull)
-     * @param filter The filter of whole text. (NotNull)
+     * @param oneArgLambda The filter of whole text. (NotNull)
      * @return The filtered written text. (NotNull)
      */
-    public String rewriteFilteringLine(String textPath, FileTextWholeFilter filter) {
+    public String rewriteFilteringLine(String textPath, FileTextWholeFilter oneArgLambda) {
         assertState();
         assertStringNotNullAndNotTrimmedEmpty("textPath", textPath);
-        assertObjectNotNull("filter", filter);
-        final String read = readFilteringWhole(textPath, filter);
+        assertObjectNotNull("oneArgLambda(filter)", oneArgLambda);
+        final String read = readFilteringWhole(textPath, oneArgLambda);
         write(textPath, read);
         return read;
     }
@@ -202,14 +202,15 @@ public class FileTextIO {
     /**
      * @param textPath The path to the text file. (NotNull)
      * @param text The written text. (NotNull)
-     * @param filter The filter of text line. (NotNull)
+     * @param oneArgLambda The filter of text line. (NotNull)
      * @return The filtered written text. (NotNull)
      */
-    public String writeFilteringLine(String textPath, String text, FileTextLineFilter filter) {
+    public String writeFilteringLine(String textPath, String text, FileTextLineFilter oneArgLambda) {
         assertState();
         assertStringNotNullAndNotTrimmedEmpty("textPath", textPath);
         assertStringNotNullAndNotTrimmedEmpty("text", text);
-        final String filtered = filterAsLine(text, filter);
+        assertObjectNotNull("oneArgLambda(filter)", oneArgLambda);
+        final String filtered = filterAsLine(text, oneArgLambda);
         writeTextClosed(createFileOutputStream(textPath), filtered);
         return filtered;
     }
@@ -217,14 +218,15 @@ public class FileTextIO {
     /**
      * @param ous The output stream for the text. (NotNull)
      * @param text The written text. (NotNull)
-     * @param filter The filter of text line. (NotNull)
+     * @param oneArgLambda The filter of text line. (NotNull)
      * @return The filtered written text. (NotNull)
      */
-    public String writeFilteringLine(OutputStream ous, String text, FileTextLineFilter filter) {
+    public String writeFilteringLine(OutputStream ous, String text, FileTextLineFilter oneArgLambda) {
         assertState();
         assertObjectNotNull("ous", ous);
         assertStringNotNullAndNotTrimmedEmpty("text", text);
-        final String filtered = filterAsLine(text, filter);
+        assertObjectNotNull("oneArgLambda(filter)", oneArgLambda);
+        final String filtered = filterAsLine(text, oneArgLambda);
         writeTextClosed(ous, filtered);
         return filtered;
     }
@@ -232,14 +234,15 @@ public class FileTextIO {
     /**
      * @param textPath The path to the text file. (NotNull)
      * @param text The written text. (NotNull)
-     * @param filter The filter of whole text. (NotNull)
+     * @param oneArgLambda The filter of whole text. (NotNull)
      * @return The filtered written text. (NotNull)
      */
-    public String writeFilteringLine(String textPath, String text, FileTextWholeFilter filter) {
+    public String writeFilteringLine(String textPath, String text, FileTextWholeFilter oneArgLambda) {
         assertState();
         assertStringNotNullAndNotTrimmedEmpty("textPath", textPath);
         assertStringNotNullAndNotTrimmedEmpty("text", text);
-        final String filtered = filterAsWhole(text, filter);
+        assertObjectNotNull("oneArgLambda(filter)", oneArgLambda);
+        final String filtered = filterAsWhole(text, oneArgLambda);
         writeTextClosed(createFileOutputStream(textPath), filtered);
         return filtered;
     }
@@ -247,14 +250,15 @@ public class FileTextIO {
     /**
      * @param ous The output stream for the text. (NotNull)
      * @param text The written text. (NotNull)
-     * @param filter The filter of whole text. (NotNull)
+     * @param oneArgLambda The filter of whole text. (NotNull)
      * @return The filtered written text. (NotNull)
      */
-    public String writeFilteringLine(OutputStream ous, String text, FileTextWholeFilter filter) {
+    public String writeFilteringLine(OutputStream ous, String text, FileTextWholeFilter oneArgLambda) {
         assertState();
         assertObjectNotNull("ous", ous);
         assertStringNotNullAndNotTrimmedEmpty("text", text);
-        final String filtered = filterAsWhole(text, filter);
+        assertObjectNotNull("oneArgLambda(filter)", oneArgLambda);
+        final String filtered = filterAsWhole(text, oneArgLambda);
         writeTextClosed(ous, filtered);
         return filtered;
     }

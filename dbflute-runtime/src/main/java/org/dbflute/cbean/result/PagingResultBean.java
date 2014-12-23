@@ -425,7 +425,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @return The value of prePageNumber.
      */
     public int getPrePageNumber() {
-        if (!isExistPrePage()) {
+        if (!existsPreviousPage()) {
             String msg = "The previous page should exist when you use prePageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber;
             throw new IllegalStateException(msg);
@@ -444,7 +444,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @return The value of nextPageNumber.
      */
     public int getNextPageNumber() {
-        if (!isExistNextPage()) {
+        if (!existsNextPage()) {
             String msg = "The next page should exist when you use nextPageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber;
             throw new IllegalStateException(msg);

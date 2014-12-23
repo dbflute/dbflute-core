@@ -29,9 +29,6 @@ public class LineTokenTest extends RuntimeTestCase {
     public void test_make_quoteAll_basic() {
         // ## Arrange ##
         LineToken impl = new LineToken();
-        LineMakingOption option = new LineMakingOption();
-        option.delimitateByComma();
-        option.quoteAll();
         List<String> valueList = new ArrayList<String>();
         valueList.add("a");
         valueList.add("b");
@@ -40,7 +37,7 @@ public class LineTokenTest extends RuntimeTestCase {
         valueList.add("e");
 
         // ## Act ##
-        String line = impl.make(valueList, option);
+        String line = impl.make(valueList, op -> op.delimitateByComma().quoteAll());
 
         // ## Assert ##
         log(line);
@@ -50,9 +47,6 @@ public class LineTokenTest extends RuntimeTestCase {
     public void test_make_quoteAll_escape() {
         // ## Arrange ##
         LineToken impl = new LineToken();
-        LineMakingOption option = new LineMakingOption();
-        option.delimitateByComma();
-        option.quoteAll();
         List<String> valueList = new ArrayList<String>();
         valueList.add("a");
         valueList.add("b");
@@ -61,7 +55,7 @@ public class LineTokenTest extends RuntimeTestCase {
         valueList.add("e");
 
         // ## Act ##
-        String line = impl.make(valueList, option);
+        String line = impl.make(valueList, op -> op.delimitateByComma().quoteAll());
 
         // ## Assert ##
         log(line);
@@ -71,9 +65,6 @@ public class LineTokenTest extends RuntimeTestCase {
     public void test_make_quoteMinimally_escape() {
         // ## Arrange ##
         LineToken impl = new LineToken();
-        LineMakingOption option = new LineMakingOption();
-        option.delimitateByComma();
-        option.quoteMinimally();
         List<String> valueList = new ArrayList<String>();
         valueList.add("a");
         valueList.add("b");
@@ -82,7 +73,7 @@ public class LineTokenTest extends RuntimeTestCase {
         valueList.add("e");
 
         // ## Act ##
-        String line = impl.make(valueList, option);
+        String line = impl.make(valueList, op -> op.delimitateByComma().quoteMinimally());
 
         // ## Assert ##
         log(line);

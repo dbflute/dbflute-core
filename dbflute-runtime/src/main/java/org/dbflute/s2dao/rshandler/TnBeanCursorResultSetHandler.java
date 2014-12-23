@@ -54,13 +54,14 @@ public class TnBeanCursorResultSetHandler extends TnBeanListResultSetHandler {
         }
         final EntityRowHandler<Entity> entityRowHandler = getEntityRowHandler();
         mappingBean(rs, new BeanRowHandler() {
-            public void handle(Object row) throws SQLException {
+            public boolean handle(Object row) throws SQLException {
                 if (!(row instanceof Entity)) {
                     String msg = "The row object should be an entity at bean cursor handling:";
                     msg = msg + " row=" + (row != null ? row.getClass().getName() + ":" + row : null);
                     throw new IllegalStateException(msg);
                 }
                 entityRowHandler.handle((Entity) row);
+                return !entityRowHandler.isBreakCursor(); // continue to next records?
             }
         });
         return null;

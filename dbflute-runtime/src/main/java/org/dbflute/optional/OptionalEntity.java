@@ -274,9 +274,9 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     @SuppressWarnings("unchecked")
-    public <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super ENTITY, ? extends RESULT> entityLambda) {
+    public <RESULT> OptionalEntity<RESULT> map(OptionalThingFunction<? super ENTITY, ? extends RESULT> entityLambda) {
         assertEntityLambdaNotNull(entityLambda);
-        return (OptionalThing<RESULT>) callbackMapping(entityLambda); // downcast allowed because factory is overridden
+        return (OptionalEntity<RESULT>) callbackMapping(entityLambda); // downcast allowed because factory is overridden
     }
 
     /** {@inheritDoc} */
@@ -320,10 +320,11 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
         return directlyGetOrElseGet(noArgLambda);
     }
 
-    // unsupported because of almost no needed, see the comment on OptionalThing for the details
-    //public ENTITY orElseThrow(...) {
-    //    return ...;
-    //}
+    /** {@inheritDoc} */
+    @Override
+    public <CAUSE extends Throwable> ENTITY orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
+        return directlyGetOrElseThrow(noArgLambda);
+    }
 
     // ===================================================================================
     //                                                                   DBFlute Extension

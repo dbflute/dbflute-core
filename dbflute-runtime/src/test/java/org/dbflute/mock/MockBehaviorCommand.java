@@ -18,12 +18,21 @@ package org.dbflute.mock;
 import org.dbflute.bhv.core.BehaviorCommand;
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.outsidesql.OutsideSqlOption;
 
 /**
  * @author jflute
  */
 public class MockBehaviorCommand implements BehaviorCommand<Object> {
+
+    public String getProjectName() {
+        return null;
+    }
+
+    public DBMeta getDBMeta() {
+        return null;
+    }
 
     public void afterExecuting() {
     }

@@ -59,6 +59,12 @@ public interface DBMeta {
     //                                                                               DBDef
     //                                                                               =====
     /**
+     * Get project name of the database (DBFlute client) for the table.
+     * @return The project name e.g. maihamadb (NotNull)
+     */
+    String getProjectName();
+
+    /**
      * Get the current DB definition.
      * @return The current DB definition. (NotNull)
      */

@@ -1686,6 +1686,10 @@ public class Database {
         return getProperties().getDependencyInjectionProperties().isDBFluteBeansGeneratedAsJavaConfig();
     }
 
+    public boolean isDBFluteBeansJavaConfigLazy() {
+        return getProperties().getDependencyInjectionProperties().isDBFluteBeansJavaConfigLazy();
+    }
+
     // -----------------------------------------------------
     //                                                 Guice
     //                                                 -----

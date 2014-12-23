@@ -6,9 +6,9 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1.0" />
-	<property name="build.version" value="${version}-RC1" />
+	<property name="build.version" value="${version}-RC3" />
 	<property name="runtime.version" value="1.1.0" />
-	<property name="runtime.build.version" value="${runtime.version}-RC1" />
+	<property name="runtime.build.version" value="${runtime.version}-RC3" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
@@ -57,6 +57,7 @@
 
 	<!-- SubProject Examples -->
 	<property name="example.on.springboot.dir" value="${example.on.stage.base}/dbflute-example-on-springboot" />
+	<property name="example.on.play2java.dir" value="${example.on.stage.base}/dbflute-example-on-play2java" />
 	<property name="example.with.doma.dir" value="${example.on.stage.base}/dbflute-example-with-doma" />
 
 	<!-- ============================================================================= -->
@@ -327,6 +328,15 @@
 			description="==> reflect to example on SpringBoot">
 		<delete dir="${example.on.springboot.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${example.on.springboot.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-example-on-play2java" depends="prepare-reflection"
+			description="==> reflect to example on Play2 Java">
+		<delete dir="${example.on.play2java.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${example.on.play2java.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />

@@ -147,10 +147,11 @@ public class OptionalScalar<SCALAR> extends BaseOptional<SCALAR> {
         return directlyGetOrElseGet(noArgLambda);
     }
 
-    // unsupported because of almost no needed, see the comment on OptionalThing for the details
-    //public ENTITY orElseThrow(...) {
-    //    return ...;
-    //}
+    /** {@inheritDoc} */
+    @Override
+    public <CAUSE extends Throwable> SCALAR orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
+        return directlyGetOrElseThrow(noArgLambda);
+    }
 
     // ===================================================================================
     //                                                                   DBFlute Extension

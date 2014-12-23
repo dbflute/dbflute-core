@@ -25,14 +25,12 @@ import java.util.Map;
  * File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
  * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
  * FileToken fileToken = new FileToken();
- * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
- *     public void write(FileMakingRowWriter writer) throws IOException, SQLException {
- *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
- *             List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
- *             writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
- *         }
+ * fileToken.make(new FileOutputStream(tsvFile), <span style="color: #553000">writer</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+ *     for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
+ *         List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
+ *         writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
  *     }
- * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+ * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
  * </pre>
  * @author jflute
  */

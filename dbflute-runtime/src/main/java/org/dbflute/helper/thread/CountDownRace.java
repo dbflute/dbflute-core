@@ -58,12 +58,12 @@ public class CountDownRace {
     // ===================================================================================
     //                                                                         Thread Fire
     //                                                                         ===========
-    public void readyGo(CountDownRaceExecution execution) {
-        if (execution == null) {
+    public void readyGo(CountDownRaceExecution oneArgLambda) {
+        if (oneArgLambda == null) {
             String msg = "The argument 'execution' should be not null.";
             throw new IllegalArgumentException(msg);
         }
-        doReadyGo(execution);
+        doReadyGo(oneArgLambda);
     }
 
     protected void doReadyGo(CountDownRaceExecution execution) {

@@ -283,7 +283,7 @@ public class PageGroupBean implements Serializable {
      * @return The value of preGroupNearestPageNumber.
      */
     public int getPreGroupNearestPageNumber() {
-        if (!isExistPrePageGroup()) {
+        if (!existsPreviousGroup()) {
             String msg = "The previous page range should exist when you use preGroupNearestPageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
             msg = msg + " pageGroupOption=" + _pageGroupOption;
@@ -305,7 +305,7 @@ public class PageGroupBean implements Serializable {
      * @return The value of nextGroupNearestPageNumber.
      */
     public int getNextGroupNearestPageNumber() {
-        if (!isExistNextPageGroup()) {
+        if (!existsNextGroup()) {
             String msg = "The next page range should exist when you use nextGroupNearestPageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
             msg = msg + " pageGroupOption=" + _pageGroupOption;

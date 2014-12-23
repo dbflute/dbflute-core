@@ -19,6 +19,7 @@ package org.dbflute.helper.thread;
  * @author jflute
  * @since 1.0.5A (2013/10/17 Thursday)
  */
+@FunctionalInterface
 public interface CountDownRaceExecution {
 
     /**

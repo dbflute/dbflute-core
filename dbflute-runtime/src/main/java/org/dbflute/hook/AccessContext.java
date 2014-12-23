@@ -434,7 +434,7 @@ public class AccessContext {
         br.addElement("For example:");
         br.addElement("  try {");
         br.addElement("      AccessContext context = new AccessContext();");
-        br.addElement("      context.setAccessTimestamp(accessTimestamp);");
+        br.addElement("      context.setAccessLocalDateTime(accessLocalDateTime);");
         br.addElement("      context.setAccessUser(accessUser);");
         br.addElement("      context.setAccessProcess(accessProcess);");
         br.addElement("      AccessContext.setAccessContextOnThread(context);");
@@ -455,7 +455,7 @@ public class AccessContext {
         br.addElement("For example:");
         br.addElement("  try {");
         br.addElement("      AccessContext context = new AccessContext();");
-        br.addElement("      context.setAccessTimestamp(accessTimestamp);");
+        br.addElement("      context.setAccessLocalDateTime(accessLocalDateTime);");
         br.addElement("      context.setAccessUser(accessUser);");
         br.addElement("      context.setAccessProcess(accessProcess);");
         br.addElement("      AccessContext.setAccessContextOnThread(context);");

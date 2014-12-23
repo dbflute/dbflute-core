@@ -11,6 +11,7 @@ ant -f build.xml reflect-to-test-dbms-derby
 ant -f build.xml reflect-to-test-dbms-sqlite
 ant -f build.xml reflect-to-test-option-compatible10x
 ant -f build.xml reflect-to-example-on-springboot
+ant -f build.xml reflect-to-example-on-play2java
 ant -f build.xml reflect-to-example-with-doma
 
 cd ..
@@ -85,6 +86,9 @@ rm ./log/*.log
 . manage.sh renewal
 cd ..
 mvn -e compile
+cd ../dbflute-test-dbms-derby/dbflute_maihamadb
+. manage.sh refresh
+cd ..
 
 cd ../dbflute-test-option-compatible10x/dbflute_maihamadb
 rm ./log/*.log
@@ -93,6 +97,12 @@ cd ..
 mvn -e compile
 
 cd ../dbflute-example-on-springboot/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal
+cd ..
+mvn -e compile
+
+cd ../dbflute-example-on-play2java/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
 cd ..

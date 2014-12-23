@@ -25,6 +25,8 @@ import org.dbflute.bhv.core.BehaviorCommandComponentSetup;
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.InternalMapContext.InvokePathProvider;
 import org.dbflute.bhv.core.execution.OutsideSqlExecuteExecution;
+import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
@@ -56,11 +58,23 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     //                                   Injection Component
     //                                   -------------------
     // these are not null
+    protected DBMetaProvider _dbmetaProvider;
     protected DataSource _dataSource;
     protected StatementFactory _statementFactory;
     protected TnBeanMetaDataFactory _beanMetaDataFactory;
     protected TnResultSetHandlerFactory _resultSetHandlerFactory;
     protected String _sqlFileEncoding;
+
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    public String getProjectName() {
+        return getDBMeta().getProjectName();
+    }
+
+    public DBMeta getDBMeta() {
+        return _dbmetaProvider.provideDBMeta(_tableDbName);
+    }
 
     // ===================================================================================
     //                                                                             Factory
@@ -198,6 +212,11 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     // -----------------------------------------------------
     //                                   Injection Component
     //                                   -------------------
+    @Override
+    public void setDBMetaProvider(DBMetaProvider dbmetaProvider) {
+        _dbmetaProvider = dbmetaProvider;
+    }
+
     public void setDataSource(DataSource dataSource) {
         _dataSource = dataSource;
     }
