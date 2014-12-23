@@ -88,7 +88,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberId(3);
      * SimpleMember member
-     *     = memberBhv.outsideSql().entityHandling().<span style="color: #CC4747">selectEntity</span>(pmb);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectEntity</span>(pmb);
      * if (member != null) {
      *     ... = member.get...();
      * } else {
@@ -155,7 +155,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * PagingResultBean&lt;SimpleMember&gt; page
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectPage</span>(pmb);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectPage</span>(pmb);
      * int allRecordCount = page.getAllRecordCount();
      * int allPageCount = page.getAllPageCount();
      * boolean isExistPrePage = page.isExistPrePage();
@@ -230,7 +230,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * pmb.setMemberName_PrefixSearch("S");
      * pmb.paging(20, 3); <span style="color: #3F7E5E">// 20 records per a page and current page number is 3</span>
      * ListResultBean&lt;SimpleMember&gt; memberList
-     *     = memberBhv.outsideSql().manualPaging().<span style="color: #CC4747">selectList</span>(pmb);
+     *     = memberBhv.outsideSql().<span style="color: #CC4747">selectPagedListOnly</span>(pmb);
      * for (SimpleMember member : memberList) {
      *     ... = member.get...();
      * }
@@ -290,8 +290,7 @@ public class OutsideSqlAllFacadeExecutor<BEHAVIOR> {
      * <pre>
      * SimpleMemberPmb pmb = new SimpleMemberPmb();
      * pmb.setMemberName_PrefixSearch("S");
-     * memberBhv.outsideSql().cursorHandling()
-     *         .<span style="color: #CC4747">selectCursor</span>(pmb, new PurchaseSummaryMemberCursorHandler() {
+     * memberBhv.outsideSql().<span style="color: #CC4747">selectCursor</span>(pmb, new PurchaseSummaryMemberCursorHandler() {
      *     protected Object fetchCursor(PurchaseSummaryMemberCursor cursor) throws SQLException {
      *         while (cursor.next()) {
      *             Integer memberId = cursor.getMemberId();
