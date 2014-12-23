@@ -2960,8 +2960,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return DfCollectionUtil.newArrayListSized(size);
     }
 
-    protected <ELEMENT> List<ELEMENT> newArrayList(@SuppressWarnings("unchecked") ELEMENT... elements) {
-        return DfCollectionUtil.newArrayList(elements);
+    // avoid heap warning
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT element) {
+        return DfCollectionUtil.newArrayList(element);
+    }
+
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT element1, ELEMENT element2) {
+        return DfCollectionUtil.newArrayList(element1, element2);
+    }
+
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT element1, ELEMENT element2, ELEMENT element3) {
+        return DfCollectionUtil.newArrayList(element1, element2, element3);
     }
 
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> collection) {

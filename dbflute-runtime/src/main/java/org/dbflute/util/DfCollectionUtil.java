@@ -78,7 +78,8 @@ public class DfCollectionUtil {
         return list;
     }
 
-    public static <ELEMENT> ArrayList<ELEMENT> newArrayList(@SuppressWarnings("unchecked") ELEMENT... elements) {
+    @SafeVarargs
+    public static <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
         final ArrayList<ELEMENT> list = newArrayListSized(elements.length);
         for (ELEMENT element : elements) {
             list.add(element);
@@ -353,7 +354,8 @@ public class DfCollectionUtil {
         return set;
     }
 
-    public static <ELEMENT> HashSet<ELEMENT> newHashSet(@SuppressWarnings("unchecked") ELEMENT... elements) {
+    @SafeVarargs
+    public static <ELEMENT> HashSet<ELEMENT> newHashSet(ELEMENT... elements) {
         final HashSet<ELEMENT> set = newHashSetSized(elements.length);
         for (ELEMENT element : elements) {
             set.add(element);
@@ -375,7 +377,8 @@ public class DfCollectionUtil {
         return set;
     }
 
-    public static <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet(@SuppressWarnings("unchecked") ELEMENT... elements) {
+    @SafeVarargs
+    public static <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet(ELEMENT... elements) {
         final LinkedHashSet<ELEMENT> set = newLinkedHashSetSized(elements.length);
         for (ELEMENT element : elements) {
             set.add(element);

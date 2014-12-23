@@ -684,8 +684,33 @@ public abstract class RuntimeTestCase extends TestCase {
         return DfCollectionUtil.newArrayList(elements);
     }
 
-    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(@SuppressWarnings("unchecked") ELEMENT... elements) {
-        return DfCollectionUtil.newArrayList(elements);
+    // avoid heap warning
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT el) {
+        return DfCollectionUtil.newArrayList(el);
+    }
+
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT el1, ELEMENT el3) {
+        return DfCollectionUtil.newArrayList(el1, el3);
+    }
+
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT el1, ELEMENT el2, ELEMENT el3) {
+        return DfCollectionUtil.newArrayList(el1, el2, el3);
+    }
+
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT el1, ELEMENT el2, ELEMENT el3, ELEMENT el4) {
+        return DfCollectionUtil.newArrayList(el1, el2, el3, el4);
+    }
+
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT el1, ELEMENT el2, ELEMENT el3, ELEMENT el4, ELEMENT el5) {
+        return DfCollectionUtil.newArrayList(el1, el2, el3, el4, el5);
+    }
+
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT el1, ELEMENT el2, ELEMENT el3, ELEMENT el4, ELEMENT el5, ELEMENT el6) {
+        return DfCollectionUtil.newArrayList(el1, el2, el3, el4, el5, el6);
+    }
+
+    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT el1, ELEMENT el2, ELEMENT el3, ELEMENT el4, ELEMENT el5, ELEMENT el6, ELEMENT el7) {
+        return DfCollectionUtil.newArrayList(el1, el2, el3, el4, el5, el6, el7);
     }
 
     protected <ELEMENT> HashSet<ELEMENT> newHashSet() {
@@ -696,19 +721,11 @@ public abstract class RuntimeTestCase extends TestCase {
         return DfCollectionUtil.newHashSet(elements);
     }
 
-    protected <ELEMENT> HashSet<ELEMENT> newHashSet(@SuppressWarnings("unchecked") ELEMENT... elements) {
-        return DfCollectionUtil.newHashSet(elements);
-    }
-
     protected <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet() {
         return DfCollectionUtil.newLinkedHashSet();
     }
 
     protected <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet(Collection<ELEMENT> elements) {
-        return DfCollectionUtil.newLinkedHashSet(elements);
-    }
-
-    protected <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet(@SuppressWarnings("unchecked") ELEMENT... elements) {
         return DfCollectionUtil.newLinkedHashSet(elements);
     }
 
