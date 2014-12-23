@@ -86,6 +86,9 @@ rm ./log/*.log
 . manage.sh renewal
 cd ..
 mvn -e compile
+cd ../dbflute-test-dbms-derby/dbflute_maihamadb
+. manage.sh refresh
+cd ..
 
 cd ../dbflute-test-option-compatible10x/dbflute_maihamadb
 rm ./log/*.log
