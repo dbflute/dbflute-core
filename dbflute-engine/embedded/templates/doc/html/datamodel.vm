@@ -82,11 +82,15 @@ h4 {
 }
 .sisterlink {
 	margin-top: 0.6em;
-	font-size: 110%;
+	font-size: 120%;
 }
 .sistersublink {
 	margin-top: 0.6em;
 	font-size: 85%;
+}
+.sisterneighborlink {
+	margin-top: 0.6em;
+	font-size: 100%;
 }
 
 /* keyword search */
@@ -302,17 +306,17 @@ ${database.schemaHtmlJavaScriptEmbedded}
 <div class="navilinkarea">
 #if ($database.hasClassificationDefinition() || $database.isSchemaHtmlOutsideSqlValid() || $database.isSchemaHtmlProcedureValid())
 #set ($linkDelimiter = "")
-<p>
+<p class="sublink">
 #if ($database.hasClassificationDefinition())
-${linkDelimiter} <span class="sublink"><a href="#cdef">Classification Definition</a></span>
+${linkDelimiter} <a href="#cdef">Classification Definition</a>
 #set ($linkDelimiter = "|")
 #end
 #if ($database.isSchemaHtmlOutsideSqlValid())
-${linkDelimiter} <span class="sublink"><a href="#outsidesql">OutsideSql List</a></span>
+${linkDelimiter} <a href="#outsidesql">OutsideSql List</a>
 #set ($linkDelimiter = "|")
 #end
 #if ($database.isSchemaHtmlProcedureValid())
-${linkDelimiter} <span class="sublink"><a href="#procedure">Procedure List</a></span>
+${linkDelimiter} <a href="#procedure">Procedure List</a>
 #end
 </p>
 #end
@@ -330,9 +334,9 @@ ${linkDelimiter} <span class="sublink"><a href="#procedure">Procedure List</a></
 #end
 #if ($selector.hasNeighborhoodSchemaHtml())
 #set ($linkDelimiter = "")
-<p>
+<p class="sisterneighborlink">
 #foreach ($schemaHtmlKey in $selector.neighborhoodSchemaHtmlKeyList)
-${linkDelimiter} <p class="sistersublink"><a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKey)}">to ${schemaHtmlKey}</a></p>
+${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKey)}">to ${schemaHtmlKey}</a>
 #set ($linkDelimiter = "|")
 #end
 </p>
