@@ -16,6 +16,7 @@
 package org.dbflute.bhv;
 
 import org.dbflute.Entity;
+import org.dbflute.bhv.readable.EntityRowHandler;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.chelper.HpSLSFunction;
 import org.dbflute.cbean.result.ListResultBean;
@@ -111,11 +112,23 @@ public interface BehaviorReadable {
     <RESULT extends Entity> PagingResultBean<RESULT> readPage(ConditionBean cb);
 
     // ===================================================================================
+    //                                                                         Cursor Read
+    //                                                                         ===========
+    /**
+     * Read the cursor by the row handler. <br>
+     * An interface dispatch for selecrCursor().
+     * @param <RESULT> The result type of entity.
+     * @param cb The instance of corresponding condition-bean. (NotNull)
+     * @param entityLambda The handler of entity row. (NotNull)
+     */
+    <RESULT extends Entity> void readCursor(ConditionBean cb, EntityRowHandler<RESULT> entityLambda);
+
+    // ===================================================================================
     //                                                                         Scalar Read
     //                                                                         ===========
     /**
      * Read the scalar value derived by a function from uniquely-selected records. <br>
-     * An interface dispatch for scalarSelect().
+     * An interface dispatch for selectScalar().
      * @param <RESULT> The type of scalar result.
      * @param resultType The type of result. (NotNull)
      * @return The scalar function object to specify function for scalar value. (NotNull)

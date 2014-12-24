@@ -166,9 +166,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                    Interface Dispatch
     //                                    ------------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int readCount(ConditionBean cb) {
         assertCBStateValid(cb);
         return doReadCount(cb);
@@ -298,9 +296,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                    Interface Dispatch
     //                                    ------------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Entity readEntity(ConditionBean cb) {
         assertCBStateValid(cb);
         return doReadEntity(cb);
@@ -316,9 +312,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Entity readEntityWithDeletedCheck(ConditionBean cb) {
         assertCBStateValid(cb);
         return doReadEntityWithDeletedCheck(cb);
@@ -374,9 +368,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                    Interface Dispatch
     //                                    ------------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public <RESULT extends Entity> ListResultBean<RESULT> readList(ConditionBean cb) {
         assertCBStateValid(cb);
         @SuppressWarnings("unchecked")
@@ -447,9 +439,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                    Interface Dispatch
     //                                    ------------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public <RESULT extends Entity> PagingResultBean<RESULT> readPage(final ConditionBean cb) {
         assertCBStateValid(cb);
         @SuppressWarnings("unchecked")
@@ -531,6 +521,14 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         }
     }
 
+    // -----------------------------------------------------
+    //                                    Interface Dispatch
+    //                                    ------------------
+    @SuppressWarnings("unchecked")
+    public <RESULT extends Entity> void readCursor(ConditionBean cb, EntityRowHandler<RESULT> entityLambda) {
+        facadeSelectCursor(downcast(cb), (EntityRowHandler<ENTITY>) entityLambda);
+    }
+
     // ===================================================================================
     //                                                                       Scalar Select
     //                                                                       =============
@@ -574,9 +572,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                    Interface Dispatch
     //                                    ------------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public <RESULT> HpSLSFunction<ConditionBean, RESULT> readScalar(Class<RESULT> resultType) {
         @SuppressWarnings("unchecked")
         final HpSLSFunction<ConditionBean, RESULT> func = (HpSLSFunction<ConditionBean, RESULT>) doReadScalar(resultType);
@@ -586,9 +582,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // ===================================================================================
     //                                                                          OutsideSql
     //                                                                          ==========
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public <BEHAVIOR extends BehaviorReadable> OutsideSqlAllFacadeExecutor<BEHAVIOR> readyOutsideSql() {
         return doOutsideSql();
     }
@@ -607,9 +601,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // ===================================================================================
     //                                                                            Sequence
     //                                                                            ========
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Number readNextVal() {
         return doReadNextVal();
     }
