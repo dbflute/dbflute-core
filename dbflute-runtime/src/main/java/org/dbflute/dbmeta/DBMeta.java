@@ -35,27 +35,6 @@ import org.dbflute.dbway.DBDef;
 public interface DBMeta {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** The mark of map string. */
-    public static final String MAP_STRING_MAP_MARK = "map:";
-
-    /** The mark of list string. */
-    public static final String MAP_STRING_LIST_MARK = "list:";
-
-    /** The mark of start brace. */
-    public static final String MAP_STRING_START_BRACE = "@{";
-
-    /** The mark of end brace. */
-    public static final String MAP_STRING_END_BRACE = "@}";
-
-    /** The mark of delimiter. */
-    public static final String MAP_STRING_DELIMITER = "@;";
-
-    /** The mark of equal. */
-    public static final String MAP_STRING_EQUAL = "@=";
-
-    // ===================================================================================
     //                                                                               DBDef
     //                                                                               =====
     /**
