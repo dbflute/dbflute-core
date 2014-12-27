@@ -16,6 +16,9 @@
 package org.dbflute.system;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -66,6 +69,32 @@ public class DBFluteSystem {
     // ===================================================================================
     //                                                                        Current Time
     //                                                                        ============
+    // #dateParade
+    /**
+     * Get current local date. (server date if no provider)
+     * @return The new-created local date instance as current date. (NotNull)
+     */
+    public static LocalDate currentLocalDate() {
+        return currentZonedDateTime().toLocalDate();
+    }
+
+    /**
+     * Get current local date-time. (server date if no provider)
+     * @return The new-created local date instance as current date. (NotNull)
+     */
+    public static LocalDateTime currentLocalDateTime() {
+        return currentZonedDateTime().toLocalDateTime();
+    }
+
+    /**
+     * Get current zoned date-time. (server date if no provider)
+     * @return The new-created zoned date instance as current date. (NotNull)
+     */
+    public static ZonedDateTime currentZonedDateTime() {
+        final TimeZone timeZone = getFinalTimeZone();
+        return ZonedDateTime.ofInstant(currentDate().toInstant(), timeZone.toZoneId());
+    }
+
     /**
      * Get current date. (server date if no provider)
      * @return The new-created date instance as current date. (NotNull)
