@@ -146,6 +146,13 @@ public class DfClassificationTop {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_codeType);
     }
 
+    public boolean isCodeTypeNeedsQuoted() {
+        if (_codeType == null) { // unknown
+            return true; // quoted
+        }
+        return _codeType.equalsIgnoreCase(CODE_TYPE_STRING);
+    }
+
     // ===================================================================================
     //                                                                         Sister Code
     //                                                                         ===========
