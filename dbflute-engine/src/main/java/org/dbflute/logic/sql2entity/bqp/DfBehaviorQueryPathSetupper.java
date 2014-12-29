@@ -23,13 +23,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfBehaviorNotFoundException;
@@ -321,19 +324,7 @@ public class DfBehaviorQueryPathSetupper {
 
     protected Map<String, File> createBsBhvFileMap(File bsbhvDir) {
         final String classFileExtension = getBasicProperties().getLanguageDependency().getLanguageGrammar().getClassFileExtension();
-        final FileFilter filefilter = new FileFilter() {
-            public boolean accept(File file) {
-                final String path = file.getPath();
-                if (isApplicationBehaviorProject()) {
-                    final String additionalSuffix = getApplicationBehaviorAdditionalSuffix();
-                    final String bhvSuffix = "Bhv" + additionalSuffix;
-                    return path.endsWith(bhvSuffix + "." + classFileExtension);
-                } else {
-                    return path.endsWith("Bhv." + classFileExtension);
-                }
-            }
-        };
-        final List<File> bsbhvFileList = Arrays.asList(bsbhvDir.listFiles(filefilter));
+        final List<File> bsbhvFileList = extractBsBhvFileList(bsbhvDir, classFileExtension);
         final Map<String, File> bsbhvFileMap = new HashMap<String, File>();
         for (File bsbhvFile : bsbhvFileList) {
             String path = getSlashPath(bsbhvFile);
@@ -348,6 +339,29 @@ public class DfBehaviorQueryPathSetupper {
             bsbhvFileMap.put(behaviorName, bsbhvFile);
         }
         return bsbhvFileMap;
+    }
+
+    protected List<File> extractBsBhvFileList(File bsbhvDir, final String classFileExtension) {
+        final FileFilter filefilter = new FileFilter() {
+            public boolean accept(File file) {
+                final String path = file.getPath();
+                if (isApplicationBehaviorProject()) {
+                    final String additionalSuffix = getApplicationBehaviorAdditionalSuffix();
+                    final String bhvSuffix = "Bhv" + additionalSuffix;
+                    return path.endsWith(bhvSuffix + "." + classFileExtension);
+                } else {
+                    return path.endsWith("Bhv." + classFileExtension);
+                }
+            }
+        };
+        final List<File> bsbhvFileList = Arrays.asList(bsbhvDir.listFiles(filefilter));
+        final TreeSet<File> treeSet = new TreeSet<File>(new Comparator<File>() {
+            public int compare(File o1, File o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+        treeSet.addAll(bsbhvFileList); // not to depends on OS varying behavior
+        return new ArrayList<File>(treeSet);
     }
 
     protected void throwBehaviorNotFoundException(Map<String, File> bsbhvFileMap, Map<String, String> behaviorQueryElementMap,
