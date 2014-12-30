@@ -39,9 +39,21 @@ public interface DBMeta {
     //                                                                               =====
     /**
      * Get project name of the database (DBFlute client) for the table.
-     * @return The project name e.g. maihamadb (NotNull)
+     * @return The name string, lower case in many cases. e.g. maihamadb (NotNull)
      */
     String getProjectName();
+
+    /**
+     * Get project prefix of the database for the table, used as class name. (normally empty)
+     * @return The prefix string, camel case in many cases. e.g. Resola (ResolaStationCB) (NotNull, EmptyAllowed)
+     */
+    String getProjectPrefix();
+
+    /**
+     * Get base prefix of the database for generation gap. (normally 'Bs')
+     * @return The prefix string, camel case in many cases. e.g. Bs (BsMemberCB) (NotNull, EmptyAllowed)
+     */
+    String getGenerationGapBasePrefix();
 
     /**
      * Get the current DB definition.

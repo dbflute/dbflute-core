@@ -57,8 +57,8 @@ public class BehaviorInvokeNameExtractor {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DBMeta _dbmeta;
-    protected final Class<?> _outsideSqlResultType;
+    protected final DBMeta _dbmeta; // not null
+    protected final Class<?> _outsideSqlResultType; // nul allowd
     protected final boolean _outsideSqlAutoPaging;
     protected final InvokeNameExtractingCoinLogic _coinLogic = createInvokeNameExtractingCoinLogic();
 
@@ -316,6 +316,6 @@ public class BehaviorInvokeNameExtractor {
     }
 
     protected String removeBasePrefix(String simpleClassName) {
-        return _coinLogic.removeBasePrefix(simpleClassName);
+        return _coinLogic.removeBasePrefix(_dbmeta, simpleClassName);
     }
 }

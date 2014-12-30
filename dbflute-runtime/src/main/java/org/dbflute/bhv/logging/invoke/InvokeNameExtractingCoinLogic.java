@@ -17,6 +17,7 @@ package org.dbflute.bhv.logging.invoke;
 
 import java.util.List;
 
+import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.dbflute.helper.stacktrace.InvokeNameExtractor;
 import org.dbflute.helper.stacktrace.InvokeNameResult;
@@ -66,20 +67,23 @@ public class InvokeNameExtractingCoinLogic {
     }
 
     /**
+     * @param dbmeta The DB meta for the table. (NotNull)
      * @param simpleClassName The simple class name. (NotNull)
      * @return The simple class name removed the base prefix. (NotNull)
      */
-    public String removeBasePrefix(String simpleClassName) {
-        if (!simpleClassName.startsWith("Bs")) {
+    public String removeBasePrefix(DBMeta dbmeta, String simpleClassName) {
+        final String projectPrefix = dbmeta.getProjectPrefix();
+        final String basePrefix = projectPrefix + dbmeta.getGenerationGapBasePrefix();
+        if (!simpleClassName.startsWith(basePrefix)) {
             return simpleClassName;
         }
-        final int prefixLength = "Bs".length();
+        final int prefixLength = basePrefix.length();
         if (!Character.isUpperCase(simpleClassName.substring(prefixLength).charAt(0))) {
             return simpleClassName;
         }
         if (simpleClassName.length() <= prefixLength) {
             return simpleClassName;
         }
-        return "" + simpleClassName.substring(prefixLength);
+        return projectPrefix + simpleClassName.substring(prefixLength);
     }
 }

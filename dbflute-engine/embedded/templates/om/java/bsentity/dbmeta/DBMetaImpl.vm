@@ -48,6 +48,8 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                       Current DBDef
     //                                                                       =============
     public String getProjectName() { return ${glDBCurrent}.getInstance().projectName(); }
+    public String getProjectPrefix() { return ${glDBCurrent}.getInstance().projectPrefix(); }
+    public String getGenerationGapBasePrefix() { return ${glDBCurrent}.getInstance().generationGapBasePrefix(); }
     public DBDef getCurrentDBDef() { return ${glDBCurrent}.getInstance().currentDBDef(); }
 
     // ===================================================================================

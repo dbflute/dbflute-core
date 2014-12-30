@@ -529,7 +529,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getBasePrefix() { // non property
-        return "Bs";
+        return "Bs"; // for generation gap
     }
 
     // ===================================================================================

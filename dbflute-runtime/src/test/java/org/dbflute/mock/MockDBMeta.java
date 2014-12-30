@@ -39,6 +39,14 @@ public class MockDBMeta extends AbstractDBMeta {
         return null;
     }
 
+    public String getProjectPrefix() {
+        return null;
+    }
+
+    public String getGenerationGapBasePrefix() {
+        return null;
+    }
+
     public DBDef getCurrentDBDef() {
         return null;
     }
