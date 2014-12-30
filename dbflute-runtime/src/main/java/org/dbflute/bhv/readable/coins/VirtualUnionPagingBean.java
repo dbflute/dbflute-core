@@ -113,6 +113,9 @@ public class VirtualUnionPagingBean<ID, RESULT> {
                     }
                     overOffset = true;
                     idList = filterIdListByOffset(idList, skippedCount, offset);
+                    if (idList.isEmpty()) { // re-check
+                        continue;
+                    }
                 }
                 idList = filterIdListByLimit(idList, actualCount, limit, offset);
                 if (idList.isEmpty()) { // re-check
