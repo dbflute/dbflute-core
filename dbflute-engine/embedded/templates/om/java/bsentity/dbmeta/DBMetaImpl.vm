@@ -122,18 +122,18 @@ public class ${myClassName} extends AbstractDBMeta {
 #end
 #elseif ($col.isJavaNativeDateObject())
 ## #dataParade
-#if ($col.isJavaNativeUtilDate())
-        setupEpg(_epgMap, ${reader}, ${writerSet}(ctd(vl)), "${propName}");
-#elseif ($col.isJavaNativeTimestamp())
-        setupEpg(_epgMap, ${reader}, ${writerSet}(cttp(vl)), "${propName}");
-#elseif ($col.isJavaNativeTime())
-        setupEpg(_epgMap, ${reader}, ${writerSet}(cttm(vl)), "${propName}");
-#elseif ($col.isJavaNativeJava8LocalDate())
+#if ($col.isJavaNativeJava8LocalDate())
         setupEpg(_epgMap, ${reader}, ${writerSet}(ctld(vl)), "${propName}");
 #elseif ($col.isJavaNativeJava8LocalDateTime())
         setupEpg(_epgMap, ${reader}, ${writerSet}(ctldt(vl)), "${propName}");
 #elseif ($col.isJavaNativeJava8LocalTime())
         setupEpg(_epgMap, ${reader}, ${writerSet}(ctlt(vl)), "${propName}");
+#elseif ($col.isJavaNativeUtilDate())
+        setupEpg(_epgMap, ${reader}, ${writerSet}(ctdt(vl)), "${propName}");
+#elseif ($col.isJavaNativeTimestamp())
+        setupEpg(_epgMap, ${reader}, ${writerSet}(cttp(vl)), "${propName}");
+#elseif ($col.isJavaNativeTime())
+        setupEpg(_epgMap, ${reader}, ${writerSet}(cttm(vl)), "${propName}");
 #else
 ## unknown date
         setupEpg(_epgMap, ${reader}, ${writerSet}((${col.javaNative})vl), "${propName}");
