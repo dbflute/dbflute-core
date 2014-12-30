@@ -239,8 +239,8 @@ public class DfDocumentSelector {
     }
 
     // -----------------------------------------------------
-    //                                          Neighborhood
-    //                                          ------------
+    //                               Neighborhood SchemaHtml
+    //                               -----------------------
     public boolean hasNeighborhoodSchemaHtml() {
         return getDocumentProperties().hasNeighborhoodSchemaHtml();
     }
@@ -251,6 +251,29 @@ public class DfDocumentSelector {
 
     public String getNeighborhoodSchemaHtmlPath(String key) {
         return getDocumentProperties().getNeighborhoodSchemaHtmlPath(key);
+    }
+
+    // -----------------------------------------------------
+    //                                        Schema Diagram
+    //                                        --------------
+    public boolean hasSchemaDiagram() {
+        return getDocumentProperties().hasSchemaDiagram();
+    }
+
+    public List<String> getSchemaDiagramKeyList() {
+        return getDocumentProperties().getSchemaDiagramKeyList();
+    }
+
+    public String getSchemaDiagramPath(String key) {
+        return getDocumentProperties().getSchemaDiagramPath(key);
+    }
+
+    public String getSchemaDiagramWidth(String key) {
+        return getDocumentProperties().getSchemaDiagramWidth(key);
+    }
+
+    public String getSchemaDiagramHeight(String key) {
+        return getDocumentProperties().getSchemaDiagramHeight(key);
     }
 
     // ===================================================================================
