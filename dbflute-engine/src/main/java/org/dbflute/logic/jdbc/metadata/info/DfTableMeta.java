@@ -154,7 +154,7 @@ public class DfTableMeta {
     }
 
     public void setTableName(String tableName) {
-        this._tableName = tableName;
+        _tableName = tableName;
     }
 
     public String getTableType() {
@@ -162,7 +162,7 @@ public class DfTableMeta {
     }
 
     public void setTableType(String tableType) {
-        this._tableType = tableType;
+        _tableType = tableType;
     }
 
     public String getTableComment() {
@@ -170,7 +170,7 @@ public class DfTableMeta {
     }
 
     public void setTableComment(String tableComment) {
-        this._tableComment = tableComment;
+        _tableComment = tableComment;
     }
 
     public UnifiedSchema getUnifiedSchema() {
@@ -178,7 +178,7 @@ public class DfTableMeta {
     }
 
     public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
-        this._unifiedSchema = unifiedSchema;
+        _unifiedSchema = unifiedSchema;
     }
 
     public boolean isOutOfGenerateTarget() {
@@ -186,7 +186,7 @@ public class DfTableMeta {
     }
 
     public void setOutOfGenerateTarget(boolean outOfGenerateTarget) {
-        this._outOfGenerateTarget = outOfGenerateTarget;
+        _outOfGenerateTarget = outOfGenerateTarget;
     }
 
     public List<DfColumnMeta> getLazyColumnMetaList() {
@@ -194,6 +194,6 @@ public class DfTableMeta {
     }
 
     public void setLazyColumnMetaList(List<DfColumnMeta> lazyColumnMetaList) {
-        this._lazyColumnMetaList = lazyColumnMetaList;
+        _lazyColumnMetaList = lazyColumnMetaList;
     }
 }
