@@ -115,6 +115,9 @@ public class VirtualUnionPagingBean<ID, RESULT> {
                     idList = filterIdListByOffset(idList, skippedCount, offset);
                 }
                 idList = filterIdListByLimit(idList, actualCount, limit, offset);
+                if (idList.isEmpty()) { // re-check
+                    continue;
+                }
             }
             final List<RESULT> mappedList = dataMapper.selectMappedList(idList);
             final int mappedSize = mappedList.size();
