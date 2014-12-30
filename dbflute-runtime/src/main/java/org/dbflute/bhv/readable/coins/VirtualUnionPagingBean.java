@@ -16,10 +16,7 @@
 package org.dbflute.bhv.readable.coins;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.cbean.result.ResultBeanBuilder;
@@ -36,16 +33,15 @@ public class VirtualUnionPagingBean<ID, RESULT> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, VirtualUnionPagingMetaInfo> _metaMap = new LinkedHashMap<String, VirtualUnionPagingMetaInfo>();
+    protected final List<VirtualUnionPagingMeta> _metaMap = new ArrayList<VirtualUnionPagingMeta>();
     protected int _pageSize;
     protected int _pageNumber;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public VirtualUnionPagingBean(String key, VirtualUnionPagingIdSelector<ID> idSelector,
-            VirtualUnionPagingDataMapper<ID, RESULT> dataMapper) {
-        unionAll(key, idSelector, dataMapper);
+    public VirtualUnionPagingBean(VirtualUnionPagingIdSelector<ID> noArgLambda, VirtualUnionPagingDataMapper<ID, RESULT> oneArgLambda) {
+        unionAll(noArgLambda, oneArgLambda);
     }
 
     // ===================================================================================
@@ -55,15 +51,15 @@ public class VirtualUnionPagingBean<ID, RESULT> {
     // cannot order through all records
     // and no union(), you should remove duplicate records after select manually
     // _/_/_/_/_/_/_/_/_/_/
-    public VirtualUnionPagingBean<ID, RESULT> unionAll(String key, VirtualUnionPagingIdSelector<ID> idSelector,
-            VirtualUnionPagingDataMapper<ID, RESULT> dataMapper) {
-        _metaMap.put(key, newVirtualUnionPagingMetaInfo(idSelector, dataMapper));
+    public VirtualUnionPagingBean<ID, RESULT> unionAll(VirtualUnionPagingIdSelector<ID> noArgLambda,
+            VirtualUnionPagingDataMapper<ID, RESULT> oneArgLambda) {
+        _metaMap.add(newVirtualUnionPagingMetaInfo(noArgLambda, oneArgLambda));
         return this;
     }
 
-    protected VirtualUnionPagingMetaInfo newVirtualUnionPagingMetaInfo(VirtualUnionPagingIdSelector<ID> idSelector,
+    protected VirtualUnionPagingMeta newVirtualUnionPagingMetaInfo(VirtualUnionPagingIdSelector<ID> idSelector,
             VirtualUnionPagingDataMapper<ID, RESULT> dataMapper) {
-        return new VirtualUnionPagingMetaInfo(idSelector, dataMapper);
+        return new VirtualUnionPagingMeta(idSelector, dataMapper);
     }
 
     // ===================================================================================
@@ -102,10 +98,9 @@ public class VirtualUnionPagingBean<ID, RESULT> {
         int skippedCount = 0;
         boolean overOffset = false;
         int actualCount = 0;
-        for (Entry<String, VirtualUnionPagingMetaInfo> entry : _metaMap.entrySet()) {
-            final VirtualUnionPagingMetaInfo metaInfo = entry.getValue();
-            final VirtualUnionPagingDataMapper<ID, RESULT> dataMapper = metaInfo.getDataMapper();
-            List<ID> idList = metaInfo.getIdList();
+        for (VirtualUnionPagingMeta meta : _metaMap) {
+            final VirtualUnionPagingDataMapper<ID, RESULT> dataMapper = meta.getDataMapper();
+            List<ID> idList = meta.getIdList();
             if (idList.isEmpty()) {
                 continue;
             }
@@ -136,11 +131,10 @@ public class VirtualUnionPagingBean<ID, RESULT> {
 
     protected int prepareIdList() {
         int count = 0;
-        for (Entry<String, VirtualUnionPagingMetaInfo> entry : _metaMap.entrySet()) {
-            final VirtualUnionPagingMetaInfo metaInfo = entry.getValue();
-            final VirtualUnionPagingIdSelector<ID> idSelector = metaInfo.getIdSelector();
+        for (VirtualUnionPagingMeta meta : _metaMap) {
+            final VirtualUnionPagingIdSelector<ID> idSelector = meta.getIdSelector();
             final List<ID> idList = idSelector.selectIdList();
-            metaInfo.setIdList(idList);
+            meta.setIdList(idList);
             count = count + idList.size();
         }
         return count;
@@ -178,13 +172,13 @@ public class VirtualUnionPagingBean<ID, RESULT> {
         PagingResultBean<RESULT> selectPage();
     }
 
-    public class VirtualUnionPagingMetaInfo {
+    public class VirtualUnionPagingMeta {
 
         protected VirtualUnionPagingIdSelector<ID> _idSelector;
         protected VirtualUnionPagingDataMapper<ID, RESULT> _dataMapper;
         protected List<ID> _idList; // set later
 
-        public VirtualUnionPagingMetaInfo(VirtualUnionPagingIdSelector<ID> idSelector, VirtualUnionPagingDataMapper<ID, RESULT> dataMapper) {
+        public VirtualUnionPagingMeta(VirtualUnionPagingIdSelector<ID> idSelector, VirtualUnionPagingDataMapper<ID, RESULT> dataMapper) {
             _idSelector = idSelector;
             _dataMapper = dataMapper;
         }
