@@ -345,16 +345,23 @@ public class OutsideSqlContext {
 
     protected String buildBehaviorSqlPackageName() {
         final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(_tableDbName);
-        final String behaviorTypeName = dbmeta.getBehaviorTypeName();
+        final String behaviorType = dbmeta.getBehaviorTypeName();
         final String outsideSqlPackage = _outsideSqlPackage;
         if (outsideSqlPackage != null && outsideSqlPackage.trim().length() > 0) {
-            final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
-            String tmp = behaviorTypeName.substring(0, behaviorTypeName.lastIndexOf("."));
-            final String exbhvName = tmp.contains(".") ? tmp.substring(tmp.lastIndexOf(".") + ".".length()) : tmp;
-            return outsideSqlPackage + "." + exbhvName + "." + behaviorClassName;
+            return mergeBehaviorSqlPackage(behaviorType, outsideSqlPackage);
         } else {
-            return behaviorTypeName;
+            return behaviorType;
         }
+    }
+
+    protected String mergeBehaviorSqlPackage(String behaviorType, String outsideSqlPackage) {
+        final String dot = ".";
+        final String bhvClass = behaviorType.substring(behaviorType.lastIndexOf(dot) + dot.length());
+        final String bhvPkg = behaviorType.substring(0, behaviorType.lastIndexOf(dot));
+        final String exbhvName = bhvPkg.contains(dot) ? bhvPkg.substring(bhvPkg.lastIndexOf(dot) + dot.length()) : bhvPkg;
+        final String exbhvSuffix = dot + exbhvName;
+        final String adjustedSqlPkg = Srl.removeSuffix(outsideSqlPackage, exbhvSuffix); // avoid 'exbhv.exbhv'
+        return adjustedSqlPkg + exbhvSuffix + dot + bhvClass;
     }
 
     protected boolean isBehaviorQueryPathEnabled() {
