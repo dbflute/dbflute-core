@@ -1469,9 +1469,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             final int deimiterIndex = remainder.indexOf(delimiter);
             final String propertyName;
             if (deimiterIndex < 0) {
-                final DBMeta dbmeta = getDBMetaProvider().provideDBMeta(asTableDbName());
-                final ColumnInfo columnInfo = dbmeta.findColumnInfo(remainder); // also checked
-                propertyName = columnInfo.getPropertyName();
+                propertyName = remainder; // hard to get relation DB meta so plain name
                 last = true;
             } else {
                 propertyName = remainder.substring(0, deimiterIndex);
