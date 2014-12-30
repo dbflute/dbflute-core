@@ -38,7 +38,8 @@ public class DfLanguageTypeMappingJava implements DfLanguageTypeMapping {
     static {
         _numberList = newArrayList("Byte", "Short", "Integer", "Long", "Float", "Double", "BigDecimal", "BigInteger");
     }
-    protected static final List<String> _dateList = newArrayList("Date", "Time", "Timestamp");
+    // #dateParade
+    protected static final List<String> _dateList = newArrayList("LocalDate", "LocalDateTime", "LocalTime", "Date", "Time", "Timestamp");
     protected static final List<String> _booleanList = newArrayList("Boolean");
     protected static final List<String> _binaryList = newArrayList("byte[]");
 

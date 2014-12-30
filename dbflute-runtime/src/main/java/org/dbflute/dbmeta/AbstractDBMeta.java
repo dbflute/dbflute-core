@@ -20,6 +20,9 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -217,6 +220,30 @@ public abstract class AbstractDBMeta implements DBMeta {
     @SuppressWarnings("unchecked")
     protected static <NUMBER extends Number> NUMBER ctn(Object value, Class<NUMBER> type) { // convertToNumber
         return (NUMBER) DfTypeUtil.toNumber(value, type);
+    }
+
+    protected static LocalDate ctld(Object value) { // convertToLocalDate
+        return DfTypeUtil.toLocalDate(value);
+    }
+
+    protected static LocalDateTime ctldt(Object value) { // convertToLocalDateTime
+        return DfTypeUtil.toLocalDateTime(value);
+    }
+
+    protected static LocalTime ctlt(Object value) { // convertToLocalTime
+        return DfTypeUtil.toLocalTime(value);
+    }
+
+    protected static Date ctdt(Object value) { // convertToDate
+        return DfTypeUtil.toDate(value);
+    }
+
+    protected static Timestamp cttp(Object value) { // convertToTimestamp
+        return DfTypeUtil.toTimestamp(value);
+    }
+
+    protected static Time cttm(Object value) { // convertToTime
+        return DfTypeUtil.toTime(value);
     }
 
     // ===================================================================================

@@ -291,11 +291,11 @@ public class VirtualUnionPagingBeanTest extends RuntimeTestCase {
     //                                                                         Test Helper
     //                                                                         ===========
     protected VirtualUnionPagingBean<Integer, MappedBean> prepareBean() {
-        return new VirtualUnionPagingBean<Integer, MappedBean>("MEMBER", () -> {
+        return new VirtualUnionPagingBean<Integer, MappedBean>(() -> {
             return Arrays.asList(1, 2, 3, 4, 5, 6);
         }, idList -> {
             return idList.stream().map(id -> new MappedBean(id, "m" + id)).collect(Collectors.toList());
-        }).unionAll("PURCHASE", () -> {
+        }).unionAll(() -> {
             return Arrays.asList(7, 8, 9, 10, 11, 12);
         }, idList -> {
             return idList.stream().map(id -> new MappedBean(id, "p" + id)).collect(Collectors.toList());
@@ -303,11 +303,11 @@ public class VirtualUnionPagingBeanTest extends RuntimeTestCase {
     }
 
     protected VirtualUnionPagingBean<Integer, MappedBean> prepareNoDataBean() {
-        return new VirtualUnionPagingBean<Integer, MappedBean>("MEMBER", () -> {
+        return new VirtualUnionPagingBean<Integer, MappedBean>(() -> {
             return Arrays.asList();
         }, idList -> {
             return idList.stream().map(id -> new MappedBean(id, "m" + id)).collect(Collectors.toList());
-        }).unionAll("PURCHASE", () -> {
+        }).unionAll(() -> {
             return Arrays.asList();
         }, idList -> {
             return idList.stream().map(id -> new MappedBean(id, "p" + id)).collect(Collectors.toList());
@@ -315,15 +315,15 @@ public class VirtualUnionPagingBeanTest extends RuntimeTestCase {
     }
 
     protected VirtualUnionPagingBean<Integer, MappedBean> prepareNoDataMiddleBean() {
-        return new VirtualUnionPagingBean<Integer, MappedBean>("MEMBER", () -> {
+        return new VirtualUnionPagingBean<Integer, MappedBean>(() -> {
             return Arrays.asList(1, 2, 3, 4, 5, 6);
         }, idList -> {
             return idList.stream().map(id -> new MappedBean(id, "m" + id)).collect(Collectors.toList());
-        }).unionAll("PURCHASE", () -> {
+        }).unionAll(() -> {
             return Arrays.asList();
         }, idList -> {
             return idList.stream().map(id -> new MappedBean(id, "pc" + id)).collect(Collectors.toList());
-        }).unionAll("PRODUCT", () -> {
+        }).unionAll(() -> {
             return Arrays.asList(13, 14, 15, 16, 17);
         }, idList -> {
             return idList.stream().map(id -> new MappedBean(id, "pr" + id)).collect(Collectors.toList());
@@ -331,11 +331,11 @@ public class VirtualUnionPagingBeanTest extends RuntimeTestCase {
     }
 
     protected VirtualUnionPagingBean<Integer, MappedBean> prepareShortBean() {
-        return new VirtualUnionPagingBean<Integer, MappedBean>("MEMBER", () -> {
+        return new VirtualUnionPagingBean<Integer, MappedBean>(() -> {
             return Arrays.asList(1, 2, 3, 4, 5, 6);
         }, idList -> {
             return idList.stream().filter(id -> id <= 4).map(id -> new MappedBean(id, "m" + id)).collect(Collectors.toList());
-        }).unionAll("PURCHASE", () -> {
+        }).unionAll(() -> {
             return Arrays.asList(7, 8, 9, 10, 11, 12);
         }, idList -> {
             return idList.stream().map(id -> new MappedBean(id, "p" + id)).collect(Collectors.toList());
