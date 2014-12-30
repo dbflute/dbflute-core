@@ -87,7 +87,7 @@ ${table.aliasExpression}${table.tableDispName}
 		<td class="subcell">${col.javaBeansRulePropertyName}</td>
 		<td class="subcell">${col.javaNativeRemovedPackage}</td>
 #if ($canBeColumnNullObject)
-		<td class="subcell">#if ($col.canBeColumnNullObject())o#else &nbsp;#end</td>
+		<td class="flgcell">#if ($col.canBeColumnNullObject())o#else &nbsp;#end</td>
 #end
 	</tr>
 #set ($rownum = $rownum + 1)
