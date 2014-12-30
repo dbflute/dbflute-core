@@ -49,6 +49,7 @@ public class DBFluteSystem {
      * (NullAllowed: if null, server date might be used)
      */
     protected static DfCurrentDateProvider _currentDateProvider;
+
     /**
      * The provider of final default locale for DBFlute system. <br>
      * e.g. DisplaySql, Date conversion, LocalDate mapping and so on... <br>
