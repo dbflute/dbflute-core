@@ -72,7 +72,7 @@ public class PagingInvoker<ENTITY> {
             final InvocationResultResource<ENTITY> resource = doPaging(handler, pagingBean, builder);
             final int allRecordCount = resource.getAllRecordCount();
             final List<ENTITY> selectedList = resource.getSelectedList();
-            final PagingResultBean<ENTITY> rb = builder.buildPagingResultBean(pagingBean, allRecordCount, selectedList);
+            final PagingResultBean<ENTITY> rb = builder.buildPagingOfPaging(pagingBean, allRecordCount, selectedList);
             if (pagingBean.canPagingReSelect() && isNecessaryToReadPageAgain(rb)) {
                 return reselect(handler, pagingBean, builder, rb);
             } else {
@@ -104,7 +104,7 @@ public class PagingInvoker<ENTITY> {
             allRecordCount = executeCount(handler);
             checkSafetyResultIfNeeds(safetyMaxResultSize, allRecordCount);
             if (allRecordCount == 0) {
-                selectedList = builder.buildEmptyListResultBean(pagingBean);
+                selectedList = builder.buildEmptyListOfPaging(pagingBean);
             } else {
                 selectedList = executePaging(handler);
             }
@@ -158,7 +158,7 @@ public class PagingInvoker<ENTITY> {
         final InvocationResultResource<ENTITY> resource = doPaging(handler, pagingBean, builder);
         final int allRecordCount = resource.getAllRecordCount();
         final List<ENTITY> selectedList = resource.getSelectedList();
-        return builder.buildPagingResultBean(pagingBean, allRecordCount, selectedList);
+        return builder.buildPagingOfPaging(pagingBean, allRecordCount, selectedList);
     }
 
     /**

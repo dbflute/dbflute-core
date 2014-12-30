@@ -180,7 +180,7 @@ public class OutsideSqlBasicExecutor<BEHAVIOR> {
     }
 
     protected <ENTITY> ListResultBean<ENTITY> createListResultBean(List<ENTITY> selectedList) {
-        return new ResultBeanBuilder<ENTITY>(_tableDbName).buildListResultBean(selectedList);
+        return new ResultBeanBuilder<ENTITY>(_tableDbName).buildListSimply(selectedList);
     }
 
     protected void throwDangerousResultSizeException(Object pmb, FetchingOverSafetySizeException e) {

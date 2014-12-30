@@ -241,8 +241,8 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     //                                                                 ===================
     /**
      * Calculate all page count.
-     * @param allRecordCount All record count.
-     * @param pageSize Fetch-size.
+     * @param allRecordCount The record count of all records (without paging).
+     * @param pageSize The record count of one page.
      * @return All page count.
      */
     protected int calculateAllPageCount(int allRecordCount, int pageSize) {
@@ -326,9 +326,8 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
         final StringBuilder sb = new StringBuilder();
         sb.append("{").append(getCurrentPageNumber()).append("/").append(getAllPageCount());
         sb.append(" of ").append(getAllRecordCount());
-        sb.append(" ").append(isExistPrePage()).append("/").append(isExistNextPage());
-        sb.append(" list=").append(getSelectedList() != null ? Integer.valueOf(getSelectedList().size()) : null);
-        sb.append(" page=").append(getPageSize());
+        sb.append(" ").append(existsPreviousPage()).append("/").append(existsNextPage());
+        sb.append(" list=").append(size()).append(" page=").append(getPageSize());
         sb.append("}");
         sb.append(":selectedList=").append(getSelectedList());
         return sb.toString();

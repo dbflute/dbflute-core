@@ -15,7 +15,6 @@
  */
 package org.dbflute.bhv.exception;
 
-import org.dbflute.bhv.exception.BehaviorExceptionThrower;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;
 import org.dbflute.unit.RuntimeTestCase;

@@ -20,7 +20,6 @@ import java.util.Date;
 
 import org.dbflute.exception.AccessContextNoValueException;
 import org.dbflute.exception.AccessContextNotFoundException;
-import org.dbflute.hook.AccessContext;
 import org.dbflute.hook.AccessContext.AccessContextHolder;
 import org.dbflute.hook.AccessContext.AccessDateProvider;
 import org.dbflute.hook.AccessContext.AccessModuleProvider;

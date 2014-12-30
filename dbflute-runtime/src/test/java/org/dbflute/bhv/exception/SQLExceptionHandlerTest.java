@@ -17,7 +17,6 @@ package org.dbflute.bhv.exception;
 
 import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.InternalMapContext.InvokePathProvider;
-import org.dbflute.bhv.exception.SQLExceptionHandler;
 import org.dbflute.unit.RuntimeTestCase;
 
 /**

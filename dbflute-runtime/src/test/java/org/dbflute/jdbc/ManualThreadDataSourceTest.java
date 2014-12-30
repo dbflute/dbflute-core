@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.dbflute.jdbc.ManualThreadDataSourceHandler;
 import org.dbflute.unit.RuntimeTestCase;
 
 /**

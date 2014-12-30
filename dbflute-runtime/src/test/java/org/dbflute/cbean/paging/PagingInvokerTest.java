@@ -18,9 +18,6 @@ package org.dbflute.cbean.paging;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dbflute.cbean.paging.PagingBean;
-import org.dbflute.cbean.paging.PagingHandler;
-import org.dbflute.cbean.paging.PagingInvoker;
 import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.mock.MockColumnInfo;
 import org.dbflute.outsidesql.paging.SimplePagingBean;

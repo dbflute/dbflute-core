@@ -351,7 +351,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     }
 
     protected <RESULT extends Entity> ListResultBean<RESULT> createListResultBean(ConditionBean cb, List<RESULT> selectedList) {
-        return new ResultBeanBuilder<RESULT>(asTableDbName()).buildListResultBean(cb, selectedList);
+        return new ResultBeanBuilder<RESULT>(asTableDbName()).buildListOfCB(cb, selectedList);
     }
 
     // -----------------------------------------------------

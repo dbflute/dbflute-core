@@ -15,7 +15,6 @@
  */
 package org.dbflute.cbean.result;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.dbflute.cbean.ConditionBean;
@@ -31,7 +30,7 @@ public class ResultBeanBuilder<ENTITY> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _tableDbName;
+    protected final String _tableDbName; // null allowed
 
     // ===================================================================================
     //                                                                         Constructor
@@ -41,54 +40,80 @@ public class ResultBeanBuilder<ENTITY> {
     }
 
     // ===================================================================================
-    //                                                                             Builder
-    //                                                                             =======
-    /**
-     * Build the result bean of list without order-by clause. {for Various}
-     * @param selectedList Selected list. (NotNull)
-     * @return The result bean of list. (NotNull)
-     */
-    public ListResultBean<ENTITY> buildListResultBean(List<ENTITY> selectedList) {
-        ListResultBean<ENTITY> rb = new ListResultBean<ENTITY>();
-        rb.setTableDbName(_tableDbName);
-        rb.setAllRecordCount(selectedList.size());
-        rb.setSelectedList(selectedList);
-        return rb;
-    }
-
+    //                                                                                List
+    //                                                                                ====
     /**
      * Build the result bean of list. {for CB}
      * @param cb The condition-bean. (NotNull)
-     * @param selectedList Selected list. (NotNull)
-     * @return The result bean of list. (NotNull)
+     * @param selectedList The actually selected list of the entity. (NotNull)
+     * @return The result bean of list. (NullAllowed: if null, treated as empty)
      */
-    public ListResultBean<ENTITY> buildListResultBean(ConditionBean cb, List<ENTITY> selectedList) {
-        ListResultBean<ENTITY> rb = new ListResultBean<ENTITY>();
+    public ListResultBean<ENTITY> buildListOfCB(ConditionBean cb, List<ENTITY> selectedList) {
+        ListResultBean<ENTITY> rb = newListResultBean();
         rb.setTableDbName(_tableDbName);
         rb.setAllRecordCount(selectedList.size());
-        rb.setSelectedList(selectedList);
         rb.setOrderByClause(cb.getOrderByComponent());
+        rb.setSelectedList(selectedList);
         return rb;
     }
 
     /**
-     * Build the result bean of list as empty. {for CB}
+     * Build the result bean of list with all record count, order-by clause. {for Nested}
+     * @param inherited The result bean to inherit option info, e.g. all record count. (NotNull) 
+     * @param selectedList The actually selected list of the entity. (NotNull)
+     * @return The result bean of list. (NullAllowed: if null, treated as empty)
+     */
+    public ListResultBean<ENTITY> buildListInherited(ListResultBean<?> inherited, List<ENTITY> selectedList) {
+        ListResultBean<ENTITY> rb = newListResultBean();
+        rb.setTableDbName(_tableDbName);
+        rb.setAllRecordCount(inherited.getAllRecordCount());
+        rb.setOrderByClause(inherited.getOrderByClause());
+        rb.setSelectedList(selectedList);
+        return rb;
+    }
+
+    /**
+     * Build the result bean of list without order-by clause. {for Simple}
+     * @param selectedList The actually selected list of the entity. (NotNull)
+     * @return The result bean of list. (NullAllowed: if null, treated as empty)
+     */
+    public ListResultBean<ENTITY> buildListSimply(List<ENTITY> selectedList) {
+        ListResultBean<ENTITY> rb = newListResultBean();
+        rb.setTableDbName(_tableDbName);
+        rb.setAllRecordCount(selectedList.size());
+        rb.setSelectedList(selectedList);
+        return rb;
+    }
+
+    /**
+     * Build the result bean of list as empty. {for Paging}
      * @param pb The bean of paging. (NotNull)
      * @return The result bean of list as empty. (NotNull)
      */
-    public ListResultBean<ENTITY> buildEmptyListResultBean(PagingBean pb) {
-        ListResultBean<ENTITY> rb = new ListResultBean<ENTITY>();
+    public ListResultBean<ENTITY> buildEmptyListOfPaging(PagingBean pb) {
+        ListResultBean<ENTITY> rb = newListResultBean();
         rb.setTableDbName(_tableDbName);
-        rb.setAllRecordCount(0);
-        rb.setSelectedList(newEmptyList());
         rb.setOrderByClause(pb.getOrderByComponent());
         return rb;
     }
 
-    protected List<ENTITY> newEmptyList() {
-        return new ArrayList<ENTITY>();
+    /**
+     * Build the result bean of list as empty. {for General}
+     * @return The result bean of list as empty. (NotNull)
+     */
+    public ListResultBean<ENTITY> buildEmptyListSimply() {
+        ListResultBean<ENTITY> rb = newListResultBean();
+        rb.setTableDbName(_tableDbName);
+        return rb;
     }
 
+    protected ListResultBean<ENTITY> newListResultBean() {
+        return new ListResultBean<ENTITY>();
+    }
+
+    // ===================================================================================
+    //                                                                              Paging
+    //                                                                              ======
     /**
      * Build the result bean of paging. {for Paging}
      * @param pb The bean of paging. (NotNull)
@@ -96,14 +121,49 @@ public class ResultBeanBuilder<ENTITY> {
      * @param selectedList The list of selected entity. (NotNull)
      * @return The result bean of paging. (NotNull)
      */
-    public PagingResultBean<ENTITY> buildPagingResultBean(PagingBean pb, int allRecordCount, List<ENTITY> selectedList) {
-        PagingResultBean<ENTITY> rb = new PagingResultBean<ENTITY>();
+    public PagingResultBean<ENTITY> buildPagingOfPaging(PagingBean pb, int allRecordCount, List<ENTITY> selectedList) {
+        PagingResultBean<ENTITY> rb = newPagingResultBean();
         rb.setTableDbName(_tableDbName);
         rb.setAllRecordCount(allRecordCount);
-        rb.setSelectedList(selectedList);
         rb.setOrderByClause(pb.getOrderByComponent());
+        rb.setSelectedList(selectedList);
         rb.setPageSize(pb.getFetchSize());
         rb.setCurrentPageNumber(pb.getFetchPageNumber());
         return rb;
+    }
+
+    /**
+     * Build the result bean of paging. {for Simple}
+     * @param pageSize The record count of one page.
+     * @param pageNumber The number of current page.
+     * @param allRecordCount All record count.
+     * @param selectedList The list of selected entity. (NotNull)
+     * @return The result bean of paging. (NotNull)
+     */
+    public PagingResultBean<ENTITY> buildPagingSimply(int pageSize, int pageNumber, int allRecordCount, List<ENTITY> selectedList) {
+        PagingResultBean<ENTITY> rb = newPagingResultBean();
+        rb.setTableDbName(_tableDbName);
+        rb.setAllRecordCount(allRecordCount);
+        rb.setSelectedList(selectedList);
+        rb.setPageSize(pageSize);
+        rb.setCurrentPageNumber(pageNumber);
+        return rb;
+    }
+
+    /**
+     * Build the result bean of paging as empty. {for Empty}
+     * @param pageSize The record count of one page.
+     * @return The result bean of list as empty. (NotNull)
+     */
+    public ListResultBean<ENTITY> buildEmptyPagingSimply(int pageSize) {
+        PagingResultBean<ENTITY> rb = newPagingResultBean();
+        rb.setTableDbName(_tableDbName);
+        rb.setPageSize(pageSize);
+        rb.setCurrentPageNumber(1);
+        return rb;
+    }
+
+    protected PagingResultBean<ENTITY> newPagingResultBean() {
+        return new PagingResultBean<ENTITY>();
     }
 }
