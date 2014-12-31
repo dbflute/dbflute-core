@@ -6,14 +6,15 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1.0" />
-	<property name="build.version" value="${version}-RC3" />
+	<property name="build.version" value="${version}" />
 	<property name="runtime.version" value="1.1.0" />
-	<property name="runtime.build.version" value="${runtime.version}-RC3" />
+	<property name="runtime.build.version" value="${runtime.version}" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
 	<property name="workspace.base" value="../.." />
 	<property name="dbflute.base" value="${workspace.base}/dbflute-core" />
+	<property name="dbflute.howto.dir" value="${workspace.base}/dbflute-howto" />
 	<property name="dbflute.www.base" value="${workspace.base}/dbflute-www" />
 	<property name="test.active.stage.base" value="${workspace.base}" />
 	<property name="test.dbms.stage.base" value="${workspace.base}" />
@@ -346,6 +347,15 @@
 			description="==> reflect to example with Doma">
 		<delete dir="${example.with.doma.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${example.with.doma.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-howto" depends="prepare-reflection"
+			description="==> reflect to how-to project">
+		<delete dir="${dbflute.howto.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${dbflute.howto.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />

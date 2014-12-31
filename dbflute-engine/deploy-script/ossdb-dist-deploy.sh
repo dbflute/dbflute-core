@@ -10,6 +10,7 @@ ant -f build.xml reflect-to-test-option-compatible10x
 ant -f build.xml reflect-to-example-on-springboot
 ant -f build.xml reflect-to-example-on-play2java
 ant -f build.xml reflect-to-example-with-doma
+ant -f build.xml reflect-to-howto
 
 cd ..
 export answer=y
@@ -88,5 +89,13 @@ rm ./log/*.log
 . manage.sh replace-schema
 . manage.sh jdbc
 . manage.sh doc
+cd ..
+mvn -e compile
+
+cd ../dbflute-howto/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh replace-schema
+. manage.sh jdbc,doc
+. manage.sh generate,sql2entity,outside-sql-test
 cd ..
 mvn -e compile

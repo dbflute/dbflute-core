@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -540,16 +540,16 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
      * PurchaseCB cb = new PurchaseCB();
      * cb.specify().columnPurchaseDatetime();
      * </pre>
-     * And if this is based on PURCHASE, 'member.birthdate' means as follows:
+     * And if this is based on PURCHASE, 'member.memberName' means as follows:
      * <pre>
      * PurchaseCB cb = new PurchaseCB();
-     * cb.specify().specifyMember().columnBirthdate();
+     * cb.specify().specifyMember().columnMemberName();
      * </pre>
-     * @param columnNamePath The path string. (NotNull, NotTrimmedEmpty)
+     * @param columnPropertyPath The path string to property for the column. (NotNull, NotTrimmedEmpty)
      * @return The info of specified column. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
-    SpecifiedColumn invokeSpecifyColumn(String columnNamePath);
+    SpecifiedColumn invokeSpecifyColumn(String columnPropertyPath);
 
     /**
      * Invoke the method 'orScopeQuery()' by the query callback. <br>

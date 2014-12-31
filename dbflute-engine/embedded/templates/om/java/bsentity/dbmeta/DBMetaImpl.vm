@@ -48,6 +48,8 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                       Current DBDef
     //                                                                       =============
     public String getProjectName() { return ${glDBCurrent}.getInstance().projectName(); }
+    public String getProjectPrefix() { return ${glDBCurrent}.getInstance().projectPrefix(); }
+    public String getGenerationGapBasePrefix() { return ${glDBCurrent}.getInstance().generationGapBasePrefix(); }
     public DBDef getCurrentDBDef() { return ${glDBCurrent}.getInstance().currentDBDef(); }
 
     // ===================================================================================
@@ -115,12 +117,33 @@ public class ${myClassName} extends AbstractDBMeta {
 #elseif ($col.isJavaNativeBigDecimal())
         setupEpg(_epgMap, ${reader}, ${writerSet}(ctb(vl)), "${propName}");
 #else
+## unknown number
         setupEpg(_epgMap, ${reader}, ${writerSet}(ctn(vl, ${col.javaNative}.class)), "${propName}");
 #end
+#elseif ($col.isJavaNativeDateObject())
+## #dataParade
+#if ($col.isJavaNativeJava8LocalDate())
+        setupEpg(_epgMap, ${reader}, ${writerSet}(ctld(vl)), "${propName}");
+#elseif ($col.isJavaNativeJava8LocalDateTime())
+        setupEpg(_epgMap, ${reader}, ${writerSet}(ctldt(vl)), "${propName}");
+#elseif ($col.isJavaNativeJava8LocalTime())
+        setupEpg(_epgMap, ${reader}, ${writerSet}(ctlt(vl)), "${propName}");
+#elseif ($col.isJavaNativeUtilDate())
+        setupEpg(_epgMap, ${reader}, ${writerSet}(ctdt(vl)), "${propName}");
+#elseif ($col.isJavaNativeTimestamp())
+        setupEpg(_epgMap, ${reader}, ${writerSet}(cttp(vl)), "${propName}");
+#elseif ($col.isJavaNativeTime())
+        setupEpg(_epgMap, ${reader}, ${writerSet}(cttm(vl)), "${propName}");
 #else
+## unknown date
+        setupEpg(_epgMap, ${reader}, ${writerSet}((${col.javaNative})vl), "${propName}");
+#end
+#else
+## other types
 #if ($col.isJavaNativeUtilList())
         setupEpg(_epgMap, ${reader}, ${writerSet}((${col.javaNative})vl), "${propName}");
 #else
+## string here
         setupEpg(_epgMap, ${reader}, ${writerSet}((${col.javaNative})vl), "${propName}");
 #end
 #end

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,34 +35,25 @@ import org.dbflute.dbway.DBDef;
 public interface DBMeta {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** The mark of map string. */
-    public static final String MAP_STRING_MAP_MARK = "map:";
-
-    /** The mark of list string. */
-    public static final String MAP_STRING_LIST_MARK = "list:";
-
-    /** The mark of start brace. */
-    public static final String MAP_STRING_START_BRACE = "@{";
-
-    /** The mark of end brace. */
-    public static final String MAP_STRING_END_BRACE = "@}";
-
-    /** The mark of delimiter. */
-    public static final String MAP_STRING_DELIMITER = "@;";
-
-    /** The mark of equal. */
-    public static final String MAP_STRING_EQUAL = "@=";
-
-    // ===================================================================================
     //                                                                               DBDef
     //                                                                               =====
     /**
      * Get project name of the database (DBFlute client) for the table.
-     * @return The project name e.g. maihamadb (NotNull)
+     * @return The name string, lower case in many cases. e.g. maihamadb (NotNull)
      */
     String getProjectName();
+
+    /**
+     * Get project prefix of the database for the table, used as class name. (normally empty)
+     * @return The prefix string, camel case in many cases. e.g. Resola (ResolaStationCB) (NotNull, EmptyAllowed)
+     */
+    String getProjectPrefix();
+
+    /**
+     * Get base prefix of the database for generation gap. (normally 'Bs')
+     * @return The prefix string, camel case in many cases. e.g. Bs (BsMemberCB) (NotNull, EmptyAllowed)
+     */
+    String getGenerationGapBasePrefix();
 
     /**
      * Get the current DB definition.

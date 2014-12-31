@@ -318,6 +318,9 @@ ${linkDelimiter} <a href="#outsidesql">OutsideSql List</a>
 #if ($database.isSchemaHtmlProcedureValid())
 ${linkDelimiter} <a href="#procedure">Procedure List</a>
 #end
+#if ($selector.hasSchemaDiagram())
+${linkDelimiter} <a href="#diagram">Schema Diagram</a>
+#end
 </p>
 #end
 #if ($selector.isSchemaHtmlToHistoryHtmlLink() || $selector.isSchemaHtmlToPropertiesHtmlLink())
@@ -536,8 +539,19 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 </dl>
 #end
 #end
+#if ($selector.hasSchemaDiagram())
 
-<h2>Thanks</h2>
+<h2 id="diagram">Schema Diagram</h2>
+#foreach ($schemaHtmlKey in $selector.schemaDiagramKeyList)
+#set ($diagramPath = "${selector.getSchemaDiagramPath($schemaHtmlKey)}")
+<h3>${schemaHtmlKey}</h3>
+<p>
+	<a href="${diagramPath}"><img src="${diagramPath}" width="${selector.getSchemaDiagramWidth($schemaHtmlKey)}" height="${selector.getSchemaDiagramHeight($schemaHtmlKey)}"/></a>
+</p>
+#end
+#end
+
+<h2 id="thanks">Thanks</h2>
 <p>
 	Created by <a href="http://dbflute.org/">DBFlute(AutoGenerator)</a>
 </p>

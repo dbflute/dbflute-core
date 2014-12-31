@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 package org.dbflute.system;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -46,6 +49,7 @@ public class DBFluteSystem {
      * (NullAllowed: if null, server date might be used)
      */
     protected static DfCurrentDateProvider _currentDateProvider;
+
     /**
      * The provider of final default locale for DBFlute system. <br>
      * e.g. DisplaySql, Date conversion, LocalDate mapping and so on... <br>
@@ -66,6 +70,32 @@ public class DBFluteSystem {
     // ===================================================================================
     //                                                                        Current Time
     //                                                                        ============
+    // #dateParade
+    /**
+     * Get current local date. (server date if no provider)
+     * @return The new-created local date instance as current date. (NotNull)
+     */
+    public static LocalDate currentLocalDate() {
+        return currentZonedDateTime().toLocalDate();
+    }
+
+    /**
+     * Get current local date-time. (server date if no provider)
+     * @return The new-created local date instance as current date. (NotNull)
+     */
+    public static LocalDateTime currentLocalDateTime() {
+        return currentZonedDateTime().toLocalDateTime();
+    }
+
+    /**
+     * Get current zoned date-time. (server date if no provider)
+     * @return The new-created zoned date instance as current date. (NotNull)
+     */
+    public static ZonedDateTime currentZonedDateTime() {
+        final TimeZone timeZone = getFinalTimeZone();
+        return ZonedDateTime.ofInstant(currentDate().toInstant(), timeZone.toZoneId());
+    }
+
     /**
      * Get current date. (server date if no provider)
      * @return The new-created date instance as current date. (NotNull)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package org.dbflute.cbean.result;
 
-import org.dbflute.cbean.result.ListResultBean;
-import org.dbflute.cbean.result.ResultBeanBuilder;
 import org.dbflute.mock.MockColumnInfo;
 import org.dbflute.outsidesql.paging.SimplePagingBean;
 import org.dbflute.unit.RuntimeTestCase;
@@ -35,7 +33,7 @@ public class ResultBeanBuilderTest extends RuntimeTestCase {
         ResultBeanBuilder<String> tgt = createTarget();
 
         // ## Act ##
-        ListResultBean<String> actualList = tgt.buildEmptyListResultBean(pb);
+        ListResultBean<String> actualList = tgt.buildEmptyListOfPaging(pb);
 
         // ## Assert ##
         assertEquals(0, actualList.size());

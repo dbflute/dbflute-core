@@ -28,6 +28,7 @@ ${table.aliasExpression}${table.tableDispName}
 #set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
 #set ($hasDefaultValue = $table.hasDefaultValueExceptAutoIncrement())
 #set ($hasColumnComment = $table.hasColumnComment())
+#set ($canBeColumnNullObject = $table.canBeColumnNullObject())
 <table summary="Columns in ${table.tableDispName}">
 	<thead>
 	<tr>
@@ -54,6 +55,9 @@ ${table.aliasExpression}${table.tableDispName}
 #end
 		<th>PropertyName</th>
 		<th>${table.database.targetLanguageInitCap}Type</th>
+#if ($canBeColumnNullObject)
+		<th>NullObj</th>
+#end
 	</tr>
 	</thead>
 #set ($rownum = 1)
@@ -82,6 +86,9 @@ ${table.aliasExpression}${table.tableDispName}
 #end
 		<td class="subcell">${col.javaBeansRulePropertyName}</td>
 		<td class="subcell">${col.javaNativeRemovedPackage}</td>
+#if ($canBeColumnNullObject)
+		<td class="flgcell">#if ($col.canBeColumnNullObject())o#else &nbsp;#end</td>
+#end
 	</tr>
 #set ($rownum = $rownum + 1)
 #end

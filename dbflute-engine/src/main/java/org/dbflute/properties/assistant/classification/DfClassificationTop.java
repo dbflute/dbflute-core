@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,6 +144,13 @@ public class DfClassificationTop {
 
     public boolean hasCodeType() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_codeType);
+    }
+
+    public boolean isCodeTypeNeedsQuoted() {
+        if (_codeType == null) { // unknown
+            return true; // quoted
+        }
+        return _codeType.equalsIgnoreCase(CODE_TYPE_STRING);
     }
 
     // ===================================================================================

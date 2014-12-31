@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -345,14 +345,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // classification interface
     public boolean isCodeTypeNeedsQuoted(String classificationName) {
         final DfClassificationTop classificationTop = getClassificationTop(classificationName);
-        if (classificationTop == null) {
-            return false;
-        }
-        final String codeType = classificationTop.getCodeType();
-        if (codeType == null) { // unknown
-            return true; // quoted
-        }
-        return codeType.equalsIgnoreCase(DfClassificationTop.CODE_TYPE_STRING);
+        return classificationTop != null && classificationTop.isCodeTypeNeedsQuoted();
     }
 
     // -----------------------------------------------------

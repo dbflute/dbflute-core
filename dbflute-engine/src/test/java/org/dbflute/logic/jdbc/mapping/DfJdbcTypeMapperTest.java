@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.DfLanguageDependencyJava;
-import org.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper;
 import org.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.DfMapperResource;
 import org.dbflute.unit.EngineTestCase;
 
@@ -75,6 +74,7 @@ public class DfJdbcTypeMapperTest extends EngineTestCase {
     public void test_getColumnTorqueType_OriginalMapping() {
         // ## Arrange ##
         Properties prop = new Properties();
+        prop.setProperty("torque.database", "oracle");
         prop.setProperty("torque.typeMappingMap", "map:{FOO=java.bar.Tender}");
         initializeTestProperty(prop);
         Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
@@ -131,7 +131,9 @@ public class DfJdbcTypeMapperTest extends EngineTestCase {
     }
 
     protected void initializeEmptyProperty() {
-        DfBuildProperties.getInstance().setProperties(new Properties());
+        Properties properties = new Properties();
+        properties.setProperty("torque.database", "oracle");
+        DfBuildProperties.getInstance().setProperties(properties);
         DfBuildProperties.getInstance().getHandler().reload();
         TypeMap.reload();
     }

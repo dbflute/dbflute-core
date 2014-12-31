@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.dbflute.cbean.result.grouping.GroupingListDeterminer;
@@ -64,11 +65,11 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     /** The count of all record. */
     protected int _allRecordCount;
 
-    /** The list of selected entity. (NotNull: but switch-able) */
-    protected List<ENTITY> _selectedList = new ArrayList<ENTITY>();
+    /** The clause of order-by. (NullAllowed: lazy-loaded) */
+    protected OrderByClause _orderByClause;
 
-    /** The clause of order-by. (NotNull: but switch-able) */
-    protected OrderByClause _orderByClause = new OrderByClause();
+    /** The list of selected entity. (NullAllowed: lazy-loaded) */
+    protected List<ENTITY> _selectedList;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -99,14 +100,17 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * @return The new mapped list as result bean. (NotNull)
      */
     public <DTO> ListResultBean<DTO> mappingList(EntityDtoMapper<ENTITY, DTO> entityLambda) {
-        final ListResultBean<DTO> mappingList = new ListResultBean<DTO>();
-        for (ENTITY entity : _selectedList) {
-            mappingList.add(entityLambda.map(entity));
+        final List<DTO> mappingList;
+        if (hasWrappedListInstance()) {
+            final List<ENTITY> selectedList = getSelectedList();
+            mappingList = new ArrayList<DTO>(selectedList.size());
+            for (ENTITY entity : selectedList) {
+                mappingList.add(entityLambda.map(entity));
+            }
+        } else {
+            mappingList = null;
         }
-        mappingList.setTableDbName(getTableDbName());
-        mappingList.setAllRecordCount(getAllRecordCount());
-        mappingList.setOrderByClause(getOrderByClause());
-        return mappingList;
+        return createInheritedResultBean(mappingList);
     }
 
     // ===================================================================================
@@ -138,21 +142,25 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      */
     public List<ListResultBean<ENTITY>> groupingList(GroupingListDeterminer<ENTITY> determiner) {
         final List<ListResultBean<ENTITY>> groupingRowList = new ArrayList<ListResultBean<ENTITY>>();
+        if (!hasWrappedListInstance()) {
+            return groupingRowList; // not read-only
+        }
         GroupingListRowResource<ENTITY> rowResource = new GroupingListRowResource<ENTITY>();
         int rowElementIndex = 0;
         int wholeElementIndex = 0;
-        for (ENTITY entity : _selectedList) {
+        final List<ENTITY> selectedList = getSelectedList();
+        for (ENTITY entity : selectedList) {
             // set up row resource
             rowResource.addGroupingEntity(entity);
             rowResource.setCurrentIndex(rowElementIndex);
 
-            if (_selectedList.size() == (wholeElementIndex + 1)) { // last loop
+            if (selectedList.size() == (wholeElementIndex + 1)) { // last loop
                 groupingRowList.add(createInheritedResultBean(rowResource.getGroupingEntityList()));
                 break;
             }
 
             // not last loop so the nextElement must exist
-            final ENTITY nextElement = _selectedList.get(wholeElementIndex + 1);
+            final ENTITY nextElement = selectedList.get(wholeElementIndex + 1);
 
             // do at row end
             if (determiner.isBreakRow(rowResource, nextElement)) { // determine the row end
@@ -182,7 +190,10 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      */
     public Map<String, ListResultBean<ENTITY>> groupingMap(GroupingMapDeterminer<ENTITY> entityLambda) {
         final Map<String, ListResultBean<ENTITY>> groupingListMap = new LinkedHashMap<String, ListResultBean<ENTITY>>();
-        for (ENTITY entity : _selectedList) {
+        if (!hasWrappedListInstance()) {
+            return groupingListMap; // not read-only
+        }
+        for (ENTITY entity : getSelectedList()) {
             final String groupingKey = entityLambda.provideKey(entity);
             ListResultBean<ENTITY> rowList = groupingListMap.get(groupingKey);
             if (rowList == null) {
@@ -210,8 +221,12 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * @return The value list of the entity column. (NotNull, NotNullElement)
      */
     public <COLUMN> List<COLUMN> extractColumnList(EntityColumnExtractor<ENTITY, COLUMN> entityLambda) {
-        final List<COLUMN> columnList = new ArrayList<COLUMN>(_selectedList.size());
-        for (ENTITY entity : _selectedList) {
+        if (!hasWrappedListInstance()) {
+            return new ArrayList<COLUMN>(2); // not read-only
+        }
+        final List<ENTITY> selectedList = getSelectedList();
+        final List<COLUMN> columnList = new ArrayList<COLUMN>(selectedList.size());
+        for (ENTITY entity : selectedList) {
             final COLUMN column = entityLambda.extract(entity);
             if (column != null) {
                 columnList.add(column);
@@ -233,8 +248,12 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * @return The value set of the entity column. (NotNull, NotNullElement)
      */
     public <COLUMN> Set<COLUMN> extractColumnSet(EntityColumnExtractor<ENTITY, COLUMN> entityLambda) {
-        final Set<COLUMN> columnSet = new LinkedHashSet<COLUMN>(_selectedList.size());
-        for (ENTITY entity : _selectedList) {
+        if (!hasWrappedListInstance()) {
+            return new LinkedHashSet<COLUMN>(2); // not read-only
+        }
+        final List<ENTITY> selectedList = getSelectedList();
+        final Set<COLUMN> columnSet = new LinkedHashSet<COLUMN>(selectedList.size());
+        for (ENTITY entity : selectedList) {
             COLUMN column = entityLambda.extract(entity);
             if (column != null) {
                 columnSet.add(column);
@@ -247,8 +266,8 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     //                                                                       Determination
     //                                                                       =============
     /**
-     * Has this result selected?
-     * @return The determination, true or false. {Whether table DB name is not null}
+     * Is this result by selected?
+     * @return The determination, true or false. {whether table DB name is not null}
      */
     public boolean isSelectedResult() {
         return _tableDbName != null;
@@ -257,17 +276,13 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     // ===================================================================================
     //                                                                Inherited ResultBean
     //                                                                ====================
-    protected ListResultBean<ENTITY> createInheritedResultBean(List<ENTITY> selectedList) {
-        final ListResultBean<ENTITY> rb = newInheritedResultBean();
-        rb.setTableDbName(getTableDbName());
-        rb.setAllRecordCount(getAllRecordCount());
-        rb.setOrderByClause(getOrderByClause());
-        rb.setSelectedList(selectedList); // if null, nothing is set
-        return rb;
+    protected <ELEMENT> ListResultBean<ELEMENT> createInheritedResultBean(List<ELEMENT> selectedList) {
+        final ResultBeanBuilder<ELEMENT> builder = newResultBeanBuilder(getTableDbName());
+        return builder.buildListInherited(this, selectedList);
     }
 
-    protected ListResultBean<ENTITY> newInheritedResultBean() {
-        return new ListResultBean<ENTITY>();
+    protected <ELEMENT> ResultBeanBuilder<ELEMENT> newResultBeanBuilder(String tableDbName) {
+        return new ResultBeanBuilder<ELEMENT>(tableDbName);
     }
 
     // ===================================================================================
@@ -278,8 +293,8 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      */
     public int hashCode() {
         int result = 17;
-        if (_selectedList != null) {
-            result = (31 * result) + _selectedList.hashCode();
+        if (hasWrappedListInstance()) {
+            result = (31 * result) + getSelectedList().hashCode();
         }
         return result;
     }
@@ -295,13 +310,13 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
         if (!(other instanceof List<?>)) {
             return false;
         }
-        if (_selectedList == null) {
+        if (!hasWrappedListInstance()) {
             return false; // basically unreachable
         }
         if (other instanceof ListResultBean<?>) {
-            return _selectedList.equals(((ListResultBean<?>) other).getSelectedList());
+            return getSelectedList().equals(((ListResultBean<?>) other).getSelectedList());
         } else {
-            return _selectedList.equals(other);
+            return getSelectedList().equals(other);
         }
     }
 
@@ -323,95 +338,109 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     //                                                                       List Elements
     //                                                                       =============
     public boolean add(ENTITY o) {
-        return _selectedList.add(o);
+        return getSelectedList().add(o);
     }
 
     public boolean addAll(Collection<? extends ENTITY> c) {
-        return _selectedList.addAll(c);
+        return getSelectedList().addAll(c);
     }
 
     public void clear() {
-        _selectedList.clear();
+        if (hasWrappedListInstance()) {
+            getSelectedList().clear();
+        }
     }
 
     public boolean contains(Object o) {
-        return _selectedList.contains(o);
+        return hasWrappedListInstance() ? getSelectedList().contains(o) : false;
     }
 
     public boolean containsAll(Collection<?> c) {
-        return _selectedList.containsAll(c);
+        return hasWrappedListInstance() ? getSelectedList().containsAll(c) : false;
     }
 
     public boolean isEmpty() {
-        return _selectedList.isEmpty();
+        return hasWrappedListInstance() ? getSelectedList().isEmpty() : true; // empty if no instance
     }
 
     public Iterator<ENTITY> iterator() {
-        return _selectedList.iterator();
+        return hasWrappedListInstance() ? getSelectedList().iterator() : createEmptyIterator();
+    }
+
+    protected Iterator<ENTITY> createEmptyIterator() {
+        return new Iterator<ENTITY>() {
+            public boolean hasNext() {
+                return false;
+            }
+
+            public ENTITY next() {
+                throw new NoSuchElementException();
+            }
+        };
     }
 
     public boolean remove(Object o) {
-        return _selectedList.remove(o);
+        return getSelectedList().remove(o);
     }
 
     public boolean removeAll(Collection<?> c) {
-        return _selectedList.removeAll(c);
+        return getSelectedList().removeAll(c);
     }
 
     public boolean retainAll(Collection<?> c) {
-        return _selectedList.retainAll(c);
+        return getSelectedList().retainAll(c);
     }
 
     public int size() {
-        return _selectedList.size();
+        return getSelectedList().size();
     }
 
     public Object[] toArray() {
-        return _selectedList.toArray();
+        return getSelectedList().toArray();
     }
 
     public <TYPE> TYPE[] toArray(TYPE[] a) {
-        return _selectedList.toArray(a);
+        return getSelectedList().toArray(a);
     }
 
     public void add(int index, ENTITY element) {
-        _selectedList.add(index, element);
+        getSelectedList().add(index, element);
     }
 
     public boolean addAll(int index, Collection<? extends ENTITY> c) {
-        return _selectedList.addAll(index, c);
+        return getSelectedList().addAll(index, c);
     }
 
     public ENTITY get(int index) {
-        return _selectedList.get(index);
+        return getSelectedList().get(index);
     }
 
     public int indexOf(Object o) {
-        return _selectedList.indexOf(o);
+        return getSelectedList().indexOf(o);
     }
 
     public int lastIndexOf(Object o) {
-        return _selectedList.lastIndexOf(o);
+        return getSelectedList().lastIndexOf(o);
     }
 
     public ListIterator<ENTITY> listIterator() {
-        return _selectedList.listIterator();
+        return getSelectedList().listIterator();
     }
 
     public ListIterator<ENTITY> listIterator(int index) {
-        return _selectedList.listIterator(index);
+        return getSelectedList().listIterator(index);
     }
 
     public ENTITY remove(int index) {
-        return _selectedList.remove(index);
+        return getSelectedList().remove(index);
     }
 
     public ENTITY set(int index, ENTITY element) {
-        return _selectedList.set(index, element);
+        return getSelectedList().set(index, element);
     }
 
     public List<ENTITY> subList(int fromIndex, int toIndex) {
-        return _selectedList.subList(fromIndex, toIndex);
+        return getSelectedList().subList(fromIndex, toIndex);
     }
 
     // ===================================================================================
@@ -450,40 +479,44 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     }
 
     /**
-     * Get the value of selectedList.
-     * @return Selected list. (NotNull)
-     */
-    public List<ENTITY> getSelectedList() {
-        return _selectedList;
-    }
-
-    /**
-     * Set the value of selectedList.
-     * @param selectedList Selected list. (NotNull: if you set null, it ignores it)
-     */
-    public void setSelectedList(List<ENTITY> selectedList) {
-        if (selectedList == null) {
-            return; // not allowed to set null value to the selected list
-        }
-        _selectedList = selectedList;
-    }
-
-    /**
      * Get the value of orderByClause.
      * @return The value of orderByClause. (NotNull)
      */
     public OrderByClause getOrderByClause() {
+        if (_orderByClause == null) {
+            _orderByClause = new OrderByClause();
+        }
         return _orderByClause;
     }
 
     /**
      * Set the value of orderByClause.
-     * @param orderByClause The value of orderByClause. (NotNull: if you set null, it ignores it)
+     * @param orderByClause The value of orderByClause. (NullAllowed)
      */
     public void setOrderByClause(OrderByClause orderByClause) {
-        if (orderByClause == null) {
-            return; // not allowed to set null value to the selected list
-        }
         _orderByClause = orderByClause;
+    }
+
+    /**
+     * Get the value of selectedList.
+     * @return Selected list. (NotNull)
+     */
+    public List<ENTITY> getSelectedList() {
+        if (_selectedList == null) {
+            _selectedList = new ArrayList<ENTITY>();
+        }
+        return _selectedList;
+    }
+
+    /**
+     * Set the value of selectedList.
+     * @param selectedList Selected list. (NullAllowed: if null, clear the list)
+     */
+    public void setSelectedList(List<ENTITY> selectedList) {
+        _selectedList = selectedList;
+    }
+
+    protected boolean hasWrappedListInstance() {
+        return _selectedList != null;
     }
 }

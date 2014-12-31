@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1359,13 +1359,12 @@ public class ForeignKey implements Constraint {
 
     protected String doExtractFixedConditionEmbeddedCommentClassificationNormalCode(DfClassificationTop classificationTop,
             String elementName) {
-        final String codeType = classificationTop.getCodeType();
         final List<DfClassificationElement> elementList = classificationTop.getClassificationElementList();
         String code = null;
         for (final DfClassificationElement element : elementList) {
             final String name = element.getName();
             if (elementName.equals(name)) {
-                code = quoteClassifiationElementIfNeeds(element.getCode(), codeType);
+                code = quoteClassifiationElementIfNeeds(classificationTop, element.getCode());
                 break;
             }
         }
@@ -1374,7 +1373,6 @@ public class ForeignKey implements Constraint {
 
     protected String doExtractFixedConditionEmbeddedCommentClassificationGroupCode(DfClassificationTop classificationTop, String elementName) {
         String code = null;
-        final String codeType = classificationTop.getCodeType();
         final List<DfClassificationGroup> groupList = classificationTop.getGroupList();
         for (DfClassificationGroup group : groupList) {
             final String groupName = group.getGroupName();
@@ -1385,7 +1383,7 @@ public class ForeignKey implements Constraint {
                     if (sb.length() > 0) {
                         sb.append(", ");
                     }
-                    sb.append(quoteClassifiationElementIfNeeds(groupelement.getCode(), codeType));
+                    sb.append(quoteClassifiationElementIfNeeds(classificationTop, groupelement.getCode()));
                 }
                 sb.insert(0, "(").append(")");
                 code = sb.toString();
@@ -1395,12 +1393,8 @@ public class ForeignKey implements Constraint {
         return code;
     }
 
-    protected String quoteClassifiationElementIfNeeds(String code, final String codeType) {
-        return needsToQuoteClassificationValue(codeType) ? Srl.quoteSingle(code) : code;
-    }
-
-    protected boolean needsToQuoteClassificationValue(final String codeType) {
-        return codeType == null || !codeType.equals(DfClassificationTop.CODE_TYPE_NUMBER);
+    protected String quoteClassifiationElementIfNeeds(DfClassificationTop classificationTop, String code) {
+        return classificationTop.isCodeTypeNeedsQuoted() ? Srl.quoteSingle(code) : code;
     }
 
     protected void throwFixedConditionEmbeddedCommentClassificationNotFoundException(String classificationName) {

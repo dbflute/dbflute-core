@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,9 @@ import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.bhv.readable.EntityRowHandler;
 import org.dbflute.hook.CallbackContext;
 import org.dbflute.hook.SqlLogInfo;
+import org.dbflute.hook.SqlLogInfo.SqlLogDisplaySqlBuilder;
 import org.dbflute.hook.SqlResultHandler;
 import org.dbflute.hook.SqlResultInfo;
-import org.dbflute.hook.SqlLogInfo.SqlLogDisplaySqlBuilder;
 import org.dbflute.mock.MockBehaviorCommand;
 import org.dbflute.mock.MockConditionBean;
 import org.dbflute.mock.MockOutsideSqlContext;
