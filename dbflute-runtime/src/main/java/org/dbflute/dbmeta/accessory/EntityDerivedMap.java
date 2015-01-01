@@ -77,6 +77,9 @@ public class EntityDerivedMap implements Serializable {
         if (aliasName == null) {
             throw new IllegalArgumentException("The argument 'aliasName' should not be null.");
         }
+        if (propertyType == null) {
+            throw new IllegalArgumentException("The argument 'propertyType' should not be null.");
+        }
         if (aliasName.trim().length() == 0) {
             throw new IllegalArgumentException("The argument 'aliasName' should not be empty: [" + aliasName + "]");
         }
@@ -88,8 +91,7 @@ public class EntityDerivedMap implements Serializable {
             throwUnknownDerivedAliasNameException(entity, aliasName, derivedMap);
         }
         try {
-            @SuppressWarnings("unchecked")
-            final VALUE found = (VALUE) derivedMap.get(aliasName);
+            final VALUE found = propertyType.cast(derivedMap.get(aliasName)); // also checking type
             final String tableDbName = entity.asTableDbName(); // not to have reference to entity in optional
             return OptionalScalar.ofNullable(found, () -> {
                 throwDerivedPropertyValueNotFoundException(tableDbName, aliasName);
