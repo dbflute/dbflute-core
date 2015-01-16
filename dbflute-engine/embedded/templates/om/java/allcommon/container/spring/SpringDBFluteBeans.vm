@@ -29,7 +29,7 @@
     </bean>
     <bean id="${database.commonColumnAutoSetupperComponentName}" class="${database.implementedCommonColumnAutoSetupperClass}" autowire="byType"/>
     <bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}" autowire="byType"/>
-    <bean id="${database.behaviorCommandInvokerComponentName}" class="org.dbflute.bhv.core.BehaviorCommandInvoker" autowire="byType">
+    <bean id="${database.behaviorCommandInvokerComponentName}" class="${database.behaviorCommandInvokerClass}" autowire="byType">
         <property name="invokerAssistant"><ref bean="${database.invokerAssistantComponentName}"/></property>
     </bean>
 

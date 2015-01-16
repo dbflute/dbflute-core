@@ -1,5 +1,5 @@
-/*
- * Copyright 2014-2015 the original author or authors.
+/*S
+ * Copyright 2014-2015 the original authoimpr or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.exception.DfColumnNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
@@ -657,6 +658,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getExtensionClass("ImplementedCommonColumnAutoSetupper");
     }
 
+    public String getBehaviorCommandInvokerClass() { // Java only
+        return getExtensionClass(BehaviorCommandInvoker.class.getName());
+    }
+
+    public String getBehaviorCommandInvokerSimpleIfPlainClass() { // Java only
+        return getExtensionClass(BehaviorCommandInvoker.class.getSimpleName());
+    }
+
     public String getS2DaoSettingClass() { // CSharp only
         final String className = "S2DaoSetting";
         if (hasExtensionClass(className)) {
@@ -670,9 +679,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         if (hasExtensionClass(className)) {
             return getExtendedExtensionClass(className);
         } else {
-            final String commonPackage = getBasicProperties().getBaseCommonPackage();
-            final String projectPrefix = getBasicProperties().getProjectPrefix();
-            return commonPackage + "." + projectPrefix + className;
+            if (className.contains(".")) { // e.g. BehaviorCommandInvoker
+                return className;
+            } else { // allcommon's classes
+                final String commonPackage = getBasicProperties().getBaseCommonPackage();
+                final String projectPrefix = getBasicProperties().getProjectPrefix();
+                return commonPackage + "." + projectPrefix + className;
+            }
         }
     }
 

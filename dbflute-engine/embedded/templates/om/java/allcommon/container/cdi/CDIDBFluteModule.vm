@@ -206,10 +206,10 @@ public class ${glDBFluteModule} implements Extension {
      * @param beanManager The manager of CDI beans. (NotNull)
      * @return The new-created DBFlute bean. (NotNull)
      */
-    protected DBFluteBean<BehaviorCommandInvoker> newDBFluteBeanOfBehaviorCommandInvoker(final BeanManager beanManager) {
-        return new DBFluteBean<BehaviorCommandInvoker>(beanManager, BehaviorCommandInvoker.class) {
+    protected DBFluteBean<${database.behaviorCommandInvokerSimpleIfPlainClass}> newDBFluteBeanOfBehaviorCommandInvoker(final BeanManager beanManager) {
+        return new DBFluteBean<${database.behaviorCommandInvokerSimpleIfPlainClass}>(beanManager, ${database.behaviorCommandInvokerSimpleIfPlainClass}.class) {
             @Override
-            protected void postInject(final BehaviorCommandInvoker instance) {
+            protected void postInject(final ${database.behaviorCommandInvokerSimpleIfPlainClass} instance) {
                 final Bean<?> bean = beanManager.resolve(beanManager.getBeans(InvokerAssistant.class, createDBFluteAnnotationLiteral()));
                 instance.setInvokerAssistant((InvokerAssistant) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
             }
