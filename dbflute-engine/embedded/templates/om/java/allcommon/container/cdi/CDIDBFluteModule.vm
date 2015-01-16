@@ -341,7 +341,7 @@ public class ${glDBFluteModule} implements Extension {
 
         @Override
         protected void postInject(final BEHAVIOR instance) {
-            Bean<?> bean = beanManager.resolve(beanManager.getBeans(BehaviorCommandInvoker.class, createDBFluteAnnotationLiteral()));
+            Bean<?> bean = beanManager.resolve(beanManager.getBeans(${database.behaviorCommandInvokerSimpleIfPlainClass}.class, createDBFluteAnnotationLiteral()));
             instance.setBehaviorCommandInvoker((BehaviorCommandInvoker) beanManager.getReference(
                     bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
 

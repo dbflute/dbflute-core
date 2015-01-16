@@ -659,11 +659,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public String getBehaviorCommandInvokerClass() { // Java only
-        return getExtensionClassAsPlain(BehaviorCommandInvoker.class.getName());
+        return getExtensionClassRuntime(BehaviorCommandInvoker.class.getName());
     }
 
     public String getBehaviorCommandInvokerSimpleIfPlainClass() { // Java only
-        return getExtensionClassAsPlain(BehaviorCommandInvoker.class.getSimpleName());
+        return getExtensionClassRuntime(BehaviorCommandInvoker.class.getSimpleName());
     }
 
     public String getS2DaoSettingClass() { // CSharp only
@@ -676,23 +676,25 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     protected String getExtensionClassAllcommon(String className) {
-        return doGetExtensionClass(className, true);
-    }
-
-    protected String getExtensionClassAsPlain(String className) {
         return doGetExtensionClass(className, false);
     }
 
-    protected String doGetExtensionClass(String className, boolean allcommon) {
-        if (hasExtensionClass(className)) {
-            return getExtendedExtensionClass(className);
+    protected String getExtensionClassRuntime(String className) {
+        return doGetExtensionClass(className, true);
+    }
+
+    protected String doGetExtensionClass(String className, boolean runtime) {
+        final String plainName = Srl.substringLastRear(className, ".");
+        if (hasExtensionClass(plainName)) {
+            return getExtendedExtensionClass(plainName);
         } else {
-            if (allcommon) {
-                final String commonPackage = getBasicProperties().getBaseCommonPackage();
-                final String projectPrefix = getBasicProperties().getProjectPrefix();
-                return commonPackage + "." + projectPrefix + className;
-            } else { // e.g. BehaviorCommandInvoker
+            if (runtime) { // e.g. BehaviorCommandInvoker
                 return className;
+            } else {
+                final DfBasicProperties prop = getBasicProperties();
+                final String commonPackage = prop.getBaseCommonPackage();
+                final String projectPrefix = prop.getProjectPrefix();
+                return commonPackage + "." + projectPrefix + className;
             }
         }
     }
