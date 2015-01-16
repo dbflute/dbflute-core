@@ -647,23 +647,23 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                  Extended Component
     //                                                                  ==================
     public String getDBFluteInitializerClass() { // Java only
-        return getExtensionClass("DBFluteInitializer");
+        return getExtensionClassAllcommon("DBFluteInitializer");
     }
 
     public String getImplementedInvokerAssistantClass() { // Java only
-        return getExtensionClass("ImplementedInvokerAssistant");
+        return getExtensionClassAllcommon("ImplementedInvokerAssistant");
     }
 
     public String getImplementedCommonColumnAutoSetupperClass() { // Java only
-        return getExtensionClass("ImplementedCommonColumnAutoSetupper");
+        return getExtensionClassAllcommon("ImplementedCommonColumnAutoSetupper");
     }
 
     public String getBehaviorCommandInvokerClass() { // Java only
-        return getExtensionClass(BehaviorCommandInvoker.class.getName());
+        return getExtensionClassAsPlain(BehaviorCommandInvoker.class.getName());
     }
 
     public String getBehaviorCommandInvokerSimpleIfPlainClass() { // Java only
-        return getExtensionClass(BehaviorCommandInvoker.class.getSimpleName());
+        return getExtensionClassAsPlain(BehaviorCommandInvoker.class.getSimpleName());
     }
 
     public String getS2DaoSettingClass() { // CSharp only
@@ -675,16 +675,24 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         }
     }
 
-    protected String getExtensionClass(String className) {
+    protected String getExtensionClassAllcommon(String className) {
+        return doGetExtensionClass(className, true);
+    }
+
+    protected String getExtensionClassAsPlain(String className) {
+        return doGetExtensionClass(className, false);
+    }
+
+    protected String doGetExtensionClass(String className, boolean allcommon) {
         if (hasExtensionClass(className)) {
             return getExtendedExtensionClass(className);
         } else {
-            if (className.contains(".")) { // e.g. BehaviorCommandInvoker
-                return className;
-            } else { // allcommon's classes
+            if (allcommon) {
                 final String commonPackage = getBasicProperties().getBaseCommonPackage();
                 final String projectPrefix = getBasicProperties().getProjectPrefix();
                 return commonPackage + "." + projectPrefix + className;
+            } else { // e.g. BehaviorCommandInvoker
+                return className;
             }
         }
     }
