@@ -80,7 +80,7 @@ public class ${glDBFluteBeansJavaConfig} {
     }
 
     protected BehaviorCommandInvoker newBehaviorCommandInvoker() {
-        return new BehaviorCommandInvoker();
+        return new ${database.behaviorCommandInvokerSimpleIfPlainClass}();
     }
 
 #if ($database.isDBFluteBeansJavaConfigLazy())

@@ -29,7 +29,7 @@ import ${glPackageExtendedBhv}.*;
  */
 public class ${glDBFluteModule} extends AbstractModule {
 
-    protected DataSource dataSource;
+    protected final DataSource dataSource;
 
     public ${glDBFluteModule}(DataSource dataSource) {
         if (dataSource == null) {
@@ -68,7 +68,7 @@ public class ${glDBFluteModule} extends AbstractModule {
     }
 
     protected BehaviorCommandInvoker createBehaviorCommandInvoker() {
-        return new BehaviorCommandInvoker();
+        return new ${database.behaviorCommandInvokerSimpleIfPlainClass}();
     }
 
     protected ${glImplementedInvokerAssistant} createImplementedInvokerAssistant() {

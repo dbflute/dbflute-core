@@ -1,5 +1,5 @@
-/*
- * Copyright 2014-2015 the original author or authors.
+/*S
+ * Copyright 2014-2015 the original authoimpr or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.exception.DfColumnNotFoundException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
@@ -646,15 +647,23 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                  Extended Component
     //                                                                  ==================
     public String getDBFluteInitializerClass() { // Java only
-        return getExtensionClass("DBFluteInitializer");
+        return getExtensionClassAllcommon("DBFluteInitializer");
     }
 
     public String getImplementedInvokerAssistantClass() { // Java only
-        return getExtensionClass("ImplementedInvokerAssistant");
+        return getExtensionClassAllcommon("ImplementedInvokerAssistant");
     }
 
     public String getImplementedCommonColumnAutoSetupperClass() { // Java only
-        return getExtensionClass("ImplementedCommonColumnAutoSetupper");
+        return getExtensionClassAllcommon("ImplementedCommonColumnAutoSetupper");
+    }
+
+    public String getBehaviorCommandInvokerClass() { // Java only
+        return getExtensionClassRuntime(BehaviorCommandInvoker.class.getName());
+    }
+
+    public String getBehaviorCommandInvokerSimpleIfPlainClass() { // Java only
+        return getExtensionClassRuntime(BehaviorCommandInvoker.class.getSimpleName());
     }
 
     public String getS2DaoSettingClass() { // CSharp only
@@ -666,13 +675,27 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         }
     }
 
-    protected String getExtensionClass(String className) {
-        if (hasExtensionClass(className)) {
-            return getExtendedExtensionClass(className);
+    protected String getExtensionClassAllcommon(String className) {
+        return doGetExtensionClass(className, false);
+    }
+
+    protected String getExtensionClassRuntime(String className) {
+        return doGetExtensionClass(className, true);
+    }
+
+    protected String doGetExtensionClass(String className, boolean runtime) {
+        final String plainName = Srl.substringLastRear(className, ".");
+        if (hasExtensionClass(plainName)) {
+            return getExtendedExtensionClass(plainName);
         } else {
-            final String commonPackage = getBasicProperties().getBaseCommonPackage();
-            final String projectPrefix = getBasicProperties().getProjectPrefix();
-            return commonPackage + "." + projectPrefix + className;
+            if (runtime) { // e.g. BehaviorCommandInvoker
+                return className;
+            } else {
+                final DfBasicProperties prop = getBasicProperties();
+                final String commonPackage = prop.getBaseCommonPackage();
+                final String projectPrefix = prop.getProjectPrefix();
+                return commonPackage + "." + projectPrefix + className;
+            }
         }
     }
 

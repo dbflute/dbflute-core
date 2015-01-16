@@ -636,7 +636,9 @@ public class Column {
         if (defaultValue == null) {
             return "null";
         }
-        return "\"" + defaultValue + "\"";
+        // escape because default value might contain double quotation
+        final String escaped = Srl.replace(Srl.replace(defaultValue, "\\", "\\\\"), "\"", "\\\"");
+        return "\"" + escaped + "\"";
     }
 
     // -----------------------------------------------------

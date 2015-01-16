@@ -156,11 +156,16 @@ public class ${glDBFluteInitializer} {
         if (dataSourceHandler != null) {
             return;
         }
-        if (dataSourceFqcn.startsWith("org.apache.commons.dbcp.")) {
+        if (needsSpringTransactionalDataSource(dataSourceFqcn)) {
             config.unlock();
             config.setDataSourceHandler(new ${glDBFluteConfig}.SpringTransactionalDataSourceHandler());
         }
     }
+
+    protected boolean needsSpringTransactionalDataSource(String dataSourceFqcn) {
+        return dataSourceFqcn.startsWith("org.apache.commons.dbcp.")
+            || dataSourceFqcn.startsWith("org.apache.tomcat.jdbc.pool.");
+    } 
 
 #end
     /**

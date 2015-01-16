@@ -2001,6 +2001,14 @@ public class Database {
         return getLittleAdjustmentProperties().getImplementedCommonColumnAutoSetupperClass();
     }
 
+    public String getBehaviorCommandInvokerClass() {
+        return getLittleAdjustmentProperties().getBehaviorCommandInvokerClass();
+    }
+
+    public String getBehaviorCommandInvokerSimpleIfPlainClass() {
+        return getLittleAdjustmentProperties().getBehaviorCommandInvokerSimpleIfPlainClass();
+    }
+
     public String getS2DaoSettingClass() {
         return getLittleAdjustmentProperties().getS2DaoSettingClass();
     }

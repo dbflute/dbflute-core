@@ -206,10 +206,10 @@ public class ${glDBFluteModule} implements Extension {
      * @param beanManager The manager of CDI beans. (NotNull)
      * @return The new-created DBFlute bean. (NotNull)
      */
-    protected DBFluteBean<BehaviorCommandInvoker> newDBFluteBeanOfBehaviorCommandInvoker(final BeanManager beanManager) {
-        return new DBFluteBean<BehaviorCommandInvoker>(beanManager, BehaviorCommandInvoker.class) {
+    protected DBFluteBean<${database.behaviorCommandInvokerSimpleIfPlainClass}> newDBFluteBeanOfBehaviorCommandInvoker(final BeanManager beanManager) {
+        return new DBFluteBean<${database.behaviorCommandInvokerSimpleIfPlainClass}>(beanManager, ${database.behaviorCommandInvokerSimpleIfPlainClass}.class) {
             @Override
-            protected void postInject(final BehaviorCommandInvoker instance) {
+            protected void postInject(final ${database.behaviorCommandInvokerSimpleIfPlainClass} instance) {
                 final Bean<?> bean = beanManager.resolve(beanManager.getBeans(InvokerAssistant.class, createDBFluteAnnotationLiteral()));
                 instance.setInvokerAssistant((InvokerAssistant) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
             }
@@ -258,11 +258,7 @@ public class ${glDBFluteModule} implements Extension {
             return instance;
         }
 
-        /**
-         * Bean customization point.
-         * @param instance
-         */
-        protected void postInject(final T instance) {
+        protected void postInject(final T instance) { // bean customization point
         }
 
         @Override
@@ -331,19 +327,10 @@ public class ${glDBFluteModule} implements Extension {
     // ===================================================================================
     //                                                                       Behavior Bean
     //                                                                       =============
-    /**
-     * New behavior-bean instance.
-     * @param <BEHAVIOR> The type of behavior.
-     * @return Behavior-bean. (NotNull)
-     */
     public <BEHAVIOR extends AbstractBehaviorReadable<?, ?>> BehaviorBean<BEHAVIOR> newBehaviorBean(final BeanManager beanManager, final Class<BEHAVIOR> beanClass) {
         return new BehaviorBean<BEHAVIOR>(beanManager, beanClass);
     }
 
-    /**
-     * Behavior implementation of {@link Bean}.
-     * @param <BEHAVIOR> The type of behavior.
-     */
     public class BehaviorBean<BEHAVIOR extends AbstractBehaviorReadable<?, ?>> extends DBFluteBean<BEHAVIOR> {
         protected final BeanManager beanManager;
 
@@ -354,7 +341,7 @@ public class ${glDBFluteModule} implements Extension {
 
         @Override
         protected void postInject(final BEHAVIOR instance) {
-            Bean<?> bean = beanManager.resolve(beanManager.getBeans(BehaviorCommandInvoker.class, createDBFluteAnnotationLiteral()));
+            Bean<?> bean = beanManager.resolve(beanManager.getBeans(${database.behaviorCommandInvokerSimpleIfPlainClass}.class, createDBFluteAnnotationLiteral()));
             instance.setBehaviorCommandInvoker((BehaviorCommandInvoker) beanManager.getReference(
                     bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
 

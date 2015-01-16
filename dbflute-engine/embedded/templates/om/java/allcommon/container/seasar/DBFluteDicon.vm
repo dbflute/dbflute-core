@@ -31,7 +31,7 @@
     <component name="invokerAssistant" class="${database.implementedInvokerAssistantClass}"/>
     <component name="commonColumnAutoSetupper" class="${database.implementedCommonColumnAutoSetupperClass}"/>
     <component name="behaviorSelector" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}"/>
-    <component name="behaviorCommandInvoker" class="org.dbflute.bhv.core.BehaviorCommandInvoker"/>
+    <component name="behaviorCommandInvoker" class="${database.behaviorCommandInvokerClass}"/>
 #if (!$database.isSuppressDiconBehaviorDefinition())
 
     <!-- The components of Behavior. -->
