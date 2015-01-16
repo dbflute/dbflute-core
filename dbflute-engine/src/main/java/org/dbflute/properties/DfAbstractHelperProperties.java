@@ -15,11 +15,7 @@
  */
 package org.dbflute.properties;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -39,6 +35,8 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.core.DfEnvironmentType;
 import org.dbflute.infra.core.logic.DfSchemaResourceFinder;
 import org.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
+import org.dbflute.properties.assistant.dispatchvariable.DfDispatchVariableResolver;
+import org.dbflute.properties.assistant.dispatchvariable.DfOutsideFileVariableInfo;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.dbflute.properties.handler.DfPropertiesHandler;
 import org.dbflute.properties.propreader.DfOutsideListPropReader;
@@ -54,9 +52,6 @@ import org.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
 import org.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfTypeUtil;
-import org.dbflute.util.Srl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -66,8 +61,6 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                                      Definition
     //                                                                      ==========
-    private static final Logger _log = LoggerFactory.getLogger(DfAbstractHelperProperties.class);
-
     // -----------------------------------------------------
     //                                         Default Value
     //                                         -------------
@@ -450,137 +443,23 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                               Dispatch Variable
     //                                                               =================
-    protected String resolveDispatchVariable(final String propTitle, String plainValue) {
-        return doResolveDispatchVariable(plainValue, new DfDispatchVariableCallback() {
-            public void throwNotFoundException(String plainValue, File dispatchFile) {
-                throwDispatchFileNotFoundException(propTitle, plainValue, dispatchFile);
-            }
-        });
+    protected String resolveDispatchVariable(String propTitle, String plainValue) {
+        final DfDispatchVariableResolver resolver = createDispatchVariableResolver();
+        return resolver.resolveDispatchVariable(propTitle, plainValue);
     }
 
-    protected void throwDispatchFileNotFoundException(String propTitle, String plainValue, File dispatchFile) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The dispatch file was not found.");
-        br.addItem("Advice");
-        br.addElement("Check your dispatch file existing.");
-        br.addElement("And check the setting in DBFlute property.");
-        br.addItem("Property");
-        br.addElement(propTitle);
-        br.addItem("Dispatch Setting");
-        br.addElement(plainValue);
-        br.addItem("Dispatch File");
-        br.addElement(dispatchFile);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
+    protected String resolvePasswordVariable(String propTitle, String user, String password) {
+        final DfDispatchVariableResolver resolver = createDispatchVariableResolver();
+        return resolver.resolvePasswordVariable(propTitle, user, password);
     }
 
-    protected String resolvePasswordVariable(final String propTitle, final String user, String password) {
-        final String resolved = doResolveDispatchVariable(password, new DfDispatchVariableCallback() {
-            public void throwNotFoundException(String plainValue, File dispatchFile) {
-                throwDatabaseUserPasswordFileNotFoundException(propTitle, user, plainValue, dispatchFile);
-            }
-        });
-        return resolved != null ? resolved : ""; // password not allowed to be null
+    public DfOutsideFileVariableInfo analyzeOutsideFileVariable(String plainValue) {
+        final DfDispatchVariableResolver resolver = createDispatchVariableResolver();
+        return resolver.analyzeOutsideFileVariable(plainValue);
     }
 
-    protected void throwDatabaseUserPasswordFileNotFoundException(String propTitle, String user, String password, File pwdFile) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The password file for the user was not found.");
-        br.addItem("Advice");
-        br.addElement("Check your password file existing.");
-        br.addElement("And check the setting in DBFlute property.");
-        br.addItem("Property");
-        br.addElement(propTitle);
-        br.addItem("Database User");
-        br.addElement(user);
-        br.addItem("Password Setting");
-        br.addElement(password);
-        br.addItem("Password File");
-        br.addElement(pwdFile);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
-    }
-
-    protected String doResolveDispatchVariable(String plainValue, DfDispatchVariableCallback callback) {
-        if (Srl.is_Null_or_TrimmedEmpty(plainValue)) {
-            return plainValue;
-        }
-        final DfDispatchVariableInfo variableInfo = analyzeDispatchVariable(plainValue);
-        if (variableInfo == null) {
-            return plainValue;
-        }
-        final File dispatchFile = variableInfo.getDispatchFile();
-        final String defaultValue = variableInfo.getDefaultValue();
-        if (!dispatchFile.exists()) {
-            if (defaultValue == null) {
-                callback.throwNotFoundException(plainValue, dispatchFile);
-            }
-            return defaultValue; // no dispatch file
-        }
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(dispatchFile), "UTF-8"));
-            final String line = br.readLine();
-            return line; // first line in the dispatch file is value
-        } catch (Exception continued) {
-            _log.info("Failed to read the dispatch file: " + dispatchFile);
-            return defaultValue; // no password
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {}
-            }
-        }
-    }
-
-    protected static interface DfDispatchVariableCallback {
-        void throwNotFoundException(String plainValue, File dispatchFile);
-    }
-
-    protected DfDispatchVariableInfo analyzeDispatchVariable(String password) {
-        final String prefix = "df:dfprop/";
-        if (!password.startsWith(prefix)) {
-            return null;
-        }
-        final String fileName;
-        final String defaultValue;
-        {
-            final String content = Srl.substringFirstRear(password, prefix);
-            if (content.contains("|")) {
-                fileName = Srl.substringFirstFront(content, "|");
-                defaultValue = Srl.substringFirstRear(content, "|");
-            } else {
-                fileName = content;
-                defaultValue = null;
-            }
-        }
-        final File dispatchFile = new File("./dfprop/" + fileName);
-        final DfDispatchVariableInfo variableInfo = new DfDispatchVariableInfo();
-        variableInfo.setDispatchFile(dispatchFile);
-        variableInfo.setDefaultValue(defaultValue);
-        return variableInfo;
-    }
-
-    protected static class DfDispatchVariableInfo {
-        protected File _dispatchFile;
-        protected String _defaultValue;
-
-        public File getDispatchFile() {
-            return _dispatchFile;
-        }
-
-        public void setDispatchFile(File dispatchFile) {
-            this._dispatchFile = dispatchFile;
-        }
-
-        public String getDefaultValue() {
-            return _defaultValue;
-        }
-
-        public void setDefaultValue(String defaultValue) {
-            this._defaultValue = defaultValue;
-        }
+    protected DfDispatchVariableResolver createDispatchVariableResolver() {
+        return new DfDispatchVariableResolver();
     }
 
     // ===================================================================================

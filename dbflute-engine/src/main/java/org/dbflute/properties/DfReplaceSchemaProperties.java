@@ -37,6 +37,7 @@ import org.dbflute.infra.reps.DfRepsSchemaSqlDir;
 import org.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
 import org.dbflute.properties.assistant.DfConnectionProperties;
+import org.dbflute.properties.assistant.dispatchvariable.DfOutsideFileVariableInfo;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
@@ -461,11 +462,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                     Additional User
     //                                                                     ===============
-    protected Map<String, Map<String, String>> _additionalUesrMap;
+    protected Map<String, Map<String, String>> _additionalUserMap;
 
     protected Map<String, Map<String, String>> getAdditionalUserMap() {
-        if (_additionalUesrMap != null) {
-            return _additionalUesrMap;
+        if (_additionalUserMap != null) {
+            return _additionalUserMap;
         }
         final Object obj = getReplaceSchemaDefinitionMap().get("additionalUserMap");
         if (obj != null && !(obj instanceof Map<?, ?>)) {
@@ -473,13 +474,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             throw new DfIllegalPropertyTypeException(msg);
         }
         if (obj == null) {
-            _additionalUesrMap = DfCollectionUtil.emptyMap();
+            _additionalUserMap = DfCollectionUtil.emptyMap();
         } else {
             @SuppressWarnings("unchecked")
             final Map<String, Map<String, String>> map = (Map<String, Map<String, String>>) obj;
-            _additionalUesrMap = map;
+            _additionalUserMap = map;
         }
-        return _additionalUesrMap;
+        return _additionalUserMap;
     }
 
     protected Map<String, String> getAdditionalUserPropertyMap(String additonalUser) {
@@ -529,8 +530,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (propertyMap != null && isProperty(key, false, propertyMap)) {
             final String password = propertyMap.get("password");
             if (Srl.is_NotNull_and_NotTrimmedEmpty(password)) {
-                final DfDispatchVariableInfo pwdInfo = analyzeDispatchVariable(password);
-                if (!pwdInfo.getDispatchFile().exists() && pwdInfo.getDefaultValue() == null) { // both not found
+                final DfOutsideFileVariableInfo pwdInfo = analyzeOutsideFileVariable(password);
+                if (!pwdInfo.getDispatchFile().exists() && pwdInfo.getOutsideValue() == null) { // both not found
                     result = true;
                 }
             }
