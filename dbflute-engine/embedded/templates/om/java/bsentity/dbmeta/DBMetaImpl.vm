@@ -248,6 +248,55 @@ public class ${myClassName} extends AbstractDBMeta {
 #end
     public boolean hasPrimaryKey() { return ${table.hasPrimaryKey()}; }
     public boolean hasCompoundPrimaryKey() { return ${table.hasCompoundPrimaryKey()}; }
+#if ($table.hasUnique())
+
+    // -----------------------------------------------------
+    //                                        Unique Element
+    //                                        --------------
+## #later escalate to super class, and make primary info, getPrimaryKeyInfo() by jflute
+    private volatile List<UniqueInfo> _uniqueInfoList;
+    public List<UniqueInfo> getUniqueInfoList() {
+        if (_uniqueInfoList != null) {
+            return _uniqueInfoList;
+        }
+        synchronized (this) {
+            if (_uniqueInfoList != null) {
+                return _uniqueInfoList;
+            }
+            final java.lang.reflect.Method[] methods = this.getClass().getMethods();
+            _uniqueInfoList = newArrayListSized(4);
+            final String prefix = "uniqueOf";
+            final Class<UniqueInfo> returnType = UniqueInfo.class;
+            for (java.lang.reflect.Method method : methods) {
+                if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
+                    _uniqueInfoList.add((UniqueInfo) org.dbflute.util.DfReflectionUtil.invoke(method, this, null));
+                }
+            }
+            return _uniqueInfoList;
+        }
+    }
+#foreach ($uq in $table.keyableUniqueList)
+#if ($uq.isOnlyOneColumn())
+    public UniqueInfo uniqueOf${uq.javaNameKeyword}() { return hpcui(column${uq.columnAsOne.javaBeansRulePropertyNameInitCap}()); }
+#else
+    public UniqueInfo uniqueOf${uq.javaNameKeyword}() {
+        List<ColumnInfo> ls = newArrayListSized(4);
+#foreach ($col in $uq.columnList)
+        ls.add(column${col.javaBeansRulePropertyNameInitCap}());
+#end
+        return hpcui(ls);
+    }
+#end
+#end
+
+    protected UniqueInfo hpcui(ColumnInfo uniqueColumnInfo) { // helpCreateUniqueInfo()
+        return hpcui(java.util.Arrays.asList(uniqueColumnInfo));
+    }
+
+    protected UniqueInfo hpcui(java.util.List<ColumnInfo> uniqueColumnInfoList) { // helpCreateUniqueInfo()
+        return new UniqueInfo(this, uniqueColumnInfoList, false);
+    }
+#end
 
     // ===================================================================================
     //                                                                       Relation Info
