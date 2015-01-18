@@ -29,7 +29,12 @@ public class QueryTraceableSqlStringFilter implements SqlStringFilter {
     protected final SimpleTraceableSqlStringFilter _filter;
 
     public QueryTraceableSqlStringFilter(Method actionMethod, TraceableSqlAdditionalInfoProvider additionalInfoProvider) {
-        _filter = new SimpleTraceableSqlStringFilter(actionMethod, additionalInfoProvider);
+        _filter = newSimpleTraceableSqlStringFilter(actionMethod, additionalInfoProvider);
+    }
+
+    protected SimpleTraceableSqlStringFilter newSimpleTraceableSqlStringFilter(Method actionMethod,
+            TraceableSqlAdditionalInfoProvider additionalInfoProvider) {
+        return new SimpleTraceableSqlStringFilter(actionMethod, additionalInfoProvider);
     }
 
     public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {

@@ -30,8 +30,8 @@ public class SimpleTraceableSqlStringFilter implements SqlStringFilter, Executed
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Method _actionMethod;
-    protected final TraceableSqlAdditionalInfoProvider _additionalInfoProvider;
+    protected final Method _actionMethod; // null allowed: you can override building methods instead
+    protected final TraceableSqlAdditionalInfoProvider _additionalInfoProvider; // null allowed
     protected boolean _markingAtFront;
     protected boolean _suppressMarking;
     protected int _countOfSelectCB;
@@ -89,19 +89,34 @@ public class SimpleTraceableSqlStringFilter implements SqlStringFilter, Executed
         if (_suppressMarking) {
             return null;
         }
+        final String invokeMark = buildInvokeMark();
+        if (invokeMark == null || invokeMark.trim().length() == 0) {
+            return null;
+        }
         final String filtered;
         if (_markingAtFront) {
-            filtered = "-- " + buildInvokeMark() + "\n" + executedSql;
+            filtered = "-- " + invokeMark + "\n" + executedSql;
         } else { // default here
-            filtered = executedSql + "\n-- " + buildInvokeMark();
+            filtered = executedSql + "\n-- " + invokeMark;
         }
         return filtered;
     }
 
     protected String buildInvokeMark() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(_actionMethod.getDeclaringClass().getName());
-        sb.append("#").append(_actionMethod.getName()).append("()");
+        final String declaringClass = buildDeclaringClass();
+        final boolean hasDeclaringClass = declaringClass != null && declaringClass.trim().length() > 0;
+        if (hasDeclaringClass) {
+            sb.append(declaringClass);
+        }
+        final String methodName = buildMethodName();
+        final boolean hasMethodName = methodName != null && methodName.trim().length() > 0;
+        if (hasMethodName) {
+            if (hasDeclaringClass) {
+                sb.append("#");
+            }
+            sb.append(methodName).append("()");
+        }
         if (_additionalInfoProvider != null) {
             final String addiitonalInfo = _additionalInfoProvider.provide();
             if (addiitonalInfo != null) {
@@ -109,6 +124,14 @@ public class SimpleTraceableSqlStringFilter implements SqlStringFilter, Executed
             }
         }
         return sb.toString();
+    }
+
+    protected String buildDeclaringClass() {
+        return _actionMethod != null ? _actionMethod.getDeclaringClass().getName() : null;
+    }
+
+    protected String buildMethodName() {
+        return _actionMethod != null ? _actionMethod.getName() : null;
     }
 
     protected String resolveUnsupportedMark(String info) {
