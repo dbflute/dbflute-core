@@ -16,6 +16,7 @@
 package org.dbflute.hook;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -26,6 +27,7 @@ import org.dbflute.exception.AccessContextNoValueException;
 import org.dbflute.exception.AccessContextNotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.system.DBFluteSystem;
+import org.dbflute.util.DfTypeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -498,7 +500,7 @@ public class AccessContext {
     protected String _accessModule;
     protected AccessModuleProvider _accessModuleProvider;
 
-    /** The map of access value, you can freely add your item value. */
+    /** The map of access value, you can freely add your item value. (NullAllowed: means no use) */
     protected Map<String, Object> _accessValueMap;
 
     // ===================================================================================
@@ -506,8 +508,74 @@ public class AccessContext {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _accessDate + ", " + _accessTimestamp + ", " + _accessUser + ", " + _accessProcess + ", " + _accessModule + ", "
-                + _accessValueMap + "}";
+        final StringBuilder sb = new StringBuilder();
+        sb.append(DfTypeUtil.toClassTitle(this)).append(":{");
+        boolean firstDone = false;
+        final String delimiter = ", ";
+        if (_accessLocalDate != null) {
+            sb.append(firstDone ? delimiter : "").append("localDate=").append(_accessLocalDate);
+            firstDone = true;
+        }
+        if (_accessLocalDateProvider != null) {
+            sb.append(firstDone ? delimiter : "").append("localDateProvider=").append(_accessLocalDateProvider);
+            firstDone = true;
+        }
+        if (_accessLocalDateTime != null) {
+            sb.append(firstDone ? delimiter : "").append("localDateTime=").append(_accessLocalDateTime);
+            firstDone = true;
+        }
+        if (_accessLocalDateTimeProvider != null) {
+            sb.append(firstDone ? delimiter : "").append("localDateTimeProvider=").append(_accessLocalDateTimeProvider);
+            firstDone = true;
+        }
+        if (_accessDate != null) {
+            final String disp = new SimpleDateFormat("yyyy/MM/dd").format(_accessDate);
+            sb.append(firstDone ? delimiter : "").append("date=").append(disp);
+            firstDone = true;
+        }
+        if (_accessDateProvider != null) {
+            sb.append(firstDone ? delimiter : "").append("dateProvider=").append(_accessDateProvider);
+            firstDone = true;
+        }
+        if (_accessTimestamp != null) {
+            final String disp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS").format(_accessTimestamp);
+            sb.append(firstDone ? delimiter : "").append("timestamp=").append(disp);
+            firstDone = true;
+        }
+        if (_accessTimestampProvider != null) {
+            sb.append(firstDone ? delimiter : "").append("timestampProvider=").append(_accessTimestampProvider);
+            firstDone = true;
+        }
+        if (_accessUser != null) {
+            sb.append(firstDone ? delimiter : "").append("user=").append(_accessUser);
+            firstDone = true;
+        }
+        if (_accessUserProvider != null) {
+            sb.append(firstDone ? delimiter : "").append("userProvider=").append(_accessUserProvider);
+            firstDone = true;
+        }
+        if (_accessProcess != null) {
+            sb.append(firstDone ? delimiter : "").append("process=").append(_accessProcess);
+            firstDone = true;
+        }
+        if (_accessProcessProvider != null) {
+            sb.append(firstDone ? delimiter : "").append("processProvider=").append(_accessProcessProvider);
+            firstDone = true;
+        }
+        if (_accessModule != null) {
+            sb.append(firstDone ? delimiter : "").append("module=").append(_accessModule);
+            firstDone = true;
+        }
+        if (_accessModuleProvider != null) {
+            sb.append(firstDone ? delimiter : "").append("moduleProvider=").append(_accessModuleProvider);
+            firstDone = true;
+        }
+        if (_accessValueMap != null) {
+            sb.append(firstDone ? delimiter : "").append("valueMap=").append(_accessValueMap);
+            firstDone = true;
+        }
+        sb.append("}");
+        return sb.toString();
     }
 
     // ===================================================================================
