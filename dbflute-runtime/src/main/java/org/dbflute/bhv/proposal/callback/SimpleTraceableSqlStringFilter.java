@@ -83,8 +83,8 @@ public class SimpleTraceableSqlStringFilter implements SqlStringFilter, Executed
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                      Building Logic
+    //                                                                      ==============
     protected String markingSql(String executedSql) {
         if (_suppressMarking) {
             return null;
@@ -93,17 +93,17 @@ public class SimpleTraceableSqlStringFilter implements SqlStringFilter, Executed
         if (invokeMark == null || invokeMark.trim().length() == 0) {
             return null;
         }
-        final String filtered;
-        if (_markingAtFront) {
-            filtered = "-- " + invokeMark + "\n" + executedSql;
-        } else { // default here
-            filtered = executedSql + "\n-- " + invokeMark;
-        }
-        return filtered;
+        return doMarkingSql(executedSql, invokeMark);
     }
 
     protected String buildInvokeMark() {
         final StringBuilder sb = new StringBuilder();
+        doBuildInvokeMarkCaller(sb);
+        doBuildInvokeMarkAdditionalInfo(sb);
+        return sb.toString();
+    }
+
+    protected void doBuildInvokeMarkCaller(final StringBuilder sb) {
         final String declaringClass = buildDeclaringClass();
         final boolean hasDeclaringClass = declaringClass != null && declaringClass.trim().length() > 0;
         if (hasDeclaringClass) {
@@ -117,13 +117,15 @@ public class SimpleTraceableSqlStringFilter implements SqlStringFilter, Executed
             }
             sb.append(methodName).append("()");
         }
+    }
+
+    protected void doBuildInvokeMarkAdditionalInfo(final StringBuilder sb) {
         if (_additionalInfoProvider != null) {
             final String addiitonalInfo = _additionalInfoProvider.provide();
             if (addiitonalInfo != null) {
                 sb.append(": ").append(resolveUnsupportedMark(addiitonalInfo));
             }
         }
-        return sb.toString();
     }
 
     protected String buildDeclaringClass() {
@@ -140,6 +142,16 @@ public class SimpleTraceableSqlStringFilter implements SqlStringFilter, Executed
         resolved = Srl.replace(resolved, "}", ")");
         resolved = Srl.replace(resolved, "'", "\""); // ' is NG mark when update on Oracle
         return resolved;
+    }
+
+    protected String doMarkingSql(String executedSql, final String invokeMark) {
+        final String filtered;
+        if (_markingAtFront) {
+            filtered = "-- " + invokeMark + "\n" + executedSql;
+        } else { // default here
+            filtered = executedSql + "\n-- " + invokeMark;
+        }
+        return filtered;
     }
 
     // ===================================================================================
