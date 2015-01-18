@@ -83,6 +83,9 @@ public class MockEntity implements Entity {
         return Collections.emptySet();
     }
 
+    public void myuniqueByProperty(String propertyName) {
+    }
+
     public void markAsSelect() {
     }
 

@@ -102,8 +102,8 @@ public interface Entity {
     void clearSpecifiedInfo();
 
     // ===================================================================================
-    //                                                                         Primary Key
-    //                                                                         ===========
+    //                                                                          Unique Key
+    //                                                                          ==========
     /**
      * Does it have the value of primary keys?
      * @return The determination, true or false. (if all PK values are not null, returns true)
@@ -115,6 +115,13 @@ public interface Entity {
      * @return The set of property name for specified unique columns. (NotNull)
      */
     Set<String> myuniqueDrivenProperties(); // prefix 'my' not to show when uniqueBy() completion
+
+    /**
+     * Treat the property as unique driven without setting value. (basically for Framework) <br>
+     * The property name needs to be according to Java Beans rule.
+     * @param propertyName The property name of unique-driven column. (NotNull)
+     */
+    void myuniqueByProperty(String propertyName);
 
     // ===================================================================================
     //                                                                     Birthplace Mark

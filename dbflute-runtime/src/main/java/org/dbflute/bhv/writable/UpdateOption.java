@@ -63,6 +63,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     protected SpecifyQuery<CB> _updateColumnSpecification;
     protected CB _updateColumnSpecifiedCB;
     protected Set<String> _forcedSpecifiedUpdateColumnSet;
+    protected UniqueInfo _uniqueByUniqueInfo;
     protected boolean _exceptCommonColumnForcedSpecified;
     protected boolean _updateColumnModifiedPropertiesFragmentedAllowed; // as default of batch update
     protected boolean _compatibleBatchUpdateDefaultEveryColumn;
@@ -593,6 +594,36 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
             String msg = "The CB for specification of update columns should be required here.";
             throw new IllegalStateException(msg);
         }
+    }
+
+    // ===================================================================================
+    //                                                                           Unique By
+    //                                                                           =========
+    /**
+     * To be unique by the unique column of the unique info. <br>
+     * The values of the unique columns should be in your entity. <br>
+     * Usually you can use entity's uniqueOf() so this is basically for interface dispatch world. <br>
+     * You can update the entity by the key when entity update (NOT batch update).
+     * @param uniqueInfo The unique info of DB meta for natural unique. (NotNull, NotPrimary)
+     */
+    public void uniqueBy(UniqueInfo uniqueInfo) {
+        if (uniqueInfo == null) {
+            String msg = "The argument 'uniqueInfo' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (uniqueInfo.isPrimary()) {
+            String msg = "The unique info should be natural unique (not primary): " + uniqueInfo;
+            throw new IllegalArgumentException(msg);
+        }
+        _uniqueByUniqueInfo = uniqueInfo;
+    }
+
+    public boolean hasUniqueByUniqueInfo() {
+        return _uniqueByUniqueInfo != null;
+    }
+
+    public UniqueInfo getUniqueByUniqueInfo() {
+        return _uniqueByUniqueInfo;
     }
 
     // ===================================================================================

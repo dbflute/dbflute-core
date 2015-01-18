@@ -106,14 +106,17 @@ public class InstanceKeyEntity implements Entity {
     }
 
     // ===================================================================================
-    //                                                                         Primary Key
-    //                                                                         ===========
+    //                                                                          Unique Key
+    //                                                                          ==========
     public boolean hasPrimaryKeyValue() {
         return _actualEntity.hasPrimaryKeyValue();
     }
 
     public Set<String> myuniqueDrivenProperties() {
         return _actualEntity.myuniqueDrivenProperties();
+    }
+
+    public void myuniqueByProperty(String propertyName) {
     }
 
     // ===================================================================================

@@ -77,10 +77,12 @@ public class UniqueInfo {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    @Override
     public int hashCode() {
         return _dbmeta.hashCode() + _uniqueColumnList.hashCode();
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof UniqueInfo)) {
             return false;
@@ -95,6 +97,7 @@ public class UniqueInfo {
         return true;
     }
 
+    @Override
     public String toString() {
         return _dbmeta.getTableDbName() + "." + _uniqueColumnList;
     }

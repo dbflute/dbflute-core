@@ -171,8 +171,8 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     }
 
     // ===================================================================================
-    //                                                                         Primary Key
-    //                                                                         ===========
+    //                                                                          Unique Key
+    //                                                                          ==========
     /** {@inheritDoc} */
     public Set<String> myuniqueDrivenProperties() {
         return __uniqueDrivenProperties.getPropertyNames();
@@ -180,6 +180,11 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
 
     protected EntityUniqueDrivenProperties newUniqueDrivenProperties() {
         return new EntityUniqueDrivenProperties();
+    }
+
+    /** {@inheritDoc} */
+    public void myuniqueByProperty(String propertyName) {
+        __uniqueDrivenProperties.addPropertyName(propertyName);
     }
 
     // ===================================================================================
