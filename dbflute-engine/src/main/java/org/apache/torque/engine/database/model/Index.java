@@ -281,6 +281,11 @@ public class Index implements Constraint {
         return columnList;
     }
 
+    public Column getColumnAsOne() {
+        final Table table = getTable();
+        return table.getColumn(_indexColumnMap.entrySet().iterator().next().getValue());
+    }
+
     public String getConnectedJavaName() {
         final List<Column> columnList = getColumnList();
         final StringBuilder sb = new StringBuilder();
