@@ -117,9 +117,9 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
             if (pt.isPrimaryKey()) {
                 continue;
             }
-            if (isOptimisticLockProperty(timestampProp, versionNoProp, pt) // OptimisticLock
-                    || isSpecifiedProperty(option, modifiedSet, pt) // Specified
-                    || isStatementProperty(option, pt)) { // Statement
+            if (isOptimisticLockProperty(timestampProp, versionNoProp, pt) // optimistic lock
+                    || isStatementProperty(option, pt) // statement
+                    || isSpecifiedProperty(option, modifiedSet, pt)) { // specified
                 typeList.add(pt);
             }
         }
@@ -135,15 +135,15 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         return propertyName.equalsIgnoreCase(timestampProp) || propertyName.equalsIgnoreCase(versionNoProp);
     }
 
-    protected boolean isSpecifiedProperty(UpdateOption<ConditionBean> option, Set<?> modifiedSet, TnPropertyType pt) {
-        if (option != null && option.hasSpecifiedUpdateColumn()) { // BatchUpdate
+    protected boolean isSpecifiedProperty(UpdateOption<ConditionBean> option, Set<String> modifiedSet, TnPropertyType pt) {
+        if (option != null && option.hasSpecifiedUpdateColumn()) { // entity or batch update
             return option.isSpecifiedUpdateColumn(pt.getColumnDbName());
-        } else { // EntityUpdate
+        } else { // entity update
             return isModifiedProperty(modifiedSet, pt); // process for ModifiedColumnUpdate
         }
     }
 
-    protected boolean isModifiedProperty(Set<?> modifiedSet, TnPropertyType pt) {
+    protected boolean isModifiedProperty(Set<String> modifiedSet, TnPropertyType pt) {
         return modifiedSet.contains(pt.getPropertyName());
     }
 
@@ -191,7 +191,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
             }
             sb.append(columnSqlName).append(" = ");
             final String valueExp;
-            if (option != null && option.hasStatement(columnDbName)) {
+            if (option != null && option.hasStatement(columnDbName)) { // prior to specified
                 final String statement = option.buildStatement(columnDbName);
                 valueExp = encryptIfNeeds(tableDbName, columnDbName, statement);
             } else {

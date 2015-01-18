@@ -68,7 +68,7 @@ public class TnBatchUpdateDynamicCommand extends TnUpdateEntityDynamicCommand {
     }
 
     @Override
-    protected boolean isModifiedProperty(Set<?> modifiedSet, TnPropertyType pt) {
+    protected boolean isModifiedProperty(Set<String> modifiedSet, TnPropertyType pt) {
         return true; // as default (all columns are updated)
     }
 
