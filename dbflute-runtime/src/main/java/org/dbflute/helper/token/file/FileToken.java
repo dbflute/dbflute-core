@@ -198,7 +198,7 @@ public class FileToken {
                 }
                 if (count == 0) {
                     if (option.isBeginFirstLine()) {
-                        headerInfo = new FileTokenizingHeaderInfo(); // as empty
+                        headerInfo = createFileTokenizingHeaderInfo(); // as empty
                     } else {
                         headerInfo = analyzeHeaderInfo(delimiter, lineString);
                         continue;
@@ -209,7 +209,7 @@ public class FileToken {
                     rowString = lineString;
                     realRowStringSb.append(lineString);
                 } else {
-                    final String lineSeparator = "\n";
+                    final String lineSeparator = getTokenizedRestoredLineSeparator();
                     rowString = preContinueString + lineSeparator + lineString;
                     realRowStringSb.append(lineSeparator).append(lineString);
                 }
@@ -223,7 +223,7 @@ public class FileToken {
                 temporaryValueList.addAll(ls);
 
                 try {
-                    final FileTokenizingRowResource resource = new FileTokenizingRowResource();
+                    final FileTokenizingRowResource resource = createFileTokenizingRowResource();
                     resource.setHeaderInfo(headerInfo);
 
                     if (option.isHandleEmptyAsNull()) {
@@ -265,6 +265,14 @@ public class FileToken {
         }
     }
 
+    protected FileTokenizingRowResource createFileTokenizingRowResource() {
+        return new FileTokenizingRowResource();
+    }
+
+    protected String getTokenizedRestoredLineSeparator() {
+        return "\n";
+    }
+
     protected ValueLineInfo arrangeValueList(final String lineString, String delimiter) {
         final List<String> valueList = new ArrayList<String>();
 
@@ -279,7 +287,7 @@ public class FileToken {
     }
 
     protected ValueLineInfo arrangeValueList(List<String> valueList, String delimiter) {
-        final ValueLineInfo valueLineInfo = new ValueLineInfo();
+        final ValueLineInfo valueLineInfo = createValueLineInfo();
         final ArrayList<String> resultList = new ArrayList<String>();
         String preString = "";
         for (int i = 0; i < valueList.size(); i++) {
@@ -334,6 +342,10 @@ public class FileToken {
         }
         valueLineInfo.setValueList(resultList);
         return valueLineInfo;
+    }
+
+    protected ValueLineInfo createValueLineInfo() {
+        return new ValueLineInfo();
     }
 
     protected String connectPreString(String preString, String delimiter, String value) {
@@ -401,7 +413,7 @@ public class FileToken {
     }
 
     protected FileTokenizingHeaderInfo analyzeHeaderInfo(String delimiter, final String lineString) {
-        final FileTokenizingHeaderInfo headerInfo = new FileTokenizingHeaderInfo();
+        final FileTokenizingHeaderInfo headerInfo = createFileTokenizingHeaderInfo();
         final String[] values = lineString.split(delimiter);
         for (int i = 0; i < values.length; i++) {
             final String value = values[i].trim();// Trimming is Header Only!;
@@ -415,6 +427,10 @@ public class FileToken {
         }
         headerInfo.setColumnNameRowString(lineString);
         return headerInfo;
+    }
+
+    protected FileTokenizingHeaderInfo createFileTokenizingHeaderInfo() {
+        return new FileTokenizingHeaderInfo();
     }
 
     public static class ValueLineInfo {
@@ -570,7 +586,7 @@ public class FileToken {
 
     protected void callbackDataRowWriter(FileMakingCallback callback, final FileMakingOption option, final String lineSep,
             final Writer writer, final Set<String> doneMarkSet) throws IOException {
-        final FileMakingRowResource resource = new FileMakingRowResource();
+        final FileMakingRowResource resource = createFileMakingRowResource();
         try {
             callback.write(new FileMakingRowWriter() {
                 public void writeRow(List<String> valueList) throws IOException {
@@ -597,6 +613,10 @@ public class FileToken {
             String msg = "SQL handling failed in the row writing process: option=" + option;
             throw new FileMakingSQLHandlingFailureException(msg, e);
         }
+    }
+
+    protected FileMakingRowResource createFileMakingRowResource() {
+        return new FileMakingRowResource();
     }
 
     protected void doWriteDataRow(Writer writer, FileMakingRowResource resource, FileMakingOption option, String lineSep,
