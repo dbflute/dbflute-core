@@ -18,6 +18,7 @@ package org.dbflute.helper.filesystem;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -298,10 +299,21 @@ public class FileTextIO {
 
     protected FileOutputStream createFileOutputStream(String textPath) {
         try {
+            mkdirsIfNeeds(textPath);
             return new FileOutputStream(textPath);
         } catch (FileNotFoundException e) {
             String msg = "Not found the text file: " + textPath;
             throw new IllegalStateException(msg, e);
+        }
+    }
+
+    protected void mkdirsIfNeeds(String textPath) {
+        if (textPath.contains("/")) {
+            final String dirPath = Srl.substringLastFront(textPath, "/");
+            final File dir = new File(dirPath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
         }
     }
 
