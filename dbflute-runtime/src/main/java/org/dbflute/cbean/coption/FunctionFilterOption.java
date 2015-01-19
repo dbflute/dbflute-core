@@ -86,6 +86,9 @@ public class FunctionFilterOption implements ParameterOption {
     //                                    ------------------
     protected ColumnInfo _targetColumnInfo; // not required
     protected Object _mysticBindingSnapshot; // e.g. to determine binding type
+    protected Object _tmpTrunc;
+    protected boolean _mayNullRevived;
+    protected boolean _removeCalcAlias;
     protected boolean _databaseMySQL;
     protected boolean _databasePostgreSQL;
     protected boolean _databaseOracle;
@@ -93,8 +96,6 @@ public class FunctionFilterOption implements ParameterOption {
     protected boolean _databaseSQLServer;
     protected boolean _databaseH2;
     protected boolean _databaseDerby;
-    protected Object _tmpTrunc;
-    protected boolean _mayNullRevived;
 
     /** The time-zone for filtering. (NullAllowed: if null, default zone) */
     protected TimeZone _timeZone;
@@ -903,11 +904,20 @@ public class FunctionFilterOption implements ParameterOption {
     protected String buildDreamCruiseTicketStatement(Object value) {
         final String bindPath;
         final SpecifiedColumn specifiedColumn = ((SpecifiedColumn) value);
-        final String columnExp = specifiedColumn.toColumnRealName().toString();
+        final String columnExp;
+        if (_removeCalcAlias) { // e.g. VaryingUpdate
+            columnExp = specifiedColumn.toColumnSqlName().toString();
+        } else { // normally here
+            columnExp = specifiedColumn.toColumnRealName().toString();
+        }
         if (specifiedColumn.hasSpecifyCalculation()) {
             specifiedColumn.xinitSpecifyCalculation();
             final HpCalcSpecification<ConditionBean> calcSpecification = specifiedColumn.getSpecifyCalculation();
-            bindPath = calcSpecification.buildStatementToSpecifidName(columnExp);
+            if (_removeCalcAlias) { // e.g. VaryingUpdate
+                bindPath = calcSpecification.buildStatementToSpecifidNameRemovedCalcAlias(columnExp);
+            } else { // normally here
+                bindPath = calcSpecification.buildStatementToSpecifidName(columnExp);
+            }
         } else {
             bindPath = columnExp;
         }
@@ -1002,10 +1012,6 @@ public class FunctionFilterOption implements ParameterOption {
     // -----------------------------------------------------
     //                                    called by internal
     //                                    ------------------
-    public Object getTrunc() {
-        return _tmpTrunc;
-    }
-
     public ColumnInfo xgetTargetColumnInfo() {
         return _targetColumnInfo;
     }
@@ -1020,6 +1026,14 @@ public class FunctionFilterOption implements ParameterOption {
 
     public void xsetMysticBindingSnapshot(Object mysticBindingSnapshot) {
         _mysticBindingSnapshot = mysticBindingSnapshot;
+    }
+
+    public Object getTrunc() {
+        return _tmpTrunc;
+    }
+
+    public void xremoveCalcAlias() {
+        _removeCalcAlias = true;
     }
 
     public void xjudgeDatabase(SqlClause sqlClause) {

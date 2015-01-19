@@ -220,9 +220,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
     // ===================================================================================
     //                                                                         Calculation
     //                                                                         ===========
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator plus(Number plusValue) {
         assertObjectNotNull("plusValue", plusValue);
         if (_leftMode) {
@@ -234,9 +232,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator plus(SpecifiedColumn plusColumn) {
         assertObjectNotNull("plusColumn", plusColumn);
         assertCalculationColumnNumber(plusColumn);
@@ -250,9 +246,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator minus(Number minusValue) {
         assertObjectNotNull("minusValue", minusValue);
         if (_leftMode) {
@@ -264,9 +258,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator minus(SpecifiedColumn minusColumn) {
         assertObjectNotNull("minusColumn", minusColumn);
         assertCalculationColumnNumber(minusColumn);
@@ -280,9 +272,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator multiply(Number multiplyValue) {
         assertObjectNotNull("multiplyValue", multiplyValue);
         if (_leftMode) {
@@ -294,9 +284,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator multiply(SpecifiedColumn multiplyColumn) {
         assertObjectNotNull("multiplyColumn", multiplyColumn);
         assertCalculationColumnNumber(multiplyColumn);
@@ -310,9 +298,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator divide(Number divideValue) {
         assertObjectNotNull("divideValue", divideValue);
         if (_leftMode) {
@@ -324,9 +310,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator divide(SpecifiedColumn divideColumn) {
         assertObjectNotNull("divideColumn", divideColumn);
         assertCalculationColumnNumber(divideColumn);
@@ -367,9 +351,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
         assertObjectNotNull("opLambda", opLambda);
         if (_leftMode) {
@@ -402,7 +384,10 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
         return this;
     }
 
-    protected void prepareConvOption(ColumnConversionOption option) {
+    protected void prepareConvOption(ColumnConversionOption option, boolean removeCalcAlias) {
+        if (removeCalcAlias) {
+            option.xremoveCalcAlias();
+        }
         option.xjudgeDatabase(_baseCB.getSqlClause());
         if (option.xgetTargetColumnInfo() == null) {
             // might be already set (e.g. HpSpecifiedColumn's convert(), see the comment)
@@ -435,17 +420,13 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
     // ===================================================================================
     //                                                                     Left/Right Mode
     //                                                                     ===============
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator left() {
         _leftMode = true;
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator right() {
         _leftMode = false;
         return this;
@@ -454,26 +435,29 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
     // ===================================================================================
     //                                                                           Statement
     //                                                                           =========
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String buildStatementAsSqlName(String aliasName) { // e.g. VaryingUpdate, VaryingQueryUdpate
         final ColumnSqlName columnSqlName = getResolvedSpecifiedColumnSqlName();
+        if (columnSqlName == null) { // very rare case, e.g. DreamCruise
+            String msg = "Specified column is not found or too many columns are specified: " + aliasName;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
         final String columnExp = (aliasName != null ? aliasName : "") + columnSqlName.toString();
         final boolean removeCalcAlias = aliasName == null;
         return doBuildStatement(columnExp, null, removeCalcAlias);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String buildStatementToSpecifidName(String columnExp) { // e.g. ColumnQuery, DerivedReferrer
         return doBuildStatement(columnExp, null, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    // pinpoint use so no interface
+    public String buildStatementToSpecifidNameRemovedCalcAlias(String columnExp) { // e.g. VaryingUpdate
+        return doBuildStatement(columnExp, null, true);
+    }
+
+    /** {@inheritDoc} */
     public String buildStatementToSpecifidName(String columnExp, Map<String, String> columnAliasMap) { // e.g. ManualOrder
         return doBuildStatement(columnExp, columnAliasMap, false);
     }
@@ -493,7 +477,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements ColumnCalc
             if (!calculation.isPreparedConvOption()) {
                 final ColumnConversionOption option = calculation.getColumnConversionOption();
                 if (option != null) {
-                    prepareConvOption(option);
+                    prepareConvOption(option, removeCalcAlias);
                     calculation.setPreparedConvOption(true);
                 }
             }
