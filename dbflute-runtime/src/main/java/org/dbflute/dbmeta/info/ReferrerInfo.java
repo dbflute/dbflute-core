@@ -274,7 +274,7 @@ public class ReferrerInfo implements RelationInfo {
     }
 
     public String toString() {
-        return _localDBMeta.getTableDbName() + "." + _referrerPropertyName + "<-" + _referrerDBMeta.getTableDbName();
+        return "{" + _localDBMeta.getTableDbName() + "." + _referrerPropertyName + "<-" + _referrerDBMeta.getTableDbName() + "}";
     }
 
     // ===================================================================================

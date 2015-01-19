@@ -1201,7 +1201,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
         // basically property(column) type is same as next value type
         // so there is NOT type conversion cost when writing to the entity
-        dbmeta.getPrimaryUniqueInfo().getFirstColumn().write(entity, readNextVal());
+        dbmeta.getPrimaryInfo().getFirstColumn().write(entity, readNextVal());
     }
 
     protected void assertEntityHasOptimisticLockValue(Entity entity) {

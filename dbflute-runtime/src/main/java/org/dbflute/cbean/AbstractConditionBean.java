@@ -917,7 +917,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public void enablePagingSelectAndQuerySplit() {
         assertOptionThatBadTiming("enablePagingSelectAndQuerySplit()");
         final DBMeta dbmeta = asDBMeta();
-        if (!dbmeta.hasPrimaryKey() || dbmeta.getPrimaryUniqueInfo().isTwoOrMore()) {
+        if (!dbmeta.hasPrimaryKey() || dbmeta.getPrimaryInfo().isCompoundKey()) {
             String msg = "The PagingSelectAndQuerySplit needs only-one column key table: " + asTableDbName();
             throw new IllegalConditionBeanOperationException(msg);
         }

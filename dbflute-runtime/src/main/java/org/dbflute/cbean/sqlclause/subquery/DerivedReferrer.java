@@ -181,7 +181,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         if (isFixedCondition(correlatedFixedCondition)) {
             setupUnionMainForFixedCondition(keySb, tableAliasName, derivedColumnSqlName);
         } else { // no fixed condition, mainly here
-            final List<ColumnInfo> pkList = _subQueryDBMeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            final List<ColumnInfo> pkList = _subQueryDBMeta.getPrimaryInfo().getPrimaryColumnList();
             for (ColumnInfo pk : pkList) {
                 final ColumnSqlName pkSqlName = pk.getColumnSqlName();
                 if (pkSqlName.equals(derivedRealSqlName) || pkSqlName.equals(relatedColumnSqlName)) {
@@ -339,7 +339,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
                 relatedColumnSqlSet.add(columnSqlName);
             }
             final ColumnSqlName derivedSqlName = derivedRealSqlName;
-            final List<ColumnInfo> pkList = _subQueryDBMeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            final List<ColumnInfo> pkList = _subQueryDBMeta.getPrimaryInfo().getPrimaryColumnList();
             for (ColumnInfo pk : pkList) {
                 final ColumnSqlName pkSqlName = pk.getColumnSqlName();
                 if (pkSqlName.equals(derivedSqlName) || relatedColumnSqlSet.contains(pkSqlName)) {

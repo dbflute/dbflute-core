@@ -83,9 +83,9 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
+import org.dbflute.dbmeta.info.PrimaryInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
-import org.dbflute.dbmeta.info.UniqueInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.dbflute.dbmeta.name.ColumnSqlName;
@@ -1624,8 +1624,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 relatedColumnDbName = specifiedDbName;
             } else { // as default
                 // this function is only allowed when only-one PK
-                final UniqueInfo primaryUniqueInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryUniqueInfo();
-                final ColumnInfo primaryColumnInfo = primaryUniqueInfo.getFirstColumn();
+                final PrimaryInfo primaryInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryInfo();
+                final ColumnInfo primaryColumnInfo = primaryInfo.getFirstColumn();
                 relatedColumnDbName = primaryColumnInfo.getColumnDbName();
             }
         }
@@ -1643,8 +1643,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 relatedColumnDbName = specifiedDbName;
             } else { // as default
                 // this function is only allowed when only-one PK
-                final UniqueInfo primaryUniqueInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryUniqueInfo();
-                final ColumnInfo primaryColumnInfo = primaryUniqueInfo.getFirstColumn();
+                final PrimaryInfo primaryInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryInfo();
+                final ColumnInfo primaryColumnInfo = primaryInfo.getFirstColumn();
                 relatedColumnDbName = primaryColumnInfo.getColumnDbName();
             }
         }

@@ -137,7 +137,7 @@ public class ScalarCondition extends AbstractSubQuery {
         final String endMark = resolveSubQueryEndMark(_mainSubQueryIdentity);
         final String mainSql;
         {
-            final ColumnSqlName pkSqlName = _subQueryDBMeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
+            final ColumnSqlName pkSqlName = _subQueryDBMeta.getPrimaryInfo().getFirstColumn().getColumnSqlName();
             final ColumnRealName pkRealName = ColumnRealName.create(tableAliasName, pkSqlName);
             final String selectClause = "select " + pkRealName + ", " + derivedColumnRealName;
             final String fromWhereClause =

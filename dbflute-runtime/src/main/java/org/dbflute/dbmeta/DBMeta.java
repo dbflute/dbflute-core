@@ -21,6 +21,7 @@ import java.util.Map;
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
+import org.dbflute.dbmeta.info.PrimaryInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
 import org.dbflute.dbmeta.info.UniqueInfo;
@@ -146,11 +147,19 @@ public interface DBMeta {
     //                                                                         Unique Info
     //                                                                         ===========
     /**
-     * Get primary unique info that means unique info for primary key. <br>
-     * If this table does not have primary-key, this method throws UnsupportedOperationException.
-     * @return Primary unique info. (NotNull)
+     * Get primary info that means unique info for primary key.
+     * @return The primary info of this table's primary key. (NotNull)
+     * @throws UnsupportedOperationException When the table does not have primary key.
      */
-    UniqueInfo getPrimaryUniqueInfo();
+    PrimaryInfo getPrimaryInfo();
+
+    /**
+     * Get primary unique info that means unique info for primary key.
+     * @return The unique info as primary key. (NotNull)
+     * @throws UnsupportedOperationException When the table does not have primary key.
+     * @deprecated use getPrimaryInfo()
+     */
+    UniqueInfo getPrimaryUniqueInfo(); // old style
 
     /**
      * Does this table have primary-key?
@@ -165,6 +174,12 @@ public interface DBMeta {
      * @return The determination, true or false.
      */
     boolean hasCompoundPrimaryKey();
+
+    /**
+     * Get the read-only list of unique info as natural unique (not contain primary key's unique).
+     * @return The read-only list of unique info. (NotNull)
+     */
+    List<UniqueInfo> getUniqueInfoList();
 
     // ===================================================================================
     //                                                                       Relation Info
@@ -215,8 +230,8 @@ public interface DBMeta {
     ForeignInfo findForeignInfo(int relationNo);
 
     /**
-     * Get the list of foreign info.
-     * @return The list of foreign info. (NotNull)
+     * Get the read-only list of foreign info.
+     * @return The read-only list of foreign info. (NotNull)
      */
     List<ForeignInfo> getForeignInfoList();
 
@@ -246,35 +261,10 @@ public interface DBMeta {
     ReferrerInfo findReferrerInfo(String referrerPropertyName);
 
     /**
-     * Get the list of referrer info.
-     * @return The list of referrer info. (NotNull)
+     * Get the read-only list of referrer info.
+     * @return The read-only list of referrer info. (NotNull)
      */
     List<ReferrerInfo> getReferrerInfoList();
-
-    // -----------------------------------------------------
-    //                                        Relation Trace
-    //                                        --------------
-    /**
-     * Relation trace.
-     */
-    public static interface RelationTrace { // #later remove this since Java8
-
-        /**
-         * Get the trace of relation.
-         * @return The trace of relation as the list of relation info. (NotNull)
-         */
-        List<RelationInfo> getTraceRelation();
-
-        /**
-         * Get the trace of column.
-         * @return The trace of column as column info. (NullAllowed)
-         */
-        ColumnInfo getTraceColumn();
-    }
-
-    public static interface RelationTraceFixHandler {
-        void handleFixedTrace(RelationTrace relationTrace);
-    }
 
     // ===================================================================================
     //                                                                       Identity Info

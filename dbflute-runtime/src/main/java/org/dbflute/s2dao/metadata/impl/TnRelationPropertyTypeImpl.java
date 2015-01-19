@@ -23,7 +23,7 @@ import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
-import org.dbflute.dbmeta.info.UniqueInfo;
+import org.dbflute.dbmeta.info.PrimaryInfo;
 import org.dbflute.helper.beans.DfPropertyAccessor;
 import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -79,11 +79,11 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
         final DBMeta dbmeta = yourBeanMetaData.getDBMeta();
         final List<TnPropertyType> uniquePropertyTypeList;
         if (dbmeta != null && dbmeta.hasPrimaryKey()) {
-            final UniqueInfo primaryUniqueInfo = dbmeta.getPrimaryUniqueInfo();
-            final List<ColumnInfo> uniqueColumnList = primaryUniqueInfo.getUniqueColumnList();
-            uniquePropertyTypeList = new ArrayList<TnPropertyType>(uniqueColumnList.size());
-            for (ColumnInfo columnInfo : uniqueColumnList) {
-                final TnPropertyType pt = yourBeanMetaData.getPropertyTypeByColumnName(columnInfo.getColumnDbName());
+            final PrimaryInfo primaryInfo = dbmeta.getPrimaryInfo();
+            final List<ColumnInfo> primaryColumnList = primaryInfo.getPrimaryColumnList();
+            uniquePropertyTypeList = new ArrayList<TnPropertyType>(primaryColumnList.size());
+            for (ColumnInfo pk : primaryColumnList) {
+                final TnPropertyType pt = yourBeanMetaData.getPropertyTypeByColumnName(pk.getColumnDbName());
                 uniquePropertyTypeList.add(pt);
             }
         } else {

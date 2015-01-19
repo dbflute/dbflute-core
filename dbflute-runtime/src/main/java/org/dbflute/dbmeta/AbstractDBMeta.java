@@ -15,7 +15,6 @@
  */
 package org.dbflute.dbmeta;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Time;
@@ -32,14 +31,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.dbflute.Entity;
 import org.dbflute.FunCustodial;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
+import org.dbflute.dbmeta.info.PrimaryInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
 import org.dbflute.dbmeta.info.UniqueInfo;
@@ -48,6 +46,8 @@ import org.dbflute.dbmeta.property.PropertyGateway;
 import org.dbflute.dbmeta.property.PropertyMethodFinder;
 import org.dbflute.dbmeta.property.PropertyReader;
 import org.dbflute.dbmeta.property.PropertyWriter;
+import org.dbflute.dbmeta.valuemap.MetaHandlingEntityToMapMapper;
+import org.dbflute.dbmeta.valuemap.MetaHandlingMapToEntityMapper;
 import org.dbflute.exception.DBMetaNotFoundException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -84,7 +84,8 @@ public abstract class AbstractDBMeta implements DBMeta {
     private volatile StringKeyMap<String> _tablePropertyNameFlexibleMap;
     private volatile List<ColumnInfo> _columnInfoList;
     private volatile StringKeyMap<ColumnInfo> _columnInfoFlexibleMap;
-    private volatile UniqueInfo _primaryUniqueInfo;
+    private volatile PrimaryInfo _primaryInfo;
+    private volatile List<UniqueInfo> _uniqueInfoList;
     private volatile List<ForeignInfo> _foreignInfoList;
     private volatile StringKeyMap<ForeignInfo> _foreignInfoFlexibleMap;
     private volatile Map<Integer, ForeignInfo> _foreignInfoRelationNoKeyMap;
@@ -109,7 +110,7 @@ public abstract class AbstractDBMeta implements DBMeta {
 
         // initialize the primary unique information
         if (hasPrimaryKey()) {
-            getPrimaryUniqueInfo();
+            getPrimaryInfo();
         }
 
         // these should not be initialized here
@@ -300,17 +301,13 @@ public abstract class AbstractDBMeta implements DBMeta {
     // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean hasColumn(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         return getColumnInfoFlexibleMap().containsKey(columnFlexibleName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnInfo findColumnInfo(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final ColumnInfo columnInfo = getColumnInfoFlexibleMap().get(columnFlexibleName);
@@ -394,9 +391,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public List<ColumnInfo> getColumnInfoList() {
         if (_columnInfoList != null) {
             return _columnInfoList;
@@ -405,7 +400,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_columnInfoList != null) {
                 return _columnInfoList;
             }
-            _columnInfoList = ccil();
+            _columnInfoList = Collections.unmodifiableList(ccil());
             return _columnInfoList;
         }
     }
@@ -436,23 +431,30 @@ public abstract class AbstractDBMeta implements DBMeta {
     // ===================================================================================
     //                                                                         Unique Info
     //                                                                         ===========
-    /**
-     * {@inheritDoc}
-     */
-    public UniqueInfo getPrimaryUniqueInfo() {
-        if (_primaryUniqueInfo != null) {
-            return _primaryUniqueInfo;
+    // -----------------------------------------------------
+    //                                           Primary Key
+    //                                           -----------
+    /** {@inheritDoc} */
+    public PrimaryInfo getPrimaryInfo() {
+        if (_primaryInfo != null) {
+            return _primaryInfo;
         }
         synchronized (this) {
-            if (_primaryUniqueInfo != null) {
-                return _primaryUniqueInfo;
+            if (_primaryInfo != null) {
+                return _primaryInfo;
             }
-            _primaryUniqueInfo = cpui();
-            return _primaryUniqueInfo;
+            _primaryInfo = new PrimaryInfo(cpui());
+            return _primaryInfo;
         }
     }
 
     protected abstract UniqueInfo cpui(); // createPrimaryUniqueInfo()
+
+    /** {@inheritDoc} */
+    @SuppressWarnings("deprecation")
+    public UniqueInfo getPrimaryUniqueInfo() { // old style
+        return getPrimaryInfo().getUniqueInfo();
+    }
 
     protected UniqueInfo hpcpui(ColumnInfo uniqueColumnInfo) { // helpCreatePrimaryUniqueInfo()
         return hpcpui(Arrays.asList(uniqueColumnInfo));
@@ -460,6 +462,40 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     protected UniqueInfo hpcpui(List<ColumnInfo> uniqueColumnInfoList) { // helpCreatePrimaryUniqueInfo()
         return new UniqueInfo(this, uniqueColumnInfoList, true);
+    }
+
+    // -----------------------------------------------------
+    //                                        Natural Unique
+    //                                        --------------
+    /** {@inheritDoc} */
+    public List<UniqueInfo> getUniqueInfoList() {
+        if (_uniqueInfoList != null) {
+            return _uniqueInfoList;
+        }
+        synchronized (this) {
+            if (_uniqueInfoList != null) {
+                return _uniqueInfoList;
+            }
+            final Method[] methods = this.getClass().getMethods();
+            final List<UniqueInfo> workingList = newArrayListSized(4);
+            final String prefix = "uniqueOf";
+            final Class<UniqueInfo> returnType = UniqueInfo.class;
+            for (Method method : methods) {
+                if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
+                    workingList.add((UniqueInfo) DfReflectionUtil.invoke(method, this, null));
+                }
+            }
+            _uniqueInfoList = Collections.unmodifiableList(workingList);
+            return _uniqueInfoList;
+        }
+    }
+
+    protected UniqueInfo hpcui(ColumnInfo uniqueColumnInfo) { // helpCreateUniqueInfo()
+        return hpcui(Arrays.asList(uniqueColumnInfo));
+    }
+
+    protected UniqueInfo hpcui(java.util.List<ColumnInfo> uniqueColumnInfoList) { // helpCreateUniqueInfo()
+        return new UniqueInfo(this, uniqueColumnInfoList, false);
     }
 
     // ===================================================================================
@@ -484,16 +520,12 @@ public abstract class AbstractDBMeta implements DBMeta {
         return getForeignInfoFlexibleMap().containsKey(foreignPropertyName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public DBMeta findForeignDBMeta(String foreignPropertyName) {
         return findForeignInfo(foreignPropertyName).getForeignDBMeta();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ForeignInfo findForeignInfo(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final ForeignInfo foreignInfo = getForeignInfoFlexibleMap().get(foreignPropertyName);
@@ -503,9 +535,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         return foreignInfo;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ForeignInfo findForeignInfo(int relationNo) {
         final ForeignInfo foreignInfo = getForeignInfoRelationNoKeyMap().get(relationNo);
         if (foreignInfo == null) {
@@ -544,9 +574,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         };
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public List<ForeignInfo> getForeignInfoList() {
         if (_foreignInfoList != null) {
             return _foreignInfoList;
@@ -556,14 +584,15 @@ public abstract class AbstractDBMeta implements DBMeta {
                 return _foreignInfoList;
             }
             final Method[] methods = this.getClass().getMethods();
-            _foreignInfoList = newArrayList();
+            final List<ForeignInfo> workingList = newArrayList();
             final String prefix = "foreign";
             final Class<ForeignInfo> returnType = ForeignInfo.class;
             for (Method method : methods) {
                 if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                    _foreignInfoList.add((ForeignInfo) DfReflectionUtil.invoke(method, this, null));
+                    workingList.add((ForeignInfo) DfReflectionUtil.invoke(method, this, null));
                 }
             }
+            _foreignInfoList = Collections.unmodifiableList(workingList);
             return _foreignInfoList;
         }
     }
@@ -613,25 +642,19 @@ public abstract class AbstractDBMeta implements DBMeta {
     // -----------------------------------------------------
     //                                      Referrer Element
     //                                      ----------------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean hasReferrer(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
         return getReferrerInfoFlexibleMap().containsKey(referrerPropertyName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public DBMeta findReferrerDBMeta(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
         return findReferrerInfo(referrerPropertyName).getReferrerDBMeta();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ReferrerInfo findReferrerInfo(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
         final ReferrerInfo referrerInfo = getReferrerInfoFlexibleMap().get(referrerPropertyName);
@@ -683,9 +706,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         };
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public List<ReferrerInfo> getReferrerInfoList() {
         if (_referrerInfoList != null) {
             return _referrerInfoList;
@@ -695,14 +716,15 @@ public abstract class AbstractDBMeta implements DBMeta {
                 return _referrerInfoList;
             }
             final Method[] methods = this.getClass().getMethods();
-            _referrerInfoList = newArrayList();
+            final List<ReferrerInfo> workingList = newArrayList();
             final String prefix = "referrer";
             final Class<ReferrerInfo> returnType = ReferrerInfo.class;
             for (Method method : methods) {
                 if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                    _referrerInfoList.add((ReferrerInfo) DfReflectionUtil.invoke(method, this, null));
+                    workingList.add((ReferrerInfo) DfReflectionUtil.invoke(method, this, null));
                 }
             }
+            _referrerInfoList = Collections.unmodifiableList(workingList);
             return _referrerInfoList;
         }
     }
@@ -733,99 +755,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                          ------------
     protected String buildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
         return targetName + relationPropertyName.substring(0, 1).toUpperCase() + relationPropertyName.substring(1);
-    }
-
-    // -----------------------------------------------------
-    //                                        Relation Trace
-    //                                        --------------
-    /**
-     * Relation trace.
-     */
-    protected static abstract class AbstractRelationTrace implements RelationTrace { // #later remove this since Java8
-
-        /** The list of relation. */
-        protected List<RelationInfo> _relationList;
-
-        /** The list of relation trace. */
-        protected List<AbstractRelationTrace> _relationTraceList;
-
-        /** The list of relation info as trace. */
-        protected List<RelationInfo> _traceRelationInfoList;
-
-        /** The column info as trace. */
-        protected ColumnInfo _traceColumnInfo;
-
-        /** The handler of fixed relation trace. */
-        protected RelationTraceFixHandler _relationTraceFixHandler;
-
-        /**
-         * Constructor for first step.
-         * @param relationTraceFixHandler The handler of fixed relation trace. (NullAllowed)
-         */
-        public AbstractRelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
-            this(new ArrayList<RelationInfo>(), new ArrayList<AbstractRelationTrace>());
-            this._relationTraceFixHandler = relationTraceFixHandler;
-        }
-
-        /**
-         * Constructor for relation step.
-         * @param relationList The list of relation. (NotNull)
-         * @param relationTraceList The list of relation trace. (NotNull)
-         */
-        public AbstractRelationTrace(List<RelationInfo> relationList, List<AbstractRelationTrace> relationTraceList) {
-            this._relationList = relationList;
-            this._relationTraceList = relationTraceList;
-            this._relationTraceList.add(this);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public List<RelationInfo> getTraceRelation() {
-            return _traceRelationInfoList;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public ColumnInfo getTraceColumn() {
-            return _traceColumnInfo;
-        }
-
-        /**
-         * Fix trace.
-         * @param traceRelationInfoList The trace of relation as the list of relation info. (NotNull)
-         * @param traceColumnInfo The trace of column as column info. (NullAllowed)
-         * @return Relation trace(result). (NotNull)
-         */
-        protected RelationTrace fixTrace(List<RelationInfo> traceRelationInfoList, ColumnInfo traceColumnInfo) {
-            final AbstractRelationTrace localRelationTrace = (AbstractRelationTrace) _relationTraceList.get(0);
-            localRelationTrace.setTraceRelation(traceRelationInfoList);
-            localRelationTrace.setTraceColumn(traceColumnInfo);
-            localRelationTrace.recycle();
-            localRelationTrace.handleFixedRelationTrace();
-            return localRelationTrace;
-        }
-
-        protected void setTraceRelation(List<RelationInfo> traceRelationInfoList) {
-            this._traceRelationInfoList = traceRelationInfoList;
-        }
-
-        protected void setTraceColumn(ColumnInfo traceColumn) {
-            this._traceColumnInfo = traceColumn;
-        }
-
-        protected void recycle() {
-            this._relationList = new ArrayList<RelationInfo>();
-            this._relationTraceList = new ArrayList<AbstractRelationTrace>();
-            this._relationTraceList.add(this);
-        }
-
-        protected void handleFixedRelationTrace() {
-            if (_relationTraceFixHandler != null) {
-                _relationTraceFixHandler.handleFixedTrace(this);
-            }
-        }
     }
 
     // ===================================================================================
@@ -898,9 +827,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     // ===================================================================================
     //                                                                       Name Handling
     //                                                                       =============
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean hasFlexibleName(String flexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
 
@@ -909,9 +836,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         return getColumnInfoFlexibleMap().containsKey(flexibleName) || getTableDbNameFlexibleMap().containsKey(flexibleName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String findDbName(String flexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
         final ColumnInfo columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
@@ -926,9 +851,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         return null; // unreachable
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String findPropertyName(String flexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
         final ColumnInfo columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
@@ -950,54 +873,31 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                Accept
     //                                                ------
     protected <ENTITY extends Entity> void doAcceptPrimaryKeyMap(ENTITY entity, Map<String, ? extends Object> primaryKeyMap) {
+        assertObjectNotNull("entity", entity);
         if (primaryKeyMap == null || primaryKeyMap.isEmpty()) {
-            String msg = "The argument 'primaryKeyMap' should not be null or empty:";
-            msg = msg + " primaryKeyMap=" + primaryKeyMap;
+            String msg = "The argument 'primaryKeyMap' should not be null or empty: primaryKeyMap=" + primaryKeyMap;
             throw new IllegalArgumentException(msg);
         }
-        final List<ColumnInfo> uniqueColumnList = getPrimaryUniqueInfo().getUniqueColumnList();
-        doConvertToEntity(entity, primaryKeyMap, uniqueColumnList);
+        doConvertToEntity(entity, primaryKeyMap, true);
     }
 
     protected <ENTITY extends Entity> void doAcceptAllColumnMap(ENTITY entity, Map<String, ? extends Object> allColumnMap) {
+        assertObjectNotNull("entity", entity);
         if (allColumnMap == null || allColumnMap.isEmpty()) {
-            String msg = "The argument 'allColumnMap' should not be null or empty:";
-            msg = msg + " allColumnMap=" + allColumnMap;
+            String msg = "The argument 'allColumnMap' should not be null or empty: allColumnMap=" + allColumnMap;
             throw new IllegalArgumentException(msg);
         }
-        final List<ColumnInfo> uniqueColumnList = getColumnInfoList();
-        doConvertToEntity(entity, allColumnMap, uniqueColumnList);
+        doConvertToEntity(entity, allColumnMap, false);
     }
 
-    protected <ENTITY extends Entity> void doConvertToEntity(ENTITY entity, Map<String, ? extends Object> columnMap,
-            List<ColumnInfo> columnInfoList) {
-        entity.clearModifiedInfo();
-        final MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnMap);
-        for (ColumnInfo columnInfo : columnInfoList) {
-            final String columnName = columnInfo.getColumnDbName();
-            final String propertyName = columnInfo.getPropertyName();
-            final String uncapPropName = initUncap(propertyName);
-            final Class<?> nativeType = columnInfo.getObjectNativeType();
-            if (analyzer.init(columnName, uncapPropName, propertyName)) {
-                final Object value;
-                if (String.class.isAssignableFrom(nativeType)) {
-                    value = analyzer.analyzeString(nativeType);
-                } else if (Number.class.isAssignableFrom(nativeType)) {
-                    value = analyzer.analyzeNumber(nativeType);
-                } else if (Date.class.isAssignableFrom(nativeType)) {
-                    value = analyzer.analyzeDate(nativeType);
-                } else if (Boolean.class.isAssignableFrom(nativeType)) {
-                    value = analyzer.analyzeBoolean(nativeType);
-                } else if (byte[].class.isAssignableFrom(nativeType)) {
-                    value = analyzer.analyzeBinary(nativeType);
-                } else if (UUID.class.isAssignableFrom(nativeType)) {
-                    value = analyzer.analyzeUUID(nativeType);
-                } else {
-                    value = analyzer.analyzeOther(nativeType);
-                }
-                columnInfo.write(entity, value);
-            }
-        }
+    protected <ENTITY extends Entity> void doConvertToEntity(ENTITY entity, Map<String, ? extends Object> columnMap, boolean pkOnly) {
+        final List<ColumnInfo> columnInfoList = pkOnly ? getPrimaryInfo().getPrimaryColumnList() : getColumnInfoList();
+        final MetaHandlingMapToEntityMapper mapper = createMetaHandlingMapToEntityMapper(columnMap);
+        mapper.mappingToEntity(entity, columnMap, columnInfoList);
+    }
+
+    protected MetaHandlingMapToEntityMapper createMetaHandlingMapToEntityMapper(Map<String, ? extends Object> columnMap) {
+        return new MetaHandlingMapToEntityMapper(columnMap);
     }
 
     // -----------------------------------------------------
@@ -1005,133 +905,22 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                               -------
     protected Map<String, Object> doExtractPrimaryKeyMap(Entity entity) {
         assertObjectNotNull("entity", entity);
-        return doConvertToColumnValueMap(entity, true, 4);
+        return doConvertToColumnValueMap(entity, true);
     }
 
     protected Map<String, Object> doExtractAllColumnMap(Entity entity) {
         assertObjectNotNull("entity", entity);
-        return doConvertToColumnValueMap(entity, false, 10);
+        return doConvertToColumnValueMap(entity, false);
     }
 
-    protected Map<String, Object> doConvertToColumnValueMap(Entity entity, boolean pkOnly, int sized) {
-        final Map<String, Object> valueMap = newLinkedHashMapSized(sized);
-        final List<ColumnInfo> columnInfoList;
-        if (pkOnly) {
-            columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
-        } else {
-            columnInfoList = getColumnInfoList();
-        }
-        final Set<String> specifiedProperties = entity.myspecifiedProperties();
-        final boolean nonSpChecked = !specifiedProperties.isEmpty();
-        for (ColumnInfo columnInfo : columnInfoList) {
-            final String columnName = columnInfo.getColumnDbName();
-            final Object value;
-            if (nonSpChecked && !specifiedProperties.contains(columnInfo.getPropertyName())) { // non-specified column
-                value = null; // to avoid non-specified check
-            } else {
-                value = columnInfo.read(entity);
-            }
-            valueMap.put(columnName, value);
-        }
-        return valueMap;
+    protected Map<String, Object> doConvertToColumnValueMap(Entity entity, boolean pkOnly) {
+        final List<ColumnInfo> columnInfoList = pkOnly ? getPrimaryInfo().getPrimaryColumnList() : getColumnInfoList();
+        final MetaHandlingEntityToMapMapper mapper = createMetaHandlingEntityToMapMapper(entity);
+        return mapper.mappingToColumnValueMap(columnInfoList);
     }
 
-    // -----------------------------------------------------
-    //                                              Analyzer
-    //                                              --------
-    /**
-     * This class is for internal. Don't use this!
-     */
-    protected static class MapStringValueAnalyzer {
-        protected final Map<String, ? extends Object> _valueMap;
-        protected String _columnName;
-        protected String _uncapPropName;
-        protected String _propertyName;
-
-        public MapStringValueAnalyzer(Map<String, ? extends Object> valueMap) {
-            _valueMap = valueMap;
-        }
-
-        public boolean init(String columnName, String uncapPropName, String propertyName) {
-            _columnName = columnName;
-            _uncapPropName = uncapPropName;
-            _propertyName = propertyName;
-            return _valueMap.containsKey(_columnName);
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeString(Class<PROPERTY> javaType) {
-            final Object obj = getColumnValue();
-            return (PROPERTY) DfTypeUtil.toString(obj);
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeNumber(Class<PROPERTY> javaType) {
-            final Object obj = getColumnValue();
-            return (PROPERTY) DfTypeUtil.toNumber(obj, javaType);
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeDate(Class<PROPERTY> javaType) {
-            final Object obj = getColumnValue();
-            if (Time.class.isAssignableFrom(javaType)) {
-                return (PROPERTY) DfTypeUtil.toTime(obj);
-            } else if (Timestamp.class.isAssignableFrom(javaType)) {
-                return (PROPERTY) DfTypeUtil.toTimestamp(obj);
-            } else {
-                return (PROPERTY) DfTypeUtil.toDate(obj);
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeBoolean(Class<PROPERTY> javaType) {
-            final Object obj = getColumnValue();
-            return (PROPERTY) DfTypeUtil.toBoolean(obj);
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeBinary(Class<PROPERTY> javaType) {
-            final Object obj = getColumnValue();
-            if (obj == null) {
-                return null;
-            }
-            if (obj instanceof Serializable) {
-                return (PROPERTY) DfTypeUtil.toBinary((Serializable) obj);
-            }
-            throw new UnsupportedOperationException("unsupported binary type: " + obj.getClass());
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeUUID(Class<PROPERTY> javaType) {
-            final Object obj = getColumnValue();
-            return (PROPERTY) DfTypeUtil.toUUID(obj);
-        }
-
-        @SuppressWarnings("unchecked")
-        public <PROPERTY> PROPERTY analyzeOther(Class<PROPERTY> javaType) {
-            final Object obj = getColumnValue();
-            if (obj == null) {
-                return null;
-            }
-            if (Classification.class.isAssignableFrom(javaType)) {
-                final Class<?>[] argTypes = new Class[] { Object.class };
-                final Method method = DfReflectionUtil.getPublicMethod(javaType, "codeOf", argTypes);
-                return (PROPERTY) DfReflectionUtil.invokeStatic(method, new Object[] { obj });
-            }
-            return (PROPERTY) obj;
-        }
-
-        protected Object getColumnValue() {
-            final Object value = _valueMap.get(_columnName);
-            return filterClassificationValue(value);
-        }
-
-        protected Object filterClassificationValue(Object value) {
-            if (value != null && value instanceof Classification) {
-                value = ((Classification) value).code();
-            }
-            return value;
-        }
+    protected MetaHandlingEntityToMapMapper createMetaHandlingEntityToMapMapper(Entity entity) {
+        return new MetaHandlingEntityToMapMapper(entity);
     }
 
     // ===================================================================================
