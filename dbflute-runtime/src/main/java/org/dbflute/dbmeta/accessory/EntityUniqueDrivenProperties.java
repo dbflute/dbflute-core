@@ -16,8 +16,11 @@
 package org.dbflute.dbmeta.accessory;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * The unique-driven properties of entity. (basically for Framework)
@@ -26,26 +29,45 @@ import java.util.Set;
  */
 public class EntityUniqueDrivenProperties implements Serializable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** The set of property names. (NullAllowed: lazy-loaded) */
     protected Set<String> _propertyNameSet;
 
+    // ===================================================================================
+    //                                                                   Property Handling
+    //                                                                   =================
     /**
      * Add property name. (according to Java Beans rule)
      * @param propertyName The string for name. (NotNull)
      */
     public void addPropertyName(String propertyName) {
+        assertPropertyNameNotNull(propertyName);
         getPropertyNameSet().add(propertyName);
+    }
+
+    protected void assertPropertyNameNotNull(String propertyName) {
+        if (propertyName == null) {
+            throw new IllegalArgumentException("The argument 'propertyName' should not be null.");
+        }
     }
 
     /**
      * Get the set of properties.
-     * @return The set of properties. (NotNull)
+     * @return The set of properties, read-only. (NotNull)
      */
     public Set<String> getPropertyNames() {
-        return getPropertyNameSet();
+        if (_propertyNameSet != null) {
+            return Collections.unmodifiableSet(_propertyNameSet);
+        }
+        return DfCollectionUtil.emptySet();
     }
 
     /**
@@ -68,6 +90,7 @@ public class EntityUniqueDrivenProperties implements Serializable {
      * @param propertyName The string for name. (NotNull)
      */
     public void remove(String propertyName) {
+        assertPropertyNameNotNull(propertyName);
         getPropertyNameSet().remove(propertyName);
     }
 
@@ -76,6 +99,9 @@ public class EntityUniqueDrivenProperties implements Serializable {
      * @param properties The properties as copy-resource. (NotNull)
      */
     public void accept(EntityModifiedProperties properties) {
+        if (properties == null) {
+            throw new IllegalArgumentException("The argument 'properties' should not be null.");
+        }
         clear();
         for (String propertyName : properties.getPropertyNames()) {
             addPropertyName(propertyName);
@@ -89,6 +115,9 @@ public class EntityUniqueDrivenProperties implements Serializable {
         return _propertyNameSet;
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     @Override
     public String toString() {
         return "uniqueDriven:" + _propertyNameSet;

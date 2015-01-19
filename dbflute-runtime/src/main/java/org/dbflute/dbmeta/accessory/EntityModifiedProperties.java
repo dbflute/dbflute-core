@@ -29,18 +29,34 @@ import org.dbflute.util.DfCollectionUtil;
  */
 public class EntityModifiedProperties implements Serializable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** The set of property names. (NullAllowed: lazy-loaded) */
     protected Set<String> _propertyNameSet;
 
+    // ===================================================================================
+    //                                                                   Property Handling
+    //                                                                   =================
     /**
      * Add property name. (according to Java Beans rule)
      * @param propertyName The string for name. (NotNull)
      */
     public void addPropertyName(String propertyName) {
+        assertPropertyNameNotNull(propertyName);
         getPropertyNameSet().add(propertyName);
+    }
+
+    protected void assertPropertyNameNotNull(String propertyName) {
+        if (propertyName == null) {
+            throw new IllegalArgumentException("The argument 'propertyName' should not be null.");
+        }
     }
 
     /**
@@ -85,6 +101,7 @@ public class EntityModifiedProperties implements Serializable {
      * @param propertyName The string for name. (NotNull)
      */
     public void remove(String propertyName) {
+        assertPropertyNameNotNull(propertyName);
         if (_propertyNameSet != null) {
             getPropertyNameSet().remove(propertyName);
         }
@@ -95,6 +112,9 @@ public class EntityModifiedProperties implements Serializable {
      * @param properties The properties as copy-resource. (NotNull)
      */
     public void accept(EntityModifiedProperties properties) {
+        if (properties == null) {
+            throw new IllegalArgumentException("The argument 'properties' should not be null.");
+        }
         clear();
         for (String propertyName : properties.getPropertyNames()) {
             addPropertyName(propertyName);
@@ -108,6 +128,9 @@ public class EntityModifiedProperties implements Serializable {
         return _propertyNameSet;
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     @Override
     public String toString() {
         return "modifiedProp:" + _propertyNameSet;

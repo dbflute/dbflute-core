@@ -62,6 +62,13 @@ public interface Entity {
     void mymodifyProperty(String propertyName);
 
     /**
+     * Cancel the modified the property without resetting value. (basically for Framework) <br>
+     * The property name needs to be according to Java Beans rule.
+     * @param propertyName The property name of specified column. (NotNull)
+     */
+    void mymodifyPropertyCancel(String propertyName);
+
+    /**
      * Clear the information of modified properties. (basically for Framework)
      */
     void clearModifiedInfo();
@@ -96,6 +103,13 @@ public interface Entity {
     void myspecifyProperty(String propertyName); // e.g. called by null object handling
 
     /**
+     * Cancel the specified the property without resetting value. (basically for Framework) <br>
+     * The property name needs to be according to Java Beans rule.
+     * @param propertyName The property name of specified column. (NotNull)
+     */
+    void myspecifyPropertyCancel(String propertyName);
+
+    /**
      * Clear the information of specified properties. (basically for Framework) <br>
      * It means no check of access to non-specified columns.
      */
@@ -111,8 +125,8 @@ public interface Entity {
     boolean hasPrimaryKeyValue();
 
     /**
-     * Get the properties of specified unique columns as unique-driven.
-     * @return The set of property name for specified unique columns. (NotNull)
+     * Get the properties of unique-driven columns as unique-driven.
+     * @return The set of property name for unique-driven columns, read-only. (NotNull)
      */
     Set<String> myuniqueDrivenProperties(); // prefix 'my' not to show when uniqueBy() completion
 
@@ -122,6 +136,18 @@ public interface Entity {
      * @param propertyName The property name of unique-driven column. (NotNull)
      */
     void myuniqueByProperty(String propertyName);
+
+    /**
+     * Cancel the property as unique driven without resetting value. (basically for Framework) <br>
+     * The property name needs to be according to Java Beans rule.
+     * @param propertyName The property name of unique-driven column. (NotNull)
+     */
+    void myuniqueByPropertyCancel(String propertyName);
+
+    /**
+     * Clear the information of unique-driven properties. (basically for Framework)
+     */
+    void clearUniqueDrivenInfo();
 
     // ===================================================================================
     //                                                                     Birthplace Mark
