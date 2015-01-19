@@ -28,6 +28,7 @@ import org.dbflute.dbmeta.info.UniqueInfo;
 import org.dbflute.dbmeta.name.TableSqlName;
 import org.dbflute.dbmeta.property.PropertyGateway;
 import org.dbflute.dbway.DBDef;
+import org.dbflute.optional.OptionalObject;
 
 /**
  * The interface of DB meta for one table.
@@ -128,12 +129,13 @@ public interface DBMeta {
     /**
      * Find the information of the column by the flexible name of the column.
      * <pre>
-     * If the table name is 'BOOK_ID', you can find the dbmeta by ...(as follows)
+     * If the table name is 'BOOK_ID', you can find the DB meta by ...(as follows)
      *     'BOOK_ID', 'BOok_iD', 'book_id'
      *     , 'BookId', 'bookid', 'bOoKiD'
      * </pre>
      * @param columnFlexibleName The flexible name of the column. (NotNull)
      * @return The information of the column. (NotNull)
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding column is not found.
      */
     ColumnInfo findColumnInfo(String columnFlexibleName);
 
@@ -146,6 +148,9 @@ public interface DBMeta {
     // ===================================================================================
     //                                                                         Unique Info
     //                                                                         ===========
+    // -----------------------------------------------------
+    //                                           Primary Key
+    //                                           -----------
     /**
      * Get primary info that means unique info for primary key.
      * @return The primary info of this table's primary key. (NotNull)
@@ -176,10 +181,30 @@ public interface DBMeta {
     boolean hasCompoundPrimaryKey();
 
     /**
+     * Search primary info by the specified columns. <br>
+     * It returns the found info if the specified columns contain all primary key columns.
+     * @param columnInfoList The list of column info as search key. (NotNull)
+     * @return The optional object for the found primary info. (NotNull, EmptyAllowed: when not found)
+     * @throws UnsupportedOperationException When the table does not have primary key.
+     */
+    OptionalObject<PrimaryInfo> searchPrimaryInfo(List<ColumnInfo> columnInfoList);
+
+    // -----------------------------------------------------
+    //                                        Natural Unique
+    //                                        --------------
+    /**
      * Get the read-only list of unique info as natural unique (not contain primary key's unique).
      * @return The read-only list of unique info. (NotNull)
      */
     List<UniqueInfo> getUniqueInfoList();
+
+    /**
+     * Search unique info by the specified columns. <br>
+     * It returns the found info if the specified columns contain all unique key columns.
+     * @param columnInfoList The list of column info as search key. (NotNull)
+     * @return The read-only list of the found unique info. (NotNull, EmptyAllowed: when not found)
+     */
+    List<UniqueInfo> searchUniqueInfoList(List<ColumnInfo> columnInfoList);
 
     // ===================================================================================
     //                                                                       Relation Info
@@ -191,7 +216,7 @@ public interface DBMeta {
      * Find the information of relation.
      * @param relationPropertyName The flexible name of the relation property. (NotNull)
      * @return The information object of relation. (NotNull)
-     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding relation info was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding relation info is not found.
      */
     RelationInfo findRelationInfo(String relationPropertyName);
 
@@ -209,7 +234,7 @@ public interface DBMeta {
      * Find the DB meta of foreign relation.
      * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return The DB meta of foreign relation. (NotNull)
-     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info is not found.
      */
     DBMeta findForeignDBMeta(String foreignPropertyName);
 
@@ -217,7 +242,7 @@ public interface DBMeta {
      * Find the information of foreign relation by property name.
      * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return The information object of foreign relation. (NotNull)
-     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info is not found.
      */
     ForeignInfo findForeignInfo(String foreignPropertyName);
 
@@ -225,7 +250,7 @@ public interface DBMeta {
      * Find the information of foreign relation by relation number.
      * @param relationNo The relation number of the foreign property. (NotNull)
      * @return The information object of foreign relation. (NotNull)
-     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info is not found.
      */
     ForeignInfo findForeignInfo(int relationNo);
 
@@ -234,6 +259,14 @@ public interface DBMeta {
      * @return The read-only list of foreign info. (NotNull)
      */
     List<ForeignInfo> getForeignInfoList();
+
+    /**
+     * Search foreign info by the specified columns. <br>
+     * It returns the found info if the specified columns contain all foreign key columns.
+     * @param columnInfoList The list of column info as search key. (NotNull)
+     * @return The read-only list of the found foreign info. (NotNull, EmptyAllowed: when not found)
+     */
+    List<ForeignInfo> searchForeignInfoList(List<ColumnInfo> columnInfoList);
 
     // -----------------------------------------------------
     //                                      Referrer Element
@@ -256,7 +289,7 @@ public interface DBMeta {
      * Find the information of referrer relation.
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return The information object of referrer relation. (NotNull)
-     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding referrer info was not found.
+     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding referrer info is not found.
      */
     ReferrerInfo findReferrerInfo(String referrerPropertyName);
 
@@ -265,6 +298,14 @@ public interface DBMeta {
      * @return The read-only list of referrer info. (NotNull)
      */
     List<ReferrerInfo> getReferrerInfoList();
+
+    /**
+     * Search referrer info by the specified columns. <br>
+     * It returns the found info if the specified columns contain all referrer columns.
+     * @param columnInfoList The list of column info as search key. (NotNull)
+     * @return The read-only list of the found referrer info. (NotNull, EmptyAllowed: when not found)
+     */
+    List<ReferrerInfo> searchReferrerInfoList(List<ColumnInfo> columnInfoList);
 
     // ===================================================================================
     //                                                                       Identity Info

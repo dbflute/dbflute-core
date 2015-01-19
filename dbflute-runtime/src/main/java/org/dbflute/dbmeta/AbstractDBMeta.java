@@ -28,10 +28,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import org.dbflute.Entity;
 import org.dbflute.FunCustodial;
@@ -54,6 +57,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
+import org.dbflute.optional.OptionalObject;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfAssertUtil;
 import org.dbflute.util.DfCollectionUtil;
@@ -464,6 +468,21 @@ public abstract class AbstractDBMeta implements DBMeta {
         return new UniqueInfo(this, uniqueColumnInfoList, true);
     }
 
+    /** {@inheritDoc} */
+    public OptionalObject<PrimaryInfo> searchPrimaryInfo(List<ColumnInfo> columnInfoList) {
+        final PrimaryInfo primaryInfo = getPrimaryInfo(); // exception if no PK
+        final Set<ColumnInfo> colSet = new HashSet<ColumnInfo>(columnInfoList);
+        final List<ColumnInfo> primaryColumnList = primaryInfo.getPrimaryColumnList();
+        for (ColumnInfo pk : primaryColumnList) {
+            if (!colSet.contains(pk)) {
+                return OptionalObject.ofNullable(null, () -> {
+                    throwDBMetaNotFoundException("Not found the primary key by the columns", "Specified Column", columnInfoList);
+                });
+            }
+        }
+        return OptionalObject.of(primaryInfo);
+    }
+
     // -----------------------------------------------------
     //                                        Natural Unique
     //                                        --------------
@@ -496,6 +515,36 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     protected UniqueInfo hpcui(java.util.List<ColumnInfo> uniqueColumnInfoList) { // helpCreateUniqueInfo()
         return new UniqueInfo(this, uniqueColumnInfoList, false);
+    }
+
+    /** {@inheritDoc} */
+    public List<UniqueInfo> searchUniqueInfoList(List<ColumnInfo> columnInfoList) {
+        return doSearchMetaInfoList(columnInfoList, getUniqueInfoList(), info -> {
+            return info.getUniqueColumnList();
+        });
+    }
+
+    protected <INFO> List<INFO> doSearchMetaInfoList(List<ColumnInfo> columnInfoList, List<INFO> infoList,
+            Function<INFO, Collection<ColumnInfo>> oneArgLambda) {
+        if (infoList.isEmpty()) {
+            return DfCollectionUtil.emptyList();
+        }
+        final Set<ColumnInfo> specifiedColSet = new HashSet<ColumnInfo>(columnInfoList);
+        final List<INFO> foundInfoList = newArrayListSized(infoList.size());
+        for (INFO info : infoList) {
+            final Collection<ColumnInfo> columnList = oneArgLambda.apply(info);
+            boolean notFound = false;
+            for (ColumnInfo metaCol : columnList) {
+                if (!specifiedColSet.contains(metaCol)) {
+                    notFound = true;
+                    break;
+                }
+            }
+            if (!notFound) {
+                foundInfoList.add(info);
+            }
+        }
+        return Collections.unmodifiableList(foundInfoList);
     }
 
     // ===================================================================================
@@ -639,6 +688,13 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
     }
 
+    /** {@inheritDoc} */
+    public List<ForeignInfo> searchForeignInfoList(List<ColumnInfo> columnInfoList) {
+        return doSearchMetaInfoList(columnInfoList, getForeignInfoList(), info -> {
+            return info.getLocalForeignColumnInfoMap().keySet();
+        });
+    }
+
     // -----------------------------------------------------
     //                                      Referrer Element
     //                                      ----------------
@@ -748,6 +804,13 @@ public abstract class AbstractDBMeta implements DBMeta {
             }
             return _referrerInfoFlexibleMap;
         }
+    }
+
+    /** {@inheritDoc} */
+    public List<ReferrerInfo> searchReferrerInfoList(List<ColumnInfo> columnInfoList) {
+        return doSearchMetaInfoList(columnInfoList, getReferrerInfoList(), info -> {
+            return info.getLocalReferrerColumnInfoMap().keySet();
+        });
     }
 
     // -----------------------------------------------------
