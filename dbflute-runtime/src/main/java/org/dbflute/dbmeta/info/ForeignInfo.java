@@ -283,10 +283,12 @@ public class ForeignInfo implements RelationInfo {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    @Override
     public int hashCode() {
         return _foreignPropertyName.hashCode() + _localDBMeta.hashCode() + _foreignDBMeta.hashCode();
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof ForeignInfo)) {
             return false;
@@ -304,6 +306,7 @@ public class ForeignInfo implements RelationInfo {
         return true;
     }
 
+    @Override
     public String toString() {
         return "{" + _localDBMeta.getTableDbName() + "." + _foreignPropertyName + "->" + _foreignDBMeta.getTableDbName() + "}";
     }
@@ -311,9 +314,7 @@ public class ForeignInfo implements RelationInfo {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String getConstraintName() {
         return _constraintName;
     }
@@ -328,9 +329,7 @@ public class ForeignInfo implements RelationInfo {
         return _foreignPropertyName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public DBMeta getLocalDBMeta() {
         return _localDBMeta;
     }
@@ -368,23 +367,17 @@ public class ForeignInfo implements RelationInfo {
         return _relationNo;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Class<?> getObjectNativeType() {
         return _objectNativeType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Class<?> getPropertyAccessType() {
         return _propertyAccessType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean isOneToOne() {
         return _oneToOne;
     }
@@ -437,9 +430,7 @@ public class ForeignInfo implements RelationInfo {
         return _fixedInline;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public RelationInfo getReverseRelation() {
         return _reversePropertyName != null ? _foreignDBMeta.findRelationInfo(_reversePropertyName) : null;
     }
@@ -455,6 +446,11 @@ public class ForeignInfo implements RelationInfo {
     // -----------------------------------------------------
     //                                               Derived
     //                                               -------
+    /** {@inheritDoc} */
+    public boolean isCompoundKey() {
+        return getLocalForeignColumnInfoMap().size() > 1;
+    }
+
     /**
      * Does the relation is from pure foreign key?
      * @return The determination, true or false.

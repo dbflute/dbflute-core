@@ -89,6 +89,12 @@ public interface RelationInfo {
     boolean isReferrer();
 
     /**
+     * Is the relation key compound key?
+     * @return The determination, true or false.
+     */
+    boolean isCompoundKey();
+
+    /**
      * Get the relation info of reverse relation.
      * @return The instance of relation info. (NullAllowed: if null, means one-way reference)
      */

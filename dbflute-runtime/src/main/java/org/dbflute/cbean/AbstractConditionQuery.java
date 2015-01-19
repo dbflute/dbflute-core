@@ -2814,7 +2814,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (_queryRelationKeepingMap == null) { // no way, just in case
             _queryRelationKeepingMap = newLinkedHashMapSized(4);
         }
-        ConditionQuery cq = _queryRelationKeepingMap.get(prop);
+        final ConditionQuery cq = _queryRelationKeepingMap.get(prop);
         if (cq == null) { // no way, just in case
             String msg = "Not found the condition-query for (Query)Relation: " + prop;
             throw new IllegalStateException(msg);
