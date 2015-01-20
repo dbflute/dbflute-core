@@ -116,8 +116,8 @@ public interface Entity {
     void clearSpecifiedInfo();
 
     // ===================================================================================
-    //                                                                          Unique Key
-    //                                                                          ==========
+    //                                                                        Key Handling
+    //                                                                        ============
     /**
      * Does it have the value of primary keys?
      * @return The determination, true or false. (if all PK values are not null, returns true)
