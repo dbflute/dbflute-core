@@ -37,7 +37,7 @@ public class DfRefreshResourceProcess {
     /** The logger instance for this class. (NotNull) */
     private static final Logger _log = LoggerFactory.getLogger(DfRefreshResourceProcess.class);
 
-    protected static final String BASIC_REQUEST_URL = "http://localhost:8386/";
+    protected static final String PRIMARY_REQUEST_URL = "http://localhost:8386/"; // setting default
     protected static final String SECONDARY_REQUEST_URL = "http://localhost:8387/";
 
     // ===================================================================================
@@ -69,8 +69,9 @@ public class DfRefreshResourceProcess {
         final DfRefreshResourceRequest request = createRefreshResourceRequest(_requestUrl);
         try {
             final Map<String, Map<String, Object>> resultMap = request.refreshResources();
-            final boolean existsSuccess = existsSuccess(resultMap);
-            handleNotFoundProject(existsSuccess);
+            if (existsNotFound(resultMap)) {
+                handleNotFoundProject();
+            }
         } catch (IOException e) {
             handleRefreshIOException(e);
         }
@@ -79,12 +80,10 @@ public class DfRefreshResourceProcess {
     // -----------------------------------------------------
     //                                      NotFound Project
     //                                      ----------------
-    protected void handleNotFoundProject(boolean existsSuccess) {
-        if (!existsSuccess) {
-            final boolean retrySuccess = retrySecondary();
-            if (!retrySuccess) {
-                _log.info(buildNotFoundProjectMessage());
-            }
+    protected void handleNotFoundProject() {
+        final boolean retrySuccess = retrySecondary();
+        if (!retrySuccess) {
+            _log.info(buildNotFoundProjectMessage());
         }
     }
 
@@ -126,16 +125,16 @@ public class DfRefreshResourceProcess {
     //                                       Retry Secondary
     //                                       ---------------
     protected boolean retrySecondary() {
-        if (isBasicRequestUrl()) {
+        if (isPrimaryRequestUrl()) {
             try {
                 _log.info("...Retrying refreshing by secondary URL " + SECONDARY_REQUEST_URL);
                 final DfRefreshResourceRequest request = createRefreshResourceRequest(SECONDARY_REQUEST_URL);
                 final Map<String, Map<String, Object>> resultMap = request.refreshResources();
-                final boolean success = existsSuccess(resultMap);
-                if (success) {
+                if (!existsNotFound(resultMap)) {
                     _log.info("*Success of the retry refreshing");
+                    return true;
                 }
-                return success;
+                return false;
             } catch (IOException ignored) {
                 return false;
             }
@@ -143,23 +142,22 @@ public class DfRefreshResourceProcess {
         return false;
     }
 
-    protected boolean isBasicRequestUrl() {
-        return BASIC_REQUEST_URL.equals(_requestUrl);
+    protected boolean isPrimaryRequestUrl() {
+        return PRIMARY_REQUEST_URL.equals(_requestUrl);
     }
 
     // -----------------------------------------------------
     //                                        Analyze Result
     //                                        --------------
-    protected boolean existsSuccess(final Map<String, Map<String, Object>> resultMap) {
-        boolean existsSuccess = false;
+    protected boolean existsNotFound(final Map<String, Map<String, Object>> resultMap) {
         for (Entry<String, Map<String, Object>> entry : resultMap.entrySet()) {
             final Map<String, Object> elementMap = entry.getValue();
             final String body = (String) elementMap.get(DfRefreshResourceRequest.KEY_BODY);
-            if (body != null && Srl.is_NotNull_and_NotTrimmedEmpty(body)) {
-                existsSuccess = true;
+            if (body != null && body.contains("*NotFound")) {
+                return true;
             }
         }
-        return existsSuccess;
+        return false;
     }
 
     // -----------------------------------------------------
