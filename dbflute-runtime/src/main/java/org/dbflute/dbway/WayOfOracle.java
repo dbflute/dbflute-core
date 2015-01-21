@@ -31,7 +31,7 @@ public class WayOfOracle implements DBWay, Serializable {
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
-    protected static final List<String> ORIGNAL_WILD_CARD_LIST = Arrays.asList("\uff05", "\uff3f");
+    protected static final List<String> ORIGINAL_WILD_CARD_LIST = Arrays.asList("\uff05", "\uff3f");
 
     // ===================================================================================
     //                                                                        Sequence Way
@@ -69,7 +69,7 @@ public class WayOfOracle implements DBWay, Serializable {
     //                                                                 LikeSearch WildCard
     //                                                                 ===================
     public List<String> getOriginalWildCardList() {
-        return ORIGNAL_WILD_CARD_LIST;
+        return ORIGINAL_WILD_CARD_LIST;
     }
 
     // ===================================================================================
