@@ -269,11 +269,15 @@ public class DfRefreshResourceProcess {
     //                                        Create Request
     //                                        --------------
     protected DfRefreshResourceRequest createRefreshResourceRequest(String requestUrl) {
-        return new DfRefreshResourceRequest(_projectNameList, requestUrl);
+        return newRefreshResourceRequest(_projectNameList, requestUrl);
     }
 
     protected DfRefreshResourceRequest createRefreshResourceRequest(String projectName, String requestUrl) {
-        return new DfRefreshResourceRequest(Arrays.asList(projectName), requestUrl);
+        return newRefreshResourceRequest(Arrays.asList(projectName), requestUrl);
+    }
+
+    protected DfRefreshResourceRequest newRefreshResourceRequest(List<String> projectNameList, String requestUrl) {
+        return new DfRefreshResourceRequest(projectNameList, requestUrl);
     }
 
     // ===================================================================================
