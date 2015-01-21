@@ -119,13 +119,6 @@ public class DfRefreshResourceRequest {
         }
     }
 
-    protected URLConnection openConnect(URL url) throws IOException {
-        final URLConnection conn = url.openConnection();
-        conn.setReadTimeout(getRefreshRequestReadTimeout());
-        conn.connect();
-        return conn;
-    }
-
     protected LinkedHashMap<String, Object> newElementMap() {
         return new LinkedHashMap<String, Object>();
     }
@@ -153,8 +146,15 @@ public class DfRefreshResourceRequest {
     }
 
     // ===================================================================================
-    //                                                                    Refresh Resource
-    //                                                                    ================
+    //                                                                   Connection Helper
+    //                                                                   =================
+    protected URLConnection openConnect(URL url) throws IOException {
+        final URLConnection conn = url.openConnection();
+        conn.setReadTimeout(getRefreshRequestReadTimeout());
+        conn.connect();
+        return conn;
+    }
+
     protected URL createRefreshRequestURL(String path) throws MalformedURLException {
         String requestUrl = _requestUrl;
         if (!requestUrl.endsWith("/")) {
