@@ -15,6 +15,7 @@
  */
 package org.dbflute.dbmeta;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -187,7 +188,7 @@ public interface DBMeta {
      * @return The optional object for the found primary info. (NotNull, EmptyAllowed: when not found)
      * @throws UnsupportedOperationException When the table does not have primary key.
      */
-    OptionalObject<PrimaryInfo> searchPrimaryInfo(List<ColumnInfo> columnInfoList);
+    OptionalObject<PrimaryInfo> searchPrimaryInfo(Collection<ColumnInfo> columnInfoList);
 
     // -----------------------------------------------------
     //                                        Natural Unique
@@ -204,7 +205,7 @@ public interface DBMeta {
      * @param columnInfoList The list of column info as search key. (NotNull)
      * @return The read-only list of the found unique info. (NotNull, EmptyAllowed: when not found)
      */
-    List<UniqueInfo> searchUniqueInfoList(List<ColumnInfo> columnInfoList);
+    List<UniqueInfo> searchUniqueInfoList(Collection<ColumnInfo> columnInfoList);
 
     // ===================================================================================
     //                                                                       Relation Info
@@ -266,7 +267,7 @@ public interface DBMeta {
      * @param columnInfoList The list of column info as search key. (NotNull)
      * @return The read-only list of the found foreign info. (NotNull, EmptyAllowed: when not found)
      */
-    List<ForeignInfo> searchForeignInfoList(List<ColumnInfo> columnInfoList);
+    List<ForeignInfo> searchForeignInfoList(Collection<ColumnInfo> columnInfoList);
 
     // -----------------------------------------------------
     //                                      Referrer Element
@@ -305,7 +306,7 @@ public interface DBMeta {
      * @param columnInfoList The list of column info as search key. (NotNull)
      * @return The read-only list of the found referrer info. (NotNull, EmptyAllowed: when not found)
      */
-    List<ReferrerInfo> searchReferrerInfoList(List<ColumnInfo> columnInfoList);
+    List<ReferrerInfo> searchReferrerInfoList(Collection<ColumnInfo> columnInfoList);
 
     // ===================================================================================
     //                                                                       Identity Info

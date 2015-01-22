@@ -469,7 +469,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /** {@inheritDoc} */
-    public OptionalObject<PrimaryInfo> searchPrimaryInfo(List<ColumnInfo> columnInfoList) {
+    public OptionalObject<PrimaryInfo> searchPrimaryInfo(Collection<ColumnInfo> columnInfoList) {
         final PrimaryInfo primaryInfo = getPrimaryInfo(); // exception if no PK
         final Set<ColumnInfo> colSet = new HashSet<ColumnInfo>(columnInfoList);
         final List<ColumnInfo> primaryColumnList = primaryInfo.getPrimaryColumnList();
@@ -518,13 +518,13 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /** {@inheritDoc} */
-    public List<UniqueInfo> searchUniqueInfoList(List<ColumnInfo> columnInfoList) {
+    public List<UniqueInfo> searchUniqueInfoList(Collection<ColumnInfo> columnInfoList) {
         return doSearchMetaInfoList(columnInfoList, getUniqueInfoList(), info -> {
             return info.getUniqueColumnList();
         });
     }
 
-    protected <INFO> List<INFO> doSearchMetaInfoList(List<ColumnInfo> columnInfoList, List<INFO> infoList,
+    protected <INFO> List<INFO> doSearchMetaInfoList(Collection<ColumnInfo> columnInfoList, List<INFO> infoList,
             Function<INFO, Collection<ColumnInfo>> oneArgLambda) {
         if (infoList.isEmpty()) {
             return DfCollectionUtil.emptyList();
@@ -689,7 +689,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /** {@inheritDoc} */
-    public List<ForeignInfo> searchForeignInfoList(List<ColumnInfo> columnInfoList) {
+    public List<ForeignInfo> searchForeignInfoList(Collection<ColumnInfo> columnInfoList) {
         return doSearchMetaInfoList(columnInfoList, getForeignInfoList(), info -> {
             return info.getLocalForeignColumnInfoMap().keySet();
         });
@@ -807,7 +807,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /** {@inheritDoc} */
-    public List<ReferrerInfo> searchReferrerInfoList(List<ColumnInfo> columnInfoList) {
+    public List<ReferrerInfo> searchReferrerInfoList(Collection<ColumnInfo> columnInfoList) {
         return doSearchMetaInfoList(columnInfoList, getReferrerInfoList(), info -> {
             return info.getLocalReferrerColumnInfoMap().keySet();
         });
