@@ -581,6 +581,10 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         return _updateColumnSpecification != null;
     }
 
+    public CB getUpdateColumnSpecifiedCB() { // for various determination
+        return _updateColumnSpecifiedCB; // null allowed
+    }
+
     public boolean isSpecifiedUpdateColumn(String columnDbName) {
         if (_forcedSpecifiedUpdateColumnSet != null && _forcedSpecifiedUpdateColumnSet.contains(columnDbName)) {
             return true; // basically common column
