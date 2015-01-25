@@ -2207,6 +2207,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /** {@inheritDoc} */
+    public void invokeQueryNotEqual(String columnFlexibleName, Object value) {
+        invokeQuery(columnFlexibleName, CK_NES.getConditionKey(), value);
+    }
+
+    /** {@inheritDoc} */
     public void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final PropertyNameCQContainer container = xhelpExtractingPropertyNameCQContainer(columnFlexibleName);

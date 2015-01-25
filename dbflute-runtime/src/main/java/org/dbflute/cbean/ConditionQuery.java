@@ -152,7 +152,7 @@ public interface ConditionQuery {
      * and set a dummy object to it when keys that does not have an argument, e.g. IsNull. 
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
      * @param conditionKeyName The name of the condition-key. (NotNull)
-     * @param conditionValue The value of the condition. (NullAllowed: if null, no invoking)
+     * @param conditionValue The value of the condition. (NotNull: as default, NullAllowed: as optional)
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
     void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue);
@@ -164,7 +164,7 @@ public interface ConditionQuery {
      * and set a dummy object to it when keys that does not have an argument, e.g. IsNull.
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
      * @param conditionKeyName The name of the condition-key. (NotNull)
-     * @param conditionValue The value of the condition. (NullAllowed: if null, no invoking)
+     * @param conditionValue The value of the condition. (NotNull: as default, NullAllowed: as optional)
      * @param conditionOption The option of the condition. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
@@ -173,10 +173,18 @@ public interface ConditionQuery {
     /**
      * Invoke setting query of equal. {RelationResolved}
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
-     * @param conditionValue The value of the condition 'equal'. (NullAllowed: if null, no invoking)
+     * @param conditionValue The value of the condition 'equal'. (NotNull: as default, NullAllowed: as optional)
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
     void invokeQueryEqual(String columnFlexibleName, Object conditionValue);
+
+    /**
+     * Invoke setting query of not-equal. {RelationResolved}
+     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
+     * @param conditionValue The value of the condition 'notEqual'. (NotNull: as default, NullAllowed: as optional)
+     * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
+     */
+    void invokeQueryNotEqual(String columnFlexibleName, Object conditionValue);
 
     /**
      * Invoke adding orderBy. {RelationResolved}
