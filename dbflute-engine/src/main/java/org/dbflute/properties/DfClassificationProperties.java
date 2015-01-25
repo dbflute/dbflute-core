@@ -570,6 +570,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final String name = quoteColumnNameIfNeedsDirectUse(element.getName());
         final String alias = quoteColumnNameIfNeedsDirectUse(element.getAlias());
         final String comment = quoteColumnNameIfNeedsDirectUse(element.getComment());
+        final String[] sisters = element.getSisters();
         final Map<String, Object> subItemPropMap = element.getSubItemMap();
         final StringBuilder sb = new StringBuilder();
         sb.append("select ").append(code).append(" as cls_code");
@@ -578,6 +579,12 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         sb.append("     , ").append(alias).append(" as cls_alias");
         final String commentColumn = Srl.is_NotNull_and_NotTrimmedEmpty(comment) ? comment : "null";
         sb.append(", ").append(commentColumn).append(" as cls_comment");
+
+        if (sisters != null && sisters.length > 0) {
+            for (String sister : sisters) {
+                sb.append(", ").append(sister).append(" as cls_sister");
+            }
+        }
         if (subItemPropMap != null && !subItemPropMap.isEmpty()) {
             for (Entry<String, Object> entry : subItemPropMap.entrySet()) {
                 sb.append(", ").append(entry.getValue()).append(" as cls_").append(entry.getKey());
@@ -658,6 +665,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     protected void setupTableClassification(DfClassificationTop classificationTop, List<DfClassificationElement> elementList,
             DfClassificationElement metaElement, Set<String> exceptCodeSet, Connection conn, String sql) {
         final String classificationName = classificationTop.getClassificationName();
+        final String[] sisters = metaElement.getSisters();
         final Map<String, Object> subItemPropMap = metaElement.getSubItemMap();
         Statement st = null;
         ResultSet rs = null;
@@ -690,6 +698,10 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 selectedMap.put(DfClassificationElement.KEY_ALIAS, filterTableClassificationLiteralOutput(alias));
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) { // because of not required
                     selectedMap.put(DfClassificationElement.KEY_COMMENT, comment);
+                }
+                if (sisters != null && sisters.length > 0) {
+                    final String sisterValue = rs.getString("cls_sister");
+                    selectedMap.put(DfClassificationElement.KEY_SISTER_CODE, sisterValue);
                 }
                 if (subItemPropMap != null && !subItemPropMap.isEmpty()) {
                     final Map<String, Object> subItemMap = new LinkedHashMap<String, Object>();
