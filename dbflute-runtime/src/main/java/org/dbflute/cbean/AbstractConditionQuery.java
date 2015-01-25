@@ -2029,10 +2029,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void doInvokeQuery(String colName, String ckey, Object value, ConditionOption option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", colName);
         assertStringNotNullAndNotTrimmedEmpty("conditionKeyName", ckey);
-        // TODO jflute 
-        //xgetSqlClause().isNullOrEmptyQueryChecked();
-        if (value == null) {
-            return; // do nothing if the value is null when the key has arguments
+        final boolean noArg = Srl.equalsIgnoreCase(ckey, "IsNull", "IsNotNull", "IsNullOrEmpty", "EmptyString");
+        if (!noArg && (value == null || "".equals(value))) {
+            if (xgetSqlClause().isNullOrEmptyQueryChecked()) { // as default
+                String msg = "The conditionValue is required but null or empty: column=" + colName + " value=" + value;
+                throw new IllegalConditionBeanOperationException(msg);
+            } else { // e.g. when cb.ignoreNullOrEmptyQuery()
+                return;
+            }
         }
         final PropertyNameCQContainer container = xhelpExtractingPropertyNameCQContainer(colName);
         final String flexibleName = container.getFlexibleName();
@@ -2046,7 +2050,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             return; // unreachable (to avoid compile error)
         }
         final String columnCapPropName = initCap(columnInfo.getPropertyName());
-        final boolean noArg = Srl.equalsIgnoreCase(ckey, "IsNull", "IsNotNull", "IsNullOrEmpty", "EmptyString");
         final boolean rangeOf = Srl.equalsIgnoreCase(ckey, "RangeOf");
         final boolean fromTo = Srl.equalsIgnoreCase(ckey, "FromTo", "DateFromTo");
         if (!noArg) {
