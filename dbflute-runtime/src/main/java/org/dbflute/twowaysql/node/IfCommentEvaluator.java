@@ -128,8 +128,8 @@ public class IfCommentEvaluator {
     public boolean evaluate() {
         assertExpression();
         if (_expression.contains(AND)) {
-            final List<String> splitList = splitList(_expression, AND);
-            for (String booleanClause : splitList) {
+            final List<String> clauseList = splitList(_expression, AND);
+            for (String booleanClause : clauseList) {
                 final boolean result = evaluateBooleanClause(booleanClause);
                 if (!result) {
                     return false;
@@ -137,8 +137,8 @@ public class IfCommentEvaluator {
             }
             return true;
         } else if (_expression.contains(OR)) {
-            final List<String> splitList = splitList(_expression, OR);
-            for (String booleanClause : splitList) {
+            final List<String> clauseList = splitList(_expression, OR);
+            for (String booleanClause : clauseList) {
                 final boolean result = evaluateBooleanClause(booleanClause);
                 if (result) {
                     return true;
@@ -411,10 +411,10 @@ public class IfCommentEvaluator {
      * @return The first property. (NotNull)
      */
     protected String setupPropertyList(String piece, List<String> propertyList) {
-        final List<String> splitList = splitList(piece, ".");
+        final List<String> clauseList = splitList(piece, ".");
         String firstName = null;
-        for (int i = 0; i < splitList.size(); i++) {
-            final String token = splitList.get(i);
+        for (int i = 0; i < clauseList.size(); i++) {
+            final String token = clauseList.get(i);
             if (i == 0) {
                 assertFirstName(token);
                 firstName = token;

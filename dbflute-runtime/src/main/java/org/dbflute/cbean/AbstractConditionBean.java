@@ -610,15 +610,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
         // small waste exists but simple logic is best here
         final ConditionBean departurePort = xgetDreamCruiseDeparturePort();
         for (String relationPath : _dreamCruiseJourneyLogBook) {
-            final List<String> splitList = Srl.splitList(relationPath, "_"); // e.g. _2_5
+            final List<String> relNoExpList = Srl.splitList(relationPath, "_"); // e.g. _2_5
             final StringBuilder sb = new StringBuilder();
             DBMeta currentMeta = asDBMeta();
             int index = 0;
-            for (String element : splitList) {
-                if ("".equals(element)) {
+            for (String relNoExp : relNoExpList) {
+                if ("".equals(relNoExp)) {
                     continue;
                 }
-                final Integer relationNo = Integer.valueOf(element);
+                final Integer relationNo = Integer.valueOf(relNoExp);
                 final ForeignInfo foreignInfo = currentMeta.findForeignInfo(relationNo);
                 final String foreignPropertyName = foreignInfo.getForeignPropertyName();
                 if (index > 0) {

@@ -173,7 +173,7 @@ public interface ConditionQuery {
     /**
      * Invoke setting query of equal. {RelationResolved}
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
-     * @param conditionValue The value of the condition. (NotNull)
+     * @param conditionValue The value of the condition 'equal'. (NullAllowed: if null, no invoking)
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
     void invokeQueryEqual(String columnFlexibleName, Object conditionValue);

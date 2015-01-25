@@ -1973,9 +1973,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ConditionValue invokeValue(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final DBMeta dbmeta = xgetLocalDBMeta();
@@ -2017,16 +2015,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         throw new ConditionInvokingFailureException(msg, e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue) {
         doInvokeQuery(columnFlexibleName, conditionKeyName, conditionValue, null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue, ConditionOption conditionOption) {
         assertObjectNotNull("conditionOption", conditionOption);
         doInvokeQuery(columnFlexibleName, conditionKeyName, conditionValue, conditionOption);
@@ -2035,6 +2029,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void doInvokeQuery(String colName, String ckey, Object value, ConditionOption option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", colName);
         assertStringNotNullAndNotTrimmedEmpty("conditionKeyName", ckey);
+        // TODO jflute 
+        //xgetSqlClause().isNullOrEmptyQueryChecked();
         if (value == null) {
             return; // do nothing if the value is null when the key has arguments
         }
@@ -2205,16 +2201,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void invokeQueryEqual(String columnFlexibleName, Object value) {
         invokeQuery(columnFlexibleName, CK_EQ.getConditionKey(), value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final PropertyNameCQContainer container = xhelpExtractingPropertyNameCQContainer(columnFlexibleName);
@@ -2266,15 +2258,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         throw new ConditionInvokingFailureException(msg, cause);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ConditionQuery invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final List<String> splitList = Srl.splitList(foreignPropertyName, ".");
+        final List<String> traceList = Srl.splitList(foreignPropertyName, ".");
         ConditionQuery foreignCQ = this;
-        for (String elementName : splitList) {
-            foreignCQ = doInvokeForeignCQ(foreignCQ, elementName);
+        for (String trace : traceList) {
+            foreignCQ = doInvokeForeignCQ(foreignCQ, trace);
         }
         return foreignCQ;
     }
@@ -2323,21 +2313,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         throw new ConditionInvokingFailureException(msg, cause);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean invokeHasForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final List<String> splitList = Srl.splitList(foreignPropertyName, ".");
+        final List<String> traceList = Srl.splitList(foreignPropertyName, ".");
         ConditionQuery foreignCQ = this;
-        final int splitLength = splitList.size();
+        final int splitLength = traceList.size();
         int index = 0;
-        for (String elementName : splitList) {
-            if (!doInvokeHasForeignCQ(foreignCQ, elementName)) {
+        for (String traceName : traceList) {
+            if (!doInvokeHasForeignCQ(foreignCQ, traceName)) {
                 return false;
             }
             if ((index + 1) < splitLength) { // last loop
-                foreignCQ = foreignCQ.invokeForeignCQ(elementName);
+                foreignCQ = foreignCQ.invokeForeignCQ(traceName);
             }
             ++index;
         }
