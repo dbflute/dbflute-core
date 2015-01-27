@@ -579,7 +579,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         sb.append("     , ").append(alias).append(" as cls_alias");
         final String commentColumn = Srl.is_NotNull_and_NotTrimmedEmpty(comment) ? comment : "null";
         sb.append(", ").append(commentColumn).append(" as cls_comment");
-
         if (sisters != null && sisters.length > 0) {
             for (String sister : sisters) {
                 sb.append(", ").append(sister).append(" as cls_sister");
