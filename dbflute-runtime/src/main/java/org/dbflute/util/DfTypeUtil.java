@@ -1726,13 +1726,15 @@ public final class DfTypeUtil {
 
         if (includeTime) {
             if (dayEndIndex >= 0) { // has time parts
-                final String time = startsDay.substring(dayEndIndex + dateTimeDlmLength);
+                String time = startsDay.substring(dayEndIndex + dateTimeDlmLength);
 
                 // check whether it can filter
-                if (!time.contains(timeDlm) || (time.indexOf(timeDlm) == time.lastIndexOf(timeDlm))) {
-                    return pureStr; // couldn't filter for example '2009-12-12 123451' and '2009-12-12 123:451'
+                if (!time.contains(timeDlm)) {
+                    return pureStr; // couldn't filter for example '2009-12-12 123456'
                 }
-
+                if (time.indexOf(timeDlm) == time.lastIndexOf(timeDlm)) { // '2009-12-12 12:34'
+                    time = time + ":00"; // to '2009-12-12 12:34:00' for parsing as time
+                }
                 value = yyyy_MM_dd + dateTimeDlm + handleTimeZeroPrefix(time, pureStr, includeMillis, keepMillisMore);
             } else {
                 value = yyyy_MM_dd + dateTimeDlm + "00:00:00";
