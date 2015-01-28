@@ -17,6 +17,7 @@ package org.dbflute.helper.token.file;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -484,6 +485,7 @@ public class FileToken {
         assertObjectNotNull("oneArgLambda(FileMakingCallback)", oneArgLambda);
         FileOutputStream fos = null;
         try {
+            mkdirsIfNeeds(filePath);
             fos = new FileOutputStream(filePath);
             doMake(fos, oneArgLambda, opLambda);
         } finally {
@@ -492,6 +494,18 @@ public class FileToken {
                     fos.close(); // basically no needed but just in case
                 } catch (IOException ignored) {}
             }
+        }
+    }
+
+    protected void mkdirsIfNeeds(String filePath) {
+        final String filtered = Srl.replace(filePath, "\\", "/");
+        if (!filePath.contains("/")) {
+            return;
+        }
+        final String dirPath = Srl.substringLastFront(filtered, "/");
+        final File dir = new File(dirPath);
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
     }
 

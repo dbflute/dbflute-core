@@ -6,9 +6,9 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1.0-sp1" />
-	<property name="build.version" value="${version}-RC5" />
+	<property name="build.version" value="${version}-RC6" />
 	<property name="runtime.version" value="1.1.0-sp1" />
-	<property name="runtime.build.version" value="${runtime.version}-RC5" />
+	<property name="runtime.build.version" value="${runtime.version}-RC6" />
 	<property name="example.latest.version" value="1.x" />
 
 	<!-- Base Directories -->
