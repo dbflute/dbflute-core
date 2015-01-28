@@ -92,6 +92,12 @@ public interface DBMeta {
     String getTableDbName();
 
     /**
+     * Get the display name of the table for human viewing.
+     * @return The display name of the table. (NotNull)
+     */
+    String getTableDispName();
+
+    /**
      * Get the property name (JavaBeansRule) of table.
      * @return The property name(JavaBeansRule) of table. (NotNull)
      */
