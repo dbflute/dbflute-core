@@ -801,14 +801,29 @@ public class Column {
     public String getPrimaryKeyMarkForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
         if (isPrimaryKey()) {
-            sb.append("o");
-            if (isTwoOrMoreColumnPrimaryKey()) {
-                sb.append(HTML_INDEX_PLUS);
-            }
+            buildPrimaryKeyMark(sb, "o", true);
         } else {
             sb.append("&nbsp;");
         }
         return sb.toString();
+    }
+
+    protected void buildPrimaryKeyMark(StringBuilder sb, String mark, boolean html) {
+        final String plus = html ? HTML_INDEX_PLUS : INDEX_PLUS;
+        if (isTwoOrMoreColumnPrimaryKey()) { // compound index
+            if (isTopColumnInCompoundPK()) { // top column
+                sb.append(mark).append(plus);
+            } else { // sub column
+                sb.append(plus).append(mark);
+            }
+        } else { // simple index
+            sb.append(mark);
+        }
+    }
+
+    protected boolean isTopColumnInCompoundPK() {
+        final List<Column> pkList = getTable().getPrimaryKey();
+        return !pkList.isEmpty() && pkList.get(0).equals(this);
     }
 
     public String getPrimaryKeyTitleForSchemaHtml() {
