@@ -183,10 +183,12 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                          Table Info
     //                                                                          ==========
     protected final String _tableDbName = "${table.tableDbName}";
+    protected final String _tableDispName = "${table.tableDispName}";
     protected final String _tablePropertyName = "${table.javaBeansRulePropertyName}";
     protected final TableSqlName _tableSqlName = new TableSqlName("${table.tableSqlName}", _tableDbName);
     { _tableSqlName.xacceptFilter(${glDBFluteConfig}.getInstance().getTableSqlNameFilter()); }
     public String getTableDbName() { return _tableDbName; }
+    public String getTableDispName() { return _tableDispName; }
     public String getTablePropertyName() { return _tablePropertyName; }
     public TableSqlName getTableSqlName() { return _tableSqlName; }
 #if ($table.hasAlias())
@@ -253,28 +255,6 @@ public class ${myClassName} extends AbstractDBMeta {
     // -----------------------------------------------------
     //                                        Unique Element
     //                                        --------------
-## #later escalate to super class, and make primary info, getPrimaryKeyInfo() by jflute
-    private volatile List<UniqueInfo> _uniqueInfoList;
-    public List<UniqueInfo> getUniqueInfoList() {
-        if (_uniqueInfoList != null) {
-            return _uniqueInfoList;
-        }
-        synchronized (this) {
-            if (_uniqueInfoList != null) {
-                return _uniqueInfoList;
-            }
-            final java.lang.reflect.Method[] methods = this.getClass().getMethods();
-            _uniqueInfoList = newArrayListSized(4);
-            final String prefix = "uniqueOf";
-            final Class<UniqueInfo> returnType = UniqueInfo.class;
-            for (java.lang.reflect.Method method : methods) {
-                if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                    _uniqueInfoList.add((UniqueInfo) org.dbflute.util.DfReflectionUtil.invoke(method, this, null));
-                }
-            }
-            return _uniqueInfoList;
-        }
-    }
 #foreach ($uq in $table.keyableUniqueList)
 #if ($uq.isOnlyOneColumn())
     public UniqueInfo uniqueOf${uq.javaNameKeyword}() { return hpcui(column${uq.columnAsOne.javaBeansRulePropertyNameInitCap}()); }
@@ -288,14 +268,6 @@ public class ${myClassName} extends AbstractDBMeta {
     }
 #end
 #end
-
-    protected UniqueInfo hpcui(ColumnInfo uniqueColumnInfo) { // helpCreateUniqueInfo()
-        return hpcui(java.util.Arrays.asList(uniqueColumnInfo));
-    }
-
-    protected UniqueInfo hpcui(java.util.List<ColumnInfo> uniqueColumnInfoList) { // helpCreateUniqueInfo()
-        return new UniqueInfo(this, uniqueColumnInfoList, false);
-    }
 #end
 
     // ===================================================================================

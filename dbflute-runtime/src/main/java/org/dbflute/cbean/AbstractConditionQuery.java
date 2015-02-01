@@ -83,9 +83,9 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
+import org.dbflute.dbmeta.info.PrimaryInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
-import org.dbflute.dbmeta.info.UniqueInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.dbflute.dbmeta.name.ColumnSqlName;
@@ -1624,8 +1624,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 relatedColumnDbName = specifiedDbName;
             } else { // as default
                 // this function is only allowed when only-one PK
-                final UniqueInfo primaryUniqueInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryUniqueInfo();
-                final ColumnInfo primaryColumnInfo = primaryUniqueInfo.getFirstColumn();
+                final PrimaryInfo primaryInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryInfo();
+                final ColumnInfo primaryColumnInfo = primaryInfo.getFirstColumn();
                 relatedColumnDbName = primaryColumnInfo.getColumnDbName();
             }
         }
@@ -1643,8 +1643,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 relatedColumnDbName = specifiedDbName;
             } else { // as default
                 // this function is only allowed when only-one PK
-                final UniqueInfo primaryUniqueInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryUniqueInfo();
-                final ColumnInfo primaryColumnInfo = primaryUniqueInfo.getFirstColumn();
+                final PrimaryInfo primaryInfo = findDBMeta(subQuery.asTableDbName()).getPrimaryInfo();
+                final ColumnInfo primaryColumnInfo = primaryInfo.getFirstColumn();
                 relatedColumnDbName = primaryColumnInfo.getColumnDbName();
             }
         }
@@ -1973,9 +1973,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ConditionValue invokeValue(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final DBMeta dbmeta = xgetLocalDBMeta();
@@ -2017,16 +2015,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         throw new ConditionInvokingFailureException(msg, e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue) {
         doInvokeQuery(columnFlexibleName, conditionKeyName, conditionValue, null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue, ConditionOption conditionOption) {
         assertObjectNotNull("conditionOption", conditionOption);
         doInvokeQuery(columnFlexibleName, conditionKeyName, conditionValue, conditionOption);
@@ -2035,8 +2029,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void doInvokeQuery(String colName, String ckey, Object value, ConditionOption option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", colName);
         assertStringNotNullAndNotTrimmedEmpty("conditionKeyName", ckey);
-        if (value == null) {
-            return; // do nothing if the value is null when the key has arguments
+        final boolean noArg = Srl.equalsIgnoreCase(ckey, "IsNull", "IsNotNull", "IsNullOrEmpty", "EmptyString");
+        if (!noArg && (value == null || "".equals(value))) {
+            if (xgetSqlClause().isNullOrEmptyQueryChecked()) { // as default
+                String msg = "The conditionValue is required but null or empty: column=" + colName + " value=" + value;
+                throw new IllegalConditionBeanOperationException(msg);
+            } else { // e.g. when cb.ignoreNullOrEmptyQuery()
+                return;
+            }
         }
         final PropertyNameCQContainer container = xhelpExtractingPropertyNameCQContainer(colName);
         final String flexibleName = container.getFlexibleName();
@@ -2050,7 +2050,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             return; // unreachable (to avoid compile error)
         }
         final String columnCapPropName = initCap(columnInfo.getPropertyName());
-        final boolean noArg = Srl.equalsIgnoreCase(ckey, "IsNull", "IsNotNull", "IsNullOrEmpty", "EmptyString");
         final boolean rangeOf = Srl.equalsIgnoreCase(ckey, "RangeOf");
         final boolean fromTo = Srl.equalsIgnoreCase(ckey, "FromTo", "DateFromTo");
         if (!noArg) {
@@ -2205,16 +2204,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void invokeQueryEqual(String columnFlexibleName, Object value) {
         invokeQuery(columnFlexibleName, CK_EQ.getConditionKey(), value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
+    public void invokeQueryNotEqual(String columnFlexibleName, Object value) {
+        invokeQuery(columnFlexibleName, CK_NES.getConditionKey(), value);
+    }
+
+    /** {@inheritDoc} */
     public void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final PropertyNameCQContainer container = xhelpExtractingPropertyNameCQContainer(columnFlexibleName);
@@ -2266,15 +2266,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         throw new ConditionInvokingFailureException(msg, cause);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ConditionQuery invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final List<String> splitList = Srl.splitList(foreignPropertyName, ".");
+        final List<String> traceList = Srl.splitList(foreignPropertyName, ".");
         ConditionQuery foreignCQ = this;
-        for (String elementName : splitList) {
-            foreignCQ = doInvokeForeignCQ(foreignCQ, elementName);
+        for (String trace : traceList) {
+            foreignCQ = doInvokeForeignCQ(foreignCQ, trace);
         }
         return foreignCQ;
     }
@@ -2323,21 +2321,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         throw new ConditionInvokingFailureException(msg, cause);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean invokeHasForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final List<String> splitList = Srl.splitList(foreignPropertyName, ".");
+        final List<String> traceList = Srl.splitList(foreignPropertyName, ".");
         ConditionQuery foreignCQ = this;
-        final int splitLength = splitList.size();
+        final int splitLength = traceList.size();
         int index = 0;
-        for (String elementName : splitList) {
-            if (!doInvokeHasForeignCQ(foreignCQ, elementName)) {
+        for (String traceName : traceList) {
+            if (!doInvokeHasForeignCQ(foreignCQ, traceName)) {
                 return false;
             }
             if ((index + 1) < splitLength) { // last loop
-                foreignCQ = foreignCQ.invokeForeignCQ(elementName);
+                foreignCQ = foreignCQ.invokeForeignCQ(traceName);
             }
             ++index;
         }
@@ -2814,7 +2810,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (_queryRelationKeepingMap == null) { // no way, just in case
             _queryRelationKeepingMap = newLinkedHashMapSized(4);
         }
-        ConditionQuery cq = _queryRelationKeepingMap.get(prop);
+        final ConditionQuery cq = _queryRelationKeepingMap.get(prop);
         if (cq == null) { // no way, just in case
             String msg = "Not found the condition-query for (Query)Relation: " + prop;
             throw new IllegalStateException(msg);

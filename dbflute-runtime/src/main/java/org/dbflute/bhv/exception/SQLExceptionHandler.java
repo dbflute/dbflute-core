@@ -219,11 +219,15 @@ public class SQLExceptionHandler {
         final String displaySql = resource.getDisplaySql();
         if (displaySql != null) {
             if (resource.isDisplaySqlPartHandling()) {
-                br.addItem("Display SQL (part of SQLs)");
+                br.addItem("Part of Display SQLs");
+                br.addElement(displaySql);
+                br.addElement("...");
+                br.addElement("...");
+                br.addElement("(and other statements)");
             } else {
                 br.addItem("Display SQL");
+                br.addElement(displaySql);
             }
-            br.addElement(displaySql);
         }
         // this is example to use executed SQL
         //final String executedSql = resource.getExecutedSql();

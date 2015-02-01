@@ -115,6 +115,10 @@ public class MockDBMeta extends AbstractDBMeta {
         return null;
     }
 
+    public String getTableDispName() {
+        return null;
+    }
+
     public String getTablePropertyName() {
         return null;
     }

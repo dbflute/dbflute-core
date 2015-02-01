@@ -38,27 +38,6 @@ public class InstanceKeyEntity implements Entity {
     }
 
     // ===================================================================================
-    //                                                                   Instance Identity
-    //                                                                   =================
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof InstanceKeyEntity)) {
-            return false;
-        }
-        return _actualEntity == ((InstanceKeyEntity) obj)._actualEntity;
-    }
-
-    @Override
-    public int hashCode() {
-        return _actualEntity.instanceHash();
-    }
-
-    @Override
-    public String toString() {
-        return _actualEntity.toString();
-    }
-
-    // ===================================================================================
     //                                                                          Delegation
     //                                                                          ==========
     public DBMeta asDBMeta() {
@@ -78,6 +57,9 @@ public class InstanceKeyEntity implements Entity {
 
     public void mymodifyProperty(String propertyName) {
         _actualEntity.mymodifyProperty(propertyName);
+    }
+
+    public void mymodifyPropertyCancel(String propertyName) {
     }
 
     public void clearModifiedInfo() {
@@ -100,20 +82,31 @@ public class InstanceKeyEntity implements Entity {
         _actualEntity.myspecifyProperty(propertyName);
     }
 
-    @Override
+    public void myspecifyPropertyCancel(String propertyName) {
+    }
+
     public void clearSpecifiedInfo() {
         _actualEntity.clearSpecifiedInfo();
     }
 
     // ===================================================================================
-    //                                                                         Primary Key
-    //                                                                         ===========
+    //                                                                          Unique Key
+    //                                                                          ==========
     public boolean hasPrimaryKeyValue() {
         return _actualEntity.hasPrimaryKeyValue();
     }
 
     public Set<String> myuniqueDrivenProperties() {
         return _actualEntity.myuniqueDrivenProperties();
+    }
+
+    public void myuniqueByProperty(String propertyName) {
+    }
+
+    public void myuniqueByPropertyCancel(String propertyName) {
+    }
+
+    public void clearUniqueDrivenInfo() {
     }
 
     // ===================================================================================
@@ -130,6 +123,24 @@ public class InstanceKeyEntity implements Entity {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof InstanceKeyEntity)) {
+            return false;
+        }
+        return _actualEntity == ((InstanceKeyEntity) obj)._actualEntity;
+    }
+
+    @Override
+    public int hashCode() {
+        return _actualEntity.instanceHash();
+    }
+
+    @Override
+    public String toString() {
+        return _actualEntity.toString();
+    }
+
     public int instanceHash() {
         return _actualEntity.instanceHash();
     }

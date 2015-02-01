@@ -47,7 +47,13 @@ public class UniqueInfo {
     // ===================================================================================
     //                                                                    Column Existence
     //                                                                    ================
+    /**
+     * Does the unique key contain the column?
+     * @param columnInfo The judged column. (NotNull)
+     * @return The determination, true or false.
+     */
     public boolean containsColumn(ColumnInfo columnInfo) {
+        assertObjectNotNull("columnInfo", columnInfo);
         return doContainsColumn(columnInfo.getColumnDbName());
     }
 
@@ -77,10 +83,12 @@ public class UniqueInfo {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    @Override
     public int hashCode() {
         return _dbmeta.hashCode() + _uniqueColumnList.hashCode();
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof UniqueInfo)) {
             return false;
@@ -95,13 +103,18 @@ public class UniqueInfo {
         return true;
     }
 
+    @Override
     public String toString() {
-        return _dbmeta.getTableDbName() + "." + _uniqueColumnList;
+        return "{" + _dbmeta.getTableDbName() + "." + _uniqueColumnList + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    /**
+     * Get the DB meta of the unique key's table.
+     * @return The instance of DB meta. (NotNull)
+     */
     public DBMeta getDBMeta() {
         return _dbmeta;
     }
@@ -122,10 +135,27 @@ public class UniqueInfo {
         return _uniqueColumnList.get(0);
     }
 
-    public boolean isTwoOrMore() {
+    /**
+     * Is the unique key compound key?
+     * @return The determination, true or false.
+     */
+    public boolean isCompoundKey() {
         return _uniqueColumnList.size() > 1;
     }
 
+    /**
+     * Is the unique key two-or-more keys? (compound key?)
+     * @return The determination, true or false.
+     * @deprecated use isCompoundKey()
+     */
+    public boolean isTwoOrMore() { // old style
+        return isCompoundKey();
+    }
+
+    /**
+     * Is the unique key primary key's unique?
+     * @return The determination, true or false.
+     */
     public boolean isPrimary() {
         return _primary;
     }

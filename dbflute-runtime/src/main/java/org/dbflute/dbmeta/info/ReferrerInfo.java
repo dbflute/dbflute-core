@@ -252,10 +252,12 @@ public class ReferrerInfo implements RelationInfo {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    @Override
     public int hashCode() {
         return _referrerPropertyName.hashCode() + _localDBMeta.hashCode() + _referrerDBMeta.hashCode();
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof ReferrerInfo)) {
             return false;
@@ -273,16 +275,15 @@ public class ReferrerInfo implements RelationInfo {
         return true;
     }
 
+    @Override
     public String toString() {
-        return _localDBMeta.getTableDbName() + "." + _referrerPropertyName + "<-" + _referrerDBMeta.getTableDbName();
+        return "{" + _localDBMeta.getTableDbName() + "." + _referrerPropertyName + "<-" + _referrerDBMeta.getTableDbName() + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String getConstraintName() {
         return _constraintName;
     }
@@ -297,9 +298,7 @@ public class ReferrerInfo implements RelationInfo {
         return _referrerPropertyName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public DBMeta getLocalDBMeta() {
         return _localDBMeta;
     }
@@ -329,16 +328,12 @@ public class ReferrerInfo implements RelationInfo {
         return _referrerLocalColumnInfoMap;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Class<?> getObjectNativeType() {
         return _objectNativeType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Class<?> getPropertyAccessType() {
         return _propertyAccessType;
     }
@@ -351,10 +346,13 @@ public class ReferrerInfo implements RelationInfo {
         return _oneToOne;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public RelationInfo getReverseRelation() {
         return _reversePropertyName != null ? _referrerDBMeta.findRelationInfo(_reversePropertyName) : null;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isCompoundKey() {
+        return getLocalReferrerColumnInfoMap().size() > 1;
     }
 }

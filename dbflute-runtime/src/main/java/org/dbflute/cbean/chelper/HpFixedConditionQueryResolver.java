@@ -405,10 +405,10 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                 resource.addAdditionalColumn(resolvedColumn); // selected in in-line view
 
                 if (!resource.hasJoinInfo()) { // first analyze
-                    final List<String> splitList = Srl.splitList(targetRelation, ".");
+                    final List<String> traceList = Srl.splitList(targetRelation, ".");
                     DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.asTableDbName());
-                    for (String element : splitList) {
-                        final ForeignInfo foreignInfo = currentDBMeta.findForeignInfo(element);
+                    for (String trace : traceList) {
+                        final ForeignInfo foreignInfo = currentDBMeta.findForeignInfo(trace);
                         resource.addJoinInfo(foreignInfo);
                         currentDBMeta = foreignInfo.getForeignDBMeta();
                     }
@@ -665,10 +665,10 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         final String sqBeginMark = SubQueryIndentProcessor.BEGIN_MARK_PREFIX;
         final String sqEndMark = SubQueryIndentProcessor.END_MARK_PREFIX;
 
-        final List<String> splitList = Srl.splitList(optimizedCondition, ln());
+        final List<String> lineList = Srl.splitList(optimizedCondition, ln());
         boolean subQueryIndentScope = false;
         int index = 0;
-        for (String line : splitList) {
+        for (String line : lineList) {
             if (line.contains(sqEndMark)) {
                 subQueryIndentScope = false;
             }

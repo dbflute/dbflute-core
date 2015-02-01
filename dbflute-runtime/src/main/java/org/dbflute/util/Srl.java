@@ -37,7 +37,7 @@ public class Srl {
     protected static final String HARF_NUMBER = "0123456789";
     protected static final Set<Character> _alphabetHarfCharSet;
     static {
-        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        final Set<Character> setupSet = new HashSet<Character>();
         final StringBuilder sb = new StringBuilder();
         sb.append(HARF_LOWER_ALPHABET);
         sb.append(sb.toString().toUpperCase());
@@ -49,7 +49,7 @@ public class Srl {
     }
     protected static final Set<Character> _alphabetHarfLowerCharSet;
     static {
-        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        final Set<Character> setupSet = new HashSet<Character>();
         final StringBuilder sb = new StringBuilder();
         sb.append(HARF_LOWER_ALPHABET);
         char[] chAry = sb.toString().toCharArray();
@@ -60,7 +60,7 @@ public class Srl {
     }
     protected static final Set<Character> _alphabetHarfUpperCharSet;
     static {
-        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        final Set<Character> setupSet = new HashSet<Character>();
         final StringBuilder sb = new StringBuilder();
         sb.append(HARF_LOWER_ALPHABET.toUpperCase());
         char[] chAry = sb.toString().toCharArray();
@@ -71,7 +71,7 @@ public class Srl {
     }
     protected static final Set<Character> _numberHarfCharSet;
     static {
-        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        final Set<Character> setupSet = new HashSet<Character>();
         final String chStr = HARF_NUMBER;
         char[] chAry = chStr.toCharArray();
         for (char ch : chAry) {
@@ -81,21 +81,21 @@ public class Srl {
     }
     protected static final Set<Character> _alphabetHarfNumberHarfCharSet;
     static {
-        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        final Set<Character> setupSet = new HashSet<Character>();
         setupSet.addAll(_alphabetHarfCharSet);
         setupSet.addAll(_numberHarfCharSet);
         _alphabetHarfNumberHarfCharSet = Collections.unmodifiableSet(setupSet);
     }
     protected static final Set<Character> _alphabetNumberHarfLowerCharSet;
     static {
-        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        final Set<Character> setupSet = new HashSet<Character>();
         setupSet.addAll(_alphabetHarfLowerCharSet);
         setupSet.addAll(_numberHarfCharSet);
         _alphabetNumberHarfLowerCharSet = Collections.unmodifiableSet(setupSet);
     }
     protected static final Set<Character> _alphabetNumberHarfUpperCharSet;
     static {
-        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        final Set<Character> setupSet = new HashSet<Character>();
         setupSet.addAll(_alphabetHarfUpperCharSet);
         setupSet.addAll(_numberHarfCharSet);
         _alphabetNumberHarfUpperCharSet = Collections.unmodifiableSet(setupSet);
@@ -1977,13 +1977,12 @@ public class Srl {
     public static String removeEmptyLine(String str) {
         assertStringNotNull(str);
         final StringBuilder sb = new StringBuilder();
-        final List<String> splitList = splitList(str, "\n");
-        for (String line : splitList) {
+        final List<String> lineList = splitList(str, "\n");
+        for (String line : lineList) {
             if (Srl.is_Null_or_TrimmedEmpty(line)) {
                 continue; // skip
             }
-            line = removeCR(line); // remove CR!
-            sb.append(line).append("\n");
+            sb.append(removeCR(line)).append("\n");
         }
         final String filtered = sb.toString();
         return filtered.substring(0, filtered.length() - "\n".length());
@@ -2104,8 +2103,8 @@ public class Srl {
             return decamelName;
         }
         final StringBuilder sb = new StringBuilder();
-        final List<String> splitList = splitListTrimmed(decamelName, delimiter);
-        for (String part : splitList) {
+        final List<String> partList = splitListTrimmed(decamelName, delimiter);
+        for (String part : partList) {
             boolean allUpperCase = true;
             for (int i = 1; i < part.length(); ++i) {
                 if (isLowerCase(part.charAt(i))) {
@@ -2187,8 +2186,8 @@ public class Srl {
     public static String removeLineComment(String sql) { // with removing CR!
         assertSqlNotNull(sql);
         final StringBuilder sb = new StringBuilder();
-        final List<String> splitList = splitList(sql, "\n");
-        for (String line : splitList) {
+        final List<String> lineList = splitList(sql, "\n");
+        for (String line : lineList) {
             if (line == null) {
                 continue;
             }
@@ -2240,10 +2239,10 @@ public class Srl {
     }
 
     public static String indent(int size, String str) {
-        final List<String> splitList = splitList(removeCR(str), "\n");
+        final List<String> lineList = splitList(removeCR(str), "\n");
         final StringBuilder sb = new StringBuilder();
         int index = 0;
-        for (String element : splitList) {
+        for (String element : lineList) {
             if (index > 0) {
                 sb.append("\n");
             }

@@ -555,6 +555,7 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
         DateFormat dfmil = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
         // ## Act & Assert ##
+        // ## Act & Assert ##
         assertEquals("0002/01/12 00:00:00", df.format(DfTypeUtil.toDate("date 20112")));
         assertEquals("0012/01/22 00:00:00", df.format(DfTypeUtil.toDate("date 120122")));
         assertEquals("0923/01/27 00:00:00", df.format(DfTypeUtil.toDate("date 9230127")));
@@ -566,10 +567,16 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
         assertEquals("2008/09/30 12:34:56", df.format(DfTypeUtil.toDate("2008-09-30 12:34:56")));
         assertEquals("2008/09/30 12:34:56", df.format(DfTypeUtil.toDate("2008-9-30 12:34:56")));
         assertEquals("2008/09/01 12:34:56", df.format(DfTypeUtil.toDate("2008-9-1 12:34:56")));
+        assertEquals("2008/09/01 02:04:06", df.format(DfTypeUtil.toDate("2008-9-1 2:4:6")));
+        assertEquals("2008/09/01 02:34:00", df.format(DfTypeUtil.toDate("2008-9-1 2:34")));
+        assertEquals("2008/09/01 02:04:00", df.format(DfTypeUtil.toDate("2008-9-1 2:4")));
         assertEquals("0008/09/01 12:34:56", df.format(DfTypeUtil.toDate("8-9-1 12:34:56")));
         assertEquals("2008/09/01 00:00:00", df.format(DfTypeUtil.toDate("2008-9-1")));
         assertEquals("0008/09/01 02:04:06", df.format(DfTypeUtil.toDate("8-9-1 02:04:06")));
         assertEquals("0008/09/01 02:04:06", df.format(DfTypeUtil.toDate("8-9-1 2:4:6")));
+        assertEquals("0008/09/01 02:04:00", df.format(DfTypeUtil.toDate("8-9-1 02:04")));
+        assertEquals("0008/09/01 02:04:00", df.format(DfTypeUtil.toDate("8-9-1 2:04")));
+        assertEquals("0008/09/01 02:04:00", df.format(DfTypeUtil.toDate("8-9-1 2:4")));
         assertEquals("2008/12/30 12:34:56.012", dfmil.format(DfTypeUtil.toDate("2008-12-30 12:34:56.12")));
         assertEquals("2008/12/30 12:34:56.789", dfmil.format(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
         assertEquals("2008/12/30 12:34:56.123", dfmil.format(DfTypeUtil.toDate("2008-12-30 12:34:56.123456")));

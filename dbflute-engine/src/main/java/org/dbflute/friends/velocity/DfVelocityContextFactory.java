@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.velocity.VelocityContext;
-import org.dbflute.properties.assistant.freegen.DfFreeGenManager;
-import org.dbflute.properties.assistant.freegen.DfFreeGenRequest;
+import org.dbflute.logic.manage.freegen.DfFreeGenManager;
+import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
 import org.dbflute.task.bs.assistant.DfDocumentSelector;
 
 /**

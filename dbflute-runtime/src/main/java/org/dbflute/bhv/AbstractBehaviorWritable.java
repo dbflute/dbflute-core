@@ -43,6 +43,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
+import org.dbflute.dbmeta.info.UniqueInfo;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityAlreadyUpdatedException;
 import org.dbflute.exception.IllegalBehaviorStateException;
@@ -141,18 +142,22 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                                Update
     //                                                ------
     protected void doUpdate(ENTITY entity, UpdateOption<CB> option) {
-        assertEntityNotNull(entity);
-        prepareUpdateOption(option);
+        readyEntityUpdate(entity, option);
         helpUpdateInternally(entity, option);
     }
 
     protected void doUpdateNonstrict(ENTITY entity, UpdateOption<CB> option) {
-        assertEntityNotNull(entity);
-        prepareUpdateOption(option);
+        readyEntityUpdate(entity, option);
         helpUpdateNonstrictInternally(entity, option);
     }
 
-    protected void prepareUpdateOption(UpdateOption<CB> option) {
+    protected void readyEntityUpdate(ENTITY entity, UpdateOption<CB> option) {
+        assertEntityNotNull(entity);
+        prepareUpdateOption(option);
+        prepareEntityUpdateOption(entity, option);
+    }
+
+    protected void prepareUpdateOption(UpdateOption<CB> option) { // all update commands
         if (option == null) {
             return;
         }
@@ -163,6 +168,22 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         if (option.hasSpecifiedUpdateColumn()) {
             final CB cb = createCBForSpecifiedUpdate();
             option.resolveUpdateColumnSpecification(cb);
+        }
+    }
+
+    protected void prepareEntityUpdateOption(ENTITY entity, UpdateOption<CB> option) { // only for entity update
+        if (option == null) {
+            return;
+        }
+        if (option.hasUniqueByUniqueInfo()) {
+            reflectUniqueDriven(entity, option.getUniqueByUniqueInfo());
+        }
+    }
+
+    protected void reflectUniqueDriven(ENTITY entity, UniqueInfo uniqueInfo) {
+        final List<ColumnInfo> uniqueColumnList = uniqueInfo.getUniqueColumnList();
+        for (ColumnInfo columnInfo : uniqueColumnList) {
+            entity.myuniqueByProperty(columnInfo.getPropertyName());
         }
     }
 
@@ -363,21 +384,34 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                                Delete
     //                                                ------
-    protected void doDelete(ENTITY entity, final DeleteOption<CB> option) {
-        assertEntityNotNull(entity);
-        prepareDeleteOption(option);
+    protected void doDelete(ENTITY entity, DeleteOption<CB> option) {
+        readyEntityDelete(entity, option);
         helpDeleteInternally(entity, option);
     }
 
-    protected void doDeleteNonstrict(ENTITY entity, final DeleteOption<CB> option) {
-        assertEntityNotNull(entity);
-        prepareDeleteOption(option);
+    protected void doDeleteNonstrict(ENTITY entity, DeleteOption<CB> option) {
+        readyEntityDelete(entity, option);
         helpDeleteNonstrictInternally(entity, option);
     }
 
-    protected void prepareDeleteOption(DeleteOption<CB> option) {
+    protected void readyEntityDelete(ENTITY entity, DeleteOption<CB> option) {
+        assertEntityNotNull(entity);
+        prepareDeleteOption(option);
+        prepareEntityDeleteOption(entity, option);
+    }
+
+    protected void prepareDeleteOption(DeleteOption<CB> option) { // all delete commands
         if (option != null) {
             assertDeleteOptionStatus(option);
+        }
+    }
+
+    protected void prepareEntityDeleteOption(ENTITY entity, DeleteOption<CB> option) { // only for entity delete
+        if (option == null) {
+            return;
+        }
+        if (option.hasUniqueByUniqueInfo()) {
+            reflectUniqueDriven(entity, option.getUniqueByUniqueInfo());
         }
     }
 
@@ -699,7 +733,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                          Query Update
     //                                          ------------
     protected int doQueryUpdate(ENTITY entity, CB cb, UpdateOption<CB> option) {
-        assertObjectNotNull("${myEntityVariableName}", entity);
+        assertEntityNotNull(entity);
         assertCBStateValid(cb);
         prepareUpdateOption(option);
         return checkCountBeforeQueryUpdateIfNeeds(cb) ? delegateQueryUpdate(entity, cb, option) : 0;
@@ -1167,7 +1201,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
         // basically property(column) type is same as next value type
         // so there is NOT type conversion cost when writing to the entity
-        dbmeta.getPrimaryUniqueInfo().getFirstColumn().write(entity, readNextVal());
+        dbmeta.getPrimaryInfo().getFirstColumn().write(entity, readNextVal());
     }
 
     protected void assertEntityHasOptimisticLockValue(Entity entity) {

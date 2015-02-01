@@ -26,7 +26,7 @@ import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
-import org.dbflute.dbmeta.info.UniqueInfo;
+import org.dbflute.dbmeta.info.PrimaryInfo;
 import org.dbflute.exception.BatchInsertColumnModifiedPropertiesFragmentedException;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.SpecifyUpdateColumnInvalidException;
@@ -318,8 +318,8 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
         final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
         final DBMeta dbmeta = cb.asDBMeta();
         if (dbmeta.hasPrimaryKey()) {
-            final UniqueInfo pkInfo = dbmeta.getPrimaryUniqueInfo();
-            final List<ColumnInfo> pkList = pkInfo.getUniqueColumnList();
+            final PrimaryInfo pkInfo = dbmeta.getPrimaryInfo();
+            final List<ColumnInfo> pkList = pkInfo.getPrimaryColumnList();
             for (ColumnInfo pk : pkList) {
                 final String columnDbName = pk.getColumnDbName();
                 if (cb.getSqlClause().hasSpecifiedSelectColumn(basePointAliasName, columnDbName)) {

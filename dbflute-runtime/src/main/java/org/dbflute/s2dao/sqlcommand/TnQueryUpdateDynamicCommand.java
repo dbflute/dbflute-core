@@ -165,14 +165,14 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
             List<TnPropertyType> boundPropTypeList) {
         final Map<String, Object> columnParameterMap = new LinkedHashMap<String, Object>();
         final DBMeta dbmeta = entity.asDBMeta();
-        final Set<String> modifiedPropertyNames = entity.mymodifiedProperties();
+        final Set<String> modifiedSet = entity.mymodifiedProperties();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
         for (final ColumnInfo columnInfo : columnInfoList) {
             if (columnInfo.isOptimisticLock()) {
                 continue; // exclusive control columns are processed after here
             }
             final String columnDbName = columnInfo.getColumnDbName();
-            if (option != null && option.hasStatement(columnDbName)) {
+            if (option != null && option.hasStatement(columnDbName)) { // prior to specified
                 columnParameterMap.put(columnDbName, new SqlClause.QueryUpdateSetCalculationHandler() {
                     public String buildStatement(String aliasName) {
                         return option.buildStatement(columnDbName, aliasName);
@@ -180,8 +180,8 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
                 });
                 continue;
             }
-            final String propertyName = columnInfo.getPropertyName();
-            if (modifiedPropertyNames.contains(propertyName)) {
+            if (isSpecifiedProperty(option, modifiedSet, columnInfo)) {
+                final String propertyName = columnInfo.getPropertyName();
                 final Object value = columnInfo.read(entity);
                 if (value != null) {
                     columnParameterMap.put(columnDbName, "/*entity." + propertyName + "*/null");
@@ -226,6 +226,18 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
             cb.getSqlClause().enableQueryUpdateForcedDirect();
         }
         return cb.getSqlClause().getClauseQueryUpdate(columnParameterMap);
+    }
+
+    protected boolean isSpecifiedProperty(UpdateOption<ConditionBean> option, Set<String> modifiedSet, ColumnInfo col) {
+        if (option != null && option.hasSpecifiedUpdateColumn()) {
+            return option.isSpecifiedUpdateColumn(col.getColumnDbName());
+        } else {
+            return isModifiedProperty(modifiedSet, col); // process for ModifiedColumnUpdate
+        }
+    }
+
+    protected boolean isModifiedProperty(Set<String> modifiedSet, ColumnInfo col) {
+        return modifiedSet.contains(col.getPropertyName());
     }
 
     // ===================================================================================

@@ -17,6 +17,7 @@ package org.dbflute.bhv.writable;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.coption.StatementConfigCall;
+import org.dbflute.dbmeta.info.UniqueInfo;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.util.DfTypeUtil;
@@ -32,6 +33,7 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected UniqueInfo _uniqueByUniqueInfo;
     protected boolean _nonQueryDeleteAllowed;
     protected boolean _queryDeleteForcedDirectAllowed;
     protected Integer _batchLoggingDeleteLimit;
@@ -44,6 +46,36 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
      * Constructor.
      */
     public DeleteOption() {
+    }
+
+    // ===================================================================================
+    //                                                                           Unique By
+    //                                                                           =========
+    /**
+     * To be unique by the unique columns of the unique info without values. <br>
+     * The values of the unique columns should be in your entity. <br>
+     * Usually you can use entity's uniqueOf() so this is basically for interface dispatch world. <br>
+     * You can delete the entity by the key when entity delete (NOT batch delete).
+     * @param uniqueInfo The unique info of DB meta for natural unique. (NotNull, NotPrimary)
+     */
+    public void uniqueBy(UniqueInfo uniqueInfo) {
+        if (uniqueInfo == null) {
+            String msg = "The argument 'uniqueInfo' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (uniqueInfo.isPrimary()) {
+            String msg = "The unique info should be natural unique (not primary): " + uniqueInfo;
+            throw new IllegalArgumentException(msg);
+        }
+        _uniqueByUniqueInfo = uniqueInfo;
+    }
+
+    public boolean hasUniqueByUniqueInfo() {
+        return _uniqueByUniqueInfo != null;
+    }
+
+    public UniqueInfo getUniqueByUniqueInfo() {
+        return _uniqueByUniqueInfo;
     }
 
     // ===================================================================================

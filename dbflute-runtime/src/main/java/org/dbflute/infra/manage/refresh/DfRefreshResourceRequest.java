@@ -17,7 +17,6 @@ package org.dbflute.infra.manage.refresh;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -81,37 +80,34 @@ public class DfRefreshResourceRequest {
     //                                                                             Refresh
     //                                                                             =======
     /**
-     * Refresh resources. (request to synchronizer)
+     * Refresh resources per one project. (request to synchronizer)
      * @return The map of result. map:{projectName = map:{body = ...}} (NotNull)
      * @throws IOException When the refresh failed.
      */
     public Map<String, Map<String, Object>> refreshResources() throws IOException {
-        final Map<String, Map<String, Object>> resultMap = new LinkedHashMap<String, Map<String, Object>>();
+        final Map<String, Map<String, Object>> resultMap = newResultMap();
         for (String projectName : _projectNameList) {
             resultMap.put(projectName, doRefreshResources(projectName));
         }
         return resultMap;
     }
 
-    protected Map<String, Object> doRefreshResources(String projectName) throws IOException {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("refresh?").append(projectName).append("=INFINITE");
+    protected Map<String, Map<String, Object>> newResultMap() {
+        return new LinkedHashMap<String, Map<String, Object>>();
+    }
 
-        final URL url = createRefreshRequestURL(sb.toString());
+    protected Map<String, Object> doRefreshResources(String projectName) throws IOException {
+        final String pathAndQuery = buildRefreshPathAndQuery(projectName);
+        final URL url = createRefreshRequestURL(pathAndQuery);
         if (url == null) {
             return null;
         }
-
         InputStream ins = null;
         try {
-            final URLConnection conn = url.openConnection();
-            conn.setReadTimeout(getRefreshRequestReadTimeout());
-            conn.connect();
+            final URLConnection conn = openConnect(url);
             ins = conn.getInputStream();
-            final Map<String, Object> elementMap = new LinkedHashMap<String, Object>();
-            final String body = buildResult(ins);
-            elementMap.put(KEY_BODY, body);
-            elementMap.put(KEY_HEADER_FIELDS, conn.getHeaderFields());
+            final Map<String, Object> elementMap = newElementMap();
+            setupBasicResult(conn, elementMap, ins);
             handleConnectedConnection(conn, elementMap);
             return elementMap;
         } finally {
@@ -123,7 +119,23 @@ public class DfRefreshResourceRequest {
         }
     }
 
-    protected String buildResult(InputStream ins) throws IOException, UnsupportedEncodingException {
+    protected LinkedHashMap<String, Object> newElementMap() {
+        return new LinkedHashMap<String, Object>();
+    }
+
+    protected String buildRefreshPathAndQuery(String projectName) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("refresh?").append(projectName).append("=INFINITE");
+        return sb.toString();
+    }
+
+    protected void setupBasicResult(URLConnection conn, Map<String, Object> elementMap, InputStream ins) throws IOException {
+        final String body = extractResponseBody(ins);
+        elementMap.put(KEY_BODY, body);
+        elementMap.put(KEY_HEADER_FIELDS, conn.getHeaderFields());
+    }
+
+    protected String extractResponseBody(InputStream ins) throws IOException {
         final byte[] body = new byte[1024];
         ins.read(body);
         return new String(body, "UTF-8");
@@ -134,8 +146,15 @@ public class DfRefreshResourceRequest {
     }
 
     // ===================================================================================
-    //                                                                    Refresh Resource
-    //                                                                    ================
+    //                                                                   Connection Helper
+    //                                                                   =================
+    protected URLConnection openConnect(URL url) throws IOException {
+        final URLConnection conn = url.openConnection();
+        conn.setReadTimeout(getRefreshRequestReadTimeout());
+        conn.connect();
+        return conn;
+    }
+
     protected URL createRefreshRequestURL(String path) throws MalformedURLException {
         String requestUrl = _requestUrl;
         if (!requestUrl.endsWith("/")) {

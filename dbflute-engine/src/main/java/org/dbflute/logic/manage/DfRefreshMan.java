@@ -99,7 +99,7 @@ public class DfRefreshMan {
             if (AUTO_DETECT_MARK.equalsIgnoreCase(projectName)) {
                 final String eclipseProjectName = detectEclipseProjectName();
                 if (eclipseProjectName != null) {
-                    filteredList.add(eclipseProjectName);
+                    filteredList.add(0, eclipseProjectName); // first refresh
                     continue;
                 }
                 _log.info("*Cannot auto-detect your refresh Eclipse proejct.");

@@ -72,27 +72,27 @@ public class DfClassificationElement {
         if (code == null) {
             throwClassificationRequiredAttributeNotFoundException(elementMap);
         }
-        this._code = code;
+        _code = code;
 
         final String name = (String) elementMap.get(nameKey);
-        this._name = (name != null ? name : code); // same as code if null
+        _name = (name != null ? name : code); // same as code if null
 
         final String alias = (String) elementMap.get(aliasKey);
-        this._alias = (alias != null ? alias : name); // same as name if null
+        _alias = (alias != null ? alias : name); // same as name if null
 
-        this._comment = (String) elementMap.get(commentKey);
+        _comment = (String) elementMap.get(commentKey);
 
         final Object sisterCodeObj = elementMap.get(sisterCodeKey);
         if (sisterCodeObj != null) {
             if (sisterCodeObj instanceof List<?>) {
                 @SuppressWarnings("unchecked")
                 final List<String> sisterCodeList = (List<String>) sisterCodeObj;
-                this._sisters = sisterCodeList.toArray(new String[sisterCodeList.size()]);
+                _sisters = sisterCodeList.toArray(new String[sisterCodeList.size()]);
             } else {
-                this._sisters = new String[] { (String) sisterCodeObj };
+                _sisters = new String[] { (String) sisterCodeObj };
             }
         } else {
-            this._sisters = new String[] {};
+            _sisters = new String[] {};
         }
 
         // initialize by dummy when no definition for velocity trap

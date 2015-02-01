@@ -555,10 +555,16 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals("2008/09/30 12:34:56", df.format(DfTypeUtil.toDate("2008-09-30 12:34:56")));
         assertEquals("2008/09/30 12:34:56", df.format(DfTypeUtil.toDate("2008-9-30 12:34:56")));
         assertEquals("2008/09/01 12:34:56", df.format(DfTypeUtil.toDate("2008-9-1 12:34:56")));
+        assertEquals("2008/09/01 02:04:06", df.format(DfTypeUtil.toDate("2008-9-1 2:4:6")));
+        assertEquals("2008/09/01 02:34:00", df.format(DfTypeUtil.toDate("2008-9-1 2:34")));
+        assertEquals("2008/09/01 02:04:00", df.format(DfTypeUtil.toDate("2008-9-1 2:4")));
         assertEquals("0008/09/01 12:34:56", df.format(DfTypeUtil.toDate("8-9-1 12:34:56")));
         assertEquals("2008/09/01 00:00:00", df.format(DfTypeUtil.toDate("2008-9-1")));
         assertEquals("0008/09/01 02:04:06", df.format(DfTypeUtil.toDate("8-9-1 02:04:06")));
         assertEquals("0008/09/01 02:04:06", df.format(DfTypeUtil.toDate("8-9-1 2:4:6")));
+        assertEquals("0008/09/01 02:04:00", df.format(DfTypeUtil.toDate("8-9-1 02:04")));
+        assertEquals("0008/09/01 02:04:00", df.format(DfTypeUtil.toDate("8-9-1 2:04")));
+        assertEquals("0008/09/01 02:04:00", df.format(DfTypeUtil.toDate("8-9-1 2:4")));
         assertEquals("2008/12/30 12:34:56.012", dfmil.format(DfTypeUtil.toDate("2008-12-30 12:34:56.12")));
         assertEquals("2008/12/30 12:34:56.789", dfmil.format(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
         assertEquals("2008/12/30 12:34:56.123", dfmil.format(DfTypeUtil.toDate("2008-12-30 12:34:56.123456")));

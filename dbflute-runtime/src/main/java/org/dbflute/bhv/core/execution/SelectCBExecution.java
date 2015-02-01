@@ -29,7 +29,7 @@ import org.dbflute.cbean.ckey.ConditionKey;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
-import org.dbflute.dbmeta.info.UniqueInfo;
+import org.dbflute.dbmeta.info.PrimaryInfo;
 import org.dbflute.hook.CallbackContext;
 import org.dbflute.hook.SqlStringFilter;
 import org.dbflute.jdbc.StatementFactory;
@@ -135,11 +135,11 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
             return null;
         }
         final DBMeta dbmeta = cb.asDBMeta();
-        final UniqueInfo primaryUniqueInfo = dbmeta.getPrimaryUniqueInfo();
-        if (primaryUniqueInfo.isTwoOrMore()) { // basically no way, already checked
+        final PrimaryInfo primaryInfo = dbmeta.getPrimaryInfo();
+        if (primaryInfo.isCompoundKey()) { // basically no way, already checked
             return null;
         }
-        final ColumnInfo pkColumn = primaryUniqueInfo.getFirstColumn();
+        final ColumnInfo pkColumn = primaryInfo.getFirstColumn();
         final SqlClause sqlClause = cb.getSqlClause();
         final List<Object> pkList = doSplitSelectFirst(args, cb, dbmeta, sqlClause);
         if (pkList == null) { // no way just in case

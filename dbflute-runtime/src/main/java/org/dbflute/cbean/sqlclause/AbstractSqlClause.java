@@ -627,7 +627,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             // it always has union-query because it's handled before this process
             if (dbmeta.hasPrimaryKey()) {
                 columnInfoList = new ArrayList<ColumnInfo>();
-                columnInfoList.addAll(dbmeta.getPrimaryUniqueInfo().getUniqueColumnList());
+                columnInfoList.addAll(dbmeta.getPrimaryInfo().getPrimaryColumnList());
                 if (isSelectClauseTypeSpecifiedScalar()) {
                     final ColumnInfo specifiedColumn = getSpecifiedColumnInfoAsOne();
                     if (specifiedColumn != null && !specifiedColumn.isPrimary()) {
@@ -3408,7 +3408,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (columnParameterMap != null) {
             buildQueryUpdateSetClause(columnParameterMap, dbmeta, sb, null);
         }
-        final ColumnSqlName primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
+        final ColumnSqlName primaryKeyName = dbmeta.getPrimaryInfo().getFirstColumn().getColumnSqlName();
         final String selectClause = "select " + getBasePointAliasName() + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
         // Replace template marks. These are very important!

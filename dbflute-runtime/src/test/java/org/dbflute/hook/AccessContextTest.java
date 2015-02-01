@@ -16,6 +16,8 @@
 package org.dbflute.hook;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.dbflute.exception.AccessContextNoValueException;
@@ -178,6 +180,69 @@ public class AccessContextTest extends RuntimeTestCase {
             // OK
             log(e.getMessage());
         }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public void test_toString_basic() throws Exception {
+        // ## Arrange ##
+        AccessContext accessContext = new AccessContext();
+        Date currentDate = toDate("2015/01/18 23:47:22.123");
+        accessContext.setAccessDate(currentDate);
+        Timestamp currentTimestamp = toTimestamp("2015/01/18 23:48:52.456");
+        accessContext.setAccessTimestamp(currentTimestamp);
+        accessContext.setAccessUser("accessUser");
+        accessContext.setAccessProcess("accessProcess");
+        accessContext.setAccessModule("accessModule");
+        accessContext.registerAccessValue("foo", "bar");
+
+        // ## Act ##
+        String str = accessContext.toString();
+
+        // ## Assert ##
+        log(str);
+        StringBuilder sb = new StringBuilder();
+        sb.append("AccessContext:{");
+        sb.append("date=2015/01/18, timestamp=2015/01/18 23:48:52.456");
+        sb.append(", user=accessUser, process=accessProcess, module=accessModule, valueMap={foo=bar}}");
+        assertEquals(sb.toString(), str);
+    }
+
+    public void test_toString_localDate() throws Exception {
+        // ## Arrange ##
+        AccessContext accessContext = new AccessContext();
+        LocalDate currentDate = toLocalDate("2015/01/18 23:47:22.123");
+        accessContext.setAccessLocalDate(currentDate);
+        LocalDateTime currentTimestamp = toLocalDateTime("2015/01/18 23:48:52.456");
+        accessContext.setAccessLocalDateTime(currentTimestamp);
+
+        // ## Act ##
+        String str = accessContext.toString();
+
+        // ## Assert ##
+        log(str);
+        assertEquals("AccessContext:{localDate=2015-01-18, localDateTime=2015-01-18T23:48:52.456}", str);
+    }
+
+    public void test_toString_provider() throws Exception {
+        // ## Arrange ##
+        AccessContext accessContext = new AccessContext();
+        accessContext.setAccessLocalDateProvider(() -> null);
+        accessContext.setAccessLocalDateTimeProvider(() -> null);
+        accessContext.setAccessDateProvider(() -> null);
+        accessContext.setAccessTimestampProvider(() -> null);
+        accessContext.setAccessUserProvider(() -> null);
+        accessContext.setAccessProcessProvider(() -> null);
+        accessContext.setAccessModuleProvider(() -> null);
+
+        // ## Act ##
+        String str = accessContext.toString();
+
+        // ## Assert ##
+        log(str);
+        assertContainsAll(str, "localDateProvider", "localDateTimeProvider", "dateProvider", "timestampProvider");
+        assertContainsAll(str, "userProvider", "processProvider", "moduleProvider");
     }
 
     // ===================================================================================

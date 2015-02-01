@@ -78,7 +78,7 @@ public interface BehaviorReadable {
      * Read entity by condition-bean. <br>
      * An interface dispatch for selectEntity().
      * @param cb The instance of corresponding condition-bean. (NotNull)
-     * @return Read entity. (Nullalble)
+     * @return Read entity. (NullAllowed: when not found)
      */
     Entity readEntity(ConditionBean cb);
 

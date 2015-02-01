@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.freegen.xls;
+package org.dbflute.logic.manage.freegen.xls;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,10 +30,10 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfRequiredPropertyNotFoundException;
-import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
-import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
-import org.dbflute.properties.assistant.freegen.reflector.DfFreeGenLazyReflector;
-import org.dbflute.properties.assistant.freegen.reflector.DfFreeGenMethodConverter;
+import org.dbflute.logic.manage.freegen.DfFreeGenResource;
+import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.reflector.DfFreeGenLazyReflector;
+import org.dbflute.logic.manage.freegen.reflector.DfFreeGenMethodConverter;
 import org.dbflute.util.DfCollectionUtil;
 
 /**

@@ -13,29 +13,41 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.freegen;
+package org.dbflute.logic.manage.freegen;
+
+import java.util.List;
+import java.util.Map;
+
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  */
-public class DfFreeGenOutput {
+public class DfFreeGenTable {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _templateFile;
-    protected final String _outputDirectory;
-    protected final String _package;
-    protected final String _className; // (NullAllowed: when table list)
+    protected final Map<String, Object> _tableMap;
+    protected final String _tableName;
+    protected final List<Map<String, Object>> _columnList;
+    protected final Map<String, Map<String, Object>> _schemaMap;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenOutput(String templateFile, String outputDirectory, String pkg, String className) {
-        _templateFile = templateFile;
-        _outputDirectory = outputDirectory;
-        _package = pkg;
-        _className = className;
+    public DfFreeGenTable(Map<String, Object> tableMap, String tableName, List<Map<String, Object>> columnList) {
+        _tableMap = tableMap;
+        _tableName = tableName;
+        _columnList = columnList;
+        _schemaMap = DfCollectionUtil.emptyMap();
+    }
+
+    public DfFreeGenTable(Map<String, Object> tableMap, Map<String, Map<String, Object>> schemaMap) {
+        _tableMap = tableMap;
+        _tableName = null;
+        _columnList = DfCollectionUtil.emptyList();
+        _schemaMap = schemaMap;
     }
 
     // ===================================================================================
@@ -43,26 +55,37 @@ public class DfFreeGenOutput {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{templateFile=" + _templateFile + ", outputDirectory=" + _outputDirectory + ", package=" + _package + ", className="
-                + _className + "}";
+        if (_tableName != null) {
+            return "{tableName=" + _tableName + ", rowList.size()=" + _columnList.size() + "}";
+        } else {
+            return "{schemaMap.size=" + _schemaMap.size() + ", keys=" + _schemaMap.keySet() + "}";
+        }
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getTemplateFile() {
-        return _templateFile;
+    public Map<String, Object> getTableMap() {
+        return _tableMap;
     }
 
-    public String getOutputDirectory() {
-        return _outputDirectory;
+    public boolean isOnlyOneTable() {
+        return _tableName != null;
     }
 
-    public String getPackage() {
-        return _package;
+    public String getTableName() {
+        return _tableName;
     }
 
-    public String getClassName() {
-        return _className;
+    public List<Map<String, Object>> getColumnList() {
+        return _columnList;
+    }
+
+    public Map<String, Map<String, Object>> getSchemaMap() {
+        return _schemaMap;
+    }
+
+    public List<Map<String, Object>> getTableList() {
+        return DfCollectionUtil.newArrayList(_schemaMap.values());
     }
 }

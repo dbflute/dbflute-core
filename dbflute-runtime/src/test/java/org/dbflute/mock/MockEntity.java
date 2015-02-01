@@ -48,11 +48,17 @@ public class MockEntity implements Entity {
         return "Member";
     }
 
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
     public Set<String> mymodifiedProperties() {
         return Collections.emptySet();
     }
 
     public void mymodifyProperty(String propertyName) {
+    }
+
+    public void mymodifyPropertyCancel(String propertyName) {
     }
 
     public void clearModifiedInfo() {
@@ -72,9 +78,15 @@ public class MockEntity implements Entity {
     public void myspecifyProperty(String propertyName) {
     }
 
+    public void myspecifyPropertyCancel(String propertyName) {
+    }
+
     public void clearSpecifiedInfo() {
     }
 
+    // ===================================================================================
+    //                                                                          Unique Key
+    //                                                                          ==========
     public boolean hasPrimaryKeyValue() {
         return _memberId != null;
     }
@@ -83,23 +95,23 @@ public class MockEntity implements Entity {
         return Collections.emptySet();
     }
 
+    public void myuniqueByProperty(String propertyName) {
+    }
+
+    public void myuniqueByPropertyCancel(String propertyName) {
+    }
+
+    public void clearUniqueDrivenInfo() {
+    }
+
+    // ===================================================================================
+    //                                                                     Birthplace Mark
+    //                                                                     ===============
     public void markAsSelect() {
     }
 
     public boolean createdBySelect() {
         return false;
-    }
-
-    public int instanceHash() {
-        return super.hashCode();
-    }
-
-    public String toStringWithRelation() {
-        return null;
-    }
-
-    public String buildDisplayString(String name, boolean column, boolean relation) {
-        return null;
     }
 
     // ===================================================================================
@@ -126,6 +138,18 @@ public class MockEntity implements Entity {
     @Override
     public String toString() {
         return "{" + _memberId + ", " + _memberName + "}";
+    }
+
+    public int instanceHash() {
+        return super.hashCode();
+    }
+
+    public String toStringWithRelation() {
+        return null;
+    }
+
+    public String buildDisplayString(String name, boolean column, boolean relation) {
+        return null;
     }
 
     // ===================================================================================

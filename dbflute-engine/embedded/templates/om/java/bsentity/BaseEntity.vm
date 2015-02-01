@@ -155,8 +155,8 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
     }
 
     // ===================================================================================
-    //                                                                         Primary Key
-    //                                                                         ===========
+    //                                                                        Key Handling
+    //                                                                        ============
     /** {@inheritDoc} */
     public boolean hasPrimaryKeyValue() {
 #foreach ($col in $table.primaryKey)

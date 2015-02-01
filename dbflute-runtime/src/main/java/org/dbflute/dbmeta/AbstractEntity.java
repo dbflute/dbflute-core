@@ -110,6 +110,11 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     }
 
     /** {@inheritDoc} */
+    public void mymodifyPropertyCancel(String propertyName) {
+        __modifiedProperties.remove(propertyName);
+    }
+
+    /** {@inheritDoc} */
     public void clearModifiedInfo() {
         __modifiedProperties.clear();
     }
@@ -134,8 +139,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     /** {@inheritDoc} */
     public void modifiedToSpecified() {
         if (__modifiedProperties.isEmpty()) {
-            // basically no way when called in Framework (because called when SpecifyColumn exists)
-            return;
+            return; // basically no way when called in Framework (because called when SpecifyColumn exists)
         }
         __specifiedProperties = newModifiedProperties();
         __specifiedProperties.accept(__modifiedProperties);
@@ -154,6 +158,14 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
         registerSpecifiedProperty(propertyName);
     }
 
+    /** {@inheritDoc} */
+    public void myspecifyPropertyCancel(String propertyName) {
+        if (__specifiedProperties != null) {
+            __specifiedProperties.remove(propertyName);
+        }
+    }
+
+    /** {@inheritDoc} */
     public void clearSpecifiedInfo() {
         if (__specifiedProperties != null) {
             __specifiedProperties.clear();
@@ -171,8 +183,8 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     }
 
     // ===================================================================================
-    //                                                                         Primary Key
-    //                                                                         ===========
+    //                                                                        Key Handling
+    //                                                                        ============
     /** {@inheritDoc} */
     public Set<String> myuniqueDrivenProperties() {
         return __uniqueDrivenProperties.getPropertyNames();
@@ -180,6 +192,21 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
 
     protected EntityUniqueDrivenProperties newUniqueDrivenProperties() {
         return new EntityUniqueDrivenProperties();
+    }
+
+    /** {@inheritDoc} */
+    public void myuniqueByProperty(String propertyName) {
+        __uniqueDrivenProperties.addPropertyName(propertyName);
+    }
+
+    /** {@inheritDoc} */
+    public void myuniqueByPropertyCancel(String propertyName) {
+        __uniqueDrivenProperties.remove(propertyName);
+    }
+
+    /** {@inheritDoc} */
+    public void clearUniqueDrivenInfo() {
+        __uniqueDrivenProperties.clear();
     }
 
     // ===================================================================================
