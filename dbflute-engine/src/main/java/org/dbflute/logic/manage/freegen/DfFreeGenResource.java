@@ -13,9 +13,9 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.freegen;
+package org.dbflute.logic.manage.freegen;
 
-import org.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
+import org.dbflute.logic.manage.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
 import org.dbflute.util.Srl;
 
 /**

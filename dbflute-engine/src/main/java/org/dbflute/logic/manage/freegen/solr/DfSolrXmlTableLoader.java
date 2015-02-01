@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.freegen.solr;
+package org.dbflute.logic.manage.freegen.solr;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -26,8 +26,8 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
-import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenResource;
+import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 

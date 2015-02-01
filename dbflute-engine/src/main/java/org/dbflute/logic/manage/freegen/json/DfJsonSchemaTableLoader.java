@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.freegen.json;
+package org.dbflute.logic.manage.freegen.json;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,10 +22,10 @@ import java.util.Map.Entry;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
-import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
-import org.dbflute.properties.assistant.freegen.reflector.DfFreeGenLazyReflector;
-import org.dbflute.properties.assistant.freegen.reflector.DfFreeGenMethodConverter;
+import org.dbflute.logic.manage.freegen.DfFreeGenResource;
+import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.reflector.DfFreeGenLazyReflector;
+import org.dbflute.logic.manage.freegen.reflector.DfFreeGenMethodConverter;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 

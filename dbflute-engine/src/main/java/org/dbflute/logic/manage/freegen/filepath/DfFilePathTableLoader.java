@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.properties.assistant.freegen.filepath;
+package org.dbflute.logic.manage.freegen.filepath;
 
 import java.io.File;
 import java.util.List;
@@ -21,8 +21,8 @@ import java.util.Map;
 
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
-import org.dbflute.properties.assistant.freegen.DfFreeGenResource;
-import org.dbflute.properties.assistant.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenResource;
+import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
