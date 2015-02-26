@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -41,6 +41,7 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfJDBCException;
 import org.dbflute.exception.DfLoadDataRegistrationFailureException;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.filesystem.FileTextIO;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ValueType;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
@@ -127,6 +128,7 @@ public abstract class DfAbsractDataWriter {
         _stringProcessorList.add(new UUIDStringProcessor());
         _stringProcessorList.add(new ArrayStringProcessor());
         _stringProcessorList.add(new XmlStringProcessor());
+        _stringProcessorList.add(new LargeTextFileStringProcessor());
         _stringProcessorList.add(new BinaryFileStringProcessor());
         _stringProcessorList.add(new RealStringProcessor());
     }
@@ -410,11 +412,24 @@ public abstract class DfAbsractDataWriter {
         }
     }
 
+    protected class LargeTextFileStringProcessor implements StringProcessor {
+
+        public boolean process(String dataDirectory, File dataFile, String tableName, String columnName, String value, Connection conn,
+                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
+            return processLargeTextFile(dataDirectory, dataFile, tableName, columnName, value, ps, bindCount, columnInfoMap, rowNumber);
+        }
+
+        @Override
+        public String toString() {
+            return buildProcessorToString(this);
+        }
+    }
+
     protected class BinaryFileStringProcessor implements StringProcessor {
 
         public boolean process(String dataDirectory, File dataFile, String tableName, String columnName, String value, Connection conn,
                 PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
-            return processBinary(dataFile, tableName, columnName, value, ps, bindCount, columnInfoMap, rowNumber);
+            return processBinary(dataDirectory, dataFile, tableName, columnName, value, ps, bindCount, columnInfoMap, rowNumber);
         }
 
         @Override
@@ -504,7 +519,7 @@ public abstract class DfAbsractDataWriter {
                 return true;
             }
         }
-        // if meta data is not found (basically no way) 
+        // if meta data is not found (basically no way)
         try {
             final Boolean booleanValue = DfTypeUtil.toBoolean(value);
             ps.setBoolean(bindCount, booleanValue);
@@ -677,73 +692,111 @@ public abstract class DfAbsractDataWriter {
     }
 
     // -----------------------------------------------------
-    //                                                Binary
-    //                                                ------
-    protected boolean processBinary(File dataFile, String tableName, String columnName, String value, PreparedStatement ps, int bindCount,
-            Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
+    //                                       Large Text File
+    //                                       ---------------
+    // contributed by awaawa, thanks!
+    protected boolean processLargeTextFile(String dataDirectory, File dataFile, String tableName, String columnName, String value,
+            PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
         if (value == null || value.trim().length() == 0) { // cannot be binary
             return false;
         }
         final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
-        if (columnInfo != null) {
-            final Class<?> columnType = getBindType(tableName, columnInfo);
-            if (columnType != null) {
-                if (!byte[].class.isAssignableFrom(columnType)) {
-                    return false;
-                }
-                // the value should be a path to a binary file
-                // from data file's current directory
-                final String path;
-                final String trimmedValue = value.trim();
-                if (trimmedValue.startsWith("/")) { // means absolute path
-                    path = trimmedValue;
-                } else {
-                    final String dataFilePath = Srl.replace(dataFile.getAbsolutePath(), "\\", "/");
-                    final String baseDirPath = Srl.substringLastFront(dataFilePath, "/");
-                    path = baseDirPath + "/" + trimmedValue;
-                }
-                final File binaryFile = new File(path);
-                if (!binaryFile.exists()) {
-                    throwLoadDataBinaryFileNotFoundException(tableName, columnName, path, rowNumber);
-                }
-                final List<Byte> byteList = new ArrayList<Byte>();
-                BufferedInputStream bis = null;
-                try {
-                    bis = new BufferedInputStream(new FileInputStream(binaryFile));
-                    for (int availableSize; (availableSize = bis.available()) > 0;) {
-                        final byte[] bytes = new byte[availableSize];
-                        bis.read(bytes);
-                        for (byte b : bytes) {
-                            byteList.add(b);
-                        }
-                    }
-                    byte[] bytes = new byte[byteList.size()];
-                    for (int i = 0; i < byteList.size(); i++) {
-                        bytes[i] = byteList.get(i);
-                    }
-                    ps.setBytes(bindCount, bytes);
-                } catch (IOException e) {
-                    throwLoadDataBinaryFileReadFailureException(tableName, columnName, path, rowNumber, e);
-                } finally {
-                    if (bis != null) {
-                        try {
-                            bis.close();
-                        } catch (IOException ignored) {}
-                    }
-                }
-                return true;
-            }
+        if (columnInfo == null) {
+            return false; // unsupported when meta data is not found
         }
-        // unsupported when meta data is not found
-        return false;
+        final Class<?> columnType = getBindType(tableName, columnInfo);
+        if (columnType == null) {
+            return false; // unsupported too
+        }
+        if (!isLargeTextFile(dataDirectory, tableName, columnName)) {
+            return false; // not target as large text file
+        }
+        // the value should be a path to a text file
+        // from data file's current directory
+        final String path;
+        final String trimmedValue = value.trim();
+        if (trimmedValue.startsWith("/")) { // means absolute path
+            path = trimmedValue;
+        } else {
+            final String dataFilePath = Srl.replace(dataFile.getAbsolutePath(), "\\", "/");
+            final String baseDirPath = Srl.substringLastFront(dataFilePath, "/");
+            path = baseDirPath + "/" + trimmedValue;
+        }
+        final File textFile = new File(path);
+        if (!textFile.exists()) {
+            throwLoadDataTextFileReadFailureException(tableName, columnName, path, rowNumber);
+        }
+        try {
+            StringBuilder sb = new StringBuilder();
+            final String read = new FileTextIO().encodeAsUTF8().read(path);
+            sb.append(read);
+            ps.setString(bindCount, sb.toString());
+        } catch (RuntimeException e) {
+            throwLoadDataTextFileReadFailureException(tableName, columnName, path, rowNumber, e);
+        }
+        return true;
     }
 
-    protected String filterBinary(String value) {
-        if (value == null) {
-            return null;
+    // -----------------------------------------------------
+    //                                                Binary
+    //                                                ------
+    protected boolean processBinary(String dataDirectory, File dataFile, String tableName, String columnName, String value,
+            PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
+        if (value == null || value.trim().length() == 0) { // cannot be binary
+            return false;
         }
-        value = value.trim();
-        return value;
+        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
+        if (columnInfo == null) {
+            return false; // unsupported when meta data is not found
+        }
+        final Class<?> columnType = getBindType(tableName, columnInfo);
+        if (columnType == null) {
+            return false; // unsupported too
+        }
+        if (!byte[].class.isAssignableFrom(columnType)) { // not binary
+            return false;
+        }
+        // the value should be a path to a binary file
+        // from data file's current directory
+        final String path;
+        final String trimmedValue = value.trim();
+        if (trimmedValue.startsWith("/")) { // means absolute path
+            path = trimmedValue;
+        } else {
+            final String dataFilePath = Srl.replace(dataFile.getAbsolutePath(), "\\", "/");
+            final String baseDirPath = Srl.substringLastFront(dataFilePath, "/");
+            path = baseDirPath + "/" + trimmedValue;
+        }
+        final File binaryFile = new File(path);
+        if (!binaryFile.exists()) {
+            throwLoadDataBinaryFileNotFoundException(tableName, columnName, path, rowNumber);
+        }
+        final List<Byte> byteList = new ArrayList<Byte>();
+        BufferedInputStream bis = null;
+        try {
+            bis = new BufferedInputStream(new FileInputStream(binaryFile));
+            for (int availableSize; (availableSize = bis.available()) > 0;) {
+                final byte[] bytes = new byte[availableSize];
+                bis.read(bytes);
+                for (byte b : bytes) {
+                    byteList.add(b);
+                }
+            }
+            byte[] bytes = new byte[byteList.size()];
+            for (int i = 0; i < byteList.size(); i++) {
+                bytes[i] = byteList.get(i);
+            }
+            ps.setBytes(bindCount, bytes);
+        } catch (IOException e) {
+            throwLoadDataBinaryFileReadFailureException(tableName, columnName, path, rowNumber, e);
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException ignored) {}
+            }
+        }
+        return true;
     }
 
     protected void throwLoadDataBinaryFileNotFoundException(String tableName, String columnName, String path, int rowNumber) {
@@ -751,14 +804,7 @@ public abstract class DfAbsractDataWriter {
         br.addNotice("The binary file specified at delimiter data was not found.");
         br.addItem("Advice");
         br.addElement("Make sure your path to a binary file is correct.");
-        br.addItem("Table");
-        br.addElement(tableName);
-        br.addItem("Column");
-        br.addElement(columnName);
-        br.addItem("Path");
-        br.addElement(path);
-        br.addItem("Row Number");
-        br.addElement(rowNumber);
+        setupOutsideFileBasicItem(tableName, columnName, path, rowNumber, br);
         final String msg = br.buildExceptionMessage();
         throw new DfLoadDataRegistrationFailureException(msg);
     }
@@ -767,19 +813,45 @@ public abstract class DfAbsractDataWriter {
             IOException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to read the binary file.");
-        br.addItem("Table");
-        br.addElement(tableName);
-        br.addItem("Column");
-        br.addElement(columnName);
-        br.addItem("Path");
-        br.addElement(path);
-        br.addItem("Row Number");
-        br.addElement(rowNumber);
+        setupOutsideFileBasicItem(tableName, columnName, path, rowNumber, br);
         br.addItem("IOException");
         br.addElement(cause.getClass());
         br.addElement(cause.getMessage());
         final String msg = br.buildExceptionMessage();
         throw new DfLoadDataRegistrationFailureException(msg, cause);
+    }
+
+    protected void throwLoadDataTextFileReadFailureException(String tableName, String columnName, String path, int rowNumber) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to read the text file.");
+        br.addItem("Advice");
+        br.addElement("Make sure your path to a text file is correct.");
+        setupOutsideFileBasicItem(tableName, columnName, path, rowNumber, br);
+        final String msg = br.buildExceptionMessage();
+        throw new DfLoadDataRegistrationFailureException(msg);
+    }
+
+    protected void throwLoadDataTextFileReadFailureException(String tableName, String columnName, String path, int rowNumber,
+            RuntimeException cause) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to read the text file.");
+        setupOutsideFileBasicItem(tableName, columnName, path, rowNumber, br);
+        br.addItem("Runtime Exception");
+        br.addElement(cause.getClass());
+        br.addElement(cause.getMessage());
+        final String msg = br.buildExceptionMessage();
+        throw new DfLoadDataRegistrationFailureException(msg, cause);
+    }
+
+    protected void setupOutsideFileBasicItem(String tableName, String columnName, String path, int rowNumber, ExceptionMessageBuilder br) {
+        br.addItem("Table");
+        br.addElement(tableName);
+        br.addItem("Column");
+        br.addElement(columnName);
+        br.addItem("File Path");
+        br.addElement(path);
+        br.addItem("Row Number");
+        br.addElement(rowNumber);
     }
 
     // ===================================================================================
@@ -867,7 +939,7 @@ public abstract class DfAbsractDataWriter {
      * @param ps The prepared statement. (NotNull)
      * @param bindCount The count of binding.
      * @param obj The bound value. (NotNull)
-     * @param rowNumber The row number of the current value. 
+     * @param rowNumber The row number of the current value.
      * @throws SQLException When it fails to handle the SQL.
      */
     protected void bindNotNullValueByInstance(String tableName, String columnName, Connection conn, PreparedStatement ps, int bindCount,
@@ -1097,6 +1169,10 @@ public abstract class DfAbsractDataWriter {
 
     protected boolean isRTrimCellValue(String dataDirectory) {
         return _loadingControlProp.isRTrimCellValue(dataDirectory);
+    }
+
+    protected boolean isLargeTextFile(String dataDirectory, String tableName, String columnName) {
+        return _loadingControlProp.isLargeTextFile(dataDirectory, tableName, columnName);
     }
 
     // ===================================================================================

@@ -57,6 +57,7 @@ public class DfLoadingControlProp {
     private static final Logger _log = LoggerFactory.getLogger(DfLoadingControlProp.class);
     public static final String LOADING_CONTROL_MAP_NAME = "loadingControlMap.dataprop";
     public static final String PROP_DATE_ADJUSTMENT_MAP = "dateAdjustmentMap";
+    public static final String PROP_LARGE_TEXT_FILE_MAP = "largeTextFileMap";
     public static final String KEY_ORIGIN_DATE = "df:originDate";
     public static final String KEY_MILLIS_COLUMN_LIST = "df:millisColumnList";
     protected static final String KEY_ALL_MARK = "$$ALL$$";
@@ -453,6 +454,28 @@ public class DfLoadingControlProp {
     }
 
     // ===================================================================================
+    //                                                                          Large Text
+    //                                                                          ==========
+    public boolean isLargeTextFile(String dataDirectory, String tableName, String columnName) {
+        final Map<String, Object> largeTextFileMap = getLargeTextFileMap(dataDirectory);
+        if (largeTextFileMap == null || largeTextFileMap.isEmpty()) {
+            return false;
+        }
+        @SuppressWarnings("unchecked")
+        final List<String> columnList = (List<String>) largeTextFileMap.get(tableName);
+        if (columnList == null || columnList.isEmpty()) {
+            return false;
+        }
+        return DfNameHintUtil.isTargetByHint(columnName, columnList, DfCollectionUtil.emptyList());
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> getLargeTextFileMap(String dataDirectory) {
+        final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
+        return (Map<String, Object>) loadingControlMap.get(PROP_LARGE_TEXT_FILE_MAP);
+    }
+
+    // ===================================================================================
     //                                                                 Loading Control Map
     //                                                                 ===================
     protected Map<String, Object> getLoadingControlMap(String dataDirectory) {
@@ -480,6 +503,8 @@ public class DfLoadingControlProp {
             final Object value = entry.getValue();
             if (PROP_DATE_ADJUSTMENT_MAP.equals(key)) {
                 analyzeDateAdjustmentMap(dataDirectory, analyzedMap, key, value);
+            } else if (PROP_LARGE_TEXT_FILE_MAP.equals(key)) {
+                analyzeLargeTextFileMap(dataDirectory, analyzedMap, key, value);
             } else {
                 analyzedMap.put(key, value);
             }
@@ -545,6 +570,20 @@ public class DfLoadingControlProp {
         br.addElement(value);
         final String msg = br.buildExceptionMessage();
         throw new DfLoadDataRegistrationFailureException(msg, e);
+    }
+
+    protected void analyzeLargeTextFileMap(String dataDirectory, Map<String, Object> analyzedMap, String key, Object value) {
+        // ; $$ALL$$ = list:{suffix:_TEXT}
+        // ; MEMBER = list:{MEMBER_NAME}
+        final Map<String, Object> flTableMap = StringKeyMap.createAsFlexibleOrdered();
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> elementTableMap = (Map<String, Object>) value;
+        for (Entry<String, Object> elementTableEntry : elementTableMap.entrySet()) {
+            final String tableName = elementTableEntry.getKey();
+            final Object columnList = elementTableEntry.getValue();
+            flTableMap.put(tableName, columnList);
+        }
+        analyzedMap.put(key, flTableMap);
     }
 
     protected void showLoadingControlMap(Map<String, Object> analyzedMap) {
