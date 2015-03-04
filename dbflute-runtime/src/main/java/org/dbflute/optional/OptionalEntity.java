@@ -31,7 +31,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
  *     <span style="color: #3F7E5E">// called if present, or exception</span>
  *     ... = <span style="color: #553000">member</span>.getMemberName();
  * });
- * 
+ *
  * <span style="color: #3F7E5E">// if it might be no data, ...</span>
  * <span style="color: #0000C0">memberBhv</span>.<span style="color: #994747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> <span style="color: #553000">cb</span>.acceptPK(<span style="color: #2A00FF">1</span>)).<span style="color: #CC4747">ifPresent</span>(<span style="color: #553000">member</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
  *     <span style="color: #3F7E5E">// called if present</span>
@@ -302,6 +302,12 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     public <RESULT> OptionalThing<RESULT> flatMap(OptionalThingFunction<? super ENTITY, OptionalThing<RESULT>> entityLambda) {
         assertEntityLambdaNotNull(entityLambda);
         return callbackFlatMapping(entityLambda);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected <ARG> OptionalEntity<ARG> createOptionalFlatMappedObject(ARG obj) {
+        return new OptionalEntity<ARG>(obj, _thrower);
     }
 
     // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/

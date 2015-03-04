@@ -113,6 +113,15 @@ public class OptionalEntityTest extends RuntimeTestCase {
         assertTrue(firstOpt.equals(secondOpt));
     }
 
+    public void test_empty_flatmap() throws Exception {
+        // ## Arrange ##
+        OptionalEntity<MockEntity> opt = prepareOpt(null);
+        // ## Act ##
+        MockEntity mock = opt.flatMap(OptionalEntity::of).orElseNull();
+        // ## Assert ##
+        assertNull(mock);
+    }
+
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========

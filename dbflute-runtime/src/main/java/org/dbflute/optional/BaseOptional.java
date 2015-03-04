@@ -218,8 +218,15 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
             String msg = "The argument 'mapper' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        return exists() ? mapper.apply(_obj) : null;
+        return exists() ? mapper.apply(_obj) : createOptionalFlatMappedObject(null);
     }
+
+    /**
+     * @param <ARG> The type of value for optional thing.
+     * @param obj The plain object for the optional thing. (NullAllowed: if null, return s empty optional)
+     * @return The new-created instance of optional thing. (NotNull)
+     */
+    protected abstract <ARG> OptionalThing<ARG> createOptionalFlatMappedObject(ARG obj);
 
     // ===================================================================================
     //                                                                   Standard Optional

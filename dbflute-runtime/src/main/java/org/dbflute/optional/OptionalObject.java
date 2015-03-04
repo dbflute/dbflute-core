@@ -138,6 +138,12 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
     }
 
     /** {@inheritDoc} */
+    @Override
+    protected <ARG> OptionalObject<ARG> createOptionalFlatMappedObject(ARG obj) {
+        return new OptionalObject<ARG>(obj, _thrower);
+    }
+
+    /** {@inheritDoc} */
     public OBJ orElse(OBJ other) {
         return directlyGetOrElse(other);
     }
