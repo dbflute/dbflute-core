@@ -138,6 +138,12 @@ public class OptionalScalar<SCALAR> extends BaseOptional<SCALAR> {
     }
 
     /** {@inheritDoc} */
+    @Override
+    protected <ARG> OptionalScalar<ARG> createOptionalFlatMappedObject(ARG obj) {
+        return new OptionalScalar<ARG>(obj, _thrower);
+    }
+
+    /** {@inheritDoc} */
     public SCALAR orElse(SCALAR other) {
         return directlyGetOrElse(other);
     }
