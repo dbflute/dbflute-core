@@ -21,6 +21,7 @@ import java.util.Optional;
  * The base class for optional object.
  * @param <OBJ> The type of wrapped object in the optional object.
  * @author jflute
+ * @author pull/23 (2015/03/04 Wednesday)
  * @since 1.0.5F (2014/05/10 Saturday)
  */
 public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
@@ -218,6 +219,7 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
             String msg = "The argument 'mapper' should not be null.";
             throw new IllegalArgumentException(msg);
         }
+        // pull request, thanks! https://github.com/dbflute/dbflute-core/pull/23
         return exists() ? mapper.apply(_obj) : createOptionalFlatMappedObject(null);
     }
 
