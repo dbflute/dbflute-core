@@ -119,7 +119,7 @@ public class MockEntity implements Entity {
     //                                                                      ==============
     @Override
     public int hashCode() {
-        return _memberId;
+        return _memberId != null ? _memberId : 0;
     }
 
     @Override

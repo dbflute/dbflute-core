@@ -168,7 +168,10 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
         callbackAlwaysPresent(oneArgLambda);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     * @deprecated basically use ifPresent() or use orElse(null)
+     */
     public OBJ orElseNull() {
         return directlyGetOrElse(null);
     }

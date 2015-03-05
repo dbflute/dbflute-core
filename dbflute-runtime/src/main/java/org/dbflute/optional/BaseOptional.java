@@ -190,7 +190,7 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
     //                                                 -----
     /**
      * @param <RESULT> The type of mapping result.
-     * @param mapper The callback interface to apply. (NotNull)
+     * @param mapper The callback interface to apply, null return allowed as empty. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     protected <RESULT> OptionalThing<RESULT> callbackMapping(OptionalThingFunction<? super OBJ, ? extends RESULT> mapper) {
@@ -211,8 +211,8 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
 
     /**
      * @param <RESULT> The type of mapping result.
-     * @param mapper The callback interface to apply. (NotNull)
-     * @return The optional thing as flat-mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
+     * @param mapper The callback interface to apply, cannot return null. (NotNull)
+     * @return The optional thing as flat-mapped result. (NotNull, EmptyOptionalAllowed: when not present)
      */
     protected <RESULT> OptionalThing<RESULT> callbackFlatMapping(OptionalThingFunction<? super OBJ, OptionalThing<RESULT>> mapper) {
         if (mapper == null) {
@@ -220,7 +220,17 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
             throw new IllegalArgumentException(msg);
         }
         // pull request, thanks! https://github.com/dbflute/dbflute-core/pull/23
-        return exists() ? mapper.apply(_obj) : createOptionalFlatMappedObject(null);
+        if (exists()) {
+            final OptionalThing<RESULT> applied = mapper.apply(_obj);
+            if (applied == null) { // same specification as official optional's flatMap
+                String msg = "The function of your flatMap returned null: function=" + mapper;
+                throw new IllegalStateException(msg);
+            } else {
+                return applied;
+            }
+        } else {
+            return createOptionalFlatMappedObject(null);
+        }
     }
 
     /**
