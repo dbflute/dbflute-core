@@ -37,4 +37,13 @@ public interface SqlFireHook {
      * @param fireResultInfo The information of SQL fire result. (NotNull)
      */
     void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo);
+
+    /**
+     * Does it inherit the existing hook? <br>
+     * Completely overriding as default but you can inherit it by this determination.
+     * @return The determination, true or false.
+     */
+    default boolean inheritsExistingHook() {
+        return false;
+    }
 }

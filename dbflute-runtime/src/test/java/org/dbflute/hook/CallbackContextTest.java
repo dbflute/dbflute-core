@@ -111,6 +111,90 @@ public class CallbackContextTest extends RuntimeTestCase {
     }
 
     // ===================================================================================
+    //                                                                         SqlFireHook
+    //                                                                         ===========
+    public void test_SqlFireHook_twiceSet_default() throws Exception {
+        // ## Arrange ##
+        CallbackContext context = new CallbackContext();
+        assertNull(context.getSqlFireHook());
+
+        // ## Act ##
+        context.setSqlFireHook(new SqlFireHook() {
+            public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+                fail();
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+                fail();
+            }
+        });
+        context.setSqlFireHook(new SqlFireHook() {
+            public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+                log("2");
+                markHere("secondBefore");
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+                log("3");
+                markHere("secondFinally");
+            }
+        });
+
+        // ## Assert ##
+        SqlFireHook hook = context.getSqlFireHook();
+        assertFalse(hook.inheritsExistingHook());
+        hook.hookBefore(null, null);
+        hook.hookFinally(null, null);
+        assertMarked("secondBefore");
+        assertMarked("secondFinally");
+    }
+
+    public void test_SqlFireHook_twiceSet_inherits() throws Exception {
+        // ## Arrange ##
+        CallbackContext context = new CallbackContext();
+        assertNull(context.getSqlFireHook());
+
+        // ## Act ##
+        context.setSqlFireHook(new SqlFireHook() {
+            public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+                log("1");
+                markHere("firstBefore");
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+                log("4");
+                markHere("firstFinally");
+            }
+        });
+        context.setSqlFireHook(new SqlFireHook() {
+            public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+                log("2");
+                markHere("secondBefore");
+            }
+
+            public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+                log("3");
+                markHere("secondFinally");
+            }
+
+            @Override
+            public boolean inheritsExistingHook() {
+                return true;
+            }
+        });
+
+        // ## Assert ##
+        SqlFireHook hook = context.getSqlFireHook();
+        assertFalse(hook.inheritsExistingHook());
+        hook.hookBefore(null, null);
+        hook.hookFinally(null, null);
+        assertMarked("firstBefore");
+        assertMarked("secondBefore");
+        assertMarked("secondFinally");
+        assertMarked("firstFinally");
+    }
+
+    // ===================================================================================
     //                                                                          Management
     //                                                                          ==========
     public void test_useThreadLocalProvider_basic() throws Exception {

@@ -526,10 +526,8 @@ public class CallbackContext {
     }
 
     /**
-     * Set the hook interface of SQL fires. <br>
-     * This hook interface is called back before firing SQL and finally. <br> 
-     * The hook methods may be called by nested process
-     * so you should pay attention to it when you implements this.
+     * Set the hook interface of SQL fires. (overriding existing hook as default) <br>
+     * This hook interface is called back before firing SQL and finally. 
      * <pre>
      * context.setSqlFireHook(new SqlFireHook() {
      *     public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
@@ -540,10 +538,45 @@ public class CallbackContext {
      *     }
      * });
      * </pre>
+     * <p>The hook methods may be called by nested process so you should pay attention to it when you implements this.</p>
+     * <p>Also you can inherit the existing hook with your hook by overriding isInheritExistingHook().</p>
      * @param sqlFireHook The hook interface of SQL fires. (NullAllowed)
      */
     public void setSqlFireHook(SqlFireHook sqlFireHook) {
-        _sqlFireHook = sqlFireHook;
+        if (sqlFireHook != null && sqlFireHook.inheritsExistingHook()) {
+            _sqlFireHook = createInheritableSqlFireHook(sqlFireHook);
+        } else {
+            _sqlFireHook = sqlFireHook;
+        }
+    }
+
+    protected InheritableSqlFireHook createInheritableSqlFireHook(SqlFireHook sqlFireHook) {
+        return new InheritableSqlFireHook(_sqlFireHook, sqlFireHook);
+    }
+
+    protected static class InheritableSqlFireHook implements SqlFireHook {
+
+        protected final SqlFireHook _originally; // might be null
+        protected final SqlFireHook _yourHook;
+
+        public InheritableSqlFireHook(SqlFireHook originally, SqlFireHook yourHook) {
+            _originally = originally;
+            _yourHook = yourHook;
+        }
+
+        public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+            if (_originally != null) {
+                _originally.hookBefore(meta, fireReadyInfo);
+            }
+            _yourHook.hookBefore(meta, fireReadyInfo);
+        }
+
+        public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+            _yourHook.hookFinally(meta, fireResultInfo);
+            if (_originally != null) {
+                _originally.hookFinally(meta, fireResultInfo);
+            }
+        }
     }
 
     // -----------------------------------------------------
