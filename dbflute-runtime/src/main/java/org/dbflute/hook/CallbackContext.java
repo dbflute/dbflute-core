@@ -478,7 +478,20 @@ public class CallbackContext {
      * });
      * </pre>
      * <p>The hook methods may be called by nested process so you should pay attention to it when you implements this.</p>
-     * <p>Also you can inherit the existing hook with your hook by overriding isInheritExistingHook().</p>
+     * <p>Also you can inherit the existing hook with your hook by overriding inheritsExistingHook().</p>
+     * <pre>
+     * context.setBehaviorCommandHook(new BehaviorCommandHook() {
+     *     public void hookBefore(BehaviorCommandMeta meta) {
+     *         ...
+     *     }
+     *     public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+     *         ...
+     *     }
+     *     public boolean inheritsExistingHook() {
+     *         return true; // also existing hooks will be executed, 
+     *     }
+     * });
+     * </pre>
      * @param behaviorCommandHook The hook interface of behavior commands. (NullAllowed)
      */
     public void setBehaviorCommandHook(BehaviorCommandHook behaviorCommandHook) {
@@ -539,7 +552,20 @@ public class CallbackContext {
      * });
      * </pre>
      * <p>The hook methods may be called by nested process so you should pay attention to it when you implements this.</p>
-     * <p>Also you can inherit the existing hook with your hook by overriding isInheritExistingHook().</p>
+     * <p>Also you can inherit the existing hook with your hook by overriding inheritsExistingHook().</p>
+     * <pre>
+     * context.setSqlFireHook(new SqlFireHook() {
+     *     public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+     *         ...
+     *     }
+     *     public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+     *         ...
+     *     }
+     *     public boolean inheritsExistingHook() {
+     *         return true; // also existing hooks will be executed, 
+     *     }
+     * });
+     * </pre>
      * @param sqlFireHook The hook interface of SQL fires. (NullAllowed)
      */
     public void setSqlFireHook(SqlFireHook sqlFireHook) {
