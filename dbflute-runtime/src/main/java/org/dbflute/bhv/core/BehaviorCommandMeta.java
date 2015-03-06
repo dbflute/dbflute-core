@@ -173,7 +173,7 @@ public interface BehaviorCommandMeta {
      * Get the invoke path of behavior command lazily. <br>
      * Invoke path is e.g. FooAction.index():38 -&gt; BarLogic.selectQux():127 -&gt; ... <br>
      * To create this path needs stack trace (from exception instance) so lazily.
-     * @return The display string of invoke path. (NotNull)
+     * @return The display string of invoke path. (NullAllowed: e.g. before provider setup)
      */
     String getInvokePath();
 }
