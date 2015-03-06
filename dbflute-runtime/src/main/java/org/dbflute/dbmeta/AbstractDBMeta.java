@@ -84,17 +84,17 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                  Information Resource
     //                                  --------------------
     // lazy-initialized at corresponding getters
-    private volatile StringKeyMap<String> _tableDbNameFlexibleMap;
-    private volatile StringKeyMap<String> _tablePropertyNameFlexibleMap;
+    private volatile Map<String, String> _tableDbNameFlexibleMap;
+    private volatile Map<String, String> _tablePropertyNameFlexibleMap;
     private volatile List<ColumnInfo> _columnInfoList;
     private volatile StringKeyMap<ColumnInfo> _columnInfoFlexibleMap;
     private volatile PrimaryInfo _primaryInfo;
     private volatile List<UniqueInfo> _uniqueInfoList;
     private volatile List<ForeignInfo> _foreignInfoList;
-    private volatile StringKeyMap<ForeignInfo> _foreignInfoFlexibleMap;
+    private volatile Map<String, ForeignInfo> _foreignInfoFlexibleMap;
     private volatile Map<Integer, ForeignInfo> _foreignInfoRelationNoKeyMap;
     private volatile List<ReferrerInfo> _referrerInfoList;
-    private volatile StringKeyMap<ReferrerInfo> _referrerInfoFlexibleMap;
+    private volatile Map<String, ReferrerInfo> _referrerInfoFlexibleMap;
 
     // ===================================================================================
     //                                                             Resource Initialization
@@ -268,7 +268,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                          ------------
     /**
      * Get the flexible map of table DB name.
-     * @return The flexible map of table DB name. (NotNull, NotEmpty)
+     * @return The flexible map of table DB name. (NotNull, NotEmpty, ReadOnly)
      */
     protected Map<String, String> getTableDbNameFlexibleMap() {
         if (_tableDbNameFlexibleMap != null) {
@@ -278,15 +278,16 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_tableDbNameFlexibleMap != null) {
                 return _tableDbNameFlexibleMap;
             }
-            _tableDbNameFlexibleMap = createFlexibleConcurrentMap();
-            _tableDbNameFlexibleMap.put(getTableDbName(), getTableDbName());
+            final StringKeyMap<String> map = createFlexibleConcurrentMap();
+            map.put(getTableDbName(), getTableDbName());
+            _tableDbNameFlexibleMap = Collections.unmodifiableMap(map);
             return _tableDbNameFlexibleMap;
         }
     }
 
     /**
      * Get the flexible map of table property name.
-     * @return The flexible map of table property name. (NotNull, NotEmpty)
+     * @return The flexible map of table property name. (NotNull, NotEmpty, ReadOnly)
      */
     protected Map<String, String> getTablePropertyNameFlexibleMap() {
         if (_tablePropertyNameFlexibleMap != null) {
@@ -296,9 +297,10 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_tablePropertyNameFlexibleMap != null) {
                 return _tablePropertyNameFlexibleMap;
             }
-            _tablePropertyNameFlexibleMap = createFlexibleConcurrentMap();
-            _tablePropertyNameFlexibleMap.put(getTableDbName(), getTablePropertyName());
-            return _tableDbNameFlexibleMap;
+            final StringKeyMap<String> map = createFlexibleConcurrentMap();
+            map.put(getTableDbName(), getTablePropertyName());
+            _tablePropertyNameFlexibleMap = Collections.unmodifiableMap(map);
+            return _tablePropertyNameFlexibleMap;
         }
     }
 
@@ -648,7 +650,7 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * Get the flexible map of foreign information.
-     * @return The flexible map of foreign information. (NotNull)
+     * @return The flexible map of foreign information. (NotNull, EmptyAllowed, ReadOnly)
      */
     protected Map<String, ForeignInfo> getForeignInfoFlexibleMap() {
         if (_foreignInfoFlexibleMap != null) {
@@ -659,17 +661,18 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_foreignInfoFlexibleMap != null) {
                 return _foreignInfoFlexibleMap;
             }
-            _foreignInfoFlexibleMap = createFlexibleConcurrentMap();
+            final StringKeyMap<ForeignInfo> map = createFlexibleConcurrentMap();
             for (ForeignInfo foreignInfo : foreignInfoList) {
-                _foreignInfoFlexibleMap.put(foreignInfo.getForeignPropertyName(), foreignInfo);
+                map.put(foreignInfo.getForeignPropertyName(), foreignInfo);
             }
+            _foreignInfoFlexibleMap = Collections.unmodifiableMap(map);
             return _foreignInfoFlexibleMap;
         }
     }
 
     /**
      * Get the relation-no key map of foreign information.
-     * @return The flexible map of foreign information. (NotNull)
+     * @return The unordered map of foreign information. (NotNull, EmptyAllowed, ReadOnly)
      */
     protected Map<Integer, ForeignInfo> getForeignInfoRelationNoKeyMap() {
         if (_foreignInfoRelationNoKeyMap != null) {
@@ -680,10 +683,11 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_foreignInfoRelationNoKeyMap != null) {
                 return _foreignInfoRelationNoKeyMap;
             }
-            _foreignInfoRelationNoKeyMap = newLinkedHashMap();
+            final Map<Integer, ForeignInfo> map = newConcurrentHashMap();
             for (ForeignInfo foreignInfo : foreignInfoList) {
-                _foreignInfoRelationNoKeyMap.put(foreignInfo.getRelationNo(), foreignInfo);
+                map.put(foreignInfo.getRelationNo(), foreignInfo);
             }
+            _foreignInfoRelationNoKeyMap = Collections.unmodifiableMap(map);
             return _foreignInfoRelationNoKeyMap;
         }
     }
@@ -787,7 +791,7 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * Get the flexible map of referrer information.
-     * @return The flexible map of referrer information. (NotNull)
+     * @return The flexible map of referrer information. (NotNull, EmptyAllowed, ReadOnly)
      */
     protected Map<String, ReferrerInfo> getReferrerInfoFlexibleMap() {
         if (_referrerInfoFlexibleMap != null) {
@@ -798,10 +802,11 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_referrerInfoFlexibleMap != null) {
                 return _referrerInfoFlexibleMap;
             }
-            _referrerInfoFlexibleMap = createFlexibleConcurrentMap();
+            final StringKeyMap<ReferrerInfo> map = createFlexibleConcurrentMap();
             for (ReferrerInfo referrerInfo : referrerInfoList) {
-                _referrerInfoFlexibleMap.put(referrerInfo.getReferrerPropertyName(), referrerInfo);
+                map.put(referrerInfo.getReferrerPropertyName(), referrerInfo);
             }
+            _referrerInfoFlexibleMap = Collections.unmodifiableMap(map);
             return _referrerInfoFlexibleMap;
         }
     }

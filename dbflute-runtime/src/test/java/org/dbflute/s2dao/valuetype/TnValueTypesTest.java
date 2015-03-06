@@ -25,6 +25,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -229,6 +230,10 @@ public class TnValueTypesTest extends RuntimeTestCase {
 
         public String alias() {
             return null;
+        }
+
+        public Set<String> sisterSet() {
+            return DfCollectionUtil.emptySet();
         }
 
         public boolean inGroup(String groupName) {

@@ -60,7 +60,7 @@ public class InvokeNameExtractor {
             return new ArrayList<InvokeNameResult>(2); // writable just in case
         }
         final int loopSize = resource.getLoopSize();
-        if (startIndex < 0) { // basically no way but just in case
+        if (loopSize < 0) { // basically no way but just in case
             return new ArrayList<InvokeNameResult>(2); // writable just in case
         }
         for (int i = startIndex; i < _stackTrace.length; i++) {

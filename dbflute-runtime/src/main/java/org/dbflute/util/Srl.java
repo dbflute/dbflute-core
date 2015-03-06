@@ -1095,9 +1095,6 @@ public class Srl {
         if (suffixes == null || suffixes.length == 0) {
             return false;
         }
-        if (suffixes.length == 0) {
-            return false;
-        }
         if (ignoreCase) {
             str = str.toLowerCase();
         }
