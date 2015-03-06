@@ -63,7 +63,7 @@ public interface ${glCDef} extends Classification {
         static {
             for (${classificationName} value : values()) {
                 _codeValueMap.put(value.code().toLowerCase(), value);
-                for (String sister : value.sisters()) { _codeValueMap.put(sister.toLowerCase(), value); }
+                for (String sister : value.sisterSet()) { _codeValueMap.put(sister.toLowerCase(), value); }
             }
         }
 #if ($database.hasClassificationSubItemMap($classificationName))
@@ -85,11 +85,11 @@ public interface ${glCDef} extends Classification {
 #end
         }
 #end
-        private String _code; private String _alias; private String[] _sisters;
+        private String _code; private String _alias; private Set<String> _sisterSet;
         private ${classificationName}(String code, String alias, String[] sisters)
-        { _code = code; _alias = alias; _sisters = sisters; }
+        { _code = code; _alias = alias; _sisterSet = Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(sisters))); }
         public String code() { return _code; } public String alias() { return _alias; }
-        private String[] sisters() { return _sisters; }
+        public Set<String> sisterSet() { return _sisterSet; }
 #if ($database.hasClassificationSubItemMap($classificationName))
         public Map<String, Object> subItemMap() { return _subItemMapMap.get(code()); }
 #else
