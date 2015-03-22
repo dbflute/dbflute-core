@@ -407,6 +407,11 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             // clear modified properties for update process using selected entity
             entity.clearModifiedInfo();
 
+            // unlock access to undefined classification if allowed in condition-bean
+            if (cb != null && cb.isUndefinedClassificationSelectAllowed()) {
+                entity.myunlockUndefinedClassificationAccess();
+            }
+
             // mark as select to determine the entity is selected or user-created
             // basically for e.g. determine columns of batch insert
             entity.markAsSelect();

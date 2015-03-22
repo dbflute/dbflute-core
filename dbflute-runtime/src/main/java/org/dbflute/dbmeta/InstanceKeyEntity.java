@@ -83,6 +83,7 @@ public class InstanceKeyEntity implements Entity {
     }
 
     public void myspecifyPropertyCancel(String propertyName) {
+        _actualEntity.myspecifyPropertyCancel(propertyName);
     }
 
     public void clearSpecifiedInfo() {
@@ -101,12 +102,22 @@ public class InstanceKeyEntity implements Entity {
     }
 
     public void myuniqueByProperty(String propertyName) {
+        _actualEntity.myuniqueByProperty(propertyName);
     }
 
     public void myuniqueByPropertyCancel(String propertyName) {
+        _actualEntity.myuniqueByPropertyCancel(propertyName);
     }
 
     public void clearUniqueDrivenInfo() {
+        _actualEntity.clearUniqueDrivenInfo();
+    }
+
+    // ===================================================================================
+    //                                                                      Classification
+    //                                                                      ==============
+    public void myunlockUndefinedClassificationAccess() {
+        _actualEntity.myunlockUndefinedClassificationAccess();
     }
 
     // ===================================================================================

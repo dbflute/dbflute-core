@@ -150,6 +150,15 @@ public interface Entity {
     void clearUniqueDrivenInfo();
 
     // ===================================================================================
+    //                                                                      Classification
+    //                                                                      ==============
+    /**
+     * Unlock the access to undefined classification code. (default is locked)
+     * You can select undefined classification code from database. (and can update...)
+     */
+    void myunlockUndefinedClassificationAccess();
+
+    // ===================================================================================
     //                                                                     Birthplace Mark
     //                                                                     ===============
     /**

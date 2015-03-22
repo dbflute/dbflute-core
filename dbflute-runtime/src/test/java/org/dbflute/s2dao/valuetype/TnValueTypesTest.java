@@ -57,6 +57,9 @@ public class TnValueTypesTest extends RuntimeTestCase {
 
     private final DBDef _currentDBDef = DBDef.MySQL;
 
+    // ===================================================================================
+    //                                                                            Settings
+    //                                                                            ========
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -68,6 +71,7 @@ public class TnValueTypesTest extends RuntimeTestCase {
     @Override
     protected void tearDown() throws Exception {
         TnValueTypes.restoreDefault(_currentDBDef);
+        ResourceContext.clearResourceContextOnThread();
         super.tearDown();
     }
 

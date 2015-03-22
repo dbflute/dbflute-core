@@ -271,6 +271,11 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             // clear modified properties for update process using selected entity
             entity.clearModifiedInfo();
 
+            // unlock access to undefined classification if allowed in selector
+            if (relSelector.isUndefinedClassificationSelectAllowed(relationNoSuffix)) {
+                entity.myunlockUndefinedClassificationAccess();
+            }
+
             // mark as select to determine the entity is selected or user-created
             // basically for e.g. determine columns of batch insert
             entity.markAsSelect();

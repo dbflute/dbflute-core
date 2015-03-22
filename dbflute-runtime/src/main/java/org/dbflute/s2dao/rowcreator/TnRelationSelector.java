@@ -73,6 +73,13 @@ public interface TnRelationSelector {
     Set<ColumnInfo> getRelationSpecifiedNullObjectColumnSet(String relationNoSuffix);
 
     /**
+     * Is the selecting undefined classification code allowed?
+     * @param relationNoSuffix The suffix of relation No, same as foreign relation path. (NotNull)  
+     * @return The determination, true or false.
+     */
+    boolean isUndefinedClassificationSelectAllowed(String relationNoSuffix);
+
+    /**
      * Is the handling of column null object enabled?
      * @param relationNoSuffix The suffix of relation No, same as foreign relation path. (NotNull)  
      * @return The determination, true or false.

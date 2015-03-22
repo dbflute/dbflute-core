@@ -105,6 +105,12 @@ public class MockEntity implements Entity {
     }
 
     // ===================================================================================
+    //                                                                      Classification
+    //                                                                      ==============
+    public void myunlockUndefinedClassificationAccess() {
+    }
+
+    // ===================================================================================
     //                                                                     Birthplace Mark
     //                                                                     ===============
     public void markAsSelect() {
