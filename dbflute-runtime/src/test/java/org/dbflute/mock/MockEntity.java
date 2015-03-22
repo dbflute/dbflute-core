@@ -110,6 +110,10 @@ public class MockEntity implements Entity {
     public void myunlockUndefinedClassificationAccess() {
     }
 
+    public boolean myundefinedClassificationAccessAllowed() {
+        return false;
+    }
+
     // ===================================================================================
     //                                                                     Birthplace Mark
     //                                                                     ===============

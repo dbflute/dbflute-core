@@ -120,6 +120,10 @@ public class InstanceKeyEntity implements Entity {
         _actualEntity.myunlockUndefinedClassificationAccess();
     }
 
+    public boolean myundefinedClassificationAccessAllowed() {
+        return _actualEntity.myundefinedClassificationAccessAllowed();
+    }
+
     // ===================================================================================
     //                                                                     Birthplace Mark
     //                                                                     ===============

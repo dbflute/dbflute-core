@@ -178,7 +178,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                       ---------------
     // these are static to avoid the FindBugs headache
     // (implementations of PropertyGateway can be static class)
-    protected static void ccls(ColumnInfo columnInfo, Object code) { // checkClassification
+    protected static void ccls(Entity entity, ColumnInfo columnInfo, Object code) { // checkClassification
         // old style, for compatibility, check only on entity after Java8
         if (code == null) {
             return; // no check null value which means no existence on DB
@@ -191,15 +191,16 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (!undefinedHandlingType.isChecked()) { // basically no way (not called if no check)
             return;
         }
-        final Classification classification = gcls(columnInfo, code);
+        final Classification classification = gcls(entity, columnInfo, code);
         if (classification == null) {
             final String tableDbName = columnInfo.getDBMeta().getTableDbName();
             final String columnDbName = columnInfo.getColumnDbName();
-            FunCustodial.handleUndefinedClassificationCode(tableDbName, columnDbName, meta, code);
+            final boolean allowedByOption = entity.myundefinedClassificationAccessAllowed();
+            FunCustodial.handleUndefinedClassificationCode(tableDbName, columnDbName, meta, code, allowedByOption);
         }
     }
 
-    protected static Classification gcls(ColumnInfo columnInfo, Object code) { // getClassification
+    protected static Classification gcls(Entity entity, ColumnInfo columnInfo, Object code) { // getClassification
         if (code == null) {
             return null;
         }

@@ -125,7 +125,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             }
 
             // create row instance of base table by row property cache
-            final Object row = createRow(rs, selectIndexMap, propertyCache);
+            final Object row = createRow(rs, selectIndexMap, propertyCache, cb);
 
             if (skipRelationLoop) {
                 adjustCreatedRow(row, checkNonSp, colNullObj, basePointBmd, cb);

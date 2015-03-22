@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.dbflute.cbean.ConditionBean;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyMapping;
 
@@ -33,11 +34,12 @@ public interface TnRowCreator {
      * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed)
      * @param columnPropertyTypeMap The map of row property cache. The key is String(columnName) and the value is a PropertyMapping. (NotNull)
      * @param beanClass Bean class. (NotNull)
+     * @param cb The condition-bean for the select. (NullAllowed: when not condition-bean select)
      * @return The created row. (NotNull)
      * @throws SQLException When it fails to handle the SQL.
      */
     Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap, Map<String, TnPropertyMapping> columnPropertyTypeMap,
-            Class<?> beanClass) throws SQLException;
+            Class<?> beanClass, ConditionBean cb) throws SQLException;
 
     /**
      * Create property cache as map. <br>

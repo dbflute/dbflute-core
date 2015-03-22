@@ -224,15 +224,17 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     }
 
     protected void checkClassificationCode(String columnDbName, ClassificationMeta meta, Object value) {
-        if (_undefinedClassificationSelectAllowed) { // no check
-            return;
-        }
-        FunCustodial.checkClassificationCode(this, columnDbName, meta, value);
+        FunCustodial.checkClassificationCode(this, columnDbName, meta, value); // undefined handling is here
     }
 
     /** {@inheritDoc} */
     public void myunlockUndefinedClassificationAccess() {
         _undefinedClassificationSelectAllowed = true;
+    }
+
+    /** {@inheritDoc} */
+    public boolean myundefinedClassificationAccessAllowed() {
+        return _undefinedClassificationSelectAllowed;
     }
 
     // ===================================================================================

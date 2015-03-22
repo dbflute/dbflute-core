@@ -119,11 +119,9 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap, Map<String, TnPropertyMapping> propertyCache,
-            Class<?> beanClass) throws SQLException {
+            Class<?> beanClass, ConditionBean cb) throws SQLException {
         if (propertyCache.isEmpty()) {
             String msg = "The propertyCache should not be empty: bean=" + beanClass.getName();
             throw new IllegalStateException(msg);
@@ -140,7 +138,9 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         final DBMeta dbmeta;
         if (_fixedDBMeta != null) {
             if (_creatableByDBMeta) { // mainly here
-                row = _fixedDBMeta.newEntity();
+                final Entity entity = _fixedDBMeta.newEntity();
+                reflectConditionBeanOptionToEntity(cb, entity);
+                row = entity;
             } else { // e.g. manual-extended entity
                 row = newBean(beanClass);
             }
@@ -188,6 +188,14 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                 _log.debug(msg);
             }
             throw e;
+        }
+    }
+
+    protected void reflectConditionBeanOptionToEntity(ConditionBean cb, Entity entity) {
+        // unlock access to undefined classification if allowed in condition-bean
+        // this should be set before mapping values (and also relation table's creator)
+        if (cb != null && cb.isUndefinedClassificationSelectAllowed()) {
+            entity.myunlockUndefinedClassificationAccess();
         }
     }
 
@@ -406,11 +414,6 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
 
             // clear modified properties for update process using selected entity
             entity.clearModifiedInfo();
-
-            // unlock access to undefined classification if allowed in condition-bean
-            if (cb != null && cb.isUndefinedClassificationSelectAllowed()) {
-                entity.myunlockUndefinedClassificationAccess();
-            }
 
             // mark as select to determine the entity is selected or user-created
             // basically for e.g. determine columns of batch insert

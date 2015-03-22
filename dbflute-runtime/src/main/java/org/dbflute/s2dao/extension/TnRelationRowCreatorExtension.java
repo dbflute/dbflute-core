@@ -73,21 +73,31 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         // = = = = = = = = = =/
         final TnRelationPropertyType rpt = res.getRelationPropertyType();
         final TnBeanMetaData yourBmd = rpt.getYourBeanMetaData();
-        final DBMeta dbmeta = yourBmd.getDBMeta();
         if (!res.hasRowInstance()) { // always no instance here (check just in case)
-            final Object row = newRelationRow(rpt, dbmeta);
+            final DBMeta dbmeta = yourBmd.getDBMeta();
+            final Object row = newRelationRow(rpt, res.getRelationSelector(), res.getRelationNoSuffix(), dbmeta);
             res.setRow(row);
         }
     }
 
-    protected Object newRelationRow(TnRelationPropertyType rpt, DBMeta dbmeta) {
+    protected Object newRelationRow(TnRelationPropertyType rpt, TnRelationSelector selector, String relationNoSuffix, DBMeta dbmeta) {
         final Object row;
         if (dbmeta != null) {
-            row = dbmeta.newEntity();
+            final Entity entity = dbmeta.newEntity();
+            reflectConditionBeanOptionToEntity(selector, relationNoSuffix, entity);
+            row = entity;
         } else { // no way (relation of DBFlute entity is only supported)
             row = newNonEntityRelationRow(rpt);
         }
         return row;
+    }
+
+    protected void reflectConditionBeanOptionToEntity(TnRelationSelector selector, String relationNoSuffix, Entity entity) {
+        // unlock access to undefined classification if allowed in condition-bean
+        // this should be set before mapping values (and also base-point table's creator)
+        if (selector.isUndefinedClassificationSelectAllowed(relationNoSuffix)) {
+            entity.myunlockUndefinedClassificationAccess();
+        }
     }
 
     protected Object newNonEntityRelationRow(TnRelationPropertyType rpt) { // for non DBFlute entity
@@ -270,11 +280,6 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
             // clear modified properties for update process using selected entity
             entity.clearModifiedInfo();
-
-            // unlock access to undefined classification if allowed in selector
-            if (relSelector.isUndefinedClassificationSelectAllowed(relationNoSuffix)) {
-                entity.myunlockUndefinedClassificationAccess();
-            }
 
             // mark as select to determine the entity is selected or user-created
             // basically for e.g. determine columns of batch insert

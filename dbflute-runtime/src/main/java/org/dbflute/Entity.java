@@ -158,6 +158,12 @@ public interface Entity {
      */
     void myunlockUndefinedClassificationAccess();
 
+    /**
+     * Does the access to undefined classification allowed?
+     * @return The determination, true or false. (basically false)
+     */
+    boolean myundefinedClassificationAccessAllowed();
+
     // ===================================================================================
     //                                                                     Birthplace Mark
     //                                                                     ===============
