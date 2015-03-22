@@ -32,6 +32,10 @@ public class DfLanguageFrameworkCSharp implements DfLanguageFramework {
         return "${topNamespace}/Resources/Ado.dicon";
     }
 
+    public String getDBFluteDiXmlFileName() {
+        return "DBFlute.xml";
+    }
+
     public boolean isMakeDaoInterface() {
         return true;
     }

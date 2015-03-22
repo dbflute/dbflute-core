@@ -286,7 +286,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                           Container
     //                                                                           =========
     public String getTargetContainerName() {
-        String containerName = getProperty("targetContainer", "seasar");
+        final String containerName = getProperty("targetContainer", "lasta_di");
         checkContainer(containerName);
         return containerName;
     }
@@ -307,9 +307,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getTargetContainerName().trim().equalsIgnoreCase("cdi");
     }
 
+    public boolean isTargetContainerLasta() {
+        return getTargetContainerName().trim().equalsIgnoreCase("lasta");
+    }
+
     protected void checkContainer(String containerName) {
         containerName = containerName.toLowerCase();
-        if (Srl.equalsPlain(containerName, "seasar", "spring", "guice", "cdi")) {
+        if (Srl.equalsPlain(containerName, "seasar", "spring", "guice", "cdi", "lasta_di")) {
             return;
         }
         String msg = "The targetContainer is unknown: targetContainer=" + containerName;

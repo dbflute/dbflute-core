@@ -64,6 +64,7 @@ $database.checkProperties()
 #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
 #set ($glDBFluteBeansJavaConfig = "${glProjectPrefix}DBFluteBeansJavaConfig")
 #set ($glDBFluteModule = "${glProjectPrefix}DBFluteModule")
+#set ($glDBFluteDiXmlFileName = "${database.DBFluteDiXmlFileName}")
 
 ## ===================================================================================
 ##                                                                          Class Name
@@ -200,25 +201,10 @@ $database.info("public void parseContainerConfig() {")
   #end
 #end
 #end
-#if ($database.isTargetContainerLucy())
-  #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
-  #set ($path = "${dbfluteBeansPackageName}" )
-  $database.makeDirectory($path)
-
-  #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
-  $database.info("    parse('${path}')")
-  $generator.parse("om/${glResourceDirectory}/allcommon/container/lucy/LucyDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
-  #end
-#end
 #if ($database.isTargetContainerGuice())
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteModule}.${glClassFileExtension}" )
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/guice/GuiceDBFluteModule.${glTemplateFileExtension}", $path, "", "")
-#end
-#if ($database.isTargetContainerSlim3())
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteModule}.${glClassFileExtension}" )
-  $database.info("    parse('${path}')")
-  $generator.parse("om/${glResourceDirectory}/allcommon/container/slim3/Slim3DBFluteModule.${glTemplateFileExtension}", $path, "", "")
 #end
 #if ($database.isTargetContainerCDI())
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteModule}.${glClassFileExtension}" )
@@ -230,6 +216,16 @@ $database.info("public void parseContainerConfig() {")
   #set ( $path = "${database.getMetaInfOutputDirectory()}/services/javax.enterprise.inject.spi.Extension" )
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/cdi/ExtensionConfig.${glTemplateFileExtension}", $path, "", "")
+#end
+#if ($database.isTargetContainerLasta())
+#foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+  #set ($path = "${dbfluteDiconPackageName}" )
+  $database.makeDirectory($path)
+
+  #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+  $database.info("    parse('${path}')")
+  $generator.parse("om/${glResourceDirectory}/allcommon/container/lasta/DBFluteDiXml.${glTemplateFileExtension}", $path, "", "")
+#end
 #end
 $database.info("}")
 

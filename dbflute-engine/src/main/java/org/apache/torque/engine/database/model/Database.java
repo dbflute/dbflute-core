@@ -1705,17 +1705,6 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                                 Quill
-    //                                                 -----
-    public boolean isQuillDataSourceNameValid() {
-        return getProperties().getDependencyInjectionProperties().isQuillDataSourceNameValid();
-    }
-
-    public String getQuillDataSourceName() {
-        return getProperties().getDependencyInjectionProperties().getQuillDataSourceName();
-    }
-
-    // -----------------------------------------------------
     //                                                   CDI
     //                                                   ---
     public String getMetaInfOutputDirectory() {
@@ -1724,6 +1713,24 @@ public class Database {
             resourceOutputDirectory = getBasicProperties().getDefaultResourceOutputDirectory();
         }
         return resourceOutputDirectory + "/META-INF";
+    }
+
+    // -----------------------------------------------------
+    //                                              Lasta Di
+    //                                              --------
+    public String getDBFluteDiXmlFileName() {
+        return getProperties().getDependencyInjectionProperties().getDBFluteDiXmlFileName();
+    }
+
+    // -----------------------------------------------------
+    //                                                 Quill
+    //                                                 -----
+    public boolean isQuillDataSourceNameValid() {
+        return getProperties().getDependencyInjectionProperties().isQuillDataSourceNameValid();
+    }
+
+    public String getQuillDataSourceName() {
+        return getProperties().getDependencyInjectionProperties().getQuillDataSourceName();
     }
 
     // ===================================================================================

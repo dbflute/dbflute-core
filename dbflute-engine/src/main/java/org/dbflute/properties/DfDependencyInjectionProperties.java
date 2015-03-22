@@ -233,6 +233,13 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
     }
 
     // ===================================================================================
+    //                                                                            Lasta Di
+    //                                                                            ========
+    public String getDBFluteDiXmlFileName() { // Java Only
+        return getProperty("dbfluteDiconFileName", getDefaultDBFluteDicon().getDBFluteDiXmlFileName());
+    }
+
+    // ===================================================================================
     //                                                             Quill DataSource(Quill)
     //                                                             =======================
     public boolean isQuillDataSourceNameValid() {

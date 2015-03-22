@@ -32,6 +32,10 @@ public class DfLanguageFrameworkJava implements DfLanguageFramework {
         return "j2ee.dicon";
     }
 
+    public String getDBFluteDiXmlFileName() {
+        return "dbflute.xml";
+    }
+
     public boolean isMakeDaoInterface() {
         return false;
     }

@@ -32,6 +32,10 @@ public class DfLanguageFrameworkPhp implements DfLanguageFramework {
         return "%PDO_DICON%";
     }
 
+    public String getDBFluteDiXmlFileName() {
+        return "dbflute.xml";
+    }
+
     public boolean isMakeDaoInterface() {
         return false;
     }

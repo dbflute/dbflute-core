@@ -36,6 +36,11 @@ public interface DfLanguageFramework {
     String getJ2eeDiconResourceName();
 
     /**
+     * @return The file name of DBFlute LastaDi xml. (NotNull)
+     */
+    String getDBFluteDiXmlFileName();
+
+    /**
      * @return Does it make S2Dao's interface?
      */
     boolean isMakeDaoInterface();
