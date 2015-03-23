@@ -53,7 +53,7 @@ map:{
     #  The target DI container.
     #  Your possible choices are:
     #
-    #       spring, guice, seasar, cdi, lasta
+    #       spring, guice, seasar, cdi, lasta_di
     #
     ; targetContainer = @targetContainer@
     # - - - - - - - - - -/

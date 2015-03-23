@@ -235,8 +235,29 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
     // ===================================================================================
     //                                                                            Lasta Di
     //                                                                            ========
+    public String getDBFluteDiXmlNamespace() { // Java Only
+        return getProperty("dbfluteDiXmlNamespace", getDefaultDBFluteDicon().getDBFluteDiXmlNamespace());
+    }
+
+    public List<String> getDBFluteDiXmlPackageNameList() { // Java Only
+        final String prop = getProperty("dbfluteDiXmlPackageName", null);
+        if (prop == null) {
+            return new ArrayList<String>();
+        }
+        final String[] array = prop.split(";");
+        final List<String> ls = new ArrayList<String>();
+        for (String string : array) {
+            ls.add(string.trim());
+        }
+        return ls;
+    }
+
     public String getDBFluteDiXmlFileName() { // Java Only
-        return getProperty("dbfluteDiconFileName", getDefaultDBFluteDicon().getDBFluteDiXmlFileName());
+        return getProperty("dbfluteDiXmlFileName", getDefaultDBFluteDicon().getDBFluteDiXmlFileName());
+    }
+
+    public String getRdbDiXmlResourceName() { // Java Only
+        return getProperty("rdbDiXmlResourceName", getDefaultDBFluteDicon().getRdbDiXmlResourceName());
     }
 
     // ===================================================================================

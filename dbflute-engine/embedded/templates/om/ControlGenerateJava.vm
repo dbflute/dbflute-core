@@ -64,7 +64,9 @@ $database.checkProperties()
 #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
 #set ($glDBFluteBeansJavaConfig = "${glProjectPrefix}DBFluteBeansJavaConfig")
 #set ($glDBFluteModule = "${glProjectPrefix}DBFluteModule")
+#set ($glDBFluteDiXmlNamespace = "${database.DBFluteDiXmlNamespace}")
 #set ($glDBFluteDiXmlFileName = "${database.DBFluteDiXmlFileName}")
+#set ($glRdbDiXmlResourceName = "${database.RdbDiXmlResourceName}")
 
 ## ===================================================================================
 ##                                                                          Class Name
@@ -217,12 +219,12 @@ $database.info("public void parseContainerConfig() {")
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/cdi/ExtensionConfig.${glTemplateFileExtension}", $path, "", "")
 #end
-#if ($database.isTargetContainerLasta())
-#foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-  #set ($path = "${dbfluteDiconPackageName}" )
+#if ($database.isTargetContainerLastaDi())
+#foreach ($dbfluteDiXmlPackageName in $database.DBFluteDiXmlPackageNameList)
+  #set ($path = "${dbfluteDiXmlPackageName}" )
   $database.makeDirectory($path)
 
-  #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+  #set ($path = "${dbfluteDiXmlPackageName}/${glDBFluteDiXmlFileName}" )
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/lasta/DBFluteDiXml.${glTemplateFileExtension}", $path, "", "")
 #end

@@ -38,7 +38,7 @@ import org.dbflute.optional.RelationOptionalFactory;
 import org.dbflute.outsidesql.OutsideSqlOption;
 import org.dbflute.outsidesql.factory.DefaultOutsideSqlExecutorFactory;
 import org.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
-#if ($database.isTargetContainerSeasar())
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerLastaDi())
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 #end
 import org.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
@@ -53,6 +53,13 @@ import org.seasar.framework.container.annotation.tiger.Binding;
 import org.seasar.framework.container.annotation.tiger.BindingType;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
+#end
+#if ($database.isTargetContainerLastaDi())
+
+import org.dbflute.lasta.di.core.annotation.Binding;
+import org.dbflute.lasta.di.core.annotation.BindingType;
+import org.dbflute.lasta.di.util.Disposable;
+import org.dbflute.lasta.di.util.DisposableUtil;
 #end
 
 /**
@@ -495,7 +502,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     //                                                                             =======
     /** {@inheritDoc} */
     public void toBeDisposable(final DisposableProcess callerProcess) { // for HotDeploy
-#if ($database.isTargetContainerSeasar())
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerLastaDi())
         if (_disposable) {
             return;
         }
@@ -537,7 +544,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // so this variable is actually unused in this class
     // (needs to be injected only when the DI container
     // is set by its DI setting file)
-#if ($database.isTargetContainerSeasar())
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerLastaDi())
     @Binding(bindingType=BindingType.MUST)
 #end
     public void setIntroduction(${glDBFluteInitializer} introduction) {

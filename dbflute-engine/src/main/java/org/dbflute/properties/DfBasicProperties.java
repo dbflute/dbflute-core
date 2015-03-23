@@ -307,8 +307,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getTargetContainerName().trim().equalsIgnoreCase("cdi");
     }
 
-    public boolean isTargetContainerLasta() {
-        return getTargetContainerName().trim().equalsIgnoreCase("lasta");
+    public boolean isTargetContainerLastaDi() {
+        return getTargetContainerName().trim().equalsIgnoreCase("lasta_di");
     }
 
     protected void checkContainer(String containerName) {

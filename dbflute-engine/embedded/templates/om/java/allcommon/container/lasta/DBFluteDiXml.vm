@@ -16,26 +16,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE components PUBLIC "-//DBFLUTE//DTD LastaDi 1.0//EN" 
 	"http://dbflute.org/meta/lastadi10.dtd">
-<components namespace="${glDBFluteDiconNamespace}">
-#foreach ($includePath in $database.DBFluteDiconBeforeJ2eeIncludePathList)
-    <include path="${includePath}"/>
-#end
-    <include path="${glJ2eeDiconResourceName}"/>
-#foreach ($includePath in $database.DBFluteDiconOtherIncludePathList)
-    <include path="${includePath}"/>
-#end
+<components namespace="${glDBFluteDiXmlNamespace}">
+	<include condition="#exists('#path')" path="my_included_dbflute.xml"/>
+	<include path="${glRdbDiXmlResourceName}"/>
 
-    <!-- The components of DBFlute Runtime. -->
-    <component name="introduction" class="${database.DBFluteInitializerClass}"/>
-    <component name="invokerAssistant" class="${database.implementedInvokerAssistantClass}"/>
-    <component name="commonColumnAutoSetupper" class="${database.implementedCommonColumnAutoSetupperClass}"/>
-    <component name="behaviorSelector" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}"/>
-    <component name="behaviorCommandInvoker" class="${database.behaviorCommandInvokerClass}"/>
+	<!-- The components of DBFlute Runtime. -->
+	<component name="introduction" class="${database.DBFluteInitializerClass}"/>
+	<component name="invokerAssistant" class="${database.implementedInvokerAssistantClass}"/>
+	<component name="commonColumnAutoSetupper" class="${database.implementedCommonColumnAutoSetupperClass}"/>
+	<component name="behaviorSelector" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}"/>
+	<component name="behaviorCommandInvoker" class="${database.behaviorCommandInvokerClass}"/>
 #if (!$database.isSuppressDiconBehaviorDefinition())
 
-    <!-- The components of Behavior. -->
+	<!-- The components of Behavior. -->
 #foreach ($table in $database.behaviorTableList)
-    <component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}"/>
+	<component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}"/>
 #end
 #end
 </components>

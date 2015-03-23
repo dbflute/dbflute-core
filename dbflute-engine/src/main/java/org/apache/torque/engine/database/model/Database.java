@@ -1349,6 +1349,10 @@ public class Database {
         return getBasicProperties().isTargetContainerCDI();
     }
 
+    public boolean isTargetContainerLastaDi() {
+        return getBasicProperties().isTargetContainerLastaDi();
+    }
+
     // -----------------------------------------------------
     //                                             Extension
     //                                             ---------
@@ -1718,8 +1722,36 @@ public class Database {
     // -----------------------------------------------------
     //                                              Lasta Di
     //                                              --------
+    // almost same as Seasar
+    public String getDBFluteDiXmlNamespace() {
+        return getProperties().getDependencyInjectionProperties().getDBFluteDiXmlNamespace();
+    }
+
+    public List<String> getDBFluteDiXmlPackageNameList() {
+        final String resourceOutputDirectory = getBasicProperties().getResourceOutputDirectory();
+        if (resourceOutputDirectory != null) {
+            final List<String> resulList = new ArrayList<String>();
+            resulList.add(resourceOutputDirectory);
+            return resulList;
+        }
+
+        // for compatibility and default value
+        final List<String> diconPackageNameList = getProperties().getDependencyInjectionProperties().getDBFluteDiXmlPackageNameList();
+        if (diconPackageNameList != null && !diconPackageNameList.isEmpty()) {
+            return diconPackageNameList;
+        } else {
+            final List<String> resulList = new ArrayList<String>();
+            resulList.add(getBasicProperties().getDefaultResourceOutputDirectory());
+            return resulList;
+        }
+    }
+
     public String getDBFluteDiXmlFileName() {
         return getProperties().getDependencyInjectionProperties().getDBFluteDiXmlFileName();
+    }
+
+    public String getRdbDiXmlResourceName() {
+        return getProperties().getDependencyInjectionProperties().getRdbDiXmlResourceName();
     }
 
     // -----------------------------------------------------

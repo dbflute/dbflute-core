@@ -20,20 +20,28 @@ package org.dbflute.logic.generate.language.framework;
  */
 public class DfLanguageFrameworkPhp implements DfLanguageFramework {
 
-    public String getDBFluteDiconFileName() {
-        return "dbflute.dicon";
-    }
-
     public String getDBFluteDiconNamespace() {
         return "dbflute";
+    }
+
+    public String getDBFluteDiconFileName() {
+        return "dbflute.dicon";
     }
 
     public String getJ2eeDiconResourceName() {
         return "%PDO_DICON%";
     }
 
+    public String getDBFluteDiXmlNamespace() {
+        return "dbflute";
+    }
+
     public String getDBFluteDiXmlFileName() {
         return "dbflute.xml";
+    }
+
+    public String getRdbDiXmlResourceName() {
+        return "%RDB_XML%";
     }
 
     public boolean isMakeDaoInterface() {

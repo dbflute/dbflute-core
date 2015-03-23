@@ -45,6 +45,10 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 #end
+#if ($database.isTargetContainerLastaDi())
+import org.dbflute.lasta.di.core.LaContainer;
+import org.dbflute.lasta.di.core.exception.ComponentNotFoundException;
+#end
 
 /**
  * The implementation of behavior selector.
@@ -79,6 +83,10 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #if ($database.isTargetContainerCDI())
     /** The container of CDI. */
     protected BeanManager _container;
+#end
+#if ($database.isTargetContainerLastaDi())
+    /** The container of Lasta Di. */
+    protected LaContainer _container;
 #end
 
     // ===================================================================================
@@ -179,7 +187,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     // ===================================================================================
     //                                                                           Component
     //                                                                           =========
-#if ($database.isTargetContainerSeasar() || $database.isTargetContainerSpring() || $database.isTargetContainerCDI())
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerSpring() || $database.isTargetContainerCDI() || $database.isTargetContainerLastaDi())
     @SuppressWarnings("unchecked")
 #end
     protected <COMPONENT> COMPONENT getComponent(Class<COMPONENT> componentType) { // only for behavior
@@ -188,15 +196,14 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #if ($database.isTargetContainerSeasar())
         try {
 		    return (COMPONENT)_container.getComponent(componentType);
-		} catch (ComponentNotFoundRuntimeException e) { // Normally it doesn't come.
+		} catch (ComponentNotFoundRuntimeException e) { // normally it doesn't come.
 		    final COMPONENT component;
 		    try {
-		        // for HotDeploy Mode
-		        component = (COMPONENT)_container.getRoot().getComponent(componentType);
+		        component = (COMPONENT)_container.getRoot().getComponent(componentType); // for HotDeploy mode
 		    } catch (ComponentNotFoundRuntimeException ignored) {
 		        throw e;
 		    }
-		    _container = _container.getRoot(); // Change container.
+		    _container = _container.getRoot(); // change container
 		    return component;
 		}
 #end
@@ -216,6 +223,20 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
             }
         }
         return result;
+#end
+#if ($database.isTargetContainerLastaDi())
+        try {
+		    return (COMPONENT)_container.getComponent(componentType);
+		} catch (ComponentNotFoundException e) { // normally it doesn't come.
+		    final COMPONENT component;
+		    try {
+		        component = (COMPONENT)_container.getRoot().getComponent(componentType); // for HotDeploy mode
+		    } catch (ComponentNotFoundException ignored) {
+		        throw e;
+		    }
+		    _container = _container.getRoot(); // change container
+		    return component;
+		}
 #end
     }
 
@@ -300,6 +321,11 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #end
 #if ($database.isTargetContainerCDI())
     public void setContainer(BeanManager container) {
+        this._container = container;
+    }
+#end
+#if ($database.isTargetContainerLastaDi())
+    public void setContainer(LaContainer container) {
         this._container = container;
     }
 #end
