@@ -123,14 +123,13 @@ public class ${glDBFluteBeansJavaConfig} {
 #end
     @Bean(name="${table.behaviorComponentName}")
     public ${table.extendedBehaviorClassName} create${table.extendedBehaviorClassName}() {
-        ${table.extendedBehaviorClassName} bhv = new${table.extendedBehaviorClassName}();
+        ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
         bhv.setBehaviorCommandInvoker(createBehaviorCommandInvoker()); bhv.setBehaviorSelector(createImplementedBehaviorSelector());
 #if ($table.isWritable())
         bhv.setCommonColumnAutoSetupper(createImplementedCommonColumnAutoSetupper());
 #end
         return bhv;
     }
-    protected ${table.extendedBehaviorClassName} new${table.extendedBehaviorClassName}() { return new ${table.extendedBehaviorClassName}(); }
 #set ($behaviorLoopIndex = $behaviorLoopIndex + 1)
 #end
 }
