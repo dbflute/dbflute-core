@@ -124,6 +124,12 @@ public class DfPropTableLoader {
         if (isProperty("isCheckImplicitOverride", tableMap)) {
             reader.checkImplicitOverride();
         }
+        System.out.println("**********: " + tableMap);
+        if (isProperty("isUseNonNumberVariable", tableMap)) {
+            System.out.println("**********@@@@@@@@@@@@: " + tableMap);
+            reader.useNonNumberVariable();
+            System.out.println("**********@@@@@@@@@@@@: " + tableMap);
+        }
         return reader;
     }
 
@@ -206,12 +212,17 @@ public class DfPropTableLoader {
             columnMap.put("camelizedName", camelizedName);
             columnMap.put("capCamelName", Srl.initCap(camelizedName));
             columnMap.put("uncapCamelName", Srl.initUncap(camelizedName));
+            final List<Integer> variableNumberList = property.getVariableNumberList();
+            columnMap.put("variableCount", variableNumberList.size()); // old style
+            columnMap.put("variableNumberCount", variableNumberList.size());
+            columnMap.put("variableNumberList", variableNumberList);
+            final List<String> variableStringList = property.getVariableStringList();
+            columnMap.put("variableStringCount", variableStringList.size());
+            columnMap.put("variableStringList", variableStringList);
+            columnMap.put("variableArgNameList", property.getVariableArgNameList());
             columnMap.put("variableArgDef", property.getVariableArgDef());
             columnMap.put("variableArgSet", property.getVariableArgSet());
-            final List<Integer> variableNumberList = property.getVariableNumberList();
-            columnMap.put("variableCount", variableNumberList.size());
-            columnMap.put("variableNumberList", variableNumberList);
-            columnMap.put("hasVariable", !variableNumberList.isEmpty());
+            columnMap.put("hasVariable", !variableStringList.isEmpty());
 
             final String comment = property.getComment();
             columnMap.put("comment", comment != null ? comment : "");
