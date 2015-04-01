@@ -1996,15 +1996,17 @@ public class Srl {
         if (str.length() == 1) {
             return str.toUpperCase();
         }
-        final char chars[] = str.toCharArray();
+        if (Character.isUpperCase(str.charAt(0))) {
+            return str;
+        }
+        final char[] chars = str.toCharArray();
         chars[0] = Character.toUpperCase(chars[0]);
         return new String(chars);
     }
 
     public static String initCapTrimmed(String str) {
         assertStringNotNull(str);
-        str = str.trim();
-        return initCap(str);
+        return initCap(str.trim());
     }
 
     public static String initUncap(String str) {
@@ -2015,15 +2017,17 @@ public class Srl {
         if (str.length() == 1) {
             return str.toLowerCase();
         }
-        final char chars[] = str.toCharArray();
+        if (Character.isLowerCase(str.charAt(0))) {
+            return str;
+        }
+        final char[] chars = str.toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);
         return new String(chars);
     }
 
     public static String initUncapTrimmed(String str) {
         assertStringNotNull(str);
-        str = str.trim();
-        return initUncap(str);
+        return initUncap(str.trim());
     }
 
     /**
