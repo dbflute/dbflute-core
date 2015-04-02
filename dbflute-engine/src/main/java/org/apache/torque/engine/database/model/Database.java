@@ -155,6 +155,7 @@ import org.dbflute.infra.core.DfDatabaseNameMapping;
 import org.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.dbflute.logic.generate.exmange.DfCopyrightResolver;
 import org.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
+import org.dbflute.logic.generate.exmange.DfSpringComponentResolver;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.logic.generate.packagepath.DfPackagePathHandler;
@@ -1393,13 +1394,36 @@ public class Database {
     }
 
     public void reflectAllExCopyright(String path) {
-        final String outputPath = DfGenerator.getInstance().getOutputPath();
-        final String absolutePath = outputPath + "/" + path;
+        final String absolutePath = buildOutputAbsolutePath(path);
         final String sourceCodeEncoding = getTemplateFileEncoding();
         final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
         final DfCopyrightResolver resolver = new DfCopyrightResolver(sourceCodeEncoding, sourceCodeLn);
         final String copyright = getProperties().getAllClassCopyrightProperties().getAllClassCopyright();
         resolver.reflectAllExCopyright(absolutePath, copyright);
+    }
+
+    protected String buildOutputAbsolutePath(String path) {
+        final String outputPath = DfGenerator.getInstance().getOutputPath();
+        final String absolutePath = outputPath + "/" + path;
+        return absolutePath;
+    }
+
+    // -----------------------------------------------------
+    //                                 ExBehavior Adjustment
+    //                                 ---------------------
+    public void reflectAllExBhvAdjustmentIfNeeds(String tableDbName, String path) {
+        if (needsDBFluteBeansHybritScanConfig()) {
+            final Table table = getTable(tableDbName);
+            final String absolutePath = buildOutputAbsolutePath(path);
+            final String sourceCodeEncoding = getTemplateFileEncoding();
+            final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
+            final DfSpringComponentResolver resolver = newDfSpringComponentResolver(sourceCodeEncoding, sourceCodeLn);
+            resolver.reflectAllExComponent(table, absolutePath);
+        }
+    }
+
+    protected DfSpringComponentResolver newDfSpringComponentResolver(String sourceCodeEncoding, String sourceCodeLn) {
+        return new DfSpringComponentResolver(sourceCodeEncoding, sourceCodeLn);
     }
 
     // -----------------------------------------------------
@@ -1542,12 +1566,7 @@ public class Database {
     //                                    Serial Version UID
     //                                    ------------------
     public void reflectAllExSerialVersionUID(String path) {
-        // basically for parameter-bean
-        // because it has become to need it since 0.9.7.0
-        // (supported classes since older versions don't need this)
-        //  -> not called because it has become NOT to need it since 0.9.9.6
-        final String outputPath = DfGenerator.getInstance().getOutputPath();
-        final String absolutePath = outputPath + "/" + path;
+        final String absolutePath = buildOutputAbsolutePath(path);
         final String sourceCodeEncoding = getTemplateFileEncoding();
         final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
         final DfSerialVersionUIDResolver resolver = new DfSerialVersionUIDResolver(sourceCodeEncoding, sourceCodeLn);
@@ -1688,6 +1707,14 @@ public class Database {
 
     public boolean isDBFluteBeansGeneratedAsJavaConfig() {
         return getProperties().getDependencyInjectionProperties().isDBFluteBeansGeneratedAsJavaConfig();
+    }
+
+    public boolean needsDBFluteBeansHybritScanConfig() {
+        return getProperties().getDependencyInjectionProperties().needsDBFluteBeansHybritScanConfig();
+    }
+
+    public boolean needsBehaviorSpringAutowired() {
+        return getProperties().getDependencyInjectionProperties().needsBehaviorSpringAutowired();
     }
 
     public boolean isDBFluteBeansJavaConfigLazy() {

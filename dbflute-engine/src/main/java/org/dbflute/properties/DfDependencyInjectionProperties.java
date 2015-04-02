@@ -228,7 +228,20 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         return isProperty("isDBFluteBeansGeneratedAsJavaConfig", !prop.isCompatibleBeforeJava8());
     }
 
-    public boolean isDBFluteBeansJavaConfigLazy() { // closet, Java Only
+    protected boolean isDBFluteBeansHybritScanConfig() { // closet, Java Only, for compatible
+        return isProperty("isDBFluteBeansHybritScanConfig", true); // default: use
+    }
+
+    public boolean needsDBFluteBeansHybritScanConfig() {
+        final DfBasicProperties prop = getBasicProperties();
+        return prop.isTargetContainerSpring() && isDBFluteBeansHybritScanConfig();
+    }
+
+    public boolean needsBehaviorSpringAutowired() {
+        return isDBFluteBeansGeneratedAsJavaConfig() && needsDBFluteBeansHybritScanConfig();
+    }
+
+    public boolean isDBFluteBeansJavaConfigLazy() { // closet, Java Only, for compatible
         return isProperty("isDBFluteBeansJavaConfigLazy", true); // default: lazy
     }
 

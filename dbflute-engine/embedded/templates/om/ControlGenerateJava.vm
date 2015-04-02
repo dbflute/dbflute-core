@@ -359,6 +359,7 @@ $database.info("public void parseTableClass() {")
         $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
       #end
       $database.reflectAllExCopyright($path)
+      $database.reflectAllExBhvAdjustmentIfNeeds($table.tableDbName, $path)
     #end
   #end
 

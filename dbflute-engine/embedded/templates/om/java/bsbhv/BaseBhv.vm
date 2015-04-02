@@ -20,6 +20,9 @@ import java.util.List;
 
 import org.dbflute.*;
 import org.dbflute.bhv.*;
+#if ($database.needsBehaviorSpringAutowired())
+import org.dbflute.bhv.core.BehaviorCommandInvoker;
+#end
 import org.dbflute.bhv.readable.*;
 #if ($table.isWritable() || $table.hasBehaviorFilterBeforeColumn())
 import org.dbflute.bhv.writable.*;
@@ -32,6 +35,9 @@ import org.dbflute.cbean.result.*;
 import org.dbflute.cbean.scoping.SpecifyQuery;
 #end
 import org.dbflute.exception.*;
+#if ($table.isWritable() && $database.needsBehaviorSpringAutowired())
+import org.dbflute.hook.CommonColumnAutoSetupper;
+#end
 #if ($table.needsBasicOptionalEntityImport())
 import ${database.basicOptionalEntityClassName};
 #end
@@ -1902,4 +1908,29 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     protected Class<? extends ${myExtendedObjectClassName}> typeOfSelectedEntity() { return ${myExtendedObjectClassName}.class; }
     protected Class<${myExtendedObjectClassName}> typeOfHandlingEntity() { return ${myExtendedObjectClassName}.class; }
     protected Class<${myConditionBeanClassName}> typeOfHandlingConditionBean() { return ${myConditionBeanClassName}.class; }
+#if ($database.needsBehaviorSpringAutowired())
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    @Override
+    @javax.annotation.Resource(name="${database.behaviorCommandInvokerComponentName}")
+    public void setBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
+        super.setBehaviorCommandInvoker(behaviorCommandInvoker);
+    }
+
+    @Override
+    @javax.annotation.Resource(name="${database.behaviorSelectorComponentName}")
+    public void setBehaviorSelector(BehaviorSelector behaviorSelector) {
+        super.setBehaviorSelector(behaviorSelector);
+    }
+#if ($table.isWritable())
+
+    @Override
+    @javax.annotation.Resource(name="${database.commonColumnAutoSetupperComponentName}")
+    public void setCommonColumnAutoSetupper(CommonColumnAutoSetupper commonColumnAutoSetupper) {
+        super.setCommonColumnAutoSetupper(commonColumnAutoSetupper);
+    }
+#end
+#end
 }

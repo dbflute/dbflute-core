@@ -187,7 +187,10 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     // ===================================================================================
     //                                                                           Component
     //                                                                           =========
-#if ($database.isTargetContainerSeasar() || $database.isTargetContainerSpring() || $database.isTargetContainerCDI() || $database.isTargetContainerLastaDi())
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerCDI())
+    @SuppressWarnings("unchecked")
+#end
+#if ($database.isTargetContainerSpring() && !$database.isDBFluteBeansGeneratedAsJavaConfig())
     @SuppressWarnings("unchecked")
 #end
     protected <COMPONENT> COMPONENT getComponent(Class<COMPONENT> componentType) { // only for behavior
@@ -208,7 +211,12 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 		}
 #end
 #if ($database.isTargetContainerSpring())
+#if ($database.isDBFluteBeansGeneratedAsJavaConfig())
+		return _container.getBean(componentType);
+#else
+        // component name in XML cannot contain dollar
 		return (COMPONENT)_container.getBean(replace(initUncap(toClassTitle(componentType)), "${database.dollar}", ""));
+#end
 #end
 #if ($database.isTargetContainerGuice())
 		return _container.getInstance(componentType);
