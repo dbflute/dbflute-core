@@ -202,7 +202,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 		} catch (ComponentNotFoundRuntimeException e) { // normally it doesn't come.
 		    final COMPONENT component;
 		    try {
-		        component = (COMPONENT)_container.getRoot().getComponent(componentType); // for HotDeploy mode
+		        component = (COMPONENT)_container.getRoot().getComponent(componentType); // retry for HotDeploy mode
 		    } catch (ComponentNotFoundRuntimeException ignored) {
 		        throw e;
 		    }
@@ -234,11 +234,11 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #end
 #if ($database.isTargetContainerLastaDi())
         try {
-		    return (COMPONENT)_container.getComponent(componentType);
+		    return _container.getComponent(componentType);
 		} catch (ComponentNotFoundException e) { // normally it doesn't come.
 		    final COMPONENT component;
 		    try {
-		        component = (COMPONENT)_container.getRoot().getComponent(componentType); // for HotDeploy mode
+		        component = _container.getRoot().getComponent(componentType); // retry for HotDeploy mode
 		    } catch (ComponentNotFoundException ignored) {
 		        throw e;
 		    }

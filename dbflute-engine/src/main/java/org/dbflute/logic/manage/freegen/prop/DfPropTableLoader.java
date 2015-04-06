@@ -124,11 +124,8 @@ public class DfPropTableLoader {
         if (isProperty("isCheckImplicitOverride", tableMap)) {
             reader.checkImplicitOverride();
         }
-        System.out.println("**********: " + tableMap);
         if (isProperty("isUseNonNumberVariable", tableMap)) {
-            System.out.println("**********@@@@@@@@@@@@: " + tableMap);
             reader.useNonNumberVariable();
-            System.out.println("**********@@@@@@@@@@@@: " + tableMap);
         }
         return reader;
     }
