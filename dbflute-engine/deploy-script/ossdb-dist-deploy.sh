@@ -1,7 +1,7 @@
 cd ..
 ant -f build.xml dist
 ant -f build.xml reflect-to-test-active-dockside
-ant -f build.xml reflect-to-test-active-hanger
+ant -f build.xml reflect-to-test-active-hangar
 ant -f build.xml reflect-to-test-dbms-mysql
 ant -f build.xml reflect-to-test-dbms-postgresql
 ant -f build.xml reflect-to-test-dbms-derby
@@ -23,7 +23,7 @@ rm ./log/*.log
 cd ..
 mvn -e compile
 
-cd ../dbflute-test-active-hanger/dbflute_maihamadb
+cd ../dbflute-test-active-hangar/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
 . manage.sh load-data-reverse
