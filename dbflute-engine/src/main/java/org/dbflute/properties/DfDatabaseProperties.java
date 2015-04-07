@@ -346,11 +346,13 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         for (String element : plainList) {
             if (Srl.endsWithIgnoreCase(element, genOnlySuffix)) {
                 final String keyword = Srl.substringLastFrontIgnoreCase(element, genOnlySuffix);
-                targetList.add(keyword); // meta data needs both case
                 targetGenOnlyList.add(keyword);
             } else {
                 targetList.add(element);
             }
+        }
+        if (!targetList.isEmpty() && !targetGenOnlyList.isEmpty()) {
+            targetList.addAll(targetGenOnlyList); // needs for meta data
         }
     }
 

@@ -308,7 +308,7 @@ public class ForeignInfo implements RelationInfo {
 
     @Override
     public String toString() {
-        return "{" + _localDBMeta.getTableDbName() + "." + _foreignPropertyName + "->" + _foreignDBMeta.getTableDbName() + "}";
+        return "{" + _localDBMeta.getTableDispName() + "." + _foreignPropertyName + "->" + _foreignDBMeta.getTableDbName() + "}";
     }
 
     // ===================================================================================

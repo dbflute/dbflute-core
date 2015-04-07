@@ -58,6 +58,10 @@ import org.seasar.framework.exception.SQLRuntimeException;
 #if ($database.isTargetContainerSpring())
 import org.springframework.jdbc.datasource.DataSourceUtils;
 #end
+#if ($database.isTargetContainerLastaDi())
+import org.dbflute.lasta.jta.dbcp.ConnectionWrapper;
+import org.dbflute.lasta.di.exception.SQLRuntimeException;
+#end
 
 /**
  * @author ${database.classAuthor}
@@ -1092,8 +1096,8 @@ public class ${glDBFluteConfig} {
 
         public Connection digUp(Connection conn) throws SQLException {
             Connection digged = unwrap(conn);
-#if ($database.isTargetContainerSeasar())
-            digged = resolveS2DBCP(digged);
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerLastaDi())
+            digged = resolveLaDBCP(digged);
 #end
             digged = resolveCommonsDBCP(digged);
             return digged;
@@ -1105,9 +1109,9 @@ public class ${glDBFluteConfig} {
             }
             return conn;
         }
-#if ($database.isTargetContainerSeasar())
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerLastaDi())
 
-        protected Connection resolveS2DBCP(Connection conn) {
+        protected Connection resolveLaDBCP(Connection conn) {
             if (conn instanceof ConnectionWrapper) {
                 return ((ConnectionWrapper)conn).getPhysicalConnection();
             }
@@ -1138,8 +1142,8 @@ public class ${glDBFluteConfig} {
     public static class ImplementedSQLExceptionDigger implements SQLExceptionDigger {
 
         public SQLException digUp(Throwable cause) {
-#if ($database.isTargetContainerSeasar())
-            SQLException s2found = resolveS2DBCP(cause);
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerLastaDi())
+            SQLException s2found = resolveLaDBCP(cause);
             if (s2found != null) {
                 return s2found;
             }
@@ -1150,9 +1154,9 @@ public class ${glDBFluteConfig} {
             }
             return null;
         }
-#if ($database.isTargetContainerSeasar())
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerLastaDi())
 
-        protected SQLException resolveS2DBCP(Throwable cause) {
+        protected SQLException resolveLaDBCP(Throwable cause) {
             if (cause instanceof SQLRuntimeException) {
                 Throwable nestedCause = ((SQLRuntimeException)cause).getCause();
                 if (nestedCause instanceof SQLException) {

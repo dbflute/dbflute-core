@@ -149,7 +149,7 @@ public interface ConditionQuery {
      * Invoke setting query. {RelationResolved} <br>
      * Basically for keys that does not need a condition option. <br>
      * And you should set a list that has fromDate and toDate to conditionValue when DateFromTo,
-     * and set a dummy object to it when keys that does not have an argument, e.g. IsNull. 
+     * and set null value to it when keys that does not have an argument, e.g. IsNull, then the value is ignored. 
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
      * @param conditionKeyName The name of the condition-key. (NotNull)
      * @param conditionValue The value of the condition. (NotNull: as default, NullAllowed: as optional)
@@ -161,7 +161,7 @@ public interface ConditionQuery {
      * Invoke setting query with option. {RelationResolved} <br>
      * Basically for LikeSearch, NotLikeSearch, FromTo. <br>
      * And you should set a list that has fromDate and toDate to conditionValue when FromTo,
-     * and set a dummy object to it when keys that does not have an argument, e.g. IsNull.
+     * and set null value to it when keys that does not have an argument, e.g. IsNull, then the value is ignored.
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
      * @param conditionKeyName The name of the condition-key. (NotNull)
      * @param conditionValue The value of the condition. (NotNull: as default, NullAllowed: as optional)

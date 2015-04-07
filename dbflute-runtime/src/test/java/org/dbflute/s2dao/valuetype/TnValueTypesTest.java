@@ -25,6 +25,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -56,6 +57,9 @@ public class TnValueTypesTest extends RuntimeTestCase {
 
     private final DBDef _currentDBDef = DBDef.MySQL;
 
+    // ===================================================================================
+    //                                                                            Settings
+    //                                                                            ========
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -67,6 +71,7 @@ public class TnValueTypesTest extends RuntimeTestCase {
     @Override
     protected void tearDown() throws Exception {
         TnValueTypes.restoreDefault(_currentDBDef);
+        ResourceContext.clearResourceContextOnThread();
         super.tearDown();
     }
 
@@ -229,6 +234,10 @@ public class TnValueTypesTest extends RuntimeTestCase {
 
         public String alias() {
             return null;
+        }
+
+        public Set<String> sisterSet() {
+            return DfCollectionUtil.emptySet();
         }
 
         public boolean inGroup(String groupName) {

@@ -168,7 +168,10 @@ public class OptionalScalar<SCALAR> extends BaseOptional<SCALAR> {
         callbackAlwaysPresent(oneArgLambda);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     * @deprecated basically use ifPresent() or use orElse(null)
+     */
     public SCALAR orElseNull() {
         return directlyGetOrElse(null);
     }

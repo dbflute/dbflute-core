@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationMeta;
@@ -934,6 +935,10 @@ public class IfCommentEvaluatorTest extends RuntimeTestCase {
 
         public String alias() {
             return null;
+        }
+
+        public Set<String> sisterSet() {
+            return DfCollectionUtil.emptySet();
         }
 
         public boolean inGroup(String groupName) {

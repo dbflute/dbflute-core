@@ -17,6 +17,7 @@ package org.dbflute.dbmeta.valuemap;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationMeta;
@@ -65,6 +66,10 @@ public class MetaHandlingMapToEntityMapperTest extends RuntimeTestCase {
 
         public String code() {
             return null;
+        }
+        
+        public Set<String> sisterSet() {
+            return DfCollectionUtil.emptySet();
         }
 
         public static MockClassification codeOf(Object obj) {

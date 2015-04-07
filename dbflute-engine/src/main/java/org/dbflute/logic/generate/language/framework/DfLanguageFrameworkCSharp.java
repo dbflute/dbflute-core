@@ -20,16 +20,28 @@ package org.dbflute.logic.generate.language.framework;
  */
 public class DfLanguageFrameworkCSharp implements DfLanguageFramework {
 
-    public String getDBFluteDiconFileName() {
-        return "DBFlute.dicon";
-    }
-
     public String getDBFluteDiconNamespace() {
         return "DBFlute";
     }
 
+    public String getDBFluteDiconFileName() {
+        return "DBFlute.dicon";
+    }
+
     public String getJ2eeDiconResourceName() {
         return "${topNamespace}/Resources/Ado.dicon";
+    }
+
+    public String getDBFluteDiXmlNamespace() {
+        return "DBFlute";
+    }
+
+    public String getDBFluteDiXmlFileName() {
+        return "DBFlute.xml";
+    }
+
+    public String getRdbDiXmlResourceName() {
+        return "${topNamespace}/Resources/Rdb.xml";
     }
 
     public boolean isMakeDaoInterface() {

@@ -69,6 +69,7 @@ public class JavaPropertiesReader {
     protected final Map<String, JavaPropertiesStreamProvider> _extendsProviderMap = newLinkedHashMapSized(4);
     protected boolean _checkImplicitOverride;
     protected String _streamEncoding; // used if set
+    protected boolean _useNonNumberVariable;
 
     // -----------------------------------------------------
     //                                            Reflection
@@ -113,6 +114,11 @@ public class JavaPropertiesReader {
         return this;
     }
 
+    public JavaPropertiesReader useNonNumberVariable() {
+        _useNonNumberVariable = true;
+        return this;
+    }
+
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
@@ -136,30 +142,16 @@ public class JavaPropertiesReader {
             property.setCapCamelName(Srl.initCap(camelizedName));
             property.setUncapCamelName(Srl.initUncap(camelizedName));
 
-            final List<ScopeInfo> variableScopeList = newArrayList();
-            {
-                final List<ScopeInfo> scopeList;
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(value)) {
-                    scopeList = Srl.extractScopeList(value, "{", "}"); // e.g. {0} is for {1}.
-                } else {
-                    scopeList = DfCollectionUtil.emptyList();
-                }
-                for (ScopeInfo scopeInfo : scopeList) {
-                    final String content = scopeInfo.getContent();
-                    try {
-                        Integer.valueOf(content);
-                        variableScopeList.add(scopeInfo);
-                    } catch (NumberFormatException ignored) { // e.g. {A} is for {B}
-                    }
-                }
-            }
-            final List<Integer> variableNumberList = DfCollectionUtil.newArrayList();
-            for (ScopeInfo scopeInfo : variableScopeList) {
-                variableNumberList.add(valueOfVariableNumber(key, scopeInfo.getContent()));
-            }
-            property.setVariableArgDef(buildVariableArgDef(variableNumberList));
-            property.setVariableArgSet(buildVariableArgSet(variableNumberList));
+            final List<ScopeInfo> variableScopeList = analyzeVariableScopeList(value);
+            final List<Integer> variableNumberList = DfCollectionUtil.newArrayListSized(variableScopeList.size());
+            final List<String> variableStringList = DfCollectionUtil.newArrayListSized(variableScopeList.size());
+            reflectToVariableList(key, variableScopeList, variableNumberList, variableStringList);
             property.setVariableNumberList(variableNumberList);
+            property.setVariableStringList(variableStringList);
+            final List<String> variableArgNameList = prepareVariableArgNameList(variableStringList);
+            property.setVariableArgNameList(variableArgNameList);
+            property.setVariableArgDef(buildVariableArgDef(variableArgNameList));
+            property.setVariableArgSet(buildVariableArgSet(variableArgNameList));
             property.setComment(comment);
             if (containsSecureAnnotation(property)) {
                 property.toBeSecure();
@@ -168,6 +160,72 @@ public class JavaPropertiesReader {
             propertyList.add(property);
         }
         return prepareResult(prop, propertyList, duplicateKeyList);
+    }
+
+    protected List<ScopeInfo> analyzeVariableScopeList(final String value) {
+        final List<ScopeInfo> variableScopeList = newArrayList();
+        {
+            final List<ScopeInfo> scopeList;
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(value)) {
+                scopeList = extractVariableScopeList(value);
+            } else {
+                scopeList = DfCollectionUtil.emptyList();
+            }
+            for (ScopeInfo scopeInfo : scopeList) {
+                final String content = scopeInfo.getContent();
+                if (isUnsupportedVariableContent(content)) {
+                    continue;
+                }
+                variableScopeList.add(scopeInfo);
+            }
+        }
+        return variableScopeList;
+    }
+
+    protected List<ScopeInfo> extractVariableScopeList(String value) {
+        return Srl.extractScopeList(value, "{", "}"); // e.g. {0} is for {1}.
+    }
+
+    protected boolean isUnsupportedVariableContent(String content) {
+        if (content.contains(" ")) {
+            return true;
+        }
+        if (!_useNonNumberVariable) {
+            try {
+                Integer.valueOf(content);
+            } catch (NumberFormatException ignored) { // e.g. {A} is for {B}
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void reflectToVariableList(String key, List<ScopeInfo> variableScopeList, List<Integer> variableNumberList,
+            List<String> variableStringList) {
+        for (ScopeInfo scopeInfo : variableScopeList) {
+            final String content = scopeInfo.getContent();
+            final Integer variableNumber = valueOfVariableNumber(key, content);
+            if (variableNumber != null) { // for non number option
+                variableNumberList.add(variableNumber);
+            }
+            variableStringList.add(content);
+        }
+    }
+
+    protected List<String> prepareVariableArgNameList(List<String> variableStringList) {
+        final List<String> variableArgNameList = DfCollectionUtil.newArrayListSized(variableStringList.size());
+        for (Object name : variableStringList) {
+            variableArgNameList.add(doBuildVariableArgName(name));
+        }
+        return variableArgNameList;
+    }
+
+    protected String doBuildVariableArgName(Object name) {
+        return startsWithNumberVariable(name) ? ("arg" + name) : name.toString();
+    }
+
+    protected boolean startsWithNumberVariable(Object variable) {
+        return "1234567890".contains(Srl.cut(variable.toString(), 1)); // sorry, simple logic
     }
 
     protected boolean containsSecureAnnotation(JavaPropertiesProperty property) {
@@ -204,11 +262,21 @@ public class JavaPropertiesReader {
             final JavaPropertiesReader extendsReader = createExtendsReader();
             final JavaPropertiesResult extendsPropResult = extendsReader.read();
             final List<JavaPropertiesProperty> mergedList = mergeExtendsPropResult(propertyList, extendsPropResult);
-            propResult = new JavaPropertiesResult(prop, mergedList, duplicateKeyList, extendsPropResult);
+            propResult = newJavaPropertiesResult(prop, duplicateKeyList, extendsPropResult, mergedList);
         } else {
-            propResult = new JavaPropertiesResult(prop, propertyList, duplicateKeyList);
+            propResult = newJavaPropertiesResult(prop, propertyList, duplicateKeyList);
         }
         return propResult;
+    }
+
+    protected JavaPropertiesResult newJavaPropertiesResult(Properties prop, List<String> duplicateKeyList,
+            JavaPropertiesResult extendsPropResult, List<JavaPropertiesProperty> mergedList) {
+        return new JavaPropertiesResult(prop, mergedList, duplicateKeyList, extendsPropResult);
+    }
+
+    protected JavaPropertiesResult newJavaPropertiesResult(Properties prop, List<JavaPropertiesProperty> propertyList,
+            List<String> duplicateKeyList) {
+        return new JavaPropertiesResult(prop, propertyList, duplicateKeyList);
     }
 
     protected JavaPropertiesReader createExtendsReader() {
@@ -216,7 +284,7 @@ public class JavaPropertiesReader {
         final Entry<String, JavaPropertiesStreamProvider> firstEntry = providerMap.entrySet().iterator().next();
         final String firstKey = firstEntry.getKey();
         final JavaPropertiesStreamProvider firstProvider = firstEntry.getValue();
-        final JavaPropertiesReader extendsReader = new JavaPropertiesReader(firstKey, firstProvider);
+        final JavaPropertiesReader extendsReader = newJavaPropertiesReader(firstKey, firstProvider);
         providerMap.remove(firstKey);
         for (Entry<String, JavaPropertiesStreamProvider> entry : providerMap.entrySet()) { // next extends
             extendsReader.extendsProperties(entry.getKey(), entry.getValue());
@@ -225,6 +293,10 @@ public class JavaPropertiesReader {
             extendsReader.checkImplicitOverride();
         }
         return extendsReader;
+    }
+
+    protected JavaPropertiesReader newJavaPropertiesReader(String firstKey, JavaPropertiesStreamProvider firstProvider) {
+        return new JavaPropertiesReader(firstKey, firstProvider);
     }
 
     // ===================================================================================
@@ -480,29 +552,36 @@ public class JavaPropertiesReader {
         try {
             return Integer.valueOf(content);
         } catch (NumberFormatException e) {
+            if (_useNonNumberVariable) {
+                return null;
+            }
             String msg = "The NOT-number variable was found: provider=" + _streamProvider + " key=" + key;
             throw new IllegalStateException(msg, e);
         }
     }
 
-    protected String buildVariableArgDef(List<Integer> variableNumberList) {
+    protected String buildVariableArgDef(List<String> variableArgNameList) {
         final StringBuilder sb = new StringBuilder();
-        for (Integer number : variableNumberList) {
+        for (String name : variableArgNameList) {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append("String arg").append(number);
+            doBuildVariableArgStringDef(sb, name);
         }
         return sb.toString();
     }
 
-    protected String buildVariableArgSet(List<Integer> variableNumberList) {
+    protected void doBuildVariableArgStringDef(StringBuilder sb, String variableName) {
+        sb.append("String ").append(variableName); // java style
+    }
+
+    protected String buildVariableArgSet(List<String> variableArgNameList) {
         final StringBuilder sb = new StringBuilder();
-        for (Integer number : variableNumberList) {
+        for (String name : variableArgNameList) {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append("arg").append(number);
+            sb.append(name);
         }
         return sb.toString();
     }

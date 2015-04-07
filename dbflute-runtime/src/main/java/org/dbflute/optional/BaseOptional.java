@@ -21,6 +21,7 @@ import java.util.Optional;
  * The base class for optional object.
  * @param <OBJ> The type of wrapped object in the optional object.
  * @author jflute
+ * @author pull/23 (2015/03/04 Wednesday)
  * @since 1.0.5F (2014/05/10 Saturday)
  */
 public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
@@ -189,7 +190,7 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
     //                                                 -----
     /**
      * @param <RESULT> The type of mapping result.
-     * @param mapper The callback interface to apply. (NotNull)
+     * @param mapper The callback interface to apply, null return allowed as empty. (NotNull)
      * @return The optional object as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     protected <RESULT> OptionalThing<RESULT> callbackMapping(OptionalThingFunction<? super OBJ, ? extends RESULT> mapper) {
@@ -210,15 +211,26 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
 
     /**
      * @param <RESULT> The type of mapping result.
-     * @param mapper The callback interface to apply. (NotNull)
-     * @return The optional thing as flat-mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
+     * @param mapper The callback interface to apply, cannot return null. (NotNull)
+     * @return The optional thing as flat-mapped result. (NotNull, EmptyOptionalAllowed: when not present)
      */
     protected <RESULT> OptionalThing<RESULT> callbackFlatMapping(OptionalThingFunction<? super OBJ, OptionalThing<RESULT>> mapper) {
         if (mapper == null) {
             String msg = "The argument 'mapper' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        return exists() ? mapper.apply(_obj) : createOptionalFlatMappedObject(null);
+        // pull request, thanks! https://github.com/dbflute/dbflute-core/pull/23
+        if (exists()) {
+            final OptionalThing<RESULT> applied = mapper.apply(_obj);
+            if (applied == null) { // same specification as official optional's flatMap
+                String msg = "The function of your flatMap returned null: function=" + mapper;
+                throw new IllegalStateException(msg);
+            } else {
+                return applied;
+            }
+        } else {
+            return createOptionalFlatMappedObject(null);
+        }
     }
 
     /**

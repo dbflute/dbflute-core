@@ -418,6 +418,26 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     boolean isNonSpecifiedColumnAccessAllowed();
 
     // ===================================================================================
+    //                                                            Undefined Classification
+    //                                                            ========================
+    /**
+     * Enable the select of undefined classification code. (default is disabled)
+     * You can get undefined classification code from database.
+     */
+    void enableUndefinedClassificationSelect();
+
+    /**
+     * Disable the select of undefined classification code. (back to default)
+     */
+    void disableUndefinedClassificationSelect();
+
+    /**
+     * Is the selecting undefined classification code allowed?
+     * @return The determination, true or false.
+     */
+    boolean isUndefinedClassificationSelectAllowed();
+
+    // ===================================================================================
     //                                                                   Column NullObject
     //                                                                   =================
     /**

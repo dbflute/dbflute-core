@@ -171,6 +171,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** Does it allow access to non-specified column? {Internal} */
     protected boolean _nonSpecifiedColumnAccessAllowed; // the default is on the DBFlute generator (false @since 1.1)
 
+    /** Does it allow selecting undefined classification code? {Internal} */
+    protected boolean _undefinedClassificationSelectAllowed;
+
     /** Does it check record count before QueryUpdate? (contains QueryDelete) {Internal} */
     protected boolean _queryUpdateCountPreCheck;
 
@@ -1248,6 +1251,24 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** {@inheritDoc} */
     public boolean isNonSpecifiedColumnAccessAllowed() {
         return _nonSpecifiedColumnAccessAllowed;
+    }
+
+    // ===================================================================================
+    //                                                            Undefined Classification
+    //                                                            ========================
+    /** {@inheritDoc} */
+    public void enableUndefinedClassificationSelect() {
+        _undefinedClassificationSelectAllowed = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableUndefinedClassificationSelect() {
+        _undefinedClassificationSelectAllowed = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isUndefinedClassificationSelectAllowed() {
+        return _undefinedClassificationSelectAllowed;
     }
 
     // ===================================================================================

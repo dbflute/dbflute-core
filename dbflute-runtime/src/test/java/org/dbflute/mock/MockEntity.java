@@ -105,6 +105,16 @@ public class MockEntity implements Entity {
     }
 
     // ===================================================================================
+    //                                                                      Classification
+    //                                                                      ==============
+    public void myunlockUndefinedClassificationAccess() {
+    }
+
+    public boolean myundefinedClassificationAccessAllowed() {
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                     Birthplace Mark
     //                                                                     ===============
     public void markAsSelect() {
@@ -119,7 +129,7 @@ public class MockEntity implements Entity {
     //                                                                      ==============
     @Override
     public int hashCode() {
-        return _memberId;
+        return _memberId != null ? _memberId : 0;
     }
 
     @Override

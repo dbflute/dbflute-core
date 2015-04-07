@@ -101,7 +101,12 @@ public class DfSchemaXmlReader {
             } else {
                 tableExceptGenOnlyList = _databaseProp.getTableExceptGenOnlyList();
             }
-            final List<String> tableTargetGenOnlyList = _databaseProp.getTableTargetGenOnlyList();
+            final List<String> tableTargetGenOnlyList;
+            if (additional != null) {
+                tableTargetGenOnlyList = additional.getTableTargetGenOnlyList();
+            } else {
+                tableTargetGenOnlyList = _databaseProp.getTableTargetGenOnlyList();
+            }
             return !isTargetByHint(tableName, tableTargetGenOnlyList, tableExceptGenOnlyList);
         }
 

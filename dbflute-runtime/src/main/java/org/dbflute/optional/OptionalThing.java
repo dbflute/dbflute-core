@@ -61,7 +61,7 @@ public interface OptionalThing<THING> {
     /**
      * Apply the mapping of object to result object.
      * @param <RESULT> The type of mapping result.
-     * @param oneArgLambda The callback interface to apply. (NotNull)
+     * @param oneArgLambda The callback interface to apply, null return allowed as empty. (NotNull)
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super THING, ? extends RESULT> oneArgLambda);
@@ -69,7 +69,7 @@ public interface OptionalThing<THING> {
     /**
      * Apply the flat-mapping of object to result object.
      * @param <RESULT> The type of mapping result.
-     * @param oneArgLambda The callback interface to apply. (NotNull)
+     * @param oneArgLambda The callback interface to apply, cannot return null. (NotNull)
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     <RESULT> OptionalThing<RESULT> flatMap(OptionalThingFunction<? super THING, OptionalThing<RESULT>> oneArgLambda);
@@ -121,6 +121,7 @@ public interface OptionalThing<THING> {
      * Get the object instance or null if not present. <br>
      * basically use ifPresent() if might be not present, this is for emergency
      * @return The object instance wrapped in this optional thing or null. (NullAllowed: if not present)
+     * @deprecated basically use ifPresent() or use orElse(null)
      */
     THING orElseNull();
 }

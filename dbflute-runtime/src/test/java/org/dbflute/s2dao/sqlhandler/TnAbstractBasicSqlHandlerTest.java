@@ -34,9 +34,27 @@ import org.dbflute.unit.RuntimeTestCase;
  */
 public class TnAbstractBasicSqlHandlerTest extends RuntimeTestCase {
 
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        prepareMockBehaviorCommand();
+    }
+
+    protected void prepareMockBehaviorCommand() {
+        MockBehaviorCommand behaviorCommand = new MockBehaviorCommand();
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.setBehaviorCommand(behaviorCommand);
+        ResourceContext.setResourceContextOnThread(resourceContext);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        ResourceContext.clearResourceContextOnThread();
+        super.tearDown();
+    }
+
     public void test_logSql_whitebox_nothing() {
         // ## Arrange ##
-        prepareMockBehaviorCommand();
         TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
             protected String buildDisplaySql(String sql, Object[] args) {
@@ -65,7 +83,6 @@ public class TnAbstractBasicSqlHandlerTest extends RuntimeTestCase {
 
     public void test_logSql_whitebox_logEnabledOnly() {
         // ## Arrange ##
-        prepareMockBehaviorCommand();
         final List<String> markList = new ArrayList<String>();
         TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
@@ -115,7 +132,6 @@ public class TnAbstractBasicSqlHandlerTest extends RuntimeTestCase {
 
     public void test_logSql_whitebox_sqlLogHandlerOnly() {
         // ## Arrange ##
-        prepareMockBehaviorCommand();
         final List<String> markList = new ArrayList<String>();
         final Object[] args = new Object[] {};
         final Class<?>[] argsTypes = new Class<?>[] {};
@@ -180,7 +196,6 @@ public class TnAbstractBasicSqlHandlerTest extends RuntimeTestCase {
 
     public void test_logSql_whitebox_sqlResultHandlerOnly() {
         // ## Arrange ##
-        prepareMockBehaviorCommand();
         final List<String> markList = new ArrayList<String>();
         TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, "select ...") {
             @Override
@@ -241,7 +256,6 @@ public class TnAbstractBasicSqlHandlerTest extends RuntimeTestCase {
 
     public void test_logSql_whitebox_bigThree() {
         // ## Arrange ##
-        prepareMockBehaviorCommand();
         final List<String> markList = new ArrayList<String>();
         final Object[] args = new Object[] {};
         final Class<?>[] argsTypes = new Class<?>[] {};
@@ -315,12 +329,5 @@ public class TnAbstractBasicSqlHandlerTest extends RuntimeTestCase {
         assertEquals("log", markList.get(2));
         assertEquals("handle", markList.get(3));
         assertEquals("saveResultSqlLogInfo", markList.get(4));
-    }
-
-    protected void prepareMockBehaviorCommand() {
-        MockBehaviorCommand behaviorCommand = new MockBehaviorCommand();
-        ResourceContext resourceContext = new ResourceContext();
-        resourceContext.setBehaviorCommand(behaviorCommand);
-        ResourceContext.setResourceContextOnThread(resourceContext);
     }
 }

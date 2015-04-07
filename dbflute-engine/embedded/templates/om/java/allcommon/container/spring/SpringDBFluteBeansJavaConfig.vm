@@ -20,6 +20,9 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+#if ($database.needsDBFluteBeansHybritScanConfig())
+import org.springframework.context.annotation.ComponentScan;
+#end
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
 #if ($database.isDBFluteBeansJavaConfigLazy())
@@ -28,7 +31,9 @@ import org.springframework.context.annotation.Lazy;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.bhv.core.InvokerAssistant;
 import ${database.DBFluteInitializerClass};
+#if (!$database.needsDBFluteBeansHybritScanConfig())
 import ${glPackageExtendedBhv}.*;
+#end
 
 /**
  * The Java configuration of DBFlute beans for Spring Framework. <br>
@@ -36,6 +41,13 @@ import ${glPackageExtendedBhv}.*;
  * @author ${database.classAuthor}
  */
 @Configuration
+#if ($database.needsDBFluteBeansHybritScanConfig())
+#if ($database.isDBFluteBeansJavaConfigLazy())
+@ComponentScan(value="${glPackageExtendedBhv}", lazyInit=true)
+#else
+@ComponentScan("${glPackageExtendedBhv}")
+#end
+#end
 public class ${glDBFluteBeansJavaConfig} {
 
     // ===================================================================================
@@ -55,10 +67,10 @@ public class ${glDBFluteBeansJavaConfig} {
         return new ${database.DBFluteInitializerClass}(_dataSource);
     }
 
+    @Bean(name="${database.invokerAssistantComponentName}")
 #if ($database.isDBFluteBeansJavaConfigLazy())
     @Lazy
 #end
-    @Bean(name="${database.invokerAssistantComponentName}")
     public InvokerAssistant createImplementedInvokerAssistant() {
         ${glImplementedInvokerAssistant} assistant = newImplementedInvokerAssistant();
         assistant.setDataSource(_dataSource);
@@ -69,10 +81,10 @@ public class ${glDBFluteBeansJavaConfig} {
         return new ${database.implementedInvokerAssistantClass}();
     }
 
+    @Bean(name="${database.behaviorCommandInvokerComponentName}")
 #if ($database.isDBFluteBeansJavaConfigLazy())
     @Lazy
 #end
-    @Bean(name="${database.behaviorCommandInvokerComponentName}")
     public BehaviorCommandInvoker createBehaviorCommandInvoker() {
         BehaviorCommandInvoker invoker = newBehaviorCommandInvoker();
         invoker.setInvokerAssistant(createImplementedInvokerAssistant());
@@ -83,10 +95,10 @@ public class ${glDBFluteBeansJavaConfig} {
         return new ${database.behaviorCommandInvokerSimpleIfPlainClass}();
     }
 
+    @Bean(name="${database.behaviorSelectorComponentName}")
 #if ($database.isDBFluteBeansJavaConfigLazy())
     @Lazy
 #end
-    @Bean(name="${database.behaviorSelectorComponentName}")
     public ${glImplementedBehaviorSelector} createImplementedBehaviorSelector() {
         ${glImplementedBehaviorSelector} selector = newImplementedBehaviorSelector();
         selector.setContainer(_container);
@@ -97,10 +109,10 @@ public class ${glDBFluteBeansJavaConfig} {
         return new ${glImplementedBehaviorSelector}();
     }
 
+    @Bean(name="${database.commonColumnAutoSetupperComponentName}")
 #if ($database.isDBFluteBeansJavaConfigLazy())
     @Lazy
 #end
-    @Bean(name="${database.commonColumnAutoSetupperComponentName}")
     public ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
         return newImplementedCommonColumnAutoSetupper();
     }
@@ -108,6 +120,7 @@ public class ${glDBFluteBeansJavaConfig} {
     protected ${glImplementedCommonColumnAutoSetupper} newImplementedCommonColumnAutoSetupper() {
         return new ${glImplementedCommonColumnAutoSetupper}();
     }
+#if (!$database.needsDBFluteBeansHybritScanConfig())
 
 #set ($behaviorLoopIndex = 0)
 #foreach ($table in $database.behaviorTableList)
@@ -118,19 +131,19 @@ public class ${glDBFluteBeansJavaConfig} {
 #else
 
 #end
+    @Bean(name="${table.behaviorComponentName}")
 #if ($database.isDBFluteBeansJavaConfigLazy())
     @Lazy
 #end
-    @Bean(name="${table.behaviorComponentName}")
     public ${table.extendedBehaviorClassName} create${table.extendedBehaviorClassName}() {
-        ${table.extendedBehaviorClassName} bhv = new${table.extendedBehaviorClassName}();
+        ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
         bhv.setBehaviorCommandInvoker(createBehaviorCommandInvoker()); bhv.setBehaviorSelector(createImplementedBehaviorSelector());
 #if ($table.isWritable())
         bhv.setCommonColumnAutoSetupper(createImplementedCommonColumnAutoSetupper());
 #end
         return bhv;
     }
-    protected ${table.extendedBehaviorClassName} new${table.extendedBehaviorClassName}() { return new ${table.extendedBehaviorClassName}(); }
 #set ($behaviorLoopIndex = $behaviorLoopIndex + 1)
+#end
 #end
 }

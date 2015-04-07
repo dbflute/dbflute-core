@@ -39,9 +39,11 @@ public class JavaPropertiesProperty {
     protected String _camelizedName;
     protected String _capCamelName;
     protected String _uncapCamelName;
+    protected List<Integer> _variableNumberList;
+    protected List<String> _variableStringList;
+    protected List<String> _variableArgNameList;
     protected String _variableArgDef;
     protected String _variableArgSet;
-    protected List<Integer> _variableNumberList;
     protected String _comment;
     protected boolean _extends;
     protected boolean _override;
@@ -225,6 +227,22 @@ public class JavaPropertiesProperty {
 
     public void setVariableNumberList(List<Integer> variableNumberList) {
         _variableNumberList = variableNumberList;
+    }
+
+    public List<String> getVariableStringList() {
+        return _variableStringList;
+    }
+
+    public void setVariableStringList(List<String> variableStringList) {
+        _variableStringList = variableStringList;
+    }
+
+    public List<String> getVariableArgNameList() {
+        return _variableArgNameList;
+    }
+
+    public void setVariableArgNameList(List<String> variableArgNameList) {
+        _variableArgNameList = variableArgNameList;
     }
 
     public String getComment() {

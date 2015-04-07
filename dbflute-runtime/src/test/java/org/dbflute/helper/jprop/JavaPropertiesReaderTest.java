@@ -15,6 +15,10 @@
  */
 package org.dbflute.helper.jprop;
 
+import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.List;
+
 import org.dbflute.unit.RuntimeTestCase;
 
 /**
@@ -33,5 +37,70 @@ public class JavaPropertiesReaderTest extends RuntimeTestCase {
         // ## Assert ##
         log(actual);
         assertEquals("鎌倉のいぬ", actual);
+    }
+
+    // ===================================================================================
+    //                                                                            Variable
+    //                                                                            ========
+    public void test_variable_basic() {
+        // ## Arrange ##
+        JavaPropertiesReader reader = new JavaPropertiesReader("abc", () -> {
+            return new ByteArrayInputStream("land.sea = land{0}sea{1}ikspiary".getBytes("UTF-8"));
+        });
+
+        // ## Act ##
+        JavaPropertiesResult result = reader.read();
+
+        // ## Assert ##
+        log(result);
+        List<JavaPropertiesProperty> propertyList = result.getPropertyList();
+        assertHasOnlyOneElement(propertyList);
+        JavaPropertiesProperty property = propertyList.get(0);
+        List<Integer> variableNumberList = property.getVariableNumberList();
+        log(property, variableNumberList);
+        assertEquals(Arrays.asList(0, 1), variableNumberList);
+        assertEquals(Arrays.asList("0", "1"), property.getVariableStringList());
+    }
+
+    public void test_variable_nonNumber_default() {
+        // ## Arrange ##
+        JavaPropertiesReader reader = new JavaPropertiesReader("abc", () -> {
+            return new ByteArrayInputStream("land.sea = land{0}sea{foo}ikspiary".getBytes("UTF-8"));
+        });
+
+        // ## Act ##
+        JavaPropertiesResult result = reader.read();
+
+        // ## Assert ##
+        log(result);
+        List<JavaPropertiesProperty> propertyList = result.getPropertyList();
+        assertHasOnlyOneElement(propertyList);
+        JavaPropertiesProperty property = propertyList.get(0);
+        List<Integer> variableNumberList = property.getVariableNumberList();
+        log(property, variableNumberList);
+        assertEquals(Arrays.asList(0), variableNumberList);
+        assertEquals(Arrays.asList("0"), property.getVariableStringList());
+    }
+
+    public void test_variable_nonNumber_use() {
+        // ## Arrange ##
+        JavaPropertiesReader reader = new JavaPropertiesReader("abc", () -> {
+            return new ByteArrayInputStream("land.sea = land{0}sea{foo}ikspiary".getBytes("UTF-8"));
+        }).useNonNumberVariable();
+
+        // ## Act ##
+        JavaPropertiesResult result = reader.read();
+
+        // ## Assert ##
+        log(result);
+        List<JavaPropertiesProperty> propertyList = result.getPropertyList();
+        assertHasOnlyOneElement(propertyList);
+        JavaPropertiesProperty property = propertyList.get(0);
+        List<Integer> variableNumberList = property.getVariableNumberList();
+        log(property, variableNumberList);
+        assertEquals(Arrays.asList(0), variableNumberList);
+        assertEquals(Arrays.asList("0", "foo"), property.getVariableStringList());
+        assertEquals("String arg0, String foo", property.getVariableArgDef());
+        assertEquals("arg0, foo", property.getVariableArgSet());
     }
 }

@@ -155,6 +155,7 @@ import org.dbflute.infra.core.DfDatabaseNameMapping;
 import org.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.dbflute.logic.generate.exmange.DfCopyrightResolver;
 import org.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
+import org.dbflute.logic.generate.exmange.DfSpringComponentResolver;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.logic.generate.packagepath.DfPackagePathHandler;
@@ -1349,6 +1350,10 @@ public class Database {
         return getBasicProperties().isTargetContainerCDI();
     }
 
+    public boolean isTargetContainerLastaDi() {
+        return getBasicProperties().isTargetContainerLastaDi();
+    }
+
     // -----------------------------------------------------
     //                                             Extension
     //                                             ---------
@@ -1389,13 +1394,36 @@ public class Database {
     }
 
     public void reflectAllExCopyright(String path) {
-        final String outputPath = DfGenerator.getInstance().getOutputPath();
-        final String absolutePath = outputPath + "/" + path;
+        final String absolutePath = buildOutputAbsolutePath(path);
         final String sourceCodeEncoding = getTemplateFileEncoding();
         final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
         final DfCopyrightResolver resolver = new DfCopyrightResolver(sourceCodeEncoding, sourceCodeLn);
         final String copyright = getProperties().getAllClassCopyrightProperties().getAllClassCopyright();
         resolver.reflectAllExCopyright(absolutePath, copyright);
+    }
+
+    protected String buildOutputAbsolutePath(String path) {
+        final String outputPath = DfGenerator.getInstance().getOutputPath();
+        final String absolutePath = outputPath + "/" + path;
+        return absolutePath;
+    }
+
+    // -----------------------------------------------------
+    //                                 ExBehavior Adjustment
+    //                                 ---------------------
+    public void reflectAllExBhvAdjustmentIfNeeds(String tableDbName, String path) {
+        if (needsDBFluteBeansHybritScanConfig()) {
+            final Table table = getTable(tableDbName);
+            final String absolutePath = buildOutputAbsolutePath(path);
+            final String sourceCodeEncoding = getTemplateFileEncoding();
+            final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
+            final DfSpringComponentResolver resolver = newDfSpringComponentResolver(sourceCodeEncoding, sourceCodeLn);
+            resolver.reflectAllExComponent(table, absolutePath);
+        }
+    }
+
+    protected DfSpringComponentResolver newDfSpringComponentResolver(String sourceCodeEncoding, String sourceCodeLn) {
+        return new DfSpringComponentResolver(sourceCodeEncoding, sourceCodeLn);
     }
 
     // -----------------------------------------------------
@@ -1538,12 +1566,7 @@ public class Database {
     //                                    Serial Version UID
     //                                    ------------------
     public void reflectAllExSerialVersionUID(String path) {
-        // basically for parameter-bean
-        // because it has become to need it since 0.9.7.0
-        // (supported classes since older versions don't need this)
-        //  -> not called because it has become NOT to need it since 0.9.9.6
-        final String outputPath = DfGenerator.getInstance().getOutputPath();
-        final String absolutePath = outputPath + "/" + path;
+        final String absolutePath = buildOutputAbsolutePath(path);
         final String sourceCodeEncoding = getTemplateFileEncoding();
         final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
         final DfSerialVersionUIDResolver resolver = new DfSerialVersionUIDResolver(sourceCodeEncoding, sourceCodeLn);
@@ -1686,6 +1709,14 @@ public class Database {
         return getProperties().getDependencyInjectionProperties().isDBFluteBeansGeneratedAsJavaConfig();
     }
 
+    public boolean needsDBFluteBeansHybritScanConfig() {
+        return getProperties().getDependencyInjectionProperties().needsDBFluteBeansHybritScanConfig();
+    }
+
+    public boolean needsBehaviorSpringAutowired() {
+        return getProperties().getDependencyInjectionProperties().needsBehaviorSpringAutowired();
+    }
+
     public boolean isDBFluteBeansJavaConfigLazy() {
         return getProperties().getDependencyInjectionProperties().isDBFluteBeansJavaConfigLazy();
     }
@@ -1705,17 +1736,6 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                                 Quill
-    //                                                 -----
-    public boolean isQuillDataSourceNameValid() {
-        return getProperties().getDependencyInjectionProperties().isQuillDataSourceNameValid();
-    }
-
-    public String getQuillDataSourceName() {
-        return getProperties().getDependencyInjectionProperties().getQuillDataSourceName();
-    }
-
-    // -----------------------------------------------------
     //                                                   CDI
     //                                                   ---
     public String getMetaInfOutputDirectory() {
@@ -1724,6 +1744,52 @@ public class Database {
             resourceOutputDirectory = getBasicProperties().getDefaultResourceOutputDirectory();
         }
         return resourceOutputDirectory + "/META-INF";
+    }
+
+    // -----------------------------------------------------
+    //                                              Lasta Di
+    //                                              --------
+    // almost same as Seasar
+    public String getDBFluteDiXmlNamespace() {
+        return getProperties().getDependencyInjectionProperties().getDBFluteDiXmlNamespace();
+    }
+
+    public List<String> getDBFluteDiXmlPackageNameList() {
+        final String resourceOutputDirectory = getBasicProperties().getResourceOutputDirectory();
+        if (resourceOutputDirectory != null) {
+            final List<String> resulList = new ArrayList<String>();
+            resulList.add(resourceOutputDirectory);
+            return resulList;
+        }
+
+        // for compatibility and default value
+        final List<String> diconPackageNameList = getProperties().getDependencyInjectionProperties().getDBFluteDiXmlPackageNameList();
+        if (diconPackageNameList != null && !diconPackageNameList.isEmpty()) {
+            return diconPackageNameList;
+        } else {
+            final List<String> resulList = new ArrayList<String>();
+            resulList.add(getBasicProperties().getDefaultResourceOutputDirectory());
+            return resulList;
+        }
+    }
+
+    public String getDBFluteDiXmlFileName() {
+        return getProperties().getDependencyInjectionProperties().getDBFluteDiXmlFileName();
+    }
+
+    public String getRdbDiXmlResourceName() {
+        return getProperties().getDependencyInjectionProperties().getRdbDiXmlResourceName();
+    }
+
+    // -----------------------------------------------------
+    //                                                 Quill
+    //                                                 -----
+    public boolean isQuillDataSourceNameValid() {
+        return getProperties().getDependencyInjectionProperties().isQuillDataSourceNameValid();
+    }
+
+    public String getQuillDataSourceName() {
+        return getProperties().getDependencyInjectionProperties().getQuillDataSourceName();
     }
 
     // ===================================================================================

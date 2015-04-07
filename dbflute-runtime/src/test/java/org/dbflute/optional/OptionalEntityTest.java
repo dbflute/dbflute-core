@@ -29,6 +29,29 @@ public class OptionalEntityTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                      Value Handling
     //                                                                      ==============
+    public void test_empty_map() throws Exception {
+        assertNull(prepareOpt(null).map(obj -> "a").orElse(null));
+        assertNull(prepareOpt(null).map(obj -> null).orElse(null));
+        MockEntity entity = new MockEntity();
+        assertNull(prepareOpt(entity).map(obj -> null).orElse(null));
+        assertEquals("a", prepareOpt(entity).map(obj -> "a").get());
+        assertEquals(entity.hashCode(), prepareOpt(entity).map(obj -> obj).get().hashCode());
+    }
+
+    public void test_empty_flatmap() throws Exception {
+        assertNull(prepareOpt(null).flatMap(OptionalEntity::of).orElse(null));
+        assertNull(prepareOpt(null).flatMap(obj -> null).orElse(null));
+        MockEntity entity = new MockEntity();
+        entity.setMemberId(3);
+        try {
+            prepareOpt(entity).flatMap(obj -> null);
+            fail();
+        } catch (IllegalStateException e) {
+            log(e.getMessage());
+        }
+        assertEquals(entity.hashCode(), prepareOpt(entity).flatMap(OptionalEntity::of).get().hashCode());
+    }
+
     public void test_get_basic() throws Exception {
         // ## Arrange ##
         MockEntity entity = new MockEntity();
@@ -111,15 +134,6 @@ public class OptionalEntityTest extends RuntimeTestCase {
         // ## Act ##
         // ## Assert ##
         assertTrue(firstOpt.equals(secondOpt));
-    }
-
-    public void test_empty_flatmap() throws Exception {
-        // ## Arrange ##
-        OptionalEntity<MockEntity> opt = prepareOpt(null);
-        // ## Act ##
-        MockEntity mock = opt.flatMap(OptionalEntity::of).orElseNull();
-        // ## Assert ##
-        assertNull(mock);
     }
 
     // ===================================================================================

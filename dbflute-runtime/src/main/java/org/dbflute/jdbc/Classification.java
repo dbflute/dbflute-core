@@ -16,6 +16,7 @@
 package org.dbflute.jdbc;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The basic interface of classification. <br>
@@ -41,6 +42,12 @@ public interface Classification {
      * @return The code of the classification. (NullAllowed: when an alias is not specified in its setting)
      */
     String alias();
+
+    /**
+     * Get the set of sisters (alternate codes) for the classification.
+     * @return The set of sister code for the classification. (NotNull, EmptyAllowed, ReadOnly)
+     */
+    Set<String> sisterSet();
 
     /**
      * Is the classification in the group?

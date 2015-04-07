@@ -162,6 +162,7 @@ import org.dbflute.properties.DfBehaviorFilterProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfCommonColumnProperties;
 import org.dbflute.properties.DfDatabaseProperties;
+import org.dbflute.properties.DfDependencyInjectionProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfIncludeQueryProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
@@ -2503,7 +2504,12 @@ public class Table {
         // remove "$" because a component name that has a dollar mark may be unsupported
         // for example, in Spring Framework case:
         //   -> SAXParseException: Attribute value FOO$BAR of type ID must be a name.
-        return Srl.replace(componentName, "$", "");
+        // while, Seasar can read the name
+        final DfDependencyInjectionProperties diProp = getProperties().getDependencyInjectionProperties();
+        if (getBasicProperties().isTargetContainerSpring() && !diProp.isDBFluteBeansGeneratedAsJavaConfig()) {
+            return Srl.replace(componentName, "$", "");
+        }
+        return componentName;
     }
 
     public String getBehaviorInstanceMethodName() { // basically for Scala

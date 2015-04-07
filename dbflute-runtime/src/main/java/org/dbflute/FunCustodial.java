@@ -213,13 +213,19 @@ public class FunCustodial {
         if (meta.codeOf(code) != null) {
             return;
         }
-        handleUndefinedClassificationCode(entity.asTableDbName(), columnDbName, meta, code);
+        final boolean allowedByOption = entity.myundefinedClassificationAccessAllowed();
+        handleUndefinedClassificationCode(entity.asTableDbName(), columnDbName, meta, code, allowedByOption);
     }
 
-    public static void handleUndefinedClassificationCode(String tableDbName, String columnDbName, ClassificationMeta meta, Object code) {
+    public static void handleUndefinedClassificationCode(String tableDbName, String columnDbName, ClassificationMeta meta, Object code,
+            boolean allowedByOption) {
         final ClassificationUndefinedHandlingType undefinedHandlingType = meta.undefinedHandlingType();
         if (ClassificationUndefinedHandlingType.EXCEPTION.equals(undefinedHandlingType)) {
-            throwUndefinedClassificationCodeException(tableDbName, columnDbName, meta, code);
+            if (allowedByOption) { // e.g. ConditionBean's option
+                showUndefinedClassificationCodeMessage(tableDbName, columnDbName, meta, code); // logging at least
+            } else { // normally here
+                throwUndefinedClassificationCodeException(tableDbName, columnDbName, meta, code);
+            }
         } else if (ClassificationUndefinedHandlingType.LOGGING.equals(undefinedHandlingType)) {
             showUndefinedClassificationCodeMessage(tableDbName, columnDbName, meta, code);
         }
@@ -275,7 +281,7 @@ public class FunCustodial {
     public static void showUndefinedClassificationCodeMessage(String tableDbName, String columnDbName, ClassificationMeta meta, Object code) {
         if (_clsMetaLog.isInfoEnabled()) {
             final String classificationName = meta.classificationName();
-            final String exp = tableDbName + "." + columnDbName + "->" + classificationName + "." + code;
+            final String exp = classificationName + "." + code + " of " + tableDbName + "." + columnDbName;
             _clsMetaLog.info("*Undefined classification code was set: " + exp); // one line because of many called
         }
     }

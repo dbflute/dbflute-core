@@ -270,7 +270,7 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * });
      * </pre>
      * @param <RESULT> The type of mapping result.
-     * @param entityLambda The callback interface to apply. (NotNull)
+     * @param entityLambda The callback interface to apply, null return allowed as empty. (NotNull)
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
      */
     @SuppressWarnings("unchecked")
@@ -296,8 +296,8 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
      * });
      * </pre>
      * @param <RESULT> The type of mapping result.
-     * @param entityLambda The callback interface to apply. (NotNull)
-     * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
+     * @param entityLambda The callback interface to apply, cannot return null. (NotNull)
+     * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: when not present)
      */
     public <RESULT> OptionalThing<RESULT> flatMap(OptionalThingFunction<? super ENTITY, OptionalThing<RESULT>> entityLambda) {
         assertEntityLambdaNotNull(entityLambda);

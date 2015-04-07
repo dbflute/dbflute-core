@@ -380,6 +380,16 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
+    public void enableUndefinedClassificationSelect() {
+    }
+
+    public void disableUndefinedClassificationSelect() {
+    }
+
+    public boolean isUndefinedClassificationSelectAllowed() {
+        return false;
+    }
+
     public void enableColumnNullObject() {
     }
 

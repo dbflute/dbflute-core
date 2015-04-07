@@ -19,5 +19,6 @@ package org.dbflute.logic.manage.freegen.reflector;
  * @author jflute
  */
 public interface DfFreeGenLazyReflector {
+
     void reflect();
 }

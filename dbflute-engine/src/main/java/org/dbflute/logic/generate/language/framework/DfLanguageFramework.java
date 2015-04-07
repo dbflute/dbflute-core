@@ -21,19 +21,34 @@ package org.dbflute.logic.generate.language.framework;
 public interface DfLanguageFramework {
 
     /**
-     * @return The name-space of dbflute.dicon. (NotNull)
+     * @return The name-space of Seasar dbflute.dicon. (NotNull)
      */
     String getDBFluteDiconNamespace();
 
     /**
-     * @return The file name of dbflute.dicon. (NotNull)
+     * @return The file name of Seasar dbflute.dicon. (NotNull)
      */
     String getDBFluteDiconFileName();
 
     /**
-     * @return The resource name of j2ee.dicon. (NotNull)
+     * @return The resource name of Seasar j2ee.dicon. (NotNull)
      */
     String getJ2eeDiconResourceName();
+
+    /**
+     * @return The name-space of Lasta Di dbflute.xml. (NotNull)
+     */
+    String getDBFluteDiXmlNamespace();
+
+    /**
+     * @return The file name of Lasta Di dbflute.xml. (NotNull)
+     */
+    String getDBFluteDiXmlFileName();
+
+    /**
+     * @return The resource name of Lasta Di j2ee.xml. (NotNull)
+     */
+    String getRdbDiXmlResourceName();
 
     /**
      * @return Does it make S2Dao's interface?

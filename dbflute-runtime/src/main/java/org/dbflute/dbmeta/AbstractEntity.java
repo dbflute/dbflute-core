@@ -65,6 +65,9 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     /** The map of derived value, key is alias name. (NullAllowed: lazy-loaded) */
     protected EntityDerivedMap __derivedMap;
 
+    /** Does it allow selecting undefined classification code? {Internal} */
+    protected boolean _undefinedClassificationSelectAllowed;
+
     /** Is the entity created by DBFlute select process? */
     protected boolean __createdBySelect;
 
@@ -210,6 +213,31 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     }
 
     // ===================================================================================
+    //                                                                      Classification
+    //                                                                      ==============
+    protected <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) {
+        return FunCustodial.toNumber(obj, type);
+    }
+
+    protected Boolean toBoolean(Object obj) {
+        return FunCustodial.toBoolean(obj);
+    }
+
+    protected void checkClassificationCode(String columnDbName, ClassificationMeta meta, Object value) {
+        FunCustodial.checkClassificationCode(this, columnDbName, meta, value); // undefined handling is here
+    }
+
+    /** {@inheritDoc} */
+    public void myunlockUndefinedClassificationAccess() {
+        _undefinedClassificationSelectAllowed = true;
+    }
+
+    /** {@inheritDoc} */
+    public boolean myundefinedClassificationAccessAllowed() {
+        return _undefinedClassificationSelectAllowed;
+    }
+
+    // ===================================================================================
     //                                                                     Birthplace Mark
     //                                                                     ===============
     /** {@inheritDoc} */
@@ -223,21 +251,17 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     }
 
     // ===================================================================================
-    //                                                                      Classification
-    //                                                                      ==============
-    protected <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) {
-        return FunCustodial.toNumber(obj, type);
-    }
-
-    protected Boolean toBoolean(Object obj) {
-        return FunCustodial.toBoolean(obj);
-    }
-
-    // ===================================================================================
     //                                                                   Referrer Property
     //                                                                   =================
     protected <ELEMENT> List<ELEMENT> newReferrerList() {
         return new ArrayList<ELEMENT>();
+    }
+
+    // ===================================================================================
+    //                                                                        Empty String
+    //                                                                        ============
+    protected String convertEmptyToNull(String value) {
+        return FunCustodial.convertEmptyToNull(value);
     }
 
     // ===================================================================================
@@ -409,16 +433,5 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException("Failed to clone the entity: " + toString(), e);
         }
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    protected String convertEmptyToNull(String value) {
-        return FunCustodial.convertEmptyToNull(value);
-    }
-
-    protected void checkClassificationCode(String columnDbName, ClassificationMeta meta, Object value) {
-        FunCustodial.checkClassificationCode(this, columnDbName, meta, value);
     }
 }

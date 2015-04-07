@@ -98,16 +98,17 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @param rs Result set. (NotNull)
      * @param selectIndexMap The map of select index. map:{entityNo(e.g. loc00 or _0_3) = map:{selectColumnKeyName = selectIndex}} (NullAllowed)
      * @param propertyCache The map of property cache. map:{columnName, PropertyMapping} (NotNull)
+     * @param cb The condition-bean for the select. (NullAllowed: when not condition-bean select)
      * @return The created row. (NotNull)
      * @throws SQLException When it fails to handle the SQL.
      */
-    protected Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap, Map<String, TnPropertyMapping> propertyCache)
-            throws SQLException {
+    protected Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap,
+            Map<String, TnPropertyMapping> propertyCache, ConditionBean cb) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
         final Class<?> beanClass = _beanMetaData.getBeanClass();
-        return _rowCreator.createRow(rs, selectIndexMap, propertyCache, beanClass);
+        return _rowCreator.createRow(rs, selectIndexMap, propertyCache, beanClass, cb);
     }
 
     /**
