@@ -54,8 +54,8 @@ import org.seasar.framework.util.DisposableUtil;
 #end
 #if ($database.isTargetContainerLastaDi())
 
-import org.dbflute.lasta.di.util.Disposable;
-import org.dbflute.lasta.di.util.DisposableUtil;
+import org.dbflute.lasta.di.Disposable;
+import org.dbflute.lasta.di.DisposableUtil;
 #end
 
 /**
