@@ -34,6 +34,7 @@ import org.dbflute.properties.DfFreeGenProperties;
 import org.dbflute.properties.DfHibernateProperties;
 import org.dbflute.properties.DfIncludeQueryProperties;
 import org.dbflute.properties.DfInfraProperties;
+import org.dbflute.properties.DfLastaFluteProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.dbflute.properties.DfOptimisticLockProperties;
@@ -278,6 +279,18 @@ public final class DfPropertiesHandler {
             _infraProperties = new DfInfraProperties(prop);
         }
         return _infraProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                         ReplaceSchema
+    //                                         -------------
+    protected DfLastaFluteProperties _lastaflutePropertiess;
+
+    public DfLastaFluteProperties getLastaFluteProperties(Properties prop) {
+        if (_lastaflutePropertiess == null) {
+            _lastaflutePropertiess = new DfLastaFluteProperties(prop);
+        }
+        return _lastaflutePropertiess;
     }
 
     // -----------------------------------------------------

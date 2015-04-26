@@ -29,9 +29,9 @@ import org.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.dbflute.logic.manage.freegen.DfFreeGenManager;
 import org.dbflute.logic.manage.freegen.DfFreeGenOutput;
 import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
+import org.dbflute.logic.manage.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
-import org.dbflute.logic.manage.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
 import org.dbflute.logic.manage.freegen.filepath.DfFilePathTableLoader;
 import org.dbflute.logic.manage.freegen.json.DfJsonKeyTableLoader;
 import org.dbflute.logic.manage.freegen.json.DfJsonSchemaTableLoader;
@@ -114,15 +114,19 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     //         }
     //     }
     // }
-    protected Map<String, Object> _freeGenDefinitionMap;
+    protected Map<String, Object> _freeGenMap;
 
-    protected Map<String, Object> getFreeGenDefinitionMap() {
-        if (_freeGenDefinitionMap == null) {
-            final Map<String, Object> map = mapProp("torque.freeGenDefinitionMap", DEFAULT_EMPTY_MAP);
-            _freeGenDefinitionMap = newLinkedHashMap();
-            _freeGenDefinitionMap.putAll(map);
+    protected Map<String, Object> getFreeGenMap() {
+        if (_freeGenMap == null) {
+            Map<String, Object> map = mapProp("torque.freeGenMap", DEFAULT_EMPTY_MAP);
+            if (map.isEmpty()) {
+                map = mapProp("torque.freeGenDefinitionMap", DEFAULT_EMPTY_MAP); // for compatible
+            }
+            _freeGenMap = newLinkedHashMap();
+            _freeGenMap.putAll(map);
+            getLastaFluteProperties().prepareFreeGenProperties(_freeGenMap);
         }
-        return _freeGenDefinitionMap;
+        return _freeGenMap;
     }
 
     protected List<DfFreeGenRequest> _freeGenRequestList;
@@ -132,9 +136,9 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             return _freeGenRequestList;
         }
         _freeGenRequestList = new ArrayList<DfFreeGenRequest>();
-        final Map<String, Object> definitionMap = getFreeGenDefinitionMap();
+        final Map<String, Object> freeGenMap = getFreeGenMap();
         final Map<String, DfFreeGenRequest> requestMap = StringKeyMap.createAsCaseInsensitive(); // for correlation relation
-        for (Entry<String, Object> entry : definitionMap.entrySet()) {
+        for (Entry<String, Object> entry : freeGenMap.entrySet()) {
             final String requestName = entry.getKey();
             final Object obj = entry.getValue();
             if (!(obj instanceof Map<?, ?>)) {
@@ -269,7 +273,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
         final String value = getProperty(key);
         if (value == null || value.trim().length() == 0) {
             String msg = "The property '" + key + "' should not be null or empty:";
-            msg = msg + " simpleDtoDefinitionMap=" + getFreeGenDefinitionMap();
+            msg = msg + " simpleDtoDefinitionMap=" + getFreeGenMap();
             throw new IllegalStateException(msg);
         }
         return value;
@@ -284,10 +288,10 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     }
 
     protected String getProperty(String key) {
-        return (String) getFreeGenDefinitionMap().get(key);
+        return (String) getFreeGenMap().get(key);
     }
 
     protected boolean isProperty(String key, boolean defaultValue) {
-        return isProperty(key, defaultValue, getFreeGenDefinitionMap());
+        return isProperty(key, defaultValue, getFreeGenMap());
     }
 }
