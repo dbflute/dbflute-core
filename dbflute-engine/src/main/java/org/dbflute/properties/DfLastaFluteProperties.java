@@ -21,12 +21,16 @@ import java.util.Properties;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.properties.assistant.lastaflute.DfLastaFluteFreeGenReflector;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
  * @since 1.1.0-sp3 (2015/04/26 Sunday)
  */
 public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
+
+    private static final Logger logger = LoggerFactory.getLogger(DfLastaFluteProperties.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -39,7 +43,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     //                                                                      Definition Map
     //                                                                      ==============
     // map:{
-    //     ; projectName = maihama
+    //     ; serviceName = maihama
     //     ; domainPackage = org.docksidestage
     //     ; isMakeActionHtml = true
     //     ; commonMap = map:{
@@ -47,16 +51,16 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     //         ; freeGenList = list:{ env ; config ; label ; message ; jsp }
     //         ; propertiesHtmlList = list:{ env ; config ; label ; message }
     //     }
-    //     ; appcationMap = map:{
+    //     ; appMap = map:{
     //         ; dockside = map:{
     //             ; path = ../../maihama-dockside
-    //             ; freeGen = config, label, message, jsp
-    //             ; propertiesHtml = config, label, message
+    //             ; freeGenList = list:{ env ; config ; label ; message ; jsp }
+    //             ; propertiesHtmlList = list:{ env ; config ; label ; message }
     //         }
     //         ; hanger = map:{
     //             ; path = ../../maihama-hanger
-    //             ; freeGen = config, label, message, jsp
-    //             ; propertiesHtml = config, label, message
+    //             ; freeGenList = list:{ env ; config ; label ; message ; jsp }
+    //             ; propertiesHtmlList = list:{ env ; config ; label ; message }
     //         }
     //     }
     // }
@@ -83,14 +87,15 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     //                                                                     ===============
     public void prepareFreeGenProperties(Map<String, Object> freeGenMap) {
         final Map<String, Object> lastafluteMap = getLastafluteMap();
-        final String projectName = (String) lastafluteMap.get("projectName");
-        if (Srl.is_Null_or_TrimmedEmpty(projectName)) { // no use
+        final String serviceName = (String) lastafluteMap.get("serviceName");
+        if (Srl.is_Null_or_TrimmedEmpty(serviceName)) { // no use
             return;
         }
+        logger.info("...Loading freeGen settings from lastafluteMap: " + serviceName);
         final String domainPackage = (String) lastafluteMap.get("domainPackage");
         if (domainPackage == null) {
             throw new DfIllegalPropertySettingException("The property 'domainPackage' is required: " + lastafluteMap.keySet());
         }
-        new DfLastaFluteFreeGenReflector(freeGenMap, projectName, domainPackage).reflectFrom(getLastafluteMap());
+        new DfLastaFluteFreeGenReflector(freeGenMap, serviceName, domainPackage).reflectFrom(getLastafluteMap());
     }
 }

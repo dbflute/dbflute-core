@@ -68,11 +68,45 @@ public class DfPropTableLoader {
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap, Map<String, DfFreeGenRequest> requestMap) {
         final JavaPropertiesReader reader = createReader(requestName, resource, tableMap, requestMap);
-        final JavaPropertiesResult result = reader.read();
+        final JavaPropertiesResult result;
+        try {
+            result = reader.read();
+        } catch (RuntimeException e) {
+            throwFreeGenPropReadFailureException(requestName, resource, tableMap, mappingMap, e);
+            return null; // unreachable
+        }
         final List<Map<String, Object>> columnList = toMapList(result, tableMap);
         final String resourceFile = resource.getResourceFile();
         final String tableName = Srl.substringLastFront((Srl.substringLastRear(resourceFile, "/")));
         return new DfFreeGenTable(tableMap, tableName, columnList);
+    }
+
+    protected void throwFreeGenPropReadFailureException(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
+            Map<String, Map<String, String>> mappingMap, RuntimeException cause) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to read the property for free-gen.");
+        br.addItem("Current Request");
+        br.addElement(requestName);
+        br.addItem("Resource");
+        br.addElement(resource);
+        br.addItem("tableMap");
+        if (!tableMap.isEmpty()) {
+            for (Entry<String, Object> entry : tableMap.entrySet()) {
+                br.addElement(entry.getKey() + " = " + entry.getValue());
+            }
+        } else {
+            br.addElement("*empty");
+        }
+        br.addItem("mappingMap");
+        if (!mappingMap.isEmpty()) {
+            for (Entry<String, Map<String, String>> entry : mappingMap.entrySet()) {
+                br.addElement(entry.getKey() + " = " + entry.getValue());
+            }
+        } else {
+            br.addElement("*empty");
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg, cause);
     }
 
     protected JavaPropertiesReader createReader(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
@@ -92,7 +126,7 @@ public class DfPropTableLoader {
             while (true) {
                 final DfFreeGenRequest extendsRequest = requestMap.get(extendsPropRequest);
                 if (extendsRequest == null) {
-                    throwFreeGenPropExtendsRequestNotFoundException(requestName, extendsPropRequest);
+                    throwFreeGenPropExtendsRequestNotFoundException(requestName, extendsPropRequest, requestMap);
                 }
                 if (!extendsRequest.isResourceTypeProp()) {
                     throwFreeGenPropExtendsRequestNotPropException(requestName, extendsPropRequest, extendsRequest);
@@ -130,7 +164,8 @@ public class DfPropTableLoader {
         return reader;
     }
 
-    protected void throwFreeGenPropExtendsRequestNotFoundException(String requestName, String extendsPropRequest) {
+    protected void throwFreeGenPropExtendsRequestNotFoundException(String requestName, String extendsPropRequest,
+            Map<String, DfFreeGenRequest> requestMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the request to be extended for properties.");
         br.addItem("Advice");
@@ -139,8 +174,10 @@ public class DfPropTableLoader {
         br.addElement("Extends requests should be defined before the request.");
         br.addItem("Current Request");
         br.addElement(requestName);
-        br.addItem("Extends Request");
+        br.addItem("Extended Request");
         br.addElement(extendsPropRequest);
+        br.addItem("Existing Requests");
+        br.addElement(requestMap.keySet());
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }
@@ -154,7 +191,7 @@ public class DfPropTableLoader {
         br.addElement("The extends request should be PROP type.");
         br.addItem("Current Request");
         br.addElement(requestName);
-        br.addItem("(Not PROP) Extends Request");
+        br.addItem("Not PROP Extended Request");
         br.addElement(extendsPropRequest);
         br.addElement(extendsRequest.getResourceType());
         final String msg = br.buildExceptionMessage();
