@@ -64,12 +64,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                          replaceSchemaDefinitionMap
     //                                                          ==========================
-    public static final String KEY_replaceSchemaDefinitionMap = "replaceSchemaDefinitionMap";
+    public static final String KEY_replaceSchemaMap = "replaceSchemaMap";
+    public static final String KEY_oldReplaceSchemaMap = "replaceSchemaDefinitionMap";
     protected Map<String, Object> _replaceSchemaDefinitionMap;
 
-    public Map<String, Object> getReplaceSchemaDefinitionMap() {
+    public Map<String, Object> getReplaceSchemaMap() {
         if (_replaceSchemaDefinitionMap == null) {
-            final Map<String, Object> map = mapProp("torque." + KEY_replaceSchemaDefinitionMap, DEFAULT_EMPTY_MAP);
+            Map<String, Object> map = mapProp("torque." + KEY_replaceSchemaMap, null);
+            if (map == null) {
+                map = mapProp("torque." + KEY_oldReplaceSchemaMap, DEFAULT_EMPTY_MAP); // for compatible
+            }
             _replaceSchemaDefinitionMap = newLinkedHashMap();
             _replaceSchemaDefinitionMap.putAll(map);
         }
@@ -89,7 +93,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     protected String doGetPlaySqlDirectory() {
-        final String prop = (String) getReplaceSchemaDefinitionMap().get("playSqlDirectory");
+        final String prop = (String) getReplaceSchemaMap().get("playSqlDirectory");
         return Srl.is_NotNull_and_NotTrimmedEmpty(prop) ? prop : "playsql";
     }
 
@@ -247,7 +251,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (Srl.is_NotNull_and_NotTrimmedEmpty(dataLoadingType)) {
             return dataLoadingType;
         }
-        final String propString = (String) getReplaceSchemaDefinitionMap().get("repsEnvType");
+        final String propString = (String) getReplaceSchemaMap().get("repsEnvType");
         if (propString == null) {
             if (isSpecifiedEnvironmentType()) {
                 return getEnvironmentType();
@@ -259,7 +263,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     protected String getDataLoadingType() { // old style
-        return (String) getReplaceSchemaDefinitionMap().get("dataLoadingType");
+        return (String) getReplaceSchemaMap().get("dataLoadingType");
     }
 
     public boolean isTargetRepsFile(String sql) { // for ReplaceSchema
@@ -306,7 +310,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_filterVariablesMap != null) {
             return _filterVariablesMap;
         }
-        _filterVariablesMap = (Map<String, String>) getReplaceSchemaDefinitionMap().get("filterVariablesMap");
+        _filterVariablesMap = (Map<String, String>) getReplaceSchemaMap().get("filterVariablesMap");
         if (_filterVariablesMap == null) {
             _filterVariablesMap = new LinkedHashMap<String, String>();
         }
@@ -374,11 +378,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                             Logging
     //                                                                             =======
     public boolean isLoggingInsertSql() {
-        return isProperty("isLoggingInsertSql", true, getReplaceSchemaDefinitionMap());
+        return isProperty("isLoggingInsertSql", true, getReplaceSchemaMap());
     }
 
     protected boolean isLoggingReplaceSql() {
-        return isProperty("isLoggingReplaceSql", true, getReplaceSchemaDefinitionMap());
+        return isProperty("isLoggingReplaceSql", true, getReplaceSchemaMap());
     }
 
     public boolean isSuppressLoggingReplaceSql() {
@@ -392,14 +396,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         // default is false (at an old time, true)
         // though DBFlute task returns failure when this property is true,
         // load data may have big cost so change the default value
-        return isProperty("isErrorSqlContinue", false, getReplaceSchemaDefinitionMap());
+        return isProperty("isErrorSqlContinue", false, getReplaceSchemaMap());
     }
 
     // ===================================================================================
     //                                                                   SQL File Encoding
     //                                                                   =================
     public String getSqlFileEncoding() {
-        final String sqlFileEncoding = (String) getReplaceSchemaDefinitionMap().get("sqlFileEncoding");
+        final String sqlFileEncoding = (String) getReplaceSchemaMap().get("sqlFileEncoding");
         if (sqlFileEncoding != null && sqlFileEncoding.trim().length() != 0) {
             return sqlFileEncoding;
         } else {
@@ -411,7 +415,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                          Skip Sheet
     //                                                                          ==========
     public String getSkipSheet() {
-        final String skipSheet = (String) getReplaceSchemaDefinitionMap().get("skipSheet");
+        final String skipSheet = (String) getReplaceSchemaMap().get("skipSheet");
         if (skipSheet != null && skipSheet.trim().length() != 0) {
             return skipSheet;
         } else {
@@ -423,14 +427,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                  Increment Sequence
     //                                                                  ==================
     public boolean isIncrementSequenceToDataMax() {
-        return isProperty("isIncrementSequenceToDataMax", false, getReplaceSchemaDefinitionMap());
+        return isProperty("isIncrementSequenceToDataMax", false, getReplaceSchemaMap());
     }
 
     // ===================================================================================
     //                                                               Suppress Batch Update
     //                                                               =====================
     public boolean isSuppressBatchUpdate() {
-        return isProperty("isSuppressBatchUpdate", false, getReplaceSchemaDefinitionMap());
+        return isProperty("isSuppressBatchUpdate", false, getReplaceSchemaMap());
     }
 
     // ===================================================================================
@@ -439,7 +443,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     protected List<String> _objectTypeTargetList;
 
     public List<String> getObjectTypeTargetList() { // overrides the property of databaseInfoMap 
-        final Object obj = getReplaceSchemaDefinitionMap().get("objectTypeTargetList");
+        final Object obj = getReplaceSchemaMap().get("objectTypeTargetList");
         if (obj != null && !(obj instanceof List<?>)) {
             String msg = "The type of the property 'objectTypeTargetList' should be List: " + obj;
             throw new DfIllegalPropertyTypeException(msg);
@@ -468,7 +472,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_additionalUserMap != null) {
             return _additionalUserMap;
         }
-        final Object obj = getReplaceSchemaDefinitionMap().get("additionalUserMap");
+        final Object obj = getReplaceSchemaMap().get("additionalUserMap");
         if (obj != null && !(obj instanceof Map<?, ?>)) {
             String msg = "The type of the property 'additionalUserMap' should be Map: " + obj;
             throw new DfIllegalPropertyTypeException(msg);
@@ -549,7 +553,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_additionalDropMapList != null) {
             return _additionalDropMapList;
         }
-        final Object obj = getReplaceSchemaDefinitionMap().get("additionalDropMapList");
+        final Object obj = getReplaceSchemaMap().get("additionalDropMapList");
         if (obj == null) {
             _additionalDropMapList = DfCollectionUtil.emptyList();
         } else {
@@ -679,7 +683,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                 Application PlaySql
     //                                                                 ===================
     public String getApplicationPlaySqlDirectory() {
-        return getProperty("applicationPlaySqlDirectory", null, getReplaceSchemaDefinitionMap());
+        return getProperty("applicationPlaySqlDirectory", null, getReplaceSchemaMap());
     }
 
     public List<File> getApplicationReplaceSchemaSqlFileList() {
@@ -722,7 +726,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_arrangeBeforeRepsMap != null) {
             return _arrangeBeforeRepsMap;
         }
-        final Object obj = getReplaceSchemaDefinitionMap().get("arrangeBeforeRepsMap");
+        final Object obj = getReplaceSchemaMap().get("arrangeBeforeRepsMap");
         if (obj == null) {
             _arrangeBeforeRepsMap = DfCollectionUtil.emptyMap();
         } else {
@@ -791,27 +795,27 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                        Suppress Initializing Schema
     //                                                        ============================
     public boolean isSuppressTruncateTable() {
-        return isProperty("isSuppressTruncateTable", false, getReplaceSchemaDefinitionMap());
+        return isProperty("isSuppressTruncateTable", false, getReplaceSchemaMap());
     }
 
     public boolean isSuppressDropForeignKey() {
-        return isProperty("isSuppressDropForeignKey", false, getReplaceSchemaDefinitionMap());
+        return isProperty("isSuppressDropForeignKey", false, getReplaceSchemaMap());
     }
 
     public boolean isSuppressDropTable() {
-        return isProperty("isSuppressDropTable", false, getReplaceSchemaDefinitionMap());
+        return isProperty("isSuppressDropTable", false, getReplaceSchemaMap());
     }
 
     public boolean isSuppressDropSequence() {
-        return isProperty("isSuppressDropSequence", false, getReplaceSchemaDefinitionMap());
+        return isProperty("isSuppressDropSequence", false, getReplaceSchemaMap());
     }
 
     public boolean isSuppressDropProcedure() {
-        return isProperty("isSuppressDropProcedure", false, getReplaceSchemaDefinitionMap());
+        return isProperty("isSuppressDropProcedure", false, getReplaceSchemaMap());
     }
 
     public boolean isSuppressDropDBLink() {
-        return isProperty("isSuppressDropDBLink", false, getReplaceSchemaDefinitionMap());
+        return isProperty("isSuppressDropDBLink", false, getReplaceSchemaMap());
     }
 
     // ===================================================================================
@@ -1064,7 +1068,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                  InitializeFirstSql
     //                                                                  ==================
     public List<String> getInitializeFirstSqlList() {
-        final Object obj = getReplaceSchemaDefinitionMap().get("initializeFirstSqlList");
+        final Object obj = getReplaceSchemaMap().get("initializeFirstSqlList");
         if (obj == null) {
             return DfCollectionUtil.emptyList();
         }
@@ -1088,7 +1092,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_dropTableExceptList != null) {
             return _dropTableExceptList;
         }
-        _dropTableExceptList = (List<String>) getReplaceSchemaDefinitionMap().get("dropTableExceptList");
+        _dropTableExceptList = (List<String>) getReplaceSchemaMap().get("dropTableExceptList");
         if (_dropTableExceptList == null) {
             _dropTableExceptList = new ArrayList<String>();
         }
@@ -1102,7 +1106,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_dropSequenceExceptList != null) {
             return _dropSequenceExceptList;
         }
-        _dropSequenceExceptList = (List<String>) getReplaceSchemaDefinitionMap().get("dropSequenceExceptList");
+        _dropSequenceExceptList = (List<String>) getReplaceSchemaMap().get("dropSequenceExceptList");
         if (_dropSequenceExceptList == null) {
             _dropSequenceExceptList = new ArrayList<String>();
         }
@@ -1116,7 +1120,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_dropProcedureExceptList != null) {
             return _dropProcedureExceptList;
         }
-        _dropProcedureExceptList = (List<String>) getReplaceSchemaDefinitionMap().get("dropProcedureExceptList");
+        _dropProcedureExceptList = (List<String>) getReplaceSchemaMap().get("dropProcedureExceptList");
         if (_dropProcedureExceptList == null) {
             _dropProcedureExceptList = new ArrayList<String>();
         }

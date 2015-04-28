@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.torque.engine.database.model.TypeMap;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.dbflute.util.Srl;
@@ -45,11 +46,24 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
 
     protected Map<String, Object> getTypeMappingMap() {
         if (_typeMappingMap == null) {
-            final Map<String, Object> map = mapProp("torque." + KEY_typeMappingMap, DEFAULT_EMPTY_MAP);
+            Map<String, Object> map = mapProp("torque." + KEY_typeMappingMap, null);
+            if (map == null) {
+                map = getDatabaseProperties().getTypeMappingFacadeMap();
+                if (map == null) {
+                    map = prepareDefaultMappingMap();
+                }
+            }
             _typeMappingMap = newLinkedHashMap();
             _typeMappingMap.putAll(map);
         }
         return _typeMappingMap;
+    }
+
+    protected Map<String, Object> prepareDefaultMappingMap() {
+        final Map<String, Object> map = newLinkedHashMap();
+        map.put("NUMERIC", TypeMap.AUTO_MAPPING_MARK);
+        map.put("DECIMAL", TypeMap.AUTO_MAPPING_MARK);
+        return map;
     }
 
     // -----------------------------------------------------

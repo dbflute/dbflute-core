@@ -39,15 +39,34 @@ public final class DfRefreshProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                      Definition Map
     //                                                                      ==============
+    public static final String KEY_refreshMap = "refreshMap";
+    protected static final String KEY_oldRefreshMap = "refreshDefinitionMap";
+
     protected Map<String, Object> refreshDefinitionMap;
 
     protected Map<String, Object> getRefreshDefinitionMap() {
         if (refreshDefinitionMap == null) {
-            final Map<String, Object> map = mapProp("torque.refreshDefinitionMap", DEFAULT_EMPTY_MAP);
+            Map<String, Object> map = mapProp("torque." + KEY_refreshMap, null);
+            if (map == null) {
+                map = getLittleAdjustmentProperties().getRefreshFacadeMap();
+                if (map == null) {
+                    map = mapProp("torque." + KEY_oldRefreshMap, null); // for compatible
+                    if (map == null) {
+                        map = prepareDefaultRefreshMap();
+                    }
+                }
+            }
             refreshDefinitionMap = newLinkedHashMap();
             refreshDefinitionMap.putAll(map);
         }
         return refreshDefinitionMap;
+    }
+
+    protected Map<String, Object> prepareDefaultRefreshMap() {
+        final Map<String, Object> map = newLinkedHashMap();
+        map.put("projectName", "$$AutoDetect$$");
+        map.put("requestUrl", "http://localhost:8386/");
+        return map;
     }
 
     // ===================================================================================

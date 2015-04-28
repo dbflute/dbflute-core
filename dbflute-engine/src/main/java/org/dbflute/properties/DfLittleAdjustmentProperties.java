@@ -128,7 +128,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========
-    public boolean isAvailableNonPrimaryKeyWritable() {
+    public boolean isAvailableNonPrimaryKeyWritable() { // closet
         return isProperty("isAvailableNonPrimaryKeyWritable", false);
     }
 
@@ -407,7 +407,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isNonSpecifiedColumnAccessAllowed", isCompatibleBeforeJava8());
     }
 
-    public boolean isMakeConditionQueryEqualEmptyString() {
+    public boolean isMakeConditionQueryEqualEmptyString() { // closet
         return isProperty("isMakeConditionQueryEqualEmptyString", false);
     }
 
@@ -635,11 +635,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                     Make Deprecated
     //                                                                     ===============
-    public boolean isMakeDeprecated() {
+    public boolean isMakeDeprecated() { // closet
         return isProperty("isMakeDeprecated", false);
     }
 
-    public boolean isMakeRecentlyDeprecated() {
+    public boolean isMakeRecentlyDeprecated() { // closet
         return isProperty("isMakeRecentlyDeprecated", true);
     }
 
@@ -650,11 +650,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getExtensionClassAllcommon("DBFluteInitializer");
     }
 
-    public String getImplementedInvokerAssistantClass() { // Java only
+    public String getImplementedInvokerAssistantClass() { // Java only, closet
         return getExtensionClassAllcommon("ImplementedInvokerAssistant");
     }
 
-    public String getImplementedCommonColumnAutoSetupperClass() { // Java only
+    public String getImplementedCommonColumnAutoSetupperClass() { // Java only, closet
         return getExtensionClassAllcommon("ImplementedCommonColumnAutoSetupper");
     }
 
@@ -666,7 +666,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getExtensionClassRuntime(BehaviorCommandInvoker.class.getSimpleName());
     }
 
-    public String getS2DaoSettingClass() { // CSharp only
+    public String getS2DaoSettingClass() { // CSharp only, closet
         final String className = "S2DaoSetting";
         if (hasExtensionClass(className)) {
             return getExtendedExtensionClass(className);
@@ -725,8 +725,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                                               Quote
-    //                                                                               =====
+    //                                                                          Quote Name
+    //                                                                          ==========
     // -----------------------------------------------------
     //                                                 Table
     //                                                 -----
@@ -1078,7 +1078,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getEntitySelectFetchSize() != null;
     }
 
-    public String getEntitySelectFetchSize() {
+    public String getEntitySelectFetchSize() { // closet
         final String defaultValue = getDefaultEntitySelectFetchSize();
         return getProperty("entitySelectFetchSize", defaultValue);
     }
@@ -1103,7 +1103,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                    PagingSelect Fetch
     //                                    ------------------
     // cursor-skip only (because manual paging is no memory problem)
-    public boolean isUsePagingByCursorSkipSynchronizedFetchSize() {
+    public boolean isUsePagingByCursorSkipSynchronizedFetchSize() { // closet
         final boolean defaultValue = determineDefaultUsePagingByCursorSkipSynchronizedFetchSize();
         return isProperty("isUsePagingByCursorSkipSynchronizedFetchSize", defaultValue);
     }
@@ -1117,7 +1117,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getFixedPagingByCursorSkipSynchronizedFetchSize() != null;
     }
 
-    public String getFixedPagingByCursorSkipSynchronizedFetchSize() {
+    public String getFixedPagingByCursorSkipSynchronizedFetchSize() { // closet
         // this size is used when isUsePagingByCursorSkipSynchronizedFetchSize is true
         final String defaultValue = getDefaultFixedPagingByCursorSkipSynchronizedFetchSize();
         return getProperty("fixedPagingSynchronizedFetchSize", defaultValue);
@@ -1133,6 +1133,33 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         }
         return defaultValue;
     }
+
+    // ===================================================================================
+    //                                                                      Refresh Facade
+    //                                                                      ==============
+    public Map<String, Object> getRefreshFacadeMap() { // null allowed
+        final String key = DfRefreshProperties.KEY_refreshMap;
+        final Object obj = getLittleAdjustmentMap().get(key);
+        return obj != null ? castToMap(obj, key) : null;
+    }
+
+    // ===================================================================================
+    //                                                              Optimistic Lock Facade
+    //                                                              ======================
+    public Map<String, Object> getOptimisticLockFacadeMap() { // null allowed
+        final String key = DfOptimisticLockProperties.KEY_optimisticLockMap;
+        final Object obj = getLittleAdjustmentMap().get(key);
+        return obj != null ? castToMap(obj, key) : null;
+    }
+
+    // ===================================================================================
+    //                                                                     Sequence Facade
+    //                                                                     ===============
+    // quit because of fundamental properties
+    //public Map<String, Object> getSequenceFacadeMap() { // null allowed
+    //    final String key = DfSequenceIdentityProperties.KEY_sequenceMap;
+    //    return castToMap(getLittleAdjustmentMap().get(key), key);
+    //}
 
     // ===================================================================================
     //                                                                        Batch Update
@@ -1155,7 +1182,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isQueryUpdateCountPreCheck", defaultValue);
     }
 
-    // *stop support because of incomplete, not look much like DBFlute policy
+    // *quit support because of incomplete, not look much like DBFlute policy
     //// ===================================================================================
     ////                                                         SetupSelect Forced Relation
     ////                                                         ===========================

@@ -184,10 +184,11 @@ import org.slf4j.LoggerFactory;
 public class TypeMap {
 
     // ===================================================================================
-    //                                                                                 Log
-    //                                                                                 ===
+    //                                                                          Definition
+    //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
     private static final Logger _log = LoggerFactory.getLogger(TypeMap.class);
+    public static final String AUTO_MAPPING_MARK = "$$AutoMapping$$";
 
     // ===================================================================================
     //                                                                           JDBC Type
@@ -556,7 +557,7 @@ public class TypeMap {
     }
 
     protected static boolean needsAutoMappingNumber(String jdbcType, final String javaType) {
-        return isAutoMappingTargetNumberType(jdbcType) && javaType.equalsIgnoreCase("$$AutoMapping$$");
+        return isAutoMappingTargetNumberType(jdbcType) && javaType.equalsIgnoreCase(AUTO_MAPPING_MARK);
     }
 
     protected static boolean isAutoMappingTargetNumberType(String torqueType) {

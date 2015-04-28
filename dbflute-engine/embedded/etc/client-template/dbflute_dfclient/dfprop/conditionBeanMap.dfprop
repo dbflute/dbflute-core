@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# includeQueryMap: (NotRequired - Default map:{})
+# conditionBeanMap: (NotRequired - Default map:{})
 #
 # Specification:
 # map:{

@@ -200,6 +200,9 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     //         ; MEMBER_ACCOUNT(String) = list:{}
     //     }
     // }
+    protected static final String KEY_conditionBeanMap = "conditionBeanMap";
+    protected static final String KEY_oldIncludeQueryMap = "includeQueryMap";
+
     protected Map<String, Map<String, Map<String, List<String>>>> _includeQueryMap;
     protected final Map<String, Map<String, Map<String, List<String>>>> _excludeQueryMap = newLinkedHashMap();
     protected final Map<String, Map<String, Map<String, List<String>>>> _excludeReviveQueryMap = newLinkedHashMap();
@@ -212,7 +215,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             _includeQueryMap = doGetIncludeQueryMap();
         } catch (RuntimeException e) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-            br.addNotice("Failed to parse includeQueryMap.dfprop.");
+            br.addNotice("Failed to parse '" + KEY_conditionBeanMap + ".dfprop'.");
             br.addItem("Advice");
             br.addElement("Make sure your map!");
             final String msg = br.buildExceptionMessage();
@@ -223,14 +226,17 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
 
     protected Map<String, Map<String, Map<String, List<String>>>> doGetIncludeQueryMap() {
         final Map<String, Map<String, Map<String, List<String>>>> resultMap = newLinkedHashMap();
-        Map<String, Object> targetMap = mapProp("torque.includeQueryMap", DEFAULT_EMPTY_MAP);
+        Map<String, Object> targetMap = mapProp("torque." + KEY_conditionBeanMap, null); // primary @since 1.1.0-sp3
+        if (targetMap == null) {
+            targetMap = mapProp("torque." + KEY_oldIncludeQueryMap, DEFAULT_EMPTY_MAP); // for compatible
+        }
         targetMap = adjustColumnDrivenMergedDummyPropIfNeeds(targetMap);
         final Map<String, Map<String, Map<String, List<String>>>> columnDrivenTranslatedMap = extractColumnDrivenTranslatedMap(targetMap);
         for (Entry<String, Object> propEntry : targetMap.entrySet()) {
             final String propType = propEntry.getKey();
             final Object value = propEntry.getValue();
             if (!(value instanceof Map)) {
-                String msg = "The key 'includeQueryMap' should have map value:";
+                String msg = "The key '" + KEY_conditionBeanMap + "' should have map value:";
                 msg = msg + " key=" + propType + " value=" + value + " targetMap=" + targetMap;
                 throw new DfIllegalPropertyTypeException(msg);
             }
@@ -389,7 +395,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             final String propType = propEntry.getKey();
             final Object value = propEntry.getValue();
             if (!(value instanceof Map)) {
-                String msg = "The key 'includeQueryMap' should have map value:";
+                String msg = "The key '" + KEY_conditionBeanMap + "' should have map value:";
                 msg = msg + " key=" + propType + " value=" + value + " targetMap=" + targetMap;
                 throw new DfIllegalPropertyTypeException(msg);
             }

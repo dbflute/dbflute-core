@@ -24,8 +24,20 @@ import org.dbflute.util.DfStringUtil;
  */
 public final class DfAllClassCopyrightProperties extends DfAbstractHelperProperties {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String KEY_sourceCopyright = "sourceCopyright";
+    protected static final String KEY_oldAllClassCopyright = "allClassCopyright";
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _copyright;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfAllClassCopyrightProperties(Properties prop) {
         super(prop);
     }
@@ -37,7 +49,10 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
         if (_copyright != null) {
             return _copyright;
         }
-        String prop = stringProp("torque.allClassCopyright", "");
+        String prop = stringProp("torque." + KEY_sourceCopyright, null);
+        if (prop == null) {
+            prop = stringProp("torque." + KEY_oldAllClassCopyright, ""); // for compatible
+        }
 
         final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
         prop = DfStringUtil.replace(prop, "\r\n", "\n");
