@@ -237,6 +237,7 @@
   <target name="freegen" description="FreeGen task">
     <df-freegen
         contextProperties="${torque.contextProperties}"
+    	templatePath="${torque.templatePath}"
         environmentType="${dfenv}"
         genTarget="${gentgt}">
     </df-freegen>

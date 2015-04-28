@@ -103,6 +103,11 @@ public interface DfLanguageDependency {
     String getSql2EntityControl();
 
     /**
+     * @return The path of velocity control file for freeGen. (NotNull) 
+     */
+    String getLastaFluteFreeGenControl();
+
+    /**
      * @return The directory for generate output. (NotNull)
      */
     String getGenerateOutputDirectory();

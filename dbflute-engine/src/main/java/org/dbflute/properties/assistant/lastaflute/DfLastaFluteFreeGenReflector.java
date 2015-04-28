@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -114,10 +115,10 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                       =============
     protected void setupEnvGen(String appName, String path, boolean root) {
         final Map<String, Map<String, Object>> envMap = new LinkedHashMap<String, Map<String, Object>>();
-        _freeGenMap.put(initCap(appName) + "EnvGen", envMap);
+        registerFreeGen(initCap(appName) + "EnvGen", envMap);
         doSetupResourceMap(appName, path, envMap, "env");
         doSetupOutputConfigMap(appName, envMap, "env");
-        final Map<String, Object> tableMap = new LinkedHashMap<String, Object>();
+        final Map<String, Object> tableMap = createTableMap();
         envMap.put("tableMap", tableMap);
         if (root) {
             tableMap.put("superClassPackage", "org.dbflute.lastaflute.core.direction");
@@ -135,10 +136,10 @@ public final class DfLastaFluteFreeGenReflector {
     protected void setupConfigGen(String appName, String path) {
         final Map<String, Map<String, Object>> configMap = new LinkedHashMap<String, Map<String, Object>>();
         final String capAppName = initCap(appName);
-        _freeGenMap.put(capAppName + "ConfigGen", configMap);
+        registerFreeGen(capAppName + "ConfigGen", configMap);
         doSetupResourceMap(appName, path, configMap, "config");
         doSetupOutputConfigMap(appName, configMap, "config");
-        final Map<String, Object> tableMap = new LinkedHashMap<String, Object>();
+        final Map<String, Object> tableMap = createTableMap();
         configMap.put("tableMap", tableMap);
         tableMap.put("extendsPropRequest", capAppName + "EnvGen");
         tableMap.put("isCheckImplicitOverride", getTrueLiteral());
@@ -151,7 +152,7 @@ public final class DfLastaFluteFreeGenReflector {
     protected void doSetupOutputConfigMap(String appName, Map<String, Map<String, Object>> map, String theme) {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         map.put("outputMap", outputMap);
-        outputMap.put("templateFile", "SystemConfig.vm");
+        outputMap.put("templateFile", "LaSystemConfig.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", _mylastaPackage + ".direction");
         outputMap.put("className", initCap(appName) + initCap(theme));
@@ -162,10 +163,10 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                            ========
     protected void setupLabelGen(String appName, String path, boolean root) {
         final Map<String, Map<String, Object>> labelMap = new LinkedHashMap<String, Map<String, Object>>();
-        _freeGenMap.put(initCap(appName) + "LabelGen", labelMap);
+        registerFreeGen(initCap(appName) + "LabelGen", labelMap);
         doSetupResourceMap(appName, path, labelMap, "label");
         doSetupMessageOutputMap(appName, labelMap, "labels");
-        final Map<String, Object> tableMap = new LinkedHashMap<String, Object>();
+        final Map<String, Object> tableMap = createTableMap();
         labelMap.put("tableMap", tableMap);
         tableMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap("label", "prefix:labels."));
         if (!root) {
@@ -175,10 +176,10 @@ public final class DfLastaFluteFreeGenReflector {
 
     protected void setupMessageGen(String appName, String path) {
         final Map<String, Map<String, Object>> labelMap = new LinkedHashMap<String, Map<String, Object>>();
-        _freeGenMap.put(initCap(appName) + "MessageGen", labelMap);
+        registerFreeGen(initCap(appName) + "MessageGen", labelMap);
         doSetupResourceMap(appName, path, labelMap, "message");
         doSetupMessageOutputMap(appName, labelMap, "messages");
-        final Map<String, Object> tableMap = new LinkedHashMap<String, Object>();
+        final Map<String, Object> tableMap = createTableMap();
         labelMap.put("tableMap", tableMap);
         tableMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap("label", "prefix:labels."));
         doSetupMessageTableMapInheritance(appName, tableMap, "label");
@@ -187,7 +188,7 @@ public final class DfLastaFluteFreeGenReflector {
     protected void doSetupMessageOutputMap(String appName, Map<String, Map<String, Object>> map, String theme) {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         map.put("outputMap", outputMap);
-        outputMap.put("templateFile", "UserMessages.vm");
+        outputMap.put("templateFile", "LaUserMessages.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", buildMessagesPackage());
         outputMap.put("className", initCap(appName) + initCap(theme));
@@ -208,12 +209,27 @@ public final class DfLastaFluteFreeGenReflector {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected void registerFreeGen(String key, Map<String, Map<String, Object>> map) {
+        final Object existing = _freeGenMap.get(key);
+        if (existing != null) {
+            String msg = "Found the existing same-name setting: key=" + key + " existing=" + existing;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+        _freeGenMap.put(key, map);
+    }
+
     protected void doSetupResourceMap(String appName, String path, Map<String, Map<String, Object>> map, String theme) {
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         map.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
         resourceMap.put("resourceType", "PROP");
         resourceMap.put("resourceFile", "$$baseDir$$/resources/" + appName + "_" + theme + ".properties");
+    }
+
+    protected Map<String, Object> createTableMap() {
+        final Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("isLastaFlute", true);
+        return map;
     }
 
     protected String getTrueLiteral() {

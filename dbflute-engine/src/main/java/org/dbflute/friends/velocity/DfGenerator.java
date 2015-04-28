@@ -17,6 +17,7 @@ package org.dbflute.friends.velocity;
 
 import java.util.List;
 
+import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
 
 /**
@@ -29,7 +30,7 @@ public abstract class DfGenerator {
     //                                                                          Definition
     //                                                                          ==========
     /** The implementation instance of generator. (Singleton) */
-    private static volatile DfGenerator _instance;
+    private static volatile DfGenerator _instance = new DfFlutistGenerator();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -41,33 +42,38 @@ public abstract class DfGenerator {
     //                                                                  Singleton Instance
     //                                                                  ==================
     public static DfGenerator getInstance() {
-        if (_instance != null) {
-            return _instance;
-        }
-        synchronized (DfGenerator.class) {
-            if (_instance != null) {
-                return _instance;
-            }
-            // use flutist generator fixedly @since 1.0.3
-            // (not use Velocity's generator in DBFlute)
-            _instance = DfFlutistGenerator.getInstance();
-        }
         return _instance;
     }
 
     // ===================================================================================
-    //                                                                  Generator's Method
-    //                                                                  ==================
+    //                                                                      Prepare Engine
+    //                                                                      ==============
+    public abstract void initializeEngine();
+
+    public abstract void addProperty(String key, String value);
+
+    public abstract void setProperty(String key, String value);
+
+    public abstract VelocityEngine getVelocityEngine();
+
+    // ===================================================================================
+    //                                                                     Engine Resource
+    //                                                                     ===============
     public abstract String getOutputPath();
 
     public abstract void setOutputPath(String outputPath);
+
+    public abstract String getTemplatePath();
+
+    public abstract void setTemplatePath(String templatePath);
 
     public abstract void setInputEncoding(String inputEncoding);
 
     public abstract void setOutputEncoding(String outputEncoding);
 
-    public abstract void setTemplatePath(String templatePath);
-
+    // ===================================================================================
+    //                                                                      Parse Template
+    //                                                                      ==============
     public abstract String parse(String inputTemplate, String outputFile, String objectID, Object object) throws Exception;
 
     public abstract String parse(String controlTemplate, Context controlContext) throws Exception;

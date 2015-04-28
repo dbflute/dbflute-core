@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -123,10 +124,26 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
                 map = mapProp("torque.freeGenDefinitionMap", DEFAULT_EMPTY_MAP); // for compatible
             }
             _freeGenMap = newLinkedHashMap();
-            _freeGenMap.putAll(map);
-            getLastaFluteProperties().prepareFreeGenProperties(_freeGenMap);
+            prepareEmbeddedProperties();
+            prepareSpecifiedProperties(map);
         }
         return _freeGenMap;
+    }
+
+    protected void prepareEmbeddedProperties() {
+        getLastaFluteProperties().prepareFreeGenProperties(_freeGenMap);
+    }
+
+    protected void prepareSpecifiedProperties(Map<String, Object> map) {
+        for (Entry<String, Object> entry : map.entrySet()) {
+            final String key = entry.getKey();
+            final Object value = entry.getValue();
+            if (_freeGenMap.containsKey(key)) {
+                String msg = "Already embedded the freeGen setting: " + key + ", " + value;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+            _freeGenMap.put(key, value);
+        }
     }
 
     protected List<DfFreeGenRequest> _freeGenRequestList;
