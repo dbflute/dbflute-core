@@ -7,6 +7,8 @@ o databaseInfoMap.dfprop
 Properties for additional informations:
 o additionalForeignKeyMap.dfprop
 o additionalPrimaryKeyMap.dfprop
+o additionalUniqueKeyMap.dfprop (manual making)
+o additionalTableMap.dfprop (manual making)
 
 Properties for implementation environments:
 o classificationDefinitionMap.dfprop
@@ -26,3 +28,9 @@ o documentDefinitionMap.dfprop
 
 Properties for non-functional adjustments:
 o sourceCopyright.dfprop
+o infraMap.dfprop (manual making)
+
+Properties for plug-ins:
+o freeGenMap.dfprop (manual making)
+o lastafluteMap.dfprop (manual making)
+o simpleDtoMap.dfprop (manual making)
