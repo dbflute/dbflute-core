@@ -119,23 +119,23 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
 
     protected Map<String, Object> getFreeGenMap() {
         if (_freeGenMap == null) {
-            Map<String, Object> map = mapProp("torque.freeGenMap", null);
-            if (map == null) {
-                map = mapProp("torque.freeGenDefinitionMap", DEFAULT_EMPTY_MAP); // for compatible
+            Map<String, Object> specifiedMap = mapProp("torque.freeGenMap", null);
+            if (specifiedMap == null) {
+                specifiedMap = mapProp("torque.freeGenDefinitionMap", DEFAULT_EMPTY_MAP); // for compatible
             }
             _freeGenMap = newLinkedHashMap();
-            prepareEmbeddedProperties();
-            prepareSpecifiedProperties(map);
+            reflectEmbeddedProperties();
+            reflectSpecifiedProperties(specifiedMap);
         }
         return _freeGenMap;
     }
 
-    protected void prepareEmbeddedProperties() {
-        getLastaFluteProperties().prepareFreeGenProperties(_freeGenMap);
+    protected void reflectEmbeddedProperties() {
+        getLastaFluteProperties().reflectFreeGenMap(_freeGenMap);
     }
 
-    protected void prepareSpecifiedProperties(Map<String, Object> map) {
-        for (Entry<String, Object> entry : map.entrySet()) {
+    protected void reflectSpecifiedProperties(Map<String, Object> specifiedMap) {
+        for (Entry<String, Object> entry : specifiedMap.entrySet()) {
             final String key = entry.getKey();
             final Object value = entry.getValue();
             if (_freeGenMap.containsKey(key)) {

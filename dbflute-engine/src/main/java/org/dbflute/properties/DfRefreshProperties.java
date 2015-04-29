@@ -15,6 +15,7 @@
  */
 package org.dbflute.properties;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -42,10 +43,10 @@ public final class DfRefreshProperties extends DfAbstractHelperProperties {
     public static final String KEY_refreshMap = "refreshMap";
     protected static final String KEY_oldRefreshMap = "refreshDefinitionMap";
 
-    protected Map<String, Object> refreshDefinitionMap;
+    protected Map<String, Object> _refreshMap;
 
-    protected Map<String, Object> getRefreshDefinitionMap() {
-        if (refreshDefinitionMap == null) {
+    protected Map<String, Object> getRefreshMap() {
+        if (_refreshMap == null) {
             Map<String, Object> map = mapProp("torque." + KEY_refreshMap, null);
             if (map == null) {
                 map = getLittleAdjustmentProperties().getRefreshFacadeMap();
@@ -56,10 +57,11 @@ public final class DfRefreshProperties extends DfAbstractHelperProperties {
                     }
                 }
             }
-            refreshDefinitionMap = newLinkedHashMap();
-            refreshDefinitionMap.putAll(map);
+            reflectEmbeddedProjectName(map);
+            _refreshMap = newLinkedHashMap();
+            _refreshMap.putAll(map);
         }
-        return refreshDefinitionMap;
+        return _refreshMap;
     }
 
     protected Map<String, Object> prepareDefaultRefreshMap() {
@@ -69,11 +71,22 @@ public final class DfRefreshProperties extends DfAbstractHelperProperties {
         return map;
     }
 
+    protected void reflectEmbeddedProjectName(Map<String, Object> map) {
+        final List<String> projectNameList = new ArrayList<String>();
+        getLastaFluteProperties().reflectRefreshProjectList(projectNameList);
+        String projectName = (String) map.get("projectName");
+        projectName = Srl.is_NotNull_and_NotTrimmedEmpty(projectName) ? projectName : "$$AutoDetect$$";
+        for (String element : projectNameList) {
+            projectName = projectName + "/" + element;
+        }
+        map.put("projectName", projectName);
+    }
+
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
     public boolean hasRefreshDefinition() {
-        return !getRefreshDefinitionMap().isEmpty();
+        return !getRefreshMap().isEmpty();
     }
 
     // ===================================================================================
@@ -106,6 +119,6 @@ public final class DfRefreshProperties extends DfAbstractHelperProperties {
     }
 
     protected String getRefreshProperty(String key) {
-        return (String) getRefreshDefinitionMap().get(key);
+        return (String) getRefreshMap().get(key);
     }
 }

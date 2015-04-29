@@ -1076,17 +1076,17 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //     ; df:header = map:{
     //         ; title = Properties Overview
     //     }
-    //     ; ApplicationProp = map:{
+    //     ; DocksideEnv = map:{
     //         ; baseDir = ../src
-    //         ; rootFile = $$baseDir$$/main/resources/application_ja.properties
+    //         ; rootFile = $$baseDir$$/main/resources/dockside_env.properties
     //         ; environmentMap = map:{
     //             ; production = $$baseDir$$/production/resources
     //             ; integration = $$baseDir$$/integration/resources
     //         }
     //         ; diffIgnoredKeyList = list:{ errors.ignored.key }
     //         ; maskedKeyList = list:{ errors.masked.key }
-    //         ; extendsPropRequest = CommonApplicationProp
-    //         ; isCheckImplicitOverride = false
+    //         ; extendsPropRequest = MaihamaConfig
+    //         ; isCheckImplicitOverride = true
     //     }
     // }
     protected Map<String, Object> _propertiesHtmlHeaderMap;
@@ -1096,16 +1096,36 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (_propertiesHtmlMap != null) {
             return _propertiesHtmlMap;
         }
-        final String key = "propertiesHtmlMap";
-        final Map<String, Object> definitionMap = getDocumentMap();
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> propertiesHtmlMap = (Map<String, Object>) definitionMap.get(key);
-        if (propertiesHtmlMap != null) {
-            _propertiesHtmlMap = resolvePropertiesHtmlMap(propertiesHtmlMap);
-        } else {
-            _propertiesHtmlMap = DfCollectionUtil.emptyMap();
-        }
+        _propertiesHtmlMap = resolvePropertiesHtmlMap(preparePropertiesHtmlResourceMap());
         return _propertiesHtmlMap;
+    }
+
+    protected Map<String, Object> preparePropertiesHtmlResourceMap() {
+        final Map<String, Object> propHtmlMap = newLinkedHashMap();
+        reflectEmbeddedPropertiesHtmlMap(propHtmlMap);
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> specifiedMap = (Map<String, Object>) getDocumentMap().get("propertiesHtmlMap");
+        reflectSpecifiedPropertiesHtmlMap(propHtmlMap, specifiedMap);
+        return propHtmlMap;
+    }
+
+    protected void reflectEmbeddedPropertiesHtmlMap(Map<String, Object> propHtmlMap) {
+        getLastaFluteProperties().reflectPropertiesHtmlMap(propHtmlMap);
+    }
+
+    protected void reflectSpecifiedPropertiesHtmlMap(Map<String, Object> propHtmlMap, Map<String, Object> specifiedMap) {
+        if (specifiedMap == null) {
+            return;
+        }
+        for (Entry<String, Object> entry : specifiedMap.entrySet()) {
+            final String key = entry.getKey();
+            final Object value = entry.getValue();
+            if (propHtmlMap.containsKey(key)) {
+                String msg = "Already embedded the propertiesHtml setting: " + key + ", " + value;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+            propHtmlMap.put(key, value);
+        }
     }
 
     protected Map<String, Map<String, Object>> resolvePropertiesHtmlMap(Map<String, Object> propertiesHtmlMap) {

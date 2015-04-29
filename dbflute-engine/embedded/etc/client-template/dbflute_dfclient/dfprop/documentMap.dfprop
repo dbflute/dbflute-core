@@ -206,16 +206,14 @@ map:{
     #   o isCheckImplicitOverride: does it check implicit override? (NotRequired)
     #
     #; propertiesHtmlMap = map:{
-    #    ; ApplicationProperties = map:{
+    #    ; MaihamaEnv = map:{
     #        ; baseDir = ../src
-    #        ; rootFile = $$baseDir$$/main/resources/application_ja.properties
+    #        ; rootFile = $$baseDir$$/main/resources/maihama_env.properties
     #        ; environmentMap = map:{
     #            ; integration = $$baseDir$$/integration/resources
     #            ; production = $$baseDir$$/production/resources
     #        }
-    #        ; diffIgnoredKeyList = list:{}
-    #        ; maskedKeyList = list:{}
-    #        ; isEnvOnlyFloatLeft = false
+    #        ; diffIgnoredKeyList = list:{} ; maskedKeyList = list:{} ; isEnvOnlyFloatLeft = false
     #        ; extendsPropRequest = null
     #        ; isCheckImplicitOverride = false
     #    }
