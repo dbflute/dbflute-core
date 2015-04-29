@@ -142,20 +142,30 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     //                                                                 Application FreeGen
     //                                                                 ===================
     protected void processApplicationFreeGen() {
-        final String freegenSpace = "./freegen";
+        final String freeSpace = "./freegen";
         try {
-            templatePath = new File(freegenSpace).getCanonicalPath();
+            final File freeGenDir = new File(freeSpace);
+            if (!freeGenDir.exists()) {
+                _log.info("*No freeGen space so skip application freeGen: path=" + freeSpace);
+                return;
+            }
+            templatePath = freeGenDir.getCanonicalPath();
         } catch (IOException e) {
-            String msg = "Failed to set template path: " + freegenSpace;
+            String msg = "Failed to set template path: " + freeSpace;
             throw new IllegalStateException(msg, e);
         }
         final String control = CONTROL_FREEGEN_VM;
+        final String pathOfControl = freeSpace + "/" + control;
+        if (!new File(pathOfControl).exists()) {
+            _log.info("*No freeGen control vm so skip application freeGen: path=" + pathOfControl);
+            return;
+        }
         _log.info("");
         _log.info("* * * * * * * * * * * * * * * *");
         _log.info("* Process Application FreeGen *");
         _log.info("* * * * * * * * * * * * * * * *");
-        _log.info("...Using control: " + freegenSpace + "/" + control);
-        setControlTemplate(control);
+        _log.info("...Using control: " + pathOfControl);
+        setControlTemplate(control); // from templatePath, so pure name here
         fireVelocityProcess();
     }
 
