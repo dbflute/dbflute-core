@@ -1,4 +1,4 @@
-package ${request.package};
+${manager.allClassCopyright}package ${request.package};
 #if (!$table.columnList.isEmpty())
 
 import org.dbflute.lastaflute.web.response.next.HtmlNext;

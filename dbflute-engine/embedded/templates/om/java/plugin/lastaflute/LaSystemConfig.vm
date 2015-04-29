@@ -1,4 +1,4 @@
-package ${request.package};
+${manager.allClassCopyright}package ${request.package};
 
 #if ($request.tableMap.interfaceSimpleName)
 import ${request.tableMap.superClassPackage}.${request.tableMap.interfaceSimpleName};

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
+import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -107,9 +108,9 @@ public final class DfLastaFluteFreeGenReflector {
                     } else if ("message".equals(freeGen)) {
                         setupMessageGen(appName, path);
                     } else if ("jsp".equals(freeGen)) {
-                        // TODO jflute lastaflute: JSP_PATH
+                        setupJspPathGen(appName, path);
                     } else if ("html".equals(freeGen)) {
-                        // TODO jflute lastaflute: HTML_PATH
+                        // TODO jflute lastaflute: thymeleaf's HTML_PATH
                     } else {
                         String msg = "Unkonwn type for appMap's freeGen: " + freeGen;
                         throw new DfIllegalPropertySettingException(msg);
@@ -221,6 +222,34 @@ public final class DfLastaFluteFreeGenReflector {
     }
 
     // ===================================================================================
+    //                                                                       HTML Template
+    //                                                                       =============
+    protected void setupJspPathGen(String appName, String path) {
+        doSetupHtmlTemplatePathGen(appName, path, "$$baseDir$$/webapp/WEB-INF/view", "jsp");
+    }
+
+    protected void doSetupHtmlTemplatePathGen(String appName, String path, String targetDir, String ext) {
+        final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
+        final String capAppName = initCap(appName);
+        registerFreeGen(capAppName + "HtmlPath", pathMap);
+        final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
+        pathMap.put("resourceMap", resourceMap);
+        resourceMap.put("baseDir", path + "/src/main");
+        resourceMap.put("resourceType", DfFreeGenRequest.DfFreeGenerateResourceType.FILE_PATH.name());
+        final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
+        pathMap.put("outputMap", outputMap);
+        outputMap.put("templateFile", "LaHtmlPath.vm");
+        outputMap.put("outputDirectory", "$$baseDir$$/java");
+        outputMap.put("package", _appPackage + ".web.base.html");
+        outputMap.put("className", initCap(appName) + "HtmlPath");
+        final Map<String, Object> tableMap = createTableMap();
+        pathMap.put("tableMap", tableMap);
+        tableMap.put("targetDir", targetDir);
+        tableMap.put("targetExt", "." + ext);
+        tableMap.put("exceptPathList", DfCollectionUtil.newArrayList("contain:/view/common/"));
+    }
+
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected String buildTitleSuffix(String theme) {
@@ -240,7 +269,7 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         map.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
-        resourceMap.put("resourceType", "PROP");
+        resourceMap.put("resourceType", DfFreeGenRequest.DfFreeGenerateResourceType.PROP.name());
         resourceMap.put("resourceFile", "$$baseDir$$/resources/" + appName + "_" + theme + ".properties");
     }
 
