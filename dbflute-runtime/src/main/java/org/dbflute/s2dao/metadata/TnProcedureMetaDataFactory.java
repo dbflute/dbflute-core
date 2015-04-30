@@ -113,7 +113,7 @@ public class TnProcedureMetaDataFactory {
 
     protected TnProcedureParameterType createProcedureParameterType(final DfPropertyDesc parameterDesc) {
         final Type genericReturnType = parameterDesc.getReadMethod().getGenericReturnType();
-        final Class<?> elementType = DfReflectionUtil.getGenericType(genericReturnType);
+        final Class<?> elementType = DfReflectionUtil.getGenericFirstClass(genericReturnType);
         return new TnProcedureParameterType(new TnProcedureParameterAccessor() {
             public Object getValue(Object target) {
                 return parameterDesc.getValue(target);

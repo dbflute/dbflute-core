@@ -121,7 +121,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
 
     public final Class<?> getGenericType() {
         if (_readMethod != null) {
-            return DfReflectionUtil.getGenericType(_readMethod.getGenericReturnType());
+            return DfReflectionUtil.getGenericFirstClass(_readMethod.getGenericReturnType());
         }
         return null;
     }

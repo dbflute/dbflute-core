@@ -47,24 +47,6 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     /** The value of current page number. */
     protected int _currentPageNumber;
 
-    // -----------------------------------------------------
-    //                                            Page Group
-    //                                            ----------
-    /** The value of page-group bean. */
-    protected PageGroupBean _pageGroupBean;
-
-    /** The value of page-group option. */
-    protected PageGroupOption _pageGroupOption;
-
-    // -----------------------------------------------------
-    //                                            Page Range
-    //                                            ----------
-    /** The value of page-range bean. */
-    protected PageRangeBean _pageRangeBean;
-
-    /** The value of page-range option. */
-    protected PageRangeOption _pageRangeOption;
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -152,7 +134,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * <span style="color: #3F7E5E">// previous</span> <span style="color: #CC4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
      * </pre>
      * @param opLambda The callback for setting of page-group option. (NotNull)
-     * @return The value of pageGroupBean. (NotNull)
+     * @return The bean of page group. (NotNull)
      */
     public PageGroupBean pageGroup(PageNumberLinkOptionCall<PageGroupOption> opLambda) {
         assertPageGroupOptionCall(opLambda);
@@ -201,7 +183,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * <span style="color: #3F7E5E">// previous</span> <span style="color: #CC4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
      * </pre>
      * @param opLambda The callback for setting of page-range option. (NotNull)
-     * @return The value of pageRangeBean. (NotNull)
+     * @return The bean of page range. (NotNull)
      */
     public PageRangeBean pageRange(PageNumberLinkOptionCall<PageRangeOption> opLambda) {
         assertPageRangeOptionCall(opLambda);
@@ -243,7 +225,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * Calculate all page count.
      * @param allRecordCount The record count of all records (without paging).
      * @param pageSize The record count of one page.
-     * @return All page count.
+     * @return The count of all pages.
      */
     protected int calculateAllPageCount(int allRecordCount, int pageSize) {
         if (allRecordCount == 0) {
@@ -286,6 +268,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     /**
      * @return Hash-code from primary-keys.
      */
+    @Override
     public int hashCode() {
         int result = 17;
         result = (31 * result) + _pageSize;
@@ -300,6 +283,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @param other Other entity. (NullAllowed)
      * @return Comparing result. If other is null, returns false.
      */
+    @Override
     public boolean equals(Object other) {
         boolean equals = super.equals(other);
         if (!equals) {
@@ -344,7 +328,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      *  8 / 23 pages (<span style="color: #CC4747">453</span> records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * </pre>
-     * @return allRecordCount The value of allRecordCount.
+     * @return The count of all records without paging.
      */
     @Override
     public int getAllRecordCount() { // override for java-doc
@@ -353,7 +337,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
 
     /**
      * Set the value of allRecordCount when no paging with initializing cached beans.
-     * @param allRecordCount The value of allRecordCount.
+     * @param allRecordCount The count of all records without paging.
      */
     @Override
     public void setAllRecordCount(int allRecordCount) {
@@ -362,7 +346,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
 
     /**
      * Get the value of pageSize that means record size in a page.
-     * @return The value of pageSize.
+     * @return The size of one page.
      */
     public int getPageSize() {
         return _pageSize;
@@ -370,7 +354,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
 
     /**
      * Set the value of pageSize with initializing cached beans.
-     * @param pageSize The value of pageSize.
+     * @param pageSize The size of one page.
      */
     public void setPageSize(int pageSize) {
         _pageSize = pageSize;
@@ -383,7 +367,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      *  <span style="color: #CC4747">8</span> / 23 pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * </pre>
-     * @return The value of currentPageNumber.
+     * @return The number of current page.
      */
     public int getCurrentPageNumber() {
         return _currentPageNumber;
@@ -391,7 +375,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
 
     /**
      * Set the value of currentPageNumber with initializing cached beans.
-     * @param currentPageNumber The value of currentPageNumber.
+     * @param currentPageNumber The number of current page.
      */
     public void setCurrentPageNumber(int currentPageNumber) {
         _currentPageNumber = currentPageNumber;
@@ -407,25 +391,25 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      *  8 / <span style="color: #CC4747">23</span> pages (453 records)
      * previous 3 4 5 6 7 8 9 10 11 12 13 next
      * </pre>
-     * @return The value of allPageCount.
+     * @return The count of all pages.
      */
     public int getAllPageCount() {
         return calculateAllPageCount(_allRecordCount, _pageSize);
     }
 
     /**
-     * Get the value of prePageNumber that is calculated. <br>
-     * You should use this.isExistPrePage() before calling this. (call only when true)
+     * Get the value of previousPageNumber that is calculated. <br>
+     * You should use this.existsPreviousPage() before calling this. (call only when true)
      * <pre>
      * e.g. range-size=5, current-page=8 
      *  8 / 23 pages (453 records)
      * <span style="color: #CC4747">previous</span> 3 4 5 6 <span style="color: #CC4747">7</span> 8 9 10 11 12 13 next
      * </pre>
-     * @return The value of prePageNumber.
+     * @return The number of previous page.
      */
-    public int getPrePageNumber() {
+    public int getPreviousPageNumber() {
         if (!existsPreviousPage()) {
-            String msg = "The previous page should exist when you use prePageNumber:";
+            String msg = "The previous page should exist when you use previousPageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber;
             throw new IllegalStateException(msg);
         }
@@ -440,7 +424,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 <span style="color: #CC4747">9</span> 10 11 12 13 <span style="color: #CC4747">next</span>
      * </pre>
-     * @return The value of nextPageNumber.
+     * @return The number of next page.
      */
     public int getNextPageNumber() {
         if (!existsNextPage()) {
@@ -449,6 +433,21 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
             throw new IllegalStateException(msg);
         }
         return _currentPageNumber + 1;
+    }
+
+    /**
+     * Get the value of prePageNumber that is calculated. <br>
+     * You should use this.isExistPrePage() before calling this. (call only when true)
+     * <pre>
+     * e.g. range-size=5, current-page=8 
+     *  8 / 23 pages (453 records)
+     * <span style="color: #CC4747">previous</span> 3 4 5 6 <span style="color: #CC4747">7</span> 8 9 10 11 12 13 next
+     * </pre>
+     * @return The value of prePageNumber.
+     * @deprecated use getPreviousPageNumber()
+     */
+    public int getPrePageNumber() {
+        return getPreviousPageNumber();
     }
 
     /**

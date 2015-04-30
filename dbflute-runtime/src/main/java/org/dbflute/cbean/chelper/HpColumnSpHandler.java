@@ -16,11 +16,17 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.dream.SpecifiedColumn;
+import org.dbflute.dbmeta.DBMeta;
 
 /**
  * @author jflute
  */
 public interface HpColumnSpHandler {
+
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    DBMeta asDBMeta();
 
     // ===================================================================================
     //                                                                Column Specification

@@ -277,6 +277,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
         createCBExThrower().throwSpecifyIllegalPurposeException(_purpose, this);
     }
 
+    @Deprecated
+    public boolean hasSpecifiedColumn() {
+        return hasSpecifiedLocalColumn();
+    }
+
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
