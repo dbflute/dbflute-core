@@ -1,7 +1,7 @@
 ${manager.allClassCopyright}package ${request.package};
 #if (!$table.columnList.isEmpty())
 
-import org.dbflute.lastaflute.web.response.next.HtmlNext;
+import org.lastaflute.web.response.next.HtmlNext;
 #end
 
 /**

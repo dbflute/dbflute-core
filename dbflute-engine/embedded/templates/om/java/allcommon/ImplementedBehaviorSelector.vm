@@ -49,8 +49,8 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 #end
 #if ($database.isTargetContainerLastaDi())
-import org.dbflute.lasta.di.core.LaContainer;
-import org.dbflute.lasta.di.core.exception.ComponentNotFoundException;
+import org.lastaflute.di.core.LaContainer;
+import org.lastaflute.di.core.exception.ComponentNotFoundException;
 #end
 
 /**

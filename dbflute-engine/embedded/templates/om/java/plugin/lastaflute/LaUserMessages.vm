@@ -3,7 +3,7 @@ ${manager.allClassCopyright}package ${request.package};
 #if ($request.tableMap.superClassPackage)
 import ${request.tableMap.superClassPackage}.${request.tableMap.superClassSimpleName};
 #else
-import org.dbflute.lastaflute.web.ruts.message.ActionMessages;
+import org.lastaflute.web.ruts.message.ActionMessages;
 #end
 #set ($hasMessage = false)
 #foreach ($column in $table.columnList)
@@ -14,7 +14,7 @@ import org.dbflute.lastaflute.web.ruts.message.ActionMessages;
 #end
 #end
 #if ($hasMessage)
-import org.dbflute.lastaflute.web.ruts.message.ActionMessage;
+import org.lastaflute.web.ruts.message.ActionMessage;
 #end
 
 /**
