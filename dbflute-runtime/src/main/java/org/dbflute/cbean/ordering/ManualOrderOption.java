@@ -187,7 +187,7 @@ public class ManualOrderOption implements ColumnCalculator {
      * @param opLambda The callback for option of from-to. (NotNull)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public HpMobConnectedBean when_FromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) { // #dateParade
+    public HpMobConnectedBean when_FromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) { // #date_parade
         return doWhen_FromTo(toDate(fromDate), toDate(toDate), createFromToOption(opLambda));
     }
 
@@ -679,7 +679,7 @@ public class ManualOrderOption implements ColumnCalculator {
                 }
             } else if (plainValue instanceof Number) {
                 boundExp = buildLiteralNumberExpression(plainValue);
-            } else if (isAnyLocalDate(plainValue) || plainValue instanceof Date) { // #dateParade
+            } else if (isAnyLocalDate(plainValue) || plainValue instanceof Date) { // #date_parade
                 boundExp = buildLiteralDateExpression(plainValue);
             } else {
                 String notice = "The binding of the type is unsupported on the DBMS.";

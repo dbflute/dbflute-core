@@ -231,7 +231,7 @@ public class DisplaySqlBuilder {
             return quote(bindVariable.toString());
         } else if (bindVariable instanceof Number) {
             return bindVariable.toString();
-        } else if (bindVariable instanceof LocalDate) { // #dateParade
+        } else if (bindVariable instanceof LocalDate) { // #date_parade
             return buildLocalDateText(bindVariable);
         } else if (bindVariable instanceof LocalDateTime) {
             return buildLocalDateTimeText(bindVariable);

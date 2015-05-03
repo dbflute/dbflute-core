@@ -104,7 +104,7 @@ public class PmbCustodial {
 
     @SuppressWarnings("unchecked")
     public static <DATE> DATE toLocalDate(Date date, Class<DATE> localType, TimeZone timeZone) {
-        if (LocalDate.class.isAssignableFrom(localType)) { // #dateParade
+        if (LocalDate.class.isAssignableFrom(localType)) { // #date_parade
             return (DATE) DfTypeUtil.toLocalDate(date, timeZone);
         } else if (LocalDateTime.class.isAssignableFrom(localType)) {
             return (DATE) DfTypeUtil.toLocalDateTime(date, timeZone);

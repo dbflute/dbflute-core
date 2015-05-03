@@ -270,7 +270,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      * @param toDate The 'to' local date of parameter for the specified column. (basically NotNull: null allowed if one-side allowed) 
      * @param opLambda The callback for option of from-to. (NotNull)
      */
-    public void fromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) { // #dateParade
+    public void fromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) { // #date_parade
         doFromTo(toDate(fromDate), toDate(toDate), createFromToOption(opLambda));
     }
 

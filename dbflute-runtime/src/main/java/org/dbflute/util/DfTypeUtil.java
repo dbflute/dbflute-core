@@ -965,7 +965,7 @@ public final class DfTypeUtil {
      * @throws ParseDateException When it failed to parse the string to date.
      * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      */
-    public static LocalDate toLocalDate(Object obj) { // #dateParade
+    public static LocalDate toLocalDate(Object obj) { // #date_parade
         return doConvertToLocalDate(obj, (String) null, (TimeZone) null);
     }
 
@@ -1438,7 +1438,7 @@ public final class DfTypeUtil {
         if (obj == null) {
             return null;
         }
-        if (java.sql.Date.class.isAssignableFrom(type)) { // #dateParade
+        if (java.sql.Date.class.isAssignableFrom(type)) { // #date_parade
             return (DATE) toSqlDate(obj);
         } else if (java.sql.Timestamp.class.isAssignableFrom(type)) {
             return (DATE) toTimestamp(obj);

@@ -841,7 +841,7 @@ public class FunctionFilterOption implements ParameterOption {
     // -----------------------------------------------------
     //                                             Date Type
     //                                             ---------
-    protected boolean isDateTypeColumn() { // #dateParade
+    protected boolean isDateTypeColumn() { // #date_parade
         if (_targetColumnInfo != null && _targetColumnInfo.isObjectNativeTypeDate()) {
             return true;
         }
