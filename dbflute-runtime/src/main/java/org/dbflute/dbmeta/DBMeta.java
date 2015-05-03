@@ -417,32 +417,6 @@ public interface DBMeta {
     List<ColumnInfo> getCommonColumnInfoBeforeUpdateList();
 
     // ===================================================================================
-    //                                                                       Name Handling
-    //                                                                       =============
-    /**
-     * Does the table have an object for the flexible name? {Target objects are TABLE and COLUMN}
-     * @param flexibleName The flexible name of the object. (NotNull)
-     * @return The determination, true or false.
-     */
-    boolean hasFlexibleName(String flexibleName); // #later remove this since Java8
-
-    /**
-     * Find DB name by flexible name. {Target objects are TABLE and COLUMN}
-     * @param flexibleName The flexible name of the object. (NotNull)
-     * @return The DB name of anything. (NotNull)
-     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
-     */
-    String findDbName(String flexibleName); // #later remove this since Java8
-
-    /**
-     * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
-     * @param flexibleName The flexible name of the property. (NotNull)
-     * @return The DB name of anything. (NotNull)
-     * @throws org.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
-     */
-    String findPropertyName(String flexibleName); // #later remove this since Java8
-
-    // ===================================================================================
     //                                                                           Type Name
     //                                                                           =========
     /**

@@ -84,8 +84,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                  Information Resource
     //                                  --------------------
     // lazy-initialized at corresponding getters
-    private volatile Map<String, String> _tableDbNameFlexibleMap;
-    private volatile Map<String, String> _tablePropertyNameFlexibleMap;
     private volatile List<ColumnInfo> _columnInfoList;
     private volatile StringKeyMap<ColumnInfo> _columnInfoFlexibleMap;
     private volatile PrimaryInfo _primaryInfo;
@@ -100,21 +98,10 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                             Resource Initialization
     //                                                             =======================
     protected void initializeInformationResource() { // for instance initializer of subclass.
-        // initialize the flexible map of table DB name
-        getTableDbNameFlexibleMap();
-
-        // initialize the flexible map of table property name
-        getTablePropertyNameFlexibleMap();
-
-        // initialize the list of column information
-        getColumnInfoList();
-
-        // initialize the flexible map of column information 
-        getColumnInfoFlexibleMap();
-
-        // initialize the primary unique information
+        getColumnInfoList(); // initialize the list of column information
+        getColumnInfoFlexibleMap(); // initialize the flexible map of column information
         if (hasPrimaryKey()) {
-            getPrimaryInfo();
+            getPrimaryInfo(); // initialize the primary unique information
         }
 
         // these should not be initialized here
@@ -262,47 +249,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     public String getTableComment() {
         return null;
-    }
-
-    // -----------------------------------------------------
-    //                                          Flexible Map
-    //                                          ------------
-    /**
-     * Get the flexible map of table DB name.
-     * @return The flexible map of table DB name. (NotNull, NotEmpty, ReadOnly)
-     */
-    protected Map<String, String> getTableDbNameFlexibleMap() {
-        if (_tableDbNameFlexibleMap != null) {
-            return _tableDbNameFlexibleMap;
-        }
-        synchronized (this) {
-            if (_tableDbNameFlexibleMap != null) {
-                return _tableDbNameFlexibleMap;
-            }
-            final StringKeyMap<String> map = createFlexibleConcurrentMap();
-            map.put(getTableDbName(), getTableDbName());
-            _tableDbNameFlexibleMap = Collections.unmodifiableMap(map);
-            return _tableDbNameFlexibleMap;
-        }
-    }
-
-    /**
-     * Get the flexible map of table property name.
-     * @return The flexible map of table property name. (NotNull, NotEmpty, ReadOnly)
-     */
-    protected Map<String, String> getTablePropertyNameFlexibleMap() {
-        if (_tablePropertyNameFlexibleMap != null) {
-            return _tablePropertyNameFlexibleMap;
-        }
-        synchronized (this) {
-            if (_tablePropertyNameFlexibleMap != null) {
-                return _tablePropertyNameFlexibleMap;
-            }
-            final StringKeyMap<String> map = createFlexibleConcurrentMap();
-            map.put(getTableDbName(), getTablePropertyName());
-            _tablePropertyNameFlexibleMap = Collections.unmodifiableMap(map);
-            return _tablePropertyNameFlexibleMap;
-        }
     }
 
     // ===================================================================================
@@ -891,48 +837,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     public List<ColumnInfo> getCommonColumnInfoBeforeUpdateList() {
         return DfCollectionUtil.emptyList();
-    }
-
-    // ===================================================================================
-    //                                                                       Name Handling
-    //                                                                       =============
-    /** {@inheritDoc} */
-    public boolean hasFlexibleName(String flexibleName) {
-        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
-
-        // It uses column before table because column is used much more than table.
-        // This is the same consideration at other methods.
-        return getColumnInfoFlexibleMap().containsKey(flexibleName) || getTableDbNameFlexibleMap().containsKey(flexibleName);
-    }
-
-    /** {@inheritDoc} */
-    public String findDbName(String flexibleName) {
-        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
-        final ColumnInfo columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
-        if (columnInfoMap != null) {
-            return columnInfoMap.getColumnDbName();
-        }
-        final String tableDbName = getTableDbNameFlexibleMap().get(flexibleName);
-        if (tableDbName != null) {
-            return tableDbName;
-        }
-        throwDBMetaNotFoundException("The DB name was not found.", "Flexible Name", flexibleName);
-        return null; // unreachable
-    }
-
-    /** {@inheritDoc} */
-    public String findPropertyName(String flexibleName) {
-        assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
-        final ColumnInfo columnInfoMap = getColumnInfoFlexibleMap().get(flexibleName);
-        if (columnInfoMap != null) {
-            return columnInfoMap.getPropertyName();
-        }
-        final String tablePropertyName = getTablePropertyNameFlexibleMap().get(flexibleName);
-        if (tablePropertyName != null) {
-            return tablePropertyName;
-        }
-        throwDBMetaNotFoundException("The property name was not found.", "Flexible Name", flexibleName);
-        return null; // unreachable
     }
 
     // ===================================================================================
