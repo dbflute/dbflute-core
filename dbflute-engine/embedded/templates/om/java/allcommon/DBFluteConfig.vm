@@ -59,8 +59,8 @@ import org.seasar.framework.exception.SQLRuntimeException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 #end
 #if ($database.isTargetContainerLastaDi())
-import org.dbflute.lasta.jta.dbcp.ConnectionWrapper;
-import org.dbflute.lasta.di.exception.SQLRuntimeException;
+import org.lastaflute.jta.dbcp.ConnectionWrapper;
+import org.lastaflute.di.exception.SQLRuntimeException;
 #end
 
 /**
