@@ -50,7 +50,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     //     ; serviceName = maihama
     //     ; domainPackage = org.docksidestage
     //     ; environmentList = list:{ integration ; production }
-    //     ; isMakeActionHtml = true
+    //     ; isMakeDocActionHtml = true
     //     ; commonMap = map:{
     //         ; path = ../
     //         ; freeGenList = list:{ env ; config ; label ; message ; jsp }

@@ -133,7 +133,7 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> tableMap = createTableMap();
         envMap.put("tableMap", tableMap);
         if (root) {
-            tableMap.put("superClassPackage", "org.dbflute.lastaflute.core.direction");
+            tableMap.put("superClassPackage", "org.lastaflute.core.direction");
             tableMap.put("superClassSimpleName", "ObjectiveConfig");
         } else {
             tableMap.put("extendsPropRequest", _capServiceName + buildTitleSuffix("config"));
