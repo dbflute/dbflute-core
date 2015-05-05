@@ -36,6 +36,7 @@ import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.logic.manage.freegen.filepath.DfFilePathTableLoader;
 import org.dbflute.logic.manage.freegen.json.DfJsonKeyTableLoader;
 import org.dbflute.logic.manage.freegen.json.DfJsonSchemaTableLoader;
+import org.dbflute.logic.manage.freegen.mailflute.DfMailFluteTableLoader;
 import org.dbflute.logic.manage.freegen.prop.DfPropTableLoader;
 import org.dbflute.logic.manage.freegen.solr.DfSolrXmlTableLoader;
 import org.dbflute.logic.manage.freegen.xls.DfXlsTableLoader;
@@ -70,6 +71,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     protected final DfFilePathTableLoader _filePathTableLoader = new DfFilePathTableLoader();
     protected final DfJsonKeyTableLoader _jsonKeyTableLoader = new DfJsonKeyTableLoader();
     protected final DfSolrXmlTableLoader _solrXmlTableLoader = new DfSolrXmlTableLoader();
+    protected final DfMailFluteTableLoader _mailfluteTableLoader = new DfMailFluteTableLoader();
 
     // ===================================================================================
     //                                                                      Definition Map
@@ -182,6 +184,8 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
                     request.setTable(loadTableFromJsonSchema(requestName, resource, tableMap, mappingMap));
                 } else if (resource.isResourceTypeSolr()) {
                     request.setTable(loadTableFromSolrXml(requestName, resource, tableMap, mappingMap));
+                } else if (resource.isResourceTypeMailFlute()) {
+                    request.setTable(loadMailFluteTableLoader(requestName, resource, tableMap, mappingMap));
                 } else {
                     throwFreeGenResourceTypeUnknownException(requestName, resource);
                 }
@@ -270,6 +274,11 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     protected DfFreeGenTable loadTableFromSolrXml(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap) throws IOException {
         return _solrXmlTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
+    }
+
+    protected DfFreeGenTable loadMailFluteTableLoader(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
+            Map<String, Map<String, String>> mappingMap) throws IOException {
+        return _mailfluteTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
     }
 
     protected void throwFreeGenResourceTypeUnknownException(String requestName, DfFreeGenResource resource) {

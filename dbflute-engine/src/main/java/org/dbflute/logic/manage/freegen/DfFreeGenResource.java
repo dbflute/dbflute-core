@@ -78,6 +78,10 @@ public class DfFreeGenResource {
         return DfFreeGenerateResourceType.SOLR.equals(_resourceType);
     }
 
+    public boolean isResourceTypeMailFlute() {
+        return DfFreeGenerateResourceType.MAIL_FLUTE.equals(_resourceType);
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
