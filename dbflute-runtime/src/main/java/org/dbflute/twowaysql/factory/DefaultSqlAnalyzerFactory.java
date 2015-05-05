@@ -23,9 +23,7 @@ import org.dbflute.twowaysql.SqlAnalyzer;
  */
 public class DefaultSqlAnalyzerFactory implements SqlAnalyzerFactory {
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SqlAnalyzer create(String sql, boolean blockNullParameter) {
         return new SqlAnalyzer(sql, blockNullParameter);
     }

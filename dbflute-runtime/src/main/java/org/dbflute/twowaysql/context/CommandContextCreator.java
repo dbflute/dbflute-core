@@ -25,8 +25,8 @@ public class CommandContextCreator {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String[] argNames;
-    protected Class<?>[] argTypes;
+    protected final String[] argNames;
+    protected final Class<?>[] argTypes;
 
     // ===================================================================================
     //                                                                         Constructor

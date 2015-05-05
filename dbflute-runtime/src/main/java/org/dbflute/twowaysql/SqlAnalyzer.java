@@ -61,9 +61,9 @@ public class SqlAnalyzer {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _specifiedSql;
-    protected boolean _blockNullParameter;
-    protected SqlTokenizer _tokenizer;
+    protected final String _specifiedSql;
+    protected final boolean _blockNullParameter;
+    protected final SqlTokenizer _tokenizer;
     protected final Stack<Node> _nodeStack = new Stack<Node>();
     protected boolean _inBeginScope;
     protected List<String> _researchIfCommentList;
@@ -75,13 +75,21 @@ public class SqlAnalyzer {
     //                                                                         Constructor
     //                                                                         ===========
     public SqlAnalyzer(String sql, boolean blockNullParameter) {
-        sql = sql.trim();
-        if (sql.endsWith(";")) {
-            sql = sql.substring(0, sql.length() - 1);
-        }
-        _specifiedSql = sql;
+        _specifiedSql = removeLastTerminalMark(trimSqlAtFirst(sql));
         _blockNullParameter = blockNullParameter;
-        _tokenizer = new SqlTokenizer(sql);
+        _tokenizer = createSqlTokenizer(_specifiedSql);
+    }
+
+    protected String trimSqlAtFirst(String sql) {
+        return sql.trim();
+    }
+
+    protected String removeLastTerminalMark(String sql) {
+        return sql.endsWith(";") ? sql.substring(0, sql.length() - 1) : sql;
+    }
+
+    protected SqlTokenizer createSqlTokenizer(String sql) {
+        return new SqlTokenizer(sql);
     }
 
     // ===================================================================================
@@ -137,7 +145,7 @@ public class SqlAnalyzer {
     }
 
     protected void processSqlConnectorAdjustable(Node node, String sql) {
-        final SqlTokenizer st = new SqlTokenizer(sql);
+        final SqlTokenizer st = createSqlTokenizer(sql);
         st.skipWhitespace();
         final String skippedToken = st.skipToken(); // determination for and/or (also skip process)
         st.skipWhitespace();
