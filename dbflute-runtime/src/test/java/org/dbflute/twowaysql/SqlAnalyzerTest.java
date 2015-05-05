@@ -17,6 +17,7 @@ package org.dbflute.twowaysql;
 
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.context.CommandContextCreator;
+import org.dbflute.twowaysql.exception.BindVariableCommentIllegalParameterBeanSpecificationException;
 import org.dbflute.twowaysql.node.Node;
 import org.dbflute.twowaysql.node.SqlPartsNode;
 import org.dbflute.twowaysql.pmbean.SimpleMapPmb;
@@ -36,7 +37,7 @@ public class SqlAnalyzerTest extends RuntimeTestCase {
         // ## Arrange ##
         SimpleMapPmb<Object> pmb = preparePmb();
         StringBuilder sb = new StringBuilder();
-        sb.append("select ?");
+        sb.append("select *");
         sb.append(ln());
         sb.append(ln()).append("/*IF pmb.sea*/");
         sb.append(ln()).append("mystic");
@@ -53,7 +54,7 @@ public class SqlAnalyzerTest extends RuntimeTestCase {
         CommandContext ctx = prepareCtx(pmb, node);
         String sql = ctx.getSql();
         log(ln() + sql);
-        assertEquals("select ?\n\n\nmystic\n\n\namba", sql);
+        assertEquals("select *\n\n\nmystic\n\n\namba", sql);
         assertEquals(0, ctx.getBindVariables().length);
     }
 
@@ -61,7 +62,7 @@ public class SqlAnalyzerTest extends RuntimeTestCase {
         // ## Arrange ##
         SimpleMapPmb<Object> pmb = preparePmb();
         StringBuilder sb = new StringBuilder();
-        sb.append("select ?");
+        sb.append("select *");
         sb.append(ln());
         sb.append(ln()).append("/*IF pmb.sea*/mystic/*END*/");
         sb.append(ln()).append("/*IF pmb.land*/");
@@ -78,28 +79,67 @@ public class SqlAnalyzerTest extends RuntimeTestCase {
         CommandContext ctx = prepareCtx(pmb, node);
         String sql = ctx.getSql();
         log(ln() + sql);
-        assertEquals("select ?\n\nmystic\n\namba", sql);
+        assertEquals("select *\n\nmystic\n\namba", sql);
         assertEquals(0, ctx.getBindVariables().length);
     }
 
     // ===================================================================================
-    //                                                                       Plain Binding
-    //                                                                       =============
-    public void test_analyze_plainBinding_noBinding() {
+    //                                                                      Native Binding
+    //                                                                      ==============
+    public void test_analyze_nativeBinding_cannotUse_inSql() {
         // ## Arrange ##
-        SimpleMapPmb<Object> pmb = preparePmb();
         SqlAnalyzer analyzer = new SqlAnalyzer("select ?", false);
 
         // ## Act ##
         Node node = analyzer.analyze();
 
         // ## Assert ##
+        SimpleMapPmb<Object> pmb = preparePmb();
+        assertException(BindVariableCommentIllegalParameterBeanSpecificationException.class, () -> prepareCtx(pmb, node));
+    }
+
+    public void test_analyze_nativeBinding_keep_inBlockComment() {
+        // ## Arrange ##
+        SqlAnalyzer analyzer = new SqlAnalyzer("select *\n/* sea? */\nfrom ...", false);
+
+        // ## Act ##
+        Node node = analyzer.analyze();
+
+        // ## Assert ##
+        prepareCtx(preparePmb(), node); // expects no exception
+    }
+
+    public void test_analyze_nativeBinding_keep_inLineComment() {
+        // ## Arrange ##
+        SqlAnalyzer analyzer = new SqlAnalyzer("select *\n-- sea?\nfrom ...", false);
+
+        // ## Act ##
+        Node node = analyzer.analyze();
+
+        // ## Assert ##
+        // exception but replace to 'Q' in other process actually
+        SimpleMapPmb<Object> pmb = preparePmb();
+        assertException(BindVariableCommentIllegalParameterBeanSpecificationException.class, () -> prepareCtx(pmb, node));
+    }
+
+    public void test_analyze_nativeBinding_overlook() {
+        // ## Arrange ##
+        SqlAnalyzer analyzer = new SqlAnalyzer("select ?", false).overlookNativeBinding();
+
+        // ## Act ##
+        Node node = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMapPmb<Object> pmb = preparePmb();
         CommandContext ctx = prepareCtx(pmb, node);
         String sql = ctx.getSql();
         assertEquals("select ?", sql);
         assertEquals(0, ctx.getBindVariables().length);
     }
 
+    // ===================================================================================
+    //                                                                            SQL Node
+    //                                                                            ========
     public void test_createSqlNode() {
         // ## Arrange ##
         SqlAnalyzer analyzer = new SqlAnalyzer("foobar", false);

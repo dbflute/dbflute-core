@@ -133,6 +133,13 @@ public class NodeChecker {
         br.addElement("    /*" + emmark + "pnb.memberId*/");
         br.addElement("  (o):");
         br.addElement("    /*" + emmark + "pmb.memberId*/");
+        br.addElement("");
+        br.addElement("Or does it contain native binding mark '?' in your SQL?");
+        br.addElement("You cannot use native binding, use bind variable comment instead.");
+        br.addElement("  (x):");
+        br.addElement("    where MEMBER_ID = ? -- *NG");
+        br.addElement("  (o):");
+        br.addElement("    where MEMBER_ID = /*pmb.memberId*/ -- OK");
         br.addItem("Comment Expression");
         br.addElement(expression);
         // *debug to this exception does not need contents of the parameter-bean

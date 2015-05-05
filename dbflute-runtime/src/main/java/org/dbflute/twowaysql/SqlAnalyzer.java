@@ -64,6 +64,7 @@ public class SqlAnalyzer {
     protected final String _specifiedSql;
     protected final boolean _blockNullParameter;
     protected final SqlTokenizer _tokenizer;
+    protected boolean _overlookNativeBinding;
     protected final Stack<Node> _nodeStack = new Stack<Node>();
     protected boolean _inBeginScope;
     protected List<String> _researchIfCommentList;
@@ -89,7 +90,17 @@ public class SqlAnalyzer {
     }
 
     protected SqlTokenizer createSqlTokenizer(String sql) {
-        return new SqlTokenizer(sql);
+        final SqlTokenizer tokenizer = new SqlTokenizer(sql);
+        if (_overlookNativeBinding) {
+            tokenizer.overlookNativeBinding();
+        }
+        return tokenizer;
+    }
+
+    public SqlAnalyzer overlookNativeBinding() { // unused on DBFlute, for general purpose
+        _overlookNativeBinding = true;
+        _tokenizer.overlookNativeBinding(); // reflect existing instance
+        return this;
     }
 
     // ===================================================================================
