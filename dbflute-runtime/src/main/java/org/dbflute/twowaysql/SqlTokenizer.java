@@ -41,12 +41,18 @@ public class SqlTokenizer {
     protected int _tokenType = SQL;
     protected int _nextTokenType = SQL;
     protected int _bindVariableNum = 0;
+    protected boolean _plainBinding; // treats question mark on SQL as binding
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public SqlTokenizer(String sql) {
         this._sql = sql;
+    }
+
+    public SqlTokenizer plainBinding() { // unused on DBFlute, for compatible just in case
+        _plainBinding = true;
+        return this;
     }
 
     // ===================================================================================
@@ -88,7 +94,7 @@ public class SqlTokenizer {
         if (0 < commentStartPos2 && commentStartPos2 < commentStartPos) {
             commentStartPos = commentStartPos2;
         }
-        int bindVariableStartPos = _sql.indexOf("?", _position);
+        int bindVariableStartPos = _plainBinding ? _sql.indexOf("?", _position) : -1;
         int elseCommentStartPos = -1;
         int elseCommentLength = -1;
         int elseCommentSearchCurrentPosition = _position;
