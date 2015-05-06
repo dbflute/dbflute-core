@@ -84,6 +84,133 @@ public class SqlAnalyzerTest extends RuntimeTestCase {
     }
 
     // ===================================================================================
+    //                                                                         FOR Comment
+    //                                                                         ===========
+    public void test_analyze_FOR_keepLine_if_true() {
+        // ## Arrange ##
+        SimpleMapPmb<Object> pmb = preparePmb();
+        StringBuilder sb = new StringBuilder();
+        sb.append("select *");
+        sb.append(ln());
+        sb.append(ln()).append("/*FOR pmb.dstore*/");
+        sb.append(ln()).append("/*$#current*/mystic");
+        sb.append(ln()).append("/*END*/");
+        sb.append(ln()).append("/*FOR pmb.dstore*/oneman/*END*/");
+        sb.append(ln()).append("/*$pmb.iks*/");
+        String twoway = sb.toString();
+        SqlAnalyzer analyzer = new SqlAnalyzer(twoway, false);
+
+        // ## Act ##
+        Node node = analyzer.analyze();
+
+        // ## Assert ##
+        CommandContext ctx = prepareCtx(pmb, node);
+        String sql = ctx.getSql();
+        log(ln() + sql);
+        assertEquals("select *\n\n\nuni\n\ncity\n\nonemanoneman\namba", sql);
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
+    public void test_analyze_FOR_keepLine_if_false() {
+        // ## Arrange ##
+        StringBuilder sb = new StringBuilder();
+        sb.append("select *");
+        sb.append(ln());
+        sb.append(ln()).append("/*FOR pmb.bonvo*/");
+        sb.append(ln()).append("/*$#current*/mystic");
+        sb.append(ln()).append("/*END*/");
+        sb.append(ln()).append("/*FOR pmb.bonvo*/oneman/*END*/");
+        sb.append(ln()).append("/*$pmb.iks*/");
+        String twoway = sb.toString();
+        SqlAnalyzer analyzer = new SqlAnalyzer(twoway, false);
+
+        // ## Act ##
+        Node node = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMapPmb<Object> pmb = preparePmb();
+        CommandContext ctx = prepareCtx(pmb, node);
+        String sql = ctx.getSql();
+        log(ln() + sql);
+        assertEquals("select *\n\n\n\namba", sql);
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
+    // ===================================================================================
+    //                                                                BindVariable Comment
+    //                                                                ====================
+    public void test_analyze_bindVariable_basic() {
+        // ## Arrange ##
+        String twoway = "/*BEGIN*/where";
+        twoway = twoway + " /*IF pmb.sea*/member.MEMBER_ID = /*pmb.iks*/'abc'/*END*/";
+        twoway = twoway + " /*IF pmb.land*/and member.MEMBER_NAME = /*pmb.iks*/'stu'/*END*/";
+        twoway = twoway + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(twoway, false);
+
+        // ## Act ##
+        Node node = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMapPmb<Object> pmb = preparePmb();
+        CommandContext ctx = prepareCtx(pmb, node);
+        String sql = ctx.getSql();
+        log(ln() + sql);
+        String expected = "where member.MEMBER_ID = ? ";
+        assertEquals(expected, sql);
+        assertEquals(1, ctx.getBindVariables().length);
+        assertEquals("amba", ctx.getBindVariables()[0]);
+    }
+
+    public void test_analyze_bindVariable_nonSwitchToEmbedded_meansNormal() {
+        // ## Arrange ##
+        String twoway = "/*BEGIN*/where";
+        twoway = twoway + " /*IF pmb.sea*/member.MEMBER_ID = /*pmb.iks*/'abc'/*END*/";
+        twoway = twoway + " /*IF pmb.land*/and member.MEMBER_NAME = /*pmb.iks*/'stu'/*END*/";
+        twoway = twoway + " /*FOR pmb.dstore*/";
+        twoway = twoway + "   /*#current*/mystic";
+        twoway = twoway + " /*END*/";
+        twoway = twoway + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(twoway, false);
+
+        // ## Act ##
+        Node node = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMapPmb<Object> pmb = preparePmb();
+        CommandContext ctx = prepareCtx(pmb, node);
+        String sql = ctx.getSql();
+        log(ln() + sql);
+        String expected = "where member.MEMBER_ID = ?     ?    ? ";
+        assertEquals(expected, sql);
+        assertEquals(3, ctx.getBindVariables().length);
+    }
+
+    public void test_analyze_bindVariable_switchToEmbedded_dangerous() {
+        // ## Arrange ##
+        String twoway = "/*BEGIN*/where";
+        twoway = twoway + " /*IF pmb.sea*/member.MEMBER_ID = /*pmb.iks*/'abc'/*END*/";
+        twoway = twoway + " /*IF pmb.land*/and member.MEMBER_NAME = /*pmb.iks*/'stu'/*END*/";
+        twoway = twoway + " /*FOR pmb.dstore*/";
+        twoway = twoway + "   /*#current*/mystic";
+        twoway = twoway + " /*END*/";
+        twoway = twoway + "/*END*/";
+        @SuppressWarnings("deprecation")
+        SqlAnalyzer analyzer = new SqlAnalyzer(twoway, false).switchBindingToReplaceOnlyEmbedded();
+
+        // ## Act ##
+        Node node = analyzer.analyze();
+
+        // ## Assert ##
+        SimpleMapPmb<Object> pmb = preparePmb();
+        CommandContext ctx = prepareCtx(pmb, node);
+        String sql = ctx.getSql();
+        log(ln() + sql);
+        String expected = "where member.MEMBER_ID = 'amba''abc'     unimystic    citymystic ";
+        assertEquals(expected, sql);
+        assertEquals(0, ctx.getBindVariables().length);
+    }
+
+    // ===================================================================================
     //                                                                      Native Binding
     //                                                                      ==============
     public void test_analyze_nativeBinding_cannotUse_inSql() {
@@ -124,6 +251,7 @@ public class SqlAnalyzerTest extends RuntimeTestCase {
 
     public void test_analyze_nativeBinding_overlook() {
         // ## Arrange ##
+        @SuppressWarnings("deprecation")
         SqlAnalyzer analyzer = new SqlAnalyzer("select ?", false).overlookNativeBinding();
 
         // ## Act ##
@@ -159,6 +287,8 @@ public class SqlAnalyzerTest extends RuntimeTestCase {
         pmb.addParameter("sea", true);
         pmb.addParameter("land", false);
         pmb.addParameter("iks", "amba");
+        pmb.addParameter("dstore", newArrayList("uni", "city"));
+        pmb.addParameter("bonvo", newArrayList());
         return pmb;
     }
 

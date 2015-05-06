@@ -64,7 +64,8 @@ public class SqlAnalyzer {
     protected final String _specifiedSql;
     protected final boolean _blockNullParameter;
     protected final SqlTokenizer _tokenizer;
-    protected boolean _overlookNativeBinding;
+    protected boolean _overlookNativeBinding; // unused on DBFlute, for general purpose
+    protected boolean _switchBindingToReplaceOnlyEmbedded; // dangerous, always unused on DBFlute, for general purpose
     protected final Stack<Node> _nodeStack = new Stack<Node>();
     protected boolean _inBeginScope;
     protected List<String> _researchIfCommentList;
@@ -76,30 +77,54 @@ public class SqlAnalyzer {
     //                                                                         Constructor
     //                                                                         ===========
     public SqlAnalyzer(String sql, boolean blockNullParameter) {
-        _specifiedSql = removeLastTerminalMark(trimSqlAtFirst(sql));
+        _specifiedSql = filterAtFirst(sql);
         _blockNullParameter = blockNullParameter;
         _tokenizer = createSqlTokenizer(_specifiedSql);
+    }
+
+    protected String filterAtFirst(String sql) {
+        return removeTerminalMarkAtFirst(trimSqlAtFirst(sql));
     }
 
     protected String trimSqlAtFirst(String sql) {
         return sql.trim();
     }
 
-    protected String removeLastTerminalMark(String sql) {
+    protected String removeTerminalMarkAtFirst(String sql) {
         return sql.endsWith(";") ? sql.substring(0, sql.length() - 1) : sql;
     }
 
     protected SqlTokenizer createSqlTokenizer(String sql) {
-        final SqlTokenizer tokenizer = new SqlTokenizer(sql);
+        final SqlTokenizer tokenizer = newSqlTokenizer(sql);
         if (_overlookNativeBinding) {
             tokenizer.overlookNativeBinding();
         }
         return tokenizer;
     }
 
-    public SqlAnalyzer overlookNativeBinding() { // unused on DBFlute, for general purpose
+    protected SqlTokenizer newSqlTokenizer(String sql) {
+        return new SqlTokenizer(sql);
+    }
+
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
+    /**
+     * @return this. (NotNull)
+     * @deprecated unused on DBFlute, basically for general purpose
+     */
+    public SqlAnalyzer overlookNativeBinding() {
         _overlookNativeBinding = true;
         _tokenizer.overlookNativeBinding(); // reflect existing instance
+        return this;
+    }
+
+    /**
+     * @return this. (NotNull)
+     * @deprecated dangerous, be careful, and unused on DBFlute, basically for general purpose
+     */
+    public SqlAnalyzer switchBindingToReplaceOnlyEmbedded() {
+        _switchBindingToReplaceOnlyEmbedded = true;
         return this;
     }
 
@@ -494,38 +519,49 @@ public class SqlAnalyzer {
     // ===================================================================================
     //                                                                    Bind or Embedded
     //                                                                    ================
-    protected void parseCommentBindVariable() {
-        final String expr = _tokenizer.getToken();
-        final String testValue = _tokenizer.skipToken(true);
-        if (expr.startsWith(EmbeddedVariableNode.PREFIX_NORMAL)) {
-            if (expr.startsWith(EmbeddedVariableNode.PREFIX_REPLACE_ONLY)) { // replaceOnly
-                final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX_REPLACE_ONLY.length());
-                peek().addChild(createEmbeddedVariableNode(realExpr, testValue, true, false));
-            } else if (expr.startsWith(EmbeddedVariableNode.PREFIX_TERMINAL_DOT)) { // terminalDot
-                final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX_TERMINAL_DOT.length());
-                peek().addChild(createEmbeddedVariableNode(realExpr, testValue, false, true));
-            } else { // normal
-                final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX_NORMAL.length());
-                peek().addChild(createEmbeddedVariableNode(realExpr, testValue, false, false));
-            }
-        } else {
-            peek().addChild(createBindVariableNode(expr, testValue));
-        }
-    }
-
-    protected void parseBindVariable() {
+    protected void parseBindVariable() { // for native binding, unused on DBFlute so checked later
         final String expr = _tokenizer.getToken();
         peek().addChild(createBindVariableNode(expr, null));
     }
 
-    protected BindVariableNode createBindVariableNode(String expr, String testValue) {
-        researchIfNeeds(_researchBindVariableCommentList, expr); // for research
-        return newBindVariableNode(expr, testValue);
+    protected void parseCommentBindVariable() { // main binding on DBFlute
+        final String expr = _tokenizer.getToken();
+        final String testValue = _tokenizer.skipToken(true);
+        if (expr.startsWith(EmbeddedVariableNode.PREFIX_NORMAL)) {
+            if (expr.startsWith(EmbeddedVariableNode.PREFIX_REPLACE_ONLY)) { // replaceOnly
+                peek().addChild(prepareReplaceOnlyEmbeddedVariableNode(expr, testValue, /*removePrefix*/true));
+            } else if (expr.startsWith(EmbeddedVariableNode.PREFIX_TERMINAL_DOT)) { // terminalDot
+                peek().addChild(prepareTerminalDotEmbeddedVariableNode(expr, testValue));
+            } else { // normal
+                peek().addChild(prepareNormalEmbeddedVariableNode(expr, testValue));
+            }
+        } else {
+            final Node bindVariableNode;
+            if (_switchBindingToReplaceOnlyEmbedded) { // false on DBFlute, for general purpose
+                bindVariableNode = prepareReplaceOnlyEmbeddedVariableNode(expr, testValue, /*removePrefix*/false);
+            } else { // always here on DBFlute
+                bindVariableNode = createBindVariableNode(expr, testValue);
+            }
+            peek().addChild(bindVariableNode);
+        }
     }
 
-    protected BindVariableNode newBindVariableNode(String expr, String testValue) {
-        final NodeAdviceFactory tracerFactory = getNodeAdviceFactory();
-        return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, tracerFactory);
+    // -----------------------------------------------------
+    //                                     Embedded Variable
+    //                                     -----------------
+    protected EmbeddedVariableNode prepareReplaceOnlyEmbeddedVariableNode(String expr, String testValue, boolean removePrefix) {
+        final String realExpr = removePrefix ? expr.substring(EmbeddedVariableNode.PREFIX_REPLACE_ONLY.length()) : expr;
+        return createEmbeddedVariableNode(realExpr, testValue, /*replaceOnly*/true, false);
+    }
+
+    protected EmbeddedVariableNode prepareTerminalDotEmbeddedVariableNode(String expr, String testValue) {
+        final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX_TERMINAL_DOT.length());
+        return createEmbeddedVariableNode(realExpr, testValue, false, /*terminalDot*/true);
+    }
+
+    protected EmbeddedVariableNode prepareNormalEmbeddedVariableNode(String expr, String testValue) {
+        final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX_NORMAL.length());
+        return createEmbeddedVariableNode(realExpr, testValue, false, false);
     }
 
     protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly, boolean terminalDot) {
@@ -536,6 +572,19 @@ public class SqlAnalyzer {
     protected EmbeddedVariableNode newEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly, boolean terminalDot) {
         final NodeAdviceFactory tracerFactory = getNodeAdviceFactory();
         return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, tracerFactory, replaceOnly, terminalDot);
+    }
+
+    // -----------------------------------------------------
+    //                                         Bind Variable
+    //                                         -------------
+    protected BindVariableNode createBindVariableNode(String expr, String testValue) {
+        researchIfNeeds(_researchBindVariableCommentList, expr); // for research
+        return newBindVariableNode(expr, testValue);
+    }
+
+    protected BindVariableNode newBindVariableNode(String expr, String testValue) {
+        final NodeAdviceFactory tracerFactory = getNodeAdviceFactory();
+        return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, tracerFactory);
     }
 
     // ===================================================================================
