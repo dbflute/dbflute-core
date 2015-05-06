@@ -166,6 +166,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         br.addElement("At least one table should be related to common columns.");
         br.addElement("The definition might contain a non-existent common column.");
         br.addElement("Make sure your definition is correct.");
+        br.addElement("");
+        br.addElement("And DBFlute cannot detect the common columns");
+        br.addElement("of tables without PK, so check about it too");
         br.addItem("Common Column");
         br.addElement(getCommonColumnNameList());
         final String msg = br.buildExceptionMessage();
