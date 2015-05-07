@@ -137,7 +137,7 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         if (!isAcceptableLikeSearch(loopInfo)) {
             return;
         }
-        final FilteringBindOption inLoopForcedLikeSearchOption = getInLoopForcedLikeSearchOption(loopInfo);
+        final FilteringBindOption inLoopForcedLikeSearchOption = findInLoopForcedLikeSearchOption(loopInfo);
         if (inLoopForcedLikeSearchOption != null) { // forced option
             boundValue.setFilteringBindOption(inLoopForcedLikeSearchOption);
         } else {
@@ -158,18 +158,18 @@ public abstract class VariableNode extends AbstractNode implements LoopAcceptabl
         return true; // basically true
     }
 
-    protected FilteringBindOption getInLoopForcedLikeSearchOption(LoopInfo loopInfo) {
+    protected FilteringBindOption findInLoopForcedLikeSearchOption(LoopInfo loopInfo) {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_optionDef)) {
             final List<String> optionList = Srl.splitListTrimmed(_optionDef, "|");
             for (String option : optionList) {
-                return createLikeSearchOption(option);
+                return prepareInLoopLikeSearchOption(option);
             }
         }
         return null;
     }
 
-    protected FilteringBindOption createLikeSearchOption(String likeDirection) {
-        return _nodeAdviceFactory.createInLoopLikeSearchOption(likeDirection);
+    protected FilteringBindOption prepareInLoopLikeSearchOption(String likeDirection) {
+        return _nodeAdviceFactory.prepareInLoopLikeSearchOption(likeDirection);
     }
 
     protected void assertInLoopOnlyOptionInLoop(LoopInfo loopInfo) {

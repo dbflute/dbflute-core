@@ -41,7 +41,7 @@ public class MelodicNodeAdviceFactory implements NodeAdviceFactory {
     }
 
     @Override
-    public FilteringBindOption createInLoopLikeSearchOption(String mightBeLikeDirection) {
+    public FilteringBindOption prepareInLoopLikeSearchOption(String mightBeLikeDirection) {
         final LikeSearchOption option = newLikeSearchOption();
         if (mightBeLikeDirection.equals(INLOOP_LIKE_PREFIX)) {
             return option.likePrefix();

@@ -27,17 +27,14 @@ import org.dbflute.twowaysql.node.ParameterCommentType;
  */
 public class DefaultNodeAdviceFactory implements NodeAdviceFactory {
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public BoundValueTracer createBoundValueTracer(List<String> nameList, String expression, String specifiedSql,
             ParameterCommentType commentType) {
         return new BoundValueTracer(nameList, expression, specifiedSql, commentType);
     }
 
     @Override
-    public FilteringBindOption createInLoopLikeSearchOption(String likeDirection) {
-        String msg = "Unsupported in-loop like-search option: likeDirection=" + likeDirection;
-        throw new IllegalStateException(msg); // as default, you can override it
+    public FilteringBindOption prepareInLoopLikeSearchOption(String likeDirection) {
+        return null; // unsupported in-loop like-search option, use melodic factory if you like
     }
 }
