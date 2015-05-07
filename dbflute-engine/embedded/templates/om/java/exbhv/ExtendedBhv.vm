@@ -26,5 +26,8 @@ import ${myBaseBhvPackageName}.${myBaseBhvClassName};
  * </p>
  * @author ${database.classAuthor}
  */
+#if ($database.needsDBFluteBeansHybritScanConfig())
+@org.springframework.stereotype.Component("${table.behaviorComponentName}")
+#end
 public class $myClassName extends ${myBaseBhvClassName} {
 }
