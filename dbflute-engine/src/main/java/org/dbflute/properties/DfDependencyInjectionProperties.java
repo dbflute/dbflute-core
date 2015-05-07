@@ -234,7 +234,7 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
 
     public boolean needsDBFluteBeansHybritScanConfig() {
         final DfBasicProperties prop = getBasicProperties();
-        return prop.isTargetContainerSpring() && isDBFluteBeansHybritScanConfig();
+        return prop.isTargetContainerSpring() && isDBFluteBeansGeneratedAsJavaConfig() && isDBFluteBeansHybritScanConfig();
     }
 
     public boolean needsBehaviorSpringAutowired() {
