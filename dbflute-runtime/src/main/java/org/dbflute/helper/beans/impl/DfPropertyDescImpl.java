@@ -360,15 +360,13 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     //                                                                      ==============
     @Override
     public final String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("propertyName=");
-        buf.append(_propertyName);
-        buf.append(",propertyType=");
-        buf.append(_propertyType.getName());
-        buf.append(",readMethod=");
-        buf.append(_readMethod != null ? _readMethod.getName() : "null");
-        buf.append(",writeMethod=");
-        buf.append(_writeMethod != null ? _writeMethod.getName() : "null");
-        return buf.toString();
+        final StringBuilder sb = new StringBuilder();
+        sb.append("property:{");
+        sb.append(_propertyName);
+        sb.append(", ").append(_propertyType.getName());
+        sb.append(", reader=").append(_readMethod != null ? _readMethod.getName() : null);
+        sb.append(", writer=").append(_writeMethod != null ? _writeMethod.getName() : null);
+        sb.append("}@").append(Integer.toHexString(hashCode()));
+        return sb.toString();
     }
 }
