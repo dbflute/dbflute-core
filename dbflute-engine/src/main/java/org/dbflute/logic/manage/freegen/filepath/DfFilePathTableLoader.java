@@ -47,7 +47,8 @@ public class DfFilePathTableLoader {
     // }
     // ; tableMap = map:{
     //     ; targetDir = $$baseDir$$/webapp/WEB-INF/view
-    //     ; targetPathList = list:{ suffix:.jsp }
+    //     ; targetExt = .jsp
+    //     ; targetKeyword = 
     //     ; exceptPathList = list:{ contain:/view/common/ }
     // }
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,

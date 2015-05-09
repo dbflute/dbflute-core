@@ -82,6 +82,8 @@ public final class DfLastaFluteFreeGenReflector {
                 } else if ("message".equals(freeGen)) {
                     setupMessageGen(_uncapServiceName, path);
                     hasCommonMessage = true;
+                } else if ("mail".equals(freeGen)) {
+                    setupMailPostcardGen(_uncapServiceName, path);
                 } else {
                     String msg = "Unkonwn type for commonMap's freeGen: " + freeGen;
                     throw new DfIllegalPropertySettingException(msg);
@@ -107,6 +109,8 @@ public final class DfLastaFluteFreeGenReflector {
                         setupLabelGen(appName, path, !hasCommonMessage);
                     } else if ("message".equals(freeGen)) {
                         setupMessageGen(appName, path);
+                    } else if ("mail".equals(freeGen)) {
+                        setupMailPostcardGen(appName, path);
                     } else if ("jsp".equals(freeGen)) {
                         setupJspPathGen(appName, path);
                     } else if ("html".equals(freeGen)) {
@@ -247,6 +251,34 @@ public final class DfLastaFluteFreeGenReflector {
         tableMap.put("targetDir", targetDir);
         tableMap.put("targetExt", "." + ext);
         tableMap.put("exceptPathList", DfCollectionUtil.newArrayList("contain:/view/common/"));
+    }
+
+    // ===================================================================================
+    //                                                                       Mail Postcard
+    //                                                                       =============
+    protected void setupMailPostcardGen(String appName, String path) {
+        doSetupMailPostcardGen(appName, path, "$$baseDir$$/resources/mail", "ml");
+    }
+
+    protected void doSetupMailPostcardGen(String appName, String path, String targetDir, String ext) {
+        final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
+        final String capAppName = initCap(appName);
+        registerFreeGen(capAppName + "Postcard", pathMap);
+        final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
+        pathMap.put("resourceMap", resourceMap);
+        resourceMap.put("baseDir", path + "/src/main");
+        resourceMap.put("resourceType", DfFreeGenRequest.DfFreeGenerateResourceType.MAIL_FLUTE.name());
+        final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
+        pathMap.put("outputMap", outputMap);
+        outputMap.put("templateFile", "LaMailPostcard.vm");
+        outputMap.put("outputDirectory", "$$baseDir$$/java");
+        outputMap.put("package", _appPackage + ".web.base.mail");
+        outputMap.put("className", initCap(appName) + "Postcard");
+        final Map<String, Object> tableMap = createTableMap();
+        pathMap.put("tableMap", tableMap);
+        tableMap.put("targetDir", targetDir);
+        tableMap.put("targetExt", "." + ext);
+        tableMap.put("exceptPathList", DfCollectionUtil.newArrayList("contain:/mail/common/"));
     }
 
     // ===================================================================================

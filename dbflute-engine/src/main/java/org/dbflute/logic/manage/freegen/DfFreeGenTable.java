@@ -36,6 +36,10 @@ public class DfFreeGenTable {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // only-one table : tableMap, tableName, columnList 
+    // multiple table : tableMap, schemaMap
+    // _/_/_/_/_/_/_/_/_/_/
     public DfFreeGenTable(Map<String, Object> tableMap, String tableName, List<Map<String, Object>> columnList) {
         _tableMap = tableMap;
         _tableName = tableName;
@@ -69,23 +73,29 @@ public class DfFreeGenTable {
         return _tableMap;
     }
 
+    // -----------------------------------------------------
+    //                                        Only-One Table
+    //                                        --------------
     public boolean isOnlyOneTable() {
         return _tableName != null;
     }
 
-    public String getTableName() {
+    public String getTableName() { // can be used when only-one table
         return _tableName;
     }
 
-    public List<Map<String, Object>> getColumnList() {
+    public List<Map<String, Object>> getColumnList() { // can be used when only-one table
         return _columnList;
     }
 
-    public Map<String, Map<String, Object>> getSchemaMap() {
+    // -----------------------------------------------------
+    //                                        Multiple Table
+    //                                        --------------
+    public Map<String, Map<String, Object>> getSchemaMap() { // can be used when multiple table
         return _schemaMap;
     }
 
-    public List<Map<String, Object>> getTableList() {
+    public List<Map<String, Object>> getTableList() { // can be used when multiple table
         return DfCollectionUtil.newArrayList(_schemaMap.values());
     }
 }
