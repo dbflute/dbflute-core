@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import org.dbflute.helper.filesystem.exception.FileTextIONotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
 
@@ -48,6 +49,27 @@ public class FileTextIO {
     //                                                                           =========
     /** The encoding for the file. (Required) */
     protected String _encoding;
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    /**
+     * Encode file as UTF-8.
+     * @return this. (NotNull)
+     */
+    public FileTextIO encodeAsUTF8() {
+        _encoding = "UTF-8";
+        return this;
+    }
+
+    /**
+     * Encode file as Windows-31J.
+     * @return this. (NotNull)
+     */
+    public FileTextIO encodeAsWindows31J() {
+        _encoding = "Windows-31J";
+        return this;
+    }
 
     // ===================================================================================
     //                                                                                Read
@@ -265,27 +287,6 @@ public class FileTextIO {
     }
 
     // ===================================================================================
-    //                                                                              Option
-    //                                                                              ======
-    /**
-     * Encode file as UTF-8.
-     * @return this. (NotNull)
-     */
-    public FileTextIO encodeAsUTF8() {
-        _encoding = "UTF-8";
-        return this;
-    }
-
-    /**
-     * Encode file as Windows-31J.
-     * @return this. (NotNull)
-     */
-    public FileTextIO encodeAsWindows31J() {
-        _encoding = "Windows-31J";
-        return this;
-    }
-
-    // ===================================================================================
     //                                                                       Stream Helper
     //                                                                       =============
     protected FileInputStream createFileInputStream(String textPath) {
@@ -293,7 +294,7 @@ public class FileTextIO {
             return new FileInputStream(textPath);
         } catch (FileNotFoundException e) {
             String msg = "Not found the text file: " + textPath;
-            throw new IllegalStateException(msg, e);
+            throw new FileTextIONotFoundException(msg, e);
         }
     }
 
@@ -303,7 +304,7 @@ public class FileTextIO {
             return new FileOutputStream(textPath);
         } catch (FileNotFoundException e) {
             String msg = "Not found the text file: " + textPath;
-            throw new IllegalStateException(msg, e);
+            throw new FileTextIONotFoundException(msg, e);
         }
     }
 
