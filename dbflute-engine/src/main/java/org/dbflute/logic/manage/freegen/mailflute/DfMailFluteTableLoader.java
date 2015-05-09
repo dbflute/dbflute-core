@@ -51,7 +51,7 @@ public class DfMailFluteTableLoader {
     //     ; resourceFile = ../../../foo.properties
     // }
     // ; outputMap = map:{
-    //     ; templateFile = LaMailPostcard.vm
+    //     ; templateFile = LaMailBean.vm
     //     ; outputDirectory = ../src/main/java
     //     ; package = org.dbflute...
     //     ; className = unused
@@ -65,6 +65,7 @@ public class DfMailFluteTableLoader {
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap) {
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
+        final String mailPackage = (String) tableMap.get("mailPackage");
 
         final String targetExt = extractTargetExt(tableMap);
         final String targetKeyword = extractTargetKeyword(tableMap);
@@ -82,7 +83,8 @@ public class DfMailFluteTableLoader {
             mailMap.put("camelizedName", className);
 
             final String domainPath = buildDomainPath(file, targetDir);
-            mailMap.put("domainPath", domainPath); // e.g. /mail/member/member_registration.ml
+            mailMap.put("domainPath", domainPath); // e.g. /member/member_registration.ml
+            mailMap.put("resourcePath", mailPackage + domainPath); // e.g. mail/member/member_registration.ml
 
             mailMap.put("defName", buildUpperSnakeName(domainPath));
             {
@@ -111,6 +113,7 @@ public class DfMailFluteTableLoader {
             final Set<String> autoDetectedPropertyNameSet = new LinkedHashSet<String>();
             processAutoDetect(fileText, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet);
             final List<Map<String, String>> propertyList = new ArrayList<Map<String, String>>();
+            final StringBuilder commaSb = new StringBuilder();
             for (String propertyName : autoDetectedPropertyNameSet) {
                 final Map<String, String> propertyMap = new LinkedHashMap<String, String>(); // 'property' on template
                 propertyMap.put("propertyName", propertyName);
@@ -118,8 +121,13 @@ public class DfMailFluteTableLoader {
                 propertyMap.put("uncapCalemName", Srl.initUncap(propertyName));
                 propertyMap.put("propertyType", propertyNameTypeMap.get(propertyName)); // exists
                 propertyList.add(propertyMap);
+                if (commaSb.length() > 0) {
+                    commaSb.append(", ");
+                }
+                commaSb.append("\"").append(propertyName).append("\"");
             }
             mailMap.put("propertyList", propertyList);
+            mailMap.put("propertyNameCommaString", commaSb.toString());
             schemaMap.put(fileName, mailMap);
         }
         return new DfFreeGenTable(tableMap, schemaMap);

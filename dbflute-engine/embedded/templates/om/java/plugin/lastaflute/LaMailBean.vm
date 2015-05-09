@@ -1,8 +1,5 @@
 ${manager.allClassCopyright}package ${request.package};
 
-import java.util.Map;
-import java.util.LinkedHashMap;
-
 import org.lastaflute.core.mail.LaTypicalPostcard;
 
 /**
@@ -11,15 +8,19 @@ import org.lastaflute.core.mail.LaTypicalPostcard;
  */
 public class ${table.className} extends LaTypicalPostcard {
 
-    public static final String PATH = "${table.domainPath}";
+    public static final String PATH = "${table.resourcePath}";
 
     protected String getBodyFile() {
         return PATH;
     }
+
+    protected String[] getPropertyNames() {
+        return new String[] {${table.propertyNameCommaString}};
+    }
 #foreach ($property in $table.propertyList)
 
     public void set${property.capCalemName}(String ${property.uncapCalemName}) {
-        registerVariable("${property.uncapCalemName}", ${property.uncapCalemName});
+        registerVariable("${property.propertyName}", ${property.uncapCalemName});
     }
 #end
 }
