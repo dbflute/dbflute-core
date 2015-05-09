@@ -58,7 +58,7 @@ public class DfMailFluteTableLoader {
     // }
     // ; tableMap = map:{
     //     ; targetDir = $$baseDir$$/resources/mail
-    //     ; targetExt = .ml
+    //     ; targetExt = .dfmail
     //     ; targetKeyword = 
     //     ; exceptPathList = list:{ contain:/mail/common/ }
     // }

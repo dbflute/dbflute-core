@@ -257,7 +257,7 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                       Mail Postcard
     //                                                                       =============
     protected void setupMailPostcardGen(String appName, String path) {
-        doSetupMailPostcardGen(appName, path, "$$baseDir$$/resources/mail", "ml");
+        doSetupMailPostcardGen(appName, path, "$$baseDir$$/resources/mail", "dfmail");
     }
 
     protected void doSetupMailPostcardGen(String appName, String path, String targetDir, String ext) {
