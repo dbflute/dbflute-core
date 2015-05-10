@@ -44,7 +44,7 @@ public interface ${request.className} {
 #if ($column.hasComment)
      * comment: ${column.commentHtmlEncoded}
 #end
-     * @return The value of found property. (NullAllowed: if null, not found)
+     * @return The value of found property. (basically NotNull: because of generated)
      */
     String get${column.capCamelName}();
 #if ($column.mayBeIntegerProperty)
@@ -55,7 +55,7 @@ public interface ${request.className} {
 #if ($column.hasComment)
      * comment: ${column.commentHtmlEncoded}
 #end
-     * @return The value of found property. (NullAllowed: if null, not found)
+     * @return The value of found property. (basically NotNull: because of generated)
      * @throws NumberFormatException When the property is not integer.
      */
     Integer get${column.capCamelName}AsInteger();
@@ -68,7 +68,7 @@ public interface ${request.className} {
 #if ($column.hasComment)
      * comment: ${column.commentHtmlEncoded}
 #end
-     * @return The value of found property. (NullAllowed: if null, not found)
+     * @return The value of found property. (basically NotNull: because of generated)
      * @throws NumberFormatException When the property is not long.
      */
     Long get${column.capCamelName}AsLong();
@@ -81,7 +81,7 @@ public interface ${request.className} {
 #if ($column.hasComment)
      * comment: ${column.commentHtmlEncoded}
 #end
-     * @return The value of found property. (NullAllowed: if null, not found)
+     * @return The value of found property. (basically NotNull: because of generated)
      * @throws NumberFormatException When the property is not decimal.
      */
     java.math.BigDecimal get${column.capCamelName}AsDecimal();
@@ -89,14 +89,14 @@ public interface ${request.className} {
 #if ($column.mayBeDateProperty)
 
     /**
-     * Get the value for the key '${column.propertyKey}' as {@link java.util.Date}. <br>
+     * Get the value for the key '${column.propertyKey}' as {@link java.time.LocalDate}. <br>
      * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
 #if ($column.hasComment)
      * comment: ${column.commentHtmlEncoded}
 #end
-     * @return The value of found property. (NullAllowed: if null, not found)
+     * @return The value of found property. (basically NotNull: because of generated)
      */
-    java.util.Date get${column.capCamelName}AsDate();
+    java.time.LocalDate get${column.capCamelName}AsDate();
 #end
 #if ($column.mayBeBooleanProperty)
 
@@ -162,7 +162,7 @@ public interface ${request.className} {
 #if ($column.isOverride)
         @Override
 #end
-        public java.util.Date get${column.capCamelName}AsDate() {
+        public java.time.LocalDate get${column.capCamelName}AsDate() {
             return getAsDate(${request.className}.${column.defName});
         }
 #end
