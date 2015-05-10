@@ -50,32 +50,32 @@ public class DfFreeGenRequest {
     // ===================================================================================
     //                                                                        ResourceType
     //                                                                        ============
-    public enum DfFreeGenerateResourceType {
-        PROP, XLS, FILE_PATH, JSON_KEY, JSON_SCHEMA, SOLR, MAIL_FLUTE
-    }
-
     public boolean isResourceTypeProp() {
-        return _resource.isResourceTypeProp();
+        return DfFreeGenResourceType.PROP.equals(_resource.getResourceType());
     }
 
     public boolean isResourceTypeXls() {
-        return _resource.isResourceTypeXls();
+        return DfFreeGenResourceType.XLS.equals(_resource.getResourceType());
     }
 
     public boolean isResourceTypeFilePath() {
-        return _resource.isResourceTypeFilePath();
+        return DfFreeGenResourceType.FILE_PATH.equals(_resource.getResourceType());
     }
 
     public boolean isResourceTypeJsonKey() {
-        return _resource.isResourceTypeJsonKey();
+        return DfFreeGenResourceType.JSON_KEY.equals(_resource.getResourceType());
     }
 
     public boolean isResourceTypeJsonSchema() {
-        return _resource.isResourceTypeJsonSchema();
+        return DfFreeGenResourceType.JSON_SCHEMA.equals(_resource.getResourceType());
     }
 
     public boolean isResourceTypeSolr() {
-        return _resource.isResourceTypeSolr();
+        return DfFreeGenResourceType.SOLR.equals(_resource.getResourceType());
+    }
+
+    public boolean isResourceTypeMailFlute() {
+        return DfFreeGenResourceType.MAIL_FLUTE.equals(_resource.getResourceType());
     }
 
     // ===================================================================================
@@ -122,7 +122,7 @@ public class DfFreeGenRequest {
         return _resource;
     }
 
-    public DfFreeGenerateResourceType getResourceType() {
+    public DfFreeGenResourceType getResourceType() {
         return _resource.getResourceType();
     }
 

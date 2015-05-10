@@ -13,21 +13,23 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.manage.freegen.json;
+package org.dbflute.logic.manage.freegen.table.json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class DfJsonKeyTableLoader {
+public class DfJsonKeyTableLoader implements DfFreeGenTableLoader {
 
     // ===================================================================================
     //                                                                          Definition
@@ -50,8 +52,8 @@ public class DfJsonKeyTableLoader {
     // ; tableMap = map:{
     //     ; keyPath = categories -> map.key
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap) {
+    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getTableMap();
         final String resourceFile = resource.getResourceFile();
         final String tableName = Srl.substringLastFront((Srl.substringLastRear(resourceFile, "/")));
 

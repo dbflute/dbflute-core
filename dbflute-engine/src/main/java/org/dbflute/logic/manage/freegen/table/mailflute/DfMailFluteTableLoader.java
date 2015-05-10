@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.manage.freegen.mailflute;
+package org.dbflute.logic.manage.freegen.table.mailflute;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,8 +28,10 @@ import java.util.Set;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.helper.filesystem.FileTextIO;
+import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectAssist;
 import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectBindNode;
 import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectProcess;
@@ -41,7 +43,7 @@ import org.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfMailFluteTableLoader {
+public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
 
     // ===================================================================================
     //                                                                          Load Table
@@ -62,8 +64,8 @@ public class DfMailFluteTableLoader {
     //     ; targetKeyword = 
     //     ; exceptPathList = list:{ contain:/mail/common/ }
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap) {
+    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getTableMap();
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
 
         final String targetExt = extractTargetExt(tableMap);

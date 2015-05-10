@@ -15,7 +15,6 @@
  */
 package org.dbflute.properties;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,18 +27,12 @@ import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.dbflute.logic.manage.freegen.DfFreeGenManager;
+import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenOutput;
 import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
-import org.dbflute.logic.manage.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
-import org.dbflute.logic.manage.freegen.filepath.DfFilePathTableLoader;
-import org.dbflute.logic.manage.freegen.json.DfJsonKeyTableLoader;
-import org.dbflute.logic.manage.freegen.json.DfJsonSchemaTableLoader;
-import org.dbflute.logic.manage.freegen.mailflute.DfMailFluteTableLoader;
-import org.dbflute.logic.manage.freegen.prop.DfPropTableLoader;
-import org.dbflute.logic.manage.freegen.solr.DfSolrXmlTableLoader;
-import org.dbflute.logic.manage.freegen.xls.DfXlsTableLoader;
+import org.dbflute.logic.manage.freegen.DfFreeGenResourceType;
+import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.util.DfCollectionUtil;
 
 /**
@@ -62,16 +55,6 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     public DfFreeGenManager getFreeGenManager() {
         return _manager;
     }
-
-    // ===================================================================================
-    //                                                                              Loader
-    //                                                                              ======
-    protected final DfPropTableLoader _propTableLoader = new DfPropTableLoader();
-    protected final DfXlsTableLoader _xlsTableLoader = new DfXlsTableLoader();
-    protected final DfFilePathTableLoader _filePathTableLoader = new DfFilePathTableLoader();
-    protected final DfJsonKeyTableLoader _jsonKeyTableLoader = new DfJsonKeyTableLoader();
-    protected final DfSolrXmlTableLoader _solrXmlTableLoader = new DfSolrXmlTableLoader();
-    protected final DfMailFluteTableLoader _mailfluteTableLoader = new DfMailFluteTableLoader();
 
     // ===================================================================================
     //                                                                      Definition Map
@@ -168,34 +151,18 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             final Map<String, Object> elementMap = (Map<String, Object>) obj;
             final DfFreeGenRequest request = createFreeGenerateRequest(requestName, elementMap);
 
-            try {
-                final Map<String, Object> tableMap = extractTableMap(elementMap);
-                final Map<String, Map<String, String>> mappingMap = extractMappingMap(tableMap);
-                final DfFreeGenResource resource = request.getResource();
-                if (resource.isResourceTypeProp()) {
-                    request.setTable(loadTableFromProp(requestName, resource, tableMap, mappingMap, requestMap));
-                } else if (resource.isResourceTypeXls()) {
-                    request.setTable(loadTableFromXls(requestName, resource, tableMap, mappingMap));
-                } else if (resource.isResourceTypeFilePath()) {
-                    request.setTable(loadTableFromFilePath(requestName, resource, tableMap, mappingMap));
-                } else if (resource.isResourceTypeJsonKey()) {
-                    request.setTable(loadTableFromJsonKey(requestName, resource, tableMap, mappingMap));
-                } else if (resource.isResourceTypeJsonSchema()) {
-                    request.setTable(loadTableFromJsonSchema(requestName, resource, tableMap, mappingMap));
-                } else if (resource.isResourceTypeSolr()) {
-                    request.setTable(loadTableFromSolrXml(requestName, resource, tableMap, mappingMap));
-                } else if (resource.isResourceTypeMailFlute()) {
-                    request.setTable(loadMailFluteTableLoader(requestName, resource, tableMap, mappingMap));
-                } else {
-                    throwFreeGenResourceTypeUnknownException(requestName, resource);
-                }
-            } catch (IOException e) {
-                String msg = "Failed to load table: request=" + request;
-                throw new IllegalStateException(msg, e);
-            }
+            final Map<String, Object> tableMap = extractTableMap(elementMap);
+            final Map<String, Map<String, String>> mappingMap = extractMappingMap(tableMap);
+            final DfFreeGenMapProp mapProp = new DfFreeGenMapProp(tableMap, mappingMap, requestMap);
 
-            final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
-            request.setPackagePathHandler(packagePathHandler);
+            final DfFreeGenResource resource = request.getResource();
+            final DfFreeGenTableLoader tableLoader = DfFreeGenResourceType.tableLoaderMap.get(request.getResourceType());
+            if (tableLoader == null) {
+                throwFreeGenResourceTypeUnknownException(requestName, resource);
+            }
+            request.setTable(tableLoader.loadTable(requestName, resource, mapProp));
+
+            request.setPackagePathHandler(new DfPackagePathHandler(getBasicProperties()));
             _freeGenRequestList.add(request);
             requestMap.put(requestName, request);
         }
@@ -227,7 +194,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             final Map<String, String> resourceMap = (Map<String, String>) elementMap.get("resourceMap");
             final String baseDir = resourceMap.get("baseDir");
             final String resourceTypeStr = resourceMap.get("resourceType"); // required
-            final DfFreeGenerateResourceType resourceType = DfFreeGenerateResourceType.valueOf(resourceTypeStr);
+            final DfFreeGenResourceType resourceType = DfFreeGenResourceType.valueOf(resourceTypeStr);
             final String resourceFile = resourceMap.get("resourceFile");
             final String encoding = resourceMap.get("encoding");
             resource = new DfFreeGenResource(baseDir, resourceType, resourceFile, encoding);
@@ -243,42 +210,6 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             output = new DfFreeGenOutput(templateFile, outputDirectory, pkg, className);
         }
         return new DfFreeGenRequest(_manager, requestName, resource, output);
-    }
-
-    protected DfFreeGenTable loadTableFromProp(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap, Map<String, DfFreeGenRequest> requestMap) throws IOException {
-        return _propTableLoader.loadTable(requestName, resource, tableMap, mappingMap, requestMap);
-    }
-
-    protected DfFreeGenTable loadTableFromXls(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap) throws IOException {
-        return _xlsTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
-    }
-
-    protected DfFreeGenTable loadTableFromFilePath(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap) throws IOException {
-        return _filePathTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
-    }
-
-    protected DfFreeGenTable loadTableFromJsonKey(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap) throws IOException {
-        return _jsonKeyTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
-    }
-
-    protected DfFreeGenTable loadTableFromJsonSchema(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap) throws IOException {
-        final DfJsonSchemaTableLoader loader = new DfJsonSchemaTableLoader(requestName, resource, tableMap, mappingMap);
-        return loader.loadTable();
-    }
-
-    protected DfFreeGenTable loadTableFromSolrXml(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap) throws IOException {
-        return _solrXmlTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
-    }
-
-    protected DfFreeGenTable loadMailFluteTableLoader(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap) throws IOException {
-        return _mailfluteTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
     }
 
     protected void throwFreeGenResourceTypeUnknownException(String requestName, DfFreeGenResource resource) {

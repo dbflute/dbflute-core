@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.manage.freegen.prop;
+package org.dbflute.logic.manage.freegen.table.prop;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,9 +31,11 @@ import org.dbflute.helper.jprop.JavaPropertiesReader;
 import org.dbflute.helper.jprop.JavaPropertiesResult;
 import org.dbflute.helper.jprop.JavaPropertiesStreamProvider;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
@@ -43,7 +45,7 @@ import org.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfPropTableLoader {
+public class DfPropTableLoader implements DfFreeGenTableLoader {
 
     // ===================================================================================
     //                                                                          Load Table
@@ -65,13 +67,15 @@ public class DfPropTableLoader {
     //     ; extendsPropFileList = list:{ ../../../bar.properties }
     //     ; isCheckImplicitOverride = false
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap, Map<String, DfFreeGenRequest> requestMap) {
+    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getTableMap();
+        final Map<String, DfFreeGenRequest> requestMap = mapProp.getRequestMap();
         final JavaPropertiesReader reader = createReader(requestName, resource, tableMap, requestMap);
         final JavaPropertiesResult result;
         try {
             result = reader.read();
         } catch (RuntimeException e) {
+            final Map<String, Map<String, String>> mappingMap = mapProp.getMappingMap();
             throwFreeGenPropReadFailureException(requestName, resource, tableMap, mappingMap, e);
             return null; // unreachable
         }

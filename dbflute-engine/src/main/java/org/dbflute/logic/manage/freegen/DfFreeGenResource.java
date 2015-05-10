@@ -15,7 +15,6 @@
  */
 package org.dbflute.logic.manage.freegen;
 
-import org.dbflute.logic.manage.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
 import org.dbflute.util.Srl;
 
 /**
@@ -26,15 +25,15 @@ public class DfFreeGenResource {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _baseDir; // NullAllowed
-    protected final DfFreeGenerateResourceType _resourceType; // NotNull
-    protected final String _resourceFile; // NotNull
-    protected final String _encoding; // NullAllowed
+    protected final String _baseDir; // null allowed
+    protected final DfFreeGenResourceType _resourceType; // not null
+    protected final String _resourceFile; // not null
+    protected final String _encoding; // null allowed
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenResource(String baseDir, DfFreeGenerateResourceType resourceType, String resourceFile, String encoding) {
+    public DfFreeGenResource(String baseDir, DfFreeGenResourceType resourceType, String resourceFile, String encoding) {
         _baseDir = baseDir;
         _resourceType = resourceType;
         _resourceFile = resolveBaseDir(resourceFile);
@@ -52,37 +51,6 @@ public class DfFreeGenResource {
     }
 
     // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
-    public boolean isResourceTypeProp() {
-        return DfFreeGenerateResourceType.PROP.equals(_resourceType);
-    }
-
-    public boolean isResourceTypeXls() {
-        return DfFreeGenerateResourceType.XLS.equals(_resourceType);
-    }
-
-    public boolean isResourceTypeFilePath() {
-        return DfFreeGenerateResourceType.FILE_PATH.equals(_resourceType);
-    }
-
-    public boolean isResourceTypeJsonKey() {
-        return DfFreeGenerateResourceType.JSON_KEY.equals(_resourceType);
-    }
-
-    public boolean isResourceTypeJsonSchema() {
-        return DfFreeGenerateResourceType.JSON_SCHEMA.equals(_resourceType);
-    }
-
-    public boolean isResourceTypeSolr() {
-        return DfFreeGenerateResourceType.SOLR.equals(_resourceType);
-    }
-
-    public boolean isResourceTypeMailFlute() {
-        return DfFreeGenerateResourceType.MAIL_FLUTE.equals(_resourceType);
-    }
-
-    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
@@ -93,7 +61,7 @@ public class DfFreeGenResource {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public DfFreeGenerateResourceType getResourceType() {
+    public DfFreeGenResourceType getResourceType() {
         return _resourceType;
     }
 
@@ -102,10 +70,7 @@ public class DfFreeGenResource {
     }
 
     public String getResourceFilePureName() {
-        if (_resourceFile == null) {
-            return _resourceFile;
-        }
-        return Srl.substringLastRear(_resourceFile, "/");
+        return _resourceFile != null ? Srl.substringLastRear(_resourceFile, "/") : _resourceFile;
     }
 
     public boolean hasEncoding() {

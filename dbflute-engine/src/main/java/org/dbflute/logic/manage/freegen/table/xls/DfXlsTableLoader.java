@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.manage.freegen.xls;
+package org.dbflute.logic.manage.freegen.table.xls;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,8 +30,10 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfRequiredPropertyNotFoundException;
+import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenLazyReflector;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenMethodConverter;
 import org.dbflute.util.DfCollectionUtil;
@@ -39,7 +41,7 @@ import org.dbflute.util.DfCollectionUtil;
 /**
  * @author jflute
  */
-public class DfXlsTableLoader {
+public class DfXlsTableLoader implements DfFreeGenTableLoader {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -73,8 +75,9 @@ public class DfXlsTableLoader {
     //         }
     //     }
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap) {
+    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getTableMap();
+        final Map<String, Map<String, String>> mappingMap = mapProp.getMappingMap();
         if (tableMap == null || tableMap.isEmpty()) {
             String msg = "The tableMap was not found in the FreeGen property: " + requestName;
             throw new DfRequiredPropertyNotFoundException(msg);

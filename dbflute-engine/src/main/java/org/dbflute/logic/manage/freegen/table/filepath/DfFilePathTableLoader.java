@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.manage.freegen.filepath;
+package org.dbflute.logic.manage.freegen.table.filepath;
 
 import java.io.File;
 import java.util.List;
@@ -21,8 +21,10 @@ import java.util.Map;
 
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
+import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
@@ -30,7 +32,7 @@ import org.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfFilePathTableLoader {
+public class DfFilePathTableLoader implements DfFreeGenTableLoader {
 
     // ===================================================================================
     //                                                                          Load Table
@@ -51,8 +53,8 @@ public class DfFilePathTableLoader {
     //     ; targetKeyword = 
     //     ; exceptPathList = list:{ contain:/view/common/ }
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap) {
+    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getTableMap();
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
 
         final String targetExt = extractTargetExt(tableMap);

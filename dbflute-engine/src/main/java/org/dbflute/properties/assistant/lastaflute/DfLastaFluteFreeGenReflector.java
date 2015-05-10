@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
+import org.dbflute.logic.manage.freegen.DfFreeGenResourceType;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -242,7 +242,7 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         pathMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
-        resourceMap.put("resourceType", DfFreeGenRequest.DfFreeGenerateResourceType.MAIL_FLUTE.name());
+        resourceMap.put("resourceType", DfFreeGenResourceType.MAIL_FLUTE.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaMailBean.vm");
@@ -276,7 +276,7 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         pathMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
-        resourceMap.put("resourceType", DfFreeGenRequest.DfFreeGenerateResourceType.FILE_PATH.name());
+        resourceMap.put("resourceType", DfFreeGenResourceType.FILE_PATH.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaHtmlPath.vm");
@@ -310,7 +310,7 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         map.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
-        resourceMap.put("resourceType", DfFreeGenRequest.DfFreeGenerateResourceType.PROP.name());
+        resourceMap.put("resourceType", DfFreeGenResourceType.PROP.name());
         resourceMap.put("resourceFile", "$$baseDir$$/resources/" + appName + "_" + theme + ".properties");
     }
 
