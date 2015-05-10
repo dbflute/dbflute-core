@@ -81,7 +81,8 @@ public class DfSolrXmlTableLoader implements DfFreeGenTableLoader {
             final InputSource is = new InputSource(br);
             final DfSolrXmlParserHandler parserHandler = new DfSolrXmlParserHandler(tableMap, mappingMap);
             saxParser.parse(is, parserHandler);
-            return new DfFreeGenTable(tableMap, requestName, parserHandler.getColumnList());
+            final String tableName = requestName; // basically unsed, also for compatible
+            return new DfFreeGenTable(tableMap, tableName, parserHandler.getColumnList());
         } catch (IOException e) {
             String msg = "Failed to read the properties:";
             msg = msg + " requestName=" + requestName + " resourceFile=" + resourceFile;

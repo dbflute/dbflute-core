@@ -49,12 +49,12 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     //                                                                          Load Table
     //                                                                          ==========
     // ; resourceMap = map:{
+    //     ; baseDir = ../src/main
     //     ; resourceType = MAIL_FLUTE
-    //     ; resourceFile = ../../../foo.properties
     // }
     // ; outputMap = map:{
     //     ; templateFile = LaMailBean.vm
-    //     ; outputDirectory = ../src/main/java
+    //     ; outputDirectory = $$baseDir$$/java
     //     ; package = org.dbflute...
     //     ; className = unused
     // }
@@ -67,40 +67,44 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> tableMap = mapProp.getTableMap();
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
-
         final String targetExt = extractTargetExt(tableMap);
         final String targetKeyword = extractTargetKeyword(tableMap);
         final List<String> exceptPathList = extractExceptPathList(tableMap);
-        final List<File> fileList = DfCollectionUtil.newArrayList();
 
+        final Map<String, Map<String, Object>> schemaMap = doLoad(targetDir, targetExt, targetKeyword, exceptPathList);
+        return new DfFreeGenTable(tableMap, schemaMap);
+    }
+
+    protected Map<String, Map<String, Object>> doLoad(String targetDir, String targetExt, String targetKeyword, List<String> exceptPathList) {
+        final List<File> fileList = DfCollectionUtil.newArrayList();
         collectFile(fileList, targetExt, targetKeyword, exceptPathList, new File(targetDir));
         final Map<String, Map<String, Object>> schemaMap = DfCollectionUtil.newLinkedHashMap();
         for (File file : fileList) {
-            final Map<String, Object> mailMap = DfCollectionUtil.newHashMap(); // 'table' on template
+            final Map<String, Object> table = DfCollectionUtil.newHashMap();
             final String fileName = file.getName();
-            mailMap.put("fileName", fileName);
+            table.put("fileName", fileName);
             final String className = Srl.camelize(Srl.substringLastFront(fileName, targetExt)) + "Postcard";
-            mailMap.put("className", className);
-            mailMap.put("camelizedName", className);
+            table.put("className", className); // used as output file name
+            table.put("camelizedName", className);
 
             final String domainPath = buildDomainPath(file, targetDir);
-            mailMap.put("domainPath", domainPath); // e.g. /member/member_registration.ml
+            table.put("domainPath", domainPath); // e.g. /member/member_registration.ml
 
-            mailMap.put("defName", buildUpperSnakeName(domainPath));
+            table.put("defName", buildUpperSnakeName(domainPath));
             {
                 final String dirPath = Srl.substringLastFront(domainPath, "/");
                 final String snakeCase = buildPlainSnakeName(dirPath);
                 final String camelizedName = Srl.camelize(snakeCase);
-                mailMap.put("camelizedDir", camelizedName);
-                mailMap.put("capCamelDir", Srl.initCap(camelizedName));
-                mailMap.put("uncapCamelDir", Srl.initUncap(camelizedName));
+                table.put("camelizedDir", camelizedName);
+                table.put("capCamelDir", Srl.initCap(camelizedName));
+                table.put("uncapCamelDir", Srl.initUncap(camelizedName));
             }
             {
                 final String snakeCase = buildPlainSnakeName(fileName);
                 final String camelizedName = Srl.camelize(snakeCase);
-                mailMap.put("camelizedFile", camelizedName);
-                mailMap.put("capCamelFile", Srl.initCap(camelizedName));
-                mailMap.put("uncapCamelFile", Srl.initUncap(camelizedName));
+                table.put("camelizedFile", camelizedName);
+                table.put("capCamelFile", Srl.initCap(camelizedName));
+                table.put("uncapCamelFile", Srl.initUncap(camelizedName));
             }
             final String fileText;
             try {
@@ -115,22 +119,22 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
             final List<Map<String, String>> propertyList = new ArrayList<Map<String, String>>();
             final StringBuilder commaSb = new StringBuilder();
             for (String propertyName : autoDetectedPropertyNameSet) {
-                final Map<String, String> propertyMap = new LinkedHashMap<String, String>(); // 'property' on template
-                propertyMap.put("propertyName", propertyName);
-                propertyMap.put("capCalemName", Srl.initCap(propertyName));
-                propertyMap.put("uncapCalemName", Srl.initUncap(propertyName));
-                propertyMap.put("propertyType", propertyNameTypeMap.get(propertyName)); // exists
-                propertyList.add(propertyMap);
+                final Map<String, String> property = new LinkedHashMap<String, String>();
+                property.put("propertyName", propertyName);
+                property.put("capCalemName", Srl.initCap(propertyName));
+                property.put("uncapCalemName", Srl.initUncap(propertyName));
+                property.put("propertyType", propertyNameTypeMap.get(propertyName)); // exists
+                propertyList.add(property);
                 if (commaSb.length() > 0) {
                     commaSb.append(", ");
                 }
                 commaSb.append("\"").append(propertyName).append("\"");
             }
-            mailMap.put("propertyList", propertyList);
-            mailMap.put("propertyNameCommaString", commaSb.toString());
-            schemaMap.put(fileName, mailMap);
+            table.put("propertyList", propertyList);
+            table.put("propertyNameCommaString", commaSb.toString());
+            schemaMap.put(fileName, table);
         }
-        return new DfFreeGenTable(tableMap, schemaMap);
+        return schemaMap;
     }
 
     protected String extractTargetExt(Map<String, Object> tableMap) {

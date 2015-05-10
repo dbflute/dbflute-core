@@ -111,7 +111,7 @@ public class DfXlsTableLoader implements DfFreeGenTableLoader {
             String msg = "Not found the sheet name in the file: name=" + sheetName + " xls=" + resourceFile;
             throw new IllegalStateException(msg);
         }
-        final List<Map<String, Object>> rowList = new ArrayList<Map<String, Object>>();
+        final List<Map<String, Object>> columnList = new ArrayList<Map<String, Object>>(); // rows
         for (int i = (rowBeginNumber - 1); i < Integer.MAX_VALUE; i++) {
             final HSSFRow row = sheet.getRow(i);
             if (row == null) {
@@ -133,7 +133,7 @@ public class DfXlsTableLoader implements DfFreeGenTableLoader {
             }
             prepareColumnNameConversion(requestName, beanMap, reflectorList);
             if (exists) {
-                rowList.add(beanMap);
+                columnList.add(beanMap);
             } else { // means empty row
                 break;
             }
@@ -141,7 +141,8 @@ public class DfXlsTableLoader implements DfFreeGenTableLoader {
                 reflector.reflect();
             }
         }
-        return new DfFreeGenTable(tableMap, sheetName, rowList);
+        final String tableName = sheetName; // basically unused, also for compatible
+        return new DfFreeGenTable(tableMap, tableName, columnList);
     }
 
     protected boolean processColumnValue(final String requestName, final Map<String, String> columnMap, final HSSFRow row,

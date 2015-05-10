@@ -43,7 +43,7 @@ public class DfFreeGenManager {
     // ===================================================================================
     //                                                                           Generator
     //                                                                           =========
-    public DfGenerator getGeneratorInstance() {
+    public DfGenerator getGenerator() {
         return DfGenerator.getInstance();
     }
 
@@ -51,13 +51,18 @@ public class DfFreeGenManager {
     //                                                                           Directory
     //                                                                           =========
     public void setOutputDirectory(String outputDirectory) {
+        final DfGenerator generator = getGenerator();
+        final String existingPath = generator.getOutputPath();
+        if (existingPath != null && existingPath.equals(outputDirectory)) {
+            return;
+        }
         _log.info("...Setting up generateOutputDirectory: " + outputDirectory);
-        getGeneratorInstance().setOutputPath(outputDirectory);
+        generator.setOutputPath(outputDirectory);
     }
 
     public void makeDirectory(String filePath) {
         final String basePath = Srl.substringLastFront(filePath, "/");
-        FileUtil.mkdir(getGeneratorInstance().getOutputPath() + "/" + basePath);
+        FileUtil.mkdir(getGenerator().getOutputPath() + "/" + basePath);
     }
 
     // ===================================================================================

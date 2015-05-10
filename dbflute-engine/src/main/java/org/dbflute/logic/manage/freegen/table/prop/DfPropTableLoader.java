@@ -52,7 +52,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
     //                                                                          ==========
     // ; resourceMap = map:{
     //     ; resourceType = PROP
-    //     ; resourceFile = ../../../foo.properties
+    //     ; resourceFile = ../../../sea.properties
     // }
     // ; outputMap = map:{
     //     ; templateFile = MessageDef.vm
@@ -79,9 +79,9 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
             throwFreeGenPropReadFailureException(requestName, resource, tableMap, mappingMap, e);
             return null; // unreachable
         }
-        final List<Map<String, Object>> columnList = toMapList(result, tableMap);
         final String resourceFile = resource.getResourceFile();
-        final String tableName = Srl.substringLastFront((Srl.substringLastRear(resourceFile, "/")));
+        final String tableName = buildTableName(resourceFile);
+        final List<Map<String, Object>> columnList = toMapList(result, tableMap);
         return new DfFreeGenTable(tableMap, tableName, columnList);
     }
 
@@ -113,6 +113,13 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         throw new DfIllegalPropertySettingException(msg, cause);
     }
 
+    protected String buildTableName(final String resourceFile) {
+        return Srl.substringLastFront((Srl.substringLastRear(resourceFile, "/")), "."); // sea
+    }
+
+    // ===================================================================================
+    //                                                                   Properties Reader
+    //                                                                   =================
     protected JavaPropertiesReader createReader(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, DfFreeGenRequest> requestMap) {
         final String resourceFile = resource.getResourceFile();

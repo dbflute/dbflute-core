@@ -88,10 +88,9 @@ public class DfFilePathTableLoader implements DfFreeGenTableLoader {
                 columnMap.put("capCamelFile", Srl.initCap(camelizedName));
                 columnMap.put("uncapCamelFile", Srl.initUncap(camelizedName));
             }
-
             columnList.add(columnMap);
         }
-        return new DfFreeGenTable(tableMap, "dummy", columnList);
+        return new DfFreeGenTable(tableMap, "unused", columnList);
     }
 
     protected String extractTargetExt(Map<String, Object> tableMap) {

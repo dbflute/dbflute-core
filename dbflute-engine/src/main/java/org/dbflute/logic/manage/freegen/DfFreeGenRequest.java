@@ -18,14 +18,16 @@ package org.dbflute.logic.manage.freegen;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.generate.packagepath.DfPackagePathHandler;
-import org.dbflute.properties.DfBasicProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
  */
 public class DfFreeGenRequest {
+
+    private static final Logger logger = LoggerFactory.getLogger(DfFreeGenRequest.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -85,14 +87,12 @@ public class DfFreeGenRequest {
         _manager.setOutputDirectory(_output.getOutputDirectory());
     }
 
-    public String getGenerateDirPath() {
+    public String getGenerateDirPath() { // contains rear slash '/'
         return getPackageAsPath(_output.getPackage());
     }
 
     public String getGenerateFilePath() {
-        final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
-        final String classExt = basicProp.getLanguageDependency().getLanguageGrammar().getClassFileExtension();
-        return getGenerateDirPath() + "/" + _output.getClassName() + "." + classExt;
+        return getGenerateDirPath() + _output.getClassName() + "." + _output.getFileExt();
     }
 
     protected String getPackageAsPath(String pkg) {
@@ -101,6 +101,13 @@ public class DfFreeGenRequest {
 
     public String getTemplatePath() {
         return _output.getTemplateFile();
+    }
+
+    // ===================================================================================
+    //                                                                             Logging
+    //                                                                             =======
+    public void info(String msg) {
+        logger.info(msg);
     }
 
     // ===================================================================================
@@ -118,6 +125,9 @@ public class DfFreeGenRequest {
         return _requestName;
     }
 
+    // -----------------------------------------------------
+    //                                              Resource
+    //                                              --------
     public DfFreeGenResource getResource() {
         return _resource;
     }
@@ -134,6 +144,9 @@ public class DfFreeGenRequest {
         return _resource.getResourceFilePureName();
     }
 
+    // -----------------------------------------------------
+    //                                                Output
+    //                                                ------
     public DfFreeGenOutput getOutput() {
         return _output;
     }
@@ -154,30 +167,40 @@ public class DfFreeGenRequest {
         return _output.getClassName();
     }
 
-    public DfFreeGenTable getTable() {
+    public String getFileExt() {
+        return _output.getFileExt();
+    }
+
+    // -----------------------------------------------------
+    //                                                 Table
+    //                                                 -----
+    public DfFreeGenTable getTable() { // fixed info of table
         return _table;
     }
 
-    public Map<String, Object> getTableMap() {
+    public Map<String, Object> getTableMap() { // flexible table configuration
         return _table.getTableMap();
     }
 
-    public boolean isOnlyOneTable() {
+    public boolean isOnlyOneTable() { // only-one or multiple table?
         return _table.isOnlyOneTable();
     }
 
-    public String getTableName() {
+    public String getTableName() { // when only-one table
         return _table.getTableName();
     }
 
-    public List<Map<String, Object>> getColumnList() {
+    public List<Map<String, Object>> getColumnList() { // when only-one table
         return _table.getColumnList();
     }
 
-    public List<Map<String, Object>> getTableList() {
+    public List<Map<String, Object>> getTableList() { // when multiple table
         return _table.getTableList();
     }
 
+    // -----------------------------------------------------
+    //                                                Setter
+    //                                                ------
     public void setTable(DfFreeGenTable table) {
         _table = table;
     }

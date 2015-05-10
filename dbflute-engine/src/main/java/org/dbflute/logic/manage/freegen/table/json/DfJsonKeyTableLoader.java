@@ -41,7 +41,7 @@ public class DfJsonKeyTableLoader implements DfFreeGenTableLoader {
     //                                                                          ==========
     // ; resourceMap = map:{
     //     ; resourceType = JSON_KEY
-    //     ; resourceFile = ../../../foo.properties
+    //     ; resourceFile = ../../../sea.json
     // }
     // ; outputMap = map:{
     //     ; templateFile = MessageDef.vm
@@ -55,15 +55,19 @@ public class DfJsonKeyTableLoader implements DfFreeGenTableLoader {
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> tableMap = mapProp.getTableMap();
         final String resourceFile = resource.getResourceFile();
-        final String tableName = Srl.substringLastFront((Srl.substringLastRear(resourceFile, "/")));
 
         final Map<String, Object> rootMap = decodeJsonMap(requestName, resourceFile);
         final String keyPath = (String) tableMap.get("keyPath");
         final List<String> pathList = Srl.splitListTrimmed(keyPath, "->");
         final List<String> keyList = traceKeyList(requestName, resource, rootMap, keyPath, pathList);
 
+        final String tableName = buildTableName(resourceFile);
         final List<Map<String, Object>> columnList = setupColumnList(requestName, resource, keyList);
         return new DfFreeGenTable(tableMap, tableName, columnList);
+    }
+
+    protected String buildTableName(final String resourceFile) {
+        return Srl.substringLastFront((Srl.substringLastRear(resourceFile, "/")), "."); // sea
     }
 
     // ===================================================================================

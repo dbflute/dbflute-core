@@ -26,16 +26,18 @@ public class DfFreeGenOutput {
     protected final String _templateFile;
     protected final String _outputDirectory;
     protected final String _package;
-    protected final String _className; // (NullAllowed: when table list)
+    protected final String _className; // null allowed: when table list
+    protected final String _fileExt;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenOutput(String templateFile, String outputDirectory, String pkg, String className) {
+    public DfFreeGenOutput(String templateFile, String outputDirectory, String pkg, String className, String fileExt) {
         _templateFile = templateFile;
         _outputDirectory = outputDirectory;
         _package = pkg;
         _className = className;
+        _fileExt = fileExt;
     }
 
     // ===================================================================================
@@ -44,7 +46,7 @@ public class DfFreeGenOutput {
     @Override
     public String toString() {
         return "{templateFile=" + _templateFile + ", outputDirectory=" + _outputDirectory + ", package=" + _package + ", className="
-                + _className + "}";
+                + _className + ", " + _fileExt + "}";
     }
 
     // ===================================================================================
@@ -64,5 +66,9 @@ public class DfFreeGenOutput {
 
     public String getClassName() {
         return _className;
+    }
+
+    public String getFileExt() {
+        return _fileExt;
     }
 }

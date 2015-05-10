@@ -28,10 +28,10 @@ public class DfFreeGenTable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, Object> _tableMap;
-    protected final String _tableName;
-    protected final List<Map<String, Object>> _columnList;
-    protected final Map<String, Map<String, Object>> _schemaMap;
+    protected final Map<String, Object> _tableMap; // not null
+    protected final String _tableName; // only-one table, but may be unused
+    protected final List<Map<String, Object>> _columnList; // only-one table
+    protected final Map<String, Map<String, Object>> _schemaMap; // multiple table
 
     // ===================================================================================
     //                                                                         Constructor

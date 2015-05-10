@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.helper.StringKeyMap;
@@ -207,9 +208,15 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             final String outputDirectory = resource.resolveBaseDir(outputMap.get("outputDirectory"));
             final String pkg = outputMap.get("package");
             final String className = outputMap.get("className");
-            output = new DfFreeGenOutput(templateFile, outputDirectory, pkg, className);
+            final String fileExt = outputMap.getOrDefault("fileExt", getLanguageClassExt());
+            output = new DfFreeGenOutput(templateFile, outputDirectory, pkg, className, fileExt);
         }
         return new DfFreeGenRequest(_manager, requestName, resource, output);
+    }
+
+    protected String getLanguageClassExt() {
+        final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
+        return basicProp.getLanguageDependency().getLanguageGrammar().getClassFileExtension();
     }
 
     protected void throwFreeGenResourceTypeUnknownException(String requestName, DfFreeGenResource resource) {

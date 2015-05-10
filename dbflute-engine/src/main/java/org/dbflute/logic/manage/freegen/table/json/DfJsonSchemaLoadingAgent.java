@@ -99,17 +99,17 @@ public class DfJsonSchemaLoadingAgent {
         final Map<String, Object> tableMap = _mapProp.getTableMap();
         prepareReflectorList();
         final Map<String, Map<String, Object>> schemaMap = DfCollectionUtil.newLinkedHashMap();
-        final Map<String, Object> rootMap = decodeJsonMap(_requestName, _resource);
+        final Map<String, Object> rootMap = decodeJsonMap();
         final String tablePath = (String) tableMap.get("tablePath");
         if (Srl.is_Null_or_TrimmedEmpty(tablePath)) {
-            throwJsonTablePathPropertyNotFoundException(_requestName, _resource, _mapProp);
+            throwJsonTablePathPropertyNotFoundException();
         }
-        final Map<String, Object> traceMap = traceMap(_requestName, _resource, rootMap, tablePath);
+        final Map<String, Object> traceMap = traceMap(rootMap, tablePath);
         for (Entry<String, Object> traceEntry : traceMap.entrySet()) {
             final String tableName = traceEntry.getKey();
             @SuppressWarnings("unchecked")
             final Map<String, Object> tableAttrMap = (Map<String, Object>) traceEntry.getValue();
-            final Map<String, Object> beanMap = prepareTableBeanMap(_requestName, schemaMap, tableName, tableAttrMap, _mapProp);
+            final Map<String, Object> beanMap = prepareTableBeanMap(schemaMap, tableName, tableAttrMap);
             schemaMap.put(tableName, beanMap);
         }
         reflectLazyProcess();
@@ -155,10 +155,10 @@ public class DfJsonSchemaLoadingAgent {
     // -----------------------------------------------------
     //                                            Table Bean
     //                                            ----------
-    protected Map<String, Object> prepareTableBeanMap(String requestName, Map<String, Map<String, Object>> schemaMap, String tableName,
-            Map<String, Object> tableAttrMap, DfFreeGenMapProp mapProp) {
+    protected Map<String, Object> prepareTableBeanMap(Map<String, Map<String, Object>> schemaMap, String tableName,
+            Map<String, Object> tableAttrMap) {
         final Map<String, Object> tableBeanMap = DfCollectionUtil.newLinkedHashMap();
-        prepareTableName(requestName, tableName, tableBeanMap);
+        prepareTableName(tableName, tableBeanMap);
         final List<Map<String, Object>> columnList = DfCollectionUtil.newArrayList();
         for (Entry<String, Object> columnEntry : tableAttrMap.entrySet()) {
             final String columnName = columnEntry.getKey();
@@ -168,7 +168,7 @@ public class DfJsonSchemaLoadingAgent {
             } else {
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> columnAttrMap = (Map<String, Object>) columnEntry.getValue();
-                columnList.add(prepareColumnBeanMap(requestName, mapProp, schemaMap, tableName, columnName, columnAttrMap));
+                columnList.add(prepareColumnBeanMap(schemaMap, tableName, columnName, columnAttrMap));
             }
         }
         tableBeanMap.put("columnList", columnList);
@@ -183,28 +183,29 @@ public class DfJsonSchemaLoadingAgent {
         beanMap.put("isRefColumn", refColumn);
     }
 
-    protected void prepareTableName(String requestName, String tableName, Map<String, Object> tableBeanMap) {
+    protected void prepareTableName(String tableName, Map<String, Object> tableBeanMap) {
         tableBeanMap.put("name", tableName);
-        convertByMethod(requestName, tableBeanMap, "camelizedName", "df:camelize(name)");
-        convertByMethod(requestName, tableBeanMap, "capCamelName", "df:capCamel(name)");
-        convertByMethod(requestName, tableBeanMap, "uncapCamelName", "df:uncapCamel(name)");
+        convertByMethod(tableBeanMap, "className", "df:camelize(name)"); // used as output file name
+        convertByMethod(tableBeanMap, "camelizedName", "df:camelize(name)");
+        convertByMethod(tableBeanMap, "capCamelName", "df:capCamel(name)");
+        convertByMethod(tableBeanMap, "uncapCamelName", "df:uncapCamel(name)");
     }
 
     // -----------------------------------------------------
     //                                           Column Bean
     //                                           -----------
-    protected Map<String, Object> prepareColumnBeanMap(String requestName, DfFreeGenMapProp mapProp,
-            Map<String, Map<String, Object>> schemaMap, String tableName, String columnName, Map<String, Object> columnAttrMap) {
+    protected Map<String, Object> prepareColumnBeanMap(Map<String, Map<String, Object>> schemaMap, String tableName, String columnName,
+            Map<String, Object> columnAttrMap) {
         final Map<String, Object> columnBeanMap = DfCollectionUtil.newLinkedHashMap();
         final boolean refColumn = isRefColumn(columnAttrMap);
         if (refColumn) {
-            prepareRefColumn(requestName, schemaMap, tableName, columnName, columnAttrMap, columnBeanMap);
+            prepareRefColumn(schemaMap, tableName, columnName, columnAttrMap, columnBeanMap);
         }
-        prepareColumnName(requestName, columnName, columnBeanMap);
+        prepareColumnName(columnName, columnBeanMap);
         for (Entry<String, Object> attrEntry : columnAttrMap.entrySet()) {
             final String attrKey = attrEntry.getKey();
             final Object attrValue = attrEntry.getValue();
-            prepareAttrValue(requestName, mapProp, columnName, columnBeanMap, attrKey, attrValue);
+            prepareAttrValue(columnName, columnBeanMap, attrKey, attrValue);
         }
         markTableOrColumn(columnBeanMap, false, true, refColumn);
         return columnBeanMap;
@@ -215,35 +216,34 @@ public class DfJsonSchemaLoadingAgent {
         return "ref".equals(type);
     }
 
-    protected void prepareRefColumn(String requestName, Map<String, Map<String, Object>> schemaMap, final String tableName,
-            String columnName, Map<String, Object> columnAttrMap, Map<String, Object> columnBeanMap) {
+    protected void prepareRefColumn(Map<String, Map<String, Object>> schemaMap, final String tableName, String columnName,
+            Map<String, Object> columnAttrMap, Map<String, Object> columnBeanMap) {
         final String refTableName = columnName; // same as column name
         addLazyReflector(new DfFreeGenLazyReflector() {
             public void reflect() {
                 final Map<String, Object> tableBeanMap = schemaMap.get(refTableName);
                 if (tableBeanMap == null) {
-                    throwJsonTableReferenceNotFoundException(requestName, tableName, refTableName);
+                    throwJsonTableReferenceNotFoundException(tableName, refTableName);
                 }
                 columnBeanMap.put("entity", tableBeanMap);
             }
         });
     }
 
-    protected void prepareColumnName(String requestName, String columnName, Map<String, Object> columnBeanMap) {
+    protected void prepareColumnName(String columnName, Map<String, Object> columnBeanMap) {
         columnBeanMap.put("name", columnName);
-        convertByMethod(requestName, columnBeanMap, "camelizedName", "df:camelize(name)");
-        convertByMethod(requestName, columnBeanMap, "capCamelName", "df:capCamel(name)");
-        convertByMethod(requestName, columnBeanMap, "uncapCamelName", "df:uncapCamel(name)");
+        convertByMethod(columnBeanMap, "camelizedName", "df:camelize(name)");
+        convertByMethod(columnBeanMap, "capCamelName", "df:capCamel(name)");
+        convertByMethod(columnBeanMap, "uncapCamelName", "df:uncapCamel(name)");
     }
 
-    protected void prepareAttrValue(String requestName, DfFreeGenMapProp mapProp, String columnName, Map<String, Object> columnBeanMap,
-            String attrKey, Object attrValue) {
+    protected void prepareAttrValue(String columnName, Map<String, Object> columnBeanMap, String attrKey, Object attrValue) {
         if (attrValue instanceof String) {
-            if (convertByMethod(requestName, columnBeanMap, attrKey, (String) attrValue)) {
+            if (convertByMethod(columnBeanMap, attrKey, (String) attrValue)) {
                 return;
             }
             Object resultValue = attrValue;
-            final Map<String, Map<String, String>> mappingMap = mapProp.getMappingMap();
+            final Map<String, Map<String, String>> mappingMap = _mapProp.getMappingMap();
             final Map<String, String> mapping = mappingMap.get(attrKey);
             if (mapping != null) {
                 final String mappingValue = mapping.get(resultValue);
@@ -260,15 +260,17 @@ public class DfJsonSchemaLoadingAgent {
     // -----------------------------------------------------
     //                                         Assist Helper
     //                                         -------------
-    protected boolean convertByMethod(String requestName, Map<String, Object> beanMap, String key, String value) {
-        return _methodConverter.processConvertMethod(requestName, beanMap, key, value, _reflectorList);
+    protected boolean convertByMethod(Map<String, Object> beanMap, String key, String value) {
+        return _methodConverter.processConvertMethod(_requestName, beanMap, key, value, _reflectorList);
     }
 
-    protected void throwJsonTableReferenceNotFoundException(String requestName, String currentTableName, String specifiedTableName) {
+    protected void throwJsonTableReferenceNotFoundException(String currentTableName, String specifiedTableName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the table by the reference at the type. (FreeGen)");
         br.addItem("Request Name");
-        br.addElement(requestName);
+        br.addElement(_requestName);
+        br.addItem("JSON File");
+        br.addElement(_resource.getResourceFile());
         br.addItem("Current Table");
         br.addElement(currentTableName);
         br.addItem("Specified Table");
@@ -277,15 +279,15 @@ public class DfJsonSchemaLoadingAgent {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwJsonTablePathPropertyNotFoundException(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+    protected void throwJsonTablePathPropertyNotFoundException() {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the table path in the tableMap property. (FreeGen)");
         br.addItem("Request Name");
-        br.addElement(requestName);
+        br.addElement(_requestName);
         br.addItem("JSON File");
-        br.addElement(resource.getResourceFile());
+        br.addElement(_resource.getResourceFile());
         br.addItem("tableMap");
-        br.addElement(mapProp.getTableMap());
+        br.addElement(_mapProp.getTableMap());
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }
@@ -311,15 +313,15 @@ public class DfJsonSchemaLoadingAgent {
     // ===================================================================================
     //                                                                         Decode JSON
     //                                                                         ===========
-    protected Map<String, Object> decodeJsonMap(String requestName, DfFreeGenResource resource) {
-        final String resourceFile = resource.getResourceFile();
-        return new DfJsonFreeAgent().decodeJsonMap(requestName, resourceFile);
+    protected Map<String, Object> decodeJsonMap() {
+        final String resourceFile = _resource.getResourceFile();
+        return new DfJsonFreeAgent().decodeJsonMap(_requestName, resourceFile);
     }
 
     // ===================================================================================
     //                                                                           Trace Map
     //                                                                           =========
-    protected Map<String, Object> traceMap(String requestName, DfFreeGenResource resource, Map<String, Object> rootMap, String tracePath) {
-        return new DfJsonFreeAgent().traceMap(requestName, resource, rootMap, tracePath);
+    protected Map<String, Object> traceMap(Map<String, Object> rootMap, String tracePath) {
+        return new DfJsonFreeAgent().traceMap(_requestName, _resource, rootMap, tracePath);
     }
 }

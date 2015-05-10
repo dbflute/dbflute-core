@@ -84,6 +84,8 @@ public final class DfLastaFluteFreeGenReflector {
                     hasCommonMessage = true;
                 } else if ("mail".equals(freeGen)) {
                     setupMailPostcardGen(_uncapServiceName, path, lastafluteMap);
+                } else if ("doc".equals(freeGen)) {
+                    setupDocGen(_uncapServiceName, path);
                 } else {
                     String msg = "Unkonwn type for commonMap's freeGen: " + freeGen;
                     throw new DfIllegalPropertySettingException(msg);
@@ -115,6 +117,8 @@ public final class DfLastaFluteFreeGenReflector {
                         setupJspPathGen(appName, path);
                     } else if ("html".equals(freeGen)) {
                         // TODO jflute lastaflute: thymeleaf's HTML_PATH
+                    } else if ("doc".equals(freeGen)) {
+                        setupDocGen(appName, path);
                     } else {
                         String msg = "Unkonwn type for appMap's freeGen: " + freeGen;
                         throw new DfIllegalPropertySettingException(msg);
@@ -288,6 +292,31 @@ public final class DfLastaFluteFreeGenReflector {
         tableMap.put("targetDir", targetDir);
         tableMap.put("targetExt", "." + ext);
         tableMap.put("exceptPathList", DfCollectionUtil.newArrayList("contain:/view/common/"));
+    }
+
+    // ===================================================================================
+    //                                                                            Document
+    //                                                                            ========
+    // last process recommended for generated classes by others
+    protected void setupDocGen(String appName, String path) {
+        final Map<String, Map<String, Object>> docMap = new LinkedHashMap<String, Map<String, Object>>();
+        final String theme = "lastaDoc";
+        registerFreeGen(initCap(appName) + buildTitleSuffix(theme), docMap);
+        final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
+        docMap.put("resourceMap", resourceMap);
+        resourceMap.put("baseDir", path + "/src/main");
+        resourceMap.put("resourceType", DfFreeGenResourceType.LASTA_FLUTE.name());
+        final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
+        docMap.put("outputMap", outputMap);
+        outputMap.put("templateFile", "LaDocHtml.vm");
+        outputMap.put("outputDirectory", "$$baseDir$$/../test/resources");
+        outputMap.put("package", "ladoc");
+        outputMap.put("className", appName + "-lastadoc");
+        outputMap.put("fileExt", "html");
+        final Map<String, Object> tableMap = createTableMap();
+        docMap.put("tableMap", tableMap);
+        tableMap.put("targetDir", "$$baseDir$$/java");
+        tableMap.put("appName", appName);
     }
 
     // ===================================================================================
