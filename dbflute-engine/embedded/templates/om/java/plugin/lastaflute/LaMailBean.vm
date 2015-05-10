@@ -10,10 +10,10 @@ import org.lastaflute.core.mail.Postbox;
  */
 public class ${table.className} extends LaTypicalPostcard {
 
-    public static final String PATH = "${table.resourcePath}";
+    public static final String PATH = "${table.domainPath}";
 
-    public static void droppedInto(Postbox postbox, MPCall<WelcomeMemberPostcard> postcardLambda) {
-        WelcomeMemberPostcard postcard = new WelcomeMemberPostcard();
+    public static void droppedInto(Postbox postbox, MPCall<${table.className}> postcardLambda) {
+        ${table.className} postcard = new ${table.className}();
         postcardLambda.write(postcard);
         postbox.post(postcard);
     }

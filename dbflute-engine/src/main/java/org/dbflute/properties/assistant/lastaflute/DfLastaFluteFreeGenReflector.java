@@ -78,12 +78,12 @@ public final class DfLastaFluteFreeGenReflector {
                 } else if ("config".equals(freeGen)) {
                     setupConfigGen(_uncapServiceName, path);
                 } else if ("label".equals(freeGen)) {
-                    setupLabelGen(_uncapServiceName, path, true);
+                    setupLabelGen(_uncapServiceName, path, true, lastafluteMap);
                 } else if ("message".equals(freeGen)) {
-                    setupMessageGen(_uncapServiceName, path);
+                    setupMessageGen(_uncapServiceName, path, lastafluteMap);
                     hasCommonMessage = true;
                 } else if ("mail".equals(freeGen)) {
-                    setupMailPostcardGen(_uncapServiceName, path);
+                    setupMailPostcardGen(_uncapServiceName, path, lastafluteMap);
                 } else {
                     String msg = "Unkonwn type for commonMap's freeGen: " + freeGen;
                     throw new DfIllegalPropertySettingException(msg);
@@ -106,11 +106,11 @@ public final class DfLastaFluteFreeGenReflector {
                     } else if ("config".equals(freeGen)) {
                         setupConfigGen(appName, path);
                     } else if ("label".equals(freeGen)) {
-                        setupLabelGen(appName, path, !hasCommonMessage);
+                        setupLabelGen(appName, path, !hasCommonMessage, lastafluteMap);
                     } else if ("message".equals(freeGen)) {
-                        setupMessageGen(appName, path);
+                        setupMessageGen(appName, path, lastafluteMap);
                     } else if ("mail".equals(freeGen)) {
-                        setupMailPostcardGen(appName, path);
+                        setupMailPostcardGen(appName, path, lastafluteMap);
                     } else if ("jsp".equals(freeGen)) {
                         setupJspPathGen(appName, path);
                     } else if ("html".equals(freeGen)) {
@@ -178,61 +178,64 @@ public final class DfLastaFluteFreeGenReflector {
     // ===================================================================================
     //                                                                            Messages
     //                                                                            ========
-    protected void setupLabelGen(String appName, String path, boolean root) {
+    protected void setupLabelGen(String appName, String path, boolean root, Map<String, Object> lastafluteMap) {
         final Map<String, Map<String, Object>> labelMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "label";
         registerFreeGen(initCap(appName) + buildTitleSuffix(theme), labelMap);
         doSetupResourceMap(appName, path, labelMap, theme);
-        doSetupMessageOutputMap(appName, labelMap, theme);
+        doSetupMessageOutputMap(appName, labelMap, theme, lastafluteMap);
         final Map<String, Object> tableMap = createTableMap();
         labelMap.put("tableMap", tableMap);
         tableMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap(theme, "prefix:labels."));
         if (!root) {
-            doSetupMessageTableMapInheritance(_uncapServiceName, tableMap, "message");
+            doSetupMessageTableMapInheritance(_uncapServiceName, tableMap, "message", lastafluteMap);
         }
     }
 
-    protected void setupMessageGen(String appName, String path) {
+    protected void setupMessageGen(String appName, String path, Map<String, Object> lastafluteMap) {
         final Map<String, Map<String, Object>> labelMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "message";
         registerFreeGen(initCap(appName) + buildTitleSuffix(theme), labelMap);
         doSetupResourceMap(appName, path, labelMap, theme);
-        doSetupMessageOutputMap(appName, labelMap, theme);
+        doSetupMessageOutputMap(appName, labelMap, theme, lastafluteMap);
         final Map<String, Object> tableMap = createTableMap();
         labelMap.put("tableMap", tableMap);
         tableMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap("label", "prefix:labels."));
-        doSetupMessageTableMapInheritance(appName, tableMap, "label");
+        doSetupMessageTableMapInheritance(appName, tableMap, "label", lastafluteMap);
     }
 
-    protected void doSetupMessageOutputMap(String appName, Map<String, Map<String, Object>> map, String theme) {
+    protected void doSetupMessageOutputMap(String appName, Map<String, Map<String, Object>> map, String theme,
+            Map<String, Object> lastafluteMap) {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         map.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaUserMessages.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
-        outputMap.put("package", buildMessagesPackage());
+        outputMap.put("package", buildMessagesPackage(appName, lastafluteMap));
         outputMap.put("className", initCap(appName) + initCap(theme) + "s");
     }
 
-    protected void doSetupMessageTableMapInheritance(String appName, Map<String, Object> tableMap, String theme) {
+    protected void doSetupMessageTableMapInheritance(String appName, Map<String, Object> tableMap, String theme,
+            Map<String, Object> lastafluteMap) {
         tableMap.put("extendsPropRequest", initCap(appName) + buildTitleSuffix(theme));
         tableMap.put("isCheckImplicitOverride", getTrueLiteral());
         tableMap.put("isUseNonNumberVariable", getTrueLiteral());
-        tableMap.put("superClassPackage", buildMessagesPackage());
+        tableMap.put("superClassPackage", buildMessagesPackage(appName, lastafluteMap));
         tableMap.put("superClassSimpleName", initCap(appName) + initCap(theme) + "s");
     }
 
-    protected String buildMessagesPackage() {
-        return _appPackage + ".web.base.messages";
+    protected String buildMessagesPackage(String appName, Map<String, Object> lastafluteMap) {
+        final String messagesPackage = _appPackage + ".web.base.messages"; // can be hot deploy
+        return filterOverridden(messagesPackage, lastafluteMap, appName, "message", "package");
     }
 
     // ===================================================================================
     //                                                                       Mail Postcard
     //                                                                       =============
-    protected void setupMailPostcardGen(String appName, String path) {
-        doSetupMailPostcardGen(appName, path, "$$baseDir$$/resources", "mail", "dfmail");
+    protected void setupMailPostcardGen(String appName, String path, Map<String, Object> lastafluteMap) {
+        doSetupMailPostcardGen(appName, path, "$$baseDir$$/resources/mail", "dfmail", lastafluteMap);
     }
 
-    protected void doSetupMailPostcardGen(String appName, String path, String resourcesDir, String mailPackage, String ext) {
+    protected void doSetupMailPostcardGen(String appName, String path, String targetDir, String ext, Map<String, Object> lastafluteMap) {
         final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
         final String capAppName = initCap(appName);
         registerFreeGen(capAppName + "Postcard", pathMap);
@@ -244,14 +247,15 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaMailBean.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
-        outputMap.put("package", _appPackage + ".web.base.mail");
+        final String generatedPackage = _mylastaPackage + ".mail"; // no hot deploy because mail is leaden
+        outputMap.put("package", filterOverridden(generatedPackage, lastafluteMap, appName, "mail", "package"));
         outputMap.put("className", initCap(appName) + "Postcard");
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
-        tableMap.put("targetDir", resourcesDir + "/" + mailPackage);
-        tableMap.put("targetExt", "." + ext);
-        tableMap.put("exceptPathList", DfCollectionUtil.newArrayList("contain:/mail/common/"));
-        tableMap.put("mailPackage", mailPackage);
+        tableMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, "mail", "targetDir"));
+        tableMap.put("targetExt", filterOverridden("." + ext, lastafluteMap, appName, "mail", "targetExt"));
+        final List<String> exceptPathList = DfCollectionUtil.newArrayList("contain:/mail/common/");
+        tableMap.put("exceptPathList", filterOverridden(exceptPathList, lastafluteMap, appName, "mail", "exceptPathList"));
     }
 
     // ===================================================================================
@@ -259,6 +263,10 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                       =============
     protected void setupJspPathGen(String appName, String path) {
         doSetupHtmlTemplatePathGen(appName, path, "$$baseDir$$/webapp/WEB-INF/view", "jsp");
+    }
+
+    protected void setupHtmlPathGen(String appName, String path) {
+        doSetupHtmlTemplatePathGen(appName, path, "$$baseDir$$/resources/templates", "jsp");
     }
 
     protected void doSetupHtmlTemplatePathGen(String appName, String path, String targetDir, String ext) {
@@ -318,5 +326,16 @@ public final class DfLastaFluteFreeGenReflector {
 
     protected String initCap(String project) {
         return Srl.initCap(project);
+    }
+
+    protected <VALUE> VALUE filterOverridden(VALUE overriddenValue, Map<String, Object> lastafluteMap, String appName, String title,
+            String key) {
+        @SuppressWarnings("unchecked")
+        final Map<String, VALUE> overrideMap = (Map<String, VALUE>) lastafluteMap.get("overrideMap");
+        if (overrideMap == null) {
+            return overriddenValue;
+        }
+        final String fullKey = appName + ".freeGen." + title + "." + key;
+        return (VALUE) overrideMap.getOrDefault(fullKey, overriddenValue);
     }
 }

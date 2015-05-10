@@ -65,7 +65,6 @@ public class DfMailFluteTableLoader {
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap) {
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
-        final String mailPackage = (String) tableMap.get("mailPackage");
 
         final String targetExt = extractTargetExt(tableMap);
         final String targetKeyword = extractTargetKeyword(tableMap);
@@ -84,7 +83,6 @@ public class DfMailFluteTableLoader {
 
             final String domainPath = buildDomainPath(file, targetDir);
             mailMap.put("domainPath", domainPath); // e.g. /member/member_registration.ml
-            mailMap.put("resourcePath", mailPackage + domainPath); // e.g. mail/member/member_registration.ml
 
             mailMap.put("defName", buildUpperSnakeName(domainPath));
             {
