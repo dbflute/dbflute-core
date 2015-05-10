@@ -3539,7 +3539,7 @@ public class Table {
     //                                         Select Entity
     //                                         -------------
     public boolean isAvailableSelectEntityPlainReturn() {
-        return getLittleAdjustmentProperties().isAvailableSelectEntityPlainReturn();
+        return getLittleAdjustmentProperties().isAvailableSelectEntityPlainReturnTable(getTableDbName());
     }
 
     public String filterSelectEntityOptionalReturn(String entityType) {
@@ -3548,11 +3548,14 @@ public class Table {
     }
 
     public String filterSelectEntityOptionalReturnIfNeeds(String entityType) {
+        return doFilterSelectEntityOptionalReturnIfNeeds(entityType);
+    }
+
+    protected String doFilterSelectEntityOptionalReturnIfNeeds(String entityType) {
         if (isAvailableSelectEntityPlainReturn()) {
             return entityType;
         } else {
-            final String optionalEntity = getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
-            return optionalEntity + getLanguageGrammar().buildGenericOneClassHint(entityType);
+            return filterSelectEntityOptionalReturn(entityType);
         }
     }
 
@@ -3575,11 +3578,14 @@ public class Table {
     }
 
     public String filterSelectByPKOptionalReturnIfNeeds(String entityType) {
+        return doFilterSelectByPKOptionalReturnIfNeeds(entityType);
+    }
+
+    protected String doFilterSelectByPKOptionalReturnIfNeeds(String entityType) {
         if (isCompatibleSelectByPKPlainReturn()) {
             return entityType;
         } else {
-            final String optionalEntity = getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
-            return optionalEntity + getLanguageGrammar().buildGenericOneClassHint(entityType);
+            return filterSelectEntityOptionalReturn(entityType);
         }
     }
 

@@ -136,6 +136,20 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isAvailableSelectEntityPlainReturn", isCompatibleBeforeJava8());
     }
 
+    public boolean isAvailableSelectEntityPlainReturnTable(String tableName) { // closet
+        if (!isAvailableSelectEntityPlainReturn()) {
+            return false;
+        }
+        final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
+        final String key = "availableSelectEntityPlainReturnTableList";
+        @SuppressWarnings("unchecked")
+        final List<String> tableList = (List<String>) littleAdjustmentMap.get(key);
+        if (tableList == null || tableList.isEmpty()) { // no name specification
+            return true; // all table make
+        }
+        return isTargetByHint(tableName, tableList, DfCollectionUtil.emptyList());
+    }
+
     public boolean isAvailableSelectEntityWithDeletedCheck() { // closet
         // selectEntityWithDeletedCheck() can coexist with optional entity
         //final boolean defaultValue = isCompatibleUnderJava8();
