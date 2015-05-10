@@ -318,8 +318,8 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         docMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaDocHtml.vm");
-        outputMap.put("outputDirectory", "$$baseDir$$/../test/resources");
-        outputMap.put("package", "ladoc");
+        outputMap.put("outputDirectory", "./output");
+        outputMap.put("package", "lasta");
         outputMap.put("className", appName + "-lastadoc");
         outputMap.put("fileExt", "html");
         final Map<String, Object> tableMap = createTableMap();
