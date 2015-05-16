@@ -60,6 +60,7 @@ public final class DfLastaFlutePropertiesHtmlReflector {
     //                                                                     ===============
     public void reflectFrom(Map<String, Object> lastafluteMap) {
         logger.info("Before refecting, existing propertiesHtml settigs: " + _propHtmlMap.keySet());
+        final boolean envSuffixOnFile = isUseEnvSuffixOnFile(lastafluteMap);
         boolean hasCommonEnv = false;
         boolean hasCommonMessage = false;
         @SuppressWarnings("unchecked")
@@ -71,7 +72,7 @@ public final class DfLastaFlutePropertiesHtmlReflector {
             for (String propertiesHtml : propertiesHtmlList) {
                 logger.info("...Reflecting common propertiesHtml settigs: " + propertiesHtml + ", " + path);
                 if ("env".equals(propertiesHtml)) {
-                    setupEnv(_uncapServiceName, path, true);
+                    setupEnv(_uncapServiceName, path, true, envSuffixOnFile);
                     hasCommonEnv = true;
                 } else if ("config".equals(propertiesHtml)) {
                     setupConfig(_uncapServiceName, path);
@@ -98,7 +99,7 @@ public final class DfLastaFlutePropertiesHtmlReflector {
                 for (String propertiesHtml : propertiesHtmlList) {
                     logger.info("...Reflecting application propertiesHtml settigs: " + appName + "." + propertiesHtml);
                     if ("env".equals(propertiesHtml)) {
-                        setupEnv(appName, path, !hasCommonEnv);
+                        setupEnv(appName, path, !hasCommonEnv, envSuffixOnFile);
                     } else if ("config".equals(propertiesHtml)) {
                         setupConfig(appName, path);
                     } else if ("label".equals(propertiesHtml)) {
@@ -115,13 +116,19 @@ public final class DfLastaFlutePropertiesHtmlReflector {
         logger.info("After refecting, existing propertiesHtml settigs: " + _propHtmlMap.keySet());
     }
 
+    protected boolean isUseEnvSuffixOnFile(Map<String, Object> lastafluteMap) {
+        final Object obj = lastafluteMap.get("isUseLastaEnv");
+        return obj != null && obj.toString().equalsIgnoreCase("true");
+    }
+
     // ===================================================================================
     //                                                                       Configuration
     //                                                                       =============
-    protected void setupEnv(String appName, String path, boolean root) {
+    protected void setupEnv(String appName, String path, boolean root, boolean envSuffixOnFile) {
         final Map<String, Object> map = new LinkedHashMap<String, Object>();
-        registerBasicItem(appName, path, map, "env");
-        registerEnvironmentMap(map);
+        final String theme = "env";
+        registerBasicItem(appName, path, map, theme);
+        registerEnvironmentMap(appName, map, theme, envSuffixOnFile);
         if (!root) {
             registerExtendsProp(map, _uncapServiceName, "config");
         }
@@ -178,13 +185,27 @@ public final class DfLastaFlutePropertiesHtmlReflector {
     }
 
     protected void registerRootFile(String appName, Map<String, Object> map, String theme) {
-        map.put("rootFile", "$$baseDir$$/main/resources/" + appName + "_" + theme + ".properties");
+        map.put("rootFile", getMainResourcesDir() + buildPropertiesFileName(appName, theme));
     }
 
-    protected void registerEnvironmentMap(Map<String, Object> map) {
+    protected String getMainResourcesDir() {
+        return "$$baseDir$$/main/resources/";
+    }
+
+    protected String buildPropertiesFileName(String appName, String theme) {
+        return appName + "_" + theme + ".properties";
+    }
+
+    protected void registerEnvironmentMap(String appName, Map<String, Object> map, String theme, boolean envSuffixOnFile) {
         final Map<String, Object> environmentMap = new LinkedHashMap<String, Object>();
-        for (String environment : _environmentList) {
-            environmentMap.put(environment, "$$baseDir$$/" + environment + "/resources");
+        for (String envKey : _environmentList) {
+            final String path;
+            if (envSuffixOnFile) { // e.g. maihama_env_production.properties
+                path = getMainResourcesDir() + buildPropertiesFileName(appName, theme + "_" + envKey);
+            } else { // maven profile way
+                path = "$$baseDir$$/" + envKey + "/resources";
+            }
+            environmentMap.put(envKey, path);
         }
         map.put("environmentMap", environmentMap);
     }
