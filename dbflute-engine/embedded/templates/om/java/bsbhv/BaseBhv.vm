@@ -283,7 +283,11 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     }
 
     protected <ENTITY extends ${myExtendedObjectClassName}> ${table.filterSelectEntityOptionalReturn("ENTITY")} doSelectOptionalEntity(${myConditionBeanClassName} cb, Class<? extends ENTITY> tp) {
+#if ($table.isBasicOptionalEntityDBFluteEmbeddedClass())
         return createOptionalEntity(doSelectEntity(cb, tp), cb);
+#else
+        return ${table.selectEntityOptionalSimpleName}.of(doSelectEntity(cb, tp));
+#end
     }
 
 #if ($table.isAvailableSelectEntityPlainReturn())

@@ -3543,8 +3543,7 @@ public class Table {
     }
 
     public String filterSelectEntityOptionalReturn(String entityType) {
-        final String optionalEntity = getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
-        return optionalEntity + getLanguageGrammar().buildGenericOneClassHint(entityType);
+        return getSelectEntityOptionalSimpleName() + getLanguageGrammar().buildGenericOneClassHint(entityType);
     }
 
     public String filterSelectEntityOptionalReturnIfNeeds(String entityType) {
@@ -3557,6 +3556,14 @@ public class Table {
         } else {
             return filterSelectEntityOptionalReturn(entityType);
         }
+    }
+
+    public boolean isBasicOptionalEntityDBFluteEmbeddedClass() {
+        return getLittleAdjustmentProperties().isBasicOptionalEntityDBFluteEmbeddedClass();
+    }
+
+    public String getSelectEntityOptionalSimpleName() {
+        return getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
     }
 
     protected boolean isAvailableSelectEntityWithDeletedCheck() {

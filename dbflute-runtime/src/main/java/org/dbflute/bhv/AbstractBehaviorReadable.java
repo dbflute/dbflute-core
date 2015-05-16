@@ -305,11 +305,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     protected abstract Entity doReadEntity(ConditionBean cb);
 
     protected <RESULT> OptionalEntity<RESULT> createOptionalEntity(RESULT entity, final Object... searchKey) {
-        return new OptionalEntity<RESULT>(entity, new OptionalThingExceptionThrower() {
-            public void throwNotFoundException() {
-                throwSelectEntityAlreadyDeletedException(searchKey);
-            }
-        });
+        return new OptionalEntity<RESULT>(entity, () -> throwSelectEntityAlreadyDeletedException(searchKey));
     }
 
     /** {@inheritDoc} */

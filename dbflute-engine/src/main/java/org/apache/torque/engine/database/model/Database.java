@@ -2206,10 +2206,6 @@ public class Database {
         return getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
     }
 
-    public boolean isBasicOptionalEntityDBFluteEmbeddedClass() {
-        return getLittleAdjustmentProperties().isBasicOptionalEntityDBFluteEmbeddedClass();
-    }
-
     public String getRelationOptionalEntityClassName() {
         return getLittleAdjustmentProperties().getRelationOptionalEntityClass();
     }
