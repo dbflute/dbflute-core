@@ -45,21 +45,21 @@ public class TnRelationRowOptionalNullThrower extends SerializableOptionalThingE
     //                                                                           Attribute
     //                                                                           =========
     // several attributes are not null, but treated as null allowed just in case
-    protected final Object row; // not null
-    protected final String propertyName; // not null
-    protected final String invokePath; // null allowed (exists if saved)
-    protected final String sql; // not null (if CB)
-    protected final Object[] args; // not null (if CB)
+    protected final Object _row; // not null
+    protected final String _propertyName; // not null
+    protected final String _invokePath; // null allowed (exists if saved)
+    protected final String _sql; // not null (if CB)
+    protected final Object[] _args; // not null (if CB)
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnRelationRowOptionalNullThrower(Object row, String propertyName, String invokePath, String sql, Object[] args) {
-        this.row = row;
-        this.propertyName = propertyName;
-        this.invokePath = invokePath;
-        this.sql = sql;
-        this.args = args;
+        _row = row;
+        _propertyName = propertyName;
+        _invokePath = invokePath;
+        _sql = sql;
+        _args = args;
     }
 
     // ===================================================================================
@@ -96,18 +96,18 @@ public class TnRelationRowOptionalNullThrower extends SerializableOptionalThingE
         br.addItem("Your Operation");
         final String localTable;
         final String localSuffix;
-        if (row instanceof Entity) { // basically here
-            final Entity entity = ((Entity) row);
+        if (_row instanceof Entity) { // basically here
+            final Entity entity = ((Entity) _row);
             final DBMeta dbmeta = entity.asDBMeta();
             localTable = dbmeta.getTableDispName();
             localSuffix = dbmeta.extractPrimaryKeyMap(entity).toString();
         } else {
-            localTable = row != null ? row.getClass().getSimpleName() : null; // just in case
-            localSuffix = "{" + row + "}";
+            localTable = _row != null ? _row.getClass().getSimpleName() : null; // just in case
+            localSuffix = "{" + _row + "}";
         }
-        br.addElement(localTable + ":" + localSuffix + " => " + propertyName);
-        if (row instanceof Entity) { // basically here
-            final Entity entity = ((Entity) row);
+        br.addElement(localTable + ":" + localSuffix + " => " + _propertyName);
+        if (_row instanceof Entity) { // basically here
+            final Entity entity = ((Entity) _row);
             br.addItem("Local Entity");
             try {
                 br.addElement(entity.toStringWithRelation());
@@ -121,18 +121,18 @@ public class TnRelationRowOptionalNullThrower extends SerializableOptionalThingE
             }
         } else {
             br.addItem("Local Entity");
-            br.addElement(row);
+            br.addElement(_row);
         }
-        if (invokePath != null) { // if saved
+        if (_invokePath != null) { // if saved
             br.addItem("Behavior");
-            br.addElement(invokePath);
+            br.addElement(_invokePath);
         }
-        if (sql != null) { // basically true, just in case
+        if (_sql != null) { // basically true, just in case
             br.addItem("ConditionBean");
             try {
                 final TimeZone finalTimeZone = getFinalTimeZone();
                 final DisplaySqlBuilder displaySqlBuilder = createDisplaySqlBuilder(finalTimeZone);
-                br.addElement(displaySqlBuilder.buildDisplaySql(sql, args));
+                br.addElement(displaySqlBuilder.buildDisplaySql(_sql, _args));
                 br.addElement("");
                 br.addElement("(using DBFlute system time-zone: " + finalTimeZone.getID() + ")");
             } catch (RuntimeException continued) {
@@ -140,9 +140,9 @@ public class TnRelationRowOptionalNullThrower extends SerializableOptionalThingE
                 if (_log.isDebugEnabled()) {
                     _log.debug(msg);
                 }
-                br.addElement(sql);
-                if (args != null) {
-                    br.addElement(Arrays.asList(args));
+                br.addElement(_sql);
+                if (_args != null) {
+                    br.addElement(Arrays.asList(_args));
                 }
             }
         }
