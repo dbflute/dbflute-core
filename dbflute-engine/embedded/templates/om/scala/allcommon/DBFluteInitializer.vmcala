@@ -71,10 +71,7 @@ class ${glDBFluteInitializer} {
      * with calling super.prologue() in it.
      */
     protected def prologue(): Unit = {
-#if ($database.isTargetContainerSeasar())
-        handleSqlLogRegistry();
-        loadCoolClasses();
-#elseif ($database.isTargetContainerSpring())
+#if ($database.isTargetContainerSpring())
         setupDataSourceHandler(_dataSourceFqcn);
 #end
     }
@@ -91,30 +88,6 @@ class ${glDBFluteInitializer} {
     // ===================================================================================
     //                                                                            Contents
     //                                                                            ========
-    protected def handleSqlLogRegistry(): Unit = { // for S2Container
-        if (${glDBFluteConfig}.isUseSqlLogRegistry()) {
-            val sb = new StringBuilder();
-            sb.append("{SqlLog Information}").append(ln());
-            sb.append("  [SqlLogRegistry]").append(ln());
-            if (TnSqlLogRegistry.setupSqlLogRegistry()) {
-                sb.append("    ...Setting up sqlLogRegistry(org.seasar.extension.jdbc)").append(ln());
-                sb.append("    because the property 'useSqlLogRegistry' of the config of DBFlute is true");
-            } else {
-                sb.append("    The sqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version");
-            }
-           _log.info(sb);
-        } else {
-            val sqlLogRegistry: Object = TnSqlLogRegistry.findContainerSqlLogRegistry();
-            if (sqlLogRegistry != null) {
-                TnSqlLogRegistry.closeRegistration();
-            }
-        }
-    }
-
-    protected def loadCoolClasses(): Unit = { // for S2Container 
-        ConditionBeanContext.loadCoolClasses(); // against the ClassLoader Headache!
-    }
-
     /**
      * Set up the handler of data source to the configuration of DBFlute. <br>
      * If it uses commons-DBCP, it needs to arrange some for transaction.
