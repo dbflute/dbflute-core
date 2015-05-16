@@ -25,9 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.dbflute.exception.DfMailFluteBodyMetaParseFailureException;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.helper.filesystem.FileTextIO;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
@@ -35,6 +37,8 @@ import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectAssist;
 import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectBindNode;
 import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectProcess;
+import org.dbflute.logic.sql2entity.analyzer.DfSql2EntityMark;
+import org.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
 import org.dbflute.twowaysql.node.IfNode;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
@@ -44,6 +48,17 @@ import org.dbflute.util.Srl;
  * @author jflute
  */
 public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String META_DELIMITER = ">>>";
+    protected static final String SUBJECT_LABEL = "subject:";
+    protected static final String OPTION_LABEL = "option:";
+    protected static final String PLUS_HTML_OPTION = "+html";
+    protected static final String PROPDEF_PREFIX = "-- !!";
+    protected static final String LF = "\n";
+    protected static final String CRLF = "\r\n";
 
     // ===================================================================================
     //                                                                          Load Table
@@ -79,6 +94,7 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         final List<File> fileList = DfCollectionUtil.newArrayList();
         collectFile(fileList, targetExt, targetKeyword, exceptPathList, new File(targetDir));
         final Map<String, Map<String, Object>> schemaMap = DfCollectionUtil.newLinkedHashMap();
+        final FileTextIO textIO = new FileTextIO().encodeAsUTF8().removeUTF8Bom().replaceCrLfToLf();
         for (File file : fileList) {
             final Map<String, Object> table = DfCollectionUtil.newHashMap();
             final String fileName = file.getName();
@@ -108,14 +124,16 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
             }
             final String fileText;
             try {
-                fileText = new FileTextIO().encodeAsUTF8().read(new FileInputStream(file));
+                fileText = textIO.read(new FileInputStream(file));
             } catch (FileNotFoundException e) { // no way, collected file
-                throw new IllegalStateException("Not found the file: " + file);
+                throw new IllegalStateException("Not found the file: " + file, e);
             }
+            checkBodyMetaFormat(file, fileText);
             final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
             final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
             final Set<String> autoDetectedPropertyNameSet = new LinkedHashSet<String>();
             processAutoDetect(fileText, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet);
+            processSpecifiedDetect(fileText, propertyNameTypeMap, propertyNameOptionMap);
             final List<Map<String, String>> propertyList = new ArrayList<Map<String, String>>();
             final StringBuilder commaSb = new StringBuilder();
             for (String propertyName : autoDetectedPropertyNameSet) {
@@ -159,7 +177,7 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         return exceptPathList;
     }
 
-    protected void processAutoDetect(String sql, Map<String, String> propertyNameTypeMap, Map<String, String> propertyNameOptionMap,
+    protected void processAutoDetect(String fileText, Map<String, String> propertyNameTypeMap, Map<String, String> propertyNameOptionMap,
             Set<String> autoDetectedPropertyNameSet) {
         final DfParameterAutoDetectProcess process = new DfParameterAutoDetectProcess() {
             @Override
@@ -172,7 +190,18 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
                 // unsupported
             }
         };
-        process.processAutoDetect(sql, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet);
+        process.processAutoDetect(fileText, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet);
+    }
+
+    protected void processSpecifiedDetect(String fileText, Map<String, String> propertyNameTypeMap,
+            Map<String, String> propertyNameOptionMap) {
+        final List<DfSql2EntityMark> propertyTypeList = new DfSql2EntityMarkAnalyzer().getParameterBeanPropertyTypeList(fileText);
+        for (DfSql2EntityMark mark : propertyTypeList) {
+            final String content = mark.getContent();
+            final String propertyType = Srl.substringFirstFront(content, " ").trim();
+            final String propertyName = Srl.substringFirstRear(content, " ").trim();
+            propertyNameTypeMap.put(propertyName, propertyType);
+        }
     }
 
     // ===================================================================================
@@ -231,6 +260,127 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
             result = true;
         }
         return result;
+    }
+
+    // ===================================================================================
+    //                                                                        Check Format
+    //                                                                        ============
+    protected void checkBodyMetaFormat(File bodyFile, String fileText) {
+        final String delimiter = META_DELIMITER;
+        if (fileText.contains(delimiter)) {
+            final String meta = Srl.substringFirstFront(fileText, delimiter);
+            final List<String> splitList = Srl.splitList(meta, LF);
+            final String firstLine = splitList.get(0);
+            if (!firstLine.startsWith(SUBJECT_LABEL)) {
+                throwMailFluteBodyMetaSubjectNotFoundException(bodyFile, fileText);
+            }
+            if (splitList.size() > 1) {
+                final List<String> nextList = splitList.subList(1, splitList.size());
+                final int nextSize = nextList.size();
+                int index = 0;
+                int lineNumber = 2;
+                for (String line : nextList) {
+                    if (index == nextSize - 1) { // last loop
+                        if (line.isEmpty()) { // empty line only allowed in last loop
+                            break;
+                        }
+                    }
+                    if (!line.startsWith(OPTION_LABEL) && !line.startsWith(PROPDEF_PREFIX)) {
+                        throwMailFluteBodyMetaUnknownLineException(bodyFile, fileText, line, lineNumber);
+                    }
+                    // option check is not here because it can be added in MailFlute
+                    ++lineNumber;
+                    ++index;
+                }
+            }
+        } else { // no delimiter
+            // required as generate
+            throwMailFluteBodyMetaNotFoundException(bodyFile, fileText);
+        }
+    }
+
+    protected void throwMailFluteBodyMetaSubjectNotFoundException(File bodyFile, String fileText) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the subject in the MailFlute body meta.");
+        br.addItem("Advice");
+        br.addElement("The MailFlute body meta should start with subject.");
+        br.addElement("For example:");
+        br.addElement("  subject: ...(mail subject)");
+        br.addElement("  >>>");
+        br.addElement("  ...(mail body)");
+        br.addItem("Body File");
+        br.addElement(bodyFile.getPath());
+        br.addItem("File Text");
+        br.addElement(fileText);
+        final String msg = br.buildExceptionMessage();
+        throw new DfMailFluteBodyMetaParseFailureException(msg);
+    }
+
+    protected void throwMailFluteBodyMetaUnknownLineException(File bodyFile, String fileText, String line, int lineNumber) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unknown line in the MailFlute body meta.");
+        br.addItem("Advice");
+        br.addElement("The MailFlute body meta should start with subject:");
+        br.addElement("For example:");
+        br.addElement("  (o):");
+        br.addElement("    subject: ...(mail subject)");
+        br.addElement("    >>>");
+        br.addElement("    ...(mail body)");
+        br.addElement("  (o):");
+        br.addElement("    subject: ...(mail subject)");
+        br.addElement("    option: ...(options)");
+        br.addElement("    -- !!String memberName!!");
+        br.addElement("    >>>");
+        br.addElement("    ...(mail body)");
+        br.addElement("  (x):");
+        br.addElement("    subject: ...(mail subject)");
+        br.addElement("    maihama // *NG: unknown meta definition");
+        br.addElement("    >>>");
+        br.addElement("    ...(mail body)");
+        br.addElement("  (x):");
+        br.addElement("    subject: ...(mail subject)");
+        br.addElement("        // *NG: empty line not allowed");
+        br.addElement("    >>>");
+        br.addElement("    ...(mail body)");
+        br.addItem("Body File");
+        br.addElement(bodyFile.getPath());
+        br.addItem("File Text");
+        br.addElement(fileText);
+        br.addItem("Unknown Line");
+        br.addElement("Line Number: " + lineNumber);
+        br.addElement(line);
+        final String msg = br.buildExceptionMessage();
+        throw new DfMailFluteBodyMetaParseFailureException(msg);
+    }
+
+    protected void throwMailFluteBodyMetaNotFoundException(File bodyFile, String fileText) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the delimiter for MailFlute body meta.");
+        br.addItem("Advice");
+        br.addElement("The delimiter of MailFlute body meta is '>>>'.");
+        br.addElement("It should be defined like this:");
+        br.addElement("For example:");
+        br.addElement("  (o):");
+        br.addElement("    subject: ...(mail subject)");
+        br.addElement("    >>>");
+        br.addElement("    ...(mail body)");
+        br.addElement("  (o):");
+        br.addElement("    subject: ...(mail subject)");
+        br.addElement("    option: ...(options)");
+        br.addElement("    -- !!String memberName!!");
+        br.addElement("    >>>");
+        br.addElement("    ...(mail body)");
+        br.addElement("  (x):");
+        br.addElement("    subject: ...(mail subject)");
+        br.addElement("    ...(mail body)");
+        br.addElement("  (x):");
+        br.addElement("    Hello, sea...");
+        br.addItem("Body File");
+        br.addElement(bodyFile.getPath());
+        br.addItem("File Text");
+        br.addElement(fileText);
+        final String msg = br.buildExceptionMessage();
+        throw new DfMailFluteBodyMetaParseFailureException(msg);
     }
 
     // ===================================================================================
