@@ -727,10 +727,8 @@ public abstract class DfAbsractDataWriter {
             throwLoadDataTextFileReadFailureException(tableName, columnName, path, rowNumber);
         }
         try {
-            StringBuilder sb = new StringBuilder();
-            final String read = new FileTextIO().encodeAsUTF8().read(path);
-            sb.append(read);
-            ps.setString(bindCount, sb.toString());
+            final String read = new FileTextIO().encodeAsUTF8().removeUTF8Bom().read(path);
+            ps.setString(bindCount, read);
         } catch (RuntimeException e) {
             throwLoadDataTextFileReadFailureException(tableName, columnName, path, rowNumber, e);
         }

@@ -49,6 +49,7 @@ public class FileTextIO {
     //                                                                           =========
     /** The encoding for the file. (Required) */
     protected String _encoding;
+    protected boolean _removeUTF8Bom;
     protected boolean _replaceCrLfToLf;
 
     // ===================================================================================
@@ -69,6 +70,15 @@ public class FileTextIO {
      */
     public FileTextIO encodeAsWindows31J() {
         _encoding = "Windows-31J";
+        return this;
+    }
+
+    /**
+     * Remove initial UTF-8 bom if it exists.
+     * @return this. (NotNull)
+     */
+    public FileTextIO removeUTF8Bom() {
+        _removeUTF8Bom = true;
         return this;
     }
 
@@ -350,7 +360,7 @@ public class FileTextIO {
         final byte[] bytes = readBytesClosed(ins);
         try {
             final String text = new String(bytes, _encoding);
-            return doReplaceCrLfToLfIfNeeds(text);
+            return adjustInOutTextIfNeeds(text);
         } catch (UnsupportedEncodingException e) {
             String msg = "Unknown encoding: " + _encoding;
             throw new IllegalStateException(msg, e);
@@ -361,7 +371,7 @@ public class FileTextIO {
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(ous, _encoding));
-            writer.write(doReplaceCrLfToLfIfNeeds(text));
+            writer.write(adjustInOutTextIfNeeds(text));
             writer.flush();
         } catch (IOException e) {
             handleOutputStreamWriteFailureException(ous, e);
@@ -370,8 +380,20 @@ public class FileTextIO {
         }
     }
 
-    protected String doReplaceCrLfToLfIfNeeds(final String text) {
-        return _replaceCrLfToLf ? replace(text, "\r\n", "\n") : text;
+    protected String adjustInOutTextIfNeeds(String text) {
+        return doReplaceCrLfToLfIfNeeds(doRemoveUTF8BomIfNeeds(text));
+    }
+
+    protected String doRemoveUTF8BomIfNeeds(String text) {
+        if (_removeUTF8Bom && text != null && !text.isEmpty() && text.charAt(0) == '\uFEFF') {
+            return text.substring(1);
+        } else {
+            return text;
+        }
+    }
+
+    protected String doReplaceCrLfToLfIfNeeds(String text) {
+        return (_replaceCrLfToLf && text != null) ? replace(text, "\r\n", "\n") : text;
     }
 
     protected void close(BufferedReader reader) {
