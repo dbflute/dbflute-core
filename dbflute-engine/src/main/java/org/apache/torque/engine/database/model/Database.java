@@ -2219,17 +2219,6 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                         SQL Log Registry Properties
-    //                                                         ===========================
-    public boolean isSqlLogRegistryValid() {
-        return getProperties().getSqlLogRegistryProperties().isValid();
-    }
-
-    public int getSqlLogRegistryLimitSize() {
-        return getProperties().getSqlLogRegistryProperties().getLimitSize();
-    }
-
-    // ===================================================================================
     //                                                               OutsideSql Properties
     //                                                               =====================
     public boolean isGenerateProcedureParameterBean() {
