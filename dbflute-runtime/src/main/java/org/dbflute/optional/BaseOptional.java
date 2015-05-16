@@ -15,6 +15,7 @@
  */
 package org.dbflute.optional;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
@@ -24,11 +25,15 @@ import java.util.Optional;
  * @author pull/23 (2015/03/04 Wednesday)
  * @since 1.0.5F (2014/05/10 Saturday)
  */
-public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ> {
+public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializable {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    // basically for optional entity of relation
+    // if this is not serializable, must have default constructor even so cannot serialize
+    private static final long serialVersionUID = 1L;
+
     protected static final OptionalThingIfPresentAfter IF_PRESENT_AFTER_EMPTY = noArgLambda -> {};
     protected static final OptionalThingIfPresentAfter IF_PRESENT_AFTER_NONE_FIRE = noArgLambda -> {
         if (noArgLambda == null) {

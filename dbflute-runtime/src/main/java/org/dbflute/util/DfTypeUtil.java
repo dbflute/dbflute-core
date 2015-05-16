@@ -3599,7 +3599,8 @@ public final class DfTypeUtil {
         }
     }
 
-    public static Serializable toSerializable(byte[] bytes) {
+    @SuppressWarnings("unchecked")
+    public static <SER extends Serializable> SER toSerializable(byte[] bytes) {
         if (bytes == null) {
             return null;
         }
@@ -3607,7 +3608,7 @@ public final class DfTypeUtil {
             final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             final ObjectInputStream ois = new ObjectInputStream(bais);
             try {
-                return (Serializable) ois.readObject();
+                return (SER) ois.readObject();
             } finally {
                 ois.close();
             }

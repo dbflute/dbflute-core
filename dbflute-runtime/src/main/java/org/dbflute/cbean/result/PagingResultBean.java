@@ -48,15 +48,6 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     protected int _currentPageNumber;
 
     // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    /**
-     * Constructor.
-     */
-    public PagingResultBean() {
-    }
-
-    // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
     /**
@@ -249,6 +240,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     // ===================================================================================
     //                                                                             Mapping
     //                                                                             =======
+    @SuppressWarnings("deprecation")
     @Override
     public <DTO> PagingResultBean<DTO> mappingList(EntityDtoMapper<ENTITY, DTO> entityDtoMapper) {
         final ListResultBean<DTO> ls = super.mappingList(entityDtoMapper);

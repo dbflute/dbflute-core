@@ -26,6 +26,7 @@ import org.dbflute.hook.SqlStringFilter;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlFilter;
 import org.dbflute.outsidesql.OutsideSqlFilter.ExecutionFilterType;
+import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.Srl;
 
 /**
@@ -62,8 +63,8 @@ public abstract class AbstractOutsideSqlExecution extends AbstractFixedSqlExecut
     //                                                                              Filter
     //                                                                              ======
     @Override
-    protected String filterExecutedSql(String executedSql) {
-        executedSql = super.filterExecutedSql(executedSql);
+    protected String filterExecutedSql(CommandContext ctx) {
+        String executedSql = super.filterExecutedSql(ctx);
         executedSql = doFilterExecutedSqlByOutsideSqlFilter(executedSql);
         if (_removeBlockComment) {
             executedSql = Srl.removeBlockComment(executedSql);

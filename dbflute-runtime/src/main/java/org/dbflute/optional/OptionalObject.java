@@ -25,19 +25,17 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    private static final long serialVersionUID = 1L; // basically cannot use (for optional entity)
+
     protected static final OptionalObject<Object> EMPTY_INSTANCE;
     static {
-        EMPTY_INSTANCE = new OptionalObject<Object>(null, new OptionalThingExceptionThrower() {
-            public void throwNotFoundException() {
-                String msg = "The empty optional so the value is null.";
-                throw new IllegalStateException(msg);
-            }
+        EMPTY_INSTANCE = new OptionalObject<Object>(null, () -> {
+            String msg = "The empty optional so the value is null.";
+            throw new IllegalStateException(msg);
         });
     }
-    protected static final OptionalThingExceptionThrower NOWAY_THROWER = new OptionalThingExceptionThrower() {
-        public void throwNotFoundException() {
-            throw new IllegalStateException("no way");
-        }
+    protected static final OptionalThingExceptionThrower NOWAY_THROWER = () -> {
+        throw new IllegalStateException("no way");
     };
 
     // ===================================================================================

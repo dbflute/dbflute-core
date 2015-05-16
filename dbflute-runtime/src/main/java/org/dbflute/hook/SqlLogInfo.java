@@ -46,6 +46,7 @@ public class SqlLogInfo {
         _displaySqlBuilder = displaySqlBuilder;
     }
 
+    @FunctionalInterface
     public static interface SqlLogDisplaySqlBuilder {
         String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes);
     }

@@ -25,6 +25,7 @@ import org.dbflute.unit.RuntimeTestCase;
  */
 public class ResultBeanBuilderTest extends RuntimeTestCase {
 
+    @SuppressWarnings("deprecation")
     public void test_buildEmptyListResultBean() {
         // ## Arrange ##
         SimplePagingBean pb = new SimplePagingBean();

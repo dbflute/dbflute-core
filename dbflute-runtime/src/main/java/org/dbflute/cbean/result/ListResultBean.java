@@ -66,19 +66,10 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     protected int _allRecordCount;
 
     /** The clause of order-by. (NullAllowed: lazy-loaded) */
-    protected OrderByClause _orderByClause;
+    protected transient OrderByClause _orderByClause; // #later: removed
 
     /** The list of selected entity. (NullAllowed: lazy-loaded) */
     protected List<ENTITY> _selectedList;
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    /**
-     * Constructor.
-     */
-    public ListResultBean() {
-    }
 
     // ===================================================================================
     //                                                                             Mapping
@@ -481,6 +472,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     /**
      * Get the value of orderByClause.
      * @return The value of orderByClause. (NotNull)
+     * @deprecated don't use this
      */
     public OrderByClause getOrderByClause() {
         if (_orderByClause == null) {

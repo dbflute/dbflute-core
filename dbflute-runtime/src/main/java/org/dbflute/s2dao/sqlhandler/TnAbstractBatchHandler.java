@@ -155,13 +155,13 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
 
     @Override
     protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlFireHook,
-            boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
+            boolean hasSqlLog, boolean hasSqlResult) {
         if (_batchLoggingSb == null) {
             _batchLoggingSb = new StringBuilder(1000);
         }
         final String displaySql = buildDisplaySql(_sql, args);
         saveBatchLoggingSql(displaySql);
-        doLogSql(args, argTypes, false, false, hasSqlLog, false, sqlLogRegistry); // process non-batch handling
+        doLogSql(args, argTypes, false, false, hasSqlLog, false); // process non-batch handling
         if (needsBreakLoggingScope()) {
             handleBatchLogging(); // and also cleared
         }

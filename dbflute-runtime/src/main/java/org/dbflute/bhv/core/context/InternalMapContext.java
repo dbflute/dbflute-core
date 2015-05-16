@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.dbflute.hook.SqlLogInfo;
 import org.dbflute.jdbc.StatementConfig;
+import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 
 /**
  * The context of internal map.
@@ -83,19 +84,44 @@ public class InternalMapContext {
     }
 
     // ===================================================================================
-    //                                                                        Regular Item
-    //                                                                        ============
+    //                                                                          Definition
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                           Invoke Name
+    //                                           -----------
     protected static final String KEY_BEHAVIOR_INVOKE_NAME = "df:BehaviorInvokeName";
     protected static final String KEY_CLIENT_INVOKE_NAME = "df:ClientInvokeName";
     protected static final String KEY_BYPASS_INVOKE_NAME = "df:ByPassInvokeName";
+
+    // -----------------------------------------------------
+    //                                           Invoke Path
+    //                                           -----------
     protected static final String KEY_SAVED_INVOKE_PATH = "df:SavedInvokePath";
     protected static final String KEY_INVOKE_PATH_PROVIDER = "df:InvokePathProvider";
+
+    // -----------------------------------------------------
+    //                                            SqlLogInfo
+    //                                            ----------
     protected static final String KEY_HOOK_SQL_LOG_INFO = "df:HookSqlLogInfo";
     protected static final String KEY_RESULT_SQL_LOG_INFO = "df:ResultSqlLogInfo";
     protected static final String KEY_SQL_BEFORE_TIME_MILLIS = "df:SqlBeforeTimeMillis";
     protected static final String KEY_SQL_AFTER_TIME_MILLIS = "df:SqlAfterTimeMillis";
+
+    // -----------------------------------------------------
+    //                                   DisplaySql Resource
+    //                                   -------------------
+    protected static final String KEY_DISPLAY_SQL_RESOURCE_SQL = "df:DisplaySqlResourceSql";
+    protected static final String KEY_DISPLAY_SQL_RESOURCE_ARGS = "df:DisplaySqlResourceArgs";
+    protected static final String KEY_DISPLAY_SQL_RESOURCE_BOUND_STYLE = "df:DisplaySqlResourceBoundStyle";
+
+    // -----------------------------------------------------
+    //                            StatementConfig for Update
+    //                            --------------------------
     protected static final String KEY_UPDATE_STATEMENT_CONFIG = "df:UpdateStatementConfig";
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     // -----------------------------------------------------
     //                                           Invoke Name
     //                                           -----------
@@ -179,6 +205,33 @@ public class InternalMapContext {
 
     public static void setSqlAfterTimeMillis(Long sqlAfterTimeMillis) {
         setObject(KEY_SQL_AFTER_TIME_MILLIS, sqlAfterTimeMillis);
+    }
+
+    // -----------------------------------------------------
+    //                                   DisplaySql Resource
+    //                                   -------------------
+    public static String getDisplaySqlResourceSql() {
+        return (String) getObject(KEY_DISPLAY_SQL_RESOURCE_SQL);
+    }
+
+    public static void setDisplaySqlLogResourceSql(String displaySqlResourceSql) {
+        setObject(KEY_DISPLAY_SQL_RESOURCE_SQL, displaySqlResourceSql);
+    }
+
+    public static Object[] getDisplaySqlResourceParams() {
+        return (Object[]) getObject(KEY_DISPLAY_SQL_RESOURCE_ARGS);
+    }
+
+    public static void setDisplaySqlLogResourceParams(Object[] displaySqlResourceArgs) {
+        setObject(KEY_DISPLAY_SQL_RESOURCE_ARGS, displaySqlResourceArgs);
+    }
+
+    public static BoundDateDisplayStyle getDisplaySqlResourceBoundStyle() {
+        return (BoundDateDisplayStyle) getObject(KEY_DISPLAY_SQL_RESOURCE_BOUND_STYLE);
+    }
+
+    public static void setDisplaySqlLogResourceBoundStyle(BoundDateDisplayStyle displaySqlResourceBoundStyle) {
+        setObject(KEY_DISPLAY_SQL_RESOURCE_BOUND_STYLE, displaySqlResourceBoundStyle);
     }
 
     // -----------------------------------------------------
