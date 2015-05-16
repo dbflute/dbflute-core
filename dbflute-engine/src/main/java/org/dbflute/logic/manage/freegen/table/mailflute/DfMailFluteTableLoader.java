@@ -270,8 +270,7 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         if (fileText.contains(delimiter)) {
             final String meta = Srl.substringFirstFront(fileText, delimiter);
             final List<String> splitList = Srl.splitList(meta, LF);
-            final String firstLine = splitList.get(0);
-            if (!firstLine.startsWith(SUBJECT_LABEL)) {
+            if (!splitList.get(0).startsWith(SUBJECT_LABEL)) {
                 throwMailFluteBodyMetaSubjectNotFoundException(bodyFile, fileText);
             }
             if (splitList.size() > 1) {
