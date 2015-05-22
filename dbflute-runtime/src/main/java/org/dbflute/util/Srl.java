@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * String Utility for Internal Programming of DBFlute.
@@ -1587,6 +1588,19 @@ public class Srl {
         }
     }
 
+    public static <ELEMENT> String delimit(Collection<ELEMENT> list, Function<ELEMENT, String> oneArgInLambda, String delimiter) {
+        final StringBuilder sb = new StringBuilder();
+        int index = 0;
+        for (ELEMENT element : list) {
+            if (index > 0) {
+                sb.append(delimiter);
+            }
+            sb.append(oneArgInLambda.apply(element));
+            ++index;
+        }
+        return sb.toString();
+    }
+
     // ===================================================================================
     //                                                                      Scope Handling
     //                                                                      ==============
@@ -1926,29 +1940,6 @@ public class Srl {
     }
 
     // ===================================================================================
-    //                                                                       Line Handling
-    //                                                                       =============
-    /**
-     * Remove empty lines. <br>
-     * And CR is removed.
-     * @param str The target string. (NotNull)
-     * @return The filtered string. (NotNull)
-     */
-    public static String removeEmptyLine(String str) {
-        assertStringNotNull(str);
-        final StringBuilder sb = new StringBuilder();
-        final List<String> lineList = splitList(str, "\n");
-        for (String line : lineList) {
-            if (is_Null_or_TrimmedEmpty(line)) {
-                continue; // skip
-            }
-            sb.append(removeCR(line)).append("\n");
-        }
-        final String filtered = sb.toString();
-        return filtered.substring(0, filtered.length() - "\n".length());
-    }
-
-    // ===================================================================================
     //                                                                    Initial Handling
     //                                                                    ================
     public static String initCap(String str) {
@@ -2131,6 +2122,26 @@ public class Srl {
     // ===================================================================================
     //                                                                        SQL Handling
     //                                                                        ============
+    /**
+     * Remove empty lines. <br>
+     * And CR is removed.
+     * @param str The target string. (NotNull)
+     * @return The filtered string. (NotNull)
+     */
+    public static String removeEmptyLine(String str) {
+        assertStringNotNull(str);
+        final StringBuilder sb = new StringBuilder();
+        final List<String> lineList = splitList(str, "\n");
+        for (String line : lineList) {
+            if (is_Null_or_TrimmedEmpty(line)) {
+                continue; // skip
+            }
+            sb.append(removeCR(line)).append("\n");
+        }
+        final String filtered = sb.toString();
+        return filtered.substring(0, filtered.length() - "\n".length());
+    }
+
     /**
      * Remove block comments.
      * @param sql The string of SQL. (NotNull)

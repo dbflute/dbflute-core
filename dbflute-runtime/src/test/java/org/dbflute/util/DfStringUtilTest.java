@@ -1184,6 +1184,20 @@ public class DfStringUtilTest extends RuntimeTestCase {
         assertEquals(0, list.size());
     }
 
+    public void test_delimit_basic() {
+        // ## Arrange ##
+        List<String> list = Arrays.asList("sea", "land", "iks");
+
+        // ## Act ##
+        // ## Assert ##
+        assertEquals("sea, land, iks", delimit(list, el -> el, ", "));
+        assertEquals("s|l|i", delimit(list, el -> String.valueOf(el.charAt(0)), "|"));
+        assertEquals("3, 4, 3", delimit(list, el -> String.valueOf(el.length()), ", "));
+        assertEquals("sea", delimit(Arrays.asList("sea"), el -> el, ", "));
+        assertEquals("", delimit(new ArrayList<String>(), el -> el, ", "));
+        assertEquals("sea, null", delimit(Arrays.asList("sea", null), el -> el, ", "));
+    }
+
     // ===================================================================================
     //                                                                      Scope Handling
     //                                                                      ==============
@@ -1384,25 +1398,6 @@ public class DfStringUtilTest extends RuntimeTestCase {
     }
 
     // ===================================================================================
-    //                                                                       Line Handling
-    //                                                                       =============
-    public void test_removeEmptyLine_basic() {
-        // ## Arrange ##
-        String sql = "aaaa\r\n";
-        sql = sql + "bbbb\r\n";
-        sql = sql + "--\r\n";
-        sql = sql + "\r\n";
-        sql = sql + "\n";
-        sql = sql + "cccc\r\n";
-
-        // ## Act ##
-        String actual = removeEmptyLine(sql);
-
-        // ## Assert ##
-        assertEquals("aaaa\nbbbb\n--\ncccc", actual);
-    }
-
-    // ===================================================================================
     //                                                                    Initial Handling
     //                                                                    ================
     public void test_initBeansProp_basic() {
@@ -1471,6 +1466,22 @@ public class DfStringUtilTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                        SQL Handling
     //                                                                        ============
+    public void test_removeEmptyLine_basic() {
+        // ## Arrange ##
+        String sql = "aaaa\r\n";
+        sql = sql + "bbbb\r\n";
+        sql = sql + "--\r\n";
+        sql = sql + "\r\n";
+        sql = sql + "\n";
+        sql = sql + "cccc\r\n";
+
+        // ## Act ##
+        String actual = removeEmptyLine(sql);
+
+        // ## Assert ##
+        assertEquals("aaaa\nbbbb\n--\ncccc", actual);
+    }
+
     public void test_removeBlockComment_basic() {
         // ## Arrange ##
         String sql = "baz/*BEGIN*/where /*FOR pmb*/ /*FIRST 'foo'*/member.../*END FOR*//* END */bar";
