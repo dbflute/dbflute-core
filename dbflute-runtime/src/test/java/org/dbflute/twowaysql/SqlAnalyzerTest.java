@@ -194,7 +194,6 @@ public class SqlAnalyzerTest extends RuntimeTestCase {
         twoway = twoway + "   /*#current*/mystic";
         twoway = twoway + " /*END*/";
         twoway = twoway + "/*END*/";
-        @SuppressWarnings("deprecation")
         SqlAnalyzer analyzer = new SqlAnalyzer(twoway, false).switchBindingToReplaceOnlyEmbedded();
 
         // ## Act ##
@@ -251,7 +250,6 @@ public class SqlAnalyzerTest extends RuntimeTestCase {
 
     public void test_analyze_nativeBinding_overlook() {
         // ## Arrange ##
-        @SuppressWarnings("deprecation")
         SqlAnalyzer analyzer = new SqlAnalyzer("select ?", false).overlookNativeBinding();
 
         // ## Act ##

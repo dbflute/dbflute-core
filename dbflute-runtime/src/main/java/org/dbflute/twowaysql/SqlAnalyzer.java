@@ -65,7 +65,7 @@ public class SqlAnalyzer {
     protected final boolean _blockNullParameter;
     protected final SqlTokenizer _tokenizer;
     protected boolean _overlookNativeBinding; // unused on DBFlute, for general purpose
-    protected boolean _switchBindingToReplaceOnlyEmbedded; // dangerous, always unused on DBFlute, for general purpose
+    protected boolean _switchBindingToReplaceOnlyEmbedded; // dangerous, unused on DBFlute, for general purpose
     protected final Stack<Node> _nodeStack = new Stack<Node>();
     protected boolean _inBeginScope;
     protected List<String> _researchIfCommentList;
@@ -110,8 +110,8 @@ public class SqlAnalyzer {
     //                                                Option
     //                                                ------
     /**
+     * [Attention] unused on DBFlute, for general purpose
      * @return this. (NotNull)
-     * @deprecated unused on DBFlute, basically for general purpose
      */
     public SqlAnalyzer overlookNativeBinding() {
         _overlookNativeBinding = true;
@@ -120,8 +120,8 @@ public class SqlAnalyzer {
     }
 
     /**
+     * [Attention] dangerous, be careful, and unused on DBFlute, basically for general purpose
      * @return this. (NotNull)
-     * @deprecated dangerous, be careful, and unused on DBFlute, basically for general purpose
      */
     public SqlAnalyzer switchBindingToReplaceOnlyEmbedded() {
         _switchBindingToReplaceOnlyEmbedded = true;
