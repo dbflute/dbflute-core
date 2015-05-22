@@ -84,7 +84,7 @@ public class ${request.className} extends ActionMessages {
 #end
     public ${request.className} add${column.capCamelName}(String property) {
         assertPropertyNotNull(property);
-        add(property, new ActionMessage(${column.defName}, (Object[])null));
+        add(property, new ActionMessage(${column.defName}));
         return this;
     }
 #end
