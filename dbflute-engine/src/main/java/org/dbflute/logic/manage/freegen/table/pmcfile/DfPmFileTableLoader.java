@@ -13,11 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.manage.freegen.table.mailflute;
+package org.dbflute.logic.manage.freegen.table.pmcfile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -25,11 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.dbflute.exception.DfMailFluteBodyMetaParseFailureException;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.helper.filesystem.FileTextIO;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
@@ -47,15 +46,11 @@ import org.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
+public class DfPmFileTableLoader implements DfFreeGenTableLoader {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final String META_DELIMITER = ">>>";
-    protected static final String SUBJECT_LABEL = "subject:";
-    protected static final String OPTION_LABEL = "option:";
-    protected static final String PLUS_HTML_OPTION = "+html";
     protected static final String PROPDEF_PREFIX = "-- !!";
     protected static final String LF = "\n";
     protected static final String CRLF = "\r\n";
@@ -65,19 +60,21 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     //                                                                          ==========
     // ; resourceMap = map:{
     //     ; baseDir = ../src/main
-    //     ; resourceType = MAIL_FLUTE
+    //     ; resourceType = PM_FILE
     // }
     // ; outputMap = map:{
-    //     ; templateFile = LaMailBean.vm
+    //     ; templateFile = LaPmTemplate.vm
     //     ; outputDirectory = $$baseDir$$/java
     //     ; package = org.dbflute...
     //     ; className = unused
     // }
     // ; tableMap = map:{
-    //     ; targetDir = $$baseDir$$/resources/mail
-    //     ; targetExt = .dfmail
+    //     ; targetDir = $$baseDir$$/resources
+    //     ; targetExt = .dfpm
     //     ; targetKeyword = 
-    //     ; exceptPathList = list:{ contain:/mail/common/ }
+    //     ; exceptPathList = list:{ contain:/common/ }
+    //     ; targetSuffix = Bean
+    //     ; isConventionSuffix = false
     // }
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> tableMap = mapProp.getTableMap();
@@ -85,26 +82,34 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         final String targetExt = extractTargetExt(tableMap);
         final String targetKeyword = extractTargetKeyword(tableMap);
         final List<String> exceptPathList = extractExceptPathList(tableMap);
-
-        final Map<String, Map<String, Object>> schemaMap = doLoad(targetDir, targetExt, targetKeyword, exceptPathList);
+        final Map<String, Map<String, Object>> schemaMap = doLoad(targetDir, targetExt, targetKeyword, exceptPathList, tableMap);
         return new DfFreeGenTable(tableMap, schemaMap);
     }
 
-    protected Map<String, Map<String, Object>> doLoad(String targetDir, String targetExt, String targetKeyword, List<String> exceptPathList) {
+    protected Map<String, Map<String, Object>> doLoad(String targetDir, String targetExt, String targetKeyword,
+            List<String> exceptPathList, Map<String, Object> tableMap) {
         final List<File> fileList = DfCollectionUtil.newArrayList();
-        collectFile(fileList, targetExt, targetKeyword, exceptPathList, new File(targetDir));
+        final File baseDir = new File(targetDir);
+        collectFile(fileList, targetExt, targetKeyword, exceptPathList, baseDir);
         final Map<String, Map<String, Object>> schemaMap = DfCollectionUtil.newLinkedHashMap();
         final FileTextIO textIO = new FileTextIO().encodeAsUTF8().removeUTF8Bom().replaceCrLfToLf();
-        for (File file : fileList) {
+        for (File pmFile : fileList) {
             final Map<String, Object> table = DfCollectionUtil.newHashMap();
-            final String fileName = file.getName();
+            final String fileName = pmFile.getName();
             table.put("fileName", fileName);
-            final String className = Srl.camelize(Srl.substringLastFront(fileName, targetExt)) + "Postcard";
+            final StringBuilder classNameSb = new StringBuilder();
+            classNameSb.append(Srl.camelize(Srl.substringLastFront(fileName, targetExt)));
+            final String classSuffix = deriveClassSuffix(tableMap, baseDir, pmFile);
+            classNameSb.append(classSuffix);
+            final String className = classNameSb.toString();
             table.put("className", className); // used as output file name
             table.put("camelizedName", className);
+            if (Srl.is_NotNull_and_NotEmpty(className)) {
+                table.put("additionalPackage", classSuffix.toLowerCase());
+            }
 
-            final String domainPath = buildDomainPath(file, targetDir);
-            table.put("domainPath", domainPath); // e.g. /member/member_registration.dfmail
+            final String domainPath = buildDomainPath(pmFile, targetDir);
+            table.put("domainPath", domainPath); // e.g. /member/member_registration.dfpm
 
             table.put("defName", buildUpperSnakeName(domainPath));
             {
@@ -124,11 +129,10 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
             }
             final String fileText;
             try {
-                fileText = textIO.read(new FileInputStream(file));
+                fileText = textIO.read(new FileInputStream(pmFile));
             } catch (FileNotFoundException e) { // no way, collected file
-                throw new IllegalStateException("Not found the file: " + file, e);
+                throw new IllegalStateException("Not found the pmc file: " + pmFile, e);
             }
-            checkBodyMetaFormat(file, fileText);
             final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
             final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
             final Set<String> autoDetectedPropertyNameSet = new LinkedHashSet<String>();
@@ -153,6 +157,33 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
             schemaMap.put(fileName, table);
         }
         return schemaMap;
+    }
+
+    protected String deriveClassSuffix(Map<String, Object> tableMap, File baseDir, File pmFile) {
+        if (((String) tableMap.getOrDefault("isConventionSuffix", "true")).equalsIgnoreCase("true")) {
+            final String baseCano;
+            try {
+                baseCano = toPath(baseDir.getCanonicalPath());
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to get canonical path: " + pmFile, e);
+            }
+            final String currentCano;
+            try {
+                currentCano = toPath(pmFile.getCanonicalPath());
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to get canonical path: " + pmFile, e);
+            }
+            String suffix = "";
+            if (currentCano.startsWith(baseCano)) {
+                final String relativePath = Srl.ltrim(Srl.substringFirstRear(currentCano, baseCano), "/");
+                if (relativePath.contains("/")) {
+                    suffix = Srl.initCap(Srl.substringFirstFront(relativePath, "/").toLowerCase());
+                }
+            }
+            return suffix;
+        } else {
+            return (String) tableMap.getOrDefault("targetSuffix", "");
+        }
     }
 
     protected String extractTargetExt(Map<String, Object> tableMap) {
@@ -263,126 +294,6 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     }
 
     // ===================================================================================
-    //                                                                        Check Format
-    //                                                                        ============
-    protected void checkBodyMetaFormat(File bodyFile, String fileText) {
-        final String delimiter = META_DELIMITER;
-        if (fileText.contains(delimiter)) {
-            final String meta = Srl.substringFirstFront(fileText, delimiter);
-            final List<String> splitList = Srl.splitList(meta, LF);
-            if (!splitList.get(0).startsWith(SUBJECT_LABEL)) {
-                throwMailFluteBodyMetaSubjectNotFoundException(bodyFile, fileText);
-            }
-            if (splitList.size() > 1) {
-                final List<String> nextList = splitList.subList(1, splitList.size());
-                final int nextSize = nextList.size();
-                int index = 0;
-                int lineNumber = 2;
-                for (String line : nextList) {
-                    if (index == nextSize - 1) { // last loop
-                        if (line.isEmpty()) { // empty line only allowed in last loop
-                            break;
-                        }
-                    }
-                    if (!line.startsWith(OPTION_LABEL) && !line.startsWith(PROPDEF_PREFIX)) {
-                        throwMailFluteBodyMetaUnknownLineException(bodyFile, fileText, line, lineNumber);
-                    }
-                    // option check is not here because it can be added in MailFlute
-                    ++lineNumber;
-                    ++index;
-                }
-            }
-        } else { // no delimiter
-            // required as generate
-            throwMailFluteBodyMetaNotFoundException(bodyFile, fileText);
-        }
-    }
-
-    protected void throwMailFluteBodyMetaSubjectNotFoundException(File bodyFile, String fileText) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the subject in the MailFlute body meta.");
-        br.addItem("Advice");
-        br.addElement("The MailFlute body meta should start with subject.");
-        br.addElement("For example:");
-        br.addElement("  subject: ...(mail subject)");
-        br.addElement("  >>>");
-        br.addElement("  ...(mail body)");
-        br.addItem("Body File");
-        br.addElement(bodyFile.getPath());
-        br.addItem("File Text");
-        br.addElement(fileText);
-        final String msg = br.buildExceptionMessage();
-        throw new DfMailFluteBodyMetaParseFailureException(msg);
-    }
-
-    protected void throwMailFluteBodyMetaUnknownLineException(File bodyFile, String fileText, String line, int lineNumber) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Unknown line in the MailFlute body meta.");
-        br.addItem("Advice");
-        br.addElement("The MailFlute body meta should start with subject:");
-        br.addElement("For example:");
-        br.addElement("  (o):");
-        br.addElement("    subject: ...(mail subject)");
-        br.addElement("    >>>");
-        br.addElement("    ...(mail body)");
-        br.addElement("  (o):");
-        br.addElement("    subject: ...(mail subject)");
-        br.addElement("    option: ...(options)");
-        br.addElement("    -- !!String memberName!!");
-        br.addElement("    >>>");
-        br.addElement("    ...(mail body)");
-        br.addElement("  (x):");
-        br.addElement("    subject: ...(mail subject)");
-        br.addElement("    maihama // *NG: unknown meta definition");
-        br.addElement("    >>>");
-        br.addElement("    ...(mail body)");
-        br.addElement("  (x):");
-        br.addElement("    subject: ...(mail subject)");
-        br.addElement("        // *NG: empty line not allowed");
-        br.addElement("    >>>");
-        br.addElement("    ...(mail body)");
-        br.addItem("Body File");
-        br.addElement(bodyFile.getPath());
-        br.addItem("File Text");
-        br.addElement(fileText);
-        br.addItem("Unknown Line");
-        br.addElement("Line Number: " + lineNumber);
-        br.addElement(line);
-        final String msg = br.buildExceptionMessage();
-        throw new DfMailFluteBodyMetaParseFailureException(msg);
-    }
-
-    protected void throwMailFluteBodyMetaNotFoundException(File bodyFile, String fileText) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the delimiter for MailFlute body meta.");
-        br.addItem("Advice");
-        br.addElement("The delimiter of MailFlute body meta is '>>>'.");
-        br.addElement("It should be defined like this:");
-        br.addElement("For example:");
-        br.addElement("  (o):");
-        br.addElement("    subject: ...(mail subject)");
-        br.addElement("    >>>");
-        br.addElement("    ...(mail body)");
-        br.addElement("  (o):");
-        br.addElement("    subject: ...(mail subject)");
-        br.addElement("    option: ...(options)");
-        br.addElement("    -- !!String memberName!!");
-        br.addElement("    >>>");
-        br.addElement("    ...(mail body)");
-        br.addElement("  (x):");
-        br.addElement("    subject: ...(mail subject)");
-        br.addElement("    ...(mail body)");
-        br.addElement("  (x):");
-        br.addElement("    Hello, sea...");
-        br.addItem("Body File");
-        br.addElement(bodyFile.getPath());
-        br.addItem("File Text");
-        br.addElement(fileText);
-        final String msg = br.buildExceptionMessage();
-        throw new DfMailFluteBodyMetaParseFailureException(msg);
-    }
-
-    // ===================================================================================
     //                                                                        Build String
     //                                                                        ============
     protected String buildDomainPath(File file, String targetDir) {
@@ -404,7 +315,11 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     //                                                                      General Helper
     //                                                                      ==============
     protected String toPath(File file) {
-        return replace(file.getPath(), "\\", "/");
+        return toPath(file.getPath());
+    }
+
+    protected String toPath(String path) {
+        return replace(path, "\\", "/");
     }
 
     protected String replace(String str, String fromStr, String toStr) {

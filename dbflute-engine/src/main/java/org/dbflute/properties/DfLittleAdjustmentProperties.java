@@ -304,7 +304,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public String getRelationOptionalEntityClass() { // closet
-        // you should also override TnRelationOptionalFactory if you change this
+        // you should also override RelationOptionalFactory if you change this
         final DfLanguageImplStyle implStyle = getLanguageDependency().getLanguageImplStyle();
         final String langClass = implStyle.getRelationOptionalEntityClass();
         final String embedded = getOptionalEntityDBFluteEmbeddedClassName();

@@ -29,7 +29,7 @@ $manager.makeDirectory($request.generateDirPath)
   $generator.parse("om/java/plugin/lastaflute/${request.templatePath}", $request.generateFilePath, "", "")
 #else
   #foreach ($table in $request.tableList)
-    #set ($path = "${request.generateDirPath}${table.className}.${request.fileExt}")
+    #set ($path = "${request.buildGenerateDirHierarchyPath($table)}${table.className}.${request.fileExt}")
     $manager.makeDirectory($path)
     $request.info("parse('${path}')")
     $generator.parse("om/java/plugin/lastaflute/${request.templatePath}", $path, "", "")

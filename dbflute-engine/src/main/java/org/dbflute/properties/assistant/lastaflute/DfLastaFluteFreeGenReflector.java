@@ -84,6 +84,8 @@ public final class DfLastaFluteFreeGenReflector {
                     hasCommonMessage = true;
                 } else if ("mail".equals(freeGen)) {
                     setupMailFluteGen(_uncapServiceName, path, lastafluteMap);
+                } else if ("template".equals(freeGen)) {
+                    setupPmTemplateGen(_uncapServiceName, path, lastafluteMap);
                 } else if ("doc".equals(freeGen)) {
                     setupDocGen(_uncapServiceName, path);
                 } else {
@@ -113,6 +115,8 @@ public final class DfLastaFluteFreeGenReflector {
                         setupMessageGen(appName, path, lastafluteMap);
                     } else if ("mail".equals(freeGen)) {
                         setupMailFluteGen(appName, path, lastafluteMap);
+                    } else if ("template".equals(freeGen)) {
+                        setupPmTemplateGen(appName, path, lastafluteMap);
                     } else if ("jsp".equals(freeGen)) {
                         setupJspPathGen(appName, path, lastafluteMap);
                     } else if ("html".equals(freeGen)) {
@@ -242,7 +246,7 @@ public final class DfLastaFluteFreeGenReflector {
     protected void doSetupMailFluteGen(String appName, String path, String targetDir, String ext, Map<String, Object> lastafluteMap) {
         final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
         final String capAppName = initCap(appName);
-        registerFreeGen(capAppName + "Postcard", pathMap);
+        registerFreeGen(capAppName + "MailFlute", pathMap);
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         pathMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
@@ -263,6 +267,39 @@ public final class DfLastaFluteFreeGenReflector {
 
     protected String buildMailPostcardPackage(String appName, Map<String, Object> lastafluteMap) {
         final String generatedPackage = _mylastaPackage + ".mail";
+        return filterOverridden(generatedPackage, lastafluteMap, appName, "mail", "package");
+    }
+
+    // ===================================================================================
+    //                                                                          PmTemplate
+    //                                                                          ==========
+    protected void setupPmTemplateGen(String appName, String path, Map<String, Object> lastafluteMap) {
+        doSetupPmTemplateGen(appName, path, "$$baseDir$$/resources", "dfpm", lastafluteMap);
+    }
+
+    protected void doSetupPmTemplateGen(String appName, String path, String targetDir, String ext, Map<String, Object> lastafluteMap) {
+        final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
+        final String capAppName = initCap(appName);
+        registerFreeGen(capAppName + "PmTemplate", pathMap);
+        final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
+        pathMap.put("resourceMap", resourceMap);
+        resourceMap.put("baseDir", path + "/src/main");
+        resourceMap.put("resourceType", DfFreeGenResourceType.PM_FILE.name());
+        final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
+        pathMap.put("outputMap", outputMap);
+        outputMap.put("templateFile", "LaPmTemplate.vm");
+        outputMap.put("outputDirectory", "$$baseDir$$/java");
+        outputMap.put("package", buildPmTemplateBeanPackage(capAppName, lastafluteMap));
+        outputMap.put("className", "unused");
+        final Map<String, Object> tableMap = createTableMap();
+        pathMap.put("tableMap", tableMap);
+        tableMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, "template", "targetDir"));
+        tableMap.put("targetExt", filterOverridden("." + ext, lastafluteMap, appName, "template", "targetExt"));
+        tableMap.put("isConventionSuffix", "true");
+    }
+
+    protected String buildPmTemplateBeanPackage(String appName, Map<String, Object> lastafluteMap) {
+        final String generatedPackage = _mylastaPackage + ".template";
         return filterOverridden(generatedPackage, lastafluteMap, appName, "mail", "package");
     }
 
@@ -314,7 +351,7 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         docMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
-        resourceMap.put("resourceType", DfFreeGenResourceType.LASTA_FLUTE.name());
+        resourceMap.put("resourceType", DfFreeGenResourceType.LASTA_DOC.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         docMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaDocHtml.vm");

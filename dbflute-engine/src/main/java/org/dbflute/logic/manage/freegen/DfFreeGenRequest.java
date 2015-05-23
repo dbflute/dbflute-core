@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.logic.generate.packagepath.DfPackagePathHandler;
+import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,6 +92,10 @@ public class DfFreeGenRequest {
         return getPackageAsPath(_output.getPackage());
     }
 
+    public String buildGenerateDirHierarchyPath(Map<String, Object> tableMap) { // contains rear slash '/'
+        return getPackageAsPath(buildHierarchyPackage(tableMap));
+    }
+
     public String getGenerateFilePath() {
         return getGenerateDirPath() + _output.getClassName() + "." + _output.getFileExt();
     }
@@ -161,6 +166,12 @@ public class DfFreeGenRequest {
 
     public String getPackage() {
         return _output.getPackage();
+    }
+
+    public String buildHierarchyPackage(Map<String, Object> tableMap) {
+        final String additionalPkg = (String) tableMap.get("additionalPackage");
+        final String added = Srl.is_NotNull_and_NotEmpty(additionalPkg) ? "." + additionalPkg : "";
+        return _output.getPackage() + added;
     }
 
     public String getClassName() {
