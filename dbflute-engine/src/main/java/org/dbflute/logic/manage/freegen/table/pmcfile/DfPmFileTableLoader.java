@@ -104,12 +104,13 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
             final String className = classNameSb.toString();
             table.put("className", className); // used as output file name
             table.put("camelizedName", className);
-            if (Srl.is_NotNull_and_NotEmpty(className)) {
+            if (Srl.is_NotNull_and_NotEmpty(classSuffix)) {
                 table.put("additionalPackage", classSuffix.toLowerCase());
             }
 
             final String domainPath = buildDomainPath(pmFile, targetDir);
             table.put("domainPath", domainPath); // e.g. /member/member_registration.dfpm
+            table.put("resourcePath", Srl.ltrim(domainPath, "/")); // e.g. member/member_registration.dfpm
 
             table.put("defName", buildUpperSnakeName(domainPath));
             {
@@ -159,6 +160,28 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         return schemaMap;
     }
 
+    protected String extractTargetExt(Map<String, Object> tableMap) {
+        final String targetExt = (String) tableMap.get("targetExt"); // not required
+        if (targetExt != null && !targetExt.startsWith(".")) {
+            return "." + targetExt;
+        }
+        return targetExt;
+    }
+
+    protected String extractTargetKeyword(Map<String, Object> tableMap) {
+        return (String) tableMap.get("targetKeyword"); // not required
+    }
+
+    protected List<String> extractExceptPathList(Map<String, Object> tableMap) {
+        @SuppressWarnings("unchecked")
+        List<String> exceptPathList = (List<String>) tableMap.get("exceptPathList"); // not required
+        if (exceptPathList == null) {
+            exceptPathList = DfCollectionUtil.newArrayListSized(4);
+        }
+        exceptPathList.add("contain:.svn");
+        return exceptPathList;
+    }
+
     protected String deriveClassSuffix(Map<String, Object> tableMap, File baseDir, File pmFile) {
         if (((String) tableMap.getOrDefault("isConventionSuffix", "true")).equalsIgnoreCase("true")) {
             final String baseCano;
@@ -184,28 +207,6 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         } else {
             return (String) tableMap.getOrDefault("targetSuffix", "");
         }
-    }
-
-    protected String extractTargetExt(Map<String, Object> tableMap) {
-        final String targetExt = (String) tableMap.get("targetExt"); // not required
-        if (targetExt != null && !targetExt.startsWith(".")) {
-            return "." + targetExt;
-        }
-        return targetExt;
-    }
-
-    protected String extractTargetKeyword(Map<String, Object> tableMap) {
-        return (String) tableMap.get("targetKeyword"); // not required
-    }
-
-    protected List<String> extractExceptPathList(Map<String, Object> tableMap) {
-        @SuppressWarnings("unchecked")
-        List<String> exceptPathList = (List<String>) tableMap.get("exceptPathList"); // not required
-        if (exceptPathList == null) {
-            exceptPathList = DfCollectionUtil.newArrayListSized(4);
-        }
-        exceptPathList.add("contain:.svn");
-        return exceptPathList;
     }
 
     protected void processAutoDetect(String fileText, Map<String, String> propertyNameTypeMap, Map<String, String> propertyNameOptionMap,

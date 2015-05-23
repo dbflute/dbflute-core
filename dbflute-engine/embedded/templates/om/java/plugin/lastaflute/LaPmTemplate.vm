@@ -8,7 +8,7 @@ import org.lastaflute.core.template.TemplatePmb;
  */
 public class ${table.className} implements TemplatePmb {
 
-    public static final String PATH = "${table.domainPath}";
+    public static final String PATH = "${table.resourcePath}";
 
 #foreach ($property in $table.propertyList)
     protected ${property.propertyType} ${property.uncapCalemName};

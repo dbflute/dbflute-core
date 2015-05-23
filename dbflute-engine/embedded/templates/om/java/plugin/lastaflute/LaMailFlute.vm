@@ -1,4 +1,4 @@
-${manager.allClassCopyright}package ${request.package};
+${manager.allClassCopyright}package ${request.buildHierarchyPackage($table)};
 
 import org.lastaflute.core.mail.LaTypicalPostcard;
 import org.lastaflute.core.mail.MPCall;
@@ -10,7 +10,7 @@ import org.lastaflute.core.mail.Postbox;
  */
 public class ${table.className} extends LaTypicalPostcard {
 
-    public static final String PATH = "${table.domainPath}";
+    public static final String PATH = "${table.resourcePath}";
 
     public static void droppedInto(Postbox postbox, MPCall<${table.className}> postcardLambda) {
         ${table.className} postcard = new ${table.className}();

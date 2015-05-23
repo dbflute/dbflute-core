@@ -18,6 +18,7 @@ package org.dbflute.logic.manage.freegen.table.mailflute;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -78,6 +79,7 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     //     ; targetExt = .dfmail
     //     ; targetKeyword = 
     //     ; exceptPathList = list:{ contain:/mail/common/ }
+    //     ; isConventionSuffix = false
     // }
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> tableMap = mapProp.getTableMap();
@@ -86,25 +88,32 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         final String targetKeyword = extractTargetKeyword(tableMap);
         final List<String> exceptPathList = extractExceptPathList(tableMap);
 
-        final Map<String, Map<String, Object>> schemaMap = doLoad(targetDir, targetExt, targetKeyword, exceptPathList);
+        final Map<String, Map<String, Object>> schemaMap = doLoad(targetDir, targetExt, targetKeyword, exceptPathList, tableMap);
         return new DfFreeGenTable(tableMap, schemaMap);
     }
 
-    protected Map<String, Map<String, Object>> doLoad(String targetDir, String targetExt, String targetKeyword, List<String> exceptPathList) {
+    protected Map<String, Map<String, Object>> doLoad(String targetDir, String targetExt, String targetKeyword,
+            List<String> exceptPathList, Map<String, Object> tableMap) {
         final List<File> fileList = DfCollectionUtil.newArrayList();
-        collectFile(fileList, targetExt, targetKeyword, exceptPathList, new File(targetDir));
+        final File baseDir = new File(targetDir);
+        collectFile(fileList, targetExt, targetKeyword, exceptPathList, baseDir);
         final Map<String, Map<String, Object>> schemaMap = DfCollectionUtil.newLinkedHashMap();
         final FileTextIO textIO = new FileTextIO().encodeAsUTF8().removeUTF8Bom().replaceCrLfToLf();
-        for (File file : fileList) {
+        for (File mailFile : fileList) {
             final Map<String, Object> table = DfCollectionUtil.newHashMap();
-            final String fileName = file.getName();
+            final String fileName = mailFile.getName();
             table.put("fileName", fileName);
             final String className = Srl.camelize(Srl.substringLastFront(fileName, targetExt)) + "Postcard";
             table.put("className", className); // used as output file name
             table.put("camelizedName", className);
+            final String addedPkg = deriveAdditionalPackage(tableMap, baseDir, mailFile);
+            if (Srl.is_NotNull_and_NotEmpty(addedPkg)) {
+                table.put("additionalPackage", addedPkg);
+            }
 
-            final String domainPath = buildDomainPath(file, targetDir);
+            final String domainPath = buildDomainPath(mailFile, targetDir);
             table.put("domainPath", domainPath); // e.g. /member/member_registration.dfmail
+            table.put("resourcePath", Srl.ltrim(domainPath, "/")); // e.g. member/member_registration.dfmail
 
             table.put("defName", buildUpperSnakeName(domainPath));
             {
@@ -124,11 +133,11 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
             }
             final String fileText;
             try {
-                fileText = textIO.read(new FileInputStream(file));
+                fileText = textIO.read(new FileInputStream(mailFile));
             } catch (FileNotFoundException e) { // no way, collected file
-                throw new IllegalStateException("Not found the file: " + file, e);
+                throw new IllegalStateException("Not found the file: " + mailFile, e);
             }
-            checkBodyMetaFormat(file, fileText);
+            checkBodyMetaFormat(mailFile, fileText);
             final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
             final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
             final Set<String> autoDetectedPropertyNameSet = new LinkedHashSet<String>();
@@ -175,6 +184,33 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         }
         exceptPathList.add("contain:.svn");
         return exceptPathList;
+    }
+
+    protected String deriveAdditionalPackage(Map<String, Object> tableMap, File baseDir, File pmFile) {
+        if (((String) tableMap.getOrDefault("isConventionSuffix", "true")).equalsIgnoreCase("true")) {
+            final String baseCano;
+            try {
+                baseCano = toPath(baseDir.getCanonicalPath());
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to get canonical path: " + pmFile, e);
+            }
+            final String currentCano;
+            try {
+                currentCano = toPath(pmFile.getCanonicalPath());
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to get canonical path: " + pmFile, e);
+            }
+            String pkg = null;
+            if (currentCano.startsWith(baseCano)) {
+                final String relativePath = Srl.ltrim(Srl.substringFirstRear(currentCano, baseCano), "/");
+                if (relativePath.contains("/")) {
+                    pkg = Srl.substringFirstFront(relativePath, "/").toLowerCase();
+                }
+            }
+            return pkg;
+        } else {
+            return null;
+        }
     }
 
     protected void processAutoDetect(String fileText, Map<String, String> propertyNameTypeMap, Map<String, String> propertyNameOptionMap,
@@ -404,7 +440,11 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     //                                                                      General Helper
     //                                                                      ==============
     protected String toPath(File file) {
-        return replace(file.getPath(), "\\", "/");
+        return toPath(file.getPath());
+    }
+
+    protected String toPath(String path) {
+        return replace(path, "\\", "/");
     }
 
     protected String replace(String str, String fromStr, String toStr) {
