@@ -22,9 +22,6 @@ import org.dbflute.dbway.DBDef;
 #if ($database.isTargetContainerSpring())
 import org.dbflute.jdbc.DataSourceHandler;
 #end
-#if ($database.isTargetContainerSeasar())
-import org.dbflute.s2dao.extension.TnSqlLogRegistry;
-#end
 import org.dbflute.system.DBFluteSystem;
 
 import org.slf4j.Logger;
