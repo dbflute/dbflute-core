@@ -66,6 +66,10 @@ public class DfResourceUtil {
     // ===================================================================================
     //                                                                        Resource URL
     //                                                                        ============
+    /**
+     * @param path The path of the resource, without initial separator '/'. (NotNull)
+     * @return The found resource as URL. (NullAllowed: if not found or context class loader is null)
+     */
     public static URL getResourceUrl(String path) {
         return getResourceUrl(path, null);
     }
@@ -146,10 +150,19 @@ public class DfResourceUtil {
     // ===================================================================================
     //                                                                     Resource Stream
     //                                                                     ===============
+    /**
+     * @param path The path of the resource, without initial separator '/'. (NotNull)
+     * @return The found resource as stream. (NullAllowed: if not found or context class loader is null)
+     */
     public static InputStream getResourceStream(String path) {
         return getResourceStream(path, null);
     }
 
+    /**
+     * @param path The path of the resource, without initial separator '/'. (NotNull)
+     * @param extension The extension of the resource. (NullAllowed: if null, no extension added)
+     * @return The found resource as stream. (NullAllowed: if not found or context class loader is null)
+     */
     public static InputStream getResourceStream(String path, String extension) {
         final URL url = getResourceUrl(path, extension);
         return url != null ? openStream(url) : null;

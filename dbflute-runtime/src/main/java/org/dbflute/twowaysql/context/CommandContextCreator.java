@@ -22,6 +22,9 @@ import org.dbflute.twowaysql.context.impl.CommandContextImpl;
  */
 public class CommandContextCreator {
 
+    protected static final String[] EMPTY_STRING_ARRAY = new String[0];
+    protected static final Class<?>[] EMPTY_TYPE_ARRAY = new Class[0];
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -32,8 +35,8 @@ public class CommandContextCreator {
     //                                                                         Constructor
     //                                                                         ===========
     public CommandContextCreator(String[] argNames, Class<?>[] argTypes) {
-        this.argNames = (argNames != null ? argNames : new String[0]);
-        this.argTypes = (argTypes != null ? argTypes : new Class[0]);
+        this.argNames = (argNames != null ? argNames : EMPTY_STRING_ARRAY);
+        this.argTypes = (argTypes != null ? argTypes : EMPTY_TYPE_ARRAY);
     }
 
     // ===================================================================================
@@ -45,7 +48,7 @@ public class CommandContextCreator {
      * @return The command context as root context. (NotNull)
      */
     public CommandContext createCommandContext(Object[] args) {
-        final CommandContext ctx = CommandContextImpl.createCommandContextImplAsRoot();
+        final CommandContext ctx = createCommandContext();
         if (args != null) {
             for (int i = 0; i < args.length; ++i) {
                 Class<?> argType = null;
@@ -64,5 +67,9 @@ public class CommandContextCreator {
             }
         }
         return ctx;
+    }
+
+    protected CommandContext createCommandContext() {
+        return CommandContextImpl.createCommandContextImplAsRoot();
     }
 }
