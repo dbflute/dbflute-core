@@ -21,7 +21,6 @@
 # o cursorSelectFetchSize: (NotRequired - Default null)
 # o refreshMap: (NotRequired - Default map:{})
 # o optimisticLockMap: (NotRequired - Default map:{})
-# o sequenceMap: (NotRequired - Default map:{})
 #
 # *The line that starts with '#' means comment-out.
 #
@@ -203,20 +202,6 @@ map:{
     #    #  Basically you don't need this if your tables have the column 'VERSION_NO'.
     #    #  because the default value is 'VERSION_NO'.
     #    ; versionNoFieldName = VERSION_NO
-    #}
-    # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o sequenceMap: (NotRequired - Default map:{})
-    #  The relation mappings between sequence and table.
-    #  If you don't specify the mappings, you cannot insert a record of the table by sequence. 
-    #  The table names are treated as case insensitive.
-    #
-    #; sequenceMap = map:{
-    #    #; PURCHASE     = SEQ_PURCHASE
-    #    #; MEMBER       = SEQ_MEMBER
-    #    #; MEMBER_LOGIN = SEQ_MEMBER_LOGIN
-    #    #; PRODUCT      = SEQ_PRODUCT
     #}
     # - - - - - - - - - -/
 }
