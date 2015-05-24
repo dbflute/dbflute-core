@@ -63,6 +63,8 @@ public final class DfLastaFluteFreeGenReflector {
     public void reflectFrom(Map<String, Object> lastafluteMap) {
         logger.info("Before refecting, existing freeGen settigs: " + _freeGenMap.keySet());
         boolean hasCommonEnv = false;
+        boolean hasCommonConfig = false;
+        boolean hasCommonLabel = false;
         boolean hasCommonMessage = false;
         @SuppressWarnings("unchecked")
         final Map<String, Object> commonMap = (Map<String, Object>) lastafluteMap.get("commonMap");
@@ -73,14 +75,16 @@ public final class DfLastaFluteFreeGenReflector {
             for (String freeGen : freeGenList) {
                 logger.info("...Reflecting common freeGen settigs: " + freeGen + ", " + path);
                 if ("env".equals(freeGen)) {
-                    setupEnvGen(_uncapServiceName, path, true);
+                    setupEnvGen(_uncapServiceName, path, false, false);
                     hasCommonEnv = true;
                 } else if ("config".equals(freeGen)) {
-                    setupConfigGen(_uncapServiceName, path);
+                    setupConfigGen(_uncapServiceName, path, hasCommonEnv, false, false);
+                    hasCommonConfig = true;
                 } else if ("label".equals(freeGen)) {
-                    setupLabelGen(_uncapServiceName, path, true, lastafluteMap);
+                    setupLabelGen(_uncapServiceName, path, false, false, lastafluteMap);
+                    hasCommonLabel = true;
                 } else if ("message".equals(freeGen)) {
-                    setupMessageGen(_uncapServiceName, path, lastafluteMap);
+                    setupMessageGen(_uncapServiceName, path, hasCommonLabel, false, false, lastafluteMap);
                     hasCommonMessage = true;
                 } else if ("mail".equals(freeGen)) {
                     setupMailFluteGen(_uncapServiceName, path, lastafluteMap);
@@ -94,6 +98,8 @@ public final class DfLastaFluteFreeGenReflector {
                 }
             }
         }
+        boolean hasAppEnv = false;
+        boolean hasAppLabel = false;
         @SuppressWarnings("unchecked")
         final Map<String, Map<String, Object>> appMap = (Map<String, Map<String, Object>>) lastafluteMap.get("appMap");
         if (appMap != null) {
@@ -106,13 +112,15 @@ public final class DfLastaFluteFreeGenReflector {
                 for (String freeGen : freeGenList) {
                     logger.info("...Reflecting application freeGen settigs: " + appName + "." + freeGen);
                     if ("env".equals(freeGen)) {
-                        setupEnvGen(appName, path, !hasCommonEnv);
+                        setupEnvGen(appName, path, hasCommonEnv, hasCommonConfig);
+                        hasAppEnv = true;
                     } else if ("config".equals(freeGen)) {
-                        setupConfigGen(appName, path);
+                        setupConfigGen(appName, path, hasCommonEnv, hasCommonConfig, hasAppEnv);
                     } else if ("label".equals(freeGen)) {
-                        setupLabelGen(appName, path, !hasCommonMessage, lastafluteMap);
+                        setupLabelGen(appName, path, hasCommonLabel, hasCommonMessage, lastafluteMap);
+                        hasAppLabel = true;
                     } else if ("message".equals(freeGen)) {
-                        setupMessageGen(appName, path, lastafluteMap);
+                        setupMessageGen(appName, path, hasCommonLabel, hasCommonMessage, hasAppLabel, lastafluteMap);
                     } else if ("mail".equals(freeGen)) {
                         setupMailFluteGen(appName, path, lastafluteMap);
                     } else if ("template".equals(freeGen)) {
@@ -136,7 +144,7 @@ public final class DfLastaFluteFreeGenReflector {
     // ===================================================================================
     //                                                                       Configuration
     //                                                                       =============
-    protected void setupEnvGen(String appName, String path, boolean root) {
+    protected void setupEnvGen(String appName, String path, boolean hasCommonEnv, boolean hasCommonConfig) {
         final Map<String, Map<String, Object>> envMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "env";
         registerFreeGen(initCap(appName) + buildTitleSuffix(theme), envMap);
@@ -144,20 +152,16 @@ public final class DfLastaFluteFreeGenReflector {
         doSetupOutputConfigMap(appName, envMap, theme);
         final Map<String, Object> tableMap = createTableMap();
         envMap.put("tableMap", tableMap);
-        if (root) {
-            tableMap.put("superClassPackage", "org.lastaflute.core.direction");
-            tableMap.put("superClassSimpleName", "ObjectiveConfig");
+        if (!hasCommonEnv && !hasCommonConfig) { // root
+            doSetupConfigTableMapRoot(tableMap);
         } else {
-            tableMap.put("extendsPropRequest", _capServiceName + buildTitleSuffix("config"));
-            tableMap.put("isCheckImplicitOverride", getTrueLiteral());
-            tableMap.put("interfacePackage", _mylastaPackage + ".direction");
-            tableMap.put("interfaceSimpleName", _capServiceName + "Config");
-            tableMap.put("superClassPackage", _mylastaPackage + ".direction");
-            tableMap.put("superClassSimpleName", _capServiceName + "Config.SimpleImpl");
+            final String parentName = _uncapServiceName;
+            final String parentTheme = hasCommonConfig ? "config" : "env";
+            doSetupConfigTableMapInheritance(tableMap, parentName, parentTheme);
         }
     }
 
-    protected void setupConfigGen(String appName, String path) {
+    protected void setupConfigGen(String appName, String path, boolean hasCommonEnv, boolean hasCommonConfig, boolean hasAppEnv) {
         final Map<String, Map<String, Object>> configMap = new LinkedHashMap<String, Map<String, Object>>();
         final String capAppName = initCap(appName);
         final String theme = "config";
@@ -166,12 +170,13 @@ public final class DfLastaFluteFreeGenReflector {
         doSetupOutputConfigMap(appName, configMap, theme);
         final Map<String, Object> tableMap = createTableMap();
         configMap.put("tableMap", tableMap);
-        tableMap.put("extendsPropRequest", capAppName + buildTitleSuffix("env"));
-        tableMap.put("isCheckImplicitOverride", getTrueLiteral());
-        tableMap.put("interfacePackage", _mylastaPackage + ".direction");
-        tableMap.put("interfaceSimpleName", capAppName + "Env");
-        tableMap.put("superClassPackage", _mylastaPackage + ".direction");
-        tableMap.put("superClassSimpleName", capAppName + "Env.SimpleImpl");
+        if (!hasCommonEnv && !hasCommonConfig && !hasAppEnv) { // root
+            doSetupConfigTableMapRoot(tableMap);
+        } else {
+            final String parentName = hasAppEnv ? appName : _uncapServiceName;
+            final String parentTheme = hasAppEnv ? "env" : (hasCommonConfig ? "config" : "env");
+            doSetupConfigTableMapInheritance(tableMap, parentName, parentTheme);
+        }
     }
 
     protected void doSetupOutputConfigMap(String appName, Map<String, Map<String, Object>> map, String theme) {
@@ -183,10 +188,25 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("className", initCap(appName) + initCap(theme));
     }
 
+    protected void doSetupConfigTableMapRoot(Map<String, Object> tableMap) {
+        tableMap.put("superClassPackage", "org.lastaflute.core.direction");
+        tableMap.put("superClassSimpleName", "ObjectiveConfig");
+    }
+
+    protected void doSetupConfigTableMapInheritance(Map<String, Object> tableMap, String appName, String theme) {
+        tableMap.put("extendsPropRequest", initCap(appName) + buildTitleSuffix(theme));
+        tableMap.put("isCheckImplicitOverride", getTrueLiteral());
+        tableMap.put("interfacePackage", _mylastaPackage + ".direction");
+        tableMap.put("interfaceSimpleName", initCap(appName) + initCap(theme));
+        tableMap.put("superClassPackage", _mylastaPackage + ".direction");
+        tableMap.put("superClassSimpleName", initCap(appName) + initCap(theme) + ".SimpleImpl");
+    }
+
     // ===================================================================================
     //                                                                            Messages
     //                                                                            ========
-    protected void setupLabelGen(String appName, String path, boolean root, Map<String, Object> lastafluteMap) {
+    protected void setupLabelGen(String appName, String path, boolean hasCommonLabel, boolean hasCommonMessage,
+            Map<String, Object> lastafluteMap) {
         final Map<String, Map<String, Object>> labelMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "label";
         registerFreeGen(initCap(appName) + buildTitleSuffix(theme), labelMap);
@@ -195,12 +215,15 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> tableMap = createTableMap();
         labelMap.put("tableMap", tableMap);
         tableMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap(theme, "prefix:labels."));
-        if (!root) {
-            doSetupMessageTableMapInheritance(_uncapServiceName, tableMap, "message", lastafluteMap);
+        if (hasCommonLabel || hasCommonMessage) {
+            final String parentName = _uncapServiceName;
+            final String parentTheme = hasCommonMessage ? "message" : "label";
+            doSetupMessageTableMapInheritance(tableMap, parentName, parentTheme, lastafluteMap);
         }
     }
 
-    protected void setupMessageGen(String appName, String path, Map<String, Object> lastafluteMap) {
+    protected void setupMessageGen(String appName, String path, boolean hasCommonLabel, boolean hasCommonMessage, boolean hasAppLabel,
+            Map<String, Object> lastafluteMap) {
         final Map<String, Map<String, Object>> labelMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "message";
         registerFreeGen(initCap(appName) + buildTitleSuffix(theme), labelMap);
@@ -209,7 +232,11 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> tableMap = createTableMap();
         labelMap.put("tableMap", tableMap);
         tableMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap("label", "prefix:labels."));
-        doSetupMessageTableMapInheritance(appName, tableMap, "label", lastafluteMap);
+        if (hasCommonLabel || hasCommonMessage || hasAppLabel) {
+            final String parentName = hasAppLabel ? appName : _uncapServiceName;
+            final String parentTheme = hasAppLabel ? "label" : (hasCommonMessage ? "message" : "label");
+            doSetupMessageTableMapInheritance(tableMap, parentName, parentTheme, lastafluteMap);
+        }
     }
 
     protected void doSetupMessageOutputMap(String appName, Map<String, Map<String, Object>> map, String theme,
@@ -222,7 +249,7 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("className", initCap(appName) + initCap(theme) + "s");
     }
 
-    protected void doSetupMessageTableMapInheritance(String appName, Map<String, Object> tableMap, String theme,
+    protected void doSetupMessageTableMapInheritance(Map<String, Object> tableMap, String appName, String theme,
             Map<String, Object> lastafluteMap) {
         tableMap.put("extendsPropRequest", initCap(appName) + buildTitleSuffix(theme));
         tableMap.put("isCheckImplicitOverride", getTrueLiteral());

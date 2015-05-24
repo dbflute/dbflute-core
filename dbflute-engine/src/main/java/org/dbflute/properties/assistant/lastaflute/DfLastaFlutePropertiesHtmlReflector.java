@@ -62,6 +62,8 @@ public final class DfLastaFlutePropertiesHtmlReflector {
         logger.info("Before refecting, existing propertiesHtml settigs: " + _propHtmlMap.keySet());
         final boolean envSuffixOnFile = isUseEnvSuffixOnFile(lastafluteMap);
         boolean hasCommonEnv = false;
+        boolean hasCommonConfig = false;
+        boolean hasCommonLabel = false;
         boolean hasCommonMessage = false;
         @SuppressWarnings("unchecked")
         final Map<String, Object> commonMap = (Map<String, Object>) lastafluteMap.get("commonMap");
@@ -72,14 +74,16 @@ public final class DfLastaFlutePropertiesHtmlReflector {
             for (String propertiesHtml : propertiesHtmlList) {
                 logger.info("...Reflecting common propertiesHtml settigs: " + propertiesHtml + ", " + path);
                 if ("env".equals(propertiesHtml)) {
-                    setupEnv(_uncapServiceName, path, true, envSuffixOnFile);
+                    setupEnv(_uncapServiceName, path, false, false, envSuffixOnFile);
                     hasCommonEnv = true;
                 } else if ("config".equals(propertiesHtml)) {
-                    setupConfig(_uncapServiceName, path);
+                    setupConfig(_uncapServiceName, path, hasCommonEnv, false, false);
+                    hasCommonConfig = true;
                 } else if ("label".equals(propertiesHtml)) {
-                    setupLabel(_uncapServiceName, path, true);
+                    setupLabel(_uncapServiceName, path, false, false);
+                    hasCommonLabel = true;
                 } else if ("message".equals(propertiesHtml)) {
-                    setupMessage(_uncapServiceName, path);
+                    setupMessage(_uncapServiceName, path, hasCommonLabel, false, false);
                     hasCommonMessage = true;
                 } else {
                     String msg = "Unkonwn type for commonMap's propertiesHtml: " + propertiesHtml;
@@ -87,6 +91,8 @@ public final class DfLastaFlutePropertiesHtmlReflector {
                 }
             }
         }
+        boolean hasAppEnv = false;
+        boolean hasAppLabel = false;
         @SuppressWarnings("unchecked")
         final Map<String, Map<String, Object>> appMap = (Map<String, Map<String, Object>>) lastafluteMap.get("appMap");
         if (appMap != null) {
@@ -99,13 +105,15 @@ public final class DfLastaFlutePropertiesHtmlReflector {
                 for (String propertiesHtml : propertiesHtmlList) {
                     logger.info("...Reflecting application propertiesHtml settigs: " + appName + "." + propertiesHtml);
                     if ("env".equals(propertiesHtml)) {
-                        setupEnv(appName, path, !hasCommonEnv, envSuffixOnFile);
+                        setupEnv(appName, path, hasCommonEnv, hasCommonConfig, envSuffixOnFile);
+                        hasAppEnv = true;
                     } else if ("config".equals(propertiesHtml)) {
-                        setupConfig(appName, path);
+                        setupConfig(appName, path, hasCommonEnv, hasCommonConfig, hasAppEnv);
                     } else if ("label".equals(propertiesHtml)) {
-                        setupLabel(appName, path, !hasCommonMessage);
+                        setupLabel(appName, path, hasCommonLabel, hasCommonMessage);
+                        hasAppLabel = true;
                     } else if ("message".equals(propertiesHtml)) {
-                        setupMessage(appName, path);
+                        setupMessage(appName, path, hasCommonLabel, hasCommonMessage, hasAppLabel);
                     } else {
                         String msg = "Unkonwn type for appMap's propertiesHtml: " + propertiesHtml;
                         throw new DfIllegalPropertySettingException(msg);
@@ -124,37 +132,49 @@ public final class DfLastaFlutePropertiesHtmlReflector {
     // ===================================================================================
     //                                                                       Configuration
     //                                                                       =============
-    protected void setupEnv(String appName, String path, boolean root, boolean envSuffixOnFile) {
+    protected void setupEnv(String appName, String path, boolean hasCommonEnv, boolean hasCommonConfig, boolean envSuffixOnFile) {
         final Map<String, Object> map = new LinkedHashMap<String, Object>();
         final String theme = "env";
         registerBasicItem(appName, path, map, theme);
         registerEnvironmentMap(appName, map, theme, envSuffixOnFile);
-        if (!root) {
-            registerExtendsProp(map, _uncapServiceName, "config");
+        if (hasCommonEnv || hasCommonConfig) { // not root
+            final String parentName = _uncapServiceName;
+            final String parentTheme = hasCommonConfig ? "config" : "env";
+            registerExtendsProp(map, parentName, parentTheme);
         }
     }
 
-    protected void setupConfig(String appName, String path) {
+    protected void setupConfig(String appName, String path, boolean hasCommonEnv, boolean hasCommonConfig, boolean hasAppEnv) {
         final Map<String, Object> map = new LinkedHashMap<String, Object>();
         registerBasicItem(appName, path, map, "config");
-        registerExtendsProp(map, appName, "env");
+        if (hasCommonEnv || hasCommonConfig || hasAppEnv) { // not root
+            final String parentName = hasAppEnv ? appName : _uncapServiceName;
+            final String parentTheme = hasAppEnv ? "env" : (hasCommonConfig ? "config" : "env");
+            registerExtendsProp(map, parentName, parentTheme);
+        }
     }
 
     // ===================================================================================
     //                                                                            Messages
     //                                                                            ========
-    protected void setupLabel(String appName, String path, boolean root) {
+    protected void setupLabel(String appName, String path, boolean hasCommonLabel, boolean hasCommonMessage) {
         final Map<String, Object> map = new LinkedHashMap<String, Object>();
         registerBasicItem(appName, path, map, "label");
-        if (!root) {
-            registerExtendsProp(map, _uncapServiceName, "message");
+        if (hasCommonLabel || hasCommonMessage) {
+            final String parentName = _uncapServiceName;
+            final String parentTheme = hasCommonMessage ? "message" : "label";
+            registerExtendsProp(map, parentName, parentTheme);
         }
     }
 
-    protected void setupMessage(String appName, String path) {
+    protected void setupMessage(String appName, String path, boolean hasCommonLabel, boolean hasCommonMessage, boolean hasAppLabel) {
         final Map<String, Object> map = new LinkedHashMap<String, Object>();
         registerBasicItem(appName, path, map, "message");
-        registerExtendsProp(map, appName, "label");
+        if (hasCommonLabel || hasCommonMessage || hasAppLabel) {
+            final String parentName = hasAppLabel ? appName : _uncapServiceName;
+            final String parentTheme = hasAppLabel ? "label" : (hasCommonMessage ? "message" : "label");
+            registerExtendsProp(map, parentName, parentTheme);
+        }
     }
 
     // ===================================================================================
