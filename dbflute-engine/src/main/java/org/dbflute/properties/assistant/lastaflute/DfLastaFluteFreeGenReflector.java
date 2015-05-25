@@ -363,6 +363,8 @@ public final class DfLastaFluteFreeGenReflector {
     }
 
     protected String buildHtmlTemplatePackage(String appName, Map<String, Object> lastafluteMap, String ext) {
+        // for simple rule "generate and reboot", making HTML file not always need hot-deploy
+        //final String generatedPackage = _appPackage + ".web.base.html";
         final String generatedPackage = _mylastaPackage + ".action";
         return filterOverridden(generatedPackage, lastafluteMap, appName, ext, "package");
     }
