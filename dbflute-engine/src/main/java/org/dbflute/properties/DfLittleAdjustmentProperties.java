@@ -632,7 +632,17 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public String filterTableDispNameIfNeeds(String tableDbName) {
-        return isTableDispNameUpperCase() ? tableDbName.toUpperCase() : tableDbName;
+        if (isTableDispNameUpperCase()) {
+            if (!tableDbName.endsWith("\"") && tableDbName.contains(".")) { // e.g. maihamadb.MEMBER
+                final String schema = Srl.substringLastFront(tableDbName, ".");
+                final String lowerName = Srl.substringLastRear(tableDbName, ".").toLowerCase();
+                return schema + "." + lowerName;
+            } else { // e.g. MEMBER or "MEM.BAR"
+                return tableDbName.toUpperCase();
+            }
+        } else {
+            return tableDbName;
+        }
     }
 
     // ===================================================================================
