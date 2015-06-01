@@ -416,10 +416,14 @@ public class PagingResultBeanTest extends RuntimeTestCase {
         // ## Act ##
         // ## Assert ##
         assertEquals(1, bean.getCurrentStartRecordNumber());
-        assertEquals(0, bean.getCurrentEndRecordNumber());
+        assertEquals(1, bean.getCurrentEndRecordNumber());
 
         bean.setPageSize(3);
         bean.setCurrentPageNumber(1);
+
+        assertEquals(1, bean.getCurrentStartRecordNumber());
+        assertEquals(1, bean.getCurrentEndRecordNumber());
+
         bean.setSelectedList(newArrayList("sea", "land"));
 
         assertEquals(1, bean.getCurrentStartRecordNumber());
