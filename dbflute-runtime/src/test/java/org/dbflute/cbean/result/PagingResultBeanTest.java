@@ -407,6 +407,26 @@ public class PagingResultBeanTest extends RuntimeTestCase {
     }
 
     // ===================================================================================
+    //                                                                       New Only Call
+    //                                                                       =============
+    public void test_getCurrentEndRecordNumber_basic() throws Exception {
+        // ## Arrange ##
+        PagingResultBean<String> bean = new PagingResultBean<String>();
+
+        // ## Act ##
+        // ## Assert ##
+        assertEquals(1, bean.getCurrentStartRecordNumber());
+        assertEquals(0, bean.getCurrentEndRecordNumber());
+
+        bean.setPageSize(3);
+        bean.setCurrentPageNumber(1);
+        bean.setSelectedList(newArrayList("sea", "land"));
+
+        assertEquals(1, bean.getCurrentStartRecordNumber());
+        assertEquals(2, bean.getCurrentEndRecordNumber());
+    }
+
+    // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
     protected PagingResultBean<String> createTarget(int pageSize, int currentPageNumber, int allRecordCount) {

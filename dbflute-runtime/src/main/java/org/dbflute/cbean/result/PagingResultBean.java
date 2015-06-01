@@ -234,7 +234,8 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     }
 
     protected int calculateCurrentEndRecordNumber(int currentPageNumber, int pageSize) {
-        return calculateCurrentStartRecordNumber(currentPageNumber, pageSize) + _selectedList.size() - 1;
+        final int listSize = _selectedList != null ? _selectedList.size() : 0;
+        return calculateCurrentStartRecordNumber(currentPageNumber, pageSize) + listSize - 1;
     }
 
     // ===================================================================================
