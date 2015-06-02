@@ -42,7 +42,6 @@ import org.dbflute.properties.DfRefreshProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
-import org.dbflute.properties.DfSqlLogRegistryProperties;
 import org.dbflute.properties.DfTypeMappingProperties;
 import org.dbflute.properties.handler.DfPropertiesHandler;
 
@@ -291,13 +290,6 @@ public final class DfBuildProperties {
     //                                            ----------
     public DfSimpleDtoProperties getSimpleDtoProperties() {
         return getHandler().getSimpleDtoProperties(getProperties());
-    }
-
-    // -----------------------------------------------------
-    //                                      SQL Log Registry
-    //                                      ----------------
-    public DfSqlLogRegistryProperties getSqlLogRegistryProperties() {
-        return getHandler().getSqlLogRegistryProperties(getProperties());
     }
 
     // -----------------------------------------------------

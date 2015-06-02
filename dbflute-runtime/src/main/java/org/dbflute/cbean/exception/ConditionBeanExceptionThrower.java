@@ -15,6 +15,7 @@
  */
 package org.dbflute.cbean.exception;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -75,7 +76,9 @@ import org.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class ConditionBeanExceptionThrower {
+public class ConditionBeanExceptionThrower implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                       Set up Select

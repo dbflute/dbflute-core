@@ -28,6 +28,9 @@ import org.dbflute.dbmeta.accessory.DerivedMappable;
 import org.dbflute.dbmeta.accessory.EntityDerivedMap;
 import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
 import org.dbflute.dbmeta.accessory.EntityUniqueDrivenProperties;
+import org.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
+import org.dbflute.exception.SpecifyDerivedReferrerUnknownAliasNameException;
+import org.dbflute.exception.SpecifyDerivedReferrerUnmatchedPropertyTypeException;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.optional.OptionalScalar;
 import org.dbflute.twowaysql.DisplaySqlBuilder;
@@ -82,7 +85,12 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
         __derivedMap.registerDerivedValue(aliasName, selectedValue);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     * @throws SpecifyDerivedReferrerInvalidAliasNameException When the alias name does not start with '$'.
+     * @throws SpecifyDerivedReferrerUnknownAliasNameException When the alias name is unknown, no derived.
+     * @throws SpecifyDerivedReferrerUnmatchedPropertyTypeException When the property type is unmatched with actual type.
+     */
     public <VALUE> OptionalScalar<VALUE> derived(String aliasName, Class<VALUE> propertyType) {
         if (__derivedMap == null) {
             // process of finding has existence check of the alias

@@ -2206,10 +2206,6 @@ public class Database {
         return getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
     }
 
-    public boolean isBasicOptionalEntityDBFluteEmbeddedClass() {
-        return getLittleAdjustmentProperties().isBasicOptionalEntityDBFluteEmbeddedClass();
-    }
-
     public String getRelationOptionalEntityClassName() {
         return getLittleAdjustmentProperties().getRelationOptionalEntityClass();
     }
@@ -2220,17 +2216,6 @@ public class Database {
 
     public boolean isRelationOptionalEntityDBFluteEmbeddedClass() {
         return getLittleAdjustmentProperties().isRelationOptionalEntityDBFluteEmbeddedClass();
-    }
-
-    // ===================================================================================
-    //                                                         SQL Log Registry Properties
-    //                                                         ===========================
-    public boolean isSqlLogRegistryValid() {
-        return getProperties().getSqlLogRegistryProperties().isValid();
-    }
-
-    public int getSqlLogRegistryLimitSize() {
-        return getProperties().getSqlLogRegistryProperties().getLimitSize();
     }
 
     // ===================================================================================

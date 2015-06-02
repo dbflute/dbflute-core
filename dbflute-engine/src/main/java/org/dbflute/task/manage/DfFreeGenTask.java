@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.dbflute.friends.velocity.DfVelocityContextFactory;
+import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.manage.freegen.DfFreeGenManager;
 import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
 import org.dbflute.properties.DfFreeGenProperties;
@@ -43,6 +44,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     //                                                                          Definition
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfFreeGenTask.class);
+    protected static final String CONTROL_FREEGEN_VM = "ControlFreeGen.vm";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -77,35 +79,94 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        setupControlTemplate();
-        final DfFreeGenProperties prop = getFreeGenProperties();
-        final List<DfFreeGenRequest> requestList = prop.getFreeGenRequestList();
+        prepareFreeGenRequestList();
+        processLastaFluteFreeGen();
+        processApplicationFreeGen();
+        refreshResources();
+    }
+
+    protected void prepareFreeGenRequestList() {
+        final List<DfFreeGenRequest> requestList = getFreeGenProperties().getFreeGenRequestList();
         for (DfFreeGenRequest request : requestList) {
-            final String requestName = request.getRequestName();
-            if (_genTarget != null && !_genTarget.equalsIgnoreCase(requestName)) {
+            if (_genTarget != null && !_genTarget.equalsIgnoreCase(request.getRequestName())) {
                 continue;
             }
             _freeGenRequestList.add(request);
         }
-        fireVelocityProcess();
-        refreshResources();
     }
 
-    protected void setupControlTemplate() {
-        final String freegenSpace = "./freegen";
-        try {
-            templatePath = new File(freegenSpace).getCanonicalPath();
-        } catch (IOException e) {
-            String msg = "Failed to set template path: " + freegenSpace;
-            throw new IllegalStateException(msg, e);
+    // ===================================================================================
+    //                                                                          LastaFlute
+    //                                                                          ==========
+    protected void processLastaFluteFreeGen() {
+        if (!hasLastaFluteRequest()) {
+            return;
         }
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final String control = lang.getLastaFluteFreeGenControl();
         _log.info("");
-        _log.info("* * * * * * * * * *");
-        _log.info("* Process FreeGen *");
-        _log.info("* * * * * * * * * *");
-        final String control = "ControlFreeGen.vm";
+        _log.info("* * * * * * * * * * * * * * * *");
+        _log.info("* Process LastaFlute FreeGen  *");
+        _log.info("* * * * * * * * * * * * * * * *");
         _log.info("...Using control: " + control);
         setControlTemplate(control);
+        fireVelocityProcess();
+        removeLastaFluteDoneRequest();
+    }
+
+    protected boolean hasLastaFluteRequest() {
+        for (DfFreeGenRequest request : _freeGenRequestList) {
+            final Object la = request.getTableMap().get("isLastaFlute");
+            if (la != null && (boolean) la) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void removeLastaFluteDoneRequest() {
+        final List<DfFreeGenRequest> doneList = new ArrayList<DfFreeGenRequest>();
+        for (DfFreeGenRequest request : _freeGenRequestList) {
+            final Object la = request.getTableMap().get("isLastaFlute");
+            if (la != null && (boolean) la) {
+                doneList.add(request);
+            }
+        }
+        _log.info("...Removing lastaflute requests: " + doneList.size());
+        for (DfFreeGenRequest request : doneList) {
+            _freeGenRequestList.remove(request);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                 Application FreeGen
+    //                                                                 ===================
+    protected void processApplicationFreeGen() {
+        final String freeSpace = "./freegen";
+        try {
+            final File freeGenDir = new File(freeSpace);
+            if (!freeGenDir.exists()) {
+                _log.info("*No freeGen space so skip application freeGen: path=" + freeSpace);
+                return;
+            }
+            templatePath = freeGenDir.getCanonicalPath();
+        } catch (IOException e) {
+            String msg = "Failed to set template path: " + freeSpace;
+            throw new IllegalStateException(msg, e);
+        }
+        final String control = CONTROL_FREEGEN_VM;
+        final String pathOfControl = freeSpace + "/" + control;
+        if (!new File(pathOfControl).exists()) {
+            _log.info("*No freeGen control vm so skip application freeGen: path=" + pathOfControl);
+            return;
+        }
+        _log.info("");
+        _log.info("* * * * * * * * * * * * * * * *");
+        _log.info("* Process Application FreeGen *");
+        _log.info("* * * * * * * * * * * * * * * *");
+        _log.info("...Using control: " + pathOfControl);
+        setControlTemplate(control); // from templatePath, so pure name here
+        fireVelocityProcess();
     }
 
     // ===================================================================================
@@ -128,8 +189,8 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
 
     protected VelocityContext createVelocityContext() {
         final DfVelocityContextFactory factory = createVelocityContextFactory();
-        final DfFreeGenManager freeGenManager = getFreeGenProperties().getFreeGenManager();
-        return factory.createAsFreeGen(freeGenManager, _freeGenRequestList);
+        final DfFreeGenManager manager = getFreeGenProperties().getFreeGenManager();
+        return factory.createAsFreeGen(manager, _freeGenRequestList);
     }
 
     // ===================================================================================

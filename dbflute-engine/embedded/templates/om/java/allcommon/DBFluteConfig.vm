@@ -59,8 +59,8 @@ import org.seasar.framework.exception.SQLRuntimeException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 #end
 #if ($database.isTargetContainerLastaDi())
-import org.dbflute.lasta.jta.dbcp.ConnectionWrapper;
-import org.dbflute.lasta.di.exception.SQLRuntimeException;
+import org.lastaflute.jta.dbcp.ConnectionWrapper;
+import org.lastaflute.di.exception.SQLRuntimeException;
 #end
 
 /**
@@ -116,7 +116,6 @@ public class ${glDBFluteConfig} {
     protected PhysicalConnectionDigger _physicalConnectionDigger;
     protected SQLExceptionDigger _sqlExceptionDigger;
     protected String _outsideSqlPackage = ${database.outsideSqlPackageExp};
-    protected boolean _useSqlLogRegistry = ${database.isSqlLogRegistryValid()};
     protected MappingDateTimeZoneProvider _mappingDateTimeZoneProvider;
 
     // extension
@@ -654,22 +653,6 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting outsideSqlPackage: " + outsideSqlPackage);
         }
         _outsideSqlPackage = outsideSqlPackage;
-    }
-
-    // [DBFlute-0.8.2]
-    // ===================================================================================
-    //                                                                    SQL Log Registry
-    //                                                                    ================
-    public boolean isUseSqlLogRegistry() {
-        return _useSqlLogRegistry;
-    }
-
-    public void setUseSqlLogRegistry(boolean useSqlLogRegistry) {
-        assertUnlocked();
-        if (_log.isInfoEnabled()) {
-            _log.info("...Setting useSqlLogRegistry: " + useSqlLogRegistry);
-        }
-        _useSqlLogRegistry = useSqlLogRegistry;
     }
 
     // [DBFlute-1.1.0]

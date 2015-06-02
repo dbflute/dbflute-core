@@ -10,7 +10,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlLog} {
         // ===============================================================================
         //                                                                      Definition
         //                                                                      ==========
-        private static readonly int DEFAULT_LIMIT_SIZE = ${database.sqlLogRegistryLimitSize};
+        private static readonly int DEFAULT_LIMIT_SIZE = 3;
 
         // ===============================================================================
         //                                                                       Attribute

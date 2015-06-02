@@ -16,11 +16,17 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.dream.SpecifiedColumn;
+import org.dbflute.dbmeta.DBMeta;
 
 /**
  * @author jflute
  */
 public interface HpColumnSpHandler {
+
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    DBMeta asDBMeta();
 
     // ===================================================================================
     //                                                                Column Specification
@@ -44,7 +50,7 @@ public interface HpColumnSpHandler {
     boolean isSpecifiedEveryColumn();
 
     /**
-     * Specify columns except record meta columns. <br>
+     * Specify columns except record meta columns. e.g. commonColumn, versionNo <br>
      * You cannot use normal SpecifyColumn with this method. <br>
      * <p>Basically you don't need this when BatchUpdate
      * because record meta columns are automatically controlled.</p>

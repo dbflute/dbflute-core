@@ -35,7 +35,6 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor.
      * @param prop Properties. (NotNull)
      */
     public DfOptimisticLockProperties(Properties prop) {
@@ -45,16 +44,23 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
     // ===================================================================================
     //                                                      Optimistic Lock Definition Map
     //                                                      ==============================
-    public static final String KEY_optimisticLockDefinitionMap = "optimisticLockDefinitionMap";
-    protected Map<String, Object> _optimisticLockDefinitionMap;
+    public static final String KEY_optimisticLockMap = "optimisticLockMap";
+    public static final String KEY_oldOptimisticLockMap = "optimisticLockDefinitionMap";
+    protected Map<String, Object> _optimisticLockMap;
 
-    public Map<String, Object> getOptimisticLockDefinitionMap() {
-        if (_optimisticLockDefinitionMap == null) {
-            final Map<String, Object> map = mapProp("torque." + KEY_optimisticLockDefinitionMap, DEFAULT_EMPTY_MAP);
-            _optimisticLockDefinitionMap = newLinkedHashMap();
-            _optimisticLockDefinitionMap.putAll(map);
+    public Map<String, Object> getOptimisticLockMap() {
+        if (_optimisticLockMap == null) {
+            Map<String, Object> map = mapProp("torque." + KEY_optimisticLockMap, null);
+            if (map == null) {
+                map = getLittleAdjustmentProperties().getOptimisticLockFacadeMap(); // primary @since 1.1.0-sp3
+                if (map == null) {
+                    map = mapProp("torque." + KEY_oldOptimisticLockMap, DEFAULT_EMPTY_MAP); // for compatible
+                }
+            }
+            _optimisticLockMap = newLinkedHashMap();
+            _optimisticLockMap.putAll(map);
         }
-        return _optimisticLockDefinitionMap;
+        return _optimisticLockMap;
     }
 
     // -----------------------------------------------------
@@ -149,7 +155,7 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
     //                                                                     Property Helper
     //                                                                     ===============
     protected String getProperty(String key, String defaultValue) {
-        Map<String, Object> map = getOptimisticLockDefinitionMap();
+        Map<String, Object> map = getOptimisticLockMap();
         Object obj = map.get(key);
         if (obj != null) {
             if (!(obj instanceof String)) {
@@ -168,7 +174,7 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
     }
 
     protected boolean isProperty(String key, boolean defaultValue) {
-        Map<String, Object> map = getOptimisticLockDefinitionMap();
+        Map<String, Object> map = getOptimisticLockMap();
         Object obj = map.get(key);
         if (obj != null) {
             if (!(obj instanceof String)) {

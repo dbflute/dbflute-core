@@ -1,0 +1,39 @@
+##
+## Copyright 2014-2014 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+$manager.info("requestList: ${requestList.size()}")
+#foreach ($request in $requestList)
+#set ($tableMap = $request.tableMap)
+#if ($tableMap.isLastaFlute)
+$request.enableOutputDirectory()
+$manager.makeDirectory($request.generateDirPath)
+
+##
+## <<<  LastaFlute Gen  >>>
+##
+#if ($request.isOnlyOneTable())
+  #set ($table = $request.table)
+  $request.info("parse('${request.generateFilePath}')")
+  $generator.parse("om/java/plugin/lastaflute/${request.templatePath}", $request.generateFilePath, "", "")
+#else
+  #foreach ($table in $request.tableList)
+    #set ($path = "${request.buildGenerateDirHierarchyPath($table)}${table.className}.${request.fileExt}")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("om/java/plugin/lastaflute/${request.templatePath}", $path, "", "")
+  #end
+#end
+#end
+#end

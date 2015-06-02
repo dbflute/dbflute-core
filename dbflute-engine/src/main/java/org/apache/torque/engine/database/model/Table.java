@@ -1233,13 +1233,13 @@ public class Table {
      * And contains one-to-one table.
      * @return Foreign table as comma string.
      */
-    public String getForeignTableNameCommaString() {
+    public String getForeignTableNameCommaString() { // for display
         final StringBuilder sb = new StringBuilder();
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> foreignKeyList = getForeignKeyList();
         for (int i = 0; i < foreignKeyList.size(); i++) {
             final ForeignKey fk = foreignKeyList.get(i);
-            final String name = fk.getForeignTablePureName();
+            final String name = fk.getForeignTable().getTableDispName();
             if (tableSet.contains(name)) {
                 continue;
             }
@@ -1253,7 +1253,7 @@ public class Table {
             if (!referrer.isOneToOne()) {
                 continue;
             }
-            final String name = referrer.getTable().getTableDbName();
+            final String name = referrer.getTable().getTableDispName();
             if (tableSet.contains(name)) {
                 continue;
             }
@@ -1815,7 +1815,7 @@ public class Table {
     // -----------------------------------------------------
     //                                          Comma String
     //                                          ------------
-    public String getReferrerTableNameCommaString() {
+    public String getReferrerTableNameCommaString() { // for display
         final StringBuilder sb = new StringBuilder();
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> ls = getReferrerList();
@@ -1825,7 +1825,7 @@ public class Table {
             if (fk.isOneToOne()) {
                 continue;
             }
-            final String name = fk.getTable().getTableDbName();
+            final String name = fk.getTable().getTableDispName();
             if (tableSet.contains(name)) {
                 continue;
             }
@@ -1837,7 +1837,7 @@ public class Table {
             if (!fk.isOneToOne()) {
                 continue;
             }
-            final String name = fk.getTable().getTableDbName();
+            final String name = fk.getTable().getTableDispName();
             if (tableSet.contains(name)) {
                 continue;
             }
@@ -3539,21 +3539,31 @@ public class Table {
     //                                         Select Entity
     //                                         -------------
     public boolean isAvailableSelectEntityPlainReturn() {
-        return getLittleAdjustmentProperties().isAvailableSelectEntityPlainReturn();
+        return getLittleAdjustmentProperties().isAvailableSelectEntityPlainReturnTable(getTableDbName());
     }
 
     public String filterSelectEntityOptionalReturn(String entityType) {
-        final String optionalEntity = getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
-        return optionalEntity + getLanguageGrammar().buildGenericOneClassHint(entityType);
+        return getSelectEntityOptionalSimpleName() + getLanguageGrammar().buildGenericOneClassHint(entityType);
     }
 
     public String filterSelectEntityOptionalReturnIfNeeds(String entityType) {
+        return doFilterSelectEntityOptionalReturnIfNeeds(entityType);
+    }
+
+    protected String doFilterSelectEntityOptionalReturnIfNeeds(String entityType) {
         if (isAvailableSelectEntityPlainReturn()) {
             return entityType;
         } else {
-            final String optionalEntity = getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
-            return optionalEntity + getLanguageGrammar().buildGenericOneClassHint(entityType);
+            return filterSelectEntityOptionalReturn(entityType);
         }
+    }
+
+    public boolean isBasicOptionalEntityDBFluteEmbeddedClass() {
+        return getLittleAdjustmentProperties().isBasicOptionalEntityDBFluteEmbeddedClass();
+    }
+
+    public String getSelectEntityOptionalSimpleName() {
+        return getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
     }
 
     protected boolean isAvailableSelectEntityWithDeletedCheck() {
@@ -3575,11 +3585,14 @@ public class Table {
     }
 
     public String filterSelectByPKOptionalReturnIfNeeds(String entityType) {
+        return doFilterSelectByPKOptionalReturnIfNeeds(entityType);
+    }
+
+    protected String doFilterSelectByPKOptionalReturnIfNeeds(String entityType) {
         if (isCompatibleSelectByPKPlainReturn()) {
             return entityType;
         } else {
-            final String optionalEntity = getLittleAdjustmentProperties().getBasicOptionalEntitySimpleName();
-            return optionalEntity + getLanguageGrammar().buildGenericOneClassHint(entityType);
+            return filterSelectEntityOptionalReturn(entityType);
         }
     }
 

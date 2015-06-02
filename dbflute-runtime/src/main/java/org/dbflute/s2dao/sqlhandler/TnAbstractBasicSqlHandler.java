@@ -46,7 +46,6 @@ import org.dbflute.jdbc.ManualThreadDataSourceHandler;
 import org.dbflute.jdbc.NotClosingConnectionWrapper;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.jdbc.ValueType;
-import org.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.system.QLog;
@@ -193,41 +192,34 @@ public abstract class TnAbstractBasicSqlHandler {
         final boolean hasSqlFireHook = hasSqlFireHook();
         final boolean hasSqlLog = hasSqlLogHandler();
         final boolean hasSqlResult = hasSqlResultHandler();
-        final Object sqlLogRegistry = getSqlLogRegistry();
-        final boolean hasRegistry = sqlLogRegistry != null;
 
-        if (logEnabled || hasSqlFireHook || hasSqlLog || hasSqlResult || hasRegistry) {
+        if (logEnabled || hasSqlFireHook || hasSqlLog || hasSqlResult) {
             if (isInternalDebugEnabled()) {
-                final String determination =
-                        logEnabled + ", " + hasSqlFireHook + ", " + hasSqlLog + ", " + hasSqlResult + ", " + hasRegistry;
+                final String determination = logEnabled + ", " + hasSqlFireHook + ", " + hasSqlLog + ", " + hasSqlResult;
                 _log.debug("...Logging SQL by " + determination);
             }
-            if (processBeforeLogging(args, argTypes, logEnabled, hasSqlFireHook, hasSqlLog, hasSqlResult, sqlLogRegistry)) {
+            if (processBeforeLogging(args, argTypes, logEnabled, hasSqlFireHook, hasSqlLog, hasSqlResult)) {
                 return; // processed by anyone
             }
-            doLogSql(args, argTypes, logEnabled, hasSqlFireHook, hasSqlLog, hasSqlResult, sqlLogRegistry);
+            doLogSql(args, argTypes, logEnabled, hasSqlFireHook, hasSqlLog, hasSqlResult);
         }
     }
 
     protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlFireHook,
-            boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
+            boolean hasSqlLog, boolean hasSqlResult) {
         return false;
     }
 
     protected void doLogSql(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlFireHook, boolean hasSqlLog,
-            boolean hasSqlResult, Object sqlLogRegistry) {
-        final boolean hasRegistry = sqlLogRegistry != null;
+            boolean hasSqlResult) {
         final String firstDisplaySql;
-        if (logEnabled || hasRegistry) { // build at once
+        if (logEnabled) { // build at once
             if (isInternalDebugEnabled()) {
-                _log.debug("...Building DisplaySql by " + logEnabled + ", " + hasRegistry);
+                _log.debug("...Building DisplaySql by " + logEnabled);
             }
             firstDisplaySql = buildDisplaySql(_sql, args);
             if (logEnabled) {
                 logDisplaySql(firstDisplaySql);
-            }
-            if (hasRegistry) { // S2Container provides
-                pushToSqlLogRegistry(args, argTypes, firstDisplaySql, sqlLogRegistry);
             }
         } else {
             firstDisplaySql = null;
@@ -343,22 +335,18 @@ public abstract class TnAbstractBasicSqlHandler {
 
     protected SqlLogDisplaySqlBuilder createSqlLogDisplaySqlBuilder(final String alreadyBuiltDisplaySql) {
         if (alreadyBuiltDisplaySql != null) {
-            return new SqlLogDisplaySqlBuilder() {
-                public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
-                    if (isInternalDebugEnabled()) {
-                        _log.debug("...Returning DisplaySql, already built");
-                    }
-                    return alreadyBuiltDisplaySql;
+            return (executedSql, bindArgs, bindArgTypes) -> {
+                if (isInternalDebugEnabled()) {
+                    _log.debug("...Returning DisplaySql, already built");
                 }
+                return alreadyBuiltDisplaySql;
             };
         } else {
-            return new SqlLogDisplaySqlBuilder() {
-                public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
-                    if (isInternalDebugEnabled()) {
-                        _log.debug("...Building DisplaySql lazily");
-                    }
-                    return buildDisplaySql(executedSql, bindArgs);
+            return (executedSql, bindArgs, bindArgTypes) -> {
+                if (isInternalDebugEnabled()) {
+                    _log.debug("...Building DisplaySql lazily");
                 }
+                return buildDisplaySql(executedSql, bindArgs);
             };
         }
     }
@@ -379,18 +367,6 @@ public abstract class TnAbstractBasicSqlHandler {
 
     protected void saveResultSqlLogInfo(SqlLogInfo sqlLogInfo) {
         InternalMapContext.setResultSqlLogInfo(sqlLogInfo);
-    }
-
-    // -----------------------------------------------------
-    //                                        SqlLogRegistry
-    //                                        --------------
-    protected Object getSqlLogRegistry() { // S2Container provides
-        // find by reflection so you should determine existence by null
-        return TnSqlLogRegistry.findContainerSqlLogRegistry();
-    }
-
-    protected void pushToSqlLogRegistry(Object[] args, Class<?>[] argTypes, String firstDisplaySql, Object sqlLogRegistry) {
-        TnSqlLogRegistry.push(_sql, firstDisplaySql, args, argTypes, sqlLogRegistry);
     }
 
     // ===================================================================================

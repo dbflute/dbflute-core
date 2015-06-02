@@ -98,7 +98,12 @@ public class DfPropHtmlManager {
         for (Entry<String, String> envEntry : environmentMap.entrySet()) {
             final String envType = envEntry.getKey();
             final String envDir = envEntry.getValue();
-            final String envFile = envDir + "/" + standardPureFileName;
+            final String envFile;
+            if (envDir.endsWith(".properties")) { // file name specified
+                envFile = envDir;
+            } else {
+                envFile = envDir + "/" + standardPureFileName;
+            }
             setupEnvironmentProperty(request, envFile, envType, defaultEnvMap);
         }
         return request;

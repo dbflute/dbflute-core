@@ -25,12 +25,12 @@ package org.dbflute.infra;
  * https://github.com/dbflute
  * 
  * [HashTag in SourceCode]
- * hope     : expects future implementation
- * forNow   : pending deep implementation
- * needsFix : needs fix, refactoring or formal implementation
+ * hope      : expects future implementation
+ * for_now   : pending deep implementation
+ * needs_fix : needs fix, refactoring or formal implementation
  * 
- * extPoint   : extension point for users
- * dateParade : handling point of (many) date types e.g. LocalDate
+ * ext_point   : extension point for users
+ * date_parade : handling point of (many) date types e.g. LocalDate
  * </pre>
  * @author jflute
  * @since 1.1.0 (2014/10/18 Saturday)

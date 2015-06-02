@@ -35,7 +35,7 @@ import java.util.Properties;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.dbflute.DfBuildProperties;
@@ -44,9 +44,9 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.properties.DfBasicProperties;
 
 /**
- * The Velocity generator for DBFlute.
+ * The generator for DBFlute using Velocity.
  * @author modified by taktos (originated in Velocity)
- * @author modified by jflute
+ * @author modified by jflute (originated in Velocity)
  * @since 0.7.6 (2008/07/01 Tuesday)
  */
 public class DfFlutistGenerator extends DfGenerator {
@@ -54,96 +54,30 @@ public class DfFlutistGenerator extends DfGenerator {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /**
-     * The generator tools used for creating additional
-     * output withing the control template. This could
-     * use some cleaning up.
-     */
-    private static final DfFlutistGenerator instance = new DfFlutistGenerator();
-
-    /**
-     * Where the texen output will placed.
-     */
     public static final String OUTPUT_PATH = "output.path";
-
-    /**
-     * Where the velocity templates live.
-     */
     public static final String TEMPLATE_PATH = "template.path";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /**
-     * Default properties used by texen.
-     */
-    private Properties props = new Properties();
-
-    /**
-     * Context used for generating the texen output.
-     */
-    private Context controlContext;
-
-    /**
-     * Keep track of the file writers used for outputting
-     * to files. If we come across a file writer more
-     * then once then the additional output will be
-     * appended to the file instead of overwritting
-     * the contents.
-     */
-    private Hashtable<String, Writer> writers = new Hashtable<String, Writer>();
-
-    /**
-     * This is the encoding for the output file(s).
-     */
+    protected final Properties props = new Properties();
+    protected Context controlContext;
+    protected final Hashtable<String, Writer> writers = new Hashtable<String, Writer>();
     protected String outputEncoding;
-
-    /**
-     * This is the encoding for the input file(s)
-     * (templates).
-     */
     protected String inputEncoding;
+    protected final List<String> parseFileNameList = new ArrayList<String>(); // *extension
+    protected final List<String> skipFileNameList = new ArrayList<String>(); // *extension
 
-    /**
-     * The list of file name parsed. {DBFlute Original Attribute}
-     */
-    protected List<String> parseFileNameList = new ArrayList<String>();// [Extension]
-
-    /**
-     * The list of file name skipped. {DBFlute Original Attribute}
-     */
-    protected List<String> skipFileNameList = new ArrayList<String>();// [Extension]
+    /** The engine instance of velocity. (NotNull: after initialization, Overridden: when initialization) */
+    protected VelocityEngine velocityEngine;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Default constructor.
-     */
-    private DfFlutistGenerator() {
+    public DfFlutistGenerator() {
         setDefaultProps();
     }
 
-    /**
-     * Create a new generator object with default properties.
-     * @return Generator generator used in the control context.
-     */
-    public static DfFlutistGenerator getInstance() {
-        return instance;
-    }
-
-    /**
-     * Create a new Generator object with a given property
-     * set. The property set will be duplicated.
-     * @param props properties object to help populate the control context.
-     */
-    public DfFlutistGenerator(Properties props) {
-        this.props = (Properties) props.clone();
-    }
-
-    /**
-     * Set default properties.
-     */
     protected void setDefaultProps() {
         props.put("path.output", "output");
         props.put("context.objects.strings", "org.apache.velocity.util.StringUtils");
@@ -152,14 +86,69 @@ public class DfFlutistGenerator extends DfGenerator {
     }
 
     // ===================================================================================
-    //                                                                               Parse
-    //                                                                               =====
+    //                                                                      Prepare Engine
+    //                                                                      ==============
+    public void initializeEngine() {
+        velocityEngine = new VelocityEngine();
+    }
+
+    protected void initializeEngineIfNeeds() {
+        if (velocityEngine == null) {
+            initializeEngine();
+        }
+    }
+
+    public void addProperty(String key, String value) {
+        initializeEngineIfNeeds();
+        velocityEngine.addProperty(key, value);
+    }
+
+    public void setProperty(String key, String value) {
+        initializeEngineIfNeeds();
+        velocityEngine.setProperty(key, value);
+    }
+
+    public VelocityEngine getVelocityEngine() {
+        initializeEngineIfNeeds();
+        return velocityEngine;
+    }
+
+    // ===================================================================================
+    //                                                                     Engine Resource
+    //                                                                     ===============
+    public void setOutputPath(String outputPath) {
+        props.put(OUTPUT_PATH, outputPath);
+    }
+
+    public String getOutputPath() {
+        return props.getProperty(OUTPUT_PATH);
+    }
+
+    public void setTemplatePath(String templatePath) {
+        props.put(TEMPLATE_PATH, templatePath);
+    }
+
+    public String getTemplatePath() {
+        return props.getProperty(TEMPLATE_PATH);
+    }
+
+    public void setOutputEncoding(String outputEncoding) {
+        this.outputEncoding = outputEncoding;
+    }
+
+    public void setInputEncoding(String inputEncoding) {
+        this.inputEncoding = inputEncoding;
+    }
+
+    // ===================================================================================
+    //                                                                      Parse Template
+    //                                                                      ==============
     /**
      * Parse an input and write the output to an output file.  If the
      * output file parameter is null or an empty string the result is
      * returned as a string object.  Otherwise an empty string is returned.
      * @param inputTemplate input template
-     * @param outputFile output file (NullAllowed: If you use as nested parsing, you should set null about this.)
+     * @param outputFile output file (NullAllowed: if you use as nested parsing, you should set null about this)
      */
     public String parse(String inputTemplate, String outputFile) throws Exception {
         return parse(inputTemplate, outputFile, null, null);
@@ -171,7 +160,7 @@ public class DfFlutistGenerator extends DfGenerator {
      * returned as a string object.  Otherwise an empty string is returned.
      * You can add objects to the context with the objs Hashtable.
      * @param inputTemplate input template
-     * @param outputFile output file. (NullAllowed: If you use as nested parsing, you should set null about this.)
+     * @param outputFile output file. (NullAllowed: if you use as nested parsing, you should set null about this)
      * @param objectID id for object to be placed in the control context
      * @param object object to be placed in the context
      * @return String generated output from velocity
@@ -187,7 +176,7 @@ public class DfFlutistGenerator extends DfGenerator {
      * You can add objects to the context with the objs Hashtable.
      * @param inputTemplate input template
      * @param specifiedInputEncoding inputEncoding template encoding
-     * @param outputFile output file (NullAllowed: If you use as nested parsing, you should set null about this.)
+     * @param outputFile output file (NullAllowed: if you use as nested parsing, you should set null about this)
      * @param specifiedOutputEncoding outputEncoding encoding of output file
      * @param objectID id for object to be placed in the control context
      * @param object object to be placed in the context
@@ -302,42 +291,23 @@ public class DfFlutistGenerator extends DfGenerator {
         }
     }
 
-    /**
-     * Parse the control template and merge it with the control
-     * context. This is the starting point in texen.
-     * @param controlTemplate control template
-     * @param controlContext control context
-     * @return String generated output
-     */
     public String parse(String controlTemplate, Context controlContext) throws Exception {
         this.controlContext = controlContext;
         fillContextDefaults(this.controlContext);
         fillContextProperties(this.controlContext);
 
-        Template template = getTemplate(controlTemplate, inputEncoding);
-        StringWriter sw = new StringWriter();
+        final Template template = getTemplate(controlTemplate, inputEncoding);
+        final StringWriter sw = new StringWriter();
         template.merge(controlContext, sw);
 
         return sw.toString();
     }
 
-    /**
-     * Create a new context and fill it with the elements of the
-     * objs Hashtable.  Default objects and objects that comes from
-     * the properties of this Generator object is also added.
-     * @param objs objects to place in the control context
-     * @return Context context filled with objects
-     */
     protected Context getContext(Hashtable<?, ?> objs) {
         fillContextHash(controlContext, objs);
         return controlContext;
     }
 
-    /**
-     * Add all the contents of a Hashtable to the context.
-     * @param context context to fill with objects
-     * @param objs source of objects
-     */
     protected void fillContextHash(Context context, Hashtable<?, ?> objs) {
         Enumeration<?> enu = objs.keys();
         while (enu.hasMoreElements()) {
@@ -346,52 +316,32 @@ public class DfFlutistGenerator extends DfGenerator {
         }
     }
 
-    /**
-     * Add properties that will aways be in the context by default
-     * @param context control context to fill with default values.
-     */
     protected void fillContextDefaults(Context context) {
-        context.put("generator", instance);
+        context.put("generator", this);
         context.put("outputDirectory", getOutputPath());
     }
 
-    /**
-     * Add objects to the context from the current properties.
-     * @param context control context to fill with objects
-     *                that are specified in the default.properties
-     *                file
-     */
     protected void fillContextProperties(Context context) {
-        Enumeration<?> enu = props.propertyNames();
-
+        final Enumeration<?> enu = props.propertyNames();
         while (enu.hasMoreElements()) {
-            String nm = (String) enu.nextElement();
+            final String nm = (String) enu.nextElement();
             if (nm.startsWith("context.objects.")) {
-
-                String contextObj = props.getProperty(nm);
-                int colon = nm.lastIndexOf('.');
-                String contextName = nm.substring(colon + 1);
-
+                final String contextObj = props.getProperty(nm);
+                final int colon = nm.lastIndexOf('.');
+                final String contextName = nm.substring(colon + 1);
                 try {
-                    Class<?> cls = Class.forName(contextObj);
-                    Object o = cls.newInstance();
+                    final Class<?> cls = Class.forName(contextObj);
+                    final Object o = cls.newInstance();
                     context.put(contextName, o);
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    //TO DO: Log Something Here
+                    throw new IllegalStateException("Failed to create the instance: " + contextObj, e);
                 }
             }
         }
     }
 
-    /**
-     * Properly shut down the generator, right now
-     * this is simply flushing and closing the file
-     * writers that we have been holding on to.
-     */
     public void shutdown() {
-        Iterator<Writer> iterator = writers.values().iterator();
-
+        final Iterator<Writer> iterator = writers.values().iterator();
         while (iterator.hasNext()) {
             Writer writer = (Writer) iterator.next();
             try {
@@ -405,11 +355,25 @@ public class DfFlutistGenerator extends DfGenerator {
         writers.clear();
     }
 
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String ln() {
-        return "\n";
+    public Writer getWriter(String path, String encoding) throws Exception {
+        Writer writer;
+        if (encoding == null || encoding.length() == 0 || encoding.equals("8859-1") || encoding.equals("8859_1")) {
+            writer = new FileWriter(path);
+        } else {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), encoding));
+        }
+        return writer;
+    }
+
+    public Template getTemplate(String templateName, String encoding) throws Exception {
+        initializeEngineIfNeeds();
+        final Template template;
+        if (encoding == null || encoding.length() == 0 || encoding.equals("8859-1") || encoding.equals("8859_1")) {
+            template = velocityEngine.getTemplate(templateName);
+        } else {
+            template = velocityEngine.getTemplate(templateName, encoding);
+        }
+        return template;
     }
 
     // ===================================================================================
@@ -454,106 +418,19 @@ public class DfFlutistGenerator extends DfGenerator {
         return new FileInputStream(file);
     }
 
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    /**
-     * Set the template path, where Texen will look
-     * for Velocity templates.
-     *
-     * @param templatePath template path for velocity templates.
-     */
-    public void setTemplatePath(String templatePath) {
-        props.put(TEMPLATE_PATH, templatePath);
-    }
-
-    /**
-     * Get the template path.
-     *
-     * @return String template path for velocity templates.
-     */
-    public String getTemplatePath() {
-        return props.getProperty(TEMPLATE_PATH);
-    }
-
-    /**
-     * Set the output path for the generated
-     * output.
-     * @param outputPath output path for texen output.
-     */
-    public void setOutputPath(String outputPath) {
-        props.put(OUTPUT_PATH, outputPath);
-    }
-
-    /**
-     * Get the output path for the generated
-     * output.
-     *
-     * @return String output path for texen output.
-     */
-    public String getOutputPath() {
-        return props.getProperty(OUTPUT_PATH);
-    }
-
-    /**
-     * Set the output encoding.
-     */
-    public void setOutputEncoding(String outputEncoding) {
-        this.outputEncoding = outputEncoding;
-    }
-
-    /**
-     * Set the input (template) encoding.
-     * @param inputEncoding Input encoding
-     */
-    public void setInputEncoding(String inputEncoding) {
-        this.inputEncoding = inputEncoding;
-    }
-
-    /**
-     * Returns a writer, based on encoding and path.
-     * @param path      path to the output file
-     * @param encoding  output encoding
-     */
-    public Writer getWriter(String path, String encoding) throws Exception {
-        Writer writer;
-        if (encoding == null || encoding.length() == 0 || encoding.equals("8859-1") || encoding.equals("8859_1")) {
-            writer = new FileWriter(path);
-        } else {
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), encoding));
-        }
-        return writer;
-    }
-
-    /**
-     * Returns a template, based on encoding and path.
-     * @param templateName  name of the template
-     * @param encoding      template encoding
-     */
-    public Template getTemplate(String templateName, String encoding) throws Exception {
-        Template template;
-        if (encoding == null || encoding.length() == 0 || encoding.equals("8859-1") || encoding.equals("8859_1")) {
-            template = Velocity.getTemplate(templateName);
-        } else {
-            template = Velocity.getTemplate(templateName, encoding);
-        }
-        return template;
-    }
-
     public List<String> getParseFileNameList() {
         return parseFileNameList;
-    }
-
-    public void setParseFileNameList(List<String> parseFileNameList) {
-        this.parseFileNameList = parseFileNameList;
     }
 
     public List<String> getSkipFileNameList() {
         return skipFileNameList;
     }
 
-    public void setSkipFileNameList(List<String> skipFileNameList) {
-        this.skipFileNameList = skipFileNameList;
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return "\n";
     }
 
     // ===================================================================================

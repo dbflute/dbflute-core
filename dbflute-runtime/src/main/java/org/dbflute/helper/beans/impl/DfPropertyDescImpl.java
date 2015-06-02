@@ -20,6 +20,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.dbflute.helper.beans.DfBeanDesc;
 import org.dbflute.helper.beans.DfPropertyDesc;
@@ -121,7 +124,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
 
     public final Class<?> getGenericType() {
         if (_readMethod != null) {
-            return DfReflectionUtil.getGenericType(_readMethod.getGenericReturnType());
+            return DfReflectionUtil.getGenericFirstClass(_readMethod.getGenericReturnType());
         }
         return null;
     }
@@ -177,9 +180,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     // ===================================================================================
     //                                                                               Value
     //                                                                               =====
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public final Object getValue(Object target) {
         if (!_readable) {
             throwPropertyNotReadableException(target);
@@ -218,9 +219,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
         throw new DfBeanIllegalPropertyException(msg, e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public final void setValue(Object target, Object value) {
         if (!_writable) {
             throwPropertyNotWritableException(target, value);
@@ -298,13 +297,21 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     // ===================================================================================
     //                                                                             Convert
     //                                                                             =======
-    public Object convertIfNeed(Object arg) {
+    public Object convertIfNeed(Object arg) { // #date_parade
         if (_propertyType.isPrimitive()) {
             return convertPrimitiveWrapper(arg);
         } else if (Number.class.isAssignableFrom(_propertyType)) {
             return convertNumber(arg);
         } else if (java.util.Date.class.isAssignableFrom(_propertyType)) {
             return convertDate(arg);
+        } else if (LocalDate.class.isAssignableFrom(_propertyType)) {
+            return DfTypeUtil.toLocalDate(arg);
+        } else if (LocalDate.class.isAssignableFrom(_propertyType)) {
+            return DfTypeUtil.toLocalDate(arg);
+        } else if (LocalDateTime.class.isAssignableFrom(_propertyType)) {
+            return DfTypeUtil.toLocalDateTime(arg);
+        } else if (LocalTime.class.isAssignableFrom(_propertyType)) {
+            return DfTypeUtil.toLocalTime(arg);
         } else if (Boolean.class.isAssignableFrom(_propertyType)) {
             return DfTypeUtil.toBoolean(arg);
         } else if (arg != null && arg.getClass() != String.class && String.class == _propertyType) {
@@ -353,15 +360,13 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     //                                                                      ==============
     @Override
     public final String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("propertyName=");
-        buf.append(_propertyName);
-        buf.append(",propertyType=");
-        buf.append(_propertyType.getName());
-        buf.append(",readMethod=");
-        buf.append(_readMethod != null ? _readMethod.getName() : "null");
-        buf.append(",writeMethod=");
-        buf.append(_writeMethod != null ? _writeMethod.getName() : "null");
-        return buf.toString();
+        final StringBuilder sb = new StringBuilder();
+        sb.append("property:{");
+        sb.append(_propertyName);
+        sb.append(", ").append(_propertyType.getName());
+        sb.append(", reader=").append(_readMethod != null ? _readMethod.getName() : null);
+        sb.append(", writer=").append(_writeMethod != null ? _writeMethod.getName() : null);
+        sb.append("}@").append(Integer.toHexString(hashCode()));
+        return sb.toString();
     }
 }

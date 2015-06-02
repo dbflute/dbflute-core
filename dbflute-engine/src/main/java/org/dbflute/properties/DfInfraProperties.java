@@ -41,7 +41,10 @@ public final class DfInfraProperties extends DfAbstractHelperProperties {
 
     protected Map<String, Object> getInfraDefinitionMap() {
         if (infraDefinitionMap == null) {
-            final Map<String, Object> map = mapProp("torque.infraDefinitionMap", DEFAULT_EMPTY_MAP);
+            Map<String, Object> map = mapProp("torque.infraMap", null);
+            if (map == null) {
+                map = mapProp("torque.infraDefinitionMap", DEFAULT_EMPTY_MAP);
+            }
             infraDefinitionMap = newLinkedHashMap();
             infraDefinitionMap.putAll(map);
         }

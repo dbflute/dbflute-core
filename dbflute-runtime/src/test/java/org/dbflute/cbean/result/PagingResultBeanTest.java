@@ -57,7 +57,7 @@ public class PagingResultBeanTest extends RuntimeTestCase {
         PagingResultBean<String> page = createTarget(4, 3, 20);
 
         // ## Act ##
-        int prePageNumber = page.getPrePageNumber();
+        int prePageNumber = page.getPreviousPageNumber();
 
         // ## Assert ##
         assertEquals(2, prePageNumber);
@@ -69,7 +69,7 @@ public class PagingResultBeanTest extends RuntimeTestCase {
 
         // ## Act ##
         try {
-            int prePageNumber = page.getPrePageNumber();
+            int prePageNumber = page.getPreviousPageNumber();
 
             // ## Assert ##
             fail("prePageNumber=" + prePageNumber);
@@ -217,7 +217,7 @@ public class PagingResultBeanTest extends RuntimeTestCase {
         PagingResultBean<String> page = createTarget(4, 4, 20);
 
         // ## Act ##
-        int pageNumber = page.pageGroup(op -> op.groupSize(3)).getPreGroupNearestPageNumber();
+        int pageNumber = page.pageGroup(op -> op.groupSize(3)).getPreviousGroupNearestPageNumber();
 
         // ## Assert ##
         assertEquals(3, pageNumber);
@@ -229,7 +229,7 @@ public class PagingResultBeanTest extends RuntimeTestCase {
 
         // ## Act ##
         try {
-            int pageNumber = page.pageGroup(op -> op.groupSize(3)).getPreGroupNearestPageNumber();
+            int pageNumber = page.pageGroup(op -> op.groupSize(3)).getPreviousGroupNearestPageNumber();
 
             // ## Assert ##
             fail("pageNumber=" + pageNumber);
@@ -357,7 +357,7 @@ public class PagingResultBeanTest extends RuntimeTestCase {
         PagingResultBean<String> page = createTarget(4, 8, 40);
 
         // ## Act ##
-        int pageNumber = page.pageRange(op -> op.rangeSize(3)).getPreRangeNearestPageNumber();
+        int pageNumber = page.pageRange(op -> op.rangeSize(3)).getPreviousRangeNearestPageNumber();
 
         // ## Assert ##
         assertEquals(4, pageNumber);
@@ -369,7 +369,7 @@ public class PagingResultBeanTest extends RuntimeTestCase {
 
         // ## Act ##
         try {
-            int pageNumber = page.pageRange(op -> op.rangeSize(3)).getPreRangeNearestPageNumber();
+            int pageNumber = page.pageRange(op -> op.rangeSize(3)).getPreviousRangeNearestPageNumber();
 
             // ## Assert ##
             fail("pageNumber=" + pageNumber);
@@ -404,6 +404,30 @@ public class PagingResultBeanTest extends RuntimeTestCase {
             // OK
             log(e.getMessage());
         }
+    }
+
+    // ===================================================================================
+    //                                                                       New Only Call
+    //                                                                       =============
+    public void test_getCurrentEndRecordNumber_basic() throws Exception {
+        // ## Arrange ##
+        PagingResultBean<String> bean = new PagingResultBean<String>();
+
+        // ## Act ##
+        // ## Assert ##
+        assertEquals(1, bean.getCurrentStartRecordNumber());
+        assertEquals(1, bean.getCurrentEndRecordNumber());
+
+        bean.setPageSize(3);
+        bean.setCurrentPageNumber(1);
+
+        assertEquals(1, bean.getCurrentStartRecordNumber());
+        assertEquals(1, bean.getCurrentEndRecordNumber());
+
+        bean.setSelectedList(newArrayList("sea", "land"));
+
+        assertEquals(1, bean.getCurrentStartRecordNumber());
+        assertEquals(2, bean.getCurrentEndRecordNumber());
     }
 
     // ===================================================================================

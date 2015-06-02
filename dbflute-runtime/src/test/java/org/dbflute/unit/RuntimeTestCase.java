@@ -457,6 +457,47 @@ public abstract class RuntimeTestCase extends TestCase {
     }
 
     // -----------------------------------------------------
+    //                                             Exception
+    //                                             ---------
+    /**
+     * Assert that the callback throws the exception.
+     * <pre>
+     * String str = null;
+     * assertException(NullPointerException.class, () <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> str.toString());
+     * </pre>
+     * @param exceptionType The expected exception type. (NotNull) 
+     * @param noArgInLambda The callback for calling methods that should throw the exception. (NotNull)
+     */
+    protected void assertException(Class<?> exceptionType, ExceptionExaminer noArgInLambda) {
+        assertNotNull(exceptionType);
+        boolean noThrow = false;
+        try {
+            noArgInLambda.examine();
+            noThrow = true;
+        } catch (Throwable cause) {
+            final Class<? extends Throwable> causeClass = cause.getClass();
+            final String msg = cause.getMessage();
+            final String exp = (msg != null && msg.contains(ln()) ? ln() : "") + msg;
+            if (!exceptionType.isAssignableFrom(causeClass)) {
+                fail("expected: " + exceptionType.getSimpleName() + " but: " + causeClass.getSimpleName() + " => " + exp);
+            }
+            log("expected: " + exp);
+        }
+        if (noThrow) {
+            fail("expected: " + exceptionType.getSimpleName() + " but: no exception");
+        }
+    }
+
+    @FunctionalInterface
+    public interface ExceptionExaminer {
+
+        /**
+         * Examine the process, should throw the specified exception.
+         */
+        void examine();
+    }
+
+    // -----------------------------------------------------
     //                                             Mark Here
     //                                             ---------
     /**

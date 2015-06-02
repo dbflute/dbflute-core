@@ -15,6 +15,7 @@
  */
 package org.dbflute.util;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -256,6 +257,20 @@ public class DfCollectionUtil {
         }
         movedList.addAll(last);
         return movedList;
+    }
+
+    // -----------------------------------------------------
+    //                                                 Array
+    //                                                 -----
+    public static <ELEMENT> List<ELEMENT> toListFromArray(Object ary) {
+        final int len = Array.getLength(ary);
+        final List<ELEMENT> list = new ArrayList<ELEMENT>(len);
+        for (int i = 0; i < len; i++) {
+            @SuppressWarnings("unchecked")
+            final ELEMENT element = (ELEMENT) Array.get(ary, i);
+            list.add(element);
+        }
+        return list;
     }
 
     // ===================================================================================

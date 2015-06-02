@@ -41,12 +41,18 @@ public class SqlTokenizer {
     protected int _tokenType = SQL;
     protected int _nextTokenType = SQL;
     protected int _bindVariableNum = 0;
+    protected boolean _overlookNativeBinding; // treats question mark on SQL as binding
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public SqlTokenizer(String sql) {
         this._sql = sql;
+    }
+
+    public SqlTokenizer overlookNativeBinding() { // unused on DBFlute, for general purpose
+        _overlookNativeBinding = true;
+        return this;
     }
 
     // ===================================================================================
@@ -88,7 +94,8 @@ public class SqlTokenizer {
         if (0 < commentStartPos2 && commentStartPos2 < commentStartPos) {
             commentStartPos = commentStartPos2;
         }
-        int bindVariableStartPos = _sql.indexOf("?", _position);
+        // native binding is unused on DBFlute, check it later or overlook
+        final int bindVariableStartPos = !_overlookNativeBinding ? _sql.indexOf("?", _position) : -1;
         int elseCommentStartPos = -1;
         int elseCommentLength = -1;
         int elseCommentSearchCurrentPosition = _position;
@@ -114,19 +121,19 @@ public class SqlTokenizer {
             _nextTokenType = EOF;
             _position = _sql.length();
             _tokenType = SQL;
-        } else {
+        } else { // e.g. next is /**/ or native binding or else comment
             _token = _sql.substring(_position, nextStartPos);
             _tokenType = SQL;
             boolean needNext = nextStartPos == _position;
             if (nextStartPos == commentStartPos) {
                 _nextTokenType = COMMENT;
                 _position = commentStartPos + 2;
-            } else if (nextStartPos == elseCommentStartPos) {
-                _nextTokenType = ELSE;
-                _position = elseCommentStartPos + elseCommentLength;
             } else if (nextStartPos == bindVariableStartPos) {
                 _nextTokenType = BIND_VARIABLE;
                 _position = bindVariableStartPos;
+            } else if (nextStartPos == elseCommentStartPos) {
+                _nextTokenType = ELSE;
+                _position = elseCommentStartPos + elseCommentLength;
             }
             if (needNext) {
                 next();
@@ -146,10 +153,6 @@ public class SqlTokenizer {
             nextStartPos = elseCommentStartPos;
         }
         return nextStartPos;
-    }
-
-    protected String nextBindVariableName() {
-        return "$" + ++_bindVariableNum;
     }
 
     // ===================================================================================
@@ -195,6 +198,10 @@ public class SqlTokenizer {
         _nextTokenType = SQL;
         _position += 1;
         _tokenType = BIND_VARIABLE;
+    }
+
+    protected String nextBindVariableName() {
+        return "$" + ++_bindVariableNum;
     }
 
     protected void parseElse() {

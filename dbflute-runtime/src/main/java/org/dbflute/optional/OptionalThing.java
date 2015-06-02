@@ -27,6 +27,37 @@ import org.dbflute.exception.EntityAlreadyDeletedException;
 public interface OptionalThing<THING> {
 
     // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    // using as object
+    /**
+     * @param <EMPTY> The type of empty optional thing.
+     * @return The fixed instance as empty. (NotNull)
+     */
+    public static <EMPTY> OptionalThing<EMPTY> empty() {
+        return OptionalObject.empty();
+    }
+
+    /**
+     * @param <THING> The type of thing wrapped in the optional thing.
+     * @param object The wrapped thing which is optional. (NotNull)
+     * @return The new-created instance as existing optional thing. (NotNull)
+     */
+    public static <THING> OptionalThing<THING> of(THING object) {
+        return OptionalObject.of(object);
+    }
+
+    /**
+     * @param <THING> The type of thing wrapped in the optional thing.
+     * @param object The wrapped instance or thing. (NullAllowed)
+     * @param noArgLambda The callback for exception when illegal access. (NotNull)
+     * @return The new-created instance as existing or empty optional thing. (NotNull)
+     */
+    public static <THING> OptionalThing<THING> ofNullable(THING object, OptionalThingExceptionThrower noArgLambda) {
+        return OptionalObject.ofNullable(object, noArgLambda);
+    }
+
+    // ===================================================================================
     //                                                                   Standard Handling
     //                                                                   =================
     /**
@@ -52,14 +83,14 @@ public interface OptionalThing<THING> {
     THING get();
 
     /**
-     * Filter the object by the predicate.
+     * Filter the thing by the predicate.
      * @param oneArgLambda The callback to predicate whether the object is remained. (NotNull)
      * @return The filtered optional thing, might be empty. (NotNull)
      */
     OptionalThing<THING> filter(OptionalThingPredicate<THING> oneArgLambda);
 
     /**
-     * Apply the mapping of object to result object.
+     * Apply the mapping of thing to result thing.
      * @param <RESULT> The type of mapping result.
      * @param oneArgLambda The callback interface to apply, null return allowed as empty. (NotNull)
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
@@ -67,7 +98,7 @@ public interface OptionalThing<THING> {
     <RESULT> OptionalThing<RESULT> map(OptionalThingFunction<? super THING, ? extends RESULT> oneArgLambda);
 
     /**
-     * Apply the flat-mapping of object to result object.
+     * Apply the flat-mapping of thing to result thing.
      * @param <RESULT> The type of mapping result.
      * @param oneArgLambda The callback interface to apply, cannot return null. (NotNull)
      * @return The optional thing as mapped result. (NotNull, EmptyOptionalAllowed: if not present or callback returns null)
@@ -111,7 +142,7 @@ public interface OptionalThing<THING> {
     //                                                                   DBFlute Extension
     //                                                                   =================
     /**
-     * Handle the object in the optional thing or exception if not present.
+     * Handle the thing in the optional thing or exception if not present.
      * @param oneArgLambda The callback interface to consume the optional thing. (NotNull)
      * @throws EntityAlreadyDeletedException When the object instance wrapped in this optional thing is null, which means object has already been deleted (point is not found).
      */

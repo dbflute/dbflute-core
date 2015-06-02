@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * String Utility for Internal Programming of DBFlute.
@@ -773,14 +774,12 @@ public class Srl {
         if (keywords == null || keywords.length == 0) {
             return false;
         }
-        if (ignoreCase) {
-            str = str.toLowerCase();
-        }
+        final String filtered = ignoreCase ? str.toLowerCase() : str;
         for (String keyword : keywords) {
             if (ignoreCase) {
                 keyword = keyword != null ? keyword.toLowerCase() : null;
             }
-            if (keyword == null || !str.contains(keyword)) {
+            if (keyword == null || !filtered.contains(keyword)) {
                 return false;
             }
         }
@@ -800,14 +799,12 @@ public class Srl {
         if (keywords == null || keywords.length == 0) {
             return false;
         }
-        if (ignoreCase) {
-            str = str.toLowerCase();
-        }
+        final String filtered = ignoreCase ? str.toLowerCase() : str;
         for (String keyword : keywords) {
             if (ignoreCase) {
                 keyword = keyword != null ? keyword.toLowerCase() : null;
             }
-            if (keyword != null && str.contains(keyword)) {
+            if (keyword != null && filtered.contains(keyword)) {
                 return true;
             }
         }
@@ -827,10 +824,7 @@ public class Srl {
         if (keywords == null || keywords.length == 0) {
             return false;
         }
-        if (ignoreCase) {
-            str = str.toLowerCase();
-        }
-        String current = str;
+        String current = ignoreCase ? str.toLowerCase() : str;
         for (String keyword : keywords) {
             if (ignoreCase) {
                 keyword = keyword != null ? keyword.toLowerCase() : null;
@@ -1065,14 +1059,9 @@ public class Srl {
         if (prefixes == null || prefixes.length == 0) {
             return false;
         }
-        if (ignoreCase) {
-            str = str.toLowerCase();
-        }
+        final String filtered = ignoreCase ? str.toLowerCase() : str;
         for (String prefix : prefixes) {
-            if (ignoreCase) {
-                prefix = prefix != null ? prefix.toLowerCase() : null;
-            }
-            if (prefix != null && str.startsWith(prefix)) {
+            if (prefix != null && filtered.startsWith(ignoreCase ? prefix.toLowerCase() : prefix)) {
                 return true;
             }
         }
@@ -1095,14 +1084,9 @@ public class Srl {
         if (suffixes == null || suffixes.length == 0) {
             return false;
         }
-        if (ignoreCase) {
-            str = str.toLowerCase();
-        }
+        final String filtered = ignoreCase ? str.toLowerCase() : str;
         for (String suffix : suffixes) {
-            if (ignoreCase) {
-                suffix = suffix != null ? suffix.toLowerCase() : null;
-            }
-            if (suffix != null && str.endsWith(suffix)) {
+            if (suffix != null && filtered.endsWith(ignoreCase ? suffix.toLowerCase() : suffix)) {
                 return true;
             }
         }
@@ -1245,17 +1229,15 @@ public class Srl {
     protected static int doCount(String str, String element, boolean ignoreCase) {
         assertStringNotNull(str);
         assertElementNotNull(element);
+        String filteredStr = ignoreCase ? str.toLowerCase() : str;
+        final String filteredElement = ignoreCase ? element.toLowerCase() : element;
         int count = 0;
-        if (ignoreCase) {
-            str = str.toLowerCase();
-            element = element.toLowerCase();
-        }
         while (true) {
-            final int index = str.indexOf(element);
+            final int index = filteredStr.indexOf(filteredElement);
             if (index < 0) {
                 break;
             }
-            str = str.substring(index + element.length());
+            filteredStr = filteredStr.substring(index + filteredElement.length());
             ++count;
         }
         return count;
@@ -1347,50 +1329,32 @@ public class Srl {
 
     public static String connectPrefix(String str, String prefix, String delimiter) {
         assertStringNotNull(str);
-        if (is_NotNull_and_NotTrimmedEmpty(prefix)) {
-            return prefix + delimiter + str;
-        }
-        return str;
+        return is_NotNull_and_NotTrimmedEmpty(prefix) ? prefix + delimiter + str : str;
     }
 
     public static String connectSuffix(String str, String suffix, String delimiter) {
         assertStringNotNull(str);
-        if (is_NotNull_and_NotTrimmedEmpty(suffix)) {
-            return str + delimiter + suffix;
-        }
-        return str;
+        return is_NotNull_and_NotTrimmedEmpty(suffix) ? str + delimiter + suffix : str;
     }
 
     public static String removePrefix(String str, String prefix) {
         assertStringNotNull(str);
-        if (startsWith(str, prefix)) {
-            return substringFirstRear(str, prefix);
-        }
-        return str;
+        return startsWith(str, prefix) ? substringFirstRear(str, prefix) : str;
     }
 
     public static String removePrefixIgnoreCase(String str, String prefix) {
         assertStringNotNull(str);
-        if (startsWithIgnoreCase(str, prefix)) {
-            return substringFirstRearIgnoreCase(str, prefix);
-        }
-        return str;
+        return startsWithIgnoreCase(str, prefix) ? substringFirstRearIgnoreCase(str, prefix) : str;
     }
 
     public static String removeSuffix(String str, String suffix) {
         assertStringNotNull(str);
-        if (endsWith(str, suffix)) {
-            return substringLastFront(str, suffix);
-        }
-        return str;
+        return endsWith(str, suffix) ? substringLastFront(str, suffix) : str;
     }
 
     public static String removeSuffixIgnoreCase(String str, String suffix) {
         assertStringNotNull(str);
-        if (endsWithIgnoreCase(str, suffix)) {
-            return substringLastFrontIgnoreCase(str, suffix);
-        }
-        return str;
+        return endsWithIgnoreCase(str, suffix) ? substringLastFrontIgnoreCase(str, suffix) : str;
     }
 
     // ===================================================================================
@@ -1491,8 +1455,8 @@ public class Srl {
         if (!isQuotedAnything(str, beginMark, endMark)) {
             return str;
         }
-        str = Srl.substring(str, beginMark.length());
-        str = Srl.substring(str, 0, str.length() - endMark.length());
+        str = substring(str, beginMark.length());
+        str = substring(str, 0, str.length() - endMark.length());
         return str;
     }
 
@@ -1622,6 +1586,19 @@ public class Srl {
         public void setNext(DelimiterInfo next) {
             this._next = next;
         }
+    }
+
+    public static <ELEMENT> String delimit(Collection<ELEMENT> list, Function<ELEMENT, String> oneArgInLambda, String delimiter) {
+        final StringBuilder sb = new StringBuilder();
+        int index = 0;
+        for (ELEMENT element : list) {
+            if (index > 0) {
+                sb.append(delimiter);
+            }
+            sb.append(oneArgInLambda.apply(element));
+            ++index;
+        }
+        return sb.toString();
     }
 
     // ===================================================================================
@@ -1765,7 +1742,7 @@ public class Srl {
             for (ScopeInfo scope : scopeList) {
                 sb.append(scope.substringInterspaceToPrevious());
                 sb.append(scope.getBeginMark());
-                sb.append(Srl.replace(scope.getContent(), fromStr, toStr));
+                sb.append(replace(scope.getContent(), fromStr, toStr));
                 sb.append(scope.getEndMark());
                 if (scope.getNext() == null) { // last
                     sb.append(scope.substringInterspaceToNext());
@@ -1778,10 +1755,10 @@ public class Srl {
             final List<ScopeInfo> scopeList = takeScopeList();
             final StringBuilder sb = new StringBuilder();
             for (ScopeInfo scope : scopeList) {
-                sb.append(Srl.replace(scope.substringInterspaceToPrevious(), fromStr, toStr));
+                sb.append(replace(scope.substringInterspaceToPrevious(), fromStr, toStr));
                 sb.append(scope.getScope());
                 if (scope.getNext() == null) { // last
-                    sb.append(Srl.replace(scope.substringInterspaceToNext(), fromStr, toStr));
+                    sb.append(replace(scope.substringInterspaceToNext(), fromStr, toStr));
                 }
             }
             return sb.toString();
@@ -1960,29 +1937,6 @@ public class Srl {
             rear = rear.substring(endIndex + endMark.length());
         }
         return sb.toString();
-    }
-
-    // ===================================================================================
-    //                                                                       Line Handling
-    //                                                                       =============
-    /**
-     * Remove empty lines. <br>
-     * And CR is removed.
-     * @param str The target string. (NotNull)
-     * @return The filtered string. (NotNull)
-     */
-    public static String removeEmptyLine(String str) {
-        assertStringNotNull(str);
-        final StringBuilder sb = new StringBuilder();
-        final List<String> lineList = splitList(str, "\n");
-        for (String line : lineList) {
-            if (Srl.is_Null_or_TrimmedEmpty(line)) {
-                continue; // skip
-            }
-            sb.append(removeCR(line)).append("\n");
-        }
-        final String filtered = sb.toString();
-        return filtered.substring(0, filtered.length() - "\n".length());
     }
 
     // ===================================================================================
@@ -2168,6 +2122,26 @@ public class Srl {
     // ===================================================================================
     //                                                                        SQL Handling
     //                                                                        ============
+    /**
+     * Remove empty lines. <br>
+     * And CR is removed.
+     * @param str The target string. (NotNull)
+     * @return The filtered string. (NotNull)
+     */
+    public static String removeEmptyLine(String str) {
+        assertStringNotNull(str);
+        final StringBuilder sb = new StringBuilder();
+        final List<String> lineList = splitList(str, "\n");
+        for (String line : lineList) {
+            if (is_Null_or_TrimmedEmpty(line)) {
+                continue; // skip
+            }
+            sb.append(removeCR(line)).append("\n");
+        }
+        final String filtered = sb.toString();
+        return filtered.substring(0, filtered.length() - "\n".length());
+    }
+
     /**
      * Remove block comments.
      * @param sql The string of SQL. (NotNull)

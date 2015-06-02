@@ -34,6 +34,7 @@ import org.dbflute.properties.DfFreeGenProperties;
 import org.dbflute.properties.DfHibernateProperties;
 import org.dbflute.properties.DfIncludeQueryProperties;
 import org.dbflute.properties.DfInfraProperties;
+import org.dbflute.properties.DfLastaFluteProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.dbflute.properties.DfOptimisticLockProperties;
@@ -42,7 +43,6 @@ import org.dbflute.properties.DfRefreshProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
-import org.dbflute.properties.DfSqlLogRegistryProperties;
 import org.dbflute.properties.DfTypeMappingProperties;
 
 /**
@@ -281,6 +281,18 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
+    //                                         ReplaceSchema
+    //                                         -------------
+    protected DfLastaFluteProperties _lastaflutePropertiess;
+
+    public DfLastaFluteProperties getLastaFluteProperties(Properties prop) {
+        if (_lastaflutePropertiess == null) {
+            _lastaflutePropertiess = new DfLastaFluteProperties(prop);
+        }
+        return _lastaflutePropertiess;
+    }
+
+    // -----------------------------------------------------
     //                                     Little Adjustment
     //                                     -----------------
     protected DfLittleAdjustmentProperties _littleAdjustmentPropertiess;
@@ -374,18 +386,6 @@ public final class DfPropertiesHandler {
             _simpleDtoProperties = new DfSimpleDtoProperties(prop);
         }
         return _simpleDtoProperties;
-    }
-
-    // -----------------------------------------------------
-    //                                      SQL Log Registry
-    //                                      ----------------
-    protected DfSqlLogRegistryProperties _sqlLogRegistryProperties;
-
-    public DfSqlLogRegistryProperties getSqlLogRegistryProperties(Properties prop) {
-        if (_sqlLogRegistryProperties == null) {
-            _sqlLogRegistryProperties = new DfSqlLogRegistryProperties(prop);
-        }
-        return _sqlLogRegistryProperties;
     }
 
     // -----------------------------------------------------

@@ -97,8 +97,23 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
     HpColumnSpHandler localSp();
 
     /**
+     * Does it have specified columns for the local table at least one? <br>
+     * (without new-creation of specification instance)
+     * @return The determination, true or false.
+     */
+    boolean hasSpecifiedLocalColumn();
+
+    // make when it needs (for compile speed)
+    ///**
+    // * Does it have specified columns at least one? (without new-creation of specification instance)
+    // * @return The determination, true or false.
+    // */
+    //boolean hasSpecifiedRelationColumn();
+
+    /**
      * Does it have specified columns at least one? (without new-creation of specification instance)
      * @return The determination, true or false.
+     * @deprecated use hasSpecifiedLocalColumn()
      */
     boolean hasSpecifiedColumn();
 

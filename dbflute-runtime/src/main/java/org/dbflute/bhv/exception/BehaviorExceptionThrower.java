@@ -15,6 +15,7 @@
  */
 package org.dbflute.bhv.exception;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.dbflute.Entity;
@@ -47,7 +48,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author jflute
  */
-public class BehaviorExceptionThrower {
+public class BehaviorExceptionThrower implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                          Definition

@@ -267,7 +267,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
 
     protected DfParameterBeanResolver createParameterBeanResolver() {
         final DfOutsideSqlFile outsideSqlFile = _outsideSqlPack.getOutsideSqlFile(_sqlFile);
-        return new DfParameterBeanResolver(_sql2entityMeta, outsideSqlFile, _schemaData);
+        return new DfParameterBeanResolver(outsideSqlFile, _schemaData);
     }
 
     // ===================================================================================

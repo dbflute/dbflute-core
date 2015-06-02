@@ -28,7 +28,6 @@ import java.util.Set;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.tools.ant.BuildException;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.exception.MethodInvocationException;
@@ -236,7 +235,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     // ===================================================================================
     //                                                                    Velocity Process
     //                                                                    ================
-    protected DfGenerator getGeneratorHandler() {
+    protected DfGenerator getGenerator() {
         return DfGenerator.getInstance();
     }
 
@@ -248,11 +247,10 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         setOutputEncoding(getBasicProperties().getSourceFileEncoding());
 
         try {
-            initializeVelocityInstance();
+            initializeGeneratorInstance();
             final DfGenerator generator = setupGenerator();
             final Context ctx = setupControlContext();
-
-            _log.info("generator.parse(\"" + controlTemplate + "\", c);");
+            _log.info("generator.parse(\"" + controlTemplate + "\", ctx);");
             generator.parse(controlTemplate, ctx);
             generator.shutdown();
             cleanup();
@@ -279,56 +277,26 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         if (controlTemplate == null) {
             throw new IllegalStateException("The control template needs to be defined!");
         }
-        // *because of unused
-        //if (outputDirectory == null) {
-        //    throw new IllegalStateException("The output directory needs to be defined!");
-        //}
-        // *because of unused
-        //if (outputFile == null) {
-        //    throw new IllegalStateException("The output file needs to be defined!");
-        //}
     }
 
-    protected void initializeVelocityInstance() {
-        // /---------------------------
-        // Initialize Velocity instance 
-        // ----------/
+    protected void initializeGeneratorInstance() {
+        final DfGenerator generator = getGenerator();
+        generator.initializeEngine(); // re-create if already exists
         if (templatePath != null) {
-            log("Using templatePath: " + templatePath, 3);
-            setupVelocityTemplateProperty();
+            generator.setProperty("file.resource.loader.path", templatePath);
         }
         if (useClasspath) {
-            log("Using classpath");
-            setupVelocityClasspathProperty();
+            final String resourceLoaderName = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
+            generator.addProperty("resource.loader", "classpath");
+            generator.setProperty("classpath.resource.loader.class", resourceLoaderName);
+            generator.setProperty("classpath.resource.loader.cache", "false");
+            generator.setProperty("classpath.resource.loader.modificationCheckInterval", "2");
         }
-        setupVelocityLogProperty();
-        try {
-            Velocity.init();
-        } catch (Exception e) {
-            String msg = "Failed to initialize Velocity:";
-            msg = msg + " templatePath=" + templatePath + " useClasspath=" + useClasspath;
-            throw new IllegalStateException(msg, e);
-        }
+        generator.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM_CLASS, DfFlutistLog4JLogSystem.class.getName());
     }
 
-    private void setupVelocityTemplateProperty() {
-        Velocity.setProperty("file.resource.loader.path", templatePath);
-    }
-
-    private void setupVelocityClasspathProperty() {
-        final String resourceLoaderName = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
-        Velocity.addProperty("resource.loader", "classpath");
-        Velocity.setProperty("classpath.resource.loader.class", resourceLoaderName);
-        Velocity.setProperty("classpath.resource.loader.cache", "false");
-        Velocity.setProperty("classpath.resource.loader.modificationCheckInterval", "2");
-    }
-
-    private void setupVelocityLogProperty() {
-        Velocity.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM_CLASS, DfFlutistLog4JLogSystem.class.getName());
-    }
-
-    private DfGenerator setupGenerator() {
-        final DfGenerator generator = getGeneratorHandler();
+    protected DfGenerator setupGenerator() {
+        final DfGenerator generator = getGenerator();
 
         // *set up later using DBFlute property (dfprop)
         //generator.setOutputPath(outputDirectory);
@@ -344,7 +312,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return generator;
     }
 
-    private Context setupControlContext() {
+    protected Context setupControlContext() {
         final Context ctx;
         try {
             ctx = initControlContext();
@@ -391,19 +359,18 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return ctx;
     }
 
-    // Copy from velocity.
-    private static String fileContentsToString(String file) {
+    protected static String fileContentsToString(String filePath) {
         String contents = "";
-        File f = new File(file);
-        if (f.exists()) {
+        final File file = new File(filePath);
+        if (file.exists()) {
             FileReader fr = null;
             try {
-                fr = new FileReader(f);
-                char template[] = new char[(int) f.length()];
+                fr = new FileReader(file);
+                final char template[] = new char[(int) file.length()];
                 fr.read(template);
                 contents = new String(template);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new IllegalStateException("Failed to read the file: " + filePath, e);
             } finally {
                 if (fr != null) {
                     try {

@@ -70,7 +70,7 @@ public class DBFluteSystem {
     // ===================================================================================
     //                                                                        Current Time
     //                                                                        ============
-    // #dateParade
+    // #date_parade
     /**
      * Get current local date. (server date if no provider)
      * @return The new-created local date instance as current date. (NotNull)

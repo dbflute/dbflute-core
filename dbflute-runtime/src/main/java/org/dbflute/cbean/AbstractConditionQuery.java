@@ -1049,7 +1049,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return date;
     }
 
-    protected Object xtoFromToLocalDate(Object date, String columnDbName, FromToOption option) { // #dateParade
+    protected Object xtoFromToLocalDate(Object date, String columnDbName, FromToOption option) { // #date_parade
         final TimeZone realZone = xchooseFromToRealTimeZone(columnDbName, option);
         return DfTypeUtil.toLocalDate(date, realZone);
     }
@@ -2063,7 +2063,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final List<Class<?>> typeList = newArrayListSized(4);
         final Class<?> propertyType = columnInfo.getObjectNativeType();
         if (fromTo) {
-            if (LocalDate.class.isAssignableFrom(propertyType)) { // #dateParade
+            if (LocalDate.class.isAssignableFrom(propertyType)) { // #date_parade
                 typeList.add(propertyType);
                 typeList.add(propertyType);
             } else if (LocalDateTime.class.isAssignableFrom(propertyType)) {

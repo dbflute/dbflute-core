@@ -71,12 +71,16 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                               documentDefinitionMap
     //                                                               =====================
-    public static final String KEY_documentDefinitionMap = "documentDefinitionMap";
+    public static final String KEY_documentMap = "documentMap";
+    protected static final String KEY_oldDocumentMap = "documentDefinitionMap";
     protected Map<String, Object> _documentDefinitionMap;
 
-    protected Map<String, Object> getDocumentDefinitionMap() {
+    protected Map<String, Object> getDocumentMap() {
         if (_documentDefinitionMap == null) {
-            final Map<String, Object> map = mapProp("torque." + KEY_documentDefinitionMap, DEFAULT_EMPTY_MAP);
+            Map<String, Object> map = mapProp("torque." + KEY_documentMap, null);
+            if (map == null) {
+                map = mapProp("torque." + KEY_oldDocumentMap, DEFAULT_EMPTY_MAP);
+            }
             _documentDefinitionMap = newLinkedHashMap();
             _documentDefinitionMap.putAll(map);
         }
@@ -88,7 +92,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                                                    ================
     public String getDocumentOutputDirectory() {
         final String defaultValue = "./output/doc";
-        return getProperty("documentOutputDirectory", defaultValue, getDocumentDefinitionMap());
+        return getProperty("documentOutputDirectory", defaultValue, getDocumentMap());
     }
 
     // ===================================================================================
@@ -100,7 +104,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String getAliasDelimiterInDbComment() {
-        String delimiter = (String) getDocumentDefinitionMap().get("aliasDelimiterInDbComment");
+        String delimiter = (String) getDocumentMap().get("aliasDelimiterInDbComment");
         if (delimiter != null && delimiter.trim().length() > 0) {
             // basically colon but it might be real tab and line (attention on trimming)
             return resolveControlCharacter(delimiter);
@@ -169,21 +173,21 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isDbCommentOnAliasBasis() {
-        return isProperty("isDbCommentOnAliasBasis", false, getDocumentDefinitionMap());
+        return isProperty("isDbCommentOnAliasBasis", false, getDocumentMap());
     }
 
     // ===================================================================================
     //                                                            Entity JavaDoc DbComment
     //                                                            ========================
     public boolean isEntityJavaDocDbCommentValid() { // default true since 1.0.4D
-        return isProperty("isEntityJavaDocDbCommentValid", true, getDocumentDefinitionMap());
+        return isProperty("isEntityJavaDocDbCommentValid", true, getDocumentMap());
     }
 
     // ===================================================================================
     //                                                             Entity DBMeta DbComment
     //                                                             =======================
     public boolean isEntityDBMetaDbCommentValid() {
-        return isProperty("isEntityDBMetaDbCommentValid", false, getDocumentDefinitionMap());
+        return isProperty("isEntityDBMetaDbCommentValid", false, getDocumentMap());
     }
 
     // ===================================================================================
@@ -302,15 +306,15 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                                                          ==========
     public String getSchemaHtmlFileName(String projectName) {
         final String defaultName = "schema-" + projectName + ".html";
-        return getProperty("schemaHtmlFileName", defaultName, getDocumentDefinitionMap());
+        return getProperty("schemaHtmlFileName", defaultName, getDocumentMap());
     }
 
     public boolean isSuppressSchemaHtmlOutsideSql() {
-        return isProperty("isSuppressSchemaHtmlOutsideSql", false, getDocumentDefinitionMap());
+        return isProperty("isSuppressSchemaHtmlOutsideSql", false, getDocumentMap());
     }
 
     public boolean isSuppressSchemaHtmlProcedure() {
-        return isProperty("isSuppressSchemaHtmlProcedure", false, getDocumentDefinitionMap());
+        return isProperty("isSuppressSchemaHtmlProcedure", false, getDocumentMap());
     }
 
     // -----------------------------------------------------
@@ -372,7 +376,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     protected String getSchemaHtmlStyleSheet() { // closet
-        return getProperty("schemaHtmlStyleSheet", null, getDocumentDefinitionMap());
+        return getProperty("schemaHtmlStyleSheet", null, getDocumentMap());
     }
 
     // -----------------------------------------------------
@@ -434,14 +438,14 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     protected String getSchemaHtmlJavaScript() { // closet
-        return getProperty("schemaHtmlJavaScript", null, getDocumentDefinitionMap());
+        return getProperty("schemaHtmlJavaScript", null, getDocumentMap());
     }
 
     // -----------------------------------------------------
     //                                           Sister Link
     //                                           -----------
     public boolean isSuppressSchemaHtmlToSisterLink() { // closet
-        return isProperty("isSuppressSchemaHtmlToSisterLink", false, getDocumentDefinitionMap());
+        return isProperty("isSuppressSchemaHtmlToSisterLink", false, getDocumentMap());
     }
 
     // -----------------------------------------------------
@@ -455,7 +459,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
         final String key = "neighborhoodSchemaHtmlMap";
         @SuppressWarnings("unchecked")
-        final Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) getDocumentDefinitionMap().get(key);
+        final Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) getDocumentMap().get(key);
         if (map != null) {
             _neighborhoodSchemaHtmlMap = map;
         } else {
@@ -495,7 +499,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
         final String key = "schemaDiagramMap";
         @SuppressWarnings("unchecked")
-        final Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) getDocumentDefinitionMap().get(key);
+        final Map<String, Map<String, Object>> map = (Map<String, Map<String, Object>>) getDocumentMap().get(key);
         if (map != null) {
             _schemaDiagramMap = map;
         } else {
@@ -544,28 +548,28 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                                                         ===========
     public String getHistoryHtmlFileName(String projectName) {
         final String defaultName = "history-" + projectName + ".html";
-        return getProperty("historyHtmlFileName", defaultName, getDocumentDefinitionMap());
+        return getProperty("historyHtmlFileName", defaultName, getDocumentMap());
     }
 
     // options below are related to HistoryHTML, SchemaSyncCheck, AlterCheck, ...
 
     public boolean isCheckColumnDefOrderDiff() {
-        return isProperty("isCheckColumnDefOrderDiff", false, getDocumentDefinitionMap());
+        return isProperty("isCheckColumnDefOrderDiff", false, getDocumentMap());
     }
 
     public boolean isCheckDbCommentDiff() {
-        return isProperty("isCheckDbCommentDiff", false, getDocumentDefinitionMap());
+        return isProperty("isCheckDbCommentDiff", false, getDocumentMap());
     }
 
     public boolean isCheckProcedureDiff() {
-        return isProperty("isCheckProcedureDiff", false, getDocumentDefinitionMap());
+        return isProperty("isCheckProcedureDiff", false, getDocumentMap());
     }
 
     // -----------------------------------------------------
     //                                             CraftDiff
     //                                             ---------
     public boolean isCheckCraftDiff() { // closet
-        return isProperty("isCheckCraftDiff", true, getDocumentDefinitionMap());
+        return isProperty("isCheckCraftDiff", true, getDocumentMap());
     }
 
     public List<File> getCraftSqlFileList() {
@@ -580,7 +584,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (!isCheckCraftDiff()) {
             return null;
         }
-        return getProperty("basicCraftSqlDir", BASIC_CRAFT_DIFF_DIR, getDocumentDefinitionMap());
+        return getProperty("basicCraftSqlDir", BASIC_CRAFT_DIFF_DIR, getDocumentMap());
     }
 
     public String getCoreCraftMetaDir() {
@@ -588,7 +592,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             return null;
         }
         final String defaultDir = CORE_CRAFT_META_DIR;
-        final String property = getProperty("coreCraftMetaDirPath", defaultDir, getDocumentDefinitionMap());
+        final String property = getProperty("coreCraftMetaDirPath", defaultDir, getDocumentMap());
         return Srl.replace(property, "$$DEFAULT$$", defaultDir);
     }
 
@@ -687,7 +691,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     protected String getHistoryHtmlStyleSheet() { // closet
-        return getProperty("historyHtmlStyleSheet", null, getDocumentDefinitionMap());
+        return getProperty("historyHtmlStyleSheet", null, getDocumentMap());
     }
 
     // -----------------------------------------------------
@@ -712,14 +716,14 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     protected String getHistoryHtmlJavaScript() { // closet
-        return getProperty("historyHtmlJavaScript", null, getDocumentDefinitionMap());
+        return getProperty("historyHtmlJavaScript", null, getDocumentMap());
     }
 
     // -----------------------------------------------------
     //                                           Sister Link
     //                                           -----------
     public boolean isSuppressHistoryHtmlToSisterLink() { // closet
-        return isProperty("isSuppressHistoryHtmlToSisterLink", false, getDocumentDefinitionMap());
+        return isProperty("isSuppressHistoryHtmlToSisterLink", false, getDocumentMap());
     }
 
     // ===================================================================================
@@ -733,7 +737,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
         final String key = "loadDataReverseMap";
         @SuppressWarnings("unchecked")
-        final Map<String, Object> map = (Map<String, Object>) getDocumentDefinitionMap().get(key);
+        final Map<String, Object> map = (Map<String, Object>) getDocumentMap().get(key);
         if (map != null) {
             _loadDataReverseMap = map;
         } else {
@@ -791,7 +795,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         try {
             return Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
-            String msg = "The property 'recordLimit' of loadDataReverse in " + KEY_documentDefinitionMap;
+            String msg = "The property 'recordLimit' of loadDataReverse in " + KEY_oldDocumentMap;
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }
@@ -837,7 +841,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         try {
             return Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
-            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_documentDefinitionMap;
+            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_oldDocumentMap;
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }
@@ -863,7 +867,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         try {
             return Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
-            String msg = "The property 'cellLengthLimit' of loadDataReverse in " + KEY_documentDefinitionMap;
+            String msg = "The property 'cellLengthLimit' of loadDataReverse in " + KEY_oldDocumentMap;
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }
@@ -914,7 +918,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
         final String key = "schemaSyncCheckMap";
         @SuppressWarnings("unchecked")
-        final Map<String, String> map = (Map<String, String>) getDocumentDefinitionMap().get(key);
+        final Map<String, String> map = (Map<String, String>) getDocumentMap().get(key);
         if (map != null) {
             _schemaSyncCheckMap = map;
         } else {
@@ -1072,17 +1076,17 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //     ; df:header = map:{
     //         ; title = Properties Overview
     //     }
-    //     ; ApplicationProp = map:{
+    //     ; DocksideEnv = map:{
     //         ; baseDir = ../src
-    //         ; rootFile = $$baseDir$$/main/resources/application_ja.properties
+    //         ; rootFile = $$baseDir$$/main/resources/dockside_env.properties
     //         ; environmentMap = map:{
     //             ; production = $$baseDir$$/production/resources
     //             ; integration = $$baseDir$$/integration/resources
     //         }
     //         ; diffIgnoredKeyList = list:{ errors.ignored.key }
     //         ; maskedKeyList = list:{ errors.masked.key }
-    //         ; extendsPropRequest = CommonApplicationProp
-    //         ; isCheckImplicitOverride = false
+    //         ; extendsPropRequest = MaihamaConfig
+    //         ; isCheckImplicitOverride = true
     //     }
     // }
     protected Map<String, Object> _propertiesHtmlHeaderMap;
@@ -1092,16 +1096,36 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (_propertiesHtmlMap != null) {
             return _propertiesHtmlMap;
         }
-        final String key = "propertiesHtmlMap";
-        final Map<String, Object> definitionMap = getDocumentDefinitionMap();
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> propertiesHtmlMap = (Map<String, Object>) definitionMap.get(key);
-        if (propertiesHtmlMap != null) {
-            _propertiesHtmlMap = resolvePropertiesHtmlMap(propertiesHtmlMap);
-        } else {
-            _propertiesHtmlMap = DfCollectionUtil.emptyMap();
-        }
+        _propertiesHtmlMap = resolvePropertiesHtmlMap(preparePropertiesHtmlResourceMap());
         return _propertiesHtmlMap;
+    }
+
+    protected Map<String, Object> preparePropertiesHtmlResourceMap() {
+        final Map<String, Object> propHtmlMap = newLinkedHashMap();
+        reflectEmbeddedPropertiesHtmlMap(propHtmlMap);
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> specifiedMap = (Map<String, Object>) getDocumentMap().get("propertiesHtmlMap");
+        reflectSpecifiedPropertiesHtmlMap(propHtmlMap, specifiedMap);
+        return propHtmlMap;
+    }
+
+    protected void reflectEmbeddedPropertiesHtmlMap(Map<String, Object> propHtmlMap) {
+        getLastaFluteProperties().reflectPropertiesHtmlMap(propHtmlMap);
+    }
+
+    protected void reflectSpecifiedPropertiesHtmlMap(Map<String, Object> propHtmlMap, Map<String, Object> specifiedMap) {
+        if (specifiedMap == null) {
+            return;
+        }
+        for (Entry<String, Object> entry : specifiedMap.entrySet()) {
+            final String key = entry.getKey();
+            final Object value = entry.getValue();
+            if (propHtmlMap.containsKey(key)) {
+                String msg = "Already embedded the propertiesHtml setting: " + key + ", " + value;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+            propHtmlMap.put(key, value);
+        }
     }
 
     protected Map<String, Map<String, Object>> resolvePropertiesHtmlMap(Map<String, Object> propertiesHtmlMap) {

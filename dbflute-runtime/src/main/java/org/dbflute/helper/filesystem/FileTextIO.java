@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import org.dbflute.helper.filesystem.exception.FileTextIONotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
 
@@ -48,6 +49,47 @@ public class FileTextIO {
     //                                                                           =========
     /** The encoding for the file. (Required) */
     protected String _encoding;
+    protected boolean _removeUTF8Bom;
+    protected boolean _replaceCrLfToLf;
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    /**
+     * Encode file as UTF-8.
+     * @return this. (NotNull)
+     */
+    public FileTextIO encodeAsUTF8() {
+        _encoding = "UTF-8";
+        return this;
+    }
+
+    /**
+     * Encode file as Windows-31J.
+     * @return this. (NotNull)
+     */
+    public FileTextIO encodeAsWindows31J() {
+        _encoding = "Windows-31J";
+        return this;
+    }
+
+    /**
+     * Remove initial UTF-8 bom if it exists.
+     * @return this. (NotNull)
+     */
+    public FileTextIO removeUTF8Bom() {
+        _removeUTF8Bom = true;
+        return this;
+    }
+
+    /**
+     * Replace CR+LF to LF when read and write.
+     * @return this. (NotNull)
+     */
+    public FileTextIO replaceCrLfToLf() {
+        _replaceCrLfToLf = true;
+        return this;
+    }
 
     // ===================================================================================
     //                                                                                Read
@@ -265,27 +307,6 @@ public class FileTextIO {
     }
 
     // ===================================================================================
-    //                                                                              Option
-    //                                                                              ======
-    /**
-     * Encode file as UTF-8.
-     * @return this. (NotNull)
-     */
-    public FileTextIO encodeAsUTF8() {
-        _encoding = "UTF-8";
-        return this;
-    }
-
-    /**
-     * Encode file as Windows-31J.
-     * @return this. (NotNull)
-     */
-    public FileTextIO encodeAsWindows31J() {
-        _encoding = "Windows-31J";
-        return this;
-    }
-
-    // ===================================================================================
     //                                                                       Stream Helper
     //                                                                       =============
     protected FileInputStream createFileInputStream(String textPath) {
@@ -293,7 +314,7 @@ public class FileTextIO {
             return new FileInputStream(textPath);
         } catch (FileNotFoundException e) {
             String msg = "Not found the text file: " + textPath;
-            throw new IllegalStateException(msg, e);
+            throw new FileTextIONotFoundException(msg, e);
         }
     }
 
@@ -303,7 +324,7 @@ public class FileTextIO {
             return new FileOutputStream(textPath);
         } catch (FileNotFoundException e) {
             String msg = "Not found the text file: " + textPath;
-            throw new IllegalStateException(msg, e);
+            throw new FileTextIONotFoundException(msg, e);
         }
     }
 
@@ -338,7 +359,8 @@ public class FileTextIO {
     protected String readTextClosed(InputStream ins) throws IOException {
         final byte[] bytes = readBytesClosed(ins);
         try {
-            return new String(bytes, _encoding);
+            final String text = new String(bytes, _encoding);
+            return adjustInOutTextIfNeeds(text);
         } catch (UnsupportedEncodingException e) {
             String msg = "Unknown encoding: " + _encoding;
             throw new IllegalStateException(msg, e);
@@ -349,13 +371,29 @@ public class FileTextIO {
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(ous, _encoding));
-            writer.write(text);
+            writer.write(adjustInOutTextIfNeeds(text));
             writer.flush();
         } catch (IOException e) {
             handleOutputStreamWriteFailureException(ous, e);
         } finally {
             close(writer);
         }
+    }
+
+    protected String adjustInOutTextIfNeeds(String text) {
+        return doReplaceCrLfToLfIfNeeds(doRemoveUTF8BomIfNeeds(text));
+    }
+
+    protected String doRemoveUTF8BomIfNeeds(String text) {
+        if (_removeUTF8Bom && text != null && !text.isEmpty() && text.charAt(0) == '\uFEFF') {
+            return text.substring(1);
+        } else {
+            return text;
+        }
+    }
+
+    protected String doReplaceCrLfToLfIfNeeds(String text) {
+        return (_replaceCrLfToLf && text != null) ? replace(text, "\r\n", "\n") : text;
     }
 
     protected void close(BufferedReader reader) {
@@ -465,6 +503,35 @@ public class FileTextIO {
             String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String replace(String str, String fromStr, String toStr) {
+        StringBuilder sb = null; // lazy load
+        int pos = 0;
+        int pos2 = 0;
+        do {
+            pos = str.indexOf(fromStr, pos2);
+            if (pos2 == 0 && pos < 0) { // first loop and not found
+                return str; // without creating StringBuilder 
+            }
+            if (sb == null) {
+                sb = new StringBuilder();
+            }
+            if (pos == 0) {
+                sb.append(toStr);
+                pos2 = fromStr.length();
+            } else if (pos > 0) {
+                sb.append(str.substring(pos2, pos));
+                sb.append(toStr);
+                pos2 = pos + fromStr.length();
+            } else { // (pos < 0) second or after loop only
+                sb.append(str.substring(pos2));
+                return sb.toString();
+            }
+        } while (true);
     }
 
     // ===================================================================================

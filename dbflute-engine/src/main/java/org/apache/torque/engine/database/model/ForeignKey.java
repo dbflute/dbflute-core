@@ -1768,7 +1768,7 @@ public class ForeignKey implements Constraint {
         final StringBuilder sb = new StringBuilder();
         final Table foreignTable = getForeignTable();
         sb.append(foreignTable.getAliasExpression());
-        sb.append(foreignTable.getTableDbName());
+        sb.append(foreignTable.getTableDispName());
         sb.append(" by my ").append(getLocalColumnNameCommaString());
         sb.append(", named '").append(getForeignJavaBeansRulePropertyName()).append("'");
         return sb.toString();
@@ -1832,7 +1832,7 @@ public class ForeignKey implements Constraint {
     public String getReferrerSimpleDisp() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getTable().getAliasExpression());
-        sb.append(getTable().getTableDbName());
+        sb.append(getTable().getTableDispName());
         sb.append(" by ").append(getLocalColumnNameCommaString());
         sb.append(", named '").append(getReferrerJavaBeansRulePropertyName()).append("'");
         return sb.toString();

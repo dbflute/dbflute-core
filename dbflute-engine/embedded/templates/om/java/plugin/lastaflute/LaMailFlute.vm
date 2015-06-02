@@ -1,0 +1,39 @@
+${manager.allClassCopyright}package ${request.buildHierarchyPackage($table)};
+
+import org.lastaflute.core.mail.LaTypicalPostcard;
+import org.lastaflute.core.mail.MPCall;
+import org.lastaflute.core.mail.Postbox;
+
+/**
+ * The postcard for MailFlute on LastaFlute.
+ * @author FreeGen
+ */
+public class ${table.className} extends LaTypicalPostcard {
+
+    public static final String PATH = "${table.resourcePath}";
+
+    public static void droppedInto(Postbox postbox, MPCall<${table.className}> postcardLambda) {
+        ${table.className} postcard = new ${table.className}();
+        postcardLambda.write(postcard);
+        postbox.post(postcard);
+    }
+
+    protected String getBodyFile() {
+        return PATH;
+    }
+
+    protected String[] getPropertyNames() {
+        return new String[] {${table.propertyNameCommaString}};
+    }
+#foreach ($property in $table.propertyList)
+
+    /**
+     * Set the value of ${property.uncapCalemName}, used in parameter comment. <br>
+     * Even if empty string, treated as empty plainly. So "IF pmb != null" is false if empty.
+     * @param ${property.uncapCalemName} The parameter value of ${property.uncapCalemName}. (NotNull)
+     */
+    public void set${property.capCalemName}(${property.propertyType} ${property.uncapCalemName}) {
+        registerVariable("${property.propertyName}", ${property.uncapCalemName});
+    }
+#end
+}

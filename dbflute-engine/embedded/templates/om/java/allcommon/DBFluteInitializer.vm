@@ -22,9 +22,6 @@ import org.dbflute.dbway.DBDef;
 #if ($database.isTargetContainerSpring())
 import org.dbflute.jdbc.DataSourceHandler;
 #end
-#if ($database.isTargetContainerSeasar())
-import org.dbflute.s2dao.extension.TnSqlLogRegistry;
-#end
 import org.dbflute.system.DBFluteSystem;
 
 import org.slf4j.Logger;
@@ -88,7 +85,6 @@ public class ${glDBFluteInitializer} {
      */
     protected void prologue() {
 #if ($database.isTargetContainerSeasar())
-        handleSqlLogRegistry();
         loadCoolClasses();
 #elseif ($database.isTargetContainerSpring())
         setupDataSourceHandler(_dataSourceFqcn);
@@ -112,26 +108,6 @@ public class ${glDBFluteInitializer} {
     //                                                                            Contents
     //                                                                            ========
 #if ($database.isTargetContainerSeasar())
-    protected void handleSqlLogRegistry() { // for S2Container
-        if (${glDBFluteConfig}.getInstance().isUseSqlLogRegistry()) {
-            final StringBuilder sb = new StringBuilder();
-            sb.append("{SqlLog Information}").append(ln());
-            sb.append("  [SqlLogRegistry]").append(ln());
-            if (TnSqlLogRegistry.setupSqlLogRegistry()) {
-                sb.append("    ...Setting up sqlLogRegistry(org.seasar.extension.jdbc)").append(ln());
-                sb.append("    because the property 'useSqlLogRegistry' of the config of DBFlute is true");
-            } else {
-                sb.append("    The sqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version");
-            }
-           _log.info(sb.toString());
-        } else {
-            final Object sqlLogRegistry = TnSqlLogRegistry.findContainerSqlLogRegistry();
-            if (sqlLogRegistry != null) {
-                TnSqlLogRegistry.closeRegistration();
-            }
-        }
-    }
-
     protected void loadCoolClasses() { // for S2Container 
         ConditionBeanContext.loadCoolClasses(); // against the ClassLoader Headache!
     }

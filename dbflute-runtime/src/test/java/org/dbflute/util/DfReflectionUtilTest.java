@@ -140,7 +140,7 @@ public class DfReflectionUtilTest extends RuntimeTestCase {
         Type genericType = getListMethod().getGenericReturnType();
 
         // ## Act ##
-        Class<?> elementType = DfReflectionUtil.getGenericType(genericType);
+        Class<?> elementType = DfReflectionUtil.getGenericFirstClass(genericType);
 
         // ## Assert ##
         log("genericType = " + genericType);
@@ -153,7 +153,7 @@ public class DfReflectionUtilTest extends RuntimeTestCase {
         Type genericType = getSetMethod().getGenericReturnType();
 
         // ## Act ##
-        Class<?> elementType = DfReflectionUtil.getGenericType(genericType);
+        Class<?> elementType = DfReflectionUtil.getGenericFirstClass(genericType);
 
         // ## Assert ##
         log("genericType = " + genericType);
@@ -166,7 +166,7 @@ public class DfReflectionUtilTest extends RuntimeTestCase {
         Type genericType = getCollectionMethod().getGenericReturnType();
 
         // ## Act ##
-        Class<?> elementType = DfReflectionUtil.getGenericType(genericType);
+        Class<?> elementType = DfReflectionUtil.getGenericFirstClass(genericType);
 
         // ## Assert ##
         log("genericType = " + genericType);
@@ -179,7 +179,7 @@ public class DfReflectionUtilTest extends RuntimeTestCase {
         Type genericType = getNestedListMethod().getGenericReturnType();
 
         // ## Act ##
-        Class<?> elementType = DfReflectionUtil.getGenericType(genericType);
+        Class<?> elementType = DfReflectionUtil.getGenericFirstClass(genericType);
 
         // ## Assert ##
         log("genericType = " + genericType);
@@ -192,7 +192,7 @@ public class DfReflectionUtilTest extends RuntimeTestCase {
         Type genericType = getBeanListMethod().getGenericReturnType();
 
         // ## Act ##
-        Class<?> elementType = DfReflectionUtil.getGenericType(genericType);
+        Class<?> elementType = DfReflectionUtil.getGenericFirstClass(genericType);
 
         // ## Assert ##
         log("genericType = " + genericType);
@@ -205,7 +205,7 @@ public class DfReflectionUtilTest extends RuntimeTestCase {
         Type genericType = getNonGenericMethod().getGenericReturnType();
 
         // ## Act ##
-        Class<?> elementType = DfReflectionUtil.getGenericType(genericType);
+        Class<?> elementType = DfReflectionUtil.getGenericFirstClass(genericType);
 
         // ## Assert ##
         log("genericType = " + genericType);

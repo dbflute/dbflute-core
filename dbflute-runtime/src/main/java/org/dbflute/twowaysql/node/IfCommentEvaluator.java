@@ -270,7 +270,7 @@ public class IfCommentEvaluator {
             final BigDecimal leftDecimal = new BigDecimal(((Number) leftResult).toString());
             final BigDecimal rightDecimal = new BigDecimal(((Number) rightResult).toString());
             return determiner.compare(leftDecimal.compareTo(rightDecimal));
-        } else if (leftResult instanceof LocalDate) { // #dateParade
+        } else if (leftResult instanceof LocalDate) { // #date_parade
             final LocalDate leftDate = (LocalDate) leftResult;
             final LocalDate rightDate = toLocalDate(rightResult); // to fit with left, just in case
             return determiner.compare(leftDate.compareTo(rightDate));
@@ -300,7 +300,7 @@ public class IfCommentEvaluator {
             if (!(rightResult instanceof Number)) {
                 throwIfCommentDifferentTypeComparisonException(leftResult, rightResult, booleanClause);
             }
-        } else if (leftResult instanceof Date || DfTypeUtil.isAnyLocalDate(leftResult)) { // #dateParade
+        } else if (leftResult instanceof Date || DfTypeUtil.isAnyLocalDate(leftResult)) { // #date_parade
             if (!(rightResult instanceof Date) && !DfTypeUtil.isAnyLocalDate(rightResult)) { // converted if Date vs. LocalDate
                 throwIfCommentDifferentTypeComparisonException(leftResult, rightResult, booleanClause);
             }
@@ -346,7 +346,7 @@ public class IfCommentEvaluator {
                 if (rearValue.startsWith(quote) && rearValue.endsWith(quote)) {
                     final String literal = rearValue.substring(qlen, rearValue.length() - qlen).trim();
                     try {
-                        if (leftResult instanceof LocalDate) { // #dateParade
+                        if (leftResult instanceof LocalDate) { // #date_parade
                             return toLocalDate(literal);
                         } else if (leftResult instanceof LocalDateTime) {
                             return toLocalDateTime(literal);

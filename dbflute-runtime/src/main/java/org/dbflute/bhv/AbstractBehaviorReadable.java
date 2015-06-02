@@ -304,12 +304,12 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
 
     protected abstract Entity doReadEntity(ConditionBean cb);
 
-    protected <RESULT> OptionalEntity<RESULT> createOptionalEntity(RESULT entity, final Object... searchKey) {
-        return new OptionalEntity<RESULT>(entity, new OptionalThingExceptionThrower() {
-            public void throwNotFoundException() {
-                throwSelectEntityAlreadyDeletedException(searchKey);
-            }
-        });
+    protected <RESULT> OptionalEntity<RESULT> createOptionalEntity(RESULT entity, Object... searchKey) {
+        if (entity != null) {
+            return OptionalEntity.of(entity);
+        } else { // not serializable here because of select entity (while relation optional is able)
+            return OptionalEntity.ofNullable(entity, () -> throwSelectEntityAlreadyDeletedException(searchKey));
+        }
     }
 
     /** {@inheritDoc} */

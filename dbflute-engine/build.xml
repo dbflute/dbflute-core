@@ -5,9 +5,9 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="1.1.0-sp2" />
+	<property name="version" value="1.1.0-sp4" />
 	<property name="build.version" value="${version}" />
-	<property name="runtime.version" value="1.1.0-sp2" />
+	<property name="runtime.version" value="1.1.0-sp4" />
 	<property name="runtime.build.version" value="${runtime.version}" />
 	<property name="example.latest.version" value="1.x" />
 
@@ -42,7 +42,7 @@
 
 	<!-- Test: Active Stage -->
 	<property name="test.active.dockside.dir" value="${test.active.stage.base}/dbflute-test-active-dockside" />
-	<property name="test.active.hanger.dir" value="${test.active.stage.base}/dbflute-test-active-hanger" />
+	<property name="test.active.hangar.dir" value="${test.active.stage.base}/dbflute-test-active-hangar" />
 
 	<!-- Test: DBMS Stage -->
 	<property name="test.dbms.mysql.dir" value="${test.dbms.stage.base}/dbflute-test-dbms-mysql" />
@@ -244,10 +244,10 @@
 		<delete dir="${extraction.dir}" />
 	</target>
 
-	<target name="reflect-to-test-active-hanger" depends="prepare-reflection"
-			description="==> reflect to test as active hanger">
-		<delete dir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" />
-		<copy todir="${test.active.hanger.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+	<target name="reflect-to-test-active-hangar" depends="prepare-reflection"
+			description="==> reflect to test as active hangar">
+		<delete dir="${test.active.hangar.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${test.active.hangar.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />

@@ -18,6 +18,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+#if ($database.isTargetContainerLastaDi())
+import javax.annotation.Resource;
+#end
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +49,8 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 #end
 #if ($database.isTargetContainerLastaDi())
-import org.dbflute.lasta.di.core.LaContainer;
-import org.dbflute.lasta.di.core.exception.ComponentNotFoundException;
+import org.lastaflute.di.core.LaContainer;
+import org.lastaflute.di.core.exception.ComponentNotFoundException;
 #end
 
 /**
@@ -333,6 +336,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     }
 #end
 #if ($database.isTargetContainerLastaDi())
+    @Resource
     public void setContainer(LaContainer container) {
         this._container = container;
     }

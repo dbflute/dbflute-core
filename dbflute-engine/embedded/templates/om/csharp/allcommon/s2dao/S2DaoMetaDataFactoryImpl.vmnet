@@ -53,25 +53,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             _readerFactory = readerFactory;
             _dataReaderFactory = dataReaderFactory;
 
-            HandleSqlLogRegistry();
             if (!${glDBFluteConfig}.GetInstance().IsLocked) {
                 ${glDBFluteConfig}.GetInstance().Lock();
-            }
-        }
-
-        protected void HandleSqlLogRegistry() {
-            if (${glDBFluteConfig}.GetInstance().IsUseSqlLogRegistry) {
-                StringBuilder sb = new StringBuilder();
-                ${glInternalSqlLogRegistryLocator}.Instance = new ${glInternalSqlLogRegistry}();
-                sb.append("{SqlLog Information}").append(GetLineSeparator());
-                sb.append("  [SqlLogRegistry]").append(GetLineSeparator());
-                sb.append("    ...Setting up SqlLogRegistry").append(GetLineSeparator());
-                sb.append("    because the property 'IsUseSqlLogRegistry' of the config of DBFlute is true");
-                _log.Info(sb.toString());
-            } else {
-                if (${glInternalSqlLogRegistryLocator}.Instance != null) {
-                    ${glInternalSqlLogRegistryLocator}.Instance = null;
-                }
             }
         }
 

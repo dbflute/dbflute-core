@@ -252,13 +252,10 @@ public class BindVariableNodeTest extends RuntimeTestCase {
         CommandContext ctx = createCtx(pmb);
 
         // ## Act ##
-        try {
-            rootNode.accept(ctx);
-            // ## Assert ##
-            fail();
-        } catch (IllegalStateException e) {
-            log(e.getMessage());
-        }
+        rootNode.accept(ctx);
+
+        // ## Assert ##
+        assertEquals("= ???", ctx.getSql());
     }
 
     public void test_accept_inLoopOption_melodic() {

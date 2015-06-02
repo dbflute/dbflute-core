@@ -216,11 +216,11 @@ public class ColumnInfo {
     //                                               Generic
     //                                               -------
     /**
-     * Get the generic type of property type for list property.
-     * @return The type instance. (NullAllowed: when not list type)
+     * Get the (first) generic type of property type for list property.
+     * @return The type instance. (NullAllowed: e.g. when not list type)
      */
     public Class<?> getGenericType() {
-        return DfReflectionUtil.getGenericType(getReadMethod().getGenericReturnType());
+        return DfReflectionUtil.getGenericFirstClass(getReadMethod().getGenericReturnType());
     }
 
     // -----------------------------------------------------

@@ -263,6 +263,10 @@ public class PageGroupBean implements Serializable {
         _allPageCount = allPageCount;
     }
 
+    public PageGroupOption getPageGroupOption() {
+        return _pageGroupOption;
+    }
+
     public void setPageGroupOption(PageGroupOption pageGroupOption) {
         _pageGroupOption = pageGroupOption;
     }
@@ -271,8 +275,8 @@ public class PageGroupBean implements Serializable {
     //                                   Calculated Property
     //                                   -------------------
     /**
-     * Get the value of preGroupNearestPageNumber that is calculated. <br>
-     * You should use this.isExistPrePageGroup() before calling this. (call only when true)
+     * Get the value of previousGroupNearestPageNumber that is calculated. <br>
+     * You should use this.existsPreviousGroup() before calling this. (call only when true)
      * <pre>
      * e.g. group-size=10, current-page=12
      *  12 / 23 pages (453 records)
@@ -280,11 +284,11 @@ public class PageGroupBean implements Serializable {
      * 
      * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #CC4747">10</span>
      * </pre>
-     * @return The value of preGroupNearestPageNumber.
+     * @return The number of previous group-nearest page.
      */
-    public int getPreGroupNearestPageNumber() {
+    public int getPreviousGroupNearestPageNumber() {
         if (!existsPreviousGroup()) {
-            String msg = "The previous page range should exist when you use preGroupNearestPageNumber:";
+            String msg = "The previous page range should exist when you use previousGroupNearestPageNumber:";
             msg = msg + " currentPageNumber=" + _currentPageNumber + " allPageCount=" + _allPageCount;
             msg = msg + " pageGroupOption=" + _pageGroupOption;
             throw new IllegalStateException(msg);
@@ -294,7 +298,7 @@ public class PageGroupBean implements Serializable {
 
     /**
      * Get the value of nextGroupNearestPageNumber that is calculated. <br>
-     * You should use this.isExistNextPageGroup() before calling this. (call only when true)
+     * You should use this.existsNextGroup() before calling this. (call only when true)
      * <pre>
      * e.g. group-size=10, current-page=12
      *  12 / 23 pages (453 records)
@@ -302,7 +306,7 @@ public class PageGroupBean implements Serializable {
      * 
      * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #CC4747">21</span>
      * </pre>
-     * @return The value of nextGroupNearestPageNumber.
+     * @return The number of next group-nearest page.
      */
     public int getNextGroupNearestPageNumber() {
         if (!existsNextGroup()) {
@@ -313,5 +317,22 @@ public class PageGroupBean implements Serializable {
         }
         final List<Integer> ls = createPageNumberList();
         return ls.get(ls.size() - 1) + 1;
+    }
+
+    /**
+     * Get the value of preGroupNearestPageNumber that is calculated. <br>
+     * You should use this.existsPreviousGroup() before calling this. (call only when true)
+     * <pre>
+     * e.g. group-size=10, current-page=12
+     *  12 / 23 pages (453 records)
+     * previous 11 12 13 14 15 16 17 18 19 20 next
+     * 
+     * <span style="color: #3F7E5E">// this method returns</span> <span style="color: #CC4747">10</span>
+     * </pre>
+     * @return The value of preGroupNearestPageNumber.
+     * @deprecated use getPreviousGroupNearestPageNumber()
+     */
+    public int getPreGroupNearestPageNumber() {
+        return getPreviousGroupNearestPageNumber();
     }
 }

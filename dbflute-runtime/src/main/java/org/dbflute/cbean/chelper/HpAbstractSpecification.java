@@ -72,6 +72,14 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     }
 
     // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    @Override
+    public DBMeta asDBMeta() {
+        return _dbmetaProvider.provideDBMetaChecked(getTableDbName());
+    }
+
+    // ===================================================================================
     //                                                                Column Specification
     //                                                                ====================
     public SpecifiedColumn xspecifyColumn(String columnName) { // for interface
@@ -144,8 +152,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     protected abstract String getTableDbName();
 
     protected SpecifiedColumn createSpecifiedColumn(String columnName, String tableAliasName) {
-        final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(_query.asTableDbName());
-        final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnName);
+        final ColumnInfo columnInfo = asDBMeta().findColumnInfo(columnName);
         return new SpecifiedColumn(tableAliasName, columnInfo, _baseCB);
     }
 

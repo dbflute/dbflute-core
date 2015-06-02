@@ -18,6 +18,7 @@ package org.dbflute.twowaysql.node;
 /**
  * @author jflute
  */
+@FunctionalInterface
 public interface ParameterFinder {
 
     Object find(String name);

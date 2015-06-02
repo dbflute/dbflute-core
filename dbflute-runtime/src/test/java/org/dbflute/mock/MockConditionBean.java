@@ -90,6 +90,11 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
+    public boolean hasSpecifiedLocalColumn() {
+        return false;
+    }
+
+    @Deprecated
     public boolean hasSpecifiedColumn() {
         return false;
     }

@@ -53,17 +53,21 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                             Sequence Definition Map
     //                                                             =======================
-    protected static final String KEY_sequenceDefinitionMap = "sequenceDefinitionMap";
+    protected static final String KEY_sequenceMap = "sequenceMap";
+    protected static final String KEY_oldSequenceMap = "sequenceDefinitionMap";
     protected Map<String, String> _sequenceDefinitionMap;
     protected Map<String, String> _subColumnSequenceDefinitionMap;
 
-    protected Map<String, String> getSequenceDefinitionMap() {
+    protected Map<String, String> getSequenceMap() {
         if (_sequenceDefinitionMap != null) {
             return _sequenceDefinitionMap;
         }
         final Map<String, String> flexibleMap = StringKeyMap.createAsFlexibleOrdered();
         final Map<String, String> flexibleSubMap = StringKeyMap.createAsFlexibleOrdered();
-        final Map<String, Object> originalMap = mapProp("torque." + KEY_sequenceDefinitionMap, DEFAULT_EMPTY_MAP);
+        Map<String, Object> originalMap = mapProp("torque." + KEY_sequenceMap, null);
+        if (originalMap == null) {
+            originalMap = mapProp("torque." + KEY_oldSequenceMap, DEFAULT_EMPTY_MAP); // for compatible
+        }
         final Set<Entry<String, Object>> entrySet = originalMap.entrySet();
         for (Entry<String, Object> entry : entrySet) {
             final String tableName = entry.getKey();
@@ -85,7 +89,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public Map<String, String> getTableSequenceMap() {
-        final Map<String, String> sequenceDefinitionMap = getSequenceDefinitionMap();
+        final Map<String, String> sequenceDefinitionMap = getSequenceMap();
         final Map<String, String> resultMap = new LinkedHashMap<String, String>();
         final Set<String> keySet = sequenceDefinitionMap.keySet();
         for (String tableName : keySet) {
@@ -95,7 +99,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public String getSequenceName(String tableName) {
-        final String sequenceProp = getSequenceDefinitionMap().get(tableName);
+        final String sequenceProp = getSequenceMap().get(tableName);
         return extractSequenceNameFromProp(sequenceProp);
     }
 
@@ -120,7 +124,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     protected String getSequenceProp(String tableName) {
-        final String sequenceProp = getSequenceDefinitionMap().get(tableName);
+        final String sequenceProp = getSequenceMap().get(tableName);
         if (sequenceProp == null || sequenceProp.trim().length() == 0) {
             return null;
         }
@@ -134,7 +138,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         if (_subColumnSequenceDefinitionMap != null) {
             return _subColumnSequenceDefinitionMap;
         }
-        getSequenceDefinitionMap(); // initialize
+        getSequenceMap(); // initialize
         return _subColumnSequenceDefinitionMap;
     }
 
@@ -173,7 +177,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     public void checkDefinition(DfTableDeterminer determiner) {
         final List<String> notFoundTableNameList = new ArrayList<String>();
         {
-            final Map<String, String> sequenceDefinitionMap = getSequenceDefinitionMap();
+            final Map<String, String> sequenceDefinitionMap = getSequenceMap();
             final Set<Entry<String, String>> entrySet = sequenceDefinitionMap.entrySet();
             for (Entry<String, String> entry : entrySet) {
                 final String tableName = entry.getKey();
@@ -525,7 +529,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                             Identity Definition Map
     //                                                             =======================
-    protected static final String KEY_identityDefinitionMap = "identityDefinitionMap";
+    protected static final String KEY_identityMap = "identityMap";
+    protected static final String KEY_oldIdentityMap = "identityDefinitionMap";
     protected Map<String, Object> _identityDefinitionMap;
 
     // # /---------------------------------------------------------------------------
@@ -556,7 +561,10 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     protected Map<String, Object> getIdentityDefinitionMap() {
         if (_identityDefinitionMap == null) {
-            final Map<String, Object> map = mapProp("torque." + KEY_identityDefinitionMap, DEFAULT_EMPTY_MAP);
+            Map<String, Object> map = mapProp("torque." + KEY_identityMap, null);
+            if (map == null) {
+                map = mapProp("torque." + KEY_oldIdentityMap, DEFAULT_EMPTY_MAP); // for compatible
+            }
             _identityDefinitionMap = newLinkedHashMap();
             _identityDefinitionMap.putAll(map);
         }

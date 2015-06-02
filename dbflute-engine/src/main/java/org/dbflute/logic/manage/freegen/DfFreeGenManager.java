@@ -18,6 +18,7 @@ package org.dbflute.logic.manage.freegen;
 import org.apache.velocity.texen.util.FileUtil;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.friends.velocity.DfGenerator;
+import org.dbflute.properties.DfAllClassCopyrightProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class DfFreeGenManager {
     // ===================================================================================
     //                                                                           Generator
     //                                                                           =========
-    public DfGenerator getGeneratorInstance() {
+    public DfGenerator getGenerator() {
         return DfGenerator.getInstance();
     }
 
@@ -50,25 +51,30 @@ public class DfFreeGenManager {
     //                                                                           Directory
     //                                                                           =========
     public void setOutputDirectory(String outputDirectory) {
+        final DfGenerator generator = getGenerator();
+        final String existingPath = generator.getOutputPath();
+        if (existingPath != null && existingPath.equals(outputDirectory)) {
+            return;
+        }
         _log.info("...Setting up generateOutputDirectory: " + outputDirectory);
-        getGeneratorInstance().setOutputPath(outputDirectory);
+        generator.setOutputPath(outputDirectory);
     }
 
     public void makeDirectory(String filePath) {
         final String basePath = Srl.substringLastFront(filePath, "/");
-        FileUtil.mkdir(getGeneratorInstance().getOutputPath() + "/" + basePath);
+        FileUtil.mkdir(getGenerator().getOutputPath() + "/" + basePath);
     }
 
     // ===================================================================================
     //                                                                      Resolve Helper
     //                                                                      ==============
     public String resolveTextForSchemaHtml(String text) {
-        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         return prop.resolveTextForSchemaHtml(text);
     }
 
     public String resolveTextForJavaDoc(String text, String indent) {
-        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         return prop.resolveTextForJavaDoc(text, indent);
     }
 
@@ -89,6 +95,28 @@ public class DfFreeGenManager {
 
     public String decamelize(String camelName) {
         return Srl.decamelize(camelName);
+    }
+
+    // ===================================================================================
+    //                                                                    Copyright Helper
+    //                                                                    ================
+    public String getAllClassCopyright() {
+        return getAllClassCopyrightProperties().getAllClassCopyright();
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
+    }
+
+    protected DfAllClassCopyrightProperties getAllClassCopyrightProperties() {
+        return getProperties().getAllClassCopyrightProperties();
+    }
+
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
     }
 
     // ===================================================================================

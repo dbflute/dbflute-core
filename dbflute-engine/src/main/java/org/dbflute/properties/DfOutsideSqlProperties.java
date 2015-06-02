@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
 import org.dbflute.exception.DfIllegalPropertyTypeException;
 import org.dbflute.friends.velocity.DfGenerator;
@@ -54,12 +53,16 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                             outsideSqlDefinitionMap
     //                                                             =======================
-    public static final String KEY_outsideSqlDefinitionMap = "outsideSqlDefinitionMap";
+    public static final String KEY_outsideSqlMap = "outsideSqlMap";
+    public static final String KEY_oldOutsideSqlMap = "outsideSqlDefinitionMap";
     protected Map<String, Object> _outsideSqlDefinitionMap;
 
     protected Map<String, Object> getOutsideSqlDefinitionMap() {
         if (_outsideSqlDefinitionMap == null) {
-            final Map<String, Object> map = mapProp("torque." + KEY_outsideSqlDefinitionMap, DEFAULT_EMPTY_MAP);
+            Map<String, Object> map = mapProp("torque." + KEY_outsideSqlMap, null);
+            if (map == null) {
+                map = mapProp("torque." + KEY_oldOutsideSqlMap, DEFAULT_EMPTY_MAP); // for compatible
+            }
             _outsideSqlDefinitionMap = newLinkedHashMap();
             _outsideSqlDefinitionMap.putAll(map);
         }
@@ -323,22 +326,20 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         final String mainDir = getMainSqlDirectory();
         final String mainOutput = getSql2EntityOutputDirectory();
         _outsideSqlLocationList.add(createOutsideSqlLocation(mainProjectName, mainDir, mainOutput, false, false));
-        final Object obj = getOutsideSqlDefinitionMap().get("applicationOutsideSqlMap");
-        if (obj == null) {
-            return _outsideSqlLocationList;
-        }
+        final Object obj = getApplicationOutsideSqlMap();
         if (!(obj instanceof Map<?, ?>)) {
             String msg = "The property 'applicationOutsideSqlMap' should be Map: " + obj.getClass();
             throw new DfIllegalPropertyTypeException(msg);
         }
         @SuppressWarnings("unchecked")
         final Map<String, Map<String, String>> sqlApMap = (Map<String, Map<String, String>>) obj;
-        final Set<Entry<String, Map<String, String>>> entrySet = sqlApMap.entrySet();
-
+        if (sqlApMap.isEmpty()) {
+            return _outsideSqlLocationList;
+        }
         final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
         final String defaultSqlDirectory = lang.getOutsideSqlDirectory();
         final String defaultMainProgramDirectory = lang.getMainProgramDirectory();
-        for (Entry<String, Map<String, String>> entry : entrySet) {
+        for (Entry<String, Map<String, String>> entry : sqlApMap.entrySet()) {
             final String applicationDir = entry.getKey();
             final Map<String, String> elementMap = entry.getValue();
 
@@ -385,6 +386,17 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
             _outsideSqlLocationList.add(sqlApLocation);
         }
         return _outsideSqlLocationList;
+    }
+
+    protected Object getApplicationOutsideSqlMap() {
+        final String key = "applicationOutsideSqlMap";
+        @SuppressWarnings("unchecked")
+        Map<String, Map<String, String>> map = (Map<String, Map<String, String>>) getOutsideSqlDefinitionMap().get(key);
+        if (map == null) {
+            map = newLinkedHashMap();
+        }
+        getLastaFluteProperties().reflectApplicationOutsideSqlMap(map);
+        return map;
     }
 
     protected String getMainSqlDirectory() { // for main

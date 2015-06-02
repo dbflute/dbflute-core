@@ -19,16 +19,17 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -39,9 +40,10 @@ public class DfReflectionUtil {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static Map<Class<?>, Class<?>> wrapperToPrimitiveMap = new HashMap<Class<?>, Class<?>>();
-    private static Map<Class<?>, Class<?>> primitiveToWrapperMap = new HashMap<Class<?>, Class<?>>();
-    private static Map<String, Class<?>> primitiveClsssNameMap = new HashMap<String, Class<?>>();
+    protected static final Type[] EMPTY_TYPES = new Type[0];
+    protected static Map<Class<?>, Class<?>> wrapperToPrimitiveMap = new HashMap<Class<?>, Class<?>>();
+    protected static Map<Class<?>, Class<?>> primitiveToWrapperMap = new HashMap<Class<?>, Class<?>>();
+    protected static Map<String, Class<?>> primitiveClsssNameMap = new HashMap<String, Class<?>>();
     static {
         wrapperToPrimitiveMap.put(Character.class, Character.TYPE);
         wrapperToPrimitiveMap.put(Byte.class, Byte.TYPE);
@@ -71,10 +73,10 @@ public class DfReflectionUtil {
         primitiveClsssNameMap.put(Boolean.TYPE.getName(), Boolean.TYPE);
     }
 
-    private static final Method IS_BRIDGE_METHOD = getIsBridgeMethod();
-    private static final Method IS_SYNTHETIC_METHOD = getIsSyntheticMethod();
+    protected static final Method IS_BRIDGE_METHOD = getIsBridgeMethod();
+    protected static final Method IS_SYNTHETIC_METHOD = getIsSyntheticMethod();
 
-    private static Method getIsBridgeMethod() {
+    protected static Method getIsBridgeMethod() {
         try {
             return Method.class.getMethod("isBridge", (Class[]) null);
         } catch (final NoSuchMethodException e) {
@@ -82,7 +84,7 @@ public class DfReflectionUtil {
         }
     }
 
-    private static Method getIsSyntheticMethod() {
+    protected static Method getIsSyntheticMethod() {
         try {
             return Method.class.getMethod("isSynthetic", (Class[]) null);
         } catch (final NoSuchMethodException e) {
@@ -547,28 +549,51 @@ public class DfReflectionUtil {
     // ===================================================================================
     //                                                                             Generic
     //                                                                             =======
-    public static Class<?> getGenericType(Type type) {
-        return getRawClass(getGenericParameter(type, 0));
-    }
-
-    protected static boolean isTypeOf(Type type, Class<?> clazz) {
+    // -----------------------------------------------------
+    //                                        Basic Handling
+    //                                        --------------
+    public static boolean isTypeOf(Type type, Class<?> clazz) {
         if (Class.class.isInstance(type)) {
             return clazz.isAssignableFrom(Class.class.cast(type));
         }
         if (ParameterizedType.class.isInstance(type)) {
-            final ParameterizedType parameterizedType = ParameterizedType.class.cast(type);
-            return isTypeOf(parameterizedType.getRawType(), clazz);
+            return isTypeOf(ParameterizedType.class.cast(type).getRawType(), clazz);
         }
         return false;
     }
 
-    protected static Class<?> getRawClass(Type type) {
+    // -----------------------------------------------------
+    //                                     Generic Parameter
+    //                                     -----------------
+    /**
+     * @param type The type that has the generic type. (NotNull)
+     * @return The first generic type for the specified type. (NullAllowed: e.g. not found)
+     */
+    public static Class<?> getGenericFirstClass(Type type) {
+        return findGenericClass(type, 0);
+    }
+
+    /**
+     * @param type The type that has the generic type. (NotNull)
+     * @return The second generic type for the specified type. (NullAllowed: e.g. not found)
+     */
+    public static Class<?> getGenericSecondClass(Type type) {
+        return findGenericClass(type, 1);
+    }
+
+    protected static Class<?> findGenericClass(Type type, int index) {
+        return getRawClass(getGenericParameterType(type, index));
+    }
+
+    public static Class<?> getRawClass(Type type) {
+        if (type == null) {
+            return null;
+        }
         if (Class.class.isInstance(type)) {
             return Class.class.cast(type);
         }
         if (ParameterizedType.class.isInstance(type)) {
-            final ParameterizedType parameterizedType = ParameterizedType.class.cast(type);
-            return getRawClass(parameterizedType.getRawType());
+            return getRawClass(ParameterizedType.class.cast(type).getRawType());
         }
         if (WildcardType.class.isInstance(type)) {
             final WildcardType wildcardType = WildcardType.class.cast(type);
@@ -583,31 +608,113 @@ public class DfReflectionUtil {
         return null;
     }
 
-    protected static Type getGenericParameter(Type type, int index) {
+    public static Type getGenericParameterType(Type type, int index) {
         if (!ParameterizedType.class.isInstance(type)) {
             return null;
         }
-        final List<Type> genericParameter = getGenericParameterList(type);
-        if (genericParameter.isEmpty()) {
+        final Type[] genericParameterTypeList = getGenericParameterTypes(type);
+        if (genericParameterTypeList.length == 0 || genericParameterTypeList.length < index) {
             return null;
         }
-        return genericParameter.get(index);
+        return genericParameterTypeList[index];
     }
 
-    protected static List<Type> getGenericParameterList(Type type) {
+    public static Type[] getGenericParameterTypes(Type type) {
         if (ParameterizedType.class.isInstance(type)) {
             final ParameterizedType paramType = ParameterizedType.class.cast(type);
-            return Arrays.asList(paramType.getActualTypeArguments());
+            return paramType.getActualTypeArguments();
         }
         if (GenericArrayType.class.isInstance(type)) {
             final GenericArrayType arrayType = GenericArrayType.class.cast(type);
-            return getGenericParameterList(arrayType.getGenericComponentType());
+            return getGenericParameterTypes(arrayType.getGenericComponentType());
         }
-        @SuppressWarnings("unchecked")
-        List<Type> emptyList = Collections.EMPTY_LIST;
-        return emptyList;
+        return EMPTY_TYPES;
     }
 
+    // -----------------------------------------------------
+    //                                         Type Variable
+    //                                         -------------
+    public static Map<TypeVariable<?>, Type> getTypeVariableMap(final Class<?> clazz) {
+        final Map<TypeVariable<?>, Type> map = new LinkedHashMap<TypeVariable<?>, Type>(4);
+
+        final TypeVariable<?>[] typeParameters = clazz.getTypeParameters();
+        for (TypeVariable<?> typeParameter : typeParameters) {
+            map.put(typeParameter, getActualClass(typeParameter.getBounds()[0], map));
+        }
+
+        final Class<?> superClass = clazz.getSuperclass();
+        final Type superClassType = clazz.getGenericSuperclass();
+        if (superClass != null) {
+            gatherTypeVariables(superClass, superClassType, map);
+        }
+
+        final Class<?>[] interfaces = clazz.getInterfaces();
+        final Type[] interfaceTypes = clazz.getGenericInterfaces();
+        for (int i = 0; i < interfaces.length; ++i) {
+            gatherTypeVariables(interfaces[i], interfaceTypes[i], map);
+        }
+
+        return map;
+    }
+
+    protected static void gatherTypeVariables(final Class<?> clazz, final Type type, final Map<TypeVariable<?>, Type> map) {
+        if (clazz == null) {
+            return;
+        }
+        gatherTypeVariables(type, map);
+
+        final Class<?> superClass = clazz.getSuperclass();
+        final Type superClassType = clazz.getGenericSuperclass();
+        if (superClass != null) {
+            gatherTypeVariables(superClass, superClassType, map);
+        }
+
+        final Class<?>[] interfaces = clazz.getInterfaces();
+        final Type[] interfaceTypes = clazz.getGenericInterfaces();
+        for (int i = 0; i < interfaces.length; ++i) {
+            gatherTypeVariables(interfaces[i], interfaceTypes[i], map);
+        }
+    }
+
+    protected static void gatherTypeVariables(final Type type, final Map<TypeVariable<?>, Type> map) {
+        if (ParameterizedType.class.isInstance(type)) {
+            final ParameterizedType parameterizedType = ParameterizedType.class.cast(type);
+            final TypeVariable<?>[] typeVariables = GenericDeclaration.class.cast(parameterizedType.getRawType()).getTypeParameters();
+            final Type[] actualTypes = parameterizedType.getActualTypeArguments();
+            for (int i = 0; i < actualTypes.length; ++i) {
+                map.put(typeVariables[i], actualTypes[i]);
+            }
+        }
+    }
+
+    protected static Class<?> getActualClass(final Type type, final Map<TypeVariable<?>, Type> map) {
+        if (Class.class.isInstance(type)) {
+            return Class.class.cast(type);
+        }
+        if (ParameterizedType.class.isInstance(type)) {
+            return getActualClass(ParameterizedType.class.cast(type).getRawType(), map);
+        }
+        if (WildcardType.class.isInstance(type)) {
+            return getActualClass(WildcardType.class.cast(type).getUpperBounds()[0], map);
+        }
+        if (TypeVariable.class.isInstance(type)) {
+            final TypeVariable<?> typeVariable = TypeVariable.class.cast(type);
+            if (map.containsKey(typeVariable)) {
+                return getActualClass(map.get(typeVariable), map);
+            }
+            return getActualClass(typeVariable.getBounds()[0], map);
+        }
+        if (GenericArrayType.class.isInstance(type)) {
+            final GenericArrayType genericArrayType = GenericArrayType.class.cast(type);
+            final Class<?> componentClass = getActualClass(genericArrayType.getGenericComponentType(), map);
+            return Array.newInstance(componentClass, 0).getClass();
+        }
+        return null;
+    }
+
+    // ===================================================================================
+    //                                                                   Failure Exception
+    //                                                                   =================
     public static class ReflectionFailureException extends RuntimeException {
 
         /** The serial version UID for object serialization. (Default) */

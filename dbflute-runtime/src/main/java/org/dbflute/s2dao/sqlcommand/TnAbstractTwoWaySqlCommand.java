@@ -50,7 +50,7 @@ public abstract class TnAbstractTwoWaySqlCommand extends TnAbstractBasicSqlComma
     public Object execute(Object[] args) {
         final Node rootNode = getRootNode(args);
         final CommandContext ctx = apply(rootNode, args, getArgNames(args), getArgTypes(args));
-        final String executedSql = filterExecutedSql(ctx.getSql());
+        final String executedSql = filterExecutedSql(ctx);
         final TnBasicParameterHandler handler = createBasicParameterHandler(ctx, executedSql);
         final Object[] bindVariables = ctx.getBindVariables();
         final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();
@@ -81,8 +81,8 @@ public abstract class TnAbstractTwoWaySqlCommand extends TnAbstractBasicSqlComma
     // ===================================================================================
     //                                                                              Filter
     //                                                                              ======
-    protected String filterExecutedSql(String executedSql) {
-        return executedSql;
+    protected String filterExecutedSql(CommandContext ctx) {
+        return ctx.getSql();
     }
 
     protected Object filterReturnValue(Object returnValue) {

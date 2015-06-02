@@ -25,11 +25,6 @@ public class ${myClassName} {
 	protected ${glStatementConfig} _defaultStatementConfig;
 	protected bool _queryLogLevelInfo;
 	protected bool _executeStatusLogLevelInfo;
-#if ($database.isSqlLogRegistryValid())
-	protected bool _useSqlLogRegistry = true;
-#else
-	protected bool _useSqlLogRegistry;
-#end
 #if ($database.isOutsideSqlPackageValid())
     protected String _outsideSqlPackage = "${database.outsideSqlPackage}";
 #else
@@ -128,22 +123,6 @@ public class ${myClassName} {
 		        _log.Info("...Setting executeStatusLogLevelInfo: " + value);
 		    }
 	        _executeStatusLogLevelInfo = value;
-		}
-	}
-	
-    // ===================================================================================
-    //                                                                    Sql Log Registry
-    //                                                                    ================
-	public bool IsUseSqlLogRegistry {
-	    get {
-	        return _useSqlLogRegistry;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting useSqlLogRegistry: " + value);
-		    }
-	        _useSqlLogRegistry = value;
 		}
 	}
 	

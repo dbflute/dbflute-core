@@ -1,0 +1,127 @@
+${manager.allClassCopyright}package ${request.package};
+
+#if ($request.tableMap.superClassPackage)
+import ${request.tableMap.superClassPackage}.${request.tableMap.superClassSimpleName};
+#else
+import org.lastaflute.web.ruts.message.ActionMessages;
+#end
+#set ($hasMessage = false)
+#foreach ($column in $table.columnList)
+#if (!$column.isExtends)
+#if (!$column.isLabel)
+#set ($hasMessage = true)
+#end
+#end
+#end
+#if ($hasMessage)
+import org.lastaflute.web.ruts.message.ActionMessage;
+#end
+
+/**
+ * The keys for message.
+ * @author FreeGen
+ */
+#if ($request.tableMap.superClassPackage)
+public class ${request.className} extends ${request.tableMap.superClassSimpleName} {
+#else
+public class ${request.className} extends ActionMessages {
+#end
+
+    /** The serial version UID for object serialization. (Default) */
+    private static final long serialVersionUID = 1L;
+#foreach ($column in $table.columnList)
+#if (!$column.isExtends)
+#if (!$column.isLabel)
+#if (!$column.isOverride)
+
+    /** The key of the message: ${column.propertyValue} */
+    public static final String ${column.defName} = "{${column.propertyKey}}";
+#end
+#end
+#end
+#end
+#foreach ($column in $table.columnList)
+#if (!$column.isExtends)
+#if (!$column.isLabel)
+
+#if ($column.hasVariable)
+    /**
+     * Add the created action message for the key '${column.propertyKey}' with parameters.
+     * <pre>
+     * message: ${column.propertyValue}
+#if ($column.comment != "")
+     * comment: ${column.comment}
+#end
+     * </pre>
+     * @param property The property name for the message. (NotNull)
+#foreach ($argName in $column.variableArgNameList)
+     * @param ${argName} The parameter ${argName} for message. (NotNull)
+#end
+     * @return this. (NotNull)
+     */
+#if ($column.isOverride)
+    @Override
+#end
+    public ${request.className} add${column.capCamelName}(String property, ${column.variableArgDef}) {
+        assertPropertyNotNull(property);
+        add(property, new ActionMessage(${column.defName}, ${column.variableArgSet}));
+        return this;
+    }
+#else
+    /**
+     * Add the created action message for the key '${column.propertyKey}' with parameters.
+     * <pre>
+     * message: ${column.propertyValue}
+#if ($column.comment != "")
+     * comment: ${column.comment}
+#end
+     * </pre>
+     * @param property The property name for the message. (NotNull)
+     * @return this. (NotNull)
+     */
+#if ($column.isOverride)
+    @Override
+#end
+    public ${request.className} add${column.capCamelName}(String property) {
+        assertPropertyNotNull(property);
+        add(property, new ActionMessage(${column.defName}));
+        return this;
+    }
+#end
+#end
+#end
+#end
+#if (!$request.tableMap.superClassPackage)
+
+    /**
+     * Assert the property is not null.
+     * @param property The value of the property. (NotNull)
+     */
+    protected void assertPropertyNotNull(String property) {
+        if (property == null) {
+            String msg = "The argument 'property' for message should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+#end
+
+    /**
+     * The definition of keys for labels.
+     * @author FreeGen
+     */
+#if ($request.tableMap.superClassPackage)
+    public static interface LabelKey extends ${request.tableMap.superClassSimpleName}.LabelKey {
+#else
+    public static interface LabelKey {
+#end
+#foreach ($column in $table.columnList)
+#if (!$column.isExtends)
+#if ($column.isLabel)
+
+        /** The key of the label: ${column.propertyValue} */
+        String ${column.defName} = "${column.propertyKey}";
+#end
+#end
+#end
+    }
+}

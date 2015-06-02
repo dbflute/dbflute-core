@@ -63,6 +63,7 @@ public class ResultBeanBuilder<ENTITY> {
      * @param selectedList The actually selected list of the entity. (NotNull)
      * @return The result bean of list. (NullAllowed: if null, treated as empty)
      */
+    @SuppressWarnings("deprecation")
     public ListResultBean<ENTITY> buildListInherited(ListResultBean<?> inherited, List<ENTITY> selectedList) {
         ListResultBean<ENTITY> rb = newListResultBean();
         rb.setTableDbName(_tableDbName);

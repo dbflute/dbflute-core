@@ -610,6 +610,13 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                 Type Mapping Facade
+    //                                                                 ===================
+    public Map<String, Object> getTypeMappingFacadeMap() { // null allowed
+        return getVairousStringKeyMap("typeMappingMap", null);
+    }
+
+    // ===================================================================================
     //                                                              CountDownRace MetaData
     //                                                              ======================
     public int getMetaDataCountDownRaceRunnerCount() {
@@ -724,20 +731,17 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     protected int getVariousInteger(String key, int defaultValue) {
-        final Map<String, Object> variousMap = _databaseInfo.getDatabaseVariousMap();
-        final Object obj = variousMap.get(key);
+        final Object obj = _databaseInfo.getDatabaseVariousMap().get(key);
         return obj != null ? Integer.parseInt(obj.toString()) : defaultValue;
     }
 
     protected boolean isVariousBoolean(String key, boolean defaultValue) {
-        final Map<String, Object> variousMap = _databaseInfo.getDatabaseVariousMap();
-        final Object obj = variousMap.get(key);
+        final Object obj = _databaseInfo.getDatabaseVariousMap().get(key);
         return obj != null ? obj.toString().equalsIgnoreCase("true") : defaultValue;
     }
 
     protected Object getVariousObject(String key) {
-        final Map<String, Object> variousMap = _databaseInfo.getDatabaseVariousMap();
-        return variousMap.get(key);
+        return _databaseInfo.getDatabaseVariousMap().get(key);
     }
 
     // ===================================================================================

@@ -49,16 +49,25 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    private static final long serialVersionUID = 1L; // basically for relation entity's optional
+
     protected static final OptionalEntity<Object> EMPTY_INSTANCE;
     static {
-        EMPTY_INSTANCE = new OptionalEntity<Object>(null, new OptionalThingExceptionThrower() {
+        EMPTY_INSTANCE = new OptionalEntity<Object>(null, new SerializableOptionalThingExceptionThrower() {
+
+            private static final long serialVersionUID = 1L;
+
             public void throwNotFoundException() {
                 String msg = "The empty optional so the value is null.";
                 throw new EntityAlreadyDeletedException(msg);
             }
         });
     }
-    protected static final OptionalThingExceptionThrower NOWAY_THROWER = new OptionalThingExceptionThrower() {
+    protected static final OptionalThingExceptionThrower NOWAY_THROWER = new SerializableOptionalThingExceptionThrower() {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
         public void throwNotFoundException() {
             throw new EntityAlreadyDeletedException("no way");
         }

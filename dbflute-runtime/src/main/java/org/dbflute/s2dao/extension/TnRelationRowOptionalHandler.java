@@ -15,32 +15,17 @@
  */
 package org.dbflute.s2dao.extension;
 
-import java.util.Map;
-
-import org.dbflute.Entity;
-import org.dbflute.bhv.core.context.ConditionBeanContext;
-import org.dbflute.cbean.ConditionBean;
-import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.exception.RelationEntityNotFoundException;
+import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.helper.beans.DfPropertyDesc;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.optional.OptionalThingExceptionThrower;
 import org.dbflute.optional.RelationOptionalFactory;
-import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
  * @since 1.0.5G (2014/05/20 Tuesday)
  */
 public class TnRelationRowOptionalHandler {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final Logger _log = LoggerFactory.getLogger(TnRelationRowOptionalHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -83,120 +68,25 @@ public class TnRelationRowOptionalHandler {
     //                                                                         ===========
     /**
      * Create optional null entity.
-     * @param row The base point row, which is previous relation row. (NotNull)
+     * @param row The local table's row, which is previous relation row. (NotNull)
      * @param rpt The property type for the relation. (NotNull)
      * @return The optional object for the relation. (NotNull)
      */
     protected Object createOptionalNullEntity(Object row, TnRelationPropertyType rpt) { // object for override
-        return _relationOptionalFactory.createOptionalNullEntity(createOptionalNullableThrower(row, rpt));
+        return _relationOptionalFactory.createOptionalNullEntity(createOptionalNullThrower(row, rpt));
     }
 
-    protected OptionalThingExceptionThrower createOptionalNullableThrower(final Object row, TnRelationPropertyType rpt) {
-        final String propertyName = rpt.getPropertyDesc().getPropertyName();
-        final DBMeta localDBMeta = rpt.getMyBeanMetaData().getDBMeta();
-        final ConditionBean cb;
-        if (ConditionBeanContext.isExistConditionBeanOnThread()) {
-            cb = ConditionBeanContext.getConditionBeanOnThread();
-        } else {
-            cb = null;
-        }
-        final String outsideSqlPath;
-        final Object parameterBean;
-        if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
-            final OutsideSqlContext context = OutsideSqlContext.getOutsideSqlContextOnThread();
-            outsideSqlPath = context.getOutsideSqlPath();
-            parameterBean = context.getParameterBean();
-        } else {
-            outsideSqlPath = null;
-            parameterBean = null;
-        }
-        return new OptionalThingExceptionThrower() {
-            public void throwNotFoundException() {
-                throwRelationEntityNotFoundException(row, propertyName, localDBMeta, cb, outsideSqlPath, parameterBean);
-            }
-        };
+    protected OptionalThingExceptionThrower createOptionalNullThrower(Object row, TnRelationPropertyType rpt) {
+        final String propertyName = rpt.getPropertyDesc().getPropertyName(); // not null
+        final String invokePath = InternalMapContext.getSavedInvokePath(); // null allowed
+        final String sql = InternalMapContext.getDisplaySqlResourceSql(); // not null (if CB)
+        final Object[] args = InternalMapContext.getDisplaySqlResourceParams(); // not null (if CB)
+        return newRelationRowOptionalNullThrower(row, propertyName, invokePath, sql, args);
     }
 
-    protected void throwRelationEntityNotFoundException(Object row, String propertyName, DBMeta localDBMeta, ConditionBean cb,
-            String outsideSqlPath, Object parameterBean) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the relation entity.");
-        br.addItem("Advice");
-        br.addElement("Confirm the existence in your business rule.");
-        br.addElement("If the relation entity might not exist, check it.");
-        br.addElement("For example:");
-        br.addElement("  (x):");
-        br.addElement("    List<Member> memberList = memberBhv.selectList(cb -> {");
-        br.addElement("        cb.setupSelect_MemberServiceAsOne();");
-        br.addElement("    });");
-        br.addElement("    for (Member member : memberList) {");
-        br.addElement("        ... = member.getMemberServiceAsOne().alwaysPresent(...); // *No");
-        br.addElement("    }");
-        br.addElement("  (o):");
-        br.addElement("    List<Member> memberList = memberBhv.selectList(cb -> {");
-        br.addElement("        cb.setupSelect_MemberServiceAsOne();");
-        br.addElement("    });");
-        br.addElement("    for (Member member : memberList) {");
-        br.addElement("        member.getMemberServiceAsOne().ifPresent(service -> {  // OK");
-        br.addElement("            ... = service.getServicePointCount();");
-        br.addElement("        });");
-        br.addElement("    }");
-        br.addItem("Your Operation");
-        final String localTable = localDBMeta.getTableDbName();
-        final String localSuffix;
-        if (row instanceof Entity) { // basically here
-            final Map<String, Object> pkMap = localDBMeta.extractPrimaryKeyMap((Entity) row);
-            localSuffix = pkMap.toString();
-        } else {
-            localSuffix = "{" + row + "}";
-        }
-        br.addElement(localTable + ":" + localSuffix + " => " + propertyName);
-        if (row instanceof Entity) { // basically here
-            final Entity entity = ((Entity) row);
-            br.addItem("Local Entity");
-            try {
-                br.addElement(entity.toStringWithRelation());
-            } catch (RuntimeException continued) {
-                final String tableDbName = entity.asTableDbName();
-                final String msg = "*Failed to build string from the entity for debug: " + tableDbName;
-                if (_log.isDebugEnabled()) {
-                    _log.debug(msg);
-                }
-                br.addElement(msg);
-            }
-        } else {
-            br.addItem("Local Entity");
-            br.addElement(row);
-        }
-        // cannot get it because this exception is after behavior command
-        // (thread locals are destroyed at that time)
-        //final InvokePathProvider invokePathProvider = InternalMapContext.getInvokePathProvider();
-        //if (invokePathProvider != null) {
-        //    final String invokePath = invokePathProvider.provide();
-        //    br.addItem("Behavior");
-        //    br.addElement(invokePath);
-        //}
-        if (cb != null) {
-            br.addItem("ConditionBean");
-            try {
-                final String displaySql = cb.toDisplaySql();
-                br.addElement(displaySql);
-            } catch (RuntimeException continued) {
-                final String tableDbName = cb.asTableDbName();
-                final String msg = "*Failed to get display SQL from the condition-bean for debug: " + tableDbName;
-                if (_log.isDebugEnabled()) {
-                    _log.debug(msg);
-                }
-                br.addElement(msg);
-            }
-        }
-        if (outsideSqlPath != null) {
-            br.addItem("OutsideSql");
-            br.addElement("path : " + outsideSqlPath);
-            br.addElement("pmb  : " + parameterBean);
-        }
-        final String msg = br.buildExceptionMessage();
-        throw new RelationEntityNotFoundException(msg);
+    protected TnRelationRowOptionalNullThrower newRelationRowOptionalNullThrower(Object row, String propertyName, String invokePath,
+            String sql, Object[] args) {
+        return new TnRelationRowOptionalNullThrower(row, propertyName, invokePath, sql, args);
     }
 
     // ===================================================================================

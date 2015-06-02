@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.BehaviorCommandMeta;
+import org.dbflute.bhv.core.context.InternalMapContext;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ckey.ConditionKey;
@@ -36,6 +37,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.dbflute.s2dao.sqlhandler.TnBasicParameterHandler;
 import org.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
+import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.twowaysql.node.Node;
 
 /**
@@ -203,8 +205,16 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
     //                                                                              Filter
     //                                                                              ======
     @Override
-    protected String filterExecutedSql(String executedSql) {
-        return doFilterExecutedSqlByCallbackFilter(super.filterExecutedSql(executedSql));
+    protected String filterExecutedSql(CommandContext ctx) {
+        final String filteredSql = doFilterExecutedSqlByCallbackFilter(super.filterExecutedSql(ctx));
+        saveDisplaySqlLogResource(ctx, filteredSql, ctx.getBindVariables());
+        return filteredSql;
+    }
+
+    protected void saveDisplaySqlLogResource(CommandContext ctx, String filteredSql, Object[] args) {
+        // to relation optional thrower's message, and to be serializable
+        InternalMapContext.setDisplaySqlLogResourceSql(filteredSql);
+        InternalMapContext.setDisplaySqlLogResourceParams(args);
     }
 
     protected String doFilterExecutedSqlByCallbackFilter(String executedSql) {

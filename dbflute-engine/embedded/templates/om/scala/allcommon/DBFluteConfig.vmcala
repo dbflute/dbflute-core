@@ -122,7 +122,6 @@ object ${glDBFluteConfig} {
 #else
     protected var _outsideSqlPackage: String = null;
 #end
-    protected var _useSqlLogRegistry: Boolean = ${database.isSqlLogRegistryValid()};
     protected var _mappingDateTimeZoneProvider: MappingDateTimeZoneProvider = null;
 
     // extension
@@ -543,22 +542,6 @@ object ${glDBFluteConfig} {
             _log.info("...Setting outsideSqlPackage: " + outsideSqlPackage);
         }
         _outsideSqlPackage = outsideSqlPackage;
-    }
-
-    // [DBFlute-0.8.2]
-    // ===================================================================================
-    //                                                                    SQL Log Registry
-    //                                                                    ================
-    def isUseSqlLogRegistry(): Boolean = {
-        return _useSqlLogRegistry;
-    }
-
-    def setUseSqlLogRegistry(useSqlLogRegistry: Boolean): Unit = {
-        assertNotLocked();
-        if (_log.isInfoEnabled()) {
-            _log.info("...Setting useSqlLogRegistry: " + useSqlLogRegistry);
-        }
-        _useSqlLogRegistry = useSqlLogRegistry;
     }
 
     // [DBFlute-1.1.0]

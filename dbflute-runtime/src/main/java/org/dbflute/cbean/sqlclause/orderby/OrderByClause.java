@@ -43,9 +43,6 @@ public class OrderByClause implements Serializable {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     */
     public OrderByClause() {
     }
 

@@ -27,6 +27,7 @@ import org.dbflute.unit.RuntimeTestCase;
  * @author jflute
  * @since 0.9.5 (2009/05/27 Wednesday)
  */
+@SuppressWarnings("deprecation")
 public class PagingInvokerTest extends RuntimeTestCase {
 
     // ===================================================================================

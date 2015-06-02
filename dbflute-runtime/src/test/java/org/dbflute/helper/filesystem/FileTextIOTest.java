@@ -15,6 +15,8 @@
  */
 package org.dbflute.helper.filesystem;
 
+import java.io.ByteArrayInputStream;
+
 import org.dbflute.unit.RuntimeTestCase;
 
 /**
@@ -22,6 +24,43 @@ import org.dbflute.unit.RuntimeTestCase;
  * @since 1.0.5K (2014/08/16 Saturday)
  */
 public class FileTextIOTest extends RuntimeTestCase {
+
+    // ===================================================================================
+    //                                                                   replaceCrLfToLf()
+    //                                                                   =================
+    public void test_replaceCrLfToLf_basic() throws Exception {
+        // ## Arrange ##
+        FileTextIO textIO = new FileTextIO().encodeAsUTF8().replaceCrLfToLf();
+        StringBuilder sb = new StringBuilder();
+        sb.append("foo\n");
+        sb.append("bar\r\n");
+        sb.append(" qux \n");
+        String text = sb.toString();
+
+        // ## Act ##
+        String read = textIO.read(new ByteArrayInputStream(text.getBytes("UTF-8")));
+
+        // ## Assert ##
+        assertContainsAll(read, "foo\n", "bar\n", " qux \n");
+        assertNotContains(read, "\r");
+    }
+
+    public void test_replaceCrLfToLf_non() throws Exception {
+        // ## Arrange ##
+        FileTextIO textIO = new FileTextIO().encodeAsUTF8();
+        StringBuilder sb = new StringBuilder();
+        sb.append("foo\n");
+        sb.append("bar\r\n");
+        sb.append(" qux \n");
+        String text = sb.toString();
+
+        // ## Act ##
+        String read = textIO.read(new ByteArrayInputStream(text.getBytes("UTF-8")));
+
+        // ## Assert ##
+        assertContainsAll(read, "foo\n", "bar\r\n", " qux \n");
+        assertContains(read, "\r");
+    }
 
     // ===================================================================================
     //                                                                      filterAsLine()

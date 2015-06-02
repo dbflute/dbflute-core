@@ -16,6 +16,7 @@
 package org.dbflute.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -364,6 +365,20 @@ public class DfCollectionUtilTest extends RuntimeTestCase {
         assertEquals("baz", movedList.get(3));
         assertEquals("quux", movedList.get(4));
         assertEquals(list.size(), movedList.size());
+    }
+
+    // -----------------------------------------------------
+    //                                                 Array
+    //                                                 -----
+    public void test_toListFromArray() throws Exception {
+        // ## Arrange ##
+        int[] ary = new int[] { 1, 2 };
+
+        // ## Act ##
+        List<Integer> list = DfCollectionUtil.toListFromArray(ary);
+
+        // ## Assert ##
+        assertEquals(Arrays.asList(1, 2), list);
     }
 
     // ===================================================================================

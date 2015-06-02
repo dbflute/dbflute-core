@@ -1,0 +1,21 @@
+${manager.allClassCopyright}package ${request.package};
+#if (!$table.columnList.isEmpty())
+
+import org.lastaflute.web.response.next.HtmlNext;
+#end
+
+/**
+ * The path definition of HTML.
+ * @author FreeGen
+ */
+public interface ${request.className} {
+#foreach ($column in $table.columnList)
+
+    /** The path of the HTML: ${column.domainPath} */
+#if ($column.capCamelDir && $column.capCamelDir != "")
+    HtmlNext path_${column.capCamelDir}_${column.capCamelFile} = new HtmlNext("${column.domainPath}");
+#else
+    HtmlNext path_${column.capCamelFile} = new HtmlNext("${column.domainPath}");
+#end
+#end
+}

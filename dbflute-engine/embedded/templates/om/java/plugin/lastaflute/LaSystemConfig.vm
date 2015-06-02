@@ -1,0 +1,181 @@
+${manager.allClassCopyright}package ${request.package};
+
+#if ($request.tableMap.interfaceSimpleName)
+import ${request.tableMap.superClassPackage}.${request.tableMap.interfaceSimpleName};
+#else
+import ${request.tableMap.superClassPackage}.${request.tableMap.superClassSimpleName};
+#end
+
+/**
+ * @author FreeGen
+ */
+#if ($request.tableMap.interfaceSimpleName)
+public interface ${request.className} extends ${request.tableMap.interfaceSimpleName} {
+#else
+public interface ${request.className} {
+#end
+#foreach ($column in $table.columnList)
+#if (!$column.isExtends)
+
+    /** The key of the configuration. e.g. ${column.propertyValueHtmlEncoded} */
+    String ${column.defName} = "${column.propertyKey}";
+#end
+#end
+
+    /**
+     * Get the value of property as {@link String}.
+     * @param propertyKey The key of the property. (NotNull)
+     * @return The value of found property. (NullAllowed: if null, not found)
+     */
+    String get(String propertyKey);
+
+    /**
+     * Is the property true?
+     * @param propertyKey The key of the property which is boolean type. (NotNull)
+     * @return The determination, true or false. (if the property can be true, returns true)
+     */
+    boolean is(String propertyKey);
+#foreach ($column in $table.columnList)
+#if (!$column.isExtends)
+
+    /**
+     * Get the value for the key '${column.propertyKey}'. <br>
+     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+#if ($column.hasComment)
+     * comment: ${column.commentHtmlEncoded}
+#end
+     * @return The value of found property. (basically NotNull: because of generated)
+     */
+    String get${column.capCamelName}();
+#if ($column.mayBeIntegerProperty)
+
+    /**
+     * Get the value for the key '${column.propertyKey}' as {@link Integer}. <br>
+     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+#if ($column.hasComment)
+     * comment: ${column.commentHtmlEncoded}
+#end
+     * @return The value of found property. (basically NotNull: because of generated)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer get${column.capCamelName}AsInteger();
+#end
+#if ($column.mayBeLongProperty)
+
+    /**
+     * Get the value for the key '${column.propertyKey}' as {@link Long}. <br>
+     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+#if ($column.hasComment)
+     * comment: ${column.commentHtmlEncoded}
+#end
+     * @return The value of found property. (basically NotNull: because of generated)
+     * @throws NumberFormatException When the property is not long.
+     */
+    Long get${column.capCamelName}AsLong();
+#end
+#if ($column.mayBeDecimalProperty)
+
+    /**
+     * Get the value for the key '${column.propertyKey}' as {@link java.math.BigDecimal}. <br>
+     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+#if ($column.hasComment)
+     * comment: ${column.commentHtmlEncoded}
+#end
+     * @return The value of found property. (basically NotNull: because of generated)
+     * @throws NumberFormatException When the property is not decimal.
+     */
+    java.math.BigDecimal get${column.capCamelName}AsDecimal();
+#end
+#if ($column.mayBeDateProperty)
+
+    /**
+     * Get the value for the key '${column.propertyKey}' as {@link java.time.LocalDate}. <br>
+     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+#if ($column.hasComment)
+     * comment: ${column.commentHtmlEncoded}
+#end
+     * @return The value of found property. (basically NotNull: because of generated)
+     */
+    java.time.LocalDate get${column.capCamelName}AsDate();
+#end
+#if ($column.mayBeBooleanProperty)
+
+    /**
+     * Is the property for the key '${column.propertyKey}' true? <br>
+     * The value is, e.g. ${column.propertyValueHtmlEncoded} <br>
+#if ($column.hasComment)
+     * comment: ${column.commentHtmlEncoded}
+#end
+     * @return The determination, true or false. (if the property can be true, returns true)
+     */
+    boolean is${column.capCamelName}();
+#end
+#end
+#end
+
+    /**
+     * The simple implementation for configuration.
+     * @author FreeGen
+     */
+    public static class SimpleImpl extends ${request.tableMap.superClassSimpleName} implements ${request.className} {
+
+        /** The serial version UID for object serialization. (Default) */
+        private static final long serialVersionUID = 1L;
+#foreach ($column in $table.columnList)
+#if (!$column.isExtends)
+
+#if ($column.isOverride)
+        @Override
+#end
+        public String get${column.capCamelName}() {
+            return get(${request.className}.${column.defName});
+        }
+#if ($column.mayBeIntegerProperty)
+
+#if ($column.isOverride)
+        @Override
+#end
+        public Integer get${column.capCamelName}AsInteger() {
+            return getAsInteger(${request.className}.${column.defName});
+        }
+#end
+#if ($column.mayBeLongProperty)
+
+#if ($column.isOverride)
+        @Override
+#end
+        public Long get${column.capCamelName}AsLong() {
+            return getAsLong(${request.className}.${column.defName});
+        }
+#end
+#if ($column.mayBeDecimalProperty)
+
+#if ($column.isOverride)
+        @Override
+#end
+        public java.math.BigDecimal get${column.capCamelName}AsDecimal() {
+            return getAsDecimal(${request.className}.${column.defName});
+        }
+#end
+#if ($column.mayBeDateProperty)
+
+#if ($column.isOverride)
+        @Override
+#end
+        public java.time.LocalDate get${column.capCamelName}AsDate() {
+            return getAsDate(${request.className}.${column.defName});
+        }
+#end
+#if ($column.mayBeBooleanProperty)
+
+#if ($column.isOverride)
+        @Override
+#end
+        public boolean is${column.capCamelName}() {
+            return is(${request.className}.${column.defName});
+        }
+#end
+#end
+#end
+    }
+}

@@ -93,7 +93,7 @@ public class HandyDate implements Serializable {
      * </pre>
      * @param localDate The instance of the local date. (NotNull)
      */
-    public HandyDate(LocalDate localDate) { // #dateParade
+    public HandyDate(LocalDate localDate) { // #date_parade
         assertConstructorArgNotNull("localDate", localDate);
         _cal = createCalendar(null, null); // means default zone
         prepareDefaultBeginAttribute();

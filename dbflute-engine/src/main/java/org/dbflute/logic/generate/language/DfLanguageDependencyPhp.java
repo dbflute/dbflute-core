@@ -110,6 +110,10 @@ public class DfLanguageDependencyPhp implements DfLanguageDependency {
         throw new UnsupportedOperationException("Unsupported language Php");
     }
 
+    public String getLastaFluteFreeGenControl() {
+        throw new UnsupportedOperationException("Unsupported language Php");
+    }
+
     public String getOutsideSqlDirectory() {
         return getMainProgramDirectory();
     }

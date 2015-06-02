@@ -66,19 +66,10 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     protected int _allRecordCount;
 
     /** The clause of order-by. (NullAllowed: lazy-loaded) */
-    protected OrderByClause _orderByClause;
+    protected transient OrderByClause _orderByClause; // #later: removed
 
     /** The list of selected entity. (NullAllowed: lazy-loaded) */
     protected List<ENTITY> _selectedList;
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    /**
-     * Constructor.
-     */
-    public ListResultBean() {
-    }
 
     // ===================================================================================
     //                                                                             Mapping
@@ -448,7 +439,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     //                                                                            ========
     /**
      * Get the value of tableDbName.
-     * @return The value of tableDbName. (NullAllowed: if null, it means not-selected-yet)
+     * @return The DB name of table. (NullAllowed: if null, it means not-selected-yet)
      */
     public String getTableDbName() {
         return _tableDbName;
@@ -456,7 +447,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
 
     /**
      * Set the value of tableDbName.
-     * @param tableDbName The value of tableDbName. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
      */
     public void setTableDbName(String tableDbName) {
         _tableDbName = tableDbName;
@@ -464,7 +455,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
 
     /**
      * Get the value of allRecordCount.
-     * @return The value of allRecordCount.
+     * @return The count of all records.
      */
     public int getAllRecordCount() {
         return _allRecordCount;
@@ -472,7 +463,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
 
     /**
      * Set the value of allRecordCount.
-     * @param allRecordCount The value of allRecordCount.
+     * @param allRecordCount The count of all records.
      */
     public void setAllRecordCount(int allRecordCount) {
         _allRecordCount = allRecordCount;
@@ -481,6 +472,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     /**
      * Get the value of orderByClause.
      * @return The value of orderByClause. (NotNull)
+     * @deprecated don't use this
      */
     public OrderByClause getOrderByClause() {
         if (_orderByClause == null) {

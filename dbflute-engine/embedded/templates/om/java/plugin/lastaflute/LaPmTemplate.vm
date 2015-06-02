@@ -1,0 +1,65 @@
+${manager.allClassCopyright}package ${request.buildHierarchyPackage($table)};
+
+import org.lastaflute.core.template.TemplateManager;
+import org.lastaflute.core.template.TemplatePmb;
+import org.lastaflute.core.template.TPCall;
+
+/**
+ * The Parameter-comMent style template (called PM template) on LastaFlute.
+ * @author FreeGen
+ */
+public class ${table.className} implements TemplatePmb {
+
+    public static final String PATH = "${table.resourcePath}";
+
+    public static String parsedBy(TemplateManager templateManager, TPCall<${table.className}> oneArgLambda) {
+        ${table.className} pmb = new ${table.className}();
+        oneArgLambda.setup(pmb);
+        return templateManager.parse(pmb);
+    }
+
+#foreach ($property in $table.propertyList)
+    protected ${property.propertyType} ${property.uncapCalemName};
+#end
+
+    @Override
+    public String getTemplatePath() {
+        return PATH;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("${table.className}:{");
+#set ($propIndex = 0)
+#foreach ($property in $table.propertyList)
+#if ($propIndex == 0)
+        sb.append(${property.uncapCalemName});
+#else
+        sb.append(", ").append(${property.uncapCalemName});
+#end
+#set ($propIndex = $propIndex + 1)
+#end
+        sb.append("}");
+        return sb.toString();
+    }
+#foreach ($property in $table.propertyList)
+
+    /**
+     * Get the value of ${property.uncapCalemName}, called by parameter comment.
+     * @return The parameter value of ${property.uncapCalemName}. (NullAllowed: e.g. when no setting)
+     */
+    public ${property.propertyType} get${property.capCalemName}() {
+        return ${property.uncapCalemName};
+    }
+
+    /**
+     * Set the value of ${property.uncapCalemName}, used in parameter comment. <br>
+     * Even if empty string, treated as empty plainly. So "IF pmb != null" is false if empty.
+     * @param ${property.uncapCalemName} The parameter value for parameter comment. (NullAllowed)
+     */
+    public void set${property.capCalemName}(${property.propertyType} ${property.uncapCalemName}) {
+        this.${property.uncapCalemName} = ${property.uncapCalemName};
+    }
+#end
+}
