@@ -214,8 +214,12 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * @throws EntityDuplicatedException When the entity has been duplicated.
      * @throws SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
-    public ${table.filterSelectEntityOptionalReturnIfNeeds($myExtendedObjectClassName)} selectEntity(CBCall<${myConditionBeanClassName}> cbLambda) {
+    public ${table.filterLambdaSelectEntityOptionalReturnIfNeeds($myExtendedObjectClassName)} selectEntity(CBCall<${myConditionBeanClassName}> cbLambda) {
+#if ($table.needsLambdaSelectEntityForcedlyOptional())
+        return doSelectOptionalEntity(createCB(cbLambda), typeOfSelectedEntity());
+#else
         return facadeSelectEntity(createCB(cbLambda));
+#end
     }
 
 #end

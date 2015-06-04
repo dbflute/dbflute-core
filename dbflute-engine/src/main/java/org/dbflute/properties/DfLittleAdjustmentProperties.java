@@ -136,6 +136,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isAvailableSelectEntityPlainReturn", isCompatibleBeforeJava8());
     }
 
+    public boolean isAvailableLambdaSelectEntityForcedlyOptional() { // closet
+        return isProperty("isAvailableLambdaSelectEntityForcedlyOptional", true);
+    }
+
     public boolean isAvailableSelectEntityPlainReturnTable(String tableName) { // closet
         if (!isAvailableSelectEntityPlainReturn()) {
             return false;

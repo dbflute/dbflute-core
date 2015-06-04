@@ -3550,6 +3550,22 @@ public class Table {
         return doFilterSelectEntityOptionalReturnIfNeeds(entityType);
     }
 
+    public String filterLambdaSelectEntityOptionalReturnIfNeeds(String entityType) {
+        if (needsLambdaSelectEntityForcedlyOptional()) {
+            return filterSelectEntityOptionalReturn(entityType);
+        } else {
+            return doFilterSelectEntityOptionalReturnIfNeeds(entityType);
+        }
+    }
+
+    public boolean needsLambdaSelectEntityForcedlyOptional() {
+        if (isAvailableSelectEntityPlainReturn()) {
+            return getLittleAdjustmentProperties().isAvailableLambdaSelectEntityForcedlyOptional();
+        } else {
+            return false;
+        }
+    }
+
     protected String doFilterSelectEntityOptionalReturnIfNeeds(String entityType) {
         if (isAvailableSelectEntityPlainReturn()) {
             return entityType;
