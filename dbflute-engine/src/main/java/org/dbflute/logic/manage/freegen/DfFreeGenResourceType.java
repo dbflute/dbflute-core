@@ -23,7 +23,7 @@ import org.dbflute.logic.manage.freegen.table.json.DfJsonKeyTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonSchemaTableLoader;
 import org.dbflute.logic.manage.freegen.table.lastaflute.DfLastaDocTableLoader;
 import org.dbflute.logic.manage.freegen.table.mailflute.DfMailFluteTableLoader;
-import org.dbflute.logic.manage.freegen.table.pmcfile.DfPmFileTableLoader;
+import org.dbflute.logic.manage.freegen.table.pmfile.DfPmFileTableLoader;
 import org.dbflute.logic.manage.freegen.table.prop.DfPropTableLoader;
 import org.dbflute.logic.manage.freegen.table.solr.DfSolrXmlTableLoader;
 import org.dbflute.logic.manage.freegen.table.xls.DfXlsTableLoader;
