@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.manage.freegen.table.pmcfile;
+package org.dbflute.logic.manage.freegen.table.pmfile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,9 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.helper.filesystem.FileTextIO;
+import org.dbflute.logic.generate.language.DfLanguageDependency;
+import org.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
@@ -38,6 +41,7 @@ import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectBindNode;
 import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectProcess;
 import org.dbflute.logic.sql2entity.analyzer.DfSql2EntityMark;
 import org.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
+import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.twowaysql.node.IfNode;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
@@ -136,12 +140,12 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
             }
             final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
             final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
-            final Set<String> autoDetectedPropertyNameSet = new LinkedHashSet<String>();
-            processAutoDetect(fileText, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet);
-            processSpecifiedDetect(fileText, propertyNameTypeMap, propertyNameOptionMap);
+            final Set<String> propertyNameSet = new LinkedHashSet<String>();
+            processAutoDetect(fileText, propertyNameTypeMap, propertyNameOptionMap, propertyNameSet);
+            processSpecifiedDetect(fileText, propertyNameTypeMap, propertyNameOptionMap, propertyNameSet);
             final List<Map<String, String>> propertyList = new ArrayList<Map<String, String>>();
             final StringBuilder commaSb = new StringBuilder();
-            for (String propertyName : autoDetectedPropertyNameSet) {
+            for (String propertyName : propertyNameSet) {
                 final Map<String, String> property = new LinkedHashMap<String, String>();
                 property.put("propertyName", propertyName);
                 property.put("capCalemName", Srl.initCap(propertyName));
@@ -210,7 +214,7 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
     }
 
     protected void processAutoDetect(String fileText, Map<String, String> propertyNameTypeMap, Map<String, String> propertyNameOptionMap,
-            Set<String> autoDetectedPropertyNameSet) {
+            Set<String> propertyNameSet) {
         final DfParameterAutoDetectProcess process = new DfParameterAutoDetectProcess() {
             @Override
             protected DfParameterAutoDetectBindNode newParameterAutoDetectBindNode(DfParameterAutoDetectAssist assist) {
@@ -222,18 +226,29 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
                 // unsupported
             }
         };
-        process.processAutoDetect(fileText, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet);
+        process.processAutoDetect(fileText, propertyNameTypeMap, propertyNameOptionMap, propertyNameSet);
     }
 
     protected void processSpecifiedDetect(String fileText, Map<String, String> propertyNameTypeMap,
-            Map<String, String> propertyNameOptionMap) {
+            Map<String, String> propertyNameOptionMap, Set<String> propertyNameSet) {
         final List<DfSql2EntityMark> propertyTypeList = new DfSql2EntityMarkAnalyzer().getParameterBeanPropertyTypeList(fileText);
         for (DfSql2EntityMark mark : propertyTypeList) {
             final String content = mark.getContent();
             final String propertyType = Srl.substringFirstFront(content, " ").trim();
             final String propertyName = Srl.substringFirstRear(content, " ").trim();
-            propertyNameTypeMap.put(propertyName, propertyType);
+            propertyNameTypeMap.put(propertyName, resolvePackageName(propertyType));
+            propertyNameSet.add(propertyName);
         }
+    }
+
+    protected String resolvePackageName(String typeName) {
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguagePropertyPackageResolver resolver = lang.getLanguagePropertyPackageResolver();
+        return resolver.resolvePackageName(typeName);
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
     }
 
     // ===================================================================================
