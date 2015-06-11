@@ -23,17 +23,17 @@ import org.dbflute.cbean.scoping.SpecifyQuery;
  * @param <CB> The type of condition-bean.
  * @author jflute
  */
-public class HpSSQDecorator<CB extends ConditionBean> {
+public class HpSLCDecorator<CB extends ConditionBean> {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final HpSSQOption<CB> _option;
+    protected final HpSLCCustomized<CB> _option;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpSSQDecorator(HpSSQOption<CB> option) {
+    public HpSLCDecorator(HpSLCCustomized<CB> option) {
         _option = option;
     }
 

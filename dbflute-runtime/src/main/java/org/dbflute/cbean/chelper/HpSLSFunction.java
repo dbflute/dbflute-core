@@ -63,6 +63,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     // ===================================================================================
     //                                                                            Function
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Count
+    //                                                 -----
     /**
      * Select the count value. <br>
      * You can also get same result by selectCount(cb) method.
@@ -92,10 +95,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @return The count value calculated by function. (NotNull)
      */
     public RESULT count(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
-        final ScalarSelectOption option = createScalarSelectOption();
-        opLambda.callback(option);
-        assertScalarSelectOption(option);
-        return doCount(cbLambda, option);
+        return doCount(cbLambda, prepareOption(opLambda));
     }
 
     protected RESULT doCount(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -103,6 +103,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
         return exec(scalarQuery, SelectClauseType.UNIQUE_COUNT, option);
     }
 
+    // -----------------------------------------------------
+    //                                         Count Distict
+    //                                         -------------
     /**
      * Select the count-distinct value. <br>
      * You can also get same result by selectCount(cb) method.
@@ -132,10 +135,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @return The count-distinct value calculated by function. (NotNull)
      */
     public RESULT countDistinct(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
-        final ScalarSelectOption option = createScalarSelectOption();
-        opLambda.callback(option);
-        assertScalarSelectOption(option);
-        return doCountDistinct(cbLambda, option);
+        return doCountDistinct(cbLambda, prepareOption(opLambda));
     }
 
     protected RESULT doCountDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -143,6 +143,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
         return exec(scalarQuery, SelectClauseType.COUNT_DISTINCT, option);
     }
 
+    // -----------------------------------------------------
+    //                                               Maximum
+    //                                               -------
     /**
      * Select the maximum value.
      * <pre>
@@ -171,10 +174,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @return The optional scalar for maximum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
     public OptionalScalar<RESULT> max(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
-        final ScalarSelectOption option = createScalarSelectOption();
-        opLambda.callback(option);
-        assertScalarSelectOption(option);
-        return doMax(cbLambda, option);
+        return doMax(cbLambda, prepareOption(opLambda));
     }
 
     protected OptionalScalar<RESULT> doMax(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -182,6 +182,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
         return optionalOf("max", exec(scalarQuery, SelectClauseType.MAX, option));
     }
 
+    // -----------------------------------------------------
+    //                                               Minimum
+    //                                               -------
     /**
      * Select the minimum value.
      * <pre>
@@ -210,10 +213,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @return The optional scalar for minimum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
     public OptionalScalar<RESULT> min(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
-        final ScalarSelectOption option = createScalarSelectOption();
-        opLambda.callback(option);
-        assertScalarSelectOption(option);
-        return doMin(cbLambda, option);
+        return doMin(cbLambda, prepareOption(opLambda));
     }
 
     protected OptionalScalar<RESULT> doMin(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -221,6 +221,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
         return optionalOf("min", exec(scalarQuery, SelectClauseType.MIN, option));
     }
 
+    // -----------------------------------------------------
+    //                                               Summary
+    //                                               -------
     /**
      * Select the summary value.
      * <pre>
@@ -249,10 +252,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @return The optional scalar for summary value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
     public OptionalScalar<RESULT> sum(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
-        final ScalarSelectOption option = createScalarSelectOption();
-        opLambda.callback(option);
-        assertScalarSelectOption(option);
-        return doSum(cbLambda, option);
+        return doSum(cbLambda, prepareOption(opLambda));
     }
 
     protected OptionalScalar<RESULT> doSum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -260,6 +260,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
         return optionalOf("sum", exec(scalarQuery, SelectClauseType.SUM, option));
     }
 
+    // -----------------------------------------------------
+    //                                               Average
+    //                                               -------
     /**
      * Select the average value.
      * <pre>
@@ -288,10 +291,7 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
      * @return The optional scalar for average value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
      */
     public OptionalScalar<RESULT> avg(ScalarQuery<CB> cbLambda, FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
-        final ScalarSelectOption option = createScalarSelectOption();
-        opLambda.callback(option);
-        assertScalarSelectOption(option);
-        return doAvg(cbLambda, option);
+        return doAvg(cbLambda, prepareOption(opLambda));
     }
 
     protected OptionalScalar<RESULT> doAvg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
@@ -299,6 +299,9 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
         return optionalOf("avg", exec(scalarQuery, SelectClauseType.AVG, option));
     }
 
+    // -----------------------------------------------------
+    //                                              Optional
+    //                                              --------
     protected OptionalScalar<RESULT> optionalOf(String title, RESULT result) {
         return OptionalScalar.ofNullable(result, () -> {
             throwScalarSelectValueNotFoundException(title);
@@ -360,6 +363,14 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
+    protected ScalarSelectOption prepareOption(FunctionFilterOptionCall<ScalarSelectOption> opLambda) {
+        assertObjectNotNull("opLambda", opLambda);
+        final ScalarSelectOption option = createScalarSelectOption();
+        opLambda.callback(option);
+        assertScalarSelectOption(option);
+        return option;
+    }
+
     protected ScalarSelectOption createScalarSelectOption() {
         return newScalarSelectOption();
     }
@@ -390,12 +401,6 @@ public class HpSLSFunction<CB extends ConditionBean, RESULT> {
         }
     }
 
-    /**
-     * Assert that the object is not null.
-     * @param variableName The variable name for message. (NotNull)
-     * @param value The value the checked variable. (NotNull)
-     * @throws IllegalArgumentException When the variable name or the variable is null.
-     */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
             String msg = "The value should not be null: variableName=null value=" + value;

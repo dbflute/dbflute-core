@@ -38,9 +38,9 @@ import org.dbflute.cbean.chelper.HpManualOrderThemeListHandler;
 import org.dbflute.cbean.chelper.HpQDRFunction;
 import org.dbflute.cbean.chelper.HpQDRParameter;
 import org.dbflute.cbean.chelper.HpQDRSetupper;
-import org.dbflute.cbean.chelper.HpSSQFunction;
-import org.dbflute.cbean.chelper.HpSSQOption;
-import org.dbflute.cbean.chelper.HpSSQSetupper;
+import org.dbflute.cbean.chelper.HpSLCCustomized;
+import org.dbflute.cbean.chelper.HpSLCFunction;
+import org.dbflute.cbean.chelper.HpSLCSetupper;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
@@ -54,6 +54,7 @@ import org.dbflute.cbean.coption.FromToOption;
 import org.dbflute.cbean.coption.LikeSearchOption;
 import org.dbflute.cbean.coption.ParameterOption;
 import org.dbflute.cbean.coption.RangeOfOption;
+import org.dbflute.cbean.coption.ScalarConditionOption;
 import org.dbflute.cbean.cvalue.ConditionValue;
 import org.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.dbflute.cbean.dream.SpecifiedColumn;
@@ -1559,7 +1560,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                     ScalarCondition
     //                                                                     ===============
     protected <CB extends ConditionBean> void registerScalarCondition(final String function, final ConditionQuery subQuery,
-            String propertyName, String operand, final HpSSQOption<CB> option) {
+            String propertyName, String operand, final HpSLCCustomized<CB> after, ScalarConditionOption option) {
         assertSubQueryNotNull("ScalarCondition", propertyName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
@@ -1576,35 +1577,36 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
         final PartitionByProvider partitionByProvider = new ScalarCondition.PartitionByProvider() {
             public SqlClause provideSqlClause() {
-                return option.preparePartitionBySqlClause();
+                return after.preparePartitionBySqlClause();
             }
         };
         final ScalarCondition scalarCondition =
                 new ScalarCondition(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
                         subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, partitionByProvider);
-        final QueryClause clause = new QueryClause() { // lazy registration to use partition-by
-                    public String toString() {
-                        return scalarCondition.buildScalarCondition(function);
-                    }
-                };
+        final QueryClause clause = new QueryClause() { /* lazy registration to use partition-by */
+            public String toString() {
+                return scalarCondition.buildScalarCondition(function, option);
+            }
+        };
         // no speak about inner-join because of no possible of null revival
         final QueryUsedAliasInfo usedAliasInfo = new QueryUsedAliasInfo(xgetAliasName(), null);
         registerWhereClause(clause, usedAliasInfo);
     }
 
-    protected <CB extends ConditionBean> HpSSQFunction<CB> xcreateSSQFunction(ConditionKey ckey, Class<CB> tp) { // type for cast
-        return xcreateSSQFunction(ckey.getOperand(), tp); // delegate to string operand, also for compatible
+    protected <CB extends ConditionBean> HpSLCFunction<CB> xcreateSLCFunction(ConditionKey ckey, Class<CB> tp) { // type for cast
+        return xcreateSLCFunction(ckey.getOperand(), tp); // delegate to string operand, also for compatible
     }
 
-    protected <CB extends ConditionBean> HpSSQFunction<CB> xcreateSSQFunction(final String rd, Class<CB> tp) {
-        return new HpSSQFunction<CB>(new HpSSQSetupper<CB>() {
-            public void setup(String fn, SubQuery<CB> sq, HpSSQOption<CB> op) {
-                xscalarCondition(fn, sq, rd, op);
+    protected <CB extends ConditionBean> HpSLCFunction<CB> xcreateSLCFunction(final String rd, Class<CB> tp) {
+        return new HpSLCFunction<CB>(new HpSLCSetupper<CB>() {
+            public void setup(String fn, SubQuery<CB> sq, HpSLCCustomized<CB> cs, ScalarConditionOption op) {
+                xscalarCondition(fn, sq, rd, cs, op);
             }
         });
     }
 
-    protected <CB extends ConditionBean> void xscalarCondition(String fn, SubQuery<CB> sq, String rd, HpSSQOption<CB> op) {
+    protected <CB extends ConditionBean> void xscalarCondition(String fn, SubQuery<CB> sq, String rd, HpSLCCustomized<CB> cs,
+            ScalarConditionOption op) {
         // overridden by sub-class (not abstract for suppressing option)
     }
 

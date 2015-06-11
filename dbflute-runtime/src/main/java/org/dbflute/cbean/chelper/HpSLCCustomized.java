@@ -20,11 +20,11 @@ import org.dbflute.cbean.scoping.SpecifyQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 
 /**
- * The option for ScalarCondition (the old name: ScalarSubQuery).
+ * The customized info for ScalarCondition (the old name: ScalarSubQuery).
  * @param <CB> The type of condition-bean.
  * @author jflute
  */
-public class HpSSQOption<CB extends ConditionBean> {
+public class HpSLCCustomized<CB extends ConditionBean> {
 
     // ===================================================================================
     //                                                                           Attribute

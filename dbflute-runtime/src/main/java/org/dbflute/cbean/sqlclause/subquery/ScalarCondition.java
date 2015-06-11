@@ -16,6 +16,7 @@
 package org.dbflute.cbean.sqlclause.subquery;
 
 import org.dbflute.cbean.cipher.GearedCipherManager;
+import org.dbflute.cbean.coption.ScalarConditionOption;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
@@ -58,7 +59,7 @@ public class ScalarCondition extends AbstractSubQuery {
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
-    public String buildScalarCondition(String function) {
+    public String buildScalarCondition(String function, ScalarConditionOption option) {
         // Get the specified column before it disappears at sub-query making.
         final ColumnRealName columnRealName;
         {
@@ -69,7 +70,7 @@ public class ScalarCondition extends AbstractSubQuery {
             columnRealName = _localRealNameProvider.provide(columnDbName);
         }
 
-        final String subQueryClause = getSubQueryClause(function);
+        final String subQueryClause = getSubQueryClause(function, option);
         final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
         final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
@@ -79,7 +80,7 @@ public class ScalarCondition extends AbstractSubQuery {
                 + " (" + beginMark + subQueryClause + ln() + endIndent + ") " + endMark; // right
     }
 
-    protected String getSubQueryClause(String function) {
+    protected String getSubQueryClause(String function, ScalarConditionOption option) {
         // release ScalarCondition for compound PK
         // (compound PK restricted until 1.0.5G without special reason)
         //if (!_subQueryDBMeta.hasPrimaryKey() || _subQueryDBMeta.hasCompoundPrimaryKey()) {
@@ -110,11 +111,11 @@ public class ScalarCondition extends AbstractSubQuery {
         if (_subQuerySqlClause.hasUnionQuery()) {
             subQueryClause =
                     getUnionSubQuerySql(function, tableAliasName, derivedColumnSqlName, derivedColumnRealName,
-                            partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName);
+                            partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName, option);
         } else {
             final ColumnInfo columnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
             final String specifiedExp = decrypt(columnInfo, derivedColumnRealName.toString());
-            final String selectClause = "select " + function + "(" + specifiedExp + ")";
+            final String selectClause = "select " + buildFunctionPart(function, specifiedExp, option);
             final String fromWhereClause =
                     buildFromWhereClause(selectClause, tableAliasName, partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName);
             subQueryClause = selectClause + " " + fromWhereClause;
@@ -132,7 +133,8 @@ public class ScalarCondition extends AbstractSubQuery {
 
     protected String getUnionSubQuerySql(String function, String tableAliasName // basic
             , ColumnSqlName derivedColumnSqlName, ColumnRealName derivedColumnRealName // derived
-            , ColumnRealName partitionByCorrelatedColumnRealName, ColumnSqlName partitionByRelatedColumnSqlName) { // partition-by
+            , ColumnRealName partitionByCorrelatedColumnRealName, ColumnSqlName partitionByRelatedColumnSqlName // partition-by
+            , ScalarConditionOption option) {
         final String beginMark = resolveSubQueryBeginMark(_mainSubQueryIdentity) + ln();
         final String endMark = resolveSubQueryEndMark(_mainSubQueryIdentity);
         final String mainSql;
@@ -148,8 +150,12 @@ public class ScalarCondition extends AbstractSubQuery {
         final ColumnRealName mainDerivedColumnRealName = ColumnRealName.create(mainAlias, derivedColumnSqlName);
         final ColumnInfo columnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
         final String specifiedExp = decrypt(columnInfo, mainDerivedColumnRealName.toString());
-        return "select " + function + "(" + specifiedExp + ")" + ln() // select
+        return "select " + buildFunctionPart(function, specifiedExp, option) + ln() // select
                 + "  from (" + beginMark + mainSql + ln() + "       ) " + mainAlias + endMark; // from
+    }
+
+    protected String buildFunctionPart(String function, String specifiedExp, ScalarConditionOption option) {
+        return option.filterFunction(function + "(" + specifiedExp + ")");
     }
 
     protected String buildFromWhereClause(String selectClause, String tableAliasName, ColumnRealName partitionByCorrelatedColumnRealName,
