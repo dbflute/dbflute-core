@@ -18,6 +18,7 @@ package org.dbflute.s2dao.sqlhandler;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -257,14 +258,14 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
     //                                                                 ===================
     protected void addNewTimestamp(Timestamp timestamp) {
         if (_newTimestampList == null) {
-            _newTimestampList = DfCollectionUtil.newArrayList();
+            _newTimestampList = DfCollectionUtil.newArrayListSized(2);
         }
         _newTimestampList.add(timestamp);
     }
 
     protected void addNewVersionNo(Long versionNo) {
         if (_newVersionNoList == null) {
-            _newVersionNoList = DfCollectionUtil.newArrayList();
+            _newVersionNoList = DfCollectionUtil.newArrayListSized(2);
         }
         _newVersionNoList.add(versionNo);
     }
@@ -279,7 +280,14 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
             return;
         }
         final DfPropertyDesc pd = getBeanMetaData().getTimestampPropertyType().getPropertyDesc();
-        pd.setValue(bean, newTimestampList.get(index));
+        final Timestamp timestamp = newTimestampList.get(index);
+        final Object realValue;
+        if (pd.getPropertyType().isAssignableFrom(LocalDateTime.class)) {
+            realValue = DfTypeUtil.toLocalDateTime(timestamp);
+        } else {
+            realValue = timestamp;
+        }
+        pd.setValue(bean, realValue);
     }
 
     protected void updateVersionNoIfNeed(Object bean) {
