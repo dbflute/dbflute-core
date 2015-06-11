@@ -281,12 +281,8 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
         }
         final DfPropertyDesc pd = getBeanMetaData().getTimestampPropertyType().getPropertyDesc();
         final Timestamp timestamp = newTimestampList.get(index);
-        final Object realValue;
-        if (pd.getPropertyType().isAssignableFrom(LocalDateTime.class)) {
-            realValue = DfTypeUtil.toLocalDateTime(timestamp);
-        } else {
-            realValue = timestamp;
-        }
+        final boolean localDateTime = pd.getPropertyType().isAssignableFrom(LocalDateTime.class);
+        final Object realValue = localDateTime ? DfTypeUtil.toLocalDateTime(timestamp) : timestamp;
         pd.setValue(bean, realValue);
     }
 
