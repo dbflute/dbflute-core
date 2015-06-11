@@ -34,13 +34,11 @@ import org.dbflute.FunCustodial;
 import org.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.dbflute.cbean.chelper.HpInvalidQueryInfo;
-import org.dbflute.cbean.chelper.HpManualOrderThemeListHandler;
 import org.dbflute.cbean.chelper.HpQDRFunction;
 import org.dbflute.cbean.chelper.HpQDRParameter;
 import org.dbflute.cbean.chelper.HpQDRSetupper;
 import org.dbflute.cbean.chelper.HpSLCCustomized;
 import org.dbflute.cbean.chelper.HpSLCFunction;
-import org.dbflute.cbean.chelper.HpSLCSetupper;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.cipher.GearedCipherManager;
 import org.dbflute.cbean.ckey.ConditionKey;
@@ -65,7 +63,6 @@ import org.dbflute.cbean.scoping.SubQuery;
 import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.dbflute.cbean.sqlclause.SqlClauseOracle;
-import org.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.dbflute.cbean.sqlclause.join.FixedConditionLazyChecker;
 import org.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.dbflute.cbean.sqlclause.orderby.OrderByElement;
@@ -602,10 +599,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // o SetupSelect(Relation) after Union (however, basically they should be called before union)
         // o ManualOrder with Dream Cruise using Specify(Relation) after Union
         final ConditionQuery selfCQ = this;
-        xgetSqlClause().registerClauseLazyReflector(new ClauseLazyReflector() {
-            public void reflect() {
-                reflectRelationOnUnionQuery(selfCQ, unionQuery); // reflect relations
-            }
+        xgetSqlClause().registerClauseLazyReflector(() -> {
+            reflectRelationOnUnionQuery(selfCQ, unionQuery);
         });
         final String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
         unionQueryMap.addParameter(key, unionQuery);
@@ -1249,11 +1244,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
-            public ColumnSqlName provide(String columnDbName) {
-                return subQuery.toColumnSqlName(columnDbName);
-            }
-        };
+        final ColumnSqlNameProvider subQuerySqlNameProvider = dbName -> subQuery.toColumnSqlName(dbName);
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final ExistsReferrer existsReferrer =
@@ -1332,11 +1323,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
-            public ColumnSqlName provide(String columnDbName) {
-                return subQuery.toColumnSqlName(columnDbName);
-            }
-        };
+        final ColumnSqlNameProvider subQuerySqlNameProvider = dbName -> subQuery.toColumnSqlName(dbName);
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final boolean suppressLocalAliasName = isInScopeRelationSuppressLocalAliasName();
@@ -1377,8 +1364,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                            ========================
     protected void registerSpecifyDerivedReferrer(String function, ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String referrerPropertyName, String aliasName, DerivedReferrerOption option) {
+        final DerivedReferrerOption realOp = option != null ? option : newDefaultDerivedReferrerOption();
         doRegisterSpecifyDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName,
-                aliasName, option != null ? option : newDefaultDerivedReferrerOption());
+                aliasName, realOp);
     }
 
     protected void doRegisterSpecifyDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
@@ -1394,11 +1382,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
-            public ColumnSqlName provide(String columnDbName) {
-                return subQuery.toColumnSqlName(columnDbName);
-            }
-        };
+        final ColumnSqlNameProvider subQuerySqlNameProvider = dbName -> subQuery.toColumnSqlName(dbName);
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
@@ -1422,10 +1406,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return new HpDerivingSubQueryInfo(function, aliasName, clause, derivedReferrer);
     }
 
-    /**
-     * New-create the option of (both specify and query) derived-referrer as plain.
-     * @return The new-created option of (both specify and query) derived-referrer. (NotNull)
-     */
     protected DerivedReferrerOption newDefaultDerivedReferrerOption() {
         return new DerivedReferrerOption(); // both Specify and Query
     }
@@ -1452,8 +1432,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerQueryDerivedReferrer(String function, ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName, String referrerPropertyName, String operand, Object value, String parameterPropertyName,
             DerivedReferrerOption option) {
+        final DerivedReferrerOption realOp = option != null ? option : newDefaultDerivedReferrerOption();
         doRegisterQueryDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, operand,
-                value, parameterPropertyName, option != null ? option : newDefaultDerivedReferrerOption());
+                value, parameterPropertyName, realOp);
     }
 
     protected void doRegisterQueryDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
@@ -1470,11 +1451,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
-            public ColumnSqlName provide(String columnDbName) {
-                return subQuery.toColumnSqlName(columnDbName);
-            }
-        };
+        final ColumnSqlNameProvider subQuerySqlNameProvider = dbName -> subQuery.toColumnSqlName(dbName);
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
@@ -1559,7 +1536,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                     ScalarCondition
     //                                                                     ===============
-    protected <CB extends ConditionBean> void registerScalarCondition(final String function, final ConditionQuery subQuery,
+    protected <CB extends ConditionBean> void registerScalarCondition(String function, final ConditionQuery subQuery, String propertyName,
+            String operand, final HpSLCCustomized<CB> after, ScalarConditionOption option) {
+        final ScalarConditionOption realOp = option != null ? option : newDefaultScalarConditionOption();
+        doRegisterScalarCondition(function, subQuery, propertyName, operand, after, realOp);
+    }
+
+    protected <CB extends ConditionBean> void doRegisterScalarCondition(final String function, final ConditionQuery subQuery,
             String propertyName, String operand, final HpSLCCustomized<CB> after, ScalarConditionOption option) {
         assertSubQueryNotNull("ScalarCondition", propertyName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
@@ -1567,22 +1550,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
         final SqlClause subQueryClause = subQuery.xgetSqlClause();
         final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        final ColumnSqlNameProvider subQuerySqlNameProvider = new ColumnSqlNameProvider() {
-            public ColumnSqlName provide(String columnDbName) {
-                return subQuery.toColumnSqlName(columnDbName);
-            }
-        };
+        final ColumnSqlNameProvider subQuerySqlNameProvider = dbName -> subQuery.toColumnSqlName(dbName);
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-        final PartitionByProvider partitionByProvider = new ScalarCondition.PartitionByProvider() {
-            public SqlClause provideSqlClause() {
-                return after.preparePartitionBySqlClause();
-            }
-        };
+        final PartitionByProvider partitionByProvider = () -> after.preparePartitionBySqlClause();
         final ScalarCondition scalarCondition =
                 new ScalarCondition(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
                         subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, partitionByProvider);
+        xregisterParameterOption(option);
         final QueryClause clause = new QueryClause() { /* lazy registration to use partition-by */
             public String toString() {
                 return scalarCondition.buildScalarCondition(function, option);
@@ -1598,16 +1574,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected <CB extends ConditionBean> HpSLCFunction<CB> xcreateSLCFunction(final String rd, Class<CB> tp) {
-        return new HpSLCFunction<CB>(new HpSLCSetupper<CB>() {
-            public void setup(String fn, SubQuery<CB> sq, HpSLCCustomized<CB> cs, ScalarConditionOption op) {
-                xscalarCondition(fn, sq, rd, cs, op);
-            }
+        return new HpSLCFunction<CB>((fn, sq, cs, op) -> {
+            xscalarCondition(fn, sq, rd, cs, op);
         });
     }
 
     protected <CB extends ConditionBean> void xscalarCondition(String fn, SubQuery<CB> sq, String rd, HpSLCCustomized<CB> cs,
             ScalarConditionOption op) {
         // overridden by sub-class (not abstract for suppressing option)
+    }
+
+    protected ScalarConditionOption newDefaultScalarConditionOption() {
+        return new ScalarConditionOption();
     }
 
     // ===================================================================================
@@ -1875,10 +1853,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final OrderByElement lastElement = xgetSqlClause().getOrderByLastElement();
         xcheckManualOrderState(mob, lastElement);
         xcheckManualOrderUnique(mob, lastElement);
-        mob.bind(new HpManualOrderThemeListHandler() {
-            public String register(String themeKey, Object orderValue) {
-                return xregisterManualOrderParameterToThemeList(themeKey, orderValue);
-            }
+        mob.bind((themeKey, orderValue) -> {
+            return xregisterManualOrderParameterToThemeList(themeKey, orderValue);
         });
         if (mob.hasOrderByCalculation()) {
             final ConditionBean dreamCruiseCB = xgetBaseCB().xcreateDreamCruiseCB();
@@ -2873,8 +2849,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (option == null) {
             return;
         }
+        // don't know the option has parameter or not yet
+        // so always prepare it when the option exists
         if (_parameterOptionMap == null) {
-            _parameterOptionMap = newHashMap();
+            _parameterOptionMap = newHashMapSized(4);
         }
         final String parameterKey = "option" + _parameterOptionMap.size();
         _parameterOptionMap.put(parameterKey, option);
@@ -2940,6 +2918,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                            ----------
     protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
         return DfCollectionUtil.newHashMap();
+    }
+
+    protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMapSized(int size) {
+        return DfCollectionUtil.newHashMapSized(size);
     }
 
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
