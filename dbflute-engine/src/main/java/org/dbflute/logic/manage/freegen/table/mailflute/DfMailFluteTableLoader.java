@@ -286,11 +286,18 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         return !isExceptFile(exceptPathList, currentFile) && isHitByTargetExt(toPath(currentFile), targetExt, targetKeyword);
     }
 
-    protected boolean isExceptFile(List<String> exceptPathList, File baseFile) {
-        if (baseFile.isDirectory()) {
+    protected boolean isExceptFile(List<String> exceptPathList, File currentFile) {
+        if (currentFile.isDirectory()) {
             return false;
         }
-        final String baseFilePath = toPath(baseFile);
+        final String fileName = currentFile.getName();
+        if (Srl.count(fileName, ".") > 1) { // e.g. sea.ja.dfmail
+            return true; // locale file
+        }
+        if (fileName.contains(".") && Srl.substringFirstFront(fileName, ".").endsWith("_html")) { // e.g. sea_html.dfmail
+            return true; // html file
+        }
+        final String baseFilePath = toPath(currentFile);
         final List<String> targetDummyList = DfCollectionUtil.emptyList();
         return !DfNameHintUtil.isTargetByHint(baseFilePath, targetDummyList, exceptPathList);
     }

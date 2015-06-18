@@ -101,20 +101,47 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
             final Map<String, Object> table = DfCollectionUtil.newHashMap();
             final String fileName = pmFile.getName();
             table.put("fileName", fileName);
+            final String fileText;
+            try {
+                fileText = textIO.read(new FileInputStream(pmFile));
+            } catch (FileNotFoundException e) { // no way, collected file
+                throw new IllegalStateException("Not found the pmc file: " + pmFile, e);
+            }
+            String option = null;
+            if (fileText.contains(">>>")) {
+                final String bodyMeta = Srl.substringFirstFront(fileText, ">>>");
+                if (bodyMeta.contains("option:")) {
+                    option = Srl.substringFirstFront(Srl.substringFirstRear(bodyMeta, "option:"), "\n");
+                }
+            }
+            final boolean convention = !isGenAsIs(option);
             final StringBuilder classNameSb = new StringBuilder();
             classNameSb.append(Srl.camelize(Srl.substringLastFront(fileName, targetExt)));
-            final String classSuffix = deriveClassSuffix(tableMap, baseDir, pmFile);
+            final String classSuffix = convention ? deriveClassSuffix(tableMap, baseDir, pmFile) : "";
             classNameSb.append(classSuffix);
             final String className = classNameSb.toString();
             table.put("className", className); // used as output file name
             table.put("camelizedName", className);
-            if (Srl.is_NotNull_and_NotEmpty(classSuffix)) {
-                table.put("additionalPackage", classSuffix.toLowerCase());
-            }
 
             final String domainPath = buildDomainPath(pmFile, targetDir);
             table.put("domainPath", domainPath); // e.g. /member/member_registration.dfpm
-            table.put("resourcePath", Srl.ltrim(domainPath, "/")); // e.g. member/member_registration.dfpm
+            final String resourcePath = Srl.ltrim(domainPath, "/");
+            table.put("resourcePath", resourcePath); // e.g. member/member_registration.dfpm
+            final String additionalPkg;
+            final String basePkgConnector;
+            if (Srl.is_NotNull_and_NotEmpty(resourcePath)) {
+                if (resourcePath.contains("/")) {
+                    additionalPkg = Srl.replace(Srl.substringLastFront(resourcePath, "/"), "/", ".");
+                    basePkgConnector = ".";
+                } else {
+                    additionalPkg = "";
+                    basePkgConnector = "";
+                }
+            } else {
+                additionalPkg = "";
+                basePkgConnector = "";
+            }
+            table.put("additionalPackage", convention ? "template" + basePkgConnector + additionalPkg : additionalPkg);
 
             table.put("defName", buildUpperSnakeName(domainPath));
             {
@@ -131,12 +158,6 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
                 table.put("camelizedFile", camelizedName);
                 table.put("capCamelFile", Srl.initCap(camelizedName));
                 table.put("uncapCamelFile", Srl.initUncap(camelizedName));
-            }
-            final String fileText;
-            try {
-                fileText = textIO.read(new FileInputStream(pmFile));
-            } catch (FileNotFoundException e) { // no way, collected file
-                throw new IllegalStateException("Not found the pmc file: " + pmFile, e);
             }
             final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
             final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
@@ -162,6 +183,10 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
             schemaMap.put(fileName, table);
         }
         return schemaMap;
+    }
+
+    protected boolean isGenAsIs(String option) {
+        return option != null && option.contains("genAsIs");
     }
 
     protected String extractTargetExt(Map<String, Object> tableMap) {
