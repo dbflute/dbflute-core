@@ -108,10 +108,8 @@ public class FunctionFilterOption implements ParameterOption {
     //                                              --------
     protected void doCoalesce(final Object coalesce) {
         assertOptionValueNotNull("coalesce", coalesce);
-        addProcessCallback("coalesce", new ProcessCallback() {
-            public String callback(String functionExp, int index) {
-                return processCoalesce(functionExp, index, coalesce);
-            }
+        addProcessCallback("coalesce", (functionExp, index) -> {
+            return processCoalesce(functionExp, index, coalesce);
         });
         _mayNullRevived = true;
     }
@@ -121,10 +119,8 @@ public class FunctionFilterOption implements ParameterOption {
     //                                                 -----
     protected void doRound(final Object round) {
         assertOptionValueNotNull("round", round);
-        addProcessCallback("round", new ProcessCallback() {
-            public String callback(String functionExp, int index) {
-                return processRound(functionExp, index, round);
-            }
+        addProcessCallback("round", (functionExp, index) -> {
+            return processRound(functionExp, index, round);
         });
     }
 
@@ -134,10 +130,8 @@ public class FunctionFilterOption implements ParameterOption {
     protected void doTrunc(final Object trunc) {
         assertOptionValueNotNull("trunc", trunc);
         _tmpTrunc = trunc;
-        addProcessCallback("trunc", new ProcessCallback() {
-            public String callback(String functionExp, int index) {
-                return processTrunc(functionExp, index, trunc);
-            }
+        addProcessCallback("trunc", (functionExp, index) -> {
+            return processTrunc(functionExp, index, trunc);
         });
     }
 
@@ -1003,7 +997,7 @@ public class FunctionFilterOption implements ParameterOption {
     //                                                                            Accessor
     //                                                                            ========
     // -----------------------------------------------------
-    //                            called by ParameterComment 
+    //                            called by ParameterComment
     //                            --------------------------
     public Map<String, Object> getBindMap() {
         return _bindMap;

@@ -15,6 +15,7 @@
  */
 package org.dbflute.cbean.chelper;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import org.dbflute.cbean.coption.FromToOption;
 import org.dbflute.cbean.coption.RangeOfOption;
 import org.dbflute.cbean.scoping.SubQuery;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfTypeUtil;
 
@@ -234,7 +236,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     protected void doRangeOf(Number minNumber, Number maxNumber, RangeOfOption option) {
         assertRangeOfOption(option);
         assertRangeOfNotCalledUnsupported(minNumber, maxNumber, option);
-        assertRangeOfNumberBothExistsOrOneSideAllowed(minNumber, maxNumber, option);
+        assertRangeOfNumberBothNullOrOneSideAllowed(minNumber, maxNumber, option);
         @SuppressWarnings("unchecked")
         final PARAMETER fromValue = (PARAMETER) minNumber;
         @SuppressWarnings("unchecked")
@@ -271,7 +273,14 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      * @param opLambda The callback for option of from-to. (NotNull)
      */
     public void fromTo(LocalDate fromDate, LocalDate toDate, ConditionOptionCall<FromToOption> opLambda) { // #date_parade
-        doFromTo(toDate(fromDate), toDate(toDate), createFromToOption(opLambda));
+        final FromToOption option = createFromToOption(opLambda);
+        if (option.isUsePattern()) {
+            // to avoid mismatch type of date-time and date, e.g. ...DATE_TIME <= '2015-06-30'
+            // however ... really want to check specified column's type
+            doFromTo(toTimestamp(fromDate), toTimestamp(toDate), option);
+        } else {
+            doFromTo(toDate(fromDate), toDate(toDate), option);
+        }
     }
 
     /**
@@ -289,7 +298,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
      * @param opLambda The callback for option of from-to. (NotNull)
      */
     public void fromTo(LocalDateTime fromDate, LocalDateTime toDate, ConditionOptionCall<FromToOption> opLambda) {
-        doFromTo(toDate(fromDate), toDate(toDate), createFromToOption(opLambda));
+        doFromTo(toTimestamp(fromDate), toTimestamp(toDate), createFromToOption(opLambda));
     }
 
     /**
@@ -325,7 +334,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     protected void doFromTo(Date fromDate, Date toDate, FromToOption option) {
         assertFromToOption(option);
         assertFromToNotCalledUnsupported(fromDate, toDate, option);
-        assertFromToDateBothExistsOrOneSideAllowed(fromDate, toDate, option);
+        assertFromToDateBothNullOrOneSideAllowed(fromDate, toDate, option);
         if (fromDate != null) {
             fromDate = option.filterFromDate(fromDate);
         }
@@ -369,6 +378,10 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
         return DfTypeUtil.toDate(obj, getFromToConversionTimeZone());
     }
 
+    protected Timestamp toTimestamp(Object obj) {
+        return DfTypeUtil.toTimestamp(obj, getFromToConversionTimeZone());
+    }
+
     protected TimeZone getFromToConversionTimeZone() {
         return getDBFluteSystemFinalTimeZone();
     }
@@ -387,6 +400,9 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
         }
     }
 
+    // -----------------------------------------------------
+    //                                               RangeOf
+    //                                               -------
     protected void assertRangeOfOptionCall(ConditionOptionCall<RangeOfOption> opLambda) {
         if (opLambda == null) {
             String msg = "The argument 'opLambda' for range-of option of (Query)DerivedReferrer should not be null.";
@@ -402,34 +418,88 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     }
 
     protected void assertRangeOfNotCalledUnsupported(Number minNumber, Number maxNumber, RangeOfOption option) {
-        if (option.isGreaterThan() || option.isLessThan() || option.isOrIsNull()) {
-            String msg = "Cannot use the options of the range-of for (Query)DerivedReferrer:";
-            msg = msg + " min=" + minNumber + ", max=" + maxNumber + ", option=" + option;
-            throw new IllegalConditionBeanOperationException(msg);
+        if (option.isLessThan()) {
+            throwRangeOfUnsupportedOptionException(minNumber, maxNumber, option, "lessThan");
+        }
+        if (option.isGreaterThan()) {
+            throwRangeOfUnsupportedOptionException(minNumber, maxNumber, option, "greaterThan");
+        }
+        if (option.isOrIsNull()) {
+            throwRangeOfUnsupportedOptionException(minNumber, maxNumber, option, "greaterThan");
         }
         if (option.hasCalculationRange()) {
-            String msg = "Cannot use the calculation option of the range-of for (Query)DerivedReferrer:";
-            msg = msg + " min=" + minNumber + ", max=" + maxNumber + ", option=" + option;
-            throw new IllegalConditionBeanOperationException(msg);
+            throwRangeOfUnsupportedOptionException(minNumber, maxNumber, option, "calculation");
         }
     }
 
-    protected void assertRangeOfNumberBothExistsOrOneSideAllowed(Number minNumber, Number maxNumber, RangeOfOption option) {
+    protected void throwRangeOfUnsupportedOptionException(Number minNumber, Number maxNumber, RangeOfOption option, String keyword) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unsupported option of range-of option.");
+        br.addItem("Advice");
+        br.addElement("Cannot use the option '" + keyword + "'");
+        br.addElement(" of the range-of for (Query)DerivedReferrer.");
+        br.addItem("Max/Min Number");
+        br.addElement(minNumber + " / " + maxNumber);
+        br.addItem("RangeOfOption");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    protected void assertRangeOfNumberBothNullOrOneSideAllowed(Number minNumber, Number maxNumber, RangeOfOption option) {
         final boolean oneSideAllowed = option.isOneSideAllowed();
         if (minNumber == null && maxNumber == null) {
-            String msg = "The both arguments of range-of for (Query)DerivedReferrer were null: " + option;
-            throw new IllegalConditionBeanOperationException(msg);
+            throwRangeOfNumberBothNullException(option);
         } else if (minNumber == null && !oneSideAllowed) {
-            String msg = "The argument 'minNumber' of range-of for (Query)DerivedReferrer was null:";
-            msg = msg + " maxNumber=" + maxNumber + " option=" + option;
-            throw new IllegalConditionBeanOperationException(msg);
+            throwRangeOfMinNumberOnlyNullNotAllowedException(maxNumber, option);
         } else if (maxNumber == null && !oneSideAllowed) {
-            String msg = "The argument 'maxNumber' of range-of for (Query)DerivedReferrer was null:";
-            msg = msg + " minNumber=" + minNumber + " option=" + option;
-            throw new IllegalConditionBeanOperationException(msg);
+            throwRangeOfMaxNumberOnlyNullNotAllowedException(minNumber, option);
         }
     }
 
+    protected void throwRangeOfNumberBothNullException(RangeOfOption option) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The both arguments of from-to for (Query)DerivedReferrer were null.");
+        br.addItem("Advice");
+        br.addElement("Basically it cannot allow double null");
+        br.addElement("of the range-of method, even if allowOneSide().");
+        br.addItem("FromToOption");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    protected void throwRangeOfMinNumberOnlyNullNotAllowedException(Number maxNumber, RangeOfOption option) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The min-number of range-of for (Query)DerivedReferrer were null.");
+        br.addItem("Advice");
+        br.addElement("Basically it cannot allow min-mumber to be null.");
+        br.addElement("If you need to specify null, use allowOneSide() option.");
+        br.addItem("maxNumber");
+        br.addElement(maxNumber);
+        br.addItem("RangeOfOption");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    protected void throwRangeOfMaxNumberOnlyNullNotAllowedException(Number minNumber, RangeOfOption option) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The max-mumber of range-of for (Query)DerivedReferrer were null.");
+        br.addItem("Advice");
+        br.addElement("Basically it cannot allow max-mumber to be null.");
+        br.addElement("If you need to specify null, use allowOneSide() option.");
+        br.addItem("minNumber");
+        br.addElement(minNumber);
+        br.addItem("RangeOfOption");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                                FromTo
+    //                                                ------
     protected void assertFromToOptionCall(ConditionOptionCall<FromToOption> opLambda) {
         if (opLambda == null) {
             String msg = "The argument 'opLambda' for from-to option of (Query)DerivedReferrer should not be null.";
@@ -445,32 +515,86 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
     }
 
     protected void assertFromToNotCalledUnsupported(Date fromDate, Date toDate, FromToOption option) {
-        if (option.isGreaterThan() || option.isLessThan() || option.isOrIsNull()) {
-            String msg = "Cannot use the options of the from-to for (Query)DerivedReferrer:";
-            msg = msg + " from=" + fromDate + ", to=" + toDate + ", option=" + option;
-            throw new IllegalConditionBeanOperationException(msg);
+        // allow to use e.g. compareAsDate() using DateBetweenWay of from-to option
+        //if (option.isUsePattern()) {
+        //    String msg = "Cannot use the pattern option .e.g compareAsDate() of the from-to for (Query)DerivedReferrer:";
+        //    msg = msg + " from=" + fromDate + ", to=" + toDate + ", option=" + option;
+        //    throw new IllegalConditionBeanOperationException(msg);
+        //}
+        if (!option.isUsePattern() && option.isLessThan()) {
+            throwFromToUnsupportedOptionException(fromDate, toDate, option, "lessThan");
         }
-        if (option.isUsePattern()) {
-            String msg = "Cannot use the pattern option .e.g compareAsDate() of the from-to for (Query)DerivedReferrer:";
-            msg = msg + " from=" + fromDate + ", to=" + toDate + ", option=" + option;
-            throw new IllegalConditionBeanOperationException(msg);
+        if (!option.isUsePattern() && option.isGreaterThan()) {
+            throwFromToUnsupportedOptionException(fromDate, toDate, option, "greaterThan");
+        }
+        if (option.isOrIsNull()) {
+            throwFromToUnsupportedOptionException(fromDate, toDate, option, "osIsNull");
         }
     }
 
-    protected void assertFromToDateBothExistsOrOneSideAllowed(Date fromDate, Date toDate, FromToOption option) {
+    protected void throwFromToUnsupportedOptionException(Date fromDate, Date toDate, FromToOption option, String keyword) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unsupported option of from-to option.");
+        br.addItem("Advice");
+        br.addElement("Cannot use the option '" + keyword + "'");
+        br.addElement(" of the from-to for (Query)DerivedReferrer.");
+        br.addItem("From/To Date");
+        br.addElement(fromDate + " / " + toDate);
+        br.addItem("FromToOption");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    protected void assertFromToDateBothNullOrOneSideAllowed(Date fromDate, Date toDate, FromToOption option) {
         final boolean oneSideAllowed = option.isOneSideAllowed();
         if (fromDate == null && toDate == null) {
-            String msg = "The both arguments of from-to for (Query)DerivedReferrer were null: " + option;
-            throw new IllegalConditionBeanOperationException(msg);
+            throwFromToDateBothNullException(option);
         } else if (fromDate == null && !oneSideAllowed) {
-            String msg = "The argument 'fromDate' of from-to for (Query)DerivedReferrer was null:";
-            msg = msg + " toDate=" + toDate + " option=" + option;
-            throw new IllegalConditionBeanOperationException(msg);
+            throwFromToFromDateOnlyNullNotAllowedException(toDate, option);
         } else if (toDate == null && !oneSideAllowed) {
-            String msg = "The argument 'toDate' of from-to for (Query)DerivedReferrer was null:";
-            msg = msg + " fromDate=" + fromDate + " option=" + option;
-            throw new IllegalConditionBeanOperationException(msg);
+            throwFromToToDateOnlyNullNotAllowedException(fromDate, option);
         }
+    }
+
+    protected void throwFromToDateBothNullException(FromToOption option) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The both arguments of from-to for (Query)DerivedReferrer were null.");
+        br.addItem("Advice");
+        br.addElement("Basically it cannot allow double null");
+        br.addElement("of the from-to method, even if allowOneSide().");
+        br.addItem("FromToOption");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    protected void throwFromToFromDateOnlyNullNotAllowedException(Date toDate, FromToOption option) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The from-date of from-to for (Query)DerivedReferrer were null.");
+        br.addItem("Advice");
+        br.addElement("Basically it cannot allow from-date to be null.");
+        br.addElement("If you need to specify null, use allowOneSide() option.");
+        br.addItem("toDate");
+        br.addElement(toDate);
+        br.addItem("FromToOption");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    protected void throwFromToToDateOnlyNullNotAllowedException(Date fromDate, FromToOption option) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The to-date of from-to for (Query)DerivedReferrer were null.");
+        br.addItem("Advice");
+        br.addElement("Basically it cannot allow to-date to be null.");
+        br.addElement("If you need to specify null, use allowOneSide() option.");
+        br.addItem("fromDate");
+        br.addElement(fromDate);
+        br.addItem("FromToOption");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
     }
 
     protected void assertParameterFromNotNull(Object fromValue) {

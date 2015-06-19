@@ -5,9 +5,9 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="1.1.0-sp4" />
+	<property name="version" value="1.1.0-sp5" />
 	<property name="build.version" value="${version}" />
-	<property name="runtime.version" value="1.1.0-sp4" />
+	<property name="runtime.version" value="1.1.0-sp5" />
 	<property name="runtime.build.version" value="${runtime.version}" />
 	<property name="example.latest.version" value="1.x" />
 

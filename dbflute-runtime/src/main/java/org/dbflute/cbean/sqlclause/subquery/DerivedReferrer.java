@@ -80,7 +80,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
                 relatedColumnSqlNames[i] = _subQuerySqlNameProvider.provide(relatedColumnSplit.get(i));
             }
             final String subQueryClause =
-                    getSubQueryClause(function, correlatedColumnRealNames, relatedColumnSqlNames, correlatedFixedCondition, option);
+                    buildSubQueryClause(function, correlatedColumnRealNames, relatedColumnSqlNames, correlatedFixedCondition, option);
             final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
             final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
             final String endIndent = "       ";
@@ -228,6 +228,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         // derivedRealSqlName   : might be sub-query
         if (mightBeSubQueryOrCalculation(derivedRealSqlName)) { // nested sub-query or calculation
             if (!isNestedDerivedReferrer(derivedRealSqlName)) { // might be calculation (needs to resolve location)
+                // #hope if correlation column is same as derived column with calculation, duplicate column error
                 keySb.append(keySb.length() > 0 ? ", " : "");
                 final String realNameExp = derivedColumnRealName.toString();
                 final String locationResolved = _subQueryPath.resolveParameterLocationPath(realNameExp);
@@ -263,8 +264,8 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
      * @param option The option of DerivedReferrer. (NotNull)
      * @return The clause of sub-query. (NotNull)
      */
-    protected String getSubQueryClause(String function, ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames,
-            String correlatedFixedCondition, DerivedReferrerOption option) {
+    protected String buildSubQueryClause(String function, ColumnRealName[] correlatedColumnRealNames,
+            ColumnSqlName[] relatedColumnSqlNames, String correlatedFixedCondition, DerivedReferrerOption option) {
         final String tableAliasName = getSubQueryLocalAliasName();
         final ColumnSqlName derivedColumnSqlName = getDerivedColumnSqlName();
         if (derivedColumnSqlName == null) {
@@ -424,12 +425,12 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         return name.toString().contains(getDerivedReferrerNestedAliasDef());
     }
 
-    protected String getDerivedReferrerNestedAlias() {
-        return _subQuerySqlClause.getDerivedReferrerNestedAlias();
-    }
-
     protected String getDerivedReferrerNestedAliasDef() {
         return " as " + getDerivedReferrerNestedAlias();
+    }
+
+    protected String getDerivedReferrerNestedAlias() {
+        return _subQuerySqlClause.getDerivedReferrerNestedAlias();
     }
 
     // ===================================================================================

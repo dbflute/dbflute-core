@@ -2590,23 +2590,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                     Fetch Narrowing
     //                                                                     ===============
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int getFetchNarrowingSkipStartIndex() {
         return getPageStartIndex();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int getFetchNarrowingLoopCount() {
         return getFetchSize();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public boolean isFetchNarrowingEffective() {
         return _fetchScopeEffective;
     }
@@ -2614,17 +2608,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                    Table Alias Info
     //                                                                    ================
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String getBasePointAliasName() {
         // the variable should be resolved when making a sub-query clause
         return isForSubQuery() ? "sub" + getSubQueryLevel() + "loc" : BASE_POINT_ALIAS_NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String resolveJoinAliasName(String relationPath, int nestLevel) {
         return (isForSubQuery() ? "sub" + getSubQueryLevel() : "df") + "rel" + relationPath;
 
@@ -2632,39 +2622,29 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         // (that was used long long ago)
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public int resolveRelationNo(String localTableName, String foreignPropertyName) {
         final DBMeta dbmeta = findDBMeta(localTableName);
         final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
         return foreignInfo.getRelationNo();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String getInlineViewBasePointAlias() {
         return "dfinlineloc";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String getUnionQueryInlineViewAlias() {
         return "dfunionview";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String getDerivedReferrerNestedAlias() {
         return "dfrefview";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String getScalarSelectColumnAlias() {
         return "dfscalar";
     }

@@ -52,7 +52,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * Constructor.
      * @param prop Properties. (NotNull)
      */
     public DfBasicProperties(Properties prop) {
@@ -259,7 +258,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         } else if (isTargetLanguageScala()) {
             lang = new DfLanguageDependencyScala();
         } else {
-            String msg = "The language is supported: " + getTargetLanguage();
+            String msg = "The language is unsupported: " + getTargetLanguage();
             throw new IllegalStateException(msg);
         }
         _languageDependency = lang;

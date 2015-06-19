@@ -16,6 +16,7 @@
 package org.dbflute.cbean.chelper;
 
 import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.coption.ScalarConditionOption;
 import org.dbflute.cbean.scoping.SubQuery;
 
 /**
@@ -23,13 +24,14 @@ import org.dbflute.cbean.scoping.SubQuery;
  * @param <CB> The type of condition-bean.
  * @author jflute
  */
-public interface HpSSQSetupper<CB extends ConditionBean> {
+public interface HpSLCSetupper<CB extends ConditionBean> {
 
     /**
      * Set up the scalar condition.
      * @param function The expression of function to derive the scalar value. (NotNull)
      * @param subQuery The sub query of myself. (NotNull)
+     * @param customized The customized info of ScalarCondition. (NotNull)
      * @param option The option of ScalarCondition. (NotNull)
      */
-    void setup(String function, SubQuery<CB> subQuery, HpSSQOption<CB> option);
+    void setup(String function, SubQuery<CB> subQuery, HpSLCCustomized<CB> customized, ScalarConditionOption option);
 }

@@ -138,9 +138,7 @@ public class SpecifiedColumn implements ColumnCalculator {
     //                                                                         Calculation
     //                                                                         ===========
     // SpecifyCalculation: basically for nested Calculation, DerivedReferrer
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SpecifiedColumn plus(Number plusValue) {
         assertObjectNotNull("plusValue", plusValue);
         initializeCalcSpecificationIfNeeds();
@@ -155,9 +153,7 @@ public class SpecifiedColumn implements ColumnCalculator {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SpecifiedColumn plus(SpecifiedColumn plusColumn) {
         assertObjectNotNull("plusColumn", plusColumn);
         assertCalculationColumnNumber(plusColumn);
@@ -167,9 +163,7 @@ public class SpecifiedColumn implements ColumnCalculator {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SpecifiedColumn minus(Number minusValue) {
         assertObjectNotNull("minusValue", minusValue);
         initializeCalcSpecificationIfNeeds();
@@ -177,9 +171,7 @@ public class SpecifiedColumn implements ColumnCalculator {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SpecifiedColumn minus(SpecifiedColumn minusColumn) {
         assertObjectNotNull("minusColumn", minusColumn);
         assertCalculationColumnNumber(minusColumn);
@@ -189,9 +181,7 @@ public class SpecifiedColumn implements ColumnCalculator {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SpecifiedColumn multiply(Number multiplyValue) {
         assertObjectNotNull("multiplyValue", multiplyValue);
         initializeCalcSpecificationIfNeeds();
@@ -199,9 +189,7 @@ public class SpecifiedColumn implements ColumnCalculator {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SpecifiedColumn multiply(SpecifiedColumn multiplyColumn) {
         assertObjectNotNull("multiplyColumn", multiplyColumn);
         assertCalculationColumnNumber(multiplyColumn);
@@ -211,9 +199,7 @@ public class SpecifiedColumn implements ColumnCalculator {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SpecifiedColumn divide(Number divideValue) {
         assertObjectNotNull("divideValue", divideValue);
         initializeCalcSpecificationIfNeeds();
@@ -221,9 +207,7 @@ public class SpecifiedColumn implements ColumnCalculator {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SpecifiedColumn divide(SpecifiedColumn divideColumn) {
         assertObjectNotNull("divideColumn", divideColumn);
         assertCalculationColumnNumber(divideColumn);
@@ -233,9 +217,7 @@ public class SpecifiedColumn implements ColumnCalculator {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public SpecifiedColumn convert(FunctionFilterOptionCall<ColumnConversionOption> opLambda) {
         assertObjectNotNull("opLambda", opLambda);
         initializeCalcSpecificationIfNeeds();
@@ -253,17 +235,13 @@ public class SpecifiedColumn implements ColumnCalculator {
         option.xsetTargetColumnInfo(_columnInfo); // to judge correctly e.g. Date type
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator left() {
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.left();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public ColumnCalculator right() {
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.right();
@@ -291,10 +269,7 @@ public class SpecifiedColumn implements ColumnCalculator {
     }
 
     protected SpecifyQuery<ConditionBean> createEmptySpecifyQuery() {
-        return new SpecifyQuery<ConditionBean>() {
-            public void specify(ConditionBean cb) {
-            }
-        };
+        return cb -> {};
     }
 
     protected HpCalcSpecification<ConditionBean> newCalcSpecification(SpecifyQuery<ConditionBean> specifyQuery) {

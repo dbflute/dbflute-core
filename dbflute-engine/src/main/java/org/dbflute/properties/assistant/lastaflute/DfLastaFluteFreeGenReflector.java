@@ -326,8 +326,8 @@ public final class DfLastaFluteFreeGenReflector {
     }
 
     protected String buildPmTemplateBeanPackage(String appName, Map<String, Object> lastafluteMap) {
-        final String generatedPackage = _mylastaPackage + ".template";
-        return filterOverridden(generatedPackage, lastafluteMap, appName, "mail", "package");
+        final String generatedPackage = _mylastaPackage; // template package is added later if convention
+        return filterOverridden(generatedPackage, lastafluteMap, appName, "template", "package");
     }
 
     // ===================================================================================

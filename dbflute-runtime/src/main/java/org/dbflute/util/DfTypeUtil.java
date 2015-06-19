@@ -629,7 +629,7 @@ public final class DfTypeUtil {
     //                                                                              Double
     //                                                                              ======
     public static Double toDouble(Object obj) {
-        return toDouble(obj, null);
+        return doConvertToDouble(obj, null);
     }
 
     public static Double toDouble(Object obj, String pattern) {
