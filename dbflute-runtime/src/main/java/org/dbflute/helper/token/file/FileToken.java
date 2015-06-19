@@ -414,18 +414,10 @@ public class FileToken {
     }
 
     protected FileTokenizingHeaderInfo analyzeHeaderInfo(String delimiter, final String lineString) {
-        final FileTokenizingHeaderInfo headerInfo = createFileTokenizingHeaderInfo();
-        final String[] values = lineString.split(delimiter);
-        for (int i = 0; i < values.length; i++) {
-            final String value = values[i].trim();// Trimming is Header Only!;
-            final String columnName;
-            if (value.startsWith("\"") && value.endsWith("\"")) {
-                columnName = value.substring(1, value.length() - 1);
-            } else {
-                columnName = value;
-            }
-            headerInfo.addColumnName(columnName);
-        }
+        // Get column header like value list
+        ValueLineInfo lineInfo = arrangeValueList(lineString, delimiter);
+        FileTokenizingHeaderInfo headerInfo = new FileTokenizingHeaderInfo();
+        headerInfo.acceptColumnNameList(lineInfo.getValueList());
         headerInfo.setColumnNameRowString(lineString);
         return headerInfo;
     }
