@@ -5,6 +5,7 @@ import ${request.tableMap.superClassPackage}.${request.tableMap.interfaceSimpleN
 #else
 import ${request.tableMap.superClassPackage}.${request.tableMap.superClassSimpleName};
 #end
+import org.lastaflute.core.direction.exception.ConfigPropertyNotFoundException;
 
 /**
  * @author FreeGen
@@ -25,14 +26,16 @@ public interface ${request.className} {
     /**
      * Get the value of property as {@link String}.
      * @param propertyKey The key of the property. (NotNull)
-     * @return The value of found property. (NullAllowed: if null, not found)
+     * @return The value of found property. (NotNull: if not found, exception)
+     * @throws ConfigPropertyNotFoundException When the property is not found.
      */
     String get(String propertyKey);
 
     /**
      * Is the property true?
      * @param propertyKey The key of the property which is boolean type. (NotNull)
-     * @return The determination, true or false. (if the property can be true, returns true)
+     * @return The determination, true or false. (if not found, exception)
+     * @throws ConfigPropertyNotFoundException When the property is not found.
      */
     boolean is(String propertyKey);
 #foreach ($column in $table.columnList)
@@ -44,7 +47,7 @@ public interface ${request.className} {
 #if ($column.hasComment)
      * comment: ${column.commentHtmlEncoded}
 #end
-     * @return The value of found property. (basically NotNull: because of generated)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
     String get${column.capCamelName}();
 #if ($column.mayBeIntegerProperty)
@@ -55,7 +58,7 @@ public interface ${request.className} {
 #if ($column.hasComment)
      * comment: ${column.commentHtmlEncoded}
 #end
-     * @return The value of found property. (basically NotNull: because of generated)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not integer.
      */
     Integer get${column.capCamelName}AsInteger();
@@ -68,7 +71,7 @@ public interface ${request.className} {
 #if ($column.hasComment)
      * comment: ${column.commentHtmlEncoded}
 #end
-     * @return The value of found property. (basically NotNull: because of generated)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not long.
      */
     Long get${column.capCamelName}AsLong();
@@ -81,7 +84,7 @@ public interface ${request.className} {
 #if ($column.hasComment)
      * comment: ${column.commentHtmlEncoded}
 #end
-     * @return The value of found property. (basically NotNull: because of generated)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not decimal.
      */
     java.math.BigDecimal get${column.capCamelName}AsDecimal();
@@ -94,7 +97,7 @@ public interface ${request.className} {
 #if ($column.hasComment)
      * comment: ${column.commentHtmlEncoded}
 #end
-     * @return The value of found property. (basically NotNull: because of generated)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
     java.time.LocalDate get${column.capCamelName}AsDate();
 #end
@@ -106,7 +109,7 @@ public interface ${request.className} {
 #if ($column.hasComment)
      * comment: ${column.commentHtmlEncoded}
 #end
-     * @return The determination, true or false. (if the property can be true, returns true)
+     * @return The determination, true or false. (if not found, exception but basically no way)
      */
     boolean is${column.capCamelName}();
 #end
