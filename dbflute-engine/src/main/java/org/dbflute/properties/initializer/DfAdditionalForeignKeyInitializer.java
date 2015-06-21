@@ -405,7 +405,7 @@ public class DfAdditionalForeignKeyInitializer {
             }
             if (errorIfNotFound) {
                 final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-                br.addNotice("Not found local column by the foreign column of additionalForeignKey.");
+                br.addNotice("Not found the local column by the foreign column of additionalForeignKey.");
                 br.addItem("Advice");
                 br.addElement("When localColumnName is omitted, the local table should have");
                 br.addElement("the columns that are same as primary keys of foreign table.");
@@ -427,12 +427,29 @@ public class DfAdditionalForeignKeyInitializer {
         return localColumnNameList;
     }
 
-    protected void assertForeignTable(final String foreignKeyName, final String foreignTableName) {
+    protected void assertForeignTable(String foreignKeyName, String foreignTableName) {
         if (getTable(foreignTableName) != null) {
             return;
         }
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found table by the foreignTableName of additionalForeignKey.");
+        br.addItem("Advice");
+        br.addElement("Make sure your additionalForeignKeyMap.dfprop");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("     ; FK_MEMBER_MEMBER_ADDRESS_VALID = map:{");
+        br.addElement("         ; localTableName = ... ; foreignTableName = NOEXISTING_ADDRESS // *NG");
+        br.addElement("         ; localColumnName = MEMBER_ID ; foreignColumnName = MEMBER_ID");
+        br.addElement("         ...");
+        br.addElement("     }");
+        br.addElement("  (o):");
+        br.addElement("     ; FK_MEMBER_MEMBER_ADDRESS_VALID = map:{");
+        br.addElement("         ; localTableName = ... ; foreignTableName = MEMBER_ADDRESS     // OK");
+        br.addElement("         ; localColumnName = MEMBER_ID ; foreignColumnName = MEMBER_ID");
+        br.addElement("         ...");
+        br.addElement("     }");
+        br.addElement("");
+        br.addElement("Or remove it if the table is deleted from your schema.");
         br.addItem("Additional FK");
         br.addElement(foreignKeyName);
         br.addItem("NotFound Table");
@@ -441,12 +458,27 @@ public class DfAdditionalForeignKeyInitializer {
         throw new DfPropertySettingTableNotFoundException(msg);
     }
 
-    protected void assertForeignTableColumn(final String foreignKeyName, final String foreignTableName, List<String> foreignColumnNameList) {
+    protected void assertForeignTableColumn(String foreignKeyName, String foreignTableName, List<String> foreignColumnNameList) {
         if (getTable(foreignTableName).containsColumn(foreignColumnNameList)) {
             return;
         }
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found column by the foreignColumnName of additionalForeignKey.");
+        br.addItem("Advice");
+        br.addElement("Make sure your additionalForeignKeyMap.dfprop");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("     ; FK_MEMBER_MEMBER_ADDRESS_VALID = map:{");
+        br.addElement("         ; localTableName = ... ; foreignTableName = ...");
+        br.addElement("         ; localColumnName = MEMBER_ID ; foreignColumnName = NOEXISTING_ID // *NG");
+        br.addElement("         ...");
+        br.addElement("     }");
+        br.addElement("  (o):");
+        br.addElement("     ; FK_MEMBER_MEMBER_ADDRESS_VALID = map:{");
+        br.addElement("         ; localTableName = ... ; foreignTableName = MEMBER_ADDRESS");
+        br.addElement("         ; localColumnName = MEMBER_ID ; foreignColumnName = MEMBER_ID     // OK");
+        br.addElement("         ...");
+        br.addElement("     }");
         br.addItem("Additional FK");
         br.addElement(foreignKeyName);
         br.addItem("Foreign Table");
@@ -463,6 +495,23 @@ public class DfAdditionalForeignKeyInitializer {
         }
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found table by the localTableName of additionalForeignKey.");
+        br.addItem("Advice");
+        br.addElement("Make sure your additionalForeignKeyMap.dfprop");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("     ; FK_MEMBER_MEMBER_ADDRESS_VALID = map:{");
+        br.addElement("         ; localTableName = NOEXISTING_STATUS ; foreignTableName = ... // *NG");
+        br.addElement("         ; localColumnName = MEMBER_ID ; foreignColumnName = MEMBER_ID");
+        br.addElement("         ...");
+        br.addElement("     }");
+        br.addElement("  (o):");
+        br.addElement("     ; FK_MEMBER_MEMBER_ADDRESS_VALID = map:{");
+        br.addElement("         ; localTableName = MEMBER_STATUS ; foreignTableName = ...     // OK");
+        br.addElement("         ; localColumnName = MEMBER_ID ; foreignColumnName = MEMBER_ID");
+        br.addElement("         ...");
+        br.addElement("     }");
+        br.addElement("");
+        br.addElement("Or remove it if the table is deleted from your schema.");
         br.addItem("Additional FK");
         br.addElement(foreignKeyName);
         br.addItem("NotFound Table");
@@ -490,6 +539,20 @@ public class DfAdditionalForeignKeyInitializer {
             if (!getTable(localTableName).containsColumn(localColumnNameList)) {
                 final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
                 br.addNotice("Not found column by the localColumnName of additionalForeignKey.");
+                br.addElement("Make sure your additionalForeignKeyMap.dfprop");
+                br.addElement("For example:");
+                br.addElement("  (x):");
+                br.addElement("     ; FK_MEMBER_MEMBER_ADDRESS_VALID = map:{");
+                br.addElement("         ; localTableName = ... ; foreignTableName = ...");
+                br.addElement("         ; localColumnName = NOEXISTING_ID ; foreignColumnName = MEMBER_ID // *NG");
+                br.addElement("         ...");
+                br.addElement("     }");
+                br.addElement("  (o):");
+                br.addElement("     ; FK_MEMBER_MEMBER_ADDRESS_VALID = map:{");
+                br.addElement("         ; localTableName = ... ; foreignTableName = MEMBER_ADDRESS");
+                br.addElement("         ; localColumnName = MEMBER_ID ; foreignColumnName = MEMBER_ID     // OK");
+                br.addElement("         ...");
+                br.addElement("     }");
                 br.addItem("Additional FK");
                 br.addElement(foreignKeyName);
                 br.addItem("Local Table");
