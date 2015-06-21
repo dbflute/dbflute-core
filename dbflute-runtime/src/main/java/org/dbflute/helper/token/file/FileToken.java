@@ -71,7 +71,7 @@ import org.dbflute.util.Srl;
  * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
  * </pre>
  * @author jflute
- * @author iwasaw
+ * @author iwamat-saw
  */
 public class FileToken {
 
