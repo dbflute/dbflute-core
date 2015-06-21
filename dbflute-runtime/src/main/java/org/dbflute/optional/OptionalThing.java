@@ -122,11 +122,11 @@ public interface OptionalThing<THING> {
     /**
      * Get the thing or throw the exception.
      * @param <CAUSE> The type of cause.
-     * @param supplier The supplier of exception if null. (NotNull)
+     * @param noArgLambda The supplier of exception if null. (NotNull)
      * @return The object instance wrapped in this optional object. (NotNull: if null, exception)
      * @throws CAUSE When the value is null.
      */
-    <CAUSE extends Throwable> THING orElseThrow(OptionalThingSupplier<? extends CAUSE> supplier) throws CAUSE;
+    <CAUSE extends Throwable> THING orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE;
 
     // ===================================================================================
     //                                                                   Standard Optional
