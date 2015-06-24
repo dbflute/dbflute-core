@@ -440,7 +440,7 @@ public class JavaPropertiesReader {
                     break;
                 }
                 final String ltrimmedLine = Srl.ltrim(line);
-                if (ltrimmedLine.startsWith("# ")) { // comment lines
+                if (ltrimmedLine.startsWith("#")) { // comment lines
                     final String commentCandidate = Srl.substringFirstRear(ltrimmedLine, "#").trim();
                     if (ltrimmedLine.contains("=")) { // you cannot contain equal mark in comment
                         previousComment = null; // e.g. #foo.bar.qux = value (comment out???)
