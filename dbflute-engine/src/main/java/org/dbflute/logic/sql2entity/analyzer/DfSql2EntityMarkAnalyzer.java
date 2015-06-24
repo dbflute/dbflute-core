@@ -110,6 +110,10 @@ public class DfSql2EntityMarkAnalyzer {
     //                                                                   Title/Description
     //                                                                   =================
     public String getTitle(String sql) {
+        final String oldStyleTitle = findOldStyleTitle(sql); // should be first not to conflict
+        if (oldStyleTitle != null) {
+            return oldStyleTitle;
+        }
         if (sql.startsWith("/*") && sql.contains("*/")) { // new style
             final ScopeInfo commentScope = Srl.extractScopeFirst(sql, "/*", "*/");
             final String comment = commentScope.getContent();
@@ -121,7 +125,7 @@ public class DfSql2EntityMarkAnalyzer {
                 }
             }
         }
-        return findOldStyleTitle(sql);
+        return null;
     }
 
     protected String findOldStyleTitle(String sql) {
@@ -153,6 +157,10 @@ public class DfSql2EntityMarkAnalyzer {
     }
 
     public String getDescription(String sql) {
+        final String oldStyleDescription = findOldStyleDescription(sql);
+        if (oldStyleDescription != null) {
+            return oldStyleDescription;
+        }
         if (sql.startsWith("/*") && sql.contains("*/")) { // new style
             final ScopeInfo commentScope = Srl.extractScopeFirst(sql, "/*", "*/");
             final String comment = commentScope.getContent();
@@ -164,7 +172,7 @@ public class DfSql2EntityMarkAnalyzer {
                 }
             }
         }
-        return findOldStyleDescription(sql);
+        return null;
     }
 
     protected String findOldStyleDescription(String sql) {
