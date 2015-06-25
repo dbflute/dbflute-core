@@ -157,7 +157,11 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
             } catch (FileNotFoundException e) { // no way, collected file
                 throw new IllegalStateException("Not found the file: " + bodyFile, e);
             }
-            verifyFormat(toPath(bodyFile), plainText, META_DELIMITER);
+            final String delimiter = META_DELIMITER;
+            if (!plainText.contains(delimiter)) {
+                throwBodyMetaNotFoundException(toPath(bodyFile), plainText);
+            }
+            verifyFormat(toPath(bodyFile), plainText, delimiter);
             final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
             final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
             final Set<String> propertyNameSet = new LinkedHashSet<String>();
@@ -353,7 +357,7 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
             }
         }
         if (!meta.startsWith(COMMENT_BEGIN)) { // also leading spaces not allowed
-            throwTemplateBodyMetaNotStartWithHeaderCommentException(bodyFile, plainText, meta);
+            throwBodyMetaNotStartWithHeaderCommentException(bodyFile, plainText, meta);
         }
         if (!meta.contains(COMMENT_END)) {
             throwBodyMetaHeaderCommentEndMarkNotFoundException(bodyFile, plainText, meta);
@@ -378,8 +382,9 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         if (!splitList.get(1).startsWith(SUBJECT_LABEL)) { // also leading spaces not allowed
             throwBodyMetaSubjectNotFoundException(bodyFile, plainText);
         }
-        if (splitList.size() > 2) { // after subject
-            final List<String> nextList = splitList.subList(1, splitList.size());
+        final int nextIndex = 2;
+        if (splitList.size() > nextIndex) { // after subject
+            final List<String> nextList = splitList.subList(nextIndex, splitList.size());
             final int nextSize = nextList.size();
             int index = 0;
             for (String line : nextList) {
@@ -414,44 +419,54 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         br.addElement("For example:");
         br.addElement("  (x)");
         br.addElement("    /*");
-        br.addElement("     ...");
-        br.addElement("    */ subject: ...       // *NG");
-        br.addElement("    >>>");
-        br.addElement("    ...mail body");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
+        br.addElement("    */ subject: ... >>>   // *NG");
+        br.addElement("    ...your mail body");
         br.addElement("  (x)");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    subject: ...");
-        br.addElement("    >>>...mail body     // *NG");
+        br.addElement("    >>> ...your mail body // *NG");
         br.addElement("  (o)");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    subject: ...");
         br.addElement("    >>>                   // OK");
-        br.addElement("    ...mail body");
+        br.addElement("    ...your mail body");
         setupBodyFileInfo(br, bodyFile, plainText);
         final String msg = br.buildExceptionMessage();
         throw new SMailBodyMetaParseFailureException(msg);
     }
 
-    protected void throwTemplateBodyMetaNotStartWithHeaderCommentException(String bodyFile, String plainText, String meta) {
+    protected void throwBodyMetaNotStartWithHeaderCommentException(String bodyFile, String plainText, String meta) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not start with the header comment in the mail body meta.");
         br.addItem("Advice");
         br.addElement("The mail body meta should start with '/*' and should contain '*/'.");
+        br.addElement("It means header comment of template file is required.");
         br.addElement("For example:");
-        br.addElement("  /*");
-        br.addElement("   [...your mail's title]");
-        br.addElement("   ...your mail's description");
-        br.addElement("  */");
-        br.addElement("  subject: ...");
-        br.addElement("  >>>");
-        br.addElement("  ...mail body");
+        br.addElement("  (x)");
+        br.addElement("    subject: ...              // *NG");
+        br.addElement("    >>>");
+        br.addElement("    ...your mail body");
         br.addElement("");
+        br.addElement("  (o)");
+        br.addElement("    /*                        // OK");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
+        br.addElement("    */");
+        br.addElement("    subject: ...");
+        br.addElement("    >>>");
+        br.addElement("    ...your mail body");
+        br.addElement("");
+        br.addElement("And example:");
         br.addElement("  /*");
-        br.addElement("   [new member's registration]");
+        br.addElement("   [New Member's Registration]");
         br.addElement("   The memebr will be formalized after click.");
         br.addElement("   And the ...");
         br.addElement("  */");
@@ -474,20 +489,23 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    subject: ...");
         br.addElement("    >>>");
         br.addElement("    ...             // *NG: not found");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    >>>");
         br.addElement("    */              // *NG: after delimiter");
         br.addElement("    subject: ...");
         br.addElement("    ...");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */              // OK");
         br.addElement("    subject: ...");
         br.addElement("    >>>");
@@ -559,17 +577,19 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */ subject: ...        // *NG");
         br.addElement("    >>>");
-        br.addElement("    ...mail body");
+        br.addElement("    ...your mail body");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    subject: ...           // OK");
         br.addElement("    >>>");
-        br.addElement("    ...mail body");
+        br.addElement("    ...your mail body");
         setupBodyFileInfo(br, bodyFile, plainText);
         final String msg = br.buildExceptionMessage();
         throw new SMailBodyMetaParseFailureException(msg);
@@ -584,25 +604,28 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    >>>                    // *NG");
-        br.addElement("    ...mail body");
+        br.addElement("    ...your mail body");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    option: ...");
         br.addElement("    subject: ...           // *NG");
         br.addElement("    >>>");
-        br.addElement("    ...mail body");
+        br.addElement("    ...your mail body");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    subject: ...           // OK");
         br.addElement("    >>>");
-        br.addElement("    ...mail body");
+        br.addElement("    ...your mail body");
         setupBodyFileInfo(br, bodyFile, plainText);
         final String msg = br.buildExceptionMessage();
         throw new SMailBodyMetaParseFailureException(msg);
@@ -617,7 +640,8 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    subject: ...");
         br.addElement("    maihama     // *NG: unknown meta definition");
@@ -625,7 +649,8 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         br.addElement("    ...");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    subject: ...");
         br.addElement("                // *NG: empty line not allowed");
@@ -633,14 +658,16 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         br.addElement("    ...");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    subject: ...");
         br.addElement("    >>>");
         br.addElement("    ...");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    subject: ...");
         br.addElement("    -- !!String memberName!!");
@@ -663,7 +690,8 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     //    br.addElement("For example:");
     //    br.addElement("  (x):");
     //    br.addElement("    /*");
-    //    br.addElement("     ...");
+    //    br.addElement("     [...your mail's title]");
+    //    br.addElement("     ...your mail's description");
     //    br.addElement("    */");
     //    br.addElement("    subject: ...");
     //    br.addElement("    option: maihama      // *NG: unknown option");
@@ -671,7 +699,8 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     //    br.addElement("    ...");
     //    br.addElement("  (o):");
     //    br.addElement("    /*");
-    //    br.addElement("     ...");
+    //    br.addElement("     [...your mail's title]");
+    //    br.addElement("     ...your mail's description");
     //    br.addElement("    */");
     //    br.addElement("    subject: ...");
     //    br.addElement("    option: genAsIs      // OK");
@@ -687,7 +716,7 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     //    throw new SMailBodyMetaParseFailureException(msg);
     //}
 
-    protected void throwTemplateBodyMetaNotFoundException(String bodyFile, String plainText) {
+    protected void throwBodyMetaNotFoundException(String bodyFile, String plainText) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the delimiter for mail body meta.");
         br.addItem("Advice");
@@ -696,32 +725,29 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    subject: ...");
-        br.addElement("    ...mail body");
-        br.addElement("  (x):");
-        br.addElement("    /*");
-        br.addElement("     ...");
-        br.addElement("    */");
-        br.addElement("    subject: ...");
-        br.addElement("    ...mail body");
+        br.addElement("    ...your mail body        // *NG");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    subject: ...");
-        br.addElement("    >>>");
-        br.addElement("    ...mail body");
+        br.addElement("    >>>                      // OK");
+        br.addElement("    ...your mail body");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your mail's title]");
+        br.addElement("     ...your mail's description");
         br.addElement("    */");
         br.addElement("    subject: ...");
-        br.addElement("    option: ...(options)");
+        br.addElement("    option: ...options");
         br.addElement("    -- !!String memberName!!");
-        br.addElement("    >>>");
-        br.addElement("    ...mail body");
+        br.addElement("    >>>                      // OK");
+        br.addElement("    ...your mail body");
         setupBodyFileInfo(br, bodyFile, plainText);
         final String msg = br.buildExceptionMessage();
         throw new SMailBodyMetaParseFailureException(msg);

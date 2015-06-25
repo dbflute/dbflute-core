@@ -65,7 +65,7 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
     public static final String TITLE_END = "]";
     public static final String OPTION_LABEL = "option:";
     public static final String PROPDEF_PREFIX = "-- !!";
-    // // option check is not here because it can be added in MailFlute
+    // option check is not here because it can be added in MailFlute
     //public static final Set<String> optionSet;
     //static {
     //    optionSet = Collections.unmodifiableSet(DfCollectionUtil.newLinkedHashSet("genAsIs"));
@@ -128,13 +128,17 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
             }
             final String delimiter = META_DELIMITER;
             if (((String) tableMap.getOrDefault("isLastaTemplate", "false")).equalsIgnoreCase("true")) {
-                verifyFormat(toPath(pmFile), fileText, delimiter);
+                final String templatePath = toPath(pmFile);
+                if (!fileText.contains(delimiter)) {
+                    throwTemplateMetaNotFoundException(templatePath, fileText);
+                }
+                verifyFormat(templatePath, fileText, delimiter);
             }
             String option = null;
             if (fileText.contains(delimiter)) {
                 final String bodyMeta = Srl.substringFirstFront(fileText, ">>>");
                 if (bodyMeta.contains(OPTION_LABEL)) {
-                    option = Srl.substringFirstFront(Srl.substringFirstRear(bodyMeta, OPTION_LABEL), "\n");
+                    option = Srl.substringFirstFront(Srl.substringFirstRear(bodyMeta, OPTION_LABEL), LF);
                 }
             }
             final boolean convention = !isGenAsIs(option);
@@ -395,8 +399,9 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         if (!splitList.get(0).trim().isEmpty()) { // after '*/'
             throwBodyMetaHeaderCommentEndMarkNoIndependentException(templatePath, evaluated);
         }
-        if (splitList.size() > 1) { // after header comment
-            final List<String> nextList = splitList.subList(1, splitList.size());
+        final int nextIndex = 1;
+        if (splitList.size() > nextIndex) { // after header comment
+            final List<String> nextList = splitList.subList(nextIndex, splitList.size());
             final int nextSize = nextList.size();
             int index = 0;
             for (String line : nextList) {
@@ -431,20 +436,23 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         br.addElement("For example:");
         br.addElement("  (x)");
         br.addElement("    /*");
-        br.addElement("     ...");
-        br.addElement("    */ >>>                // *NG");
-        br.addElement("    ...(template body)");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */ >>>                    // *NG");
+        br.addElement("    ...your template body");
         br.addElement("  (x)");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
         br.addElement("    */");
-        br.addElement("    >>>...(template body) // *NG");
+        br.addElement("    >>> ...your template body // *NG");
         br.addElement("  (o)");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
         br.addElement("    */");
-        br.addElement("    >>>                   // OK");
-        br.addElement("    ...(template body)");
+        br.addElement("    >>>                       // OK");
+        br.addElement("    ...your template body");
         setupTemplateFileInfo(br, templatePath, evaluated);
         final String msg = br.buildExceptionMessage();
         throw new TemplateFileParseFailureException(msg);
@@ -455,16 +463,25 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         br.addNotice("Not start with the header comment in the template meta.");
         br.addItem("Advice");
         br.addElement("The template meta should start with '/*' and should contain '*/'.");
+        br.addElement("It means header comment of template file is required.");
         br.addElement("For example:");
-        br.addElement("  /*");
-        br.addElement("   [...your template's title]");
-        br.addElement("   ...your template's description");
-        br.addElement("  */");
-        br.addElement("  >>>");
-        br.addElement("  ...(template body)");
+        br.addElement("  (x)");
+        br.addElement("    subject: ...              // *NG");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
         br.addElement("");
+        br.addElement("  (o)");
+        br.addElement("    /*                        // OK");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    subject: ...");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        br.addElement("");
+        br.addElement("And example:");
         br.addElement("  /*");
-        br.addElement("   [new member's registration]");
+        br.addElement("   [New Member's Registration]");
         br.addElement("   The memebr will be formalized after click.");
         br.addElement("   And the ...");
         br.addElement("  */");
@@ -488,19 +505,19 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         br.addElement("    /*");
         br.addElement("     ...");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         br.addElement("  (x):");
         br.addElement("    /*");
         br.addElement("     ...");
         br.addElement("    >>>");
         br.addElement("    */");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         br.addElement("  (o):");
         br.addElement("    /*");
         br.addElement("     ...");
         br.addElement("    */              // OK");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         setupTemplateFileInfo(br, templatePath, evaluated);
         br.addItem("Body Meta");
         br.addElement(meta);
@@ -519,14 +536,14 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         br.addElement("     ...your template's description     // *NG");
         br.addElement("    */");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         br.addElement("  (o):");
         br.addElement("    /*");
         br.addElement("     [...your template's title]         // OK");
         br.addElement("     ...your template's description");
         br.addElement("    */");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         setupTemplateFileInfo(br, templatePath, evaluated);
         final String msg = br.buildExceptionMessage();
         throw new TemplateFileParseFailureException(msg);
@@ -542,16 +559,16 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         br.addElement("  (x):");
         br.addElement("    /*");
         br.addElement("     [...your template's title]");
-        br.addElement("    */                                 // *NG");
+        br.addElement("    */                                  // *NG");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         br.addElement("  (o):");
         br.addElement("    /*");
         br.addElement("     [...your template's title]");
         br.addElement("     ...your template's description     // OK");
         br.addElement("    */");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         setupTemplateFileInfo(br, templatePath, evaluated);
         final String msg = br.buildExceptionMessage();
         throw new TemplateFileParseFailureException(msg);
@@ -564,17 +581,19 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
         br.addElement("    */ option: ...         // *NG");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
         br.addElement("    */");
         br.addElement("    option: ...            // OK");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         setupTemplateFileInfo(br, templatePath, evaluated);
         final String msg = br.buildExceptionMessage();
         throw new TemplateFileParseFailureException(msg);
@@ -589,36 +608,40 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
         br.addElement("    */");
         br.addElement("    maihama     // *NG: unknown meta definition");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
         br.addElement("    */");
         br.addElement("                // *NG: empty line not allowed");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
         br.addElement("    */");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
         br.addElement("    */");
         br.addElement("    -- !!String memberName!!");
         br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body");
         setupTemplateFileInfo(br, templatePath, evaluated);
         br.addItem("Unknown Line");
         br.addElement(line);
         final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
+        throw new TemplateFileParseFailureException(msg);
     }
 
     // option check is not here because it can be added in MailFlute
@@ -631,18 +654,20 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
     //    br.addElement("For example:");
     //    br.addElement("  (x):");
     //    br.addElement("    /*");
-    //    br.addElement("     ...");
+    //    br.addElement("     [...your template's title]");
+    //    br.addElement("     ...your template's description");
     //    br.addElement("    */");
     //    br.addElement("    option: maihama      // *NG: unknown option");
     //    br.addElement("    >>>");
-    //    br.addElement("    ...(template body)");
+    //    br.addElement("    ...your template body");
     //    br.addElement("  (o):");
     //    br.addElement("    /*");
-    //    br.addElement("     ...");
+    //    br.addElement("     [...your template's title]");
+    //    br.addElement("     ...your template's description");
     //    br.addElement("    */");
     //    br.addElement("    option: genAsIs      // OK");
     //    br.addElement("    >>>");
-    //    br.addElement("    ...(template body)");
+    //    br.addElement("    ...your template body");
     //    br.addItem("Body File");
     //    br.addElement(bodyFile);
     //    br.addItem("File Text");
@@ -662,25 +687,26 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
         br.addElement("    */");
-        br.addElement("    ...(template body)");
-        br.addElement("  (x):");
-        br.addElement("    ...(template body)");
+        br.addElement("    ...your template body    // *NG");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
         br.addElement("    */");
-        br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    >>>                      // OK");
+        br.addElement("    ...your template body");
         br.addElement("  (o):");
         br.addElement("    /*");
-        br.addElement("     ...");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
         br.addElement("    */");
-        br.addElement("    option: ...(options)");
+        br.addElement("    option: ...options");
         br.addElement("    -- !!String memberName!!");
-        br.addElement("    >>>");
-        br.addElement("    ...(template body)");
+        br.addElement("    >>>                      // OK");
+        br.addElement("    ...your template body");
         setupTemplateFileInfo(br, templatePath, evaluated);
         final String msg = br.buildExceptionMessage();
         throw new TemplateFileParseFailureException(msg);
