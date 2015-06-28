@@ -108,6 +108,22 @@ http://dbflute.seasar.org/ja/environment/setup/maven.html
   </plugin>
 ```
 
-# Official site
+# Information
+## License
+Apache License 2.0
+
+## Official site
 http://dbflute.seasar.org/  
 (sorry Japanese site now...English coming soon)
+
+# Thanks, Framewoks
+DBFlute forks Apache Torque and S2Dao and (heavily) extends it.  
+And is influenced by Doma, ActiveRecord
+If the frameworks were not there, no DBFlute here.
+
+I appreciate every framework.
+
+# Thanks, Friends
+DBFlute is used by:  
+- Fess: https://github.com/codelibs/fess
+- and many business project, comming soon...
