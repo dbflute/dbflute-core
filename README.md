@@ -6,7 +6,7 @@ DBFlute core libraries for Java8
 - dbflute-runtime: jar library for application
 
 ## to DB change
-DBFlute has resistance to DB change.
+DBFlute has tolerance to DB change.
 
 - Lean Startup & Incremental Development
 - Implementing with Designing Development
