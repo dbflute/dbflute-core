@@ -72,6 +72,13 @@ select mb.MEMBER_ID
  order by mb.BIRTHDATE desc, mb.MEMBER_ID asc
 ```
 
+# Quick Trial
+you can clone the example project of DBFlute:  
+https://github.com/dbflute/dbflute-howto  
+
+see HowToSelectTest.java  
+and you can implement condition-bean as trial
+
 # Setup DBFlute (Install)
 See for the detail:  
 http://dbflute.seasar.org/ja/environment/setup/maven.html  
