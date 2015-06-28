@@ -118,7 +118,7 @@ http://dbflute.seasar.org/
 
 # Thanks, Framewoks
 DBFlute forks Apache Torque and S2Dao and (heavily) extends it.  
-And is influenced by Doma, ActiveRecord
+And is influenced by Doma, ActiveRecord  
 If the frameworks were not there, no DBFlute here.
 
 I appreciate every framework.
