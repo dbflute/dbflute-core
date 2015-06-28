@@ -71,14 +71,27 @@ select mb.MEMBER_ID
  /*END*/
  order by mb.BIRTHDATE desc, mb.MEMBER_ID asc
 ```
+```java
+SimpleMemberPmb pmb = new SimpleMemberPmb();
+pmb.setMemberName_PrefixSearch("S");
+List<SimpleMember> memberList = memberBhv.outsideSql().selectList(pmb);
+```
 
 # Quick Trial
 you can clone the example project of DBFlute:  
-https://github.com/dbflute/dbflute-howto  
 
-see HowToSelectTest.java  
-and you can implement condition-bean as trial
+1. git clone https://github.com/dbflute/dbflute-howto.git
+2. prepare database by *ReplaceSchema at DBFlute client directory 'dbflute_maihamadb'
+3. compile it by Java8, on e.g. Eclipse or IntelliJ or ... as Maven project
+4. see HowToSelectTest.java  
+you can implement condition-bean as trial, and can execute it by JUnit
 
+*ReplaceSchema
+```java
+// call manage.sh at lastaflute-example-harbor/dbflute_maihamadb
+// and select replace-schema in displayed menu
+...:dbflute_maihamadb ...$ sh manage.sh
+```
 # Setup DBFlute (Install)
 See for the detail:  
 http://dbflute.seasar.org/ja/environment/setup/maven.html  
