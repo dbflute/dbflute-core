@@ -146,4 +146,5 @@ I appreciate every framework.
 # Thanks, Friends
 DBFlute is used by:  
 - Fess: https://github.com/codelibs/fess
-- and many business project, comming soon...
+- S2Robot: https://github.com/codelibs/s2robot
+- and other many business projects, comming soon...
