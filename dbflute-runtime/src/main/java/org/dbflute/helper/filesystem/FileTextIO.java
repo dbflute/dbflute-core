@@ -208,7 +208,7 @@ public class FileTextIO {
      * @param oneArgLambda The filter of whole text. (NotNull)
      * @return The filtered written text. (NotNull)
      */
-    public String rewriteFilteringLine(String textPath, FileTextWholeFilter oneArgLambda) {
+    public String rewriteFilteringWhole(String textPath, FileTextWholeFilter oneArgLambda) {
         assertState();
         assertStringNotNullAndNotTrimmedEmpty("textPath", textPath);
         assertObjectNotNull("oneArgLambda(filter)", oneArgLambda);
