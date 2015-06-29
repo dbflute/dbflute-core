@@ -4,20 +4,20 @@
     ${cursor}
 });</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda KeyValue as Inline" enabled="true" name="_kvli">(key, value) -&gt; ${cursor}</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda KeyValue as Linefeed" enabled="true" name="_kvll">(key, value) -&gt; {
     ${cursor}
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as HTML response with Form" enabled="true" name="_lahtform">${:import(org.lastaflute.web.Execute
-    , org.lastaflute.web.response.HtmlResponse)}@Execute
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as HTML response with Form" enabled="true" name="_lahtform">${:import(org.dbflute.lastaflute.web.Execute
+    , org.dbflute.lastaflute.web.response.HtmlResponse)}@Execute
 public HtmlResponse ${method}(${form}Form form) {
     return asHtml(path_${newName});
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as HTML response with ID" enabled="true" name="_lahtid">${:import(org.lastaflute.web.Execute
-    , org.lastaflute.web.response.HtmlResponse)}@Execute
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as HTML response with ID" enabled="true" name="_lahtid">${:import(org.dbflute.lastaflute.web.Execute
+    , org.dbflute.lastaflute.web.response.HtmlResponse)}@Execute
 public HtmlResponse index(long ${object}Id) {
     return asHtml(path_${newName});
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as JSON response with Form" enabled="true" name="_lajsform">${:import(org.lastaflute.web.Execute
-    , org.lastaflute.web.response.JsonResponse)}@Execute
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as JSON response with Form" enabled="true" name="_lajsform">${:import(org.dbflute.lastaflute.web.Execute
+    , org.dbflute.lastaflute.web.response.JsonResponse)}@Execute
 public JsonResponse ${method}(${form}Form form) {
     return asJson(bean);
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as JSON response with ID" enabled="true" name="_lajsid">${:import(org.lastaflute.web.Execute
-    , org.lastaflute.web.response.JsonResponse)}@Execute
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as JSON response with ID" enabled="true" name="_lajsid">${:import(org.dbflute.lastaflute.web.Execute
+    , org.dbflute.lastaflute.web.response.JsonResponse)}@Execute
 public JsonResponse index(long ${object}Id) {
     return asJson(bean);
 }</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow as Inline" enabled="true" name="_li">${var} -&gt; ${var}.${newName}</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow with Linefeed" enabled="true" name="_ll">${var} -&gt; {
@@ -73,22 +73,22 @@ public JsonResponse index(long ${object}Id) {
     //                                                                              ======</template><template autoinsert="true" context="java" deleted="false" description="Validation methods for Action" enabled="true" name="_tavalid">    // ===================================================================================
     //                                                                          Validation
     //                                                                          ==========</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: To Be Fixed Sometime" enabled="true" name="_tdreview">// #review by ${user}(${date}) ${content}</template><template autoinsert="true" context="java" deleted="false" description="TODO comment" enabled="true" name="_todo">    // TODO ${user} ${cursor} (${date})</template><template autoinsert="true" context="java" deleted="false" description="TODO review comment" enabled="true" name="_trev">    // TODO ${newName} ${cursor} by ${user} (${date})</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQueryAndPart" enabled="true" name="andCBLambda">andCB -&gt; {
-    andCB.query().set${newName}
+    andCB.query().set${columnName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ConditionBean" enabled="true" name="cbLambda">cb -&gt; {
-    cb.${newName}
+    cb.${method}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for SpecifyColumn" enabled="true" name="colCBLambda">colCB -&gt; {
-    colCB.specify().column${newName}
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Configuration" enabled="true" name="confLambda">conf -&gt; conf.${newName}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: renderWith()" enabled="true" name="dataLambda">data -&gt; {
-    data.register(${var}, ${object});
+    colCB.specify().column${columnName}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Configuration" enabled="true" name="confLambda">conf -&gt; conf.${method}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: renderWith()" enabled="true" name="dataLambda">data -&gt; {
+    data.register(${nameOfData}, ${var});
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for DerivedReferrer" enabled="true" name="derivedCBLambda">${var}CB -&gt; {
-    ${var}CB.specify().column${newName}
+    ${var}CB.specify().column${columnName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Entity" enabled="true" name="entityLambda">${var} -&gt; {
-    ${var}.${newName}
+    ${var}.${method}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Entity List" enabled="true" name="entityListLambda">${var}List -&gt; {
     ${cursor}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ReferrerLoader" enabled="true" name="loaderLambda">${var}Loader -&gt; {
-    ${var}Loader.load${newName}
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for many arguments" enabled="true" name="manyArgLambda">(${var}, ${newNew}) -&gt; {
+    ${var}Loader.load${referrer}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for many arguments" enabled="true" name="manyArgLambda">(${arg1}, ${arg2}) -&gt; {
     ${cursor}
 }</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: more validation" enabled="true" name="moreValidationLambda">messages -&gt; {}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for no-argument1" enabled="true" name="noArg1Lambda">() -&gt; {
     ${cursor}
@@ -97,26 +97,24 @@ public JsonResponse index(long ${object}Id) {
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for no-argument as Inline" enabled="true" name="noArgInLambda">() -&gt; ${cursor}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for no-argument" enabled="true" name="noArgLambda">() -&gt; {
     ${cursor}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for one argument1" enabled="true" name="oneArg1Lambda">${var} -&gt; {
-    ${var}.${newName}
+    ${var}.${method}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for one argument2" enabled="true" name="oneArg2Lambda">${var} -&gt; {
-    ${var}.${newName}
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for one argument as Inline" enabled="true" name="oneArgInLambda">${var} -&gt; ${var}.${newName}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for one argument" enabled="true" name="oneArgLambda">${var} -&gt; {
-    ${var}.${newName}
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ConditionOption" enabled="true" name="opLambda">op -&gt; op.${newName}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQuery" enabled="true" name="orCBLambda">orCB -&gt; {
-    orCB.query().set${newName}
+    ${var}.${method}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for one argument as Inline" enabled="true" name="oneArgInLambda">${var} -&gt; ${var}.${method}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for one argument" enabled="true" name="oneArgLambda">${var} -&gt; {
+    ${var}.${method}
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ConditionOption" enabled="true" name="opLambda">op -&gt; op.${method}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQuery" enabled="true" name="orCBLambda">orCB -&gt; {
+    orCB.query().set${columnName}
 }</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Mail Postcard" enabled="true" name="postcardLambda">postcard -&gt; {
-    postcard.setFrom(${object});
-    postcard.addTo(${newName});
+    postcard.setFrom(${fromAddress}, ${personal});
+    postcard.addTo(${toAddress});
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Referrer" enabled="true" name="refCBLambda">${var}CB -&gt; {
-    ${var}CB.query().addOrderBy_${newName}
+    ${var}CB.query().addOrderBy_${columnName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ScalarCondition" enabled="true" name="scalarCBLambda">${var}CB -&gt; {
-    ${var}CB.specify().column${newName}
+    ${var}CB.specify().column${columnName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for SubQuery" enabled="true" name="subCBLambda">${var}CB -&gt; {
-    ${var}CB.query().set${newName}
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Transaction" enabled="true" name="txLambda">tx -&gt; {
-    ${cursor}
+    ${var}CB.query().set${columnName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Union" enabled="true" name="unionCBLambda">unionCB -&gt; {
-    unionCB.query().set${newName}
+    unionCB.query().set${columnName}
 }</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: validation error" enabled="true" name="validationErrorLambda">() -&gt; {
-    return asHtml(path_${object});
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Validation Messages" enabled="true" name="validationMessagesLambda">messages -&gt; messages.addConstraints${object}</template></templates>
+    return asHtml(path_${newName});
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Validation Messages" enabled="true" name="validationMessagesLambda">messages -&gt; messages.addConstraints${newName}</template></templates>
