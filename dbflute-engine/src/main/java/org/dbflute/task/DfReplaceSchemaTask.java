@@ -247,6 +247,8 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
             if (!schemaOnly) { // normally load data
                 loadData(sqlRootDir, previous);
                 takeFinally(sqlRootDir, previous);
+            } else {
+                _log.info("*Skipped load data and take-finally because of schemaOnly option.");
             }
         } finally {
             setupReplaceSchemaFinalInfo();
