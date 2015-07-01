@@ -323,6 +323,7 @@ public final class DfLastaFluteFreeGenReflector {
         tableMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, "template", "targetDir"));
         tableMap.put("targetExt", filterOverridden("." + ext, lastafluteMap, appName, "template", "targetExt"));
         tableMap.put("isConventionSuffix", "true");
+        tableMap.put("isLastaTemplate", "true");
     }
 
     protected String buildPmTemplateBeanPackage(String appName, Map<String, Object> lastafluteMap) {

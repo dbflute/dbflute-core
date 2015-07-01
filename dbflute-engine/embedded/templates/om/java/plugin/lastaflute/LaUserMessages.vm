@@ -31,12 +31,10 @@ public class ${request.className} extends ActionMessages {
     private static final long serialVersionUID = 1L;
 #foreach ($column in $table.columnList)
 #if (!$column.isExtends)
-#if (!$column.isLabel)
 #if (!$column.isOverride)
 
     /** The key of the message: ${column.propertyValue} */
     public static final String ${column.defName} = "{${column.propertyKey}}";
-#end
 #end
 #end
 #end
@@ -119,7 +117,7 @@ public class ${request.className} extends ActionMessages {
 #if ($column.isLabel)
 
         /** The key of the label: ${column.propertyValue} */
-        String ${column.defName} = "${column.propertyKey}";
+        String ${column.defName} = "{${column.propertyKey}}";
 #end
 #end
 #end

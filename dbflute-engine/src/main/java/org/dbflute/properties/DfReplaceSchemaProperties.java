@@ -1064,6 +1064,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return new File(markPath).exists();
     }
 
+    public boolean isSchemaOnlyAlterCheck() { // closet, to avoid big data loading
+        return isProperty("isSchemaOnlyAlterCheck", false, getReplaceSchemaMap());
+    }
+
     // ===================================================================================
     //                                                                  InitializeFirstSql
     //                                                                  ==================

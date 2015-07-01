@@ -186,18 +186,14 @@ public class DfOutsideSqlChecker {
 
     protected void throwRequiredOutsideSqlTitleNotFoundException(String title, String fileName, String sql) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The outsideSql title was NOT found!");
+        br.addNotice("The outsideSql title was not found!");
         br.addItem("Advice");
-        br.addElement("OutsideSql title is required in this project.");
-        br.addElement("The property 'isRequiredSqlTitle' of outsideSqlDefinition is true.");
-        br.addElement("So you should add title comment, [df:title] and title,");
-        br.addElement("in your outside-SQL like this:");
+        br.addElement("OutsideSql title is required in this project");
+        br.addElement("because the property 'isRequiredSqlTitle' of outsideSqlMap.dfprop is true.");
+        br.addElement("So you should add title comment in your outside-SQL like this:");
         br.addElement("  /= = = = = = = = = = = = = = = = = = =");
         br.addElement("  /*");
-        br.addElement("   [df:title]");
-        br.addElement("   Simple Member Select");
-        br.addElement("");
-        br.addElement("   [df:description]");
+        br.addElement("   [Simple Member Select]       // *here");
         br.addElement("   This SQL is ...");
         br.addElement("  */");
         br.addElement("  -- #df:entity#");
@@ -211,7 +207,7 @@ public class DfOutsideSqlChecker {
         br.addElement("  = = = = = = = = = = /");
         br.addElement("");
         br.addElement("If you need to remove the check,");
-        br.addElement("change the property in your outsideSqlDefinitionMap.dfprop.");
+        br.addElement("change the property in your outsideSqlMap.dfprop.");
         br.addElement("For example:");
         br.addElement("    ; isRequiredSqlTitle = false");
         br.addItem("Title");
@@ -229,7 +225,7 @@ public class DfOutsideSqlChecker {
         br.addNotice("The outsideSql title was same with the other SQL.");
         br.addItem("Advice");
         br.addElement("OutsideSql title should be unique in all SQL files.");
-        br.addElement("Make sure your [df:title] in your outsideSql.");
+        br.addElement("Make sure your title in your outsideSql.");
         br.addItem("Title");
         br.addElement(title);
         br.addItem("Other SQL File");
@@ -272,16 +268,12 @@ public class DfOutsideSqlChecker {
         br.addNotice("The outsideSql description was NOT found.");
         br.addItem("Advice");
         br.addElement("OutsideSql description is required in this project.");
-        br.addElement("The property 'isRequiredSqlDescription' of outsideSqlDefinition is true.");
-        br.addElement("So you should add description comment, [df:description] and description,");
-        br.addElement("in your outside-SQL like this:");
+        br.addElement("The property 'isRequiredSqlDescription' of outsideSqlMap.dfprop is true.");
+        br.addElement("So you should add description comment in your outside-SQL like this:");
         br.addElement("  /= = = = = = = = = = = = = = = = = = =");
         br.addElement("  /*");
-        br.addElement("   [df:title]");
-        br.addElement("   Simple Member Select");
-        br.addElement("");
-        br.addElement("   [df:description]");
-        br.addElement("   This SQL is ...");
+        br.addElement("   [Simple Member Select]");
+        br.addElement("   This SQL is ...              // *here");
         br.addElement("  */");
         br.addElement("  -- #df:entity#");
         br.addElement("  -- !df:pmb!");
@@ -312,7 +304,7 @@ public class DfOutsideSqlChecker {
         br.addNotice("The outsideSql description was same with the other SQL.");
         br.addItem("Advice");
         br.addElement("OutsideSql description should be unique in all SQL files.");
-        br.addElement("Make sure your [df:description] in your outsideSql.");
+        br.addElement("Make sure your description in your outsideSql.");
         br.addItem("Description");
         br.addElement(desc);
         br.addItem("Other SQL File");

@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.helper.filesystem.FileTextIO;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
@@ -46,6 +48,7 @@ import org.dbflute.twowaysql.node.IfNode;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
+import org.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -55,8 +58,24 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final String PROPDEF_PREFIX = "-- !!";
+    public static final String META_DELIMITER = ">>>";
+    public static final String COMMENT_BEGIN = "/*";
+    public static final String COMMENT_END = "*/";
+    public static final String TITLE_BEGIN = "[";
+    public static final String TITLE_END = "]";
+    public static final String OPTION_LABEL = "option:";
+    public static final String PROPDEF_PREFIX = "-- !!";
+    // option check is not here because it can be added in MailFlute
+    //public static final Set<String> optionSet;
+    //static {
+    //    optionSet = Collections.unmodifiableSet(DfCollectionUtil.newLinkedHashSet("genAsIs"));
+    //}
+    public static final List<String> allowedPrefixList; // except first line (comment)
+    static {
+        allowedPrefixList = Arrays.asList(OPTION_LABEL, PROPDEF_PREFIX);
+    }
     protected static final String LF = "\n";
+    protected static final String CR = "\r";
     protected static final String CRLF = "\r\n";
 
     // ===================================================================================
@@ -107,11 +126,19 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
             } catch (FileNotFoundException e) { // no way, collected file
                 throw new IllegalStateException("Not found the pmc file: " + pmFile, e);
             }
+            final String delimiter = META_DELIMITER;
+            if (((String) tableMap.getOrDefault("isLastaTemplate", "false")).equalsIgnoreCase("true")) {
+                final String templatePath = toPath(pmFile);
+                if (!fileText.contains(delimiter)) {
+                    throwTemplateMetaNotFoundException(templatePath, fileText);
+                }
+                verifyFormat(templatePath, fileText, delimiter);
+            }
             String option = null;
-            if (fileText.contains(">>>")) {
+            if (fileText.contains(delimiter)) {
                 final String bodyMeta = Srl.substringFirstFront(fileText, ">>>");
-                if (bodyMeta.contains("option:")) {
-                    option = Srl.substringFirstFront(Srl.substringFirstRear(bodyMeta, "option:"), "\n");
+                if (bodyMeta.contains(OPTION_LABEL)) {
+                    option = Srl.substringFirstFront(Srl.substringFirstRear(bodyMeta, OPTION_LABEL), LF);
                 }
             }
             final boolean convention = !isGenAsIs(option);
@@ -332,6 +359,373 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
             result = true;
         }
         return result;
+    }
+
+    // ===================================================================================
+    //                                                                       Verify Format
+    //                                                                       =============
+    protected void verifyFormat(String templatePath, String evaluated, String delimiter) {
+        final String meta = Srl.substringFirstFront(evaluated, delimiter);
+        if (!meta.endsWith(LF)) { // also CRLF checked
+            throwBodyMetaNoIndependentDelimiterException(templatePath, evaluated);
+        }
+        final int rearIndex = evaluated.indexOf(delimiter) + delimiter.length();
+        if (evaluated.length() > rearIndex) { // just in case (empty template possible?)
+            final String rearFirstStr = evaluated.substring(rearIndex, rearIndex + 1);
+            if (!Srl.equalsPlain(rearFirstStr, LF, CR)) { // e.g. >>> Hello, ...
+                throwBodyMetaNoIndependentDelimiterException(templatePath, evaluated);
+            }
+        }
+        if (!meta.startsWith(COMMENT_BEGIN)) { // also leading spaces not allowed
+            throwTemplateMetaNotStartWithHeaderCommentException(templatePath, evaluated, meta);
+        }
+        if (!meta.contains(COMMENT_END)) {
+            throwBodyMetaHeaderCommentEndMarkNotFoundException(templatePath, evaluated, meta);
+        }
+        final String headerComment = Srl.extractScopeFirst(evaluated, COMMENT_BEGIN, COMMENT_END).getContent();
+        final ScopeInfo titleScope = Srl.extractScopeFirst(headerComment, TITLE_BEGIN, TITLE_END);
+        if (titleScope == null) {
+            throwBodyMetaTitleCommentNotFoundException(templatePath, evaluated);
+        }
+        final String desc = Srl.substringFirstRear(headerComment, TITLE_END);
+        if (desc.isEmpty()) {
+            throwBodyMetaDescriptionCommentNotFoundException(templatePath, evaluated);
+        }
+        final String rearMeta = Srl.substringFirstRear(meta, COMMENT_END);
+        // no way because of already checked
+        //if (!rearMeta.contains(LF)) {
+        //}
+        final List<String> splitList = Srl.splitList(rearMeta, LF);
+        if (!splitList.get(0).trim().isEmpty()) { // after '*/'
+            throwBodyMetaHeaderCommentEndMarkNoIndependentException(templatePath, evaluated);
+        }
+        final int nextIndex = 1;
+        if (splitList.size() > nextIndex) { // after header comment
+            final List<String> nextList = splitList.subList(nextIndex, splitList.size());
+            final int nextSize = nextList.size();
+            int index = 0;
+            for (String line : nextList) {
+                if (index == nextSize - 1) { // last loop
+                    if (line.isEmpty()) { // empty line only allowed in last loop
+                        break;
+                    }
+                }
+                if (!allowedPrefixList.stream().anyMatch(prefix -> line.startsWith(prefix))) {
+                    throwBodyMetaUnknownLineException(templatePath, evaluated, line);
+                }
+                // option check is not here because it can be added in MailFlute
+                //if (line.startsWith(OPTION_LABEL)) {
+                //    final String options = Srl.substringFirstRear(line, OPTION_LABEL);
+                //    final List<String> optionList = Srl.splitListTrimmed(options, ".");
+                //    for (String option : optionList) {
+                //        if (!optionSet.contains(option)) {
+                //            throwBodyMetaUnknownOptionException(templatePath, evaluated, option);
+                //        }
+                //    }
+                //}
+                ++index;
+            }
+        }
+    }
+
+    protected void throwBodyMetaNoIndependentDelimiterException(String templatePath, String evaluated) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("No independent delimter of template meta.");
+        br.addItem("Advice");
+        br.addElement("The delimter of template meta should be independent in line.");
+        br.addElement("For example:");
+        br.addElement("  (x)");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */ >>>                    // *NG");
+        br.addElement("    ...your template body");
+        br.addElement("  (x)");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    >>> ...your template body // *NG");
+        br.addElement("  (o)");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    >>>                       // OK");
+        br.addElement("    ...your template body");
+        setupTemplateFileInfo(br, templatePath, evaluated);
+        final String msg = br.buildExceptionMessage();
+        throw new TemplateFileParseFailureException(msg);
+    }
+
+    protected void throwTemplateMetaNotStartWithHeaderCommentException(String templatePath, String evaluated, String meta) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not start with the header comment in the template meta.");
+        br.addItem("Advice");
+        br.addElement("The template meta should start with '/*' and should contain '*/'.");
+        br.addElement("It means header comment of template file is required.");
+        br.addElement("For example:");
+        br.addElement("  (x)");
+        br.addElement("    subject: ...              // *NG");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        br.addElement("");
+        br.addElement("  (o)");
+        br.addElement("    /*                        // OK");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    subject: ...");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        br.addElement("");
+        br.addElement("And example:");
+        br.addElement("  /*");
+        br.addElement("   [New Member's Registration]");
+        br.addElement("   The memebr will be formalized after click.");
+        br.addElement("   And the ...");
+        br.addElement("  */");
+        br.addElement("  >>>");
+        br.addElement("  Hello, sea");
+        br.addElement("  ...");
+        setupTemplateFileInfo(br, templatePath, evaluated);
+        br.addItem("Body Meta");
+        br.addElement(meta);
+        final String msg = br.buildExceptionMessage();
+        throw new TemplateFileParseFailureException(msg);
+    }
+
+    protected void throwBodyMetaHeaderCommentEndMarkNotFoundException(String templatePath, String evaluated, String meta) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the header comment end mark in the template meta.");
+        br.addItem("Advice");
+        br.addElement("The template meta should start with '/*' and should contain '*/'.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    /*");
+        br.addElement("     ...");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        br.addElement("  (x):");
+        br.addElement("    /*");
+        br.addElement("     ...");
+        br.addElement("    >>>");
+        br.addElement("    */");
+        br.addElement("    ...your template body");
+        br.addElement("  (o):");
+        br.addElement("    /*");
+        br.addElement("     ...");
+        br.addElement("    */              // OK");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        setupTemplateFileInfo(br, templatePath, evaluated);
+        br.addItem("Body Meta");
+        br.addElement(meta);
+        final String msg = br.buildExceptionMessage();
+        throw new TemplateFileParseFailureException(msg);
+    }
+
+    protected void throwBodyMetaTitleCommentNotFoundException(String templatePath, String evaluated) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the title in the header comment of template meta.");
+        br.addItem("Advice");
+        br.addElement("The template meta should contain TITLE in the header comment.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    /*");
+        br.addElement("     ...your template's description     // *NG");
+        br.addElement("    */");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        br.addElement("  (o):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]         // OK");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        setupTemplateFileInfo(br, templatePath, evaluated);
+        final String msg = br.buildExceptionMessage();
+        throw new TemplateFileParseFailureException(msg);
+    }
+
+    protected void throwBodyMetaDescriptionCommentNotFoundException(String templatePath, String evaluated) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the description in the header comment of template meta.");
+        br.addItem("Advice");
+        br.addElement("The template meta should contain DESCRIPTION");
+        br.addElement("in the header comment like this:");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("    */                                  // *NG");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        br.addElement("  (o):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description     // OK");
+        br.addElement("    */");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        setupTemplateFileInfo(br, templatePath, evaluated);
+        final String msg = br.buildExceptionMessage();
+        throw new TemplateFileParseFailureException(msg);
+    }
+
+    protected void throwBodyMetaHeaderCommentEndMarkNoIndependentException(String templatePath, String evaluated) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("No independent the header comment end mark in the template meta.");
+        br.addItem("Advice");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */ option: ...         // *NG");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        br.addElement("  (o):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    option: ...            // OK");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        setupTemplateFileInfo(br, templatePath, evaluated);
+        final String msg = br.buildExceptionMessage();
+        throw new TemplateFileParseFailureException(msg);
+    }
+
+    protected void throwBodyMetaUnknownLineException(String templatePath, String evaluated, String line) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unknown line in the template meta.");
+        br.addItem("Advice");
+        br.addElement("The template meta should start with option:");
+        br.addElement("or fixed style, e.g. '-- !!...!!'");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    maihama     // *NG: unknown meta definition");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        br.addElement("  (x):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("                // *NG: empty line not allowed");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        br.addElement("  (o):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        br.addElement("  (o):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    -- !!String memberName!!");
+        br.addElement("    >>>");
+        br.addElement("    ...your template body");
+        setupTemplateFileInfo(br, templatePath, evaluated);
+        br.addItem("Unknown Line");
+        br.addElement(line);
+        final String msg = br.buildExceptionMessage();
+        throw new TemplateFileParseFailureException(msg);
+    }
+
+    // option check is not here because it can be added in MailFlute
+    //protected void throwBodyMetaUnknownOptionException(String bodyFile, String fileText, String option) {
+    //    final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+    //    br.addNotice("Unknown option for MailFlute body meta.");
+    //    br.addItem("Advice");
+    //    br.addElement("You can specify the following option:");
+    //    br.addElement(optionSet);
+    //    br.addElement("For example:");
+    //    br.addElement("  (x):");
+    //    br.addElement("    /*");
+    //    br.addElement("     [...your template's title]");
+    //    br.addElement("     ...your template's description");
+    //    br.addElement("    */");
+    //    br.addElement("    option: maihama      // *NG: unknown option");
+    //    br.addElement("    >>>");
+    //    br.addElement("    ...your template body");
+    //    br.addElement("  (o):");
+    //    br.addElement("    /*");
+    //    br.addElement("     [...your template's title]");
+    //    br.addElement("     ...your template's description");
+    //    br.addElement("    */");
+    //    br.addElement("    option: genAsIs      // OK");
+    //    br.addElement("    >>>");
+    //    br.addElement("    ...your template body");
+    //    br.addItem("Body File");
+    //    br.addElement(bodyFile);
+    //    br.addItem("File Text");
+    //    br.addElement(fileText);
+    //    br.addItem("Unknown Option");
+    //    br.addElement(option);
+    //    final String msg = br.buildExceptionMessage();
+    //    throw new TemplateFileParseFailureException(msg);
+    //}
+
+    protected void throwTemplateMetaNotFoundException(String templatePath, String evaluated) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the delimiter for template meta.");
+        br.addItem("Advice");
+        br.addElement("The delimiter of template meta is '>>>'.");
+        br.addElement("It should be defined.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    ...your template body    // *NG");
+        br.addElement("  (o):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    >>>                      // OK");
+        br.addElement("    ...your template body");
+        br.addElement("  (o):");
+        br.addElement("    /*");
+        br.addElement("     [...your template's title]");
+        br.addElement("     ...your template's description");
+        br.addElement("    */");
+        br.addElement("    option: ...options");
+        br.addElement("    -- !!String memberName!!");
+        br.addElement("    >>>                      // OK");
+        br.addElement("    ...your template body");
+        setupTemplateFileInfo(br, templatePath, evaluated);
+        final String msg = br.buildExceptionMessage();
+        throw new TemplateFileParseFailureException(msg);
+    }
+
+    protected void setupTemplateFileInfo(ExceptionMessageBuilder br, String templatePath, String evaluated) {
+        br.addItem("Template File");
+        br.addElement(templatePath);
+        br.addItem("Evaluated");
+        br.addElement(evaluated);
+    }
+
+    public static class TemplateFileParseFailureException extends RuntimeException { // for compatible
+
+        private static final long serialVersionUID = 1L;
+
+        public TemplateFileParseFailureException(String msg) {
+            super(msg);
+        }
     }
 
     // ===================================================================================

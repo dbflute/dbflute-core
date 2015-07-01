@@ -243,8 +243,8 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     //                                                                             =======
     @SuppressWarnings("deprecation")
     @Override
-    public <DTO> PagingResultBean<DTO> mappingList(EntityDtoMapper<ENTITY, DTO> entityDtoMapper) {
-        final ListResultBean<DTO> ls = super.mappingList(entityDtoMapper);
+    public <DTO> PagingResultBean<DTO> mappingList(EntityDtoMapper<ENTITY, DTO> entityLambda) {
+        final ListResultBean<DTO> ls = super.mappingList(entityLambda);
         final PagingResultBean<DTO> mappingList = new PagingResultBean<DTO>();
         mappingList.setSelectedList(ls.getSelectedList());
         mappingList.setTableDbName(getTableDbName());

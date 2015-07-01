@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.helper.token.file.exception.FileMakingInvalidValueCountException;
@@ -70,6 +71,7 @@ import org.dbflute.util.Srl;
  * }, <span style="color: #553000">op</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
  * </pre>
  * @author jflute
+ * @author iwamat-saw
  */
 public class FileToken {
 
@@ -289,7 +291,7 @@ public class FileToken {
 
     protected ValueLineInfo arrangeValueList(List<String> valueList, String delimiter) {
         final ValueLineInfo valueLineInfo = createValueLineInfo();
-        final ArrayList<String> resultList = new ArrayList<String>();
+        final List<String> resultList = new ArrayList<String>();
         String preString = "";
         for (int i = 0; i < valueList.size(); i++) {
             final String value = (String) valueList.get(i);
@@ -413,11 +415,13 @@ public class FileToken {
         return value;
     }
 
-    protected FileTokenizingHeaderInfo analyzeHeaderInfo(String delimiter, final String lineString) {
-        // Get column header like value list
-        ValueLineInfo lineInfo = arrangeValueList(lineString, delimiter);
-        FileTokenizingHeaderInfo headerInfo = new FileTokenizingHeaderInfo();
-        headerInfo.acceptColumnNameList(lineInfo.getValueList());
+    protected FileTokenizingHeaderInfo analyzeHeaderInfo(String delimiter, String lineString) {
+        // analyze column header like value list for delimiter in column name if quoted
+        final ValueLineInfo lineInfo = arrangeValueList(lineString, delimiter);
+        final FileTokenizingHeaderInfo headerInfo = new FileTokenizingHeaderInfo();
+        headerInfo.acceptColumnNameList(lineInfo.getValueList().stream().map(vl -> {
+            return vl.trim(); /* leading and trailing spaces is unneeded in header (non value) */
+        }).collect(Collectors.toList()));
         headerInfo.setColumnNameRowString(lineString);
         return headerInfo;
     }
@@ -427,6 +431,7 @@ public class FileToken {
     }
 
     public static class ValueLineInfo {
+
         protected List<String> _valueList;
         protected boolean _continueNextLine;
 

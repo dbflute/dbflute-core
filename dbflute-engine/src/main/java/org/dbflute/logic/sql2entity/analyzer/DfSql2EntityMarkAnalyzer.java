@@ -110,6 +110,25 @@ public class DfSql2EntityMarkAnalyzer {
     //                                                                   Title/Description
     //                                                                   =================
     public String getTitle(String sql) {
+        final String oldStyleTitle = findOldStyleTitle(sql); // should be first not to conflict
+        if (oldStyleTitle != null) {
+            return oldStyleTitle;
+        }
+        if (sql.startsWith("/*") && sql.contains("*/")) { // new style
+            final ScopeInfo commentScope = Srl.extractScopeFirst(sql, "/*", "*/");
+            final String comment = commentScope.getContent();
+            final ScopeInfo titleScope = Srl.extractScopeFirst(comment, "[", "]");
+            if (titleScope != null) {
+                final String title = titleScope.getContent().trim();
+                if (!title.isEmpty()) {
+                    return title;
+                }
+            }
+        }
+        return null;
+    }
+
+    protected String findOldStyleTitle(String sql) {
         final String titleMark = TITLE_MARK;
         final String descriptionMark = DESCRIPTION_MARK;
         final int markIndex = sql.indexOf(titleMark);
@@ -138,6 +157,25 @@ public class DfSql2EntityMarkAnalyzer {
     }
 
     public String getDescription(String sql) {
+        final String oldStyleDescription = findOldStyleDescription(sql);
+        if (oldStyleDescription != null) {
+            return oldStyleDescription;
+        }
+        if (sql.startsWith("/*") && sql.contains("*/")) { // new style
+            final ScopeInfo commentScope = Srl.extractScopeFirst(sql, "/*", "*/");
+            final String comment = commentScope.getContent();
+            final ScopeInfo descScope = Srl.extractScopeFirst(comment, "[", "]");
+            if (descScope != null) {
+                final String desc = Srl.substringFirstRear(comment, "]").trim();
+                if (!desc.isEmpty()) {
+                    return desc;
+                }
+            }
+        }
+        return null;
+    }
+
+    protected String findOldStyleDescription(String sql) {
         final String descriptionMark = DESCRIPTION_MARK;
         final int markIndex = sql.indexOf(descriptionMark);
         if (markIndex < 0) {

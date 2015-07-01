@@ -723,10 +723,51 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 elementList.add(element);
             }
         } catch (SQLException e) {
+            throwTableClassificationSelectSQLFailureException(classificationName, sql, e);
             throw new SQLFailureException("Failed to execute the SQL:" + ln() + sql, e);
         } finally {
             new DfClassificationSqlResourceCloser().closeStatement(st, rs);
         }
+    }
+
+    protected void throwTableClassificationSelectSQLFailureException(String classificationName, String sql, SQLException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to select the classification resource from the table.");
+        br.addItem("Advice");
+        br.addElement("Make sure your classificationDefinitionMap.dfprop.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("     ; MemberStatus = list:{");
+        br.addElement("         ; map:{");
+        br.addElement("             ; table=NOEXISTING_STATUS                       // *NG");
+        br.addElement("             ; code=MEMBER_STATUS_CODE; name=MEMBER_STATUS_NAME");
+        br.addElement("             ; comment=DESCRIPTION; orderBy=DISPLAY_ORDER");
+        br.addElement("         }");
+        br.addElement("     }");
+        br.addElement("  (x):");
+        br.addElement("     ; MemberStatus = list:{");
+        br.addElement("         ; map:{");
+        br.addElement("             ; table=MEMBER_STATUS");
+        br.addElement("             ; code=MEMBER_STATUS_CODE; name=NOEXISTING_NAME // *NG");
+        br.addElement("             ; comment=DESCRIPTION; orderBy=DISPLAY_ORDER");
+        br.addElement("         }");
+        br.addElement("     }");
+        br.addElement("  (o):");
+        br.addElement("     ; MemberStatus = list:{");
+        br.addElement("         ; map:{");
+        br.addElement("             ; table=MEMBER_STATUS                           // OK");
+        br.addElement("             ; code=MEMBER_STATUS_CODE; name=MEMBER_STATUS_NAME");
+        br.addElement("             ; comment=DESCRIPTION; orderBy=DISPLAY_ORDER");
+        br.addElement("         }");
+        br.addElement("     }");
+        br.addElement("");
+        br.addElement("Or remove it if the table is deleted from your schema.");
+        br.addItem("Classification");
+        br.addElement(classificationName);
+        br.addItem("SQL");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
+        throw new SQLFailureException(msg, e);
     }
 
     protected final Map<String, String> _nameFromToMap = newLinkedHashMap();

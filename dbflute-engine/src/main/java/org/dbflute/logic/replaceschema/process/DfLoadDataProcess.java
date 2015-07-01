@@ -114,7 +114,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
 
     public static DfLoadDataProcess createAsCore(String sqlRootDir, DataSource dataSource, boolean previous) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        DfLoadDataProcess process = new DfLoadDataProcess(sqlRootDir, dataSource, mainSchema);
+        final DfLoadDataProcess process = new DfLoadDataProcess(sqlRootDir, dataSource, mainSchema);
         if (previous) {
             process.suppressCheckColumnDef();
             process.suppressCheckImplicitSet();

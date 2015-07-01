@@ -206,13 +206,14 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected DfAlterCheckProcess createAlterCheckProcess() {
+        final boolean schemaOnly = getReplaceSchemaProperties().isSchemaOnlyAlterCheck();
         return DfAlterCheckProcess.createAsMain(getDataSource(), new CoreProcessPlayer() {
             public void playNext(String sqlRootDirectory) {
-                executeCoreProcess(sqlRootDirectory, false);
+                executeCoreProcess(sqlRootDirectory, false, schemaOnly);
             }
 
             public void playPrevious(String sqlRootDirectory) {
-                executeCoreProcess(sqlRootDirectory, true);
+                executeCoreProcess(sqlRootDirectory, true, schemaOnly);
             }
         });
     }
@@ -233,14 +234,22 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     //                                                                        Core Process
     //                                                                        ============
     protected void executeCoreProcess(String sqlRootDir, boolean previous) {
-        doExecuteCoreProcess(sqlRootDir, previous);
+        doExecuteCoreProcess(sqlRootDir, previous, false);
     }
 
-    protected void doExecuteCoreProcess(String sqlRootDir, boolean previous) {
+    protected void executeCoreProcess(String sqlRootDir, boolean previous, boolean schemaOnly) {
+        doExecuteCoreProcess(sqlRootDir, previous, schemaOnly);
+    }
+
+    protected void doExecuteCoreProcess(String sqlRootDir, boolean previous, boolean schemaOnly) {
         try {
             createSchema(sqlRootDir, previous);
-            loadData(sqlRootDir, previous);
-            takeFinally(sqlRootDir, previous);
+            if (!schemaOnly) { // normally load data
+                loadData(sqlRootDir, previous);
+                takeFinally(sqlRootDir, previous);
+            } else {
+                _log.info("*Skipped load data and take-finally because of schemaOnly option.");
+            }
         } finally {
             setupReplaceSchemaFinalInfo();
         }

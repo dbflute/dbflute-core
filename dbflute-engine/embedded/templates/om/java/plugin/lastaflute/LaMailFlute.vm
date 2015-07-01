@@ -10,23 +10,82 @@ import org.lastaflute.core.mail.Postbox;
  */
 public class ${table.className} extends LaTypicalPostcard {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     public static final String PATH = "${table.resourcePath}";
 
+    // ===================================================================================
+    //                                                                         Entry Point
+    //                                                                         ===========
     public static void droppedInto(Postbox postbox, MPCall<${table.className}> postcardLambda) {
         ${table.className} postcard = new ${table.className}();
         postcardLambda.write(postcard);
         postbox.post(postcard);
     }
 
+    // ===================================================================================
+    //                                                                           Meta Data
+    //                                                                           =========
+    @Override
     protected String getBodyFile() {
         return PATH;
     }
 
+    @Override
     protected String[] getPropertyNames() {
         return new String[] {${table.propertyNameCommaString}};
     }
+
+    // ===================================================================================
+    //                                                                    Postcard Request
+    //                                                                    ================
+    // -----------------------------------------------------
+    //                                          Mail Address
+    //                                          ------------
+    public void setFrom(String from, String personal) {
+        doSetFrom(from, personal);
+    }
+
+    public void addTo(String to) {
+        doAddTo(to);
+    }
+
+    public void addTo(String to, String personal) {
+        doAddTo(to, personal);
+    }
+
+    public void addCc(String cc) {
+        doAddCc(cc);
+    }
+
+    public void addCc(String cc, String personal) {
+        doAddCc(cc, personal);
+    }
+
+    public void addBcc(String bcc) {
+        doAddBcc(bcc);
+    }
+
+    public void addBcc(String bcc, String personal) {
+        doAddBcc(bcc, personal);
+    }
+
+    public void addReplyTo(String replyTo) {
+        doAddReplyTo(replyTo);
+    }
+
+    public void addReplyTo(String replyTo, String personal) {
+        doAddReplyTo(replyTo, personal);
+    }
+#set ($propertyIndex = 0)
 #foreach ($property in $table.propertyList)
 
+#if ($propertyIndex == 0)
+    // -----------------------------------------------------
+    //                                  Application Variable
+    //                                  --------------------
+#end
     /**
      * Set the value of ${property.uncapCalemName}, used in parameter comment. <br>
      * Even if empty string, treated as empty plainly. So "IF pmb != null" is false if empty.
@@ -35,5 +94,6 @@ public class ${table.className} extends LaTypicalPostcard {
     public void set${property.capCalemName}(${property.propertyType} ${property.uncapCalemName}) {
         registerVariable("${property.propertyName}", ${property.uncapCalemName});
     }
+#set ($propertyIndex = $propertyIndex + 1)
 #end
 }
