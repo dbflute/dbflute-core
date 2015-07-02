@@ -58,7 +58,7 @@ public class DfElasticsearchLoadingAgent {
     //                                                                          Load Table
     //                                                                          ==========
     // ; resourceMap = map:{
-    //     ; resourceType = ELASTICSEARCH_SCHEMA
+    //     ; resourceType = ELASTICSEARCH
     //     ; resourceFile = ../../../foo.json
     // }
     // ; outputMap = map:{
@@ -68,7 +68,7 @@ public class DfElasticsearchLoadingAgent {
     //     ; className = unused
     // }
     // ; tableMap = map:{
-    //     ; tablePath = map
+    //     ; tablePath = .fess_config -> map.mappings -> map
     //     ; mappingMap = map:{
     //         ; type = map:{
     //             ; INTEGER = Integer
