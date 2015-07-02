@@ -23,12 +23,12 @@ import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 /**
  * @author jflute
  */
-public class DfElasticSearchTableLoader implements DfFreeGenTableLoader {
+public class DfElasticsearchTempTableLoader implements DfFreeGenTableLoader {
 
     // ===================================================================================
     //                                                                          Load Table
     //                                                                          ==========
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        return new DfElasticSearchLoadingAgent(requestName, resource, mapProp).loadTable();
+        return new DfElasticsearchTempLoadingAgent(requestName, resource, mapProp).loadTable();
     }
 }

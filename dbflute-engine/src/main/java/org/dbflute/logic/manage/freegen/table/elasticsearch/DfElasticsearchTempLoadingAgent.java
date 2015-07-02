@@ -34,7 +34,7 @@ import org.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfElasticSearchLoadingAgent {
+public class DfElasticsearchTempLoadingAgent {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -48,7 +48,7 @@ public class DfElasticSearchLoadingAgent {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfElasticSearchLoadingAgent(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+    public DfElasticsearchTempLoadingAgent(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         _requestName = requestName;
         _resource = resource;
         _mapProp = mapProp;
