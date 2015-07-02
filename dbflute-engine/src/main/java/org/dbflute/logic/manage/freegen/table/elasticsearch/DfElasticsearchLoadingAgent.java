@@ -68,7 +68,7 @@ public class DfElasticsearchLoadingAgent {
     //     ; className = unused
     // }
     // ; tableMap = map:{
-    //     ; tablePath = .fess_config -> map.mappings -> map
+    //     ; tablePath = .fess_config -> mappings -> map
     //     ; mappingMap = map:{
     //         ; type = map:{
     //             ; INTEGER = Integer
@@ -120,6 +120,7 @@ public class DfElasticsearchLoadingAgent {
             throwJsonTablePathPropertyNotFoundException();
         }
         final Map<String, Object> traceMap = traceMap(rootMap, tablePath);
+        System.out.println("*******: " + traceMap);
         for (Entry<String, Object> traceEntry : traceMap.entrySet()) {
             final String tableName = traceEntry.getKey();
             @SuppressWarnings("unchecked")
