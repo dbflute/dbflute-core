@@ -157,8 +157,19 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
                 throwBodyMetaNotFoundException(toPath(bodyFile), plainText);
             }
             verifyFormat(toPath(bodyFile), plainText, delimiter);
+            final String bodyMeta = Srl.substringFirstFront(plainText, delimiter);
+            final boolean hasOptionPlusHtml = hasOptionPlusHtml(bodyMeta, delimiter);
             final String htmlFilePath = deriveHtmlFilePath(toPath(bodyFile));
-            verifyMailHtmlTemplateTextFormat(htmlFilePath, readText(textIO, htmlFilePath));
+            if (new File(htmlFilePath).exists()) {
+                if (!hasOptionPlusHtml) {
+                    throwNoPlusHtmlButHtmlTemplateExistsException(toPath(bodyFile), htmlFilePath, bodyMeta);
+                }
+                verifyMailHtmlTemplateTextFormat(htmlFilePath, readText(textIO, htmlFilePath));
+            } else {
+                if (hasOptionPlusHtml) {
+                    throwNoHtmlTemplateButPlusHtmlExistsException(toPath(bodyFile), htmlFilePath, bodyMeta);
+                }
+            }
 
             final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
             final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
@@ -186,6 +197,9 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         return schemaMap;
     }
 
+    // -----------------------------------------------------
+    //                                      Extract Resource
+    //                                      ----------------
     protected String extractTargetExt(Map<String, Object> tableMap) {
         final String targetExt = (String) tableMap.get("targetExt"); // not required
         if (targetExt != null && !targetExt.startsWith(".")) {
@@ -208,6 +222,9 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         return exceptPathList;
     }
 
+    // -----------------------------------------------------
+    //                                    Additional Package
+    //                                    ------------------
     protected String deriveAdditionalPackage(Map<String, Object> tableMap, File baseDir, File pmFile) {
         if (((String) tableMap.getOrDefault("isConventionSuffix", "true")).equalsIgnoreCase("true")) {
             final String baseCano;
@@ -235,6 +252,9 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         }
     }
 
+    // -----------------------------------------------------
+    //                                            AutoDetect
+    //                                            ----------
     protected void processAutoDetect(String fileText, Map<String, String> propertyNameTypeMap, Map<String, String> propertyNameOptionMap,
             Set<String> propertyNameSet) {
         final DfParameterAutoDetectProcess process = new DfParameterAutoDetectProcess() {
@@ -799,6 +819,51 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         br.addElement(readHtml);
         final String msg = br.buildExceptionMessage();
         throw new SMailBodyMetaParseFailureException(msg);
+    }
+
+    // *check when only generate (when runtime, no check for performance)
+    // ===================================================================================
+    //                                                                           Plus HTML
+    //                                                                           =========
+    protected boolean hasOptionPlusHtml(String bodyMeta, String delimiter) {
+        if (bodyMeta.contains(OPTION_LABEL)) {
+            final String option = Srl.substringFirstFront(Srl.substringFirstRear(bodyMeta, OPTION_LABEL), LF, META_DELIMITER);
+            return option.contains(PLUS_HTML_OPTION);
+        } else {
+            return false;
+        }
+    }
+
+    protected void throwNoPlusHtmlButHtmlTemplateExistsException(String plainTemplate, String htmlTemplate, String bodyMeta) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("No option: +html, but HTML template exists.");
+        br.addItem("Advice");
+        br.addElement("Add option: +html to body meta in plain temlate.");
+        br.addElement("Or remove HTML template if unneeded.");
+        br.addItem("Plain Template");
+        br.addElement(plainTemplate);
+        br.addItem("Html Template");
+        br.addElement(htmlTemplate);
+        br.addItem("Body Meta (in Plain Template)");
+        br.addElement(bodyMeta);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    protected void throwNoHtmlTemplateButPlusHtmlExistsException(String plainTemplate, String htmlTemplate, String bodyMeta) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("No HTML template, but option: +html exists.");
+        br.addItem("Advice");
+        br.addElement("Make HTML template at convention path.");
+        br.addElement("Or remove option: +html if unneeded.");
+        br.addItem("Plain Template");
+        br.addElement(plainTemplate);
+        br.addItem("Html Template");
+        br.addElement(htmlTemplate);
+        br.addItem("Body Meta (in Plain Template)");
+        br.addElement(bodyMeta);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================
