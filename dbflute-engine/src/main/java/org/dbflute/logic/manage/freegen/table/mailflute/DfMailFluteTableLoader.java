@@ -151,17 +151,15 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
                 table.put("capCamelFile", Srl.initCap(camelizedName));
                 table.put("uncapCamelFile", Srl.initUncap(camelizedName));
             }
-            final String plainText;
-            try {
-                plainText = textIO.read(new FileInputStream(bodyFile));
-            } catch (FileNotFoundException e) { // no way, collected file
-                throw new IllegalStateException("Not found the file: " + bodyFile, e);
-            }
+            final String plainText = readText(textIO, toPath(bodyFile));
             final String delimiter = META_DELIMITER;
             if (!plainText.contains(delimiter)) {
                 throwBodyMetaNotFoundException(toPath(bodyFile), plainText);
             }
             verifyFormat(toPath(bodyFile), plainText, delimiter);
+            final String htmlFilePath = deriveHtmlFilePath(toPath(bodyFile));
+            verifyMailHtmlTemplateTextFormat(htmlFilePath, readText(textIO, htmlFilePath));
+
             final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
             final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
             final Set<String> propertyNameSet = new LinkedHashSet<String>();
@@ -760,6 +758,50 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         br.addElement(plainText);
     }
 
+    // ===================================================================================
+    //                                                                       HTML Template
+    //                                                                       =============
+    // *very similar logic also exists on MailFlute
+    protected String deriveHtmlFilePath(String bodyFile) {
+        final String front = Srl.substringFirstFront(bodyFile, "."); // e.g. member_registration
+        final String rear = Srl.substringFirstRear(bodyFile, "."); // e.g. dfmail or ja.dfmail
+        return front + "_html." + rear; // e.g. member_registration_html.dfmail
+    }
+
+    protected void verifyMailHtmlTemplateTextFormat(String htmlFilePath, String readHtml) {
+        if (readHtml.contains(META_DELIMITER)) {
+            throwMailHtmlTemplateTextCannotContainHeaderDelimiterException(htmlFilePath, readHtml);
+        }
+    }
+
+    protected void throwMailHtmlTemplateTextCannotContainHeaderDelimiterException(String htmlFilePath, String readHtml) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("HTML template cannot contain meta delimiter '>>>'.");
+        br.addItem("Advice");
+        br.addElement("Body meta delimiter '>>>' can be used by plain text template.");
+        br.addElement("HTML template has only its body.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    /*");
+        br.addElement("     ...");
+        br.addElement("    */");
+        br.addElement("    >>>        // *NG");
+        br.addElement("    <html>");
+        br.addElement("    ...");
+        br.addElement("  (o):");
+        br.addElement("    <html>     // OK");
+        br.addElement("    ...");
+        br.addItem("HTML Template");
+        br.addElement(htmlFilePath);
+        br.addItem("Read HTML");
+        br.addElement(readHtml);
+        final String msg = br.buildExceptionMessage();
+        throw new SMailBodyMetaParseFailureException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                        Small Helper
+    //                                                                        ============
     public static class SMailBodyMetaParseFailureException extends RuntimeException { // for compatible
 
         private static final long serialVersionUID = 1L;
@@ -790,6 +832,16 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    protected String readText(final FileTextIO textIO, String filePath) {
+        final String plainText;
+        try {
+            plainText = textIO.read(new FileInputStream(filePath));
+        } catch (FileNotFoundException e) { // no way, collected file
+            throw new IllegalStateException("Not found the file: " + filePath, e);
+        }
+        return plainText;
+    }
+
     protected String toPath(File file) {
         return toPath(file.getPath());
     }
