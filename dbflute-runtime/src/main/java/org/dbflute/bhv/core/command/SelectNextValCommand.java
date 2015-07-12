@@ -34,7 +34,7 @@ import org.dbflute.s2dao.jdbc.TnResultSetHandler;
  * @author jflute
  * @param <RESULT> The type of result.
  */
-public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT> {
+public class SelectNextValCommand<RESULT> extends AbstractAllBehaviorCommand<RESULT> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -95,6 +95,18 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
     }
 
     public boolean isDelete() {
+        return false;
+    }
+
+    public boolean isEntityUpdateFamily() {
+        return false;
+    }
+
+    public boolean isBatchUpdateFamily() {
+        return false;
+    }
+
+    public boolean isQueryUpdateFamily() {
         return false;
     }
 

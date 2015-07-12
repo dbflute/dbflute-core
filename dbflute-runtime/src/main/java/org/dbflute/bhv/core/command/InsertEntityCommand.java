@@ -29,7 +29,7 @@ import org.dbflute.s2dao.sqlcommand.TnInsertEntityDynamicCommand;
 /**
  * @author jflute
  */
-public class InsertEntityCommand extends AbstractEntityCommand {
+public class InsertEntityCommand extends AbstractEntityUpdateCommand {
 
     // ===================================================================================
     //                                                                           Attribute

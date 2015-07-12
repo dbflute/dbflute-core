@@ -25,7 +25,7 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public abstract class AbstractQueryEntityCBCommand extends AbstractEntityCommand {
+public abstract class AbstractQueryUpdateCommand extends AbstractCountableUpdateCommand {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -38,7 +38,15 @@ public abstract class AbstractQueryEntityCBCommand extends AbstractEntityCommand
     //                                                                  ==================
     @Override
     public boolean isConditionBean() {
-        return true;
+        return true; // all use
+    }
+
+    public boolean isEntityUpdateFamily() {
+        return false;
+    }
+
+    public boolean isQueryUpdateFamily() {
+        return true; // yes!
     }
 
     // ===================================================================================

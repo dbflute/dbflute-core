@@ -26,7 +26,7 @@ import org.dbflute.s2dao.sqlcommand.TnInsertEntityDynamicCommand;
 /**
  * @author jflute
  */
-public class BatchInsertCommand extends AbstractListEntityCommand {
+public class BatchInsertCommand extends AbstractBatchUpdateCommand {
 
     // ===================================================================================
     //                                                                           Attribute

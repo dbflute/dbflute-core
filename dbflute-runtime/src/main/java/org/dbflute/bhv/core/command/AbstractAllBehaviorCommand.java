@@ -40,7 +40,7 @@ import org.dbflute.util.Srl;
  * @author jflute
  * @param <RESULT> The type of result.
  */
-public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand<RESULT>, BehaviorCommandComponentSetup {
+public abstract class AbstractAllBehaviorCommand<RESULT> implements BehaviorCommand<RESULT>, BehaviorCommandComponentSetup {
 
     // ===================================================================================
     //                                                                           Attribute

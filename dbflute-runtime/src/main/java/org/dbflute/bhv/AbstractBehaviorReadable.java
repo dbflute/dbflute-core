@@ -30,8 +30,8 @@ import java.util.Set;
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.BehaviorCommand;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.dbflute.bhv.core.command.AbstractBehaviorCommand;
-import org.dbflute.bhv.core.command.AbstractEntityCommand;
+import org.dbflute.bhv.core.command.AbstractAllBehaviorCommand;
+import org.dbflute.bhv.core.command.AbstractCountableUpdateCommand;
 import org.dbflute.bhv.core.command.InsertEntityCommand;
 import org.dbflute.bhv.core.command.SelectCountCBCommand;
 import org.dbflute.bhv.core.command.SelectCursorCBCommand;
@@ -1525,7 +1525,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return new SelectScalarCBCommand<RESULT>();
     }
 
-    protected void xsetupSelectCommand(AbstractBehaviorCommand<?> cmd) {
+    protected void xsetupSelectCommand(AbstractAllBehaviorCommand<?> cmd) {
         cmd.setTableDbName(asTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
     }
@@ -1546,7 +1546,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return new InsertEntityCommand();
     }
 
-    protected void xsetupEntityCommand(AbstractEntityCommand cmd, Entity entity) {
+    protected void xsetupEntityCommand(AbstractCountableUpdateCommand cmd, Entity entity) {
         cmd.setTableDbName(asTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setEntity(entity);

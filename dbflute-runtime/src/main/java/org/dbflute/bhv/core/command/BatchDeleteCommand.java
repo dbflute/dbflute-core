@@ -25,7 +25,7 @@ import org.dbflute.s2dao.sqlcommand.TnBatchDeleteDynamicCommand;
 /**
  * @author jflute
  */
-public class BatchDeleteCommand extends AbstractListEntityCommand {
+public class BatchDeleteCommand extends AbstractBatchUpdateCommand {
 
     // ===================================================================================
     //                                                                           Attribute

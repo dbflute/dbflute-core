@@ -28,7 +28,7 @@ import org.dbflute.outsidesql.factory.OutsideSqlContextFactory;
  * @author jflute
  * @param <RESULT> The type of result.
  */
-public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehaviorCommand<RESULT> {
+public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractAllBehaviorCommand<RESULT> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -82,6 +82,18 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
     }
 
     public boolean isDelete() {
+        return false; // fixed false because of unknown
+    }
+
+    public boolean isEntityUpdateFamily() {
+        return false; // fixed false because of unknown
+    }
+
+    public boolean isBatchUpdateFamily() {
+        return false; // fixed false because of unknown
+    }
+
+    public boolean isQueryUpdateFamily() {
         return false; // fixed false because of unknown
     }
 

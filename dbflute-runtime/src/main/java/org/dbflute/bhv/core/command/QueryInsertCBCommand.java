@@ -23,7 +23,7 @@ import org.dbflute.s2dao.sqlcommand.TnQueryInsertDynamicCommand;
 /**
  * @author jflute
  */
-public class QueryInsertCBCommand extends AbstractQueryEntityCBCommand {
+public class QueryInsertCBCommand extends AbstractQueryUpdateCommand {
 
     // ===================================================================================
     //                                                                           Attribute

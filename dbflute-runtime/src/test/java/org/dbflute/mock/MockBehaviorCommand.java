@@ -120,6 +120,18 @@ public class MockBehaviorCommand implements BehaviorCommand<Object> {
         return false;
     }
 
+    public boolean isEntityUpdateFamily() {
+        return false;
+    }
+
+    public boolean isBatchUpdateFamily() {
+        return false;
+    }
+
+    public boolean isQueryUpdateFamily() {
+        return false;
+    }
+
     public String getInvokePath() {
         return null;
     }
