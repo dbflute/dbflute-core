@@ -1189,7 +1189,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         throw new IllegalBehaviorStateException(msg);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected void filterEntityOfInsert(Entity entity, OptionalThing<InsertOption<? extends ConditionBean>> option) {
     }
 
