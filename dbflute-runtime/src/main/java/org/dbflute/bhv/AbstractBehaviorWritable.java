@@ -795,12 +795,6 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected OptionalThing<InsertOption<? extends ConditionBean>> createOptionalInsertOption(InsertOption<? extends ConditionBean> option) {
-        return OptionalThing.ofNullable(option, () -> {
-            throw new IllegalStateException("Not found the insert option.");
-        });
-    }
-
     protected OptionalThing<RuntimeException> createOptionalCause(RuntimeException cause) {
         return OptionalThing.ofNullable(cause, () -> {
             throw new IllegalStateException("Not found the cause exception");
@@ -1195,11 +1189,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         throw new IllegalBehaviorStateException(msg);
     }
 
-    /**
-     * Filter the entity of insert. (for extension)
-     * @param entity The entity for insert. (NotNull)
-     * @param option The optional option of insert. (NotNull, EmptyAllowed: when no option)
-     */
+    /** {@inheritDoc} */
     protected void filterEntityOfInsert(Entity entity, OptionalThing<InsertOption<? extends ConditionBean>> option) {
     }
 
