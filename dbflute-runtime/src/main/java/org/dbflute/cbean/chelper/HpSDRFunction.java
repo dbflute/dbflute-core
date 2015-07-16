@@ -401,17 +401,17 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         if (isPurposeNullAlias()) {
             return;
         }
+        final String mappingAliasPrefix = DerivedMappable.MAPPING_ALIAS_PREFIX;
+        final String realName;
+        if (aliasName.startsWith(mappingAliasPrefix)) {
+            realName = Srl.substringFirstRear(aliasName, mappingAliasPrefix);
+        } else {
+            realName = aliasName;
+        }
         final String tableDbName = _baseCB.asTableDbName();
         final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);
-        if (dbmeta.hasColumn(aliasName)) {
-            throwSpecifyDerivedReferrerConflictAliasNameException(aliasName, dbmeta.findColumnInfo(aliasName));
-        }
-        final String mappingAliasPrefix = DerivedMappable.MAPPING_ALIAS_PREFIX;
-        if (aliasName.startsWith(mappingAliasPrefix)) {
-            final String realName = Srl.substringFirstRear(aliasName, mappingAliasPrefix);
-            if (dbmeta.hasColumn(realName)) {
-                throwSpecifyDerivedReferrerConflictAliasNameException(aliasName, dbmeta.findColumnInfo(realName));
-            }
+        if (dbmeta.hasColumn(realName)) {
+            throwSpecifyDerivedReferrerConflictAliasNameException(aliasName, dbmeta.findColumnInfo(realName));
         }
     }
 
