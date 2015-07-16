@@ -29,6 +29,7 @@ import org.dbflute.cbean.dream.SpecifiedColumn;
 import org.dbflute.cbean.ordering.ManualOrderOption;
 import org.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;
 import org.dbflute.exception.FixedConditionParameterNotFoundException;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
@@ -56,6 +57,7 @@ import org.dbflute.exception.SpecifyColumnAlreadySpecifiedExceptColumnException;
 import org.dbflute.exception.SpecifyColumnNotSetupSelectColumnException;
 import org.dbflute.exception.SpecifyColumnTwoOrMoreColumnException;
 import org.dbflute.exception.SpecifyColumnWithDerivedReferrerException;
+import org.dbflute.exception.SpecifyDerivedReferrerConflictAliasNameException;
 import org.dbflute.exception.SpecifyDerivedReferrerEntityPropertyNotFoundException;
 import org.dbflute.exception.SpecifyDerivedReferrerIllegalPurposeException;
 import org.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
@@ -546,7 +548,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The alias name for (Specify)DerivedReferrer was INVALID.");
         br.addItem("Advice");
-        br.addElement("You should set valid alias name. {NotNull, NotEmpty}");
+        br.addElement("You should set valid alias name. (NotNull, NotEmpty)");
         br.addElement("For example:");
         br.addElement("  (x):");
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
@@ -557,10 +559,35 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
         br.addElement("        purchaseCB.specify().columnPurchaseDatetime();");
         br.addElement("    }, Member.ALIAS_latestPurchaseDatetime); // OK");
-        br.addItem("Local Table");
+        br.addItem("BasePoint Table");
         br.addElement(localCQ.asTableDbName());
         final String msg = br.buildExceptionMessage();
         throw new SpecifyDerivedReferrerInvalidAliasNameException(msg);
+    }
+
+    public void throwSpecifyDerivedReferrerConflictAliasNameException(ConditionQuery localCQ, String aliasName, ColumnInfo existingColumn) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The alias name for (Specify)DerivedReferrer was CONFLICT.");
+        br.addItem("Advice");
+        br.addElement("You should set unique alias name in the select world.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
+        br.addElement("        purchaseCB.specify().columnPurchaseDatetime();");
+        br.addElement("    }, \"$memberName\"); // *NG: same name as MEMBER's MEMBER_NAME");
+        br.addElement("");
+        br.addElement("  (o):");
+        br.addElement("    cb.specify().derivePurchaseList().max(purchaseCB -> {");
+        br.addElement("        purchaseCB.specify().columnPurchaseDatetime();");
+        br.addElement("    }, \"$latestPurchaseDatetime\"); // OK");
+        br.addItem("BasePoint Table");
+        br.addElement(localCQ.asTableDbName());
+        br.addItem("Conflict Alias Name");
+        br.addElement(aliasName);
+        br.addItem("Existing Column");
+        br.addElement(existingColumn);
+        final String msg = br.buildExceptionMessage();
+        throw new SpecifyDerivedReferrerConflictAliasNameException(msg);
     }
 
     public void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
