@@ -302,7 +302,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
             if (_optimisticLockHandling) {
                 throw new BatchEntityAlreadyUpdatedException(list.get(0), 0, updateCount);
             } else {
-                String msg = "The entity was NOT found! it has already been deleted.";
+                String msg = "The entity was NOT found! (might be deleted?):";
                 msg = msg + " updateCount=" + updateCount;
                 msg = msg + " entityCount=" + entityCount;
                 msg = msg + " allEntities=" + list;
@@ -343,7 +343,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
             if (_optimisticLockHandling) {
                 throw new BatchEntityAlreadyUpdatedException(list.get(index), 0, updateCount);
             } else {
-                String msg = "The entity was NOT found! it has already been deleted:";
+                String msg = "The entity was NOT found! (might be deleted?):";
                 msg = msg + " entity=" + list.get(index);
                 msg = msg + " updateCount=" + updateCount;
                 msg = msg + " allEntities=" + list;
