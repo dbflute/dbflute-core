@@ -1873,7 +1873,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     //                                                                     ===============
 #if ($table.hasBehaviorFilterBeforeInsertColumn())
     @Override
-    protected void filterEntityOfInsert(Entity tgt, InsertOption<? extends ConditionBean> op) {
+    protected void filterEntityOfInsert(Entity tgt, org.dbflute.optional.OptionalThing<InsertOption<? extends ConditionBean>> op) {
         super.filterEntityOfInsert(tgt, op);
         ${myExtendedObjectClassName} et = downcast(tgt);
 #foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
@@ -1884,7 +1884,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 #if ($table.isWritable())
 #if ($table.hasBehaviorFilterBeforeUpdateColumn())
     @Override
-    protected void filterEntityOfUpdate(Entity tgt, UpdateOption<? extends ConditionBean> op) {
+    protected void filterEntityOfUpdate(Entity tgt, org.dbflute.optional.OptionalThing<UpdateOption<? extends ConditionBean>> op) {
         super.filterEntityOfUpdate(tgt, op);
         ${myExtendedObjectClassName} et = downcast(tgt);
 #foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)

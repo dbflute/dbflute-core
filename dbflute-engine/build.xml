@@ -6,8 +6,8 @@
 
 	<!-- Version -->
 	<property name="version" value="1.1.0-sp7" />
-	<property name="build.version" value="${version}-SNAPSHOT" />
-	<property name="runtime.version" value="1.1.0-sp6" />
+	<property name="build.version" value="${version}" />
+	<property name="runtime.version" value="1.1.0-sp7" />
 	<property name="runtime.build.version" value="${runtime.version}" />
 	<property name="example.latest.version" value="1.x" />
 
