@@ -135,9 +135,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                                Create
     //                                                ------
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public void create(Entity entity, InsertOption<? extends ConditionBean> option) {
         doCreate(entity, option);
     }
@@ -797,7 +795,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     protected OptionalThing<RuntimeException> createOptionalCause(RuntimeException cause) {
         return OptionalThing.ofNullable(cause, () -> {
-            throw new IllegalStateException("Not found the cause exception");
+            throw new IllegalStateException("Not found the cause exception.");
         });
     }
 
@@ -883,12 +881,15 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         final OptionalThing<Object> optEntity = OptionalThing.of(entity);
         RuntimeException cause = null;
         try {
+            System.out.println("****1: " + cause);
             hookBeforeDelete(command, optEntity, emptyOpt(), optOption);
             return invoke(command);
         } catch (RuntimeException e) {
+            System.out.println("****2: " + cause);
             cause = e;
             throw e;
         } finally {
+            System.out.println("****3: " + cause);
             hookFinallyDelete(command, optEntity, emptyOpt(), optOption, createOptionalCause(cause));
         }
     }
@@ -1203,6 +1204,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     /**
      * Hook before insert, contains entity insert, batch insert, query insert, also varying. (for extension) <br>
+     * As best you can, your overriding code needs not to depends on internal specification. (might be changed) <br>
      * Finally process is called even if exception in before process.
      * @param command The command meta of behavior for insert. (NotNull)
      * @param entityResource The resource of entity for insert, entity or list. (NotNull)
@@ -1215,6 +1217,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     /**
      * Hook finally of insert, contains entity insert, batch insert, query insert, also varying. (for extension) <br>
+     * As best you can, your overriding code needs not to depends on internal specification. (might be changed) <br>
      * Finally process is called even if exception in before process. <br>
      * And called when both success and exception.
      * @param command The command meta of behavior for insert. (NotNull)
@@ -1320,6 +1323,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     /**
      * Hook before update, contains entity update, batch update, query update, also varying. (for extension) <br>
+     * As best you can, your overriding code needs not to depends on internal specification. (might be changed) <br>
      * Finally process is called even if exception in before process.
      * @param command The command meta of behavior for update. (NotNull)
      * @param entityResource The resource of entity for update, entity or list. (NotNull)
@@ -1332,13 +1336,14 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     /**
      * Hook finally of update, contains entity update, batch update, query update, also varying. (for extension) <br>
+     * As best you can, your overriding code needs not to depends on internal specification. (might be changed) <br>
      * Finally process is called even if exception in before process. <br>
-     * And called when both success and exception.
+     * And called when both success and exception. <br>
      * @param command The command meta of behavior for update. (NotNull)
      * @param entityResource The resource of entity for update, entity or list. (NotNull)
      * @param cbResource The optional resource of condition-bean for update. (NotNull, EmptyAllowed: except query-update)
-     * @param option The optional option of update. (NullAllowed)
-     * @param cause The optional cause exception from update. (NotNull, EmptyAllowed: when no failure)
+     * @param option The optional option of update. (NotNull, EmptyAllowed: when no option)
+     * @param cause The optional cause exception from update, but not contains update count check. (NotNull, EmptyAllowed: when no failure)
      */
     protected void hookFinallyUpdate(BehaviorCommandMeta command, Object entityResource, OptionalThing<ConditionBean> cbResource,
             OptionalThing<UpdateOption<? extends ConditionBean>> option, OptionalThing<RuntimeException> cause) {
@@ -1415,6 +1420,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     /**
      * Hook before delete, contains entity delete, batch delete, query delete, also varying. (for extension) <br>
+     * As best you can, your overriding code needs not to depends on internal specification. (might be changed) <br>
      * Finally process is called even if exception in before process.
      * @param command The command meta of behavior for delete. (NotNull)
      * @param entityResource The optional resource of entity for delete, entity or list. (NotNull, EmptyAllowed: when query-delete)
@@ -1427,13 +1433,14 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     /**
      * Hook finally of delete, contains entity delete, batch delete, query delete, also varying. (for extension) <br>
+     * As best you can, your overriding code needs not to depends on internal specification. (might be changed) <br>
      * Finally process is called even if exception in before process. <br>
      * And called when both success and exception.
      * @param command The command meta of behavior for delete. (NotNull)
      * @param entityResource The optional resource of entity for delete, entity or list. (NotNull, EmptyAllowed: when query-delete)
      * @param cbResource The optional resource of condition-bean for delete. (NotNull, EmptyAllowed: except query-update)
-     * @param option The optional option of delete. (NullAllowed)
-     * @param cause The optional cause exception from delete. (NotNull, EmptyAllowed: when no failure)
+     * @param option The optional option of delete. (NotNull, EmptyAllowed: when no option)
+     * @param cause The optional cause exception from delete, but not contains update count check. (NotNull, EmptyAllowed: when no failure)
      */
     protected void hookFinallyDelete(BehaviorCommandMeta command, OptionalThing<Object> entityResource,
             OptionalThing<ConditionBean> cbResource, OptionalThing<DeleteOption<? extends ConditionBean>> option,
