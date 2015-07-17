@@ -119,6 +119,8 @@ public class DfElasticsearchLoadingAgent {
         if (Srl.is_Null_or_TrimmedEmpty(tablePath)) {
             throwJsonTablePathPropertyNotFoundException();
         }
+        final Map<String, Object> esMap = DfCollectionUtil.newHashMap();
+        esMap.put("index", rootMap.keySet().iterator().next());
         final Map<String, Object> traceMap = traceMap(rootMap, tablePath);
         System.out.println("*******: " + traceMap);
         for (Entry<String, Object> traceEntry : traceMap.entrySet()) {
@@ -126,6 +128,7 @@ public class DfElasticsearchLoadingAgent {
             @SuppressWarnings("unchecked")
             final Map<String, Object> tableAttrMap = (Map<String, Object>) traceEntry.getValue();
             final Map<String, Object> beanMap = prepareTableBeanMap(schemaMap, tableName, tableAttrMap);
+            beanMap.put("indexSettings", esMap);
             schemaMap.put(tableName, beanMap);
         }
         reflectLazyProcess();
