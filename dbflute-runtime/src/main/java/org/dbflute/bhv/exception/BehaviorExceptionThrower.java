@@ -323,7 +323,7 @@ public class BehaviorExceptionThrower implements Serializable {
 
     public <ENTITY extends Entity> void throwUpdateEntityAlreadyDeletedException(ENTITY entity) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The updated entity was not found! it has already been deleted.");
+        br.addNotice("Not found the updated entity. (might be deleted?)");
         setupEntityElement(br, entity);
         final String msg = br.buildExceptionMessage();
         throw new EntityAlreadyDeletedException(msg); // basically treated as application exception

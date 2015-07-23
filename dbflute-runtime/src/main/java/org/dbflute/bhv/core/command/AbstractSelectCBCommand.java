@@ -27,7 +27,7 @@ import org.dbflute.util.DfTypeUtil;
  * @author jflute
  * @param <RESULT> The type of result.
  */
-public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCommand<RESULT> {
+public abstract class AbstractSelectCBCommand<RESULT> extends AbstractAllBehaviorCommand<RESULT> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -63,6 +63,18 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
     }
 
     public boolean isDelete() {
+        return false;
+    }
+
+    public boolean isEntityUpdateFamily() {
+        return false;
+    }
+
+    public boolean isBatchUpdateFamily() {
+        return false;
+    }
+
+    public boolean isQueryUpdateFamily() {
         return false;
     }
 

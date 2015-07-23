@@ -77,6 +77,10 @@ public class DfFreeGenRequest {
         return DfFreeGenResourceType.SOLR.equals(_resource.getResourceType());
     }
 
+    public boolean isResourceTypeElasticsearch() {
+        return DfFreeGenResourceType.ELASTICSEARCH.equals(_resource.getResourceType());
+    }
+
     public boolean isResourceTypeMailFlute() {
         return DfFreeGenResourceType.MAIL_FLUTE.equals(_resource.getResourceType());
     }

@@ -4,21 +4,21 @@
     ${cursor}
 });</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda KeyValue as Inline" enabled="true" name="_kvli">(key, value) -&gt; ${cursor}</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda KeyValue as Linefeed" enabled="true" name="_kvll">(key, value) -&gt; {
     ${cursor}
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as HTML response with Form" enabled="true" name="_lahtform">${:import(org.dbflute.lastaflute.web.Execute
-    , org.dbflute.lastaflute.web.response.HtmlResponse)}@Execute
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as HTML response with Form" enabled="true" name="_lahtform">${:import(org.lastaflute.web.Execute
+    , org.lastaflute.web.response.HtmlResponse)}@Execute
 public HtmlResponse ${method}(${form}Form form) {
     return asHtml(path_${newName});
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as HTML response with ID" enabled="true" name="_lahtid">${:import(org.dbflute.lastaflute.web.Execute
-    , org.dbflute.lastaflute.web.response.HtmlResponse)}@Execute
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as HTML response with ID" enabled="true" name="_lahtid">${:import(org.lastaflute.web.Execute
+    , org.lastaflute.web.response.HtmlResponse)}@Execute
 public HtmlResponse index(long ${object}Id) {
     return asHtml(path_${newName});
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as JSON response with Form" enabled="true" name="_lajsform">${:import(org.dbflute.lastaflute.web.Execute
-    , org.dbflute.lastaflute.web.response.JsonResponse)}@Execute
-public JsonResponse ${method}(${form}Form form) {
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as JSON response with Form" enabled="true" name="_lajsform">${:import(org.lastaflute.web.Execute
+    , org.lastaflute.web.response.JsonResponse)}@Execute
+public JsonResponse&lt;${bean}&gt; ${method}(${body}Body body) {
     return asJson(bean);
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as JSON response with ID" enabled="true" name="_lajsid">${:import(org.dbflute.lastaflute.web.Execute
-    , org.dbflute.lastaflute.web.response.JsonResponse)}@Execute
-public JsonResponse index(long ${object}Id) {
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as JSON response with ID" enabled="true" name="_lajsid">${:import(org.lastaflute.web.Execute
+    , org.lastaflute.web.response.JsonResponse)}@Execute
+public JsonResponse&lt;${bean}&gt; index(long ${object}Id) {
     return asJson(bean);
 }</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow as Inline" enabled="true" name="_li">${var} -&gt; ${var}.${newName}</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow with Linefeed" enabled="true" name="_ll">${var} -&gt; {
     ${var}.${newName}
@@ -78,7 +78,7 @@ public JsonResponse index(long ${object}Id) {
     cb.${method}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for SpecifyColumn" enabled="true" name="colCBLambda">colCB -&gt; {
     colCB.specify().column${columnName}
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Configuration" enabled="true" name="confLambda">conf -&gt; conf.${method}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: renderWith()" enabled="true" name="dataLambda">data -&gt; {
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Configuration" enabled="true" name="confLambda">conf -&gt; conf.${method}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for renderWith()" enabled="true" name="dataLambda">data -&gt; {
     data.register(${nameOfData}, ${var});
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for DerivedReferrer" enabled="true" name="derivedCBLambda">${var}CB -&gt; {
     ${var}CB.specify().column${columnName}
@@ -90,7 +90,7 @@ public JsonResponse index(long ${object}Id) {
     ${var}Loader.load${referrer}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for many arguments" enabled="true" name="manyArgLambda">(${arg1}, ${arg2}) -&gt; {
     ${cursor}
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: more validation" enabled="true" name="moreValidationLambda">messages -&gt; {}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for no-argument1" enabled="true" name="noArg1Lambda">() -&gt; {
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for more validation" enabled="true" name="moreValidationLambda">messages -&gt; {}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for no-argument1" enabled="true" name="noArg1Lambda">() -&gt; {
     ${cursor}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for no-argument2" enabled="true" name="noArg2Lambda">() -&gt; {
     ${cursor}
@@ -104,7 +104,7 @@ public JsonResponse index(long ${object}Id) {
     ${var}.${method}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ConditionOption" enabled="true" name="opLambda">op -&gt; op.${method}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQuery" enabled="true" name="orCBLambda">orCB -&gt; {
     orCB.query().set${columnName}
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Mail Postcard" enabled="true" name="postcardLambda">postcard -&gt; {
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Mail Postcard" enabled="true" name="postcardLambda">postcard -&gt; {
     postcard.setFrom(${fromAddress}, ${personal});
     postcard.addTo(${toAddress});
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Referrer" enabled="true" name="refCBLambda">${var}CB -&gt; {
@@ -113,8 +113,10 @@ public JsonResponse index(long ${object}Id) {
     ${var}CB.specify().column${columnName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for SubQuery" enabled="true" name="subCBLambda">${var}CB -&gt; {
     ${var}CB.query().set${columnName}
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Transaction Stage" enabled="true" name="txLambda">tx -&gt; {
+    ${cursor}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Union" enabled="true" name="unionCBLambda">unionCB -&gt; {
     unionCB.query().set${columnName}
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: validation error" enabled="true" name="validationErrorLambda">() -&gt; {
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Validation Error" enabled="true" name="validationErrorLambda">() -&gt; {
     return asHtml(path_${newName});
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Validation Messages" enabled="true" name="validationMessagesLambda">messages -&gt; messages.addConstraints${newName}</template></templates>
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Validation Messages" enabled="true" name="validationMessagesLambda">messages -&gt; messages.addConstraints${newName}</template></templates>

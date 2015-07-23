@@ -30,7 +30,7 @@ import org.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Integer> {
+public abstract class AbstractCountableUpdateCommand extends AbstractAllBehaviorCommand<Integer> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -82,6 +82,10 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
 
     public boolean isDelete() {
         return false; // as default
+    }
+
+    public boolean isBatchUpdateFamily() {
+        return false;
     }
 
     // ===================================================================================

@@ -18,10 +18,11 @@ public class ${table.className} extends LaTypicalPostcard {
     // ===================================================================================
     //                                                                         Entry Point
     //                                                                         ===========
-    public static void droppedInto(Postbox postbox, MPCall<${table.className}> postcardLambda) {
+    public static ${table.className} droppedInto(Postbox postbox, MPCall<${table.className}> postcardLambda) {
         ${table.className} postcard = new ${table.className}();
         postcardLambda.write(postcard);
         postbox.post(postcard);
+        return postcard;
     }
 
     // ===================================================================================

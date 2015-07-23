@@ -212,7 +212,7 @@ public class DfProcedureExecutionMetaExtractor {
                 throw new DfProcedureExecutionMetaGettingFailureException(msg, e);
             } else { // if no specified, it continues
                 _continuedFailureMessageMap.put(procedure.getProcedureFullQualifiedName(), msg);
-                _log.info("*Failed to call so read the warning message diplayed later");
+                _log.info("*Failed to call so read the warning message displayed later");
             }
         } finally {
             if (cs != null) {

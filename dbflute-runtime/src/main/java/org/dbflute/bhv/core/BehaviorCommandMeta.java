@@ -118,7 +118,7 @@ public interface BehaviorCommandMeta {
     /**
      * Does the command execute insert? <br>
      * But if it's a procedure or an outside-SQL, it returns false. <br>
-     * e.g. insert(entity), queryInsert(setupper)
+     * e.g. insert(entity), batchInsert(entityList), queryInsert(setupper)
      * @return The determination, true or false.
      */
     boolean isInsert();
@@ -126,7 +126,7 @@ public interface BehaviorCommandMeta {
     /**
      * Does the command execute update? <br>
      * But if it's a procedure or an outside-SQL, it returns false. <br>
-     * e.g. update(entity), queryUpdate(entity, cb)
+     * e.g. update(entity), batchUpdate(entityList), queryUpdate(entity, cb)
      * @return The determination, true or false.
      */
     boolean isUpdate();
@@ -134,10 +134,31 @@ public interface BehaviorCommandMeta {
     /**
      * Does the command execute delete? <br>
      * But if it's a procedure or an outside-SQL, it returns false. <br>
-     * e.g. delete(entity), queryDelete(cb)
+     * e.g. delete(entity), batchDelete(entityList), queryDelete(cb)
      * @return The determination, true or false.
      */
     boolean isDelete();
+
+    /**
+     * Does the command execute entity update family? (means insert, update, delete) <br>
+     * e.g. insert(entity), update(entity), delete(entity)
+     * @return The determination, true or false.
+     */
+    boolean isEntityUpdateFamily();
+
+    /**
+     * Does the command execute batch update family? (means insert, update, delete) <br>
+     * e.g. batchInsert(entityList), batchUpdate(entityList), batchDelete(entityList)
+     * @return The determination, true or false.
+     */
+    boolean isBatchUpdateFamily();
+
+    /**
+     * Does the command execute query update family? (means insert, update, delete) <br>
+     * e.g. queryInsert(setupper), queryUpdate(entity, cb), queryDelete(cb)
+     * @return The determination, true or false.
+     */
+    boolean isQueryUpdateFamily();
 
     // ===================================================================================
     //                                                                Argument Information

@@ -323,8 +323,6 @@ ${linkDelimiter} <a href="#diagram">Schema Diagram</a>
 #end
 </p>
 #end
-#if ($selector.isSchemaHtmlToHistoryHtmlLink() || $selector.isSchemaHtmlToPropertiesHtmlLink())
-<p>
 ## HistoryHtml is on fixed location
 #if ($selector.isSchemaHtmlToHistoryHtmlLink())
 <p class="sisterlink"><a href="./${selector.historyHtmlFileName}">to HistoryHTML</a></p>
@@ -332,8 +330,6 @@ ${linkDelimiter} <a href="#diagram">Schema Diagram</a>
 ## PropertiesHtml is minor case
 #if ($selector.isSchemaHtmlToPropertiesHtmlLink())
 <p class="sistersublink"><a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a></p>
-#end
-</p>
 #end
 #if ($selector.hasNeighborhoodSchemaHtml())
 #set ($linkDelimiter = "")
@@ -355,7 +351,7 @@ ${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKe
 	<ul id="suggestion-list" class="suggestionarea"></ul>
 	<span class="searchmemo">*Push 'tab' (primary tab order)</span>
 </div>
-<table summary="Tables in the Schema">
+<table>
 	<thead>
 	<tr>
 		<th class="rownumhead">No.</th>
@@ -406,7 +402,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 
 #if ($database.hasClassificationDefinition())
 <h2 id="cdef">Classification Definition</h2>
-<table summary="Classifications in the Schema">
+<table>
 	<thead>
 	<tr>
 		<th>Classification</th>

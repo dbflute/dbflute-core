@@ -23,7 +23,7 @@ import org.dbflute.s2dao.sqlcommand.TnQueryDeleteDynamicCommand;
 /**
  * @author jflute
  */
-public class QueryDeleteCBCommand extends AbstractQueryEntityCBCommand {
+public class QueryDeleteCBCommand extends AbstractQueryUpdateCommand {
 
     // ===================================================================================
     //                                                                           Attribute

@@ -30,8 +30,8 @@ import java.util.Set;
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.BehaviorCommand;
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.dbflute.bhv.core.command.AbstractBehaviorCommand;
-import org.dbflute.bhv.core.command.AbstractEntityCommand;
+import org.dbflute.bhv.core.command.AbstractAllBehaviorCommand;
+import org.dbflute.bhv.core.command.AbstractCountableUpdateCommand;
 import org.dbflute.bhv.core.command.InsertEntityCommand;
 import org.dbflute.bhv.core.command.SelectCountCBCommand;
 import org.dbflute.bhv.core.command.SelectCursorCBCommand;
@@ -84,6 +84,7 @@ import org.dbflute.helper.beans.DfPropertyDesc;
 import org.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.optional.OptionalEntity;
+import org.dbflute.optional.OptionalThing;
 import org.dbflute.optional.OptionalThingExceptionThrower;
 import org.dbflute.optional.RelationOptionalFactory;
 import org.dbflute.outsidesql.executor.OutsideSqlAllFacadeExecutor;
@@ -1364,10 +1365,10 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     // defined here (on the readable interface) for non-primary key value
     /**
      * Filter the entity of insert. (basically for non-primary-key insert)
-     * @param targetEntity Target entity that the type is entity interface. (NotNull)
-     * @param option The option of insert. (NullAllowed)
+     * @param entity Target entity that the type is entity interface. (NotNull)
+     * @param option The optional option of insert. (NotNull, EmptyAllowed: when no option)
      */
-    protected void filterEntityOfInsert(Entity targetEntity, InsertOption<? extends ConditionBean> option) {
+    protected void filterEntityOfInsert(Entity entity, OptionalThing<InsertOption<? extends ConditionBean>> option) {
     }
 
     // ===================================================================================
@@ -1402,8 +1403,14 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     protected int delegateInsertNoPK(Entity entity, InsertOption<? extends ConditionBean> option) {
         // only filtering for extension is supported (filtering for common columns is unsupported)
         assertEntityNotNull(entity);
-        filterEntityOfInsert(entity, option);
+        filterEntityOfInsert(entity, createOptionalInsertOption(option));
         return invoke(createInsertEntityCommand(entity, option));
+    }
+
+    protected OptionalThing<InsertOption<? extends ConditionBean>> createOptionalInsertOption(InsertOption<? extends ConditionBean> option) {
+        return OptionalThing.ofNullable(option, () -> {
+            throw new IllegalStateException("Not found the insert option.");
+        });
     }
 
     // ===================================================================================
@@ -1525,7 +1532,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return new SelectScalarCBCommand<RESULT>();
     }
 
-    protected void xsetupSelectCommand(AbstractBehaviorCommand<?> cmd) {
+    protected void xsetupSelectCommand(AbstractAllBehaviorCommand<?> cmd) {
         cmd.setTableDbName(asTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
     }
@@ -1546,7 +1553,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return new InsertEntityCommand();
     }
 
-    protected void xsetupEntityCommand(AbstractEntityCommand cmd, Entity entity) {
+    protected void xsetupEntityCommand(AbstractCountableUpdateCommand cmd, Entity entity) {
         cmd.setTableDbName(asTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setEntity(entity);

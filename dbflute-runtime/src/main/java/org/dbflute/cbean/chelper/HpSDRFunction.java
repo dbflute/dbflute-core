@@ -22,7 +22,10 @@ import org.dbflute.cbean.coption.DerivedReferrerOptionFactory;
 import org.dbflute.cbean.coption.FunctionFilterOptionCall;
 import org.dbflute.cbean.exception.ConditionBeanExceptionThrower;
 import org.dbflute.cbean.scoping.SubQuery;
+import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.dbmeta.accessory.DerivedMappable;
+import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 import org.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.dbflute.util.Srl;
@@ -349,18 +352,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     }
 
     protected void assertAliasName(String aliasName) {
-        if (isPurposeNullAlias()) {
-            if (aliasName != null) {
-                String msg = "The aliasName should be null in the purpose: " + _baseCB.getPurpose();
-                throw new SpecifyDerivedReferrerInvalidAliasNameException(msg);
-            }
-        } else { // normal
-            if (Srl.is_Null_or_TrimmedEmpty(aliasName)) {
-                throwSpecifyDerivedReferrerInvalidAliasNameException();
-            }
-        }
+        doAssertInvalidAliasName(aliasName);
+        doAssertConflictAliasName(aliasName);
         // *this check was moved to runtime (when creating a behavior command)
-        //String tableDbName = _baseCB.getTableDbName();
+        //String tableDbName = _baseCB.asTableDbName();
         //DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);
         //Method[] methods = dbmeta.getEntityType().getMethods();
         //String targetMethodName = "set" + replaceString(aliasName, "_", "").toLowerCase();
@@ -379,6 +374,19 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         //}
     }
 
+    protected void doAssertInvalidAliasName(String aliasName) {
+        if (isPurposeNullAlias()) {
+            if (aliasName != null) {
+                String msg = "The aliasName should be null in the purpose: " + _baseCB.getPurpose();
+                throw new SpecifyDerivedReferrerInvalidAliasNameException(msg);
+            }
+        } else { // normal
+            if (Srl.is_Null_or_TrimmedEmpty(aliasName)) {
+                throwSpecifyDerivedReferrerInvalidAliasNameException();
+            }
+        }
+    }
+
     protected boolean isPurposeNullAlias() {
         final HpCBPurpose purpose = _baseCB.getPurpose();
         return purpose.equals(HpCBPurpose.COLUMN_QUERY) || purpose.equals(HpCBPurpose.SCALAR_SELECT)
@@ -389,11 +397,26 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         createCBExThrower().throwSpecifyDerivedReferrerInvalidAliasNameException(_localCQ);
     }
 
-    protected void assertDerivedReferrerOption(FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
-        if (opLambda == null) {
-            String msg = "The argument 'opLambda' for DerivedReferrer should not be null.";
-            throw new IllegalArgumentException(msg);
+    protected void doAssertConflictAliasName(String aliasName) {
+        if (isPurposeNullAlias()) {
+            return;
         }
+        final String mappingAliasPrefix = DerivedMappable.MAPPING_ALIAS_PREFIX;
+        final String realName;
+        if (aliasName.startsWith(mappingAliasPrefix)) {
+            realName = Srl.substringFirstRear(aliasName, mappingAliasPrefix);
+        } else {
+            realName = aliasName;
+        }
+        final String tableDbName = _baseCB.asTableDbName();
+        final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);
+        if (dbmeta.hasColumn(realName)) {
+            throwSpecifyDerivedReferrerConflictAliasNameException(aliasName, dbmeta.findColumnInfo(realName));
+        }
+    }
+
+    protected void throwSpecifyDerivedReferrerConflictAliasNameException(String aliasName, ColumnInfo existingColumn) {
+        createCBExThrower().throwSpecifyDerivedReferrerConflictAliasNameException(_localCQ, aliasName, existingColumn);
     }
 
     // *this check was moved to runtime (when creating a behavior command)
@@ -403,6 +426,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     //protected String replaceString(String text, String fromText, String toText) {
     //    return Srl.replace(text, fromText, toText);
     //}
+
+    protected void assertDerivedReferrerOption(FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+        if (opLambda == null) {
+            String msg = "The argument 'opLambda' for DerivedReferrer should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
 
     protected String filterAliasName(String aliasName) {
         if (aliasName != null) {

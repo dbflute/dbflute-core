@@ -25,7 +25,7 @@ import org.dbflute.s2dao.sqlcommand.TnUpdateEntityDynamicCommand;
 /**
  * @author jflute
  */
-public class UpdateEntityCommand extends AbstractEntityCommand {
+public class UpdateEntityCommand extends AbstractEntityUpdateCommand {
 
     // ===================================================================================
     //                                                                           Attribute

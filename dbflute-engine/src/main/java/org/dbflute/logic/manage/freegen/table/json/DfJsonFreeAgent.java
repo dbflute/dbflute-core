@@ -62,7 +62,10 @@ public class DfJsonFreeAgent {
             ins = new FileInputStream(new File(resourceFile));
             decodedObj = DfReflectionUtil.invokeStatic(decodeMethod, new Object[] { ins });
         } catch (FileNotFoundException e) {
-            throwJsonFileNotFoundException(e, resourceFile);
+            throwJsonFileNotFoundException(requestName, resourceFile, e);
+            return null; // unreachable
+        } catch (RuntimeException e) {
+            throwJsonParseFailureException(requestName, resourceFile, e);
             return null; // unreachable
         } finally {
             if (ins != null) {
@@ -98,13 +101,26 @@ public class DfJsonFreeAgent {
         throw new IllegalStateException(msg, e);
     }
 
-    protected void throwJsonFileNotFoundException(FileNotFoundException e, String resourceFile) {
+    protected void throwJsonFileNotFoundException(String requestName, String resourceFile, FileNotFoundException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the JSON file for FreeGen.");
+        br.addItem("FreeGen Request");
+        br.addElement(requestName);
         br.addItem("JSON File");
         br.addElement(resourceFile);
         final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg, e);
+        throw new IllegalStateException(msg, cause);
+    }
+
+    protected void throwJsonParseFailureException(String requestName, String resourceFile, RuntimeException cause) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to parse the JSON file for FreeGen.");
+        br.addItem("FreeGen Request");
+        br.addElement(requestName);
+        br.addItem("JSON File");
+        br.addElement(resourceFile);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg, cause);
     }
 
     // ===================================================================================
@@ -309,7 +325,7 @@ public class DfJsonFreeAgent {
         // e.g.
         //  jsonPath = map
         //  jsonPath = tables -> map
-        //  jsonPath = schema -> map.tables -> map
+        //  jsonPath = schema -> tables -> map
         final List<String> pathList = Srl.splitListTrimmed(tracePath, "->");
         Map<String, Object> currentMap = rootMap;
         for (String pathElement : pathList) {
@@ -317,20 +333,21 @@ public class DfJsonFreeAgent {
                 break;
             }
             final Object obj = currentMap.get(pathElement);
+            if (obj == null) {
+                throwJsonMapKeyNotFoundException(requestName, resource, tracePath, currentMap, pathElement);
+            }
             if (!(obj instanceof Map<?, ?>)) {
                 throwJsonTracePathNotMapException(requestName, resource, tracePath, pathElement, obj);
             }
             @SuppressWarnings("unchecked")
             final Map<String, Object> nextMap = (Map<String, Object>) obj;
-            if (nextMap == null) {
-                throwJsonMapKeyNotFoundException(requestName, resource, tracePath, pathElement);
-            }
             currentMap = nextMap;
         }
         return currentMap;
     }
 
-    protected void throwJsonMapKeyNotFoundException(String requestName, DfFreeGenResource resource, String tracePath, String pathElement) {
+    protected void throwJsonMapKeyNotFoundException(String requestName, DfFreeGenResource resource, String tracePath,
+            Map<String, Object> currentMap, String pathElement) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the key in the map. (FreeGen)");
         br.addItem("Request Name");
@@ -339,6 +356,8 @@ public class DfJsonFreeAgent {
         br.addElement(resource.getResourceFile());
         br.addItem("Trace Path");
         br.addElement(tracePath);
+        br.addItem("Current Map keySet()");
+        br.addElement(currentMap.keySet());
         br.addItem("Path Element");
         br.addElement(pathElement);
         final String msg = br.buildExceptionMessage();

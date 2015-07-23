@@ -29,7 +29,7 @@ ${table.aliasExpression}${table.tableDispName}
 #set ($hasDefaultValue = $table.hasDefaultValueExceptAutoIncrement())
 #set ($hasColumnComment = $table.hasColumnComment())
 #set ($canBeColumnNullObject = $table.canBeColumnNullObject())
-<table summary="Columns in ${table.tableDispName}">
+<table>
 	<thead>
 	<tr>
 		<th class="rownumhead">No.</th>
