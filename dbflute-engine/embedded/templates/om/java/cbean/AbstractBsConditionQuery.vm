@@ -1030,6 +1030,19 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
     }
 #if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+
+    /**
+     * Equal(=). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br>
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
+     */
+    public void set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
+        doSet${tmpJavaName}_Equal(cdef != null ? ${col.javaNative}.valueOf(cdef.code()) : null);
+    }
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
 
     /**
@@ -1040,9 +1053,13 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     @Deprecated
 #end
     public void set${tmpJavaName}_Equal_${classificationElement.name}() {
-        reg${tmpJavaName}(CK_EQ, ${col.javaNative}.valueOf(${glCDef}.${col.classificationName}.${classificationElement.name}.code()));
+        doSet${tmpJavaName}_Equal(${col.javaNative}.valueOf(${glCDef}.${col.classificationName}.${classificationElement.name}.code()));
     }
 #end
+
+    protected void doSet${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
+    }
 #end
 #end
 #if (${col.isJavaNativeUUIDObject()})
