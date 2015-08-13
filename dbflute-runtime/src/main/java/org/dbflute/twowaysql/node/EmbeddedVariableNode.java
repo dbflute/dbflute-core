@@ -44,15 +44,17 @@ public class EmbeddedVariableNode extends VariableNode {
     //                                                                           =========
     protected final boolean _replaceOnly;
     protected final boolean _terminalDot;
+    protected final boolean _overlookNativeBinding; // treats native binding as plain question mark on SQL
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public EmbeddedVariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter,
-            NodeAdviceFactory nodeAdviceFactory, boolean replaceOnly, boolean terminalDot) {
+            NodeAdviceFactory nodeAdviceFactory, boolean replaceOnly, boolean terminalDot, boolean overlookNativeBinding) {
         super(expression, testValue, specifiedSql, blockNullParameter, nodeAdviceFactory);
         _replaceOnly = replaceOnly;
         _terminalDot = terminalDot;
+        _overlookNativeBinding = overlookNativeBinding;
     }
 
     // ===================================================================================
@@ -148,6 +150,9 @@ public class EmbeddedVariableNode extends VariableNode {
     }
 
     protected void assertNotContainBindSymbol(String value) {
+        if (_overlookNativeBinding) { // for general purpose e.g. MailFlute (to avoid question mark headache)
+            return;
+        }
         if (containsBindSymbol(value)) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("The value of embedded comment contained bind symbols.");
@@ -190,6 +195,7 @@ public class EmbeddedVariableNode extends VariableNode {
         if (first == null) {
             return false;
         }
+        // unsupported general purpose options in dynamic for now, e.g. MailFlute, may be almost unneeded
         final SqlAnalyzer analyzer = new SqlAnalyzer(embeddedString, _blockNullParameter);
         final Node rootNode = analyzer.analyze();
         final CommandContextCreator creator = new CommandContextCreator(new String[] { "pmb" }, new Class<?>[] { firstType });
