@@ -32,11 +32,9 @@ public class ${request.className} extends ActionMessages {
 #foreach ($column in $table.columnList)
 #if (!$column.isExtends)
 #if (!$column.isOverride)
-#if (!$column.isLabel)
 
     /** The key of the message: ${column.propertyValue} */
     public static final String ${column.defName} = "{${column.propertyKey}}";
-#end
 #end
 #end
 #end
