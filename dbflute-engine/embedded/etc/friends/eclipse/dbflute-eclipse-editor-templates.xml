@@ -119,4 +119,8 @@ public JsonResponse&lt;${bean}&gt; index(long ${object}Id) {
     unionCB.query().set${columnName}
 }</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Validation Error" enabled="true" name="validationErrorLambda">() -&gt; {
     return asHtml(path_${newName});
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Validation Messages" enabled="true" name="validationMessagesLambda">messages -&gt; messages.add${newName}</template></templates>
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Validation Messages" enabled="true" name="validationMessagesLambda">messages -&gt; messages.add${newName}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Writtern Stream" enabled="true" name="writtenStreamLambda">${:import(java.io.InputStream)}out -&gt; {
+    try (InputStream ins = ${newName}) {
+        out.write(ins);
+    }
+}</template></templates>
