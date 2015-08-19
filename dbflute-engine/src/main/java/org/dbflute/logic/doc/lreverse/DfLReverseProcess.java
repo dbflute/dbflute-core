@@ -293,10 +293,9 @@ public class DfLReverseProcess {
         });
     }
 
-    protected Map<String, File> preparetranslatedXlsMap(final DfLReverseExistingXlsInfo existingXlsInfo,
-            final Map<String, String> tableNameMap) {
+    protected Map<String, File> preparetranslatedXlsMap(DfLReverseExistingXlsInfo existingXlsInfo, Map<String, String> tableNameMap) {
         final Map<String, File> existingXlsMap = existingXlsInfo.getTableExistingXlsMap();
-        final Map<String, File> translatedXlsMap = existingXlsInfo.getTableExistingXlsMap();
+        final Map<String, File> translatedXlsMap = StringKeyMap.createAsFlexible();
         for (Entry<String, File> entry : existingXlsMap.entrySet()) {
             final String tableName = entry.getKey();
             if (tableName.startsWith("$")) {
@@ -306,7 +305,7 @@ public class DfLReverseProcess {
                 }
             }
         }
-        translatedXlsMap.putAll(translatedXlsMap);
+        translatedXlsMap.putAll(existingXlsMap);
         return translatedXlsMap;
     }
 
