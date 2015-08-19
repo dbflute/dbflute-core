@@ -257,12 +257,14 @@ public class DfLReverseProcess {
     protected Map<File, DfLReverseOutputResource> toOverrideReverseOrderedMap(List<List<Table>> orderedList, File baseDir) {
         final DfLReverseExistingXlsInfo existingXlsInfo = extractExistingXlsInfo(baseDir);
         final Map<File, DfLReverseOutputResource> orderedMap = createOrderedMap();
-        final Map<String, File> existingXlsMap = existingXlsInfo.getTableExistingXlsMap();
+        final String dataDirPath = resolvePath(baseDir);
+        final Map<String, String> tableNameMap = _tableNameProp.getTableNameMap(dataDirPath);
+        final Map<String, File> translatedXlsMap = preparetranslatedXlsMap(existingXlsInfo, tableNameMap);
         final List<Table> addedTableList = DfCollectionUtil.newArrayList();
         int sectionNo = 1;
         for (List<Table> nestedList : orderedList) {
             for (Table table : nestedList) {
-                final File existingXls = existingXlsMap.get(table.getTableDbName());
+                final File existingXls = translatedXlsMap.get(table.getTableDbName());
                 if (existingXls == null) {
                     addedTableList.add(table);
                     continue;
@@ -289,6 +291,23 @@ public class DfLReverseProcess {
                 return o1.getName().compareTo(o2.getName()); // ordered by existing file name
             }
         });
+    }
+
+    protected Map<String, File> preparetranslatedXlsMap(final DfLReverseExistingXlsInfo existingXlsInfo,
+            final Map<String, String> tableNameMap) {
+        final Map<String, File> existingXlsMap = existingXlsInfo.getTableExistingXlsMap();
+        final Map<String, File> translatedXlsMap = existingXlsInfo.getTableExistingXlsMap();
+        for (Entry<String, File> entry : existingXlsMap.entrySet()) {
+            final String tableName = entry.getKey();
+            if (tableName.startsWith("$")) {
+                final String translated = tableNameMap.get(tableName);
+                if (translated != null) {
+                    translatedXlsMap.put(translated, entry.getValue());
+                }
+            }
+        }
+        translatedXlsMap.putAll(translatedXlsMap);
+        return translatedXlsMap;
     }
 
     protected File createAddedTableXlsFile() {
