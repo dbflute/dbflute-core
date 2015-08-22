@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.RichTextString;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.dataset.DfDataColumn;
 import org.dbflute.helper.dataset.DfDataRow;
@@ -55,9 +55,9 @@ public class DfTableXlsWriter implements DfDataSetConstants {
     //                                          XLS Resource
     //                                          ------------
     protected final OutputStream _out;
-    protected final HSSFWorkbook _workbook;
-    protected final HSSFCellStyle _dateStyle;
-    protected final HSSFCellStyle _base64Style;
+    protected final Workbook _workbook;
+    protected final CellStyle _dateStyle;
+    protected final CellStyle _base64Style;
 
     // -----------------------------------------------------
     //                                           Read Option
@@ -77,13 +77,9 @@ public class DfTableXlsWriter implements DfDataSetConstants {
     //                                                                         Constructor
     //                                                                         ===========
     public DfTableXlsWriter(File file) {
-        this(create(file));
-    }
-
-    public DfTableXlsWriter(OutputStream out) {
-        _out = out;
-        _workbook = new HSSFWorkbook();
-        final HSSFDataFormat dataFormat = _workbook.createDataFormat();
+        _out = create(file);
+        _workbook = DfXlsFactory.instance().createWorkbook(file);
+        final DataFormat dataFormat = _workbook.createDataFormat();
         _dateStyle = _workbook.createCellStyle();
         _dateStyle.setDataFormat(dataFormat.getFormat(DATE_FORMAT));
         _base64Style = _workbook.createCellStyle();
@@ -163,7 +159,7 @@ public class DfTableXlsWriter implements DfDataSetConstants {
     protected void setupTableSheet(DfDataSet dataSet) {
         for (int tableIndex = 0; tableIndex < dataSet.getTableSize(); ++tableIndex) {
             final DfDataTable table = dataSet.getTable(tableIndex);
-            final HSSFSheet sheet = _workbook.createSheet();
+            final Sheet sheet = _workbook.createSheet();
             final String tableName = table.getTableDbName();
             try {
                 _workbook.setSheetName(tableIndex, tableName);
@@ -171,18 +167,18 @@ public class DfTableXlsWriter implements DfDataSetConstants {
                 String msg = "Failed to set the sheet name: " + tableName;
                 throw new IllegalStateException(msg, e);
             }
-            final HSSFRow headerRow = sheet.createRow(0);
+            final Row headerRow = sheet.createRow(0);
             for (int columnIndex = 0; columnIndex < table.getColumnSize(); ++columnIndex) {
-                final HSSFCell cell = headerRow.createCell(columnIndex);
-                cell.setCellValue(createRichTextString(table.getColumnName(columnIndex)));
+                final Cell cell = headerRow.createCell(columnIndex);
+                cell.setCellValue(createRichTextString(_workbook, table.getColumnName(columnIndex)));
             }
             for (int rowIndex = 0; rowIndex < table.getRowSize(); ++rowIndex) {
-                final HSSFRow row = sheet.createRow(rowIndex + 1);
+                final Row row = sheet.createRow(rowIndex + 1);
                 for (int columnIndex = 0; columnIndex < table.getColumnSize(); ++columnIndex) {
                     final DfDataRow dataRow = table.getRow(rowIndex);
                     final Object value = dataRow.getValue(columnIndex);
                     if (value != null) {
-                        final HSSFCell cell = row.createCell(columnIndex);
+                        final Cell cell = row.createCell(columnIndex);
                         setupCellValueOfTableSheet(table, columnIndex, row, cell, value);
                     }
                 }
@@ -196,7 +192,7 @@ public class DfTableXlsWriter implements DfDataSetConstants {
     protected void setupLargeDataSheet() {
         if (_largeDataHandling && _largeDataMap != null) {
             final int nextSheetIndex = _workbook.getNumberOfSheets();
-            final HSSFSheet sheet = _workbook.createSheet();
+            final Sheet sheet = _workbook.createSheet();
             final String sheetName = DfTableXlsReader.LDATA_SHEET_NAME;
             try {
                 _workbook.setSheetName(nextSheetIndex, sheetName);
@@ -209,19 +205,19 @@ public class DfTableXlsWriter implements DfDataSetConstants {
         }
     }
 
-    protected void doSetupLargeDataHeader(HSSFSheet sheet) {
-        final HSSFRow headerRow = sheet.createRow(0);
+    protected void doSetupLargeDataHeader(Sheet sheet) {
+        final Row headerRow = sheet.createRow(0);
         int columnIndex = 0;
         for (Entry<String, Map<String, List<String>>> entry : _largeDataMap.entrySet()) {
             final String columnTitle = entry.getKey();
-            final HSSFCell cell = headerRow.createCell(columnIndex);
-            cell.setCellValue(createRichTextString(columnTitle));
+            final Cell cell = headerRow.createCell(columnIndex);
+            cell.setCellValue(createRichTextString(_workbook, columnTitle));
             ++columnIndex;
         }
     }
 
-    protected void doSetupLargeDataRowCell(HSSFSheet sheet) {
-        final Map<Integer, HSSFRow> rowMap = allocateLargeDataRow(sheet);
+    protected void doSetupLargeDataRowCell(Sheet sheet) {
+        final Map<Integer, Row> rowMap = allocateLargeDataRow(sheet);
         int columnIndex = 0;
         for (Entry<String, Map<String, List<String>>> entry : _largeDataMap.entrySet()) {
             final Map<String, List<String>> dataMap = entry.getValue();
@@ -230,8 +226,8 @@ public class DfTableXlsWriter implements DfDataSetConstants {
                 final String dataKey = dataEntry.getKey();
                 final List<String> splitDataList = dataEntry.getValue();
                 for (String splitData : splitDataList) {
-                    final HSSFRow row = rowMap.get(rowIndex);
-                    final HSSFCell cell = row.createCell(columnIndex);
+                    final Row row = rowMap.get(rowIndex);
+                    final Cell cell = row.createCell(columnIndex);
                     final String managedValue = convertToLargeDataManagedValue(dataKey, splitData);
                     setupCellValueOfLargeDataSheet(row, cell, managedValue);
                     ++rowIndex;
@@ -241,7 +237,7 @@ public class DfTableXlsWriter implements DfDataSetConstants {
         }
     }
 
-    protected Map<Integer, HSSFRow> allocateLargeDataRow(HSSFSheet sheet) {
+    protected Map<Integer, Row> allocateLargeDataRow(Sheet sheet) {
         int maxRowSize = 0;
         for (Entry<String, Map<String, List<String>>> entry : _largeDataMap.entrySet()) {
             final Map<String, List<String>> dataMap = entry.getValue();
@@ -254,9 +250,9 @@ public class DfTableXlsWriter implements DfDataSetConstants {
                 maxRowSize = dataRowSize;
             }
         }
-        final Map<Integer, HSSFRow> rowMap = DfCollectionUtil.newLinkedHashMap();
+        final Map<Integer, Row> rowMap = DfCollectionUtil.newLinkedHashMap();
         for (int rowIndex = 0; rowIndex < maxRowSize; rowIndex++) {
-            final HSSFRow row = sheet.createRow(rowIndex + 1);
+            final Row row = sheet.createRow(rowIndex + 1);
             rowMap.put(rowIndex, row);
         }
         return rowMap;
@@ -269,36 +265,36 @@ public class DfTableXlsWriter implements DfDataSetConstants {
     // ===================================================================================
     //                                                                 Cell Value Handling
     //                                                                 ===================
-    protected void setupCellValueOfTableSheet(DfDataTable table, int columnIndex, HSSFRow row, HSSFCell cell, Object value) {
+    protected void setupCellValueOfTableSheet(DfDataTable table, int columnIndex, Row row, Cell cell, Object value) {
         doSetupCellValue(table, columnIndex, row, cell, value);
     }
 
-    protected void setupCellValueOfLargeDataSheet(HSSFRow row, HSSFCell cell, Object value) {
+    protected void setupCellValueOfLargeDataSheet(Row row, Cell cell, Object value) {
         doSetupCellValue(null, -1, row, cell, value);
     }
 
-    protected void doSetupCellValue(DfDataTable table, int columnIndex, HSSFRow row, HSSFCell cell, Object value) {
+    protected void doSetupCellValue(DfDataTable table, int columnIndex, Row row, Cell cell, Object value) {
         // value is not null here
         if (_stringCellType) {
-            cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+            cell.setCellType(Cell.CELL_TYPE_STRING);
         }
         if (value instanceof Number) {
-            cell.setCellValue(createRichTextString(value.toString()));
+            cell.setCellValue(createRichTextString(_workbook, value.toString()));
         } else if (value instanceof Date) {
             cell.setCellValue((Date) value);
             cell.setCellStyle(_dateStyle);
         } else if (value instanceof byte[]) {
-            cell.setCellValue(createRichTextString(DfTypeUtil.encodeAsBase64((byte[]) value)));
+            cell.setCellValue(createRichTextString(_workbook, DfTypeUtil.encodeAsBase64((byte[]) value)));
             cell.setCellStyle(_base64Style);
         } else if (value instanceof Boolean) {
             cell.setCellValue(((Boolean) value).booleanValue());
         } else { // e.g. String
             final String adjustedStr = adjustStringCellValue(table, columnIndex, row, cell, value);
-            cell.setCellValue(createRichTextString(adjustedStr));
+            cell.setCellValue(createRichTextString(_workbook, adjustedStr));
         }
     }
 
-    protected String adjustStringCellValue(DfDataTable table, int columnIndex, HSSFRow row, HSSFCell cell, Object value) {
+    protected String adjustStringCellValue(DfDataTable table, int columnIndex, Row row, Cell cell, Object value) {
         final boolean tableSheet = table != null;
         final String plainStr = DfTypeUtil.toString(value);
         final String strValue;
@@ -310,7 +306,7 @@ public class DfTableXlsWriter implements DfDataSetConstants {
         return resolveEmptyStringIfNeeds(strValue);
     }
 
-    protected String resolveLargeDataReferenceIfNeeds(DfDataTable table, int columnIndex, HSSFRow row, String strValue) {
+    protected String resolveLargeDataReferenceIfNeeds(DfDataTable table, int columnIndex, Row row, String strValue) {
         final String mark = "...";
         final int splitLength = getCellLengthLimit() - mark.length();
         if (strValue != null && strValue.length() > splitLength) {
@@ -366,7 +362,7 @@ public class DfTableXlsWriter implements DfDataSetConstants {
         return _quoteEmptyString && strValue.equals("") ? "\"\"" : strValue;
     }
 
-    protected HSSFRichTextString createRichTextString(String str) {
-        return new HSSFRichTextString(str);
+    protected RichTextString createRichTextString(Workbook workbook, String str) {
+        return DfXlsFactory.instance().createRichTextString(workbook, str);
     }
 }

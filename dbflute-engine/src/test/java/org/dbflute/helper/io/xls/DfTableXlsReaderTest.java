@@ -9,27 +9,25 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
 package org.dbflute.helper.io.xls;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.apache.poi.ss.usermodel.Workbook;
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.dataset.DfDataColumn;
 import org.dbflute.helper.dataset.DfDataRow;
 import org.dbflute.helper.dataset.DfDataSet;
 import org.dbflute.helper.dataset.DfDataTable;
-import org.dbflute.helper.io.xls.DfTableXlsReader;
-import org.dbflute.helper.StringKeyMap;
 import org.dbflute.unit.EngineTestCase;
 import org.dbflute.util.DfResourceUtil;
 
@@ -274,12 +272,7 @@ public class DfTableXlsReaderTest extends EngineTestCase {
         }
 
         @Override
-        protected InputStream toStream(File xlsFile) {
-            return new ByteArrayInputStream(new byte[] {});
-        }
-
-        @Override
-        protected void setupWorkbook(InputStream ins) {
+        protected void setupWorkbook(Workbook workbook) {
             // do nothing
         }
     }

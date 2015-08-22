@@ -6,7 +6,7 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="lib" path="lib/dbflute-runtime.jar" sourcepath="lib/sources/dbflute-runtime-sources.jar"/>
-	<classpathentry kind="lib" path="lib/poi-3.2-FINAL-20081019.jar"/>
+	<classpathentry kind="lib" path="lib/poi-3.12.jar"/>
 	<classpathentry kind="lib" path="lib/commons-compress-1.0.jar" sourcepath="lib/sources/commons-compress-1.0-sources.jar"/>
 	<classpathentry kind="lib" path="lib/velocity-1.7.jar" sourcepath="lib/sources/velocity-1.7-sources.jar"/>
 	<classpathentry kind="lib" path="lib/commons-collections-3.2.1.jar" sourcepath="lib/sources/commons-collections-3.2.1-sources.jar"/>
