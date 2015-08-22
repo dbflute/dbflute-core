@@ -78,7 +78,13 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // -----------------------------------------------------
     //                                          DI Component
     //                                          ------------
+#if ($database.isTargetContainerLastaDi())
+    @javax.annotation.Resource
+#end
     protected DataSource _dataSource;
+#if ($database.isTargetContainerLastaDi())
+    @javax.annotation.Resource
+#end
     protected ${glDBFluteInitializer} _introduction;
 
     // -----------------------------------------------------
@@ -531,9 +537,6 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#if ($database.isTargetContainerLastaDi())
-    @javax.annotation.Resource
-#end
     public void setDataSource(DataSource dataSource) {
         _dataSource = dataSource;
     }
@@ -542,9 +545,6 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // when the initializer is extended by DBFlute property
     // so this variable is actually unused in this class
     // (needs to be injected only when the DI container is set by its DI setting file)
-#if ($database.isTargetContainerLastaDi())
-    @javax.annotation.Resource
-#end
     public void setIntroduction(${glDBFluteInitializer} introduction) {
         _introduction = introduction;
     }

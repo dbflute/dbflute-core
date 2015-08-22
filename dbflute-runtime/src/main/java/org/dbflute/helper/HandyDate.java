@@ -278,9 +278,9 @@ public class HandyDate implements Serializable {
      *  new HandyDate("20010101", "yyyyMMdd", timeZone, locale): 2001-01-01 00:00:00.000
      * </pre>
      * @param exp The string expression of the date. (NotNull, NotEmpty)
+     * @param timeZone The time-zone to parse as date and for internal calendar. (NotNull)
      * @param pattern The pattern to parse as date. (NotNull, NotEmpty)
      * @param locale The locale to parse the date expression. (NotNull)
-     * @param timeZone The time-zone to parse as date and for internal calendar. (NotNull)
      * @throws ParseDateExpressionFailureException When it fails to parse the expression.
      */
     public HandyDate(String exp, TimeZone timeZone, String pattern, Locale locale) {

@@ -9,27 +9,26 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
 package org.dbflute.logic.manage.freegen.table.xls;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.RichTextString;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfRequiredPropertyNotFoundException;
+import org.dbflute.helper.io.xls.DfXlsFactory;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
@@ -99,21 +98,15 @@ public class DfXlsTableLoader implements DfFreeGenTableLoader {
         final String resourceFile = resource.getResourceFile();
         @SuppressWarnings("unchecked")
         final Map<String, String> columnMap = (Map<String, String>) tableMap.get("columnMap");
-        HSSFWorkbook workbook;
-        try {
-            workbook = new HSSFWorkbook(new FileInputStream(new File(resourceFile)));
-        } catch (IOException e) {
-            String msg = "Failed to read the excel(xls): requestName=" + requestName + " resourceFile=" + resourceFile;
-            throw new IllegalStateException(msg, e);
-        }
-        final HSSFSheet sheet = workbook.getSheet(sheetName);
+        final Workbook workbook = DfXlsFactory.instance().createWorkbook(new File(resourceFile));
+        final Sheet sheet = workbook.getSheet(sheetName);
         if (sheet == null) {
             String msg = "Not found the sheet name in the file: name=" + sheetName + " xls=" + resourceFile;
             throw new IllegalStateException(msg);
         }
         final List<Map<String, Object>> columnList = new ArrayList<Map<String, Object>>(); // rows
         for (int i = (rowBeginNumber - 1); i < Integer.MAX_VALUE; i++) {
-            final HSSFRow row = sheet.getRow(i);
+            final Row row = sheet.getRow(i);
             if (row == null) {
                 break;
             }
@@ -145,7 +138,7 @@ public class DfXlsTableLoader implements DfFreeGenTableLoader {
         return new DfFreeGenTable(tableMap, tableName, columnList);
     }
 
-    protected boolean processColumnValue(final String requestName, final Map<String, String> columnMap, final HSSFRow row,
+    protected boolean processColumnValue(final String requestName, final Map<String, String> columnMap, final Row row,
             final Map<String, Object> beanMap, final String key, final String value, List<DfFreeGenLazyReflector> reflectorList,
             Map<String, Map<String, String>> mappingMap) {
         if (convertByMethod(requestName, beanMap, key, value, reflectorList)) {
@@ -161,11 +154,11 @@ public class DfXlsTableLoader implements DfFreeGenTableLoader {
             msg = msg + " key=" + key + " value=" + value;
             throw new DfIllegalPropertySettingException(msg);
         }
-        final HSSFCell cell = row.getCell(cellNumber);
+        final Cell cell = row.getCell(cellNumber);
         if (cell == null) {
             return false;
         }
-        final HSSFRichTextString cellValue = cell.getRichStringCellValue();
+        final RichTextString cellValue = cell.getRichStringCellValue();
         if (cellValue == null) {
             return false;
         }

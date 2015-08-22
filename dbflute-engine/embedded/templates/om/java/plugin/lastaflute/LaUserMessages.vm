@@ -102,24 +102,4 @@ public class ${request.className} extends ActionMessages {
         }
     }
 #end
-
-    /**
-     * The definition of keys for labels.
-     * @author FreeGen
-     */
-#if ($request.tableMap.superClassPackage)
-    public static interface LabelKey extends ${request.tableMap.superClassSimpleName}.LabelKey {
-#else
-    public static interface LabelKey {
-#end
-#foreach ($column in $table.columnList)
-#if (!$column.isExtends)
-#if ($column.isLabel)
-
-        /** The key of the label: ${column.propertyValue} */
-        String ${column.defName} = "{${column.propertyKey}}";
-#end
-#end
-#end
-    }
 }

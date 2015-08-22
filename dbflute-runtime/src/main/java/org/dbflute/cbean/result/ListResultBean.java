@@ -27,12 +27,14 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.dbflute.Entity;
 import org.dbflute.cbean.result.grouping.GroupingListDeterminer;
 import org.dbflute.cbean.result.grouping.GroupingListRowResource;
 import org.dbflute.cbean.result.grouping.GroupingMapDeterminer;
 import org.dbflute.cbean.result.mapping.EntityColumnExtractor;
 import org.dbflute.cbean.result.mapping.EntityDtoMapper;
 import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * The result bean for list. <br>
@@ -317,12 +319,36 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("{").append(_tableDbName);
-        sb.append(",").append(_allRecordCount);
-        sb.append(",").append(_orderByClause != null ? _orderByClause.getOrderByClause() : null);
-        sb.append(",").append(_selectedList);
-        sb.append("}");
+        sb.append("{").append(_tableDbName).append(", ").append(_allRecordCount).append(", ").append(_selectedList).append("}");
         return sb.toString();
+    }
+
+    /**
+     * @return The rich string of all record values. (NotNull)
+     */
+    public String toRichString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(DfTypeUtil.toClassTitle(this)).append(" Show:");
+        final StringBuilder headerSb = new StringBuilder();
+        buildRichStringHeader(headerSb);
+        final String header = headerSb.toString();
+        sb.append(!header.isEmpty() ? (header.contains("\n") ? "\n" : " ") : "").append(headerSb);
+        if (!isEmpty()) {
+            forEach(entity -> {
+                sb.append("\n");
+                if (entity instanceof Entity) {
+                    sb.append(((Entity) entity).toStringWithRelation());
+                } else {
+                    sb.append(entity.toString());
+                }
+            });
+        } else {
+            sb.append(" ").append("*empty");
+        }
+        return sb.toString();
+    }
+
+    protected void buildRichStringHeader(StringBuilder sb) {
     }
 
     // ===================================================================================

@@ -24,7 +24,7 @@ Properties for ReplaceSchema:
 o replaceSchemaMap.dfprop
 
 Properties for documents:
-o documentDefinitionMap.dfprop
+o documentMap.dfprop
 
 Properties for non-functional adjustments:
 o sourceCopyright.dfprop

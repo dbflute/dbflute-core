@@ -608,7 +608,7 @@ public final class DfTypeUtil {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Long(normalize(str));
+        return Long.valueOf(normalize(str));
     }
 
     public static long toPrimitiveLong(Object obj) {
@@ -663,7 +663,7 @@ public final class DfTypeUtil {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Double(normalize(str));
+        return Double.valueOf(normalize(str));
     }
 
     public static double toPrimitiveDouble(Object obj) {
@@ -718,7 +718,7 @@ public final class DfTypeUtil {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Float(normalize(str));
+        return Float.valueOf(normalize(str));
     }
 
     public static float toPrimitiveFloat(Object obj) {
@@ -775,7 +775,7 @@ public final class DfTypeUtil {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Short(normalize(str));
+        return Short.valueOf(normalize(str));
     }
 
     public static short toPrimitiveShort(Object obj) {
@@ -832,7 +832,7 @@ public final class DfTypeUtil {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Byte(normalize(str));
+        return Byte.valueOf(normalize(str));
     }
 
     public static byte toPrimitiveByte(Object obj) {
