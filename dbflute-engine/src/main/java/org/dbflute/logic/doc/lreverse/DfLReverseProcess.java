@@ -19,7 +19,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -43,6 +42,7 @@ import org.dbflute.helper.dataset.DfDataSet;
 import org.dbflute.helper.dataset.DfDataTable;
 import org.dbflute.helper.io.compress.DfZipArchiver;
 import org.dbflute.helper.io.xls.DfTableXlsReader;
+import org.dbflute.helper.io.xls.DfXlsFactory;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
@@ -310,7 +310,8 @@ public class DfLReverseProcess {
     }
 
     protected File createAddedTableXlsFile() {
-        return new File(getReverseXlsDataDir() + "/" + getLoadDataReverseFileTitle() + "-99-added-table.xls");
+        final String fileExtension = DfXlsFactory.instance().getDefaultFileExtension();
+        return new File(getReverseXlsDataDir() + "/" + getLoadDataReverseFileTitle() + "-99-added-table" + fileExtension);
     }
 
     protected DfLReverseOutputResource createOutputResource(File xlsFile, List<Table> tableList, int sectionNo, String mainName) {
@@ -423,11 +424,7 @@ public class DfLReverseProcess {
     }
 
     protected FileFilter createXlsFileFilter() {
-        return new FileFilter() {
-            public boolean accept(File file) {
-                return file.getName().endsWith(".xls");
-            }
-        };
+        return DfXlsFactory.instance().createXlsFileFilter();
     }
 
     protected FileFilter createTsvFileFilter() {
@@ -440,7 +437,8 @@ public class DfLReverseProcess {
 
     protected String buildXlsFilePath(String number, String mainName) {
         final String fileTitle = getLoadDataReverseFileTitle();
-        return getReverseXlsDataDir() + "/" + fileTitle + "-" + number + "-" + mainName + ".xls";
+        final String fileExtension = DfXlsFactory.instance().getDefaultFileExtension();
+        return getReverseXlsDataDir() + "/" + fileTitle + "-" + number + "-" + mainName + fileExtension;
     }
 
     // ===================================================================================
@@ -501,11 +499,8 @@ public class DfLReverseProcess {
     }
 
     protected List<File> extractExistingXlsList(File baseDir) {
-        final File[] listFiles = baseDir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".xls");
-            }
-        });
+        final FileFilter fileFilter = DfXlsFactory.instance().createXlsFileFilter();
+        final File[] listFiles = baseDir.listFiles(fileFilter);
         return DfCollectionUtil.newArrayList(listFiles != null ? listFiles : new File[] {});
     }
 
