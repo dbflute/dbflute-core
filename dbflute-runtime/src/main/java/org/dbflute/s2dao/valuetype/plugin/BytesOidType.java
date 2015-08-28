@@ -56,7 +56,7 @@ public class BytesOidType extends BytesType {
         }
 
         public void set(CallableStatement cs, String parameterName, byte[] bytes) throws SQLException {
-            cs.setBytes(parameterName, bytes);
+            cs.setBlob(parameterName, createBytesOidImpl(bytes));
         }
 
         public byte[] get(ResultSet rs, int columnIndex) throws SQLException {
