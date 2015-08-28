@@ -29,12 +29,12 @@ import java.sql.Types;
  * The value type of bytes OID. (basically for PostgreSQL)
  * @author modified by jflute (originated in Seasar2)
  */
-public class BytesOidType extends BytesType {
+public class PostgreSQLOidType extends BytesType {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public BytesOidType() {
+    public PostgreSQLOidType() {
         super(new TnBytesOidTrait());
     }
 

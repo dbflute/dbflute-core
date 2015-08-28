@@ -115,14 +115,17 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #if ($database.needsPmbMetaDataProcedureParameterStringClobHandling($pmbClassName, $propertyName))
     public static final String ${annotationPropName}_VALUE_TYPE = "stringClobType";
 #end
-#if ($database.needsPmbMetaDataProcedureParameterBytesOidHandling($pmbClassName, $propertyName))
-    public static final String ${annotationPropName}_VALUE_TYPE = "bytesOidType";
-#end
 #if ($database.needsPmbMetaDataProcedureParameterFixedLengthStringHandling($pmbClassName, $propertyName))
     public static final String ${annotationPropName}_VALUE_TYPE = "fixedLengthStringType";
 #end
 #if ($database.needsPmbMetaDataProcedureParameterObjectBindingBigDecimalHandling($pmbClassName, $propertyName))
     public static final String ${annotationPropName}_VALUE_TYPE = "objectBindingBigDecimalType";
+#end
+#if ($database.needsPmbMetaDataProcedureParameterPostgreSQLByteaHandling($pmbClassName, $propertyName))
+    public static final String ${annotationPropName}_VALUE_TYPE = "postgreSqlByteaType";
+#end
+#if ($database.needsPmbMetaDataProcedureParameterPostgreSQLOidHandling($pmbClassName, $propertyName))
+    public static final String ${annotationPropName}_VALUE_TYPE = "postgreSqlOidType";
 #end
 #if ($database.needsPmbMetaDataProcedureParameterOracleArrayHandling($pmbClassName, $propertyName))
     public static final ValueType ${annotationPropName}_VALUE_TYPE

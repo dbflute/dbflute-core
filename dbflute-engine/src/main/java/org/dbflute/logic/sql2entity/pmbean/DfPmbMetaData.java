@@ -966,38 +966,32 @@ public class DfPmbMetaData {
     public boolean needsStringClobHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
         final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
-        if (metaInfo == null) {
-            return false;
-        }
-        return _columnHandler.isConceptTypeStringClob(metaInfo.getDbTypeName());
-    }
-
-    public boolean needsBytesOidHandling(String propertyName) {
-        assertArgumentPmbMetaDataPropertyName(propertyName);
-        final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
-        if (metaInfo == null) {
-            return false;
-        }
-        return _columnHandler.isConceptTypeBytesOid(metaInfo.getDbTypeName());
+        return metaInfo != null && _columnHandler.isConceptTypeStringClob(metaInfo.getDbTypeName());
     }
 
     public boolean needsFixedLengthStringHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
         final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
-        if (metaInfo == null) {
-            return false;
-        }
-        return _columnHandler.isConceptTypeFixedLengthString(metaInfo.getDbTypeName());
+        return metaInfo != null && _columnHandler.isConceptTypeFixedLengthString(metaInfo.getDbTypeName());
     }
-
+    
     public boolean needsObjectBindingBigDecimalHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
         final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
-        if (metaInfo == null) {
-            return false;
-        }
-        return _columnHandler.isConceptTypeObjectBindingBigDecimal(metaInfo.getDbTypeName());
+        return metaInfo != null && _columnHandler.isConceptTypeObjectBindingBigDecimal(metaInfo.getDbTypeName());
     }
+    public boolean needsPostgreSQLByteaHandling(String propertyName) {
+        assertArgumentPmbMetaDataPropertyName(propertyName);
+        final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
+        return metaInfo != null && _columnHandler.isPostgreSQLBytea(metaInfo.getDbTypeName());
+    }
+
+    public boolean needsPostgreSQLOidHandling(String propertyName) {
+        assertArgumentPmbMetaDataPropertyName(propertyName);
+        final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
+        return metaInfo != null && _columnHandler.isPostgreSQLOid(metaInfo.getDbTypeName());
+    }
+
 
     public boolean needsOracleArrayHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);

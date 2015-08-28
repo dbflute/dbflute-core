@@ -209,7 +209,7 @@ public class DfJdbcTypeMapper {
                 return uuid;
             }
         }
-        if (isConceptTypeBytesOid(dbTypeName)) {
+        if (isPostgreSQLOid(dbTypeName)) {
             return getBlobJdbcType();
         }
         // interval type needs ... string? at PostgreSQL-9.x!?
@@ -256,13 +256,7 @@ public class DfJdbcTypeMapper {
      * @return The determination, true or false.
      */
     public boolean isConceptTypeStringClob(final String dbTypeName) { // needs stream
-        // only Oracle's CLOB (it can get all text by getString() on DB2)
-        return isOracleClob(dbTypeName);
-    }
-
-    public boolean isConceptTypeBytesOid(final String dbTypeName) {
-        // now only PostgreSQL's oid
-        return isPostgreSQLOid(dbTypeName);
+        return isOracleClob(dbTypeName); // only Oracle's CLOB (it can get all text by getString() on DB2)
     }
 
     public boolean isConceptTypeFixedLengthString(final String dbTypeName) {
@@ -286,6 +280,10 @@ public class DfJdbcTypeMapper {
 
     public boolean isPostgreSQLUuid(final String dbTypeName) {
         return _resource.isDbmsPostgreSQL() && matchIgnoreCase(dbTypeName, "uuid");
+    }
+
+    public boolean isPostgreSQLBytea(final String dbTypeName) {
+        return _resource.isDbmsPostgreSQL() && matchIgnoreCase(dbTypeName, "bytea");
     }
 
     public boolean isPostgreSQLOid(final String dbTypeName) {

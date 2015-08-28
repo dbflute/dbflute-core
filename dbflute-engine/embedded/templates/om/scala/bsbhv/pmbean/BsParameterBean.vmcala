@@ -136,14 +136,17 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
 #if ($database.needsPmbMetaDataProcedureParameterStringClobHandling($pmbClassName, $propertyName))
     val ${annotationPropName}_VALUE_TYPE: String = "stringClobType";
 #end
-#if ($database.needsPmbMetaDataProcedureParameterBytesOidHandling($pmbClassName, $propertyName))
-    val ${annotationPropName}_VALUE_TYPE: String = "bytesOidType";
-#end
 #if ($database.needsPmbMetaDataProcedureParameterFixedLengthStringHandling($pmbClassName, $propertyName))
     val ${annotationPropName}_VALUE_TYPE: String = "fixedLengthStringType";
 #end
 #if ($database.needsPmbMetaDataProcedureParameterObjectBindingBigDecimalHandling($pmbClassName, $propertyName))
     val ${annotationPropName}_VALUE_TYPE: String = "objectBindingBigDecimalType";
+#end
+#if ($database.needsPmbMetaDataProcedureParameterPostgreSQLByteaHandling($pmbClassName, $propertyName))
+    public static final String ${annotationPropName}_VALUE_TYPE = "postgreSqlByteaType";
+#end
+#if ($database.needsPmbMetaDataProcedureParameterPostgreSQLOidHandling($pmbClassName, $propertyName))
+    public static final String ${annotationPropName}_VALUE_TYPE = "postgreSqlOidType";
 #end
 #if ($database.needsPmbMetaDataProcedureParameterOracleArrayHandling($pmbClassName, $propertyName))
     val ${annotationPropName}_VALUE_TYPE: ValueType

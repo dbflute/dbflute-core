@@ -592,16 +592,20 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).needsStringClobHandling(propertyName);
     }
 
-    public boolean needsBytesOidHandling(String className, String propertyName) {
-        return findPmbMetaData(className).needsBytesOidHandling(propertyName);
-    }
-
     public boolean needsFixedLengthStringHandling(String className, String propertyName) {
         return findPmbMetaData(className).needsFixedLengthStringHandling(propertyName);
     }
 
     public boolean needsObjectBindingBigDecimalHandling(String className, String propertyName) {
         return findPmbMetaData(className).needsObjectBindingBigDecimalHandling(propertyName);
+    }
+
+    public boolean needsPostgreSQLByteaHandling(String className, String propertyName) {
+        return findPmbMetaData(className).needsPostgreSQLByteaHandling(propertyName);
+    }
+
+    public boolean needsPostgreSQLOidHandling(String className, String propertyName) {
+        return findPmbMetaData(className).needsPostgreSQLOidHandling(propertyName);
     }
 
     public boolean needsOracleArrayHandling(String className, String propertyName) {

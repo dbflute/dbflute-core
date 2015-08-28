@@ -764,16 +764,20 @@ public class Database {
         return getPmbBasicHandler().needsStringClobHandling(className, propertyName);
     }
 
-    public boolean needsPmbMetaDataProcedureParameterBytesOidHandling(String className, String propertyName) {
-        return getPmbBasicHandler().needsBytesOidHandling(className, propertyName);
-    }
-
     public boolean needsPmbMetaDataProcedureParameterFixedLengthStringHandling(String className, String propertyName) {
         return getPmbBasicHandler().needsFixedLengthStringHandling(className, propertyName);
     }
 
     public boolean needsPmbMetaDataProcedureParameterObjectBindingBigDecimalHandling(String className, String propertyName) {
         return getPmbBasicHandler().needsObjectBindingBigDecimalHandling(className, propertyName);
+    }
+
+    public boolean needsPmbMetaDataProcedureParameterPostgreSQLByteaHandling(String className, String propertyName) {
+        return getPmbBasicHandler().needsPostgreSQLByteaHandling(className, propertyName);
+    }
+
+    public boolean needsPmbMetaDataProcedureParameterPostgreSQLOidHandling(String className, String propertyName) {
+        return getPmbBasicHandler().needsPostgreSQLOidHandling(className, propertyName);
     }
 
     public boolean needsPmbMetaDataProcedureParameterOracleArrayHandling(String className, String propertyName) {

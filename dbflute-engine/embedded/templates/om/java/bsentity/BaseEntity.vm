@@ -646,8 +646,11 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #if ($col.needsStringClobHandling())
     @MappingValueType(keyName = "stringClobType")
 #end
-#if ($col.needsBytesOidHandling())
-    @MappingValueType(keyName = "bytesOidType")
+#if ($col.needsPostgreSQLByteaHandling())
+    @MappingValueType(keyName = "postgreSqlByteaType")
+#end
+#if ($col.needsPostgreSQLOidHandling())
+    @MappingValueType(keyName = "postgreSqlOidType")
 #end
 #if ($col.needsOracleDateHandling())
     @MappingValueType(keyName = "oracleDateType")
