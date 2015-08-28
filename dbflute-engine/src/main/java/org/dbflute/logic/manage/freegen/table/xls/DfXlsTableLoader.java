@@ -39,6 +39,7 @@ import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
+ * @author p1us2er0
  */
 public class DfXlsTableLoader implements DfFreeGenTableLoader {
 

@@ -44,6 +44,7 @@ import org.dbflute.util.Srl;
 
 /**
  * @author modified by jflute (originated in Seasar2)
+ * @author p1us2er0 (pull request)
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfTableXlsWriter implements DfDataSetConstants {

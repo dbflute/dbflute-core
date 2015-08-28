@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author modified by jflute (originated in Seasar2)
+ * @author p1us2er0 (pull request)
  */
 public class DfTableXlsReader {
 

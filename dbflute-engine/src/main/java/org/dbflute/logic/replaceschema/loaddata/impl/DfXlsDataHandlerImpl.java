@@ -75,6 +75,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The implementation of xls data handler. And also of writer.
  * @author jflute
+ * @author p1us2er0
  */
 public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDataHandler {
 
