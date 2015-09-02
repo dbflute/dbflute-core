@@ -57,6 +57,16 @@ public interface OptionalThing<THING> {
         return OptionalObject.ofNullable(object, noArgLambda);
     }
 
+    /**
+     * @param <THING> The type of thing wrapped in the optional thing.
+     * @param java8opt The optional instance as Java8 standard optional. (NotNull)
+     * @param noArgLambda The callback for exception when illegal access. (NotNull)
+     * @return The new-created instance as existing or empty optional thing. (NotNull)
+     */
+    public static <THING> OptionalThing<THING> migratedFrom(Optional<THING> java8opt, OptionalThingExceptionThrower noArgLambda) {
+        return OptionalObject.ofNullable(java8opt.orElse(null), noArgLambda);
+    }
+
     // ===================================================================================
     //                                                                   Standard Handling
     //                                                                   =================
