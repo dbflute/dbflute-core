@@ -40,6 +40,7 @@ import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDispatchResult;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.reps.DfRepsExecuteLimitter;
+import org.dbflute.infra.reps.exception.DfReplaceSchemaExecuteNotAllowedException;
 import org.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
 import org.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory;
@@ -149,11 +150,33 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     protected void checkBeforeInitialize() {
         final DfRepsExecuteLimitter limitter = createRepsExecuteLimitter();
         limitter.checkExecutableOrNot();
+        checkExplicitLimitation();
     }
 
     protected DfRepsExecuteLimitter createRepsExecuteLimitter() {
         final String sqlFileEncoding = getSqlFileEncoding();
         return new DfRepsExecuteLimitter(_sqlRootDir, sqlFileEncoding);
+    }
+
+    protected void checkExplicitLimitation() {
+        if (getReplaceSchemaProperties().isReplaceSchemaLimited()) {
+            throwReplaceSchemaExecuteNotAllowedException();
+        }
+    }
+
+    protected void throwReplaceSchemaExecuteNotAllowedException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Your ReplaceSchema execution was not allowed.");
+        br.addItem("Advice");
+        br.addElement("Limited by the dfprop explicitly.");
+        br.addElement("so your execution might be mistake...?");
+        br.addElement("");
+        br.addElement("The DBFlute property is");
+        br.addElement("'isReplaceSchemaLimited' in replaceSchemaMap.dfprop.");
+        br.addItem("SQL Root Directory");
+        br.addElement(_sqlRootDir);
+        final String msg = br.buildExceptionMessage();
+        throw new DfReplaceSchemaExecuteNotAllowedException(msg);
     }
 
     // ===================================================================================
