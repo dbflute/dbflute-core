@@ -332,10 +332,6 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
         return getJdbcTypeMapper().isConceptTypeStringClob(dbTypeName);
     }
 
-    public boolean isConceptTypeBytesOid(final String dbTypeName) {
-        return getJdbcTypeMapper().isConceptTypeBytesOid(dbTypeName);
-    }
-
     public boolean isConceptTypeFixedLengthString(final String dbTypeName) {
         return getJdbcTypeMapper().isConceptTypeFixedLengthString(dbTypeName);
     }
@@ -357,6 +353,10 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
 
     public boolean isPostgreSQLUuid(final String dbTypeName) {
         return getJdbcTypeMapper().isPostgreSQLUuid(dbTypeName);
+    }
+
+    public boolean isPostgreSQLBytea(final String dbTypeName) {
+        return getJdbcTypeMapper().isPostgreSQLBytea(dbTypeName);
     }
 
     public boolean isPostgreSQLOid(final String dbTypeName) {

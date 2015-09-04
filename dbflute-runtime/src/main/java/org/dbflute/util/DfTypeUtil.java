@@ -608,7 +608,7 @@ public final class DfTypeUtil {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Long(normalize(str));
+        return Long.valueOf(normalize(str));
     }
 
     public static long toPrimitiveLong(Object obj) {
@@ -663,7 +663,7 @@ public final class DfTypeUtil {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Double(normalize(str));
+        return Double.valueOf(normalize(str));
     }
 
     public static double toPrimitiveDouble(Object obj) {
@@ -718,7 +718,7 @@ public final class DfTypeUtil {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Float(normalize(str));
+        return Float.valueOf(normalize(str));
     }
 
     public static float toPrimitiveFloat(Object obj) {
@@ -775,7 +775,7 @@ public final class DfTypeUtil {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Short(normalize(str));
+        return Short.valueOf(normalize(str));
     }
 
     public static short toPrimitiveShort(Object obj) {
@@ -832,7 +832,7 @@ public final class DfTypeUtil {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Byte(normalize(str));
+        return Byte.valueOf(normalize(str));
     }
 
     public static byte toPrimitiveByte(Object obj) {
@@ -3496,8 +3496,15 @@ public final class DfTypeUtil {
         } else if (obj instanceof Boolean) {
             return (Boolean) obj;
         } else if (obj instanceof Number) {
-            int num = ((Number) obj).intValue();
-            return Boolean.valueOf(num != 0);
+            final int num = ((Number) obj).intValue();
+            if (num == 1) {
+                return Boolean.TRUE;
+            } else if (num == 0) {
+                return Boolean.FALSE;
+            } else {
+                String msg = "Failed to parse the boolean number: number=" + num;
+                throw new ParseBooleanException(msg);
+            }
         } else if (obj instanceof String) {
             final String str = (String) obj;
             if ("true".equalsIgnoreCase(str)) {
@@ -3513,8 +3520,7 @@ public final class DfTypeUtil {
             } else if (str.equalsIgnoreCase("f")) {
                 return Boolean.FALSE;
             } else {
-                String msg = "Failed to parse the boolean string:";
-                msg = msg + " value=" + str;
+                String msg = "Failed to parse the boolean string: value=" + str;
                 throw new ParseBooleanException(msg);
             }
         } else if (obj instanceof byte[]) {
@@ -3633,19 +3639,19 @@ public final class DfTypeUtil {
             if (db != null) {
                 return db;
             }
-            return new Double(0);
+            return Double.valueOf(0);
         } else if (type == long.class) {
             Long lg = toLong(obj);
             if (lg != null) {
                 return lg;
             }
-            return Long.valueOf(0);
+            return Long.valueOf(0L);
         } else if (type == float.class) {
             Float ft = toFloat(obj);
             if (ft != null) {
                 return ft;
             }
-            return new Float(0);
+            return Float.valueOf(0);
         } else if (type == short.class) {
             Short st = toShort(obj);
             if (st != null) {

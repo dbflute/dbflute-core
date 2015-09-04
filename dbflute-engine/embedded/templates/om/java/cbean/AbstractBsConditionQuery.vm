@@ -96,7 +96,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
-     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
+     * @param cdef The instance of classification definition (as ENUM type). (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
         doSet${tmpJavaName}_Equal(cdef != null ? cdef.code() : null);
@@ -109,7 +109,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
-     * @param determination The determination, true or false. (NullAllowed: if null, no condition)
+     * @param determination The determination, true or false. (basically NotNull: error as default, or no condition as option)
      */
     public void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
         set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
@@ -166,7 +166,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
-     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
+     * @param cdef The instance of classification definition (as ENUM type). (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
         doSet${tmpJavaName}_NotEqual(cdef != null ? cdef.code() : null);
@@ -504,7 +504,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Equal(=). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (basically NotNull: error as default, or no condition as option)
      */
     ${col.propertySettingModifier} void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         doSet${tmpJavaName}_Equal(${tmpUncapitalisedJavaName});
@@ -518,7 +518,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
-     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
+     * @param cdef The instance of classification definition (as ENUM type). (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
         doSet${tmpJavaName}_Equal(cTNum(cdef != null ? cdef.code() : null, ${col.javaNative}.class));
@@ -531,7 +531,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
-     * @param determination The determination, true or false. (NullAllowed: if null, no condition)
+     * @param determination The determination, true or false. (basically NotNull: error as default, or no condition as option)
      */
     public void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
         set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
@@ -560,7 +560,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * NotEqual(&lt;&gt;). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual. (basically NotNull: error as default, or no condition as option)
      */
     ${col.propertySettingModifier} void set${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         doSet${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName});
@@ -574,7 +574,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
-     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
+     * @param cdef The instance of classification definition (as ENUM type). (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
         doSet${tmpJavaName}_NotEqual(cTNum(cdef != null ? cdef.code() : null, ${col.javaNative}.class));
@@ -603,7 +603,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_GreaterThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_GT, ${tmpUncapitalisedJavaName});
@@ -614,7 +614,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * LessThan(&lt;). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_LessThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_LT, ${tmpUncapitalisedJavaName});
@@ -625,7 +625,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * GreaterEqual(&gt;=). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_GreaterEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_GE, ${tmpUncapitalisedJavaName});
@@ -636,7 +636,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * LessEqual(&lt;=). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_LessEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_LE, ${tmpUncapitalisedJavaName});
@@ -875,7 +875,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Equal(=). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_Equal($col.javaNative ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_EQ, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
@@ -885,7 +885,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * NotEqual(&lt;&gt;). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_NotEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(${database.conditionQueryNotEqualDefinitionName}, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
@@ -896,7 +896,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_GreaterThan($col.javaNative ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_GT, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
@@ -907,7 +907,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * LessThan(&lt;). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_LT, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
@@ -918,7 +918,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * GreaterEqual(&gt;=). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_GreaterEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_GE, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
@@ -929,7 +929,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * LessEqual(&lt;=). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_LessEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_LE,#if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
@@ -1024,12 +1024,25 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Equal(=). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
     }
 #if ($col.hasClassification())
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
+
+    /**
+     * Equal(=). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br>
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br>
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdef The instance of classification definition (as ENUM type). (basically NotNull: error as default, or no condition as option)
+     */
+    public void set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
+        doSet${tmpJavaName}_Equal(cdef != null ? ${col.javaNative}.valueOf(cdef.code()) : null);
+    }
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
 
     /**
@@ -1040,16 +1053,20 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     @Deprecated
 #end
     public void set${tmpJavaName}_Equal_${classificationElement.name}() {
-        reg${tmpJavaName}(CK_EQ, ${col.javaNative}.valueOf(${glCDef}.${col.classificationName}.${classificationElement.name}.code()));
+        doSet${tmpJavaName}_Equal(${col.javaNative}.valueOf(${glCDef}.${col.classificationName}.${classificationElement.name}.code()));
     }
 #end
+
+    protected void doSet${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
+    }
 #end
 #end
 #if (${col.isJavaNativeUUIDObject()})
     /**
      * Equal(=). And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (NullAllowed: if null, no condition)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal. (basically NotNull: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});

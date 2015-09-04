@@ -16,23 +16,19 @@
 package org.dbflute.helper.io.xls;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.RichTextString;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.dbflute.exception.DfXlsReaderReadFailureException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.dataset.DfDataColumn;
@@ -53,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author modified by jflute (originated in Seasar2)
+ * @author p1us2er0 (pull request)
  */
 public class DfTableXlsReader {
 
@@ -75,8 +72,8 @@ public class DfTableXlsReader {
     //                                          ------------
     protected final File _xlsFile;
     protected DfDataSet _dataSet;
-    protected HSSFWorkbook _workbook;
-    protected HSSFDataFormat _dataFormat;
+    protected Workbook _workbook;
+    protected DataFormat _dataFormat;
 
     // -----------------------------------------------------
     //                                           Read Option
@@ -125,26 +122,14 @@ public class DfTableXlsReader {
         _rtrimCellValue = rtrimCellValue;
 
         // actually read
-        setupWorkbook(toStream(xlsFile));
-    }
-
-    protected InputStream toStream(File file) {
-        try {
-            return new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            throw new IllegalStateException(e);
-        }
+        setupWorkbook(DfXlsFactory.instance().createWorkbook(xlsFile));
     }
 
     // -----------------------------------------------------
     //                                       Set up Workbook
     //                                       ---------------
-    protected void setupWorkbook(InputStream ins) {
-        try {
-            _workbook = new HSSFWorkbook(ins);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to create workbook: " + _xlsFile, e);
-        }
+    protected void setupWorkbook(Workbook workbook) {
+        _workbook = workbook;
         _dataFormat = _workbook.createDataFormat();
         _dataSet = new DfDataSet();
         prepareLargeDataTable();
@@ -174,7 +159,7 @@ public class DfTableXlsReader {
             if (!isLargeDataSheet(sheetName)) {
                 continue;
             }
-            final HSSFSheet sheet = _workbook.getSheetAt(i);
+            final Sheet sheet = _workbook.getSheetAt(i);
             final String largeTableName = "LARGE_DATA"; // unused
             final DfDataTable table = setupTable(sheet, largeTableName, new DfDataTable(largeTableName));
             _largeDataMap = DfCollectionUtil.newLinkedHashMap();
@@ -259,7 +244,7 @@ public class DfTableXlsReader {
     // -----------------------------------------------------
     //                                            Data Table
     //                                            ----------
-    protected DfDataTable prepareTable(String sheetName, HSSFSheet sheet) {
+    protected DfDataTable prepareTable(String sheetName, Sheet sheet) {
         String tableName = sheetName;
         if (_tableNameMap != null && !_tableNameMap.isEmpty() && sheetName.startsWith("$")) {
             String realTableName = _tableNameMap.get(sheetName);
@@ -275,9 +260,9 @@ public class DfTableXlsReader {
         return setupTable(sheet, tableName, table);
     }
 
-    protected DfDataTable setupTable(HSSFSheet sheet, String tableName, final DfDataTable table) {
+    protected DfDataTable setupTable(Sheet sheet, String tableName, final DfDataTable table) {
         final int rowCount = sheet.getLastRowNum();
-        final HSSFRow nameRow = sheet.getRow(0);
+        final Row nameRow = sheet.getRow(0);
         if (nameRow == null) {
             throwXlsReaderFirstRowNotColumnDefinitionException(tableName);
         }
@@ -323,13 +308,13 @@ public class DfTableXlsReader {
     // -----------------------------------------------------
     //                                           Data Column
     //                                           -----------
-    protected void setupColumns(DfDataTable table, HSSFRow nameRow, HSSFRow valueRow) {
+    protected void setupColumns(DfDataTable table, Row nameRow, Row valueRow) {
         for (int i = 0;; ++i) {
-            final HSSFCell nameCell = nameRow.getCell(i);
+            final Cell nameCell = nameRow.getCell(i);
             if (nameCell == null) {
                 break;
             }
-            final HSSFRichTextString richStringCellValue = nameCell.getRichStringCellValue();
+            final RichTextString richStringCellValue = nameCell.getRichStringCellValue();
             if (richStringCellValue == null) {
                 break;
             }
@@ -337,7 +322,7 @@ public class DfTableXlsReader {
             if (columnName.length() == 0) {
                 break;
             }
-            HSSFCell valueCell = null;
+            Cell valueCell = null;
             if (valueRow != null) {
                 valueCell = valueRow.getCell(i);
             }
@@ -352,9 +337,9 @@ public class DfTableXlsReader {
     // -----------------------------------------------------
     //                                              Data Row
     //                                              --------
-    protected void setupRows(DfDataTable table, HSSFSheet sheet) {
+    protected void setupRows(DfDataTable table, Sheet sheet) {
         for (int i = 1;; ++i) {
-            HSSFRow row = sheet.getRow(i);
+            Row row = sheet.getRow(i);
             if (row == null) {
                 break;
             }
@@ -362,9 +347,9 @@ public class DfTableXlsReader {
         }
     }
 
-    protected void setupRow(DfDataTable table, HSSFRow row) {
+    protected void setupRow(DfDataTable table, Row row) {
         final DfDataRow dataRow = table.addRow();
-        HSSFCell cell = null;
+        Cell cell = null;
         Object value = null;
         DfDataColumn column = null;
         try {
@@ -376,7 +361,7 @@ public class DfTableXlsReader {
                 try {
                     dataRow.addValue(columnName, value);
                 } catch (NumberFormatException e) {
-                    if (cell.getCellType() != HSSFCell.CELL_TYPE_STRING) {
+                    if (cell.getCellType() != Cell.CELL_TYPE_STRING) {
                         throw e;
                     }
                     _log.info("...Changing the column type to STRING type: name=" + columnName + " value=" + value);
@@ -389,7 +374,7 @@ public class DfTableXlsReader {
         }
     }
 
-    protected void throwCellValueHandlingException(DfDataTable table, DfDataColumn column, HSSFRow row, HSSFCell cell, Object value,
+    protected void throwCellValueHandlingException(DfDataTable table, DfDataColumn column, Row row, Cell cell, Object value,
             RuntimeException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to handle the cell value on the xls file.");
@@ -411,22 +396,22 @@ public class DfTableXlsReader {
         br.addItem("Cell Type");
         if (cell != null) {
             switch (cell.getCellType()) {
-            case HSSFCell.CELL_TYPE_NUMERIC:
+            case Cell.CELL_TYPE_NUMERIC:
                 br.addElement("CELL_TYPE_NUMERIC");
                 break;
-            case HSSFCell.CELL_TYPE_STRING:
+            case Cell.CELL_TYPE_STRING:
                 br.addElement("CELL_TYPE_STRING");
                 break;
-            case HSSFCell.CELL_TYPE_FORMULA:
+            case Cell.CELL_TYPE_FORMULA:
                 br.addElement("CELL_TYPE_FORMULA");
                 break;
-            case HSSFCell.CELL_TYPE_BLANK:
+            case Cell.CELL_TYPE_BLANK:
                 br.addElement("CELL_TYPE_BLANK");
                 break;
-            case HSSFCell.CELL_TYPE_BOOLEAN:
+            case Cell.CELL_TYPE_BOOLEAN:
                 br.addElement("CELL_TYPE_BOOLEAN");
                 break;
-            case HSSFCell.CELL_TYPE_ERROR:
+            case Cell.CELL_TYPE_ERROR:
                 br.addElement("CELL_TYPE_ERROR");
                 break;
             default:
@@ -445,12 +430,12 @@ public class DfTableXlsReader {
     // ===================================================================================
     //                                                                      Value Handling
     //                                                                      ==============
-    protected Object extractCellValue(DfDataTable table, int columnIndex, HSSFRow row, HSSFCell cell) {
+    protected Object extractCellValue(DfDataTable table, int columnIndex, Row row, Cell cell) {
         if (cell == null) {
             return isEmptyStringTarget(table, columnIndex) ? "" : null;
         }
         switch (cell.getCellType()) {
-        case HSSFCell.CELL_TYPE_NUMERIC:
+        case Cell.CELL_TYPE_NUMERIC:
             if (isCellDateFormatted(cell)) {
                 return DfTypeUtil.toTimestamp(cell.getDateCellValue());
             }
@@ -459,9 +444,9 @@ public class DfTableXlsReader {
                 return new BigDecimal((int) numericCellValue);
             }
             return new BigDecimal(Double.toString(numericCellValue));
-        case HSSFCell.CELL_TYPE_STRING:
+        case Cell.CELL_TYPE_STRING:
             return processRichStringCellValue(table, columnIndex, row, cell);
-        case HSSFCell.CELL_TYPE_BOOLEAN:
+        case Cell.CELL_TYPE_BOOLEAN:
             boolean b = cell.getBooleanCellValue();
             return Boolean.valueOf(b);
         default:
@@ -469,7 +454,7 @@ public class DfTableXlsReader {
         }
     }
 
-    protected Object processRichStringCellValue(DfDataTable table, int columnIndex, HSSFRow row, HSSFCell cell) {
+    protected Object processRichStringCellValue(DfDataTable table, int columnIndex, Row row, Cell cell) {
         String str = cell.getRichStringCellValue().getString();
         str = rtrimCellValueIfNeeds(table, cell, str); // basically for compatible
         str = treatEmptyAsNullBasically(str); // empty means null basically
@@ -482,7 +467,7 @@ public class DfTableXlsReader {
         return resolveLargeDataIfNeeds(table, columnIndex, row, str);
     }
 
-    protected String rtrimCellValueIfNeeds(DfDataTable table, HSSFCell cell, String str) {
+    protected String rtrimCellValueIfNeeds(DfDataTable table, Cell cell, String str) {
         if (str != null && _rtrimCellValue && !isNotTrimTarget(table, cell)) {
             return Srl.rtrim(str);
         }
@@ -507,7 +492,7 @@ public class DfTableXlsReader {
         return str != null ? DfTypeUtil.decodeAsBase64(str) : null;
     }
 
-    protected String resolveLargeDataIfNeeds(DfDataTable table, int columnIndex, HSSFRow row, String str) {
+    protected String resolveLargeDataIfNeeds(DfDataTable table, int columnIndex, Row row, String str) {
         if (str == null) {
             return null;
         }
@@ -533,7 +518,7 @@ public class DfTableXlsReader {
         return str;
     }
 
-    protected void throwLargeDataReferenceDataNotFoundException(DfDataTable table, int columnIndex, HSSFRow row, String str, String dataKey) {
+    protected void throwLargeDataReferenceDataNotFoundException(DfDataTable table, int columnIndex, Row row, String str, String dataKey) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the reference data of large data for the column.");
         br.addItem("Xls File");
@@ -552,7 +537,7 @@ public class DfTableXlsReader {
         throw new DfXlsReaderReadFailureException(msg);
     }
 
-    public boolean isNotTrimTarget(DfDataTable table, HSSFCell cell) {
+    public boolean isNotTrimTarget(DfDataTable table, Cell cell) {
         final String tableName = table.getTableDbName();
         if (!_notTrimTableColumnMap.containsKey(tableName)) {
             return false;
@@ -584,16 +569,16 @@ public class DfTableXlsReader {
         return false;
     }
 
-    protected DfDtsColumnType getColumnType(HSSFCell cell) {
+    protected DfDtsColumnType getColumnType(Cell cell) {
         switch (cell.getCellType()) {
-        case HSSFCell.CELL_TYPE_NUMERIC:
+        case Cell.CELL_TYPE_NUMERIC:
             if (isCellDateFormatted(cell)) {
                 return DfDtsColumnTypes.TIMESTAMP;
             }
             return DfDtsColumnTypes.BIGDECIMAL;
-        case HSSFCell.CELL_TYPE_BOOLEAN:
+        case Cell.CELL_TYPE_BOOLEAN:
             return DfDtsColumnTypes.BOOLEAN;
-        case HSSFCell.CELL_TYPE_STRING:
+        case Cell.CELL_TYPE_STRING:
             if (isCellBase64Formatted(cell)) {
                 return DfDtsColumnTypes.BINARY;
             }
@@ -606,14 +591,14 @@ public class DfTableXlsReader {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
-    protected boolean isCellBase64Formatted(HSSFCell cell) {
-        final HSSFCellStyle cs = cell.getCellStyle();
+    protected boolean isCellBase64Formatted(Cell cell) {
+        final CellStyle cs = cell.getCellStyle();
         final short dfNum = cs.getDataFormat();
         return DfDataSetConstants.BASE64_FORMAT.equals(_dataFormat.getFormat(dfNum));
     }
 
-    protected boolean isCellDateFormatted(HSSFCell cell) {
-        final HSSFCellStyle cs = cell.getCellStyle();
+    protected boolean isCellDateFormatted(Cell cell) {
+        final CellStyle cs = cell.getCellStyle();
         final short dfNum = cs.getDataFormat();
         final String format = _dataFormat.getFormat(dfNum);
         if (format == null || format.length() == 0) {

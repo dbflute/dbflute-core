@@ -48,11 +48,12 @@ import org.dbflute.s2dao.valuetype.basic.UUIDAsDirectType;
 import org.dbflute.s2dao.valuetype.basic.UUIDAsStringType;
 import org.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
 import org.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
-import org.dbflute.s2dao.valuetype.plugin.BytesOidType;
 import org.dbflute.s2dao.valuetype.plugin.BytesType;
 import org.dbflute.s2dao.valuetype.plugin.FixedLengthStringType;
 import org.dbflute.s2dao.valuetype.plugin.ObjectBindingBigDecimalType;
 import org.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
+import org.dbflute.s2dao.valuetype.plugin.PostgreSQLByteaType;
+import org.dbflute.s2dao.valuetype.plugin.PostgreSQLOidType;
 import org.dbflute.s2dao.valuetype.plugin.PostgreSQLResultSetType;
 import org.dbflute.s2dao.valuetype.plugin.SerializableType;
 import org.dbflute.s2dao.valuetype.plugin.StringClobType;
@@ -99,7 +100,8 @@ public class TnValueTypes {
 
     // plug-in
     public static final ValueType STRING_CLOB = new StringClobType();
-    public static final ValueType BYTES_OID = new BytesOidType();
+    public static final ValueType POSTGRESQL_BYTEA = new PostgreSQLByteaType();
+    public static final ValueType POSTGRESQL_OID = new PostgreSQLOidType();
     public static final ValueType FIXED_LENGTH_STRING = new FixedLengthStringType();
     public static final ValueType OBJECT_BINDING_BIGDECIMAL = new ObjectBindingBigDecimalType();
 

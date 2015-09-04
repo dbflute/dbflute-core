@@ -21,30 +21,24 @@ import static org.dbflute.s2dao.valuetype.TnValueTypes.BINARY;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.BINARY_STREAM;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.BOOLEAN;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.BYTE;
-import static org.dbflute.s2dao.valuetype.TnValueTypes.BYTES_OID;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.BYTE_ARRAY_CLASS;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.CHARACTER;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.CLASSIFICATION;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.DEFAULT_OBJECT;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.DOUBLE;
-import static org.dbflute.s2dao.valuetype.TnValueTypes.FIXED_LENGTH_STRING;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.FLOAT;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.INTEGER;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.LOCALDATETIME_AS_TIMESTAMP;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.LOCALDATE_AS_SQLDATE;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.LOCALTIME_AS_TIME;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.LONG;
-import static org.dbflute.s2dao.valuetype.TnValueTypes.OBJECT_BINDING_BIGDECIMAL;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.SHORT;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.SQLDATE;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.STRING;
-import static org.dbflute.s2dao.valuetype.TnValueTypes.STRING_CLOB;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.TIME;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.TIMESTAMP;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.UTILDATE_AS_SQLDATE;
-import static org.dbflute.s2dao.valuetype.TnValueTypes.UTILDATE_AS_TIMESTAMP;
 import static org.dbflute.s2dao.valuetype.TnValueTypes.UUID_AS_DIRECT;
-import static org.dbflute.s2dao.valuetype.TnValueTypes.UUID_AS_STRING;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -149,12 +143,13 @@ public class TnPlainValueTypes {
         // _/_/_/_/_/_/_/_/_/_/
         // plug-in (default)
         // _/_/_/_/_/_/_/_/_/_/
-        registerPluginValueType("stringClobType", STRING_CLOB);
-        registerPluginValueType("bytesOidType", BYTES_OID);
-        registerPluginValueType("fixedLengthStringType", FIXED_LENGTH_STRING);
-        registerPluginValueType("objectBindingBigDecimalType", OBJECT_BINDING_BIGDECIMAL);
-        registerPluginValueType("oracleDateType", UTILDATE_AS_TIMESTAMP);
-        registerPluginValueType("uuidAsStringType", UUID_AS_STRING);
+        registerPluginValueType("uuidAsStringType", TnValueTypes.UUID_AS_STRING);
+        registerPluginValueType("stringClobType", TnValueTypes.STRING_CLOB);
+        registerPluginValueType("fixedLengthStringType", TnValueTypes.FIXED_LENGTH_STRING);
+        registerPluginValueType("objectBindingBigDecimalType", TnValueTypes.OBJECT_BINDING_BIGDECIMAL);
+        registerPluginValueType("postgreSqlByteaType", TnValueTypes.POSTGRESQL_BYTEA);
+        registerPluginValueType("postgreSqlOidType", TnValueTypes.POSTGRESQL_OID);
+        registerPluginValueType("oracleDateType", TnValueTypes.UTILDATE_AS_TIMESTAMP);
     }
 
     // ===================================================================================

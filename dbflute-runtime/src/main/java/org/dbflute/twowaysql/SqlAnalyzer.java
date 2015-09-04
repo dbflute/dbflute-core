@@ -319,11 +319,11 @@ public class SqlAnalyzer {
     }
 
     protected BeginNode createBeginNode() {
-        return newBeginNode();
+        return newBeginNode(_inBeginScope);
     }
 
-    protected BeginNode newBeginNode() {
-        return new BeginNode(_inBeginScope);
+    protected BeginNode newBeginNode(boolean inBeginScope) {
+        return new BeginNode(inBeginScope);
     }
 
     protected boolean isTopBegin(Node node) {
@@ -361,11 +361,11 @@ public class SqlAnalyzer {
 
     protected IfNode createIfNode(String expr) {
         researchIfNeeds(_researchIfCommentList, expr); // for research
-        return newIfNode(expr);
+        return newIfNode(expr, _specifiedSql);
     }
 
-    protected IfNode newIfNode(String expr) {
-        return new IfNode(expr, _specifiedSql);
+    protected IfNode newIfNode(String expr, String specifiedSql) {
+        return new IfNode(expr, specifiedSql);
     }
 
     protected void throwIfCommentConditionEmptyException() {
@@ -429,11 +429,11 @@ public class SqlAnalyzer {
 
     protected ForNode createForNode(String expr) {
         researchIfNeeds(_researchForCommentList, expr); // for research
-        return newForNode(expr);
+        return newForNode(expr, _specifiedSql, getNodeAdviceFactory());
     }
 
-    protected ForNode newForNode(String expr) {
-        return new ForNode(expr, _specifiedSql, getNodeAdviceFactory());
+    protected ForNode newForNode(String expr, String specifiedSql, NodeAdviceFactory adviceFactory) {
+        return new ForNode(expr, specifiedSql, adviceFactory);
     }
 
     protected boolean isLoopVariableComment(String comment) {
@@ -566,12 +566,14 @@ public class SqlAnalyzer {
 
     protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly, boolean terminalDot) {
         researchIfNeeds(_researchEmbeddedVariableCommentList, expr); // for research
-        return newEmbeddedVariableNode(expr, testValue, replaceOnly, terminalDot);
+        return newEmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, getNodeAdviceFactory(), replaceOnly,
+                terminalDot, _overlookNativeBinding);
     }
 
-    protected EmbeddedVariableNode newEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly, boolean terminalDot) {
-        final NodeAdviceFactory tracerFactory = getNodeAdviceFactory();
-        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, tracerFactory, replaceOnly, terminalDot);
+    protected EmbeddedVariableNode newEmbeddedVariableNode(String expr, String testValue, String specifiedSql, boolean blockNullParameter,
+            NodeAdviceFactory adviceFactory, boolean replaceOnly, boolean terminalDot, boolean overlookNativeBinding) {
+        return new EmbeddedVariableNode(expr, testValue, specifiedSql, blockNullParameter, getNodeAdviceFactory(), replaceOnly,
+                terminalDot, overlookNativeBinding);
     }
 
     // -----------------------------------------------------
@@ -579,12 +581,12 @@ public class SqlAnalyzer {
     //                                         -------------
     protected BindVariableNode createBindVariableNode(String expr, String testValue) {
         researchIfNeeds(_researchBindVariableCommentList, expr); // for research
-        return newBindVariableNode(expr, testValue);
+        return newBindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, getNodeAdviceFactory());
     }
 
-    protected BindVariableNode newBindVariableNode(String expr, String testValue) {
-        final NodeAdviceFactory tracerFactory = getNodeAdviceFactory();
-        return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, tracerFactory);
+    protected BindVariableNode newBindVariableNode(String expr, String testValue, String specifiedSql, boolean blockNullParameter,
+            NodeAdviceFactory adviceFactory) {
+        return new BindVariableNode(expr, testValue, specifiedSql, blockNullParameter, adviceFactory);
     }
 
     // ===================================================================================

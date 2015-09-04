@@ -41,7 +41,7 @@ public class SqlTokenizer {
     protected int _tokenType = SQL;
     protected int _nextTokenType = SQL;
     protected int _bindVariableNum = 0;
-    protected boolean _overlookNativeBinding; // treats question mark on SQL as binding
+    protected boolean _overlookNativeBinding; // treats native binding as plain question mark on SQL
 
     // ===================================================================================
     //                                                                         Constructor

@@ -301,13 +301,22 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
+        buildPagingDisp(sb);
+        sb.append(":selectedList=").append(getSelectedList());
+        return sb.toString();
+    }
+
+    @Override
+    protected void buildRichStringHeader(StringBuilder sb) {
+        buildPagingDisp(sb);
+    }
+
+    protected void buildPagingDisp(StringBuilder sb) {
         sb.append("{").append(getCurrentPageNumber()).append("/").append(getAllPageCount());
         sb.append(" of ").append(getAllRecordCount());
         sb.append(" ").append(existsPreviousPage()).append("/").append(existsNextPage());
         sb.append(" list=").append(size()).append(" page=").append(getPageSize());
         sb.append("}");
-        sb.append(":selectedList=").append(getSelectedList());
-        return sb.toString();
     }
 
     // ===================================================================================

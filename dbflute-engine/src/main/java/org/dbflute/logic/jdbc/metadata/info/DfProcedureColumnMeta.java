@@ -205,14 +205,14 @@ public class DfProcedureColumnMeta {
     // ===================================================================================
     //                                                                  Type Determination
     //                                                                  ==================
+    public boolean isPostgreSQLUuid() {
+        final String dbTypeName = getDbTypeName();
+        return _columnHandler.isPostgreSQLUuid(dbTypeName);
+    }
+
     public boolean isConceptTypeStringClob() {
         final String dbTypeName = getDbTypeName();
         return _columnHandler.isConceptTypeStringClob(dbTypeName);
-    }
-
-    public boolean isConceptTypeBytesOid() {
-        final String dbTypeName = getDbTypeName();
-        return _columnHandler.isConceptTypeBytesOid(dbTypeName);
     }
 
     public boolean isConceptTypeFixedLengthString() {
@@ -225,9 +225,9 @@ public class DfProcedureColumnMeta {
         return _columnHandler.isConceptTypeObjectBindingBigDecimal(dbTypeName);
     }
 
-    public boolean isPostgreSQLUuid() {
+    public boolean isPostgreSQLBytea() {
         final String dbTypeName = getDbTypeName();
-        return _columnHandler.isPostgreSQLUuid(dbTypeName);
+        return _columnHandler.isPostgreSQLBytea(dbTypeName);
     }
 
     public boolean isPostgreSQLOid() {

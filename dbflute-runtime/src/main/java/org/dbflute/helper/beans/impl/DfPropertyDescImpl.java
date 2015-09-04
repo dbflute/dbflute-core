@@ -299,13 +299,11 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     //                                                                             =======
     public Object convertIfNeed(Object arg) { // #date_parade
         if (_propertyType.isPrimitive()) {
-            return convertPrimitiveWrapper(arg);
+            return DfTypeUtil.toWrapper(arg, _propertyType);
         } else if (Number.class.isAssignableFrom(_propertyType)) {
-            return convertNumber(arg);
+            return DfTypeUtil.toNumber(arg, _propertyType);
         } else if (java.util.Date.class.isAssignableFrom(_propertyType)) {
             return convertDate(arg);
-        } else if (LocalDate.class.isAssignableFrom(_propertyType)) {
-            return DfTypeUtil.toLocalDate(arg);
         } else if (LocalDate.class.isAssignableFrom(_propertyType)) {
             return DfTypeUtil.toLocalDate(arg);
         } else if (LocalDateTime.class.isAssignableFrom(_propertyType)) {
@@ -322,14 +320,6 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
             return DfTypeUtil.toCalendar(arg);
         }
         return arg;
-    }
-
-    protected Object convertPrimitiveWrapper(Object arg) {
-        return DfTypeUtil.toWrapper(arg, _propertyType);
-    }
-
-    protected Object convertNumber(Object arg) {
-        return DfTypeUtil.toNumber(arg, _propertyType);
     }
 
     protected Object convertDate(Object arg) {

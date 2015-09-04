@@ -481,8 +481,12 @@ public class Column {
         return hasDbType() && _columnHandler.isConceptTypeStringClob(_dbType);
     }
 
-    public boolean isDbTypeBytesOid() { // as pinpoint
-        return hasDbType() && _columnHandler.isConceptTypeBytesOid(_dbType);
+    public boolean isDbTypePostgreSQLBytea() { // as pinpoint
+        return hasDbType() && _columnHandler.isPostgreSQLBytea(_dbType);
+    }
+
+    public boolean isDbTypePostgreSQLOid() { // as pinpoint
+        return hasDbType() && _columnHandler.isPostgreSQLOid(_dbType);
     }
 
     public boolean isDbTypeOracleDate() { // as pinpoint
@@ -1814,15 +1818,19 @@ public class Column {
     //                                    ValueType Handling
     //                                    ------------------
     public boolean needsMappingValueType() {
-        return needsStringClobHandling() || needsBytesOidHandling() || needsOracleDateHandling();
+        return needsStringClobHandling() || needsPostgreSQLOidHandling() || needsOracleDateHandling();
     }
 
     public boolean needsStringClobHandling() {
         return isDbTypeStringClob();
     }
 
-    public boolean needsBytesOidHandling() {
-        return isDbTypeBytesOid();
+    public boolean needsPostgreSQLByteaHandling() {
+        return isDbTypePostgreSQLBytea();
+    }
+
+    public boolean needsPostgreSQLOidHandling() {
+        return isDbTypePostgreSQLOid();
     }
 
     public boolean needsOracleDateHandling() {

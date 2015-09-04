@@ -65,13 +65,14 @@ public class DfProcedureExecutionMetaExtractor {
     protected final DfColumnExtractor _columnHandler = new DfColumnExtractor();
     protected final ValueType _stringType = TnValueTypes.STRING;
     protected final ValueType _stringClobType = TnValueTypes.STRING_CLOB;
-    protected final ValueType _bytesOidType = TnValueTypes.BYTES_OID;
     protected final ValueType _fixedLengthStringType = TnValueTypes.FIXED_LENGTH_STRING;
     protected final ValueType _objectBindingBigDecimalType = TnValueTypes.OBJECT_BINDING_BIGDECIMAL;
-    protected final ValueType _uuidAsDirectType = TnValueTypes.UUID_AS_DIRECT;
-    protected final ValueType _uuidAsStringType = TnValueTypes.UUID_AS_STRING;
+    protected final ValueType _postgreSQLByteaType = TnValueTypes.POSTGRESQL_BYTEA;
+    protected final ValueType _postgreSQLOidType = TnValueTypes.POSTGRESQL_OID;
     protected final ValueType _postgreSqlResultSetType = TnValueTypes.POSTGRESQL_RESULT_SET;
+    protected final ValueType _postgreSQLUuid = TnValueTypes.UUID_AS_DIRECT;
     protected final ValueType _oracleResultSetType = TnValueTypes.ORACLE_RESULT_SET;
+    protected final ValueType _sqlServerUuid = TnValueTypes.UUID_AS_STRING;
     protected final Map<String, String> _continuedFailureMessageMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================
@@ -537,16 +538,18 @@ public class DfProcedureExecutionMetaExtractor {
             valueType = _stringType;
         } else if (column.isConceptTypeStringClob()) {
             valueType = _stringClobType;
-        } else if (column.isConceptTypeBytesOid()) {
-            valueType = _bytesOidType;
         } else if (column.isConceptTypeFixedLengthString()) {
             valueType = _fixedLengthStringType;
         } else if (column.isConceptTypeObjectBindingBigDecimal()) {
             valueType = _objectBindingBigDecimalType;
+        } else if (column.isPostgreSQLBytea()) {
+            valueType = _postgreSQLByteaType;
+        } else if (column.isPostgreSQLOid()) {
+            valueType = _postgreSQLOidType;
         } else if (column.isPostgreSQLUuid()) { // needs to switch
-            valueType = _uuidAsDirectType;
+            valueType = _postgreSQLUuid;
         } else if (column.isSQLServerUniqueIdentifier()) { // needs to switch
-            valueType = _uuidAsStringType;
+            valueType = _sqlServerUuid;
         } else {
             valueType = null;
         }

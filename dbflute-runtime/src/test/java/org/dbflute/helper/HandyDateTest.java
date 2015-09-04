@@ -448,6 +448,9 @@ public class HandyDateTest extends RuntimeTestCase {
         assertTrue(handy("2011/01/01 00:00:00").isMonthSameAs(toDate("2011/01/03 12:34:45")));
         assertTrue(handy("2011/01/01 00:00:00").isMonthSameAs(toDate("2013/01/03 12:34:45")));
         assertFalse(handy("2011/01/01 00:00:00").isMonthSameAs(toDate("2012/03/03 12:34:45")));
+        assertTrue(handy("2011/01/01 00:00:00").isMonthOfYearSameAs(toLocalDate("2011/01/03 12:34:45")));
+        assertFalse(handy("2011/01/01 00:00:00").isMonthOfYearSameAs(toLocalDate("2011/02/03 12:34:45")));
+        assertFalse(handy("2011/01/01 00:00:00").isMonthOfYearSameAs(toLocalDate("2012/01/03 12:34:45")));
     }
 
     // -----------------------------------------------------

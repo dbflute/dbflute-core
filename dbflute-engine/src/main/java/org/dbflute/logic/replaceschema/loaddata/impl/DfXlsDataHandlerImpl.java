@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -17,8 +17,8 @@ package org.dbflute.logic.replaceschema.loaddata.impl;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.BatchUpdateException;
@@ -56,6 +56,7 @@ import org.dbflute.helper.dataset.states.DfDtsSqlContext;
 import org.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.dbflute.helper.io.xls.DfTableXlsReader;
+import org.dbflute.helper.io.xls.DfXlsFactory;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
@@ -74,6 +75,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The implementation of xls data handler. And also of writer.
  * @author jflute
+ * @author p1us2er0
  */
 public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDataHandler {
 
@@ -569,12 +571,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
 
         final String dataDirectory = resource.getDataDirectory();
         final File dir = new File(dataDirectory);
-        final FilenameFilter filter = new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".xls");
-            }
-        };
-        final File[] listFiles = dir.listFiles(filter);
+
+        final FileFilter fileFilter = DfXlsFactory.instance().createXlsFileFilter();
+        final File[] listFiles = dir.listFiles(fileFilter);
         if (listFiles == null) {
             return new ArrayList<File>();
         }

@@ -100,7 +100,7 @@ http://dbflute.seasar.org/ja/environment/setup/maven.html
 *for DBFlute Runtime
 ```xml
   <properties>
-    <dbflute.version>1.1.0-sp5</dbflute.version>
+    <dbflute.version>1.1.0-sp8</dbflute.version>
     ...
   </properties>
   ...

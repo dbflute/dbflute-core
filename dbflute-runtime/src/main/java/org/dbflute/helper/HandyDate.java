@@ -278,9 +278,9 @@ public class HandyDate implements Serializable {
      *  new HandyDate("20010101", "yyyyMMdd", timeZone, locale): 2001-01-01 00:00:00.000
      * </pre>
      * @param exp The string expression of the date. (NotNull, NotEmpty)
+     * @param timeZone The time-zone to parse as date and for internal calendar. (NotNull)
      * @param pattern The pattern to parse as date. (NotNull, NotEmpty)
      * @param locale The locale to parse the date expression. (NotNull)
-     * @param timeZone The time-zone to parse as date and for internal calendar. (NotNull)
      * @throws ParseDateExpressionFailureException When it fails to parse the expression.
      */
     public HandyDate(String exp, TimeZone timeZone, String pattern, Locale locale) {
@@ -2155,6 +2155,28 @@ public class HandyDate implements Serializable {
     }
 
     /**
+     * Is the year and month of this local date-time same as the specified date? <br>
+     * e.g. if 2011/11/27, isMonthOfYearSameAs(toLocalDateTime("2011/11/01")) is true
+     * @param date The local date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMonthOfYearSameAs(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return isMonthOfYearSameAs(prepareCompareDate(date));
+    }
+
+    /**
+     * Is the year and month of this local date same as the specified date? <br>
+     * e.g. if 2011/11/27, isMonthOfYearSameAs(toLocalDate("2011/11/01")) is true
+     * @param date The local date-time to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMonthOfYearSameAs(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return isMonthOfYearSameAs(prepareCompareDate(date));
+    }
+
+    /**
      * Is the year and month of this date same as the specified date? <br>
      * e.g. if 2011/11/27, isMonthOfYearSameAs(toDate("2011/11/01")) is true
      * @param date The date to compare. (NotNull)
@@ -2518,6 +2540,28 @@ public class HandyDate implements Serializable {
     }
 
     /**
+     * Is the date and hour and minute same as the specified local date? <br>
+     * e.g. if 2011/11/27 12:34:00, isMinuteOfDateSameAs(toLocalDate("2011/11/27 12:34:56")) is true
+     * @param date The local date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMinuteOfDateSameAs(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return isMinuteOfDateSameAs(prepareCompareDate(date));
+    }
+
+    /**
+     * Is the date and hour and minute same as the specified local date-time? <br>
+     * e.g. if 2011/11/27 12:34:00, isMinuteOfDateSameAs(toLocalDateTime("2011/11/27 12:34:56")) is true
+     * @param date The local date-time to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMinuteOfDateSameAs(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return isMinuteOfDateSameAs(prepareCompareDate(date));
+    }
+
+    /**
      * Is the date and hour and minute same as the specified date? <br>
      * e.g. if 2011/11/27 12:34:00, isMinuteOfDateSameAs(toDate("2011/11/27 12:34:56")) is true
      * @param date The date to compare. (NotNull)
@@ -2583,6 +2627,28 @@ public class HandyDate implements Serializable {
     public boolean isSecondSameAs(HandyDate handyDate) {
         assertArgumentNotNull("handyDate", handyDate);
         return getSecond() == handyDate.getSecond();
+    }
+
+    /**
+     * Is the date and time same as the specified local date? <br>
+     * e.g. if 2011/11/27 12:34:56.123, isSecondOfDateSameAs(toLocalDate("2011/11/27 12:34:56.456")) is true
+     * @param date The local date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isSecondOfDateSameAs(LocalDate date) {
+        assertArgumentNotNull("date", date);
+        return isSecondOfDateSameAs(prepareCompareDate(date));
+    }
+
+    /**
+     * Is the date and time same as the specified local date-time? <br>
+     * e.g. if 2011/11/27 12:34:56.123, isSecondOfDateSameAs(toLocalDateTime("2011/11/27 12:34:56.456")) is true
+     * @param date The local date-time to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isSecondOfDateSameAs(LocalDateTime date) {
+        assertArgumentNotNull("date", date);
+        return isSecondOfDateSameAs(prepareCompareDate(date));
     }
 
     /**

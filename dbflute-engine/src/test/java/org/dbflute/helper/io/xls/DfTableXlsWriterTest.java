@@ -9,24 +9,20 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
 package org.dbflute.helper.io.xls;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.dbflute.helper.dataset.DfDataSet;
-import org.dbflute.helper.io.xls.DfTableXlsReader;
-import org.dbflute.helper.io.xls.DfTableXlsWriter;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.helper.dataset.DfDataSet;
 import org.dbflute.infra.manage.refresh.DfRefreshResourceRequest;
 import org.dbflute.unit.EngineTestCase;
 import org.dbflute.util.DfResourceUtil;
@@ -47,7 +43,7 @@ public class DfTableXlsWriterTest extends EngineTestCase {
         String fileName = "output-table-xls-large-data-handling.xls";
         String path = getTestCaseBuildDir().getCanonicalPath() + "/../" + fileName;
         File outputFile = new File(path);
-        DfTableXlsWriter writer = new DfTableXlsWriter(new FileOutputStream(outputFile));
+        DfTableXlsWriter writer = new DfTableXlsWriter(outputFile);
         writer.largeDataHandling().cellLengthLimit(5);
 
         // ## Act ##
@@ -72,7 +68,7 @@ public class DfTableXlsWriterTest extends EngineTestCase {
         String fileName = "output-table-xls-large-data-truncated.xls";
         String path = getTestCaseBuildDir().getCanonicalPath() + "/../" + fileName;
         File outputFile = new File(path);
-        DfTableXlsWriter writer = new DfTableXlsWriter(new FileOutputStream(outputFile)).cellLengthLimit(5);
+        DfTableXlsWriter writer = new DfTableXlsWriter(outputFile).cellLengthLimit(5);
 
         // ## Act ##
         writer.write(baseSet);
@@ -105,7 +101,7 @@ public class DfTableXlsWriterTest extends EngineTestCase {
         String fileName = "output-table-xls-large-data-handling.xls";
         String path = getTestCaseBuildDir().getCanonicalPath() + "/../" + fileName;
         File outputFile = new File(path);
-        DfTableXlsWriter writer = new DfTableXlsWriter(new FileOutputStream(outputFile));
+        DfTableXlsWriter writer = new DfTableXlsWriter(outputFile);
         writer.largeDataHandling().quoteEmptyString().cellLengthLimit(5);
 
         // ## Act ##
@@ -130,7 +126,10 @@ public class DfTableXlsWriterTest extends EngineTestCase {
     //                                                                               =====
     public void test_toLargeDataSplitList_basic() throws Exception {
         // ## Arrange ##
-        DfTableXlsWriter writer = new DfTableXlsWriter(new ByteArrayOutputStream()).cellLengthLimit(3);
+        String fileName = "output-table-xls-large-data-handling.xls";
+        String path = getTestCaseBuildDir().getCanonicalPath() + "/../" + fileName;
+        File outputFile = new File(path);
+        DfTableXlsWriter writer = new DfTableXlsWriter(outputFile).cellLengthLimit(3);
 
         // ## Act ##
         List<String> splitList = writer.toLargeDataSplitList("abcdefghijklmnop");

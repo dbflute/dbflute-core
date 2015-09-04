@@ -15,7 +15,6 @@
  */
 package org.dbflute.logic.replaceschema.loaddata.impl;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -68,6 +67,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
+ * @author tty (pull request for processBinary(), thanks)
  * @since 0.9.4 (2009/03/25 Wednesday)
  */
 public abstract class DfAbsractDataWriter {
@@ -738,6 +738,9 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                                Binary
     //                                                ------
+    // -----------------------------------------------------
+    //                                                Binary
+    //                                                ------
     protected boolean processBinary(String dataDirectory, File dataFile, String tableName, String columnName, String value,
             PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
         if (value == null || value.trim().length() == 0) { // cannot be binary
@@ -769,28 +772,19 @@ public abstract class DfAbsractDataWriter {
         if (!binaryFile.exists()) {
             throwLoadDataBinaryFileNotFoundException(tableName, columnName, path, rowNumber);
         }
-        final List<Byte> byteList = new ArrayList<Byte>();
-        BufferedInputStream bis = null;
+        FileInputStream fis = null;
         try {
-            bis = new BufferedInputStream(new FileInputStream(binaryFile));
-            for (int availableSize; (availableSize = bis.available()) > 0;) {
-                final byte[] bytes = new byte[availableSize];
-                bis.read(bytes);
-                for (byte b : bytes) {
-                    byteList.add(b);
-                }
-            }
-            byte[] bytes = new byte[byteList.size()];
-            for (int i = 0; i < byteList.size(); i++) {
-                bytes[i] = byteList.get(i);
-            }
+            fis = new FileInputStream(binaryFile);
+            final int fileSize = (int) binaryFile.length();
+            final byte[] bytes = new byte[fileSize];
+            fis.read(bytes);
             ps.setBytes(bindCount, bytes);
         } catch (IOException e) {
             throwLoadDataBinaryFileReadFailureException(tableName, columnName, path, rowNumber, e);
         } finally {
-            if (bis != null) {
+            if (fis != null) {
                 try {
-                    bis.close();
+                    fis.close();
                 } catch (IOException ignored) {}
             }
         }

@@ -1132,6 +1132,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
+    //                                                                             Limited
+    //                                                                             =======
+    public boolean isReplaceSchemaLimited() {
+        return isProperty("isReplaceSchemaLimited", false, getReplaceSchemaMap());
+    }
+
+    // ===================================================================================
     //                                                                     Tool Terminator
     //                                                                     ===============
     public String resolveTerminator4Tool() {

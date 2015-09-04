@@ -919,8 +919,14 @@ abstract class $myClassName extends ${myEntityInterfaceName} with DBableEntity[$
 #if ($col.needsStringClobHandling())
     @MappingValueType(keyName = "stringClobType")
 #end
-#if ($col.needsBytesOidHandling())
-    @MappingValueType(keyName = "bytesOidType")
+#if ($col.needsPostgreSQLByteaHandling())
+    @MappingValueType(keyName = "postgreSqlByteaType")
+#end
+#if ($col.needsPostgreSQLOidHandling())
+    @MappingValueType(keyName = "postgreSqlOidType")
+#end
+#if ($col.needsOracleDateHandling())
+    @MappingValueType(keyName = "oracleDateType")
 #end
     def get${col.javaName}(): ${col.javaNative} = {
 #if ($col.isEntityConvertEmptyStringToNull())
