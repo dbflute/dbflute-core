@@ -326,7 +326,7 @@ ${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKe
     <tr>
         <td class="rownumcell">${foreach.count}</td>
         <td class="aliascell"><a href="#${actionDocMeta.url}">${actionDocMeta.url}</a></td>
-        <td class="aliascell">${actionDocMeta.type}</td>
+        <td class="aliascell">$database.htmlEscape($actionDocMeta.type)</td>
         <td class="aliascell">${actionDocMeta.methodName}</td>
     </tr>
 #end
@@ -346,8 +346,8 @@ ${actionDocMeta.type}#${actionDocMeta.methodName}
 #if ($actionDocMeta.methodComment)
 <p class="tablecomment" style="white-space:pre-wrap;">${actionDocMeta.methodComment}</p>
 #end
-$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeata.vm", null, "typeDocMeta", $actionDocMeta.formTypeDocMeta)
-$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeata.vm", null, "typeDocMeta", $actionDocMeta.returnTypeDocMeta)
+$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.formTypeDocMeta)
+$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.returnTypeDocMeta)
 #end
 #else
 #foreach ($column in $table.columnList)

@@ -2759,6 +2759,13 @@ public class Database {
         return handler.getPackageAsPath(pckge);
     }
 
+    // -----------------------------------------------------
+    //                                                Escape
+    //                                                ------
+    public String htmlEscape(String text) { // made from lasta-doc
+        return getProperties().getDocumentProperties().resolveTextForSchemaHtml(text);
+    }
+
     // ===================================================================================
     //                                                                 Behavior Query Path
     //                                                                 ===================
