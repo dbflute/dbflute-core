@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -21,9 +21,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -33,6 +39,7 @@ import org.dbflute.util.Srl;
 
 /**
  * @author jflute
+ * @author p1us2er0
  */
 public class DfJsonFreeAgent {
 
@@ -79,6 +86,22 @@ public class DfJsonFreeAgent {
         return rootMap;
     }
 
+    public <RESULT> RESULT decodeJsonMapByJs(String requestName, String resourceFile) {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("javascript");
+        try (Scanner scanner = new Scanner(Paths.get(resourceFile))){
+            engine.eval("var result = " + scanner.useDelimiter("\\Z").next());
+        } catch (IOException e) {
+            throwJsonFileNotFoundException(requestName, resourceFile, e);
+        } catch (ScriptException e) {
+            throwJsonParseFailureException(requestName, resourceFile, e);
+        }
+
+        @SuppressWarnings("unchecked")
+        RESULT result = (RESULT) engine.get("result");
+        return result;
+    }
+
     protected void throwJsonDecoderNotFoundException(String requestName, String resourceFile, String decoderName, ClassNotFoundException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the JSON decoder for FreeGen.");
@@ -101,7 +124,7 @@ public class DfJsonFreeAgent {
         throw new IllegalStateException(msg, e);
     }
 
-    protected void throwJsonFileNotFoundException(String requestName, String resourceFile, FileNotFoundException cause) {
+    protected void throwJsonFileNotFoundException(String requestName, String resourceFile, IOException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the JSON file for FreeGen.");
         br.addItem("FreeGen Request");
@@ -112,7 +135,7 @@ public class DfJsonFreeAgent {
         throw new IllegalStateException(msg, cause);
     }
 
-    protected void throwJsonParseFailureException(String requestName, String resourceFile, RuntimeException cause) {
+    protected void throwJsonParseFailureException(String requestName, String resourceFile, Exception cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to parse the JSON file for FreeGen.");
         br.addItem("FreeGen Request");

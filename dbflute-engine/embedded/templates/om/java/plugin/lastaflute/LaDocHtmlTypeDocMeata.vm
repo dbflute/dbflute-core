@@ -1,0 +1,36 @@
+#if ($typeDocMeta.type)
+${typeDocMeta.type}
+#if ($typeDocMeta.nestTypeDocMetaList.size() > 0)
+<table>
+    <thead>
+    <tr>
+        <th class="rownumhead">No.</th>
+        <th>name</th>
+        <th>comment</th>
+        <th>class</th>
+        <th>annotationList</th>
+        <th>nestTypeDocMetaList</th>
+    </tr>
+    </thead>
+#foreach ($nestTypeDocMeta in $typeDocMeta.nestTypeDocMetaList)
+    <tr>
+        <td class="rownumcell">${foreach.count}</td>
+        <td>${nestTypeDocMeta.name}</td>
+        <td>$!{nestTypeDocMeta.comment}</td>
+        <td>${nestTypeDocMeta.type}</td>
+        <td>
+#foreach ($annotation in $nestTypeDocMeta.annotationList)
+            ${annotation}
+#if (!$foreach.isLast())
+            ,
+#end
+#end
+        </td>
+        <td>
+$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeata.vm", null, "typeDocMeta", $nestTypeDocMeta)
+        </td>
+    </tr>
+#end
+</table>
+#end
+#end
