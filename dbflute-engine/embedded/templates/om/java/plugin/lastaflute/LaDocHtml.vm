@@ -1,24 +1,358 @@
+##
+## Copyright 2014-2014 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8" />
-	<title>${table.tableMap.appName} lasta_doc</title>
-	<style type="text/css">
+    <meta charset="UTF-8" />
+    <title>${table.tableMap.appName} lasta_doc</title>
+#if ($database.isSchemaHtmlStyleSheetEmbedded())
+    <style type="text/css">
+${database.schemaHtmlStyleSheetEmbedded}
+    </style>
+#elseif ($database.isSchemaHtmlStyleSheetLink())
+    ${database.schemaHtmlStyleSheetLink}
+#else
+    <style type="text/css">
 * {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
 }
 body {
-	font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
-	font-size: 80%;
-	margin: 10px 5px 5px 15px;
-	background-color: #ffffe0;
+    font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
+    font-size: 80%;
+    margin: 10px 5px 5px 15px;
+    background-color: #ffffe0;
 }
-	</style>
+
+/* heading */
+h1 {
+    font-size: 1.5em;
+    border-bottom: 2px solid #af0000;
+    border-top: 2px solid #af0000;
+}
+h2 {
+    margin: 30px 0 5px 0;
+    font-size: 1.8em;
+    border-bottom: 2px solid #af0000;
+    border-left: 10px solid #af0000;
+    text-indent: 10px;
+}
+h3 {
+    padding: 0 0 0 10px;
+    margin: 1em 10% 0 0;
+    border-top: double 3px #af0000;
+    border-bottom: solid 1px #333333;
+    font-size: 1.5em;
+    color: #333333;
+}
+h4 {
+    padding: 0 0 0 10px;
+    margin: 1em 10% 0 1em;
+    border-top: solid 1px #af0000;
+    border-bottom: solid 1px #af0000;
+    font-size: 1.4em;
+    color: #333333;
+}
+
+/* total info */
+.updatedate {
+    text-align: right;
+}
+.mainschema {
+    text-align: right;
+}
+.navilinkarea {
+    text-align: right;
+}
+.sublink {
+    margin-top: 0.1em;
+}
+.sisterlink {
+    margin-top: 0.6em;
+    font-size: 120%;
+}
+.sistersublink {
+    margin-top: 0.6em;
+    font-size: 85%;
+}
+.sisterneighborlink {
+    margin-top: 0.6em;
+    font-size: 100%;
+}
+
+/* keyword search */
+.keywordsearch {
+    padding: 0.7em 0 0.7em 0;
+}
+.searchmemo {
+    font-size: 0.9em;
+    color: #114488;
+}
+.suggestionarea {
+    padding: 0 0.2em 0.2em 0.2em;
+    margin: 0;
+    position: absolute;
+    zindex: 100;
+    background-color: #DDFFDD;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #CCCCCC;
+    list-style-type: none;
+}
+
+/* table */
+table {
+    border-collapse:collapse;
+}
+table, th {
+    border: 1px solid #555;
+}
+th {
+    background-color: #cc9;
+    font-size: 0.8em;
+}
+td {
+    border-bottom: 1px dotted #aaa;
+    border-left: 1px solid #555;
+    padding:2px;
+}
+.tablecomment {
+    font-size: 0.8em;
+    color: #3F7E5E;
+    padding:0 0 0.2em 1em;
+}
+.rownumhead {
+    text-align: center;
+    font-size: 0.4em;
+}
+.rownumcell {
+    text-align: center;
+    font-size: 0.4em;
+    color: #444;
+}
+.schemacell {
+    font-size: 0.8em;
+    white-space: nowrap;
+}
+.aliascell {
+    white-space: nowrap;
+}
+.flgcell {
+    text-align: center;
+}
+.flgplus {
+    font-size: 0.7em;
+}
+.typecell {
+    font-size: 0.6em;
+}
+.sizecell {
+    text-align: center;
+    font-size: 0.8em;
+}
+.defvalcell {
+    text-align: center;
+    font-size: 0.6em;
+}
+.relcell {
+    font-size: 0.7em;
+}
+.commentcell {
+    font-size: 0.7em;
+    color: #3F7E5E;
+}
+.subcell {
+    font-size: 0.6em;
+}
+.comcolcell {
+    color: #666;
+}
+.optcell {
+    font-style: italic;
+}
+.additionalpk {
+    font-style: italic;
+}
+.additionalfk {
+    font-style: italic;
+}
+.clstypecell {
+    text-align: center;
+    font-size: 0.8em;
+}
+.commentdesc {
+    color: #3F7E5E;
+}
+
+/* inner table */
+table.child {
+    margin: 3px;
+}
+table.child th {
+    font-size: 0.7em;
+}
+table.child, table.child td, table.child th {
+    border-top: none;
+    border-left: none;
+    border-bottom: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+}
+.clsgroup {
+    font-size: 1.2em;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+/* table supplementary info */
+span.tableschema {
+    font-size: 0.6em;
+}
+span.bqpcount {
+    font-size: 0.5em;
+}
+dl.bqplist {
+    padding-left: 2em;
+}
+dl.bqplist dt {
+    display: list-item;
+    font-size: 1.3em;
+    margin-top: 0.3em;
+}
+dl.bqplist dd {
+    padding-left: 1em;
+}
+dl.bqplist dd pre {
+    font-size: 1.1em;
+}
+dl.bqplist dd.subinfo {
+    padding-left: 2em;
+}
+dl.bqplist dd.subinfo span.sqlap {
+    font-style: italic;
+    color: #002266;
+}
+dl.bqplist dd.subinfo span.file {
+    font-style: italic;
+    color: #002266;
+}
+dl.bqplist dd.subinfo span.ctet {
+    color: green;
+}
+dl.bqplist dd.subinfo span.pmb {
+    color: green;
+}
+dl.procedurelist {
+    padding-left: 2em;
+}
+dl.procedurelist dt {
+    display: list-item;
+    font-size: 1.3em;
+    margin-top: 0.3em;
+}
+dl.procedurelist dt span.type {
+    font-size: 0.7em;
+    color: green;
+}
+dl.procedurelist dd {
+    padding-left: 1em;
+}
+dl.procedurelist dd pre {
+    font-size: 1.1em;
+}
+dl.procedurelist dd.column {
+    font-style: italic;
+    padding-left: 2em;
+}
+dl.procedurelist dd.column span.attrs {
+    font-size: 0.7em;
+    color: #125699;
+}
+dl.procedurelist dd.column span.type {
+    font-size: 0.9em;
+    color: green;
+}
+dl.procedurelist dd.column pre {
+    padding-left: 1em;
+}
+    </style>
+#end
+#if ($database.isSchemaHtmlJavaScriptEmbedded())
+    <script type="text/javascript">
+${database.schemaHtmlJavaScriptEmbedded}
+    </script>
+#elseif ($database.isSchemaHtmlJavaScriptLink())
+    ${database.schemaHtmlJavaScriptLink}
+#end
 </head>
 <body>
+<h1>lasta doc for ${table.tableMap.appName}</h1>
+<div class="navilinkarea">
+#if ($selector.hasNeighborhoodSchemaHtml())
+#set ($linkDelimiter = "")
+<p class="sisterneighborlink">
+#foreach ($schemaHtmlKey in $selector.neighborhoodSchemaHtmlKeyList)
+${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKey)}">to ${schemaHtmlKey}</a>
+#set ($linkDelimiter = "|")
+#end
+</p>
+#end
+</div>
+
+#if ($table.tableMap.actionDocMetaList)
+<table>
+    <thead>
+    <tr>
+        <th>No.</th>
+        <th>URL</th>
+        <th>class</th>
+        <th>method</th>
+    </tr>
+    </thead>
+    <tbody id="table-list-body">
+#foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
+    <tr>
+        <td class="rownumcell">${foreach.count}</td>
+        <td class="aliascell"><a href="#${actionDocMeta.url}">${actionDocMeta.url}</a></td>
+        <td class="aliascell">${actionDocMeta.type}</td>
+        <td class="aliascell">${actionDocMeta.methodName}</td>
+    </tr>
+#end
+    </tbody>
+</table>
+
+#foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
+<h2 id="${actionDocMeta.url}">
+${actionDocMeta.url}
+</h2>
+<p>
+${actionDocMeta.type}#${actionDocMeta.methodName}
+</p>
+#if ($actionDocMeta.typeComment)
+<p class="tablecomment" style="white-space:pre-wrap;">${actionDocMeta.typeComment}</p>
+#end
+#if ($actionDocMeta.methodComment)
+<p class="tablecomment" style="white-space:pre-wrap;">${actionDocMeta.methodComment}</p>
+#end
+$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeata.vm", null, "typeDocMeta", $actionDocMeta.formTypeDocMeta)
+$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeata.vm", null, "typeDocMeta", $actionDocMeta.returnTypeDocMeta)
+#end
+#else
 #foreach ($column in $table.columnList)
-${column.url} :: ${column.className} <br>
+${column.url} :: ${column.className}<br>
+#end
 #end
 </body>
 </html>

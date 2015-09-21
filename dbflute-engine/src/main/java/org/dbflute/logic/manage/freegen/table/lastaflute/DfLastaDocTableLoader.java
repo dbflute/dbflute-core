@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -17,6 +17,10 @@ package org.dbflute.logic.manage.freegen.table.lastaflute;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,10 +32,13 @@ import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
+import org.dbflute.logic.manage.freegen.table.json.DfJsonFreeAgent;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
+ * @author p1us2er0
  */
 public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
 
@@ -84,6 +91,36 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
             columnMap.put("url", url);
             columnList.add(columnMap);
         }
+
+        List<Path> lastaDocFileCandidateList = DfCollectionUtil.newArrayList();
+        String path = (String) tableMap.get("path");
+        lastaDocFileCandidateList.add(Paths.get(path, String.format("target/lasta-doc/lasta-doc.json")));
+        lastaDocFileCandidateList.add(Paths.get(path, String.format("build/lasta-doc/lasta-doc.json")));
+        Path lastaDocFile = Paths.get(String.format("./schema/lasta-doc-%s.json", tableMap.get("appName")));
+        lastaDocFileCandidateList.forEach(candidate -> {
+            if (!Files.exists(candidate)) {
+                return;
+            }
+
+            try {
+                // compare last modified time
+                if (Files.exists(lastaDocFile)
+                        && Files.getLastModifiedTime(lastaDocFile).compareTo(Files.getLastModifiedTime(candidate)) > 0) {
+                    return;
+                }
+
+                Files.copy(candidate, lastaDocFile, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                String msg = "IO exception when copy lastaDocFile.";
+                msg += " source: " + candidate + ", target: " + lastaDocFile;
+                throw new IllegalStateException(msg, e);
+            }
+        });
+
+        if (Files.exists(lastaDocFile)) {
+            tableMap.putAll(new DfJsonFreeAgent().decodeJsonMapByJs("lasta-doc", lastaDocFile.toFile().getPath()));
+        }
+
         return new DfFreeGenTable(tableMap, "unused", columnList);
     }
 
