@@ -2762,7 +2762,7 @@ public class Database {
     // -----------------------------------------------------
     //                                                Escape
     //                                                ------
-    public String htmlEscape(String text) { // made from lasta-doc
+    public String htmlEscape(String text) { // for various purpose (however basically resolved by method)
         return getProperties().getDocumentProperties().resolveTextForSchemaHtml(text);
     }
 
