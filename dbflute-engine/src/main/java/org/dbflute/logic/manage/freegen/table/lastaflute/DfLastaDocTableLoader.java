@@ -80,48 +80,26 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
                 }
             }
         });
-        // TODO jflute lastaflute: LASTA_DOC
+        final List<Map<String, Object>> columnList = prepareColumnList(lastaInfo);
+        final Path lastaDocFile = acceptLastaDocFile(tableMap);
+        if (Files.exists(lastaDocFile)) {
+            tableMap.putAll(new DfJsonFreeAgent().decodeJsonMapByJs("lasta-doc", lastaDocFile.toFile().getPath()));
+        }
+        return new DfFreeGenTable(tableMap, "unused", columnList);
+    }
+
+    protected List<Map<String, Object>> prepareColumnList(DfLastaInfo lastaInfo) {
         final List<Map<String, Object>> columnList = new ArrayList<Map<String, Object>>();
         final List<File> actionList = lastaInfo.getActionList();
         for (File action : actionList) {
-            Map<String, Object> columnMap = new LinkedHashMap<String, Object>();
+            final Map<String, Object> columnMap = new LinkedHashMap<String, Object>();
             final String className = Srl.substringLastFront(action.getName(), ".");
             final String url = calculateUrl(className);
             columnMap.put("className", className);
             columnMap.put("url", url);
             columnList.add(columnMap);
         }
-
-        List<Path> lastaDocFileCandidateList = DfCollectionUtil.newArrayList();
-        String path = (String) tableMap.get("path");
-        lastaDocFileCandidateList.add(Paths.get(path, String.format("target/lasta-doc/lasta-doc.json")));
-        lastaDocFileCandidateList.add(Paths.get(path, String.format("build/lasta-doc/lasta-doc.json")));
-        Path lastaDocFile = Paths.get(String.format("./schema/lasta-doc-%s.json", tableMap.get("appName")));
-        lastaDocFileCandidateList.forEach(candidate -> {
-            if (!Files.exists(candidate)) {
-                return;
-            }
-
-            try {
-                // compare last modified time
-                if (Files.exists(lastaDocFile)
-                        && Files.getLastModifiedTime(lastaDocFile).compareTo(Files.getLastModifiedTime(candidate)) > 0) {
-                    return;
-                }
-
-                Files.copy(candidate, lastaDocFile, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                String msg = "IO exception when copy lastaDocFile.";
-                msg += " source: " + candidate + ", target: " + lastaDocFile;
-                throw new IllegalStateException(msg, e);
-            }
-        });
-
-        if (Files.exists(lastaDocFile)) {
-            tableMap.putAll(new DfJsonFreeAgent().decodeJsonMapByJs("lasta-doc", lastaDocFile.toFile().getPath()));
-        }
-
-        return new DfFreeGenTable(tableMap, "unused", columnList);
+        return columnList;
     }
 
     protected String calculateUrl(String className) {
@@ -130,6 +108,32 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         } else {
             return "/" + Srl.decamelize(Srl.removeSuffix(className, "Action"), "/").toLowerCase() + "/";
         }
+    }
+
+    protected Path acceptLastaDocFile(Map<String, Object> tableMap) {
+        final List<Path> candidateList = DfCollectionUtil.newArrayList();
+        final String path = (String) tableMap.get("path");
+        candidateList.add(Paths.get(path, String.format("target/lasta-doc/lasta-doc.json")));
+        candidateList.add(Paths.get(path, String.format("build/lasta-doc/lasta-doc.json")));
+        final Path lastaDocFile = Paths.get(String.format("./schema/lasta-doc-%s.json", tableMap.get("appName")));
+        candidateList.forEach(candidate -> {
+            if (!Files.exists(candidate)) {
+                return;
+            }
+            try {
+                // compare last modified time
+                if (Files.exists(lastaDocFile)
+                        && Files.getLastModifiedTime(lastaDocFile).compareTo(Files.getLastModifiedTime(candidate)) > 0) {
+                    return;
+                }
+                Files.copy(candidate, lastaDocFile, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                String msg = "IO exception when copy lastaDocFile.";
+                msg += " source: " + candidate + ", target: " + lastaDocFile;
+                throw new IllegalStateException(msg, e);
+            }
+        });
+        return lastaDocFile;
     }
 
     public static class DfLastaInfo {

@@ -23,9 +23,12 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -87,9 +90,9 @@ public class DfJsonFreeAgent {
     }
 
     public <RESULT> RESULT decodeJsonMapByJs(String requestName, String resourceFile) {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("javascript");
-        try (Scanner scanner = new Scanner(Paths.get(resourceFile))){
+        final ScriptEngineManager manager = new ScriptEngineManager();
+        final ScriptEngine engine = manager.getEngineByName("javascript");
+        try (Scanner scanner = new Scanner(Paths.get(resourceFile))) {
             engine.eval("var result = " + scanner.useDelimiter("\\Z").next());
         } catch (IOException e) {
             throwJsonFileNotFoundException(requestName, resourceFile, e);
@@ -99,7 +102,47 @@ public class DfJsonFreeAgent {
 
         @SuppressWarnings("unchecked")
         RESULT result = (RESULT) engine.get("result");
-        return result;
+        return filterJavaScriptObject(result);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <RESULT> RESULT filterJavaScriptObject(RESULT result) {
+        if (result instanceof List<?>) {
+            final List<Object> srcList = (List<Object>) result;
+            final List<Object> destList = new ArrayList<Object>(srcList.size());
+            for (Object element : srcList) {
+                destList.add(filterJavaScriptObject(element));
+            }
+            return (RESULT) destList;
+        } else if (result instanceof Map<?, ?>) {
+            final Map<Object, Object> srcMap = (Map<Object, Object>) result;
+            final List<Object> challengedList = challengeList(srcMap);
+            if (challengedList != null) {
+                return (RESULT) filterJavaScriptObject(challengedList);
+            } else {
+                final Map<Object, Object> destMap = new LinkedHashMap<Object, Object>(srcMap.size());
+                for (Entry<Object, Object> entry : srcMap.entrySet()) {
+                    destMap.put(entry.getKey(), filterJavaScriptObject(entry.getValue()));
+                }
+                return (RESULT) destMap;
+            }
+        } else {
+            return result;
+        }
+    }
+
+    protected List<Object> challengeList(Map<Object, Object> map) {
+        int index = 0;
+        final Set<Object> keySet = map.keySet();
+        for (Object key : keySet) {
+            final String strKey = key.toString();
+            if (Srl.isNumberHarfAll(strKey) && Integer.parseInt(strKey) == index) {
+                ++index;
+                continue;
+            }
+            return null;
+        }
+        return new ArrayList<Object>(map.values());
     }
 
     protected void throwJsonDecoderNotFoundException(String requestName, String resourceFile, String decoderName, ClassNotFoundException e) {
