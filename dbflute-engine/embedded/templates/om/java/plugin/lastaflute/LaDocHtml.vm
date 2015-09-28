@@ -154,7 +154,7 @@ table.child, table.child td, table.child th {
 ${actionDocMeta.url}
 </h2>
 <p>
-$manager.htmlEscape($actionDocMeta.type)#${actionDocMeta.methodName}
+Execute Method: $manager.htmlEscape($actionDocMeta.type)#${actionDocMeta.methodName}()
 </p>
 #if ($actionDocMeta.typeComment)
 <p class="tablecomment" style="white-space:pre-wrap;">${actionDocMeta.typeComment}</p>
@@ -163,11 +163,11 @@ $manager.htmlEscape($actionDocMeta.type)#${actionDocMeta.methodName}
 <p class="tablecomment" style="white-space:pre-wrap;">${actionDocMeta.methodComment}</p>
 #end
 #if ($actionDocMeta.formTypeDocMeta)
-$manager.htmlEscape($actionDocMeta.formTypeDocMeta.type)
+Form or Body: $manager.htmlEscape($actionDocMeta.formTypeDocMeta.type)
 $generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.formTypeDocMeta)
 #end
 #if ($actionDocMeta.returnTypeDocMeta)
-$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.type)
+Return as: $manager.htmlEscape($actionDocMeta.returnTypeDocMeta.type)
 $generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.returnTypeDocMeta)
 #end
 #end
