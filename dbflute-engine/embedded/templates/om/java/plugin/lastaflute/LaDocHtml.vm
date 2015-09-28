@@ -27,26 +27,31 @@ body {
     font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
     font-size: 80%;
     margin: 10px 5px 5px 15px;
-    background-color: #ffffe0;
+    background-color: #F9FCEB;
 }
 
 /* heading */
 h1 {
     font-size: 1.5em;
-    border-bottom: 2px solid #af0000;
-    border-top: 2px solid #af0000;
+    margin-bottom: 10px;
+    padding: 3px 0;
+    background-color: #882255;
+    color: #F9FCEB;
+    text-indent: 2em;
+    letter-spacing: 0.2em;
 }
 h2 {
-    margin: 30px 0 5px 0;
+    margin: 2em 0 0.5em 0;
     font-size: 1.8em;
-    border-bottom: 2px solid #af0000;
-    border-left: 10px solid #af0000;
-    text-indent: 10px;
+    border-left: 0.5em solid #882255;
+    background-color: #CFA7BB;
+    text-indent: 0.3em;
+    line-height: 1.5em;
 }
 h3 {
     padding: 0 0 0 10px;
     margin: 1em 10% 0 0;
-    border-top: double 3px #af0000;
+    border-top: double 3px #882255;
     border-bottom: solid 1px #333333;
     font-size: 1.5em;
     color: #333333;
@@ -54,67 +59,27 @@ h3 {
 h4 {
     padding: 0 0 0 10px;
     margin: 1em 10% 0 1em;
-    border-top: solid 1px #af0000;
-    border-bottom: solid 1px #af0000;
+    border-top: solid 1px #882255;
+    border-bottom: solid 1px #882255;
     font-size: 1.4em;
     color: #333333;
 }
 
 /* total info */
-.updatedate {
-    text-align: right;
-}
-.mainschema {
-    text-align: right;
-}
 .navilinkarea {
     text-align: right;
-}
-.sublink {
-    margin-top: 0.1em;
-}
-.sisterlink {
-    margin-top: 0.6em;
-    font-size: 120%;
-}
-.sistersublink {
-    margin-top: 0.6em;
-    font-size: 85%;
-}
-.sisterneighborlink {
-    margin-top: 0.6em;
-    font-size: 100%;
-}
-
-/* keyword search */
-.keywordsearch {
-    padding: 0.7em 0 0.7em 0;
-}
-.searchmemo {
-    font-size: 0.9em;
-    color: #114488;
-}
-.suggestionarea {
-    padding: 0 0.2em 0.2em 0.2em;
-    margin: 0;
-    position: absolute;
-    zindex: 100;
-    background-color: #DDFFDD;
-    border-width: 1px;
-    border-style: solid;
-    border-color: #CCCCCC;
-    list-style-type: none;
 }
 
 /* table */
 table {
     border-collapse:collapse;
+    margin: 0.3em 0 1em 0;
 }
 table, th {
     border: 1px solid #555;
 }
 th {
-    background-color: #cc9;
+    background-color: #E4AAA4;
     font-size: 0.8em;
 }
 td {
@@ -125,69 +90,16 @@ td {
 .tablecomment {
     font-size: 0.8em;
     color: #3F7E5E;
-    padding:0 0 0.2em 1em;
-}
-.rownumhead {
-    text-align: center;
-    font-size: 0.4em;
+    padding:0.5em 0 0.5em 1em;
+    margin-bottom: 1em;
 }
 .rownumcell {
     text-align: center;
     font-size: 0.4em;
     color: #444;
 }
-.schemacell {
-    font-size: 0.8em;
-    white-space: nowrap;
-}
 .aliascell {
     white-space: nowrap;
-}
-.flgcell {
-    text-align: center;
-}
-.flgplus {
-    font-size: 0.7em;
-}
-.typecell {
-    font-size: 0.6em;
-}
-.sizecell {
-    text-align: center;
-    font-size: 0.8em;
-}
-.defvalcell {
-    text-align: center;
-    font-size: 0.6em;
-}
-.relcell {
-    font-size: 0.7em;
-}
-.commentcell {
-    font-size: 0.7em;
-    color: #3F7E5E;
-}
-.subcell {
-    font-size: 0.6em;
-}
-.comcolcell {
-    color: #666;
-}
-.optcell {
-    font-style: italic;
-}
-.additionalpk {
-    font-style: italic;
-}
-.additionalfk {
-    font-style: italic;
-}
-.clstypecell {
-    text-align: center;
-    font-size: 0.8em;
-}
-.commentdesc {
-    color: #3F7E5E;
 }
 
 /* inner table */
@@ -207,78 +119,6 @@ table.child, table.child td, table.child th {
     font-size: 1.2em;
     padding-left: 4px;
     padding-right: 4px;
-}
-
-/* table supplementary info */
-span.tableschema {
-    font-size: 0.6em;
-}
-span.bqpcount {
-    font-size: 0.5em;
-}
-dl.bqplist {
-    padding-left: 2em;
-}
-dl.bqplist dt {
-    display: list-item;
-    font-size: 1.3em;
-    margin-top: 0.3em;
-}
-dl.bqplist dd {
-    padding-left: 1em;
-}
-dl.bqplist dd pre {
-    font-size: 1.1em;
-}
-dl.bqplist dd.subinfo {
-    padding-left: 2em;
-}
-dl.bqplist dd.subinfo span.sqlap {
-    font-style: italic;
-    color: #002266;
-}
-dl.bqplist dd.subinfo span.file {
-    font-style: italic;
-    color: #002266;
-}
-dl.bqplist dd.subinfo span.ctet {
-    color: green;
-}
-dl.bqplist dd.subinfo span.pmb {
-    color: green;
-}
-dl.procedurelist {
-    padding-left: 2em;
-}
-dl.procedurelist dt {
-    display: list-item;
-    font-size: 1.3em;
-    margin-top: 0.3em;
-}
-dl.procedurelist dt span.type {
-    font-size: 0.7em;
-    color: green;
-}
-dl.procedurelist dd {
-    padding-left: 1em;
-}
-dl.procedurelist dd pre {
-    font-size: 1.1em;
-}
-dl.procedurelist dd.column {
-    font-style: italic;
-    padding-left: 2em;
-}
-dl.procedurelist dd.column span.attrs {
-    font-size: 0.7em;
-    color: #125699;
-}
-dl.procedurelist dd.column span.type {
-    font-size: 0.9em;
-    color: green;
-}
-dl.procedurelist dd.column pre {
-    padding-left: 1em;
 }
     </style>
 </head>
