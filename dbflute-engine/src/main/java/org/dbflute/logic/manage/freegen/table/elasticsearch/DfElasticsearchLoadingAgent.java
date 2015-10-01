@@ -121,6 +121,9 @@ public class DfElasticsearchLoadingAgent {
         }
         final Map<String, Object> esMap = DfCollectionUtil.newHashMap();
         esMap.put("index", rootMap.keySet().iterator().next());
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> indexSettingsMap = (Map<String, Object>) rootMap.values().iterator().next();
+        esMap.putAll(indexSettingsMap);
         final Map<String, Object> traceMap = traceMap(rootMap, tablePath);
         for (Entry<String, Object> traceEntry : traceMap.entrySet()) {
             final String tableName = traceEntry.getKey();
