@@ -313,7 +313,7 @@ public class DfSql2EntityMarkAnalyzer {
                     }
                 }
             }
-            final String property = Srl.substringFirstFront(scopeInfo.getContent().trim(), " ", ".", "=", "!", "<", ">");
+            final String property = Srl.substringFirstFront(scopeInfo.getContent().trim(), " ", ".", "=", "!", "<", ">", ":");
             final String lineComment = Srl.substringFirstRear(line, lineCommentMark);
             if (!lineComment.contains(columnCommentMark)) {
                 continue;
