@@ -156,6 +156,11 @@ ${actionDocMeta.url}
 <p>
 Execute Method: $manager.htmlEscape($actionDocMeta.type)#${actionDocMeta.methodName}()
 </p>
+#if ($actionDocMeta.annotationList)
+<p>
+Annotations: ${actionDocMeta.annotationList}
+</p>
+#end
 #if ($actionDocMeta.typeComment)
 <p class="tablecomment" style="white-space:pre-wrap;">${actionDocMeta.typeComment}</p>
 #end
