@@ -125,11 +125,12 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     }
 
     protected void executeTestDocument(Map<String, Object> tableMap) {
+        // TODO jflute lastadoc: performance cost (2015/10/03)
         try {
             executeMvnTestDocument(tableMap);
             executeGradleTestDocument(tableMap);
         } catch (RuntimeException continued) {
-            _log.info("Failed to execute maven or gradle test, but continue...: ", continued);
+            _log.info("Failed to execute maven or gradle test, but continue...", continued);
         }
     }
 
@@ -137,23 +138,21 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         if (mvnTestDocumentExecuted) {
             return;
         }
-        String path = (String) tableMap.get("path");
+        final String path = (String) tableMap.get("path");
         if (Files.exists(Paths.get(path, "pom.xml"))) {
-            String baseProjectDir = "../" + DfStringUtil.substringLastFront(new File(path).getName(), "-") + "-base";
-            if (new File(baseProjectDir).exists()) {
-                ProcessBuilder processBuilder =
-                        createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", "-Dtest=*ActionDefinitionTest#test_document");
-                processBuilder.directory(Paths.get(path, baseProjectDir).toFile());
-                executeCommand(processBuilder);
-            }
+            final ProcessBuilder processBuilder =
+                    createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", "-Dtest=*ActionDefTest#test_document");
+            final Path basePath = Paths.get(path, "../" + DfStringUtil.substringLastFront(new File(path).getName(), "-") + "-base");
+            processBuilder.directory(Files.exists(basePath) ? basePath.toFile() : new File(path));
+            executeCommand(processBuilder);
             mvnTestDocumentExecuted = true;
         }
     }
 
     protected void executeGradleTestDocument(Map<String, Object> tableMap) {
         if (Files.exists(Paths.get((String) tableMap.get("path"), "gradlew"))) {
-            ProcessBuilder processBuilder =
-                    createProcessBuilder("./gradlew", "cleanTest", "test", "--tests", "*ActionDefinitionTest.test_document");
+            final ProcessBuilder processBuilder =
+                    createProcessBuilder("./gradlew", "cleanTest", "test", "--tests", "*ActionDefTest.test_document");
             processBuilder.directory(Paths.get((String) tableMap.get("path")).toFile());
             executeCommand(processBuilder);
         }
