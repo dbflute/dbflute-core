@@ -53,7 +53,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     /** The logger instance for this class. (NotNull) */
     private static final Logger _log = LoggerFactory.getLogger(ConstraintNameGenerator.class);
 
-    private static boolean mvnTestDocumentExecute;
+    private static boolean mvnTestDocumentExecuted;
 
     // ===================================================================================
     //                                                                          Load Table
@@ -66,7 +66,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     //     ; templateFile = LaDocHtml.vm
     //     ; outputDirectory = $$baseDir$$/../test/resources
     //     ; package = doc
-    //     ; className = dockside-lastadoc
+    //     ; className = lastadoc-dockside
     //     ; fileExt = html
     // }
     // ; tableMap = map:{
@@ -125,29 +125,35 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     }
 
     protected void executeTestDocument(Map<String, Object> tableMap) {
-        executeMvnTestDocument(tableMap);
-        executeGradleTestDocument(tableMap);
+        try {
+            executeMvnTestDocument(tableMap);
+            executeGradleTestDocument(tableMap);
+        } catch (RuntimeException continued) {
+            _log.info("Failed to execute maven or gradle test, but continue...: ", continued);
+        }
     }
 
     protected void executeMvnTestDocument(Map<String, Object> tableMap) {
-        if (mvnTestDocumentExecute) {
+        if (mvnTestDocumentExecuted) {
             return;
         }
         String path = (String) tableMap.get("path");
         if (Files.exists(Paths.get(path, "pom.xml"))) {
-            ProcessBuilder processBuilder =
-                    createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", "-Dtest=*ActionDefinitionTest#test_document");
-            processBuilder
-                    .directory(Paths.get(path, "../" + DfStringUtil.substringLastFront(new File(path).getName(), "-") + "-base").toFile());
-            executeCommand(processBuilder);
-            mvnTestDocumentExecute = true;
+            String baseProjectDir = "../" + DfStringUtil.substringLastFront(new File(path).getName(), "-") + "-base";
+            if (new File(baseProjectDir).exists()) {
+                ProcessBuilder processBuilder =
+                        createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", "-Dtest=*ActionDefinitionTest#test_document");
+                processBuilder.directory(Paths.get(path, baseProjectDir).toFile());
+                executeCommand(processBuilder);
+            }
+            mvnTestDocumentExecuted = true;
         }
     }
 
     protected void executeGradleTestDocument(Map<String, Object> tableMap) {
         if (Files.exists(Paths.get((String) tableMap.get("path"), "gradlew"))) {
-            ProcessBuilder processBuilder = createProcessBuilder("./gradlew", "cleanTest", "test", "--tests",
-                    "*ActionDefinitionTest.test_document");
+            ProcessBuilder processBuilder =
+                    createProcessBuilder("./gradlew", "cleanTest", "test", "--tests", "*ActionDefinitionTest.test_document");
             processBuilder.directory(Paths.get((String) tableMap.get("path")).toFile());
             executeCommand(processBuilder);
         }
@@ -190,7 +196,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         final String path = (String) tableMap.get("path");
         candidateList.add(Paths.get(path, String.format("target/lastadoc/lastadoc.json")));
         candidateList.add(Paths.get(path, String.format("build/lastadoc/lastadoc.json")));
-        final Path lastaDocFile = Paths.get(String.format("./schema/%s-lastadoc.json", tableMap.get("appName")));
+        final Path lastaDocFile = Paths.get(String.format("./schema/lastadoc-%s.json", tableMap.get("appName")));
         candidateList.forEach(candidate -> {
             if (!Files.exists(candidate)) {
                 return;
