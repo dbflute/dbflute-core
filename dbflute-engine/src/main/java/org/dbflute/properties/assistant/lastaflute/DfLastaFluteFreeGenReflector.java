@@ -129,7 +129,7 @@ public final class DfLastaFluteFreeGenReflector {
                     } else if ("jsp".equals(freeGen)) {
                         setupJspPathGen(appName, path, lastafluteMap);
                     } else if ("html".equals(freeGen)) {
-                        // TODO jflute lastaflute: thymeleaf's HTML_PATH
+                        setupHtmlPathGen(appName, path, lastafluteMap);
                     } else if ("doc".equals(freeGen)) {
                         setupDocGen(appName, path);
                     } else {
@@ -336,17 +336,21 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                       HTML Template
     //                                                                       =============
     protected void setupJspPathGen(String appName, String path, Map<String, Object> lastafluteMap) {
-        doSetupHtmlTemplatePathGen(appName, path, "$$baseDir$$/webapp/WEB-INF/view", "jsp", lastafluteMap);
+        final String targetDir = "$$baseDir$$/webapp/WEB-INF/view";
+        doSetupHtmlTemplatePathGen(appName, path, targetDir, "jsp", lastafluteMap);
     }
 
     protected void setupHtmlPathGen(String appName, String path, Map<String, Object> lastafluteMap) {
-        doSetupHtmlTemplatePathGen(appName, path, "$$baseDir$$/resources/templates", "jsp", lastafluteMap);
+        // TODO jflute lastaflute: thinking Thymeleaf localtion
+        //final String targetDir = "$$baseDir$$/resources/templates";
+        final String targetDir = "$$baseDir$$/webapp/WEB-INF/view";
+        doSetupHtmlTemplatePathGen(appName, path, targetDir, "html", lastafluteMap);
     }
 
     protected void doSetupHtmlTemplatePathGen(String appName, String path, String targetDir, String ext, Map<String, Object> lastafluteMap) {
         final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
         final String capAppName = initCap(appName);
-        registerFreeGen(capAppName + "HtmlPath", pathMap);
+        registerFreeGen(capAppName + initCap(ext) + "Path", pathMap);
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         pathMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
@@ -360,7 +364,7 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
         tableMap.put("targetDir", targetDir);
-        tableMap.put("targetExt", "." + ext);
+        tableMap.put("targetExt", ext.equals("html") ? ".html" : ("." + ext + "|.html"));
         tableMap.put("exceptPathList", DfCollectionUtil.newArrayList("contain:/view/common/"));
     }
 
