@@ -6,7 +6,7 @@
         <th>name</th>
         <th>class</th>
         <th>comment</th>
-        <th>annotationList</th>
+        <th>annotations</th>
         <th>nestTypeDocMetaList</th>
     </tr>
     </thead>
@@ -14,7 +14,7 @@
     <tr>
         <td class="rownumcell">${foreach.count}</td>
         <td>${nestTypeDocMeta.name}</td>
-        <td>$manager.htmlEscape($nestTypeDocMeta.type)</td>
+        <td><p title="$manager.htmlEscape($nestTypeDocMeta.typeName)">$manager.htmlEscape($nestTypeDocMeta.simpleTypeName)</p></td>
         <td>$!{nestTypeDocMeta.comment}</td>
         <td>
 #foreach ($annotation in $nestTypeDocMeta.annotationList)

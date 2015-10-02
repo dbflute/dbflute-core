@@ -15,17 +15,22 @@
  */
 package org.dbflute.logic.manage.freegen.table.lastaflute;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.torque.engine.database.model.ConstraintNameGenerator;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
@@ -34,13 +39,21 @@ import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonFreeAgent;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
  * @author p1us2er0
  */
 public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
+
+    /** The logger instance for this class. (NotNull) */
+    private static final Logger _log = LoggerFactory.getLogger(ConstraintNameGenerator.class);
+
+    private static boolean mvnTestDocumentExecute;
 
     // ===================================================================================
     //                                                                          Load Table
@@ -81,9 +94,10 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
             }
         });
         final List<Map<String, Object>> columnList = prepareColumnList(lastaInfo);
+        executeTestDocument(tableMap);
         final Path lastaDocFile = acceptLastaDocFile(tableMap);
         if (Files.exists(lastaDocFile)) {
-            tableMap.putAll(new DfJsonFreeAgent().decodeJsonMapByJs("lasta-doc", lastaDocFile.toFile().getPath()));
+            tableMap.putAll(new DfJsonFreeAgent().decodeJsonMapByJs("lastadoc", lastaDocFile.toFile().getPath()));
         }
         return new DfFreeGenTable(tableMap, "unused", columnList);
     }
@@ -110,12 +124,73 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         }
     }
 
+    protected void executeTestDocument(Map<String, Object> tableMap) {
+        executeMvnTestDocument(tableMap);
+        executeGradleTestDocument(tableMap);
+    }
+
+    protected void executeMvnTestDocument(Map<String, Object> tableMap) {
+        if (mvnTestDocumentExecute) {
+            return;
+        }
+        String path = (String) tableMap.get("path");
+        if (Files.exists(Paths.get(path, "pom.xml"))) {
+            ProcessBuilder processBuilder =
+                    createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", "-Dtest=*ActionDefinitionTest#test_document");
+            processBuilder
+                    .directory(Paths.get(path, "../" + DfStringUtil.substringLastFront(new File(path).getName(), "-") + "-base").toFile());
+            executeCommand(processBuilder);
+            mvnTestDocumentExecute = true;
+        }
+    }
+
+    protected void executeGradleTestDocument(Map<String, Object> tableMap) {
+        if (Files.exists(Paths.get((String) tableMap.get("path"), "gradlew"))) {
+            ProcessBuilder processBuilder = createProcessBuilder("./gradlew", "cleanTest", "test", "--tests",
+                    "*ActionDefinitionTest.test_document");
+            processBuilder.directory(Paths.get((String) tableMap.get("path")).toFile());
+            executeCommand(processBuilder);
+        }
+    }
+
+    protected ProcessBuilder createProcessBuilder(String... command) {
+        List<String> list = DfCollectionUtil.newArrayList();
+        if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+            list.add("cmd");
+            list.add("/c");
+        }
+        list.addAll(Arrays.asList(command));
+        return new ProcessBuilder(list);
+    }
+
+    protected int executeCommand(ProcessBuilder processBuilder) {
+        processBuilder.redirectErrorStream(true);
+        try {
+            Process process = processBuilder.start();
+            try (InputStream inputStream = process.getInputStream();
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+                while (true) {
+                    String line = bufferedReader.readLine();
+                    if (line == null) {
+                        break;
+                    }
+                    _log.debug(line);
+                }
+            }
+            process.waitFor();
+            return process.exitValue();
+        } catch (IOException | InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     protected Path acceptLastaDocFile(Map<String, Object> tableMap) {
         final List<Path> candidateList = DfCollectionUtil.newArrayList();
         final String path = (String) tableMap.get("path");
-        candidateList.add(Paths.get(path, String.format("target/lasta-doc/lasta-doc.json")));
-        candidateList.add(Paths.get(path, String.format("build/lasta-doc/lasta-doc.json")));
-        final Path lastaDocFile = Paths.get(String.format("./schema/lasta-doc-%s.json", tableMap.get("appName")));
+        candidateList.add(Paths.get(path, String.format("target/lastadoc/lastadoc.json")));
+        candidateList.add(Paths.get(path, String.format("build/lastadoc/lastadoc.json")));
+        final Path lastaDocFile = Paths.get(String.format("./schema/%s-lastadoc.json", tableMap.get("appName")));
         candidateList.forEach(candidate -> {
             if (!Files.exists(candidate)) {
                 return;
