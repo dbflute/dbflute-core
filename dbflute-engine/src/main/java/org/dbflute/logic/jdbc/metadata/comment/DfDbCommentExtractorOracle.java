@@ -85,7 +85,7 @@ public class DfDbCommentExtractorOracle extends DfDbCommentExtractorBase {
     }
 
     protected void buildTableNameCondition(StringBuilder sb, String columnName, Set<String> tableSet) { // for performance
-        if (tableSet.size() < 1000) { // Oracle's inScope limit
+        if (!tableSet.isEmpty() && tableSet.size() < 1000) { // Oracle's inScope limit
             sb.append(" and ").append(columnName).append(" in (");
             int index = 0;
             for (String table : tableSet) {

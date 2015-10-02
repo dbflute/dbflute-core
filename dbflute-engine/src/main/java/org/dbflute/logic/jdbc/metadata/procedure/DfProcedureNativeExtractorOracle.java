@@ -45,7 +45,6 @@ public class DfProcedureNativeExtractorOracle {
     //                                                                           Attribute
     //                                                                           =========
     protected final DataSource _dataSource;
-
     protected final boolean _suppressLogging;
 
     // ===================================================================================
@@ -59,9 +58,10 @@ public class DfProcedureNativeExtractorOracle {
     // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
-    public Map<String, ProcedureNativeInfo> extractProcedureNativeInfoMap(UnifiedSchema unifiedSchema) { // Oracle dependency
-        return selectProcedureNativeInfoMap(unifiedSchema);
-    }
+    // *can get from JDBC, be valid if it needs
+    //public Map<String, ProcedureNativeInfo> extractProcedureNativeInfoMap(UnifiedSchema unifiedSchema) { // Oracle dependency
+    //    return selectProcedureNativeInfoMap(unifiedSchema);
+    //}
 
     public Map<String, ProcedureNativeInfo> extractDBLinkProcedureNativeInfoList(String dbLinkName) { // Oracle dependency
         return selectDBLinkProcedureNativeInfoMap(dbLinkName);
@@ -70,18 +70,19 @@ public class DfProcedureNativeExtractorOracle {
     // ===================================================================================
     //                                                                         Native Info
     //                                                                         ===========
-    protected Map<String, ProcedureNativeInfo> selectProcedureNativeInfoMap(UnifiedSchema unifiedSchema) {
-        final String sql = buildProcedureNativeSql(unifiedSchema);
-        final Map<String, ProcedureNativeInfo> nativeInfoMap = doSelectProcedureNativeInfoMap(sql);
-        final Map<String, List<DfProcedureArgumentInfo>> argInfoMap = selectProcedureArgumentInfoMap(unifiedSchema);
-        for (Entry<String, ProcedureNativeInfo> entry : nativeInfoMap.entrySet()) {
-            final List<DfProcedureArgumentInfo> argInfoList = argInfoMap.get(entry.getKey());
-            if (argInfoList != null) { // found (means the procedure has parameters)
-                entry.getValue().acceptArgInfoList(argInfoList);
-            }
-        }
-        return nativeInfoMap;
-    }
+    // *can get from JDBC, be valid if it needs
+    //protected Map<String, ProcedureNativeInfo> selectProcedureNativeInfoMap(UnifiedSchema unifiedSchema) {
+    //    final String sql = buildProcedureNativeSql(unifiedSchema);
+    //    final Map<String, ProcedureNativeInfo> nativeInfoMap = doSelectProcedureNativeInfoMap(sql);
+    //    final Map<String, List<DfProcedureArgumentInfo>> argInfoMap = selectProcedureArgumentInfoMap(unifiedSchema);
+    //    for (Entry<String, ProcedureNativeInfo> entry : nativeInfoMap.entrySet()) {
+    //        final List<DfProcedureArgumentInfo> argInfoList = argInfoMap.get(entry.getKey());
+    //        if (argInfoList != null) { // found (means the procedure has parameters)
+    //            entry.getValue().acceptArgInfoList(argInfoList);
+    //        }
+    //    }
+    //    return nativeInfoMap;
+    //}
 
     protected String buildProcedureNativeSql(UnifiedSchema unifiedSchema) {
         final StringBuilder sb = new StringBuilder();
@@ -198,12 +199,13 @@ public class DfProcedureNativeExtractorOracle {
     // ===================================================================================
     //                                                                       Argument Info
     //                                                                       =============
-    protected Map<String, List<DfProcedureArgumentInfo>> selectProcedureArgumentInfoMap(UnifiedSchema unifiedSchema) {
-        final DfProcedureParameterNativeExtractorOracle extractor =
-                new DfProcedureParameterNativeExtractorOracle(_dataSource, _suppressLogging);
-        final List<DfProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
-        return arrangeProcedureArgumentInfoMap(allArgList);
-    }
+    // *can get from JDBC, be valid if it needs
+    //protected Map<String, List<DfProcedureArgumentInfo>> selectProcedureArgumentInfoMap(UnifiedSchema unifiedSchema) {
+    //    final DfProcedureParameterNativeExtractorOracle extractor =
+    //            new DfProcedureParameterNativeExtractorOracle(_dataSource, _suppressLogging);
+    //    final List<DfProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
+    //    return arrangeProcedureArgumentInfoMap(allArgList);
+    //}
 
     protected Map<String, List<DfProcedureArgumentInfo>> selectDBLinkProcedureArgumentInfoMap(String dbLinkName) {
         final DfProcedureParameterNativeExtractorOracle extractor =
