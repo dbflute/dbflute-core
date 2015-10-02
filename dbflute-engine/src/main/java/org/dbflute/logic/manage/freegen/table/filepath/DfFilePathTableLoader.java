@@ -152,7 +152,9 @@ public class DfFilePathTableLoader implements DfFreeGenTableLoader {
             return false;
         }
         for (String ext : targetExts) {
-            return isHitByTargetExt(toPath(currentFile), ext, targetKeyword);
+            if (isHitByTargetExt(toPath(currentFile), ext, targetKeyword)) {
+                return true;
+            }
         }
         return false;
     }
