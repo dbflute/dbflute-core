@@ -180,9 +180,9 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
                 createProcessBuilder("./gradlew", "cleanTest", "test", "--tests", "*ActionDefTest.test_document");
         final File directory = Paths.get((String) tableMap.get("path")).toFile();
         processBuilder.directory(directory);
-        _log.info("...Executing gracle test: " + directory);
+        _log.info("...Executing gradle test: " + directory);
         executeCommand(processBuilder);
-        _log.info("*Done mvn test: " + directory);
+        _log.info("*Done gradle test: " + directory);
     }
 
     protected ProcessBuilder createProcessBuilder(String... command) {
