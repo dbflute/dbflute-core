@@ -17,7 +17,7 @@
 <html>
 <head>
     <meta charset="UTF-8" />
-    <title>${table.tableMap.appName} lasta_doc</title>
+    <title>${table.tableMap.appName} lastadoc</title>
     <style type="text/css">
 * {
     margin: 0;
@@ -123,7 +123,7 @@ table.child, table.child td, table.child th {
     </style>
 </head>
 <body>
-<h1>lasta doc for ${table.tableMap.appName}</h1>
+<h1>lastadoc for ${table.tableMap.appName}</h1>
 <div class="navilinkarea">
 </div>
 
