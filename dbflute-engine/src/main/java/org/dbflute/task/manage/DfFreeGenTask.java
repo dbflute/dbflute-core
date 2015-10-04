@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.dbflute.friends.velocity.DfVelocityContextFactory;
+import org.dbflute.helper.function.IndependentProcessor;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.manage.freegen.DfFreeGenManager;
 import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
@@ -45,6 +46,11 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfFreeGenTask.class);
     protected static final String CONTROL_FREEGEN_VM = "ControlFreeGen.vm";
+    protected static List<IndependentProcessor> lazyCallList = new ArrayList<IndependentProcessor>();
+
+    public static void regsiterLazyCall(IndependentProcessor processor) {
+        lazyCallList.add(processor);
+    }
 
     // ===================================================================================
     //                                                                           Attribute
@@ -83,6 +89,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
         processLastaFluteFreeGen();
         processApplicationFreeGen();
         refreshResources();
+        callLazily();
     }
 
     protected void prepareFreeGenRequestList() {
@@ -167,6 +174,19 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
         _log.info("...Using control: " + pathOfControl);
         setControlTemplate(control); // from templatePath, so pure name here
         fireVelocityProcess();
+    }
+
+    // ===================================================================================
+    //                                                                           Lazy Call
+    //                                                                           =========
+    public void callLazily() {
+        if (lazyCallList.isEmpty()) {
+            return;
+        }
+        _log.info("...Calling processors lazily: " + lazyCallList.size());
+        for (IndependentProcessor processor : lazyCallList) {
+            processor.process();
+        }
     }
 
     // ===================================================================================

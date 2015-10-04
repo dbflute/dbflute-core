@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.ConstraintNameGenerator;
+import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
@@ -38,6 +39,8 @@ import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonFreeAgent;
+import org.dbflute.properties.DfLastaFluteProperties;
+import org.dbflute.task.manage.DfFreeGenTask;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.Srl;
@@ -124,11 +127,17 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         }
     }
 
+    // -----------------------------------------------------
+    //                                  Execute Maven/Gradle
+    //                                  --------------------
     protected void executeTestDocument(Map<String, Object> tableMap) {
-        // TODO jflute lastadoc: performance cost (2015/10/03)
         try {
-            executeMvnTestDocument(tableMap);
-            executeGradleTestDocument(tableMap);
+            if (getLastaFluteProperties().isLastaDocMavenGeared()) {
+                executeMvnTestDocument(tableMap);
+            }
+            if (getLastaFluteProperties().isLastaDocGradleGeared()) {
+                executeGradleTestDocument(tableMap);
+            }
         } catch (RuntimeException continued) {
             _log.info("Failed to execute maven or gradle test, but continue...", continued);
         }
@@ -140,26 +149,44 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         }
         final String path = (String) tableMap.get("path");
         if (Files.exists(Paths.get(path, "pom.xml"))) {
-            final ProcessBuilder processBuilder =
-                    createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", "-Dtest=*ActionDefTest#test_document");
-            final Path basePath = Paths.get(path, "../" + DfStringUtil.substringLastFront(new File(path).getName(), "-") + "-base");
-            processBuilder.directory(Files.exists(basePath) ? basePath.toFile() : new File(path));
-            executeCommand(processBuilder);
             mvnTestDocumentExecuted = true;
+            DfFreeGenTask.regsiterLazyCall(() -> {
+                new Thread(() -> doExecuteMvnTestDocument(path)).start();
+            });
         }
+    }
+
+    protected void doExecuteMvnTestDocument(String path) {
+        final ProcessBuilder processBuilder =
+                createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", "-Dtest=*ActionDefTest#test_document");
+        final Path basePath = Paths.get(path, "../" + DfStringUtil.substringLastFront(new File(path).getName(), "-") + "-base");
+        final File directory = Files.exists(basePath) ? basePath.toFile() : new File(path);
+        processBuilder.directory(directory);
+        _log.info("...Executing mvn test: " + directory);
+        executeCommand(processBuilder);
+        _log.info("*Done mvn test: " + directory);
     }
 
     protected void executeGradleTestDocument(Map<String, Object> tableMap) {
         if (Files.exists(Paths.get((String) tableMap.get("path"), "gradlew"))) {
-            final ProcessBuilder processBuilder =
-                    createProcessBuilder("./gradlew", "cleanTest", "test", "--tests", "*ActionDefTest.test_document");
-            processBuilder.directory(Paths.get((String) tableMap.get("path")).toFile());
-            executeCommand(processBuilder);
+            DfFreeGenTask.regsiterLazyCall(() -> {
+                new Thread(() -> doExecuteGradleTestDocument(tableMap)).start();
+            });
         }
     }
 
+    protected void doExecuteGradleTestDocument(Map<String, Object> tableMap) {
+        final ProcessBuilder processBuilder =
+                createProcessBuilder("./gradlew", "cleanTest", "test", "--tests", "*ActionDefTest.test_document");
+        final File directory = Paths.get((String) tableMap.get("path")).toFile();
+        processBuilder.directory(directory);
+        _log.info("...Executing gracle test: " + directory);
+        executeCommand(processBuilder);
+        _log.info("*Done mvn test: " + directory);
+    }
+
     protected ProcessBuilder createProcessBuilder(String... command) {
-        List<String> list = DfCollectionUtil.newArrayList();
+        final List<String> list = DfCollectionUtil.newArrayList();
         if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
             list.add("cmd");
             list.add("/c");
@@ -171,12 +198,12 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     protected int executeCommand(ProcessBuilder processBuilder) {
         processBuilder.redirectErrorStream(true);
         try {
-            Process process = processBuilder.start();
-            try (InputStream inputStream = process.getInputStream();
-                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+            final Process process = processBuilder.start();
+            try (InputStream ins = process.getInputStream();
+                    InputStreamReader reader = new InputStreamReader(ins);
+                    BufferedReader br = new BufferedReader(reader)) {
                 while (true) {
-                    String line = bufferedReader.readLine();
+                    String line = br.readLine();
                     if (line == null) {
                         break;
                     }
@@ -216,6 +243,9 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         return lastaDocFile;
     }
 
+    // -----------------------------------------------------
+    //                                            Lasta Info
+    //                                            ----------
     public static class DfLastaInfo {
 
         protected final List<File> actionList = new ArrayList<File>();
@@ -227,6 +257,13 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         public void addAction(File action) {
             actionList.add(action);
         }
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfLastaFluteProperties getLastaFluteProperties() {
+        return DfBuildProperties.getInstance().getLastaFluteProperties();
     }
 
     // ===================================================================================

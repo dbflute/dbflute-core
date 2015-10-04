@@ -88,6 +88,13 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                        Service Name
+    //                                                                        ============
+    protected String findServiceName(final Map<String, Object> lastafluteMap) {
+        return (String) lastafluteMap.get("serviceName");
+    }
+
+    // ===================================================================================
     //                                                                             FreeGen
     //                                                                             =======
     public void reflectFreeGenMap(Map<String, Object> freeGenMap) {
@@ -174,9 +181,13 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                        Small Helper
-    //                                                                        ============
-    protected String findServiceName(final Map<String, Object> lastafluteMap) {
-        return (String) lastafluteMap.get("serviceName");
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isLastaDocMavenGeared() {
+        return isProperty("isLastaDocMavenGeared", false, getLastafluteMap());
+    }
+
+    public boolean isLastaDocGradleGeared() {
+        return isProperty("isLastaDocGradleGeared", false, getLastafluteMap());
     }
 }

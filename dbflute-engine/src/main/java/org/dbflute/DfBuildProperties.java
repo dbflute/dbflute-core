@@ -34,6 +34,7 @@ import org.dbflute.properties.DfFreeGenProperties;
 import org.dbflute.properties.DfHibernateProperties;
 import org.dbflute.properties.DfIncludeQueryProperties;
 import org.dbflute.properties.DfInfraProperties;
+import org.dbflute.properties.DfLastaFluteProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.dbflute.properties.DfOptimisticLockProperties;
@@ -236,6 +237,13 @@ public final class DfBuildProperties {
         return getHandler().getInfraProperties(getProperties());
     }
 
+    // -----------------------------------------------------
+    //                                            LastaFlute
+    //                                            ----------
+    public DfLastaFluteProperties getLastaFluteProperties() {
+        return getHandler().getLastaFluteProperties(getProperties());
+    }
+    
     // -----------------------------------------------------
     //                                     Little Adjustment
     //                                     -----------------
