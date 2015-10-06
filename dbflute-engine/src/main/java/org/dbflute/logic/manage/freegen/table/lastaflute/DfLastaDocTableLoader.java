@@ -158,7 +158,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
 
     protected void doExecuteMvnTestDocument(String path) {
         final ProcessBuilder processBuilder =
-                createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", "-Dtest=*ActionDefTest#test_document");
+                createProcessBuilder("mvn", "test", "-DfailIfNoTests=false", "-Dtest=*LastaDocTest#test_document");
         final Path basePath = Paths.get(path, "../" + DfStringUtil.substringLastFront(new File(path).getName(), "-") + "-base");
         final File directory = Files.exists(basePath) ? basePath.toFile() : new File(path);
         processBuilder.directory(directory);
@@ -177,7 +177,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
 
     protected void doExecuteGradleTestDocument(Map<String, Object> tableMap) {
         final ProcessBuilder processBuilder =
-                createProcessBuilder("./gradlew", "cleanTest", "test", "--tests", "*ActionDefTest.test_document");
+                createProcessBuilder("./gradlew", "cleanTest", "test", "--tests", "*LastaDocTest.test_document");
         final File directory = Paths.get((String) tableMap.get("path")).toFile();
         processBuilder.directory(directory);
         _log.info("...Executing gradle test: " + directory);
