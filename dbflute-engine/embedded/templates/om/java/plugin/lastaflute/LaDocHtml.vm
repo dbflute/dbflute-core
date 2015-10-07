@@ -106,6 +106,9 @@ td {
     border-left: 1px solid #555;
     padding:2px;
 }
+.nestedbean {
+    margin: 0 0 0 1.5em;
+}
 .tablecomment {
     font-size: 0.8em;
     color: #3F7E5E;
@@ -162,7 +165,7 @@ table.child, table.child td, table.child th {
 #foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
     <tr>
         <td class="rownumcell">${foreach.count}</td>
-        <td class="aliascell"><a href="#${actionDocMeta.url}">${actionDocMeta.url}</a></td>
+        <td class="aliascell"><a href="#$manager.htmlEscape($actionDocMeta.url)">$manager.htmlEscape($actionDocMeta.url)</a></td>
         <td class="aliascell">
 #if ($actionDocMeta.description)
             $manager.htmlEscape($actionDocMeta.description)
@@ -185,8 +188,8 @@ table.child, table.child td, table.child th {
 </table>
 
 #foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
-<h2 id="${actionDocMeta.url}">
-${actionDocMeta.url}
+<h2 id="$manager.htmlEscape($actionDocMeta.url)">
+$manager.htmlEscape($actionDocMeta.url)
 </h2>
 <p>
 <span class="actiontitle">Execute Method:</span> <span class="actionmainvalue">$manager.htmlEscape($actionDocMeta.typeName)#${actionDocMeta.methodName}()</span>
@@ -197,10 +200,10 @@ ${actionDocMeta.url}
 </p>
 #end
 #if ($actionDocMeta.typeComment)
-<p class="tablecomment" style="white-space:pre-wrap;">${actionDocMeta.typeComment}</p>
+<p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($actionDocMeta.typeComment)</p>
 #end
 #if ($actionDocMeta.methodComment)
-<p class="tablecomment" style="white-space:pre-wrap;">${actionDocMeta.methodComment}</p>
+<p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($actionDocMeta.methodComment)</p>
 #end
 #if ($actionDocMeta.formTypeDocMeta)
 <span class="actiontitle">Form or Body:</span> <span class="actionsubvalue"><span title="$manager.htmlEscape($actionDocMeta.formTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.formTypeDocMeta.simpleTypeName)</span></span>
