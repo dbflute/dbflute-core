@@ -147,6 +147,18 @@ table.child, table.child td, table.child th {
 <body>
 <h1>lastadoc for ${table.tableMap.appName}</h1>
 <div class="navilinkarea">
+#set ($linkDelimiter = "")
+<p class="sisterneighborlink">
+#foreach ($app in $table.tableMap.appList)
+${linkDelimiter}
+#if ($app.appName == $table.tableMap.appName)
+to ${app.appName}
+#else
+<a href="${app.lastadocPath}">to ${app.appName}</a>
+#end
+#set ($linkDelimiter = "|")
+#end
+</p>
 </div>
 
 #if ($table.tableMap.actionDocMetaList)
@@ -166,11 +178,7 @@ table.child, table.child td, table.child th {
     <tr>
         <td class="rownumcell">${foreach.count}</td>
         <td class="aliascell"><a href="#$manager.htmlEscape($actionDocMeta.url)">$manager.htmlEscape($actionDocMeta.url)</a></td>
-        <td class="aliascell">
-#if ($actionDocMeta.description)
-            $manager.htmlEscape($actionDocMeta.description)
-#end
-        </td>
+        <td class="aliascell">$!manager.htmlEscape($actionDocMeta.description)</td>
         <td class="aliascell"><span title="$manager.htmlEscape($actionDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.simpleTypeName)</span>#${actionDocMeta.methodName}()</td>
         <td class="aliascell">
 #if ($actionDocMeta.formTypeDocMeta)
