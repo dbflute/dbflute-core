@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.torque.engine.database.model.ConstraintNameGenerator;
 import org.dbflute.DfBuildProperties;
@@ -101,8 +102,36 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         final Path lastaDocFile = acceptLastaDocFile(tableMap);
         if (Files.exists(lastaDocFile)) {
             tableMap.putAll(new DfJsonFreeAgent().decodeJsonMapByJs("lastadoc", lastaDocFile.toFile().getPath()));
+
         }
+
+        tableMap.put("appList", findAppList(mapProp));
+
         return new DfFreeGenTable(tableMap, "unused", columnList);
+    }
+
+    protected List<Map<String, String>> findAppList(DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getTableMap();
+        List<Map<String, String>> appList;
+        try {
+            appList = Files.list(Paths.get("./output/lasta")).filter(entry -> {
+                return entry.getFileName().toString().matches(".*lastadoc-.*\\.html");
+            }).map(file -> {
+                Map<String, String> appMap = DfCollectionUtil.newLinkedHashMap();
+                appMap.put("appName", file.toFile().getName().replaceAll("(lastadoc-|\\.html)", ""));
+                appMap.put("lastadocPath", file.toFile().getName());
+                return appMap;
+            }).collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new IllegalStateException("can't read directory", e);
+        }
+        Map<String, String> appMap = DfCollectionUtil.newLinkedHashMap();
+        appMap.put("appName", (String) tableMap.get("appName"));
+        appMap.put("lastadocPath", "lastadoc-" + tableMap.get("appName") + ".html");
+        appList = appList.stream().distinct().sorted((app, app2) -> {
+            return app.get("appName").compareTo(app2.get("appName"));
+        }).collect(Collectors.toList());
+        return appList;
     }
 
     protected List<Map<String, Object>> prepareColumnList(DfLastaInfo lastaInfo) {
