@@ -84,6 +84,10 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return isProperty("isGenerateProcedureCustomizeEntity", false);
     }
 
+    public boolean isForcedlySuppressProcedureMetaData() { // closet, avoid too many procedures performance cost
+        return isProperty("isForcedlySuppressProcedureMetaData", false);
+    }
+
     protected List<String> _targetProcedureCatalogList;
 
     protected List<String> getTargetProcedureCatalogList() {

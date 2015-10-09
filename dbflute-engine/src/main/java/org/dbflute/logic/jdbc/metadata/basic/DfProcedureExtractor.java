@@ -128,10 +128,13 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     }
 
     protected boolean isQuitByGenerateProp() {
+        final DfOutsideSqlProperties prop = getOutsideSqlProperties();
+        if (prop.isForcedlySuppressProcedureMetaData()) { // emergency option
+            return true;
+        }
         if (_suppressGenerationRestriction) {
             return false;
         }
-        final DfOutsideSqlProperties prop = getOutsideSqlProperties();
         return !prop.isGenerateProcedureParameterBean();
     }
 

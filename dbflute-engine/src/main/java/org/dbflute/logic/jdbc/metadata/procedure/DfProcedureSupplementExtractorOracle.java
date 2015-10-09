@@ -105,9 +105,6 @@ public class DfProcedureSupplementExtractorOracle extends DfProcedureSupplementE
     // ===================================================================================
     //                                                                            Overload
     //                                                                            ========
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringKeyMap<Integer> extractParameterOverloadInfoMap(UnifiedSchema unifiedSchema) {
         final StringKeyMap<Integer> overloadInfoToDBLinkMap = _parameterOverloadResultMapMap.get(unifiedSchema);
@@ -160,9 +157,6 @@ public class DfProcedureSupplementExtractorOracle extends DfProcedureSupplementE
     // ===================================================================================
     //                                                                               Array
     //                                                                               =====
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringKeyMap<DfTypeArrayInfo> extractParameterArrayInfoMap(UnifiedSchema unifiedSchema) {
         final StringKeyMap<DfTypeArrayInfo> overloadInfoToDBLinkMap = _parameterArrayResultMapMap.get(unifiedSchema);
@@ -235,9 +229,6 @@ public class DfProcedureSupplementExtractorOracle extends DfProcedureSupplementE
     // ===================================================================================
     //                                                                              Struct
     //                                                                              ======
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema) {
         final StringKeyMap<DfTypeStructInfo> structInfoToDBLinkMap = _structResultMapMap.get(unifiedSchema);

@@ -1818,7 +1818,10 @@ public class Column {
     //                                    ValueType Handling
     //                                    ------------------
     public boolean needsMappingValueType() {
-        return needsStringClobHandling() || needsPostgreSQLOidHandling() || needsOracleDateHandling();
+        return needsStringClobHandling() //
+                || needsPostgreSQLByteaHandling() //
+                || needsPostgreSQLOidHandling() //
+                || needsOracleDateHandling();
     }
 
     public boolean needsStringClobHandling() {

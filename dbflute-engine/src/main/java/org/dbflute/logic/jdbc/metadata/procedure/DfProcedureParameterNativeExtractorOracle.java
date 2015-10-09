@@ -45,7 +45,6 @@ public class DfProcedureParameterNativeExtractorOracle {
     //                                                                           Attribute
     //                                                                           =========
     protected final DataSource _dataSource;
-
     protected final boolean _suppressLogging;
 
     // ===================================================================================

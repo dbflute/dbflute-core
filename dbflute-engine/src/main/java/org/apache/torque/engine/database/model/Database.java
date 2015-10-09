@@ -2759,6 +2759,13 @@ public class Database {
         return handler.getPackageAsPath(pckge);
     }
 
+    // -----------------------------------------------------
+    //                                                Escape
+    //                                                ------
+    public String htmlEscape(String text) { // for various purpose (however basically resolved by method)
+        return getProperties().getDocumentProperties().resolveTextForSchemaHtml(text);
+    }
+
     // ===================================================================================
     //                                                                 Behavior Query Path
     //                                                                 ===================

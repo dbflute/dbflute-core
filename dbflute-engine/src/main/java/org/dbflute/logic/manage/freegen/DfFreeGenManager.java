@@ -68,7 +68,11 @@ public class DfFreeGenManager {
     // ===================================================================================
     //                                                                      Resolve Helper
     //                                                                      ==============
-    public String resolveTextForSchemaHtml(String text) {
+    public String htmlEscape(String text) { // made from lasta-doc
+        return resolveTextForSchemaHtml(text);
+    }
+
+    public String resolveTextForSchemaHtml(String text) { // public for compatible
         final DfDocumentProperties prop = getDocumentProperties();
         return prop.resolveTextForSchemaHtml(text);
     }

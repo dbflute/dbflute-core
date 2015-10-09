@@ -42,6 +42,7 @@ public class DfDbCommentExtractorOracle extends DfDbCommentExtractorBase {
         final StringBuilder sb = new StringBuilder();
         sb.append("select * from ALL_TAB_COMMENTS");
         sb.append(" where OWNER = '").append(_unifiedSchema.getPureSchema()).append("'");
+        buildTableNameCondition(sb, "TABLE_NAME", tableSet);
         sb.append(" order by TABLE_NAME asc");
         final String basicSql = sb.toString();
         final List<UserTabComments> basicCommentsList = doSelectUserTabComments(basicSql, conn, tableSet);
@@ -55,11 +56,15 @@ public class DfDbCommentExtractorOracle extends DfDbCommentExtractorBase {
             final StringBuilder sb = new StringBuilder();
             sb.append("select MVIEW_NAME as TABLE_NAME, COMMENTS from ALL_MVIEW_COMMENTS");
             sb.append(" where OWNER = '").append(_unifiedSchema.getPureSchema()).append("'");
+            buildTableNameCondition(sb, "MVIEW_NAME", tableSet);
             sb.append(" order by TABLE_NAME asc");
             final String materializedSql = sb.toString();
             return doSelectUserTabComments(materializedSql, conn, tableSet);
         } catch (RuntimeException continued) { // just in case
-            _log.info("*Failed to select materialized view comments: " + continued.getMessage());
+            final String main = continued.getMessage();
+            final Throwable cause = continued.getCause();
+            final String nested = cause != null ? (", " + cause.getMessage()) : "";
+            _log.info("*Failed to select materialized view comments: " + main + nested);
             return new ArrayList<UserTabComments>(2);
         }
     }
@@ -73,8 +78,22 @@ public class DfDbCommentExtractorOracle extends DfDbCommentExtractorBase {
         final StringBuilder sb = new StringBuilder();
         sb.append("select * from ALL_COL_COMMENTS");
         sb.append(" where OWNER = '").append(_unifiedSchema.getPureSchema()).append("'");
+        buildTableNameCondition(sb, "TABLE_NAME", tableSet);
         sb.append(" order by TABLE_NAME asc, COLUMN_NAME asc");
         final String sql = sb.toString();
         return doSelectUserColComments(sql, conn, tableSet);
+    }
+
+    protected void buildTableNameCondition(StringBuilder sb, String columnName, Set<String> tableSet) { // for performance
+        if (!tableSet.isEmpty() && tableSet.size() < 1000) { // Oracle's inScope limit
+            sb.append(" and ").append(columnName).append(" in (");
+            int index = 0;
+            for (String table : tableSet) {
+                sb.append(index > 0 ? ", " : "").append("'").append(table).append("'");
+                ++index;
+            }
+            sb.append(")");
+        }
+        // even if over limit, removed after select
     }
 }

@@ -16,6 +16,7 @@
 package org.dbflute.logic.manage.freegen.table.filepath;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -57,12 +58,12 @@ public class DfFilePathTableLoader implements DfFreeGenTableLoader {
         final Map<String, Object> tableMap = mapProp.getTableMap();
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
 
-        final String targetExt = extractTargetExt(tableMap);
+        final String[] targetExts = extractTargetExt(tableMap);
         final String targetKeyword = extractTargetKeyword(tableMap);
         final List<String> exceptPathList = extractExceptPathList(tableMap);
         final List<File> fileList = DfCollectionUtil.newArrayList();
 
-        collectFile(fileList, targetExt, targetKeyword, exceptPathList, new File(targetDir));
+        collectFile(fileList, targetExts, targetKeyword, exceptPathList, new File(targetDir));
         final List<Map<String, Object>> columnList = DfCollectionUtil.newArrayList();
         for (File file : fileList) {
             final Map<String, Object> columnMap = DfCollectionUtil.newHashMap();
@@ -93,12 +94,17 @@ public class DfFilePathTableLoader implements DfFreeGenTableLoader {
         return new DfFreeGenTable(tableMap, "unused", columnList);
     }
 
-    protected String extractTargetExt(Map<String, Object> tableMap) {
+    protected String[] extractTargetExt(Map<String, Object> tableMap) {
         final String targetExt = (String) tableMap.get("targetExt"); // not required
-        if (targetExt != null && !targetExt.startsWith(".")) {
-            return "." + targetExt;
+        if (targetExt == null) {
+            return new String[] {};
         }
-        return targetExt;
+        final List<String> extList = Srl.splitList(targetExt, "|");
+        final List<String> filteredList = new ArrayList<String>(extList.size());
+        for (String ext : extList) {
+            filteredList.add(!ext.startsWith(".") ? ("." + ext) : ext);
+        }
+        return filteredList.toArray(new String[filteredList.size()]);
     }
 
     protected String extractTargetKeyword(Map<String, Object> tableMap) {
@@ -120,20 +126,19 @@ public class DfFilePathTableLoader implements DfFreeGenTableLoader {
     //                                                                        ============
     /**
      * @param fileList The list of saved list. (NotNull)
-     * @param targetExt The extension of target path. (NullAllowed)
+     * @param targetExts The extensions of target path. (NullAllowed)
      * @param targetKeyword The keyword of target path. (NullAllowed)
      * @param exceptPathList The list of except path. (NotNull)
      * @param baseFile The base file. (NotNull)
      */
-    protected void collectFile(final List<File> fileList, final String targetExt, final String targetKeyword,
-            final List<String> exceptPathList, final File baseFile) {
+    protected void collectFile(List<File> fileList, String[] targetExts, String targetKeyword, List<String> exceptPathList, File baseFile) {
         final FileHierarchyTracer tracer = new FileHierarchyTracer();
         tracer.trace(baseFile, new FileHierarchyTracingHandler() {
             public boolean isTargetFileOrDir(File currentFile) {
                 if (currentFile.isDirectory()) {
                     return true;
                 }
-                return isCollectFile(targetExt, targetKeyword, exceptPathList, currentFile);
+                return isCollectFile(targetExts, targetKeyword, exceptPathList, currentFile);
             }
 
             public void handleFile(File currentFile) {
@@ -142,8 +147,16 @@ public class DfFilePathTableLoader implements DfFreeGenTableLoader {
         });
     }
 
-    protected boolean isCollectFile(String targetExt, String targetKeyword, List<String> exceptPathList, File currentFile) {
-        return !isExceptFile(exceptPathList, currentFile) && isHitByTargetExt(toPath(currentFile), targetExt, targetKeyword);
+    protected boolean isCollectFile(String[] targetExts, String targetKeyword, List<String> exceptPathList, File currentFile) {
+        if (isExceptFile(exceptPathList, currentFile)) {
+            return false;
+        }
+        for (String ext : targetExts) {
+            if (isHitByTargetExt(toPath(currentFile), ext, targetKeyword)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected boolean isExceptFile(List<String> exceptPathList, File baseFile) {

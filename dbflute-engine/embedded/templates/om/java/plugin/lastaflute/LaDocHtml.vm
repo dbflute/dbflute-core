@@ -1,24 +1,234 @@
+##
+## Copyright 2014-2014 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8" />
-	<title>${table.tableMap.appName} lasta_doc</title>
-	<style type="text/css">
+    <meta charset="UTF-8" />
+    <title>${table.tableMap.appName} lastadoc</title>
+    <style type="text/css">
 * {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
 }
 body {
-	font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
-	font-size: 80%;
-	margin: 10px 5px 5px 15px;
-	background-color: #ffffe0;
+    font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
+    font-size: 80%;
+    margin: 10px 5px 5px 15px;
+    background-color: #F9FCEB;
 }
-	</style>
+
+/* heading */
+h1 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    padding: 3px 0;
+    background-color: #882255;
+    color: #F9FCEB;
+    text-indent: 2em;
+    letter-spacing: 0.2em;
+}
+h2 {
+    margin: 2em 0 0.5em 0;
+    font-size: 1.8em;
+    border-left: 0.5em solid #882255;
+    background-color: #CFA7BB;
+    text-indent: 0.3em;
+    line-height: 1.5em;
+}
+h3 {
+    padding: 0 0 0 10px;
+    margin: 1em 10% 0 0;
+    border-top: double 3px #882255;
+    border-bottom: solid 1px #333333;
+    font-size: 1.5em;
+    color: #333333;
+}
+h4 {
+    padding: 0 0 0 10px;
+    margin: 1em 10% 0 1em;
+    border-top: solid 1px #882255;
+    border-bottom: solid 1px #882255;
+    font-size: 1.4em;
+    color: #333333;
+}
+
+/* total info */
+.navilinkarea {
+    text-align: right;
+}
+.actiontitle {
+    font-size: 1.2em;
+    color: #889977;
+}
+.actionsubtitle {
+    font-size: 1.0em;
+    color: #889977;
+}
+.actionmainvalue {
+    font-size: 1.3em;
+    color: #221188;
+}
+.actionsubvalue {
+    font-size: 1.1em;
+    color: #221188;
+}
+p.actionsubitem {
+    padding: 0.2em 0 0 1.5em;
+}
+
+/* table */
+table {
+    border-collapse:collapse;
+    margin: 0.3em 0 1em 0;
+}
+table, th {
+    border: 1px solid #555;
+}
+th {
+    background-color: #E4AAA4;
+    font-size: 0.8em;
+}
+td {
+    border-bottom: 1px dotted #aaa;
+    border-left: 1px solid #555;
+    padding:2px;
+}
+.nestedbean {
+    margin: 0 0 0 1.5em;
+}
+.tablecomment {
+    font-size: 0.8em;
+    color: #3F7E5E;
+    padding:0.5em 0 0.5em 1em;
+    margin-bottom: 1em;
+}
+.rownumcell {
+    text-align: center;
+    font-size: 0.4em;
+    color: #444;
+}
+.aliascell {
+    white-space: nowrap;
+}
+
+/* inner table */
+table.child {
+    margin: 3px;
+}
+table.child th {
+    font-size: 0.7em;
+}
+table.child, table.child td, table.child th {
+    border-top: none;
+    border-left: none;
+    border-bottom: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+}
+.clsgroup {
+    font-size: 1.2em;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+    </style>
 </head>
 <body>
+<h1>lastadoc for ${table.tableMap.appName}</h1>
+<div class="navilinkarea">
+#set ($linkDelimiter = "")
+<p class="sisterneighborlink">
+#foreach ($app in $table.tableMap.appList)
+${linkDelimiter}
+#if ($app.appName == $table.tableMap.appName)
+to ${app.appName}
+#else
+<a href="${app.lastadocPath}">to ${app.appName}</a>
+#end
+#set ($linkDelimiter = "|")
+#end
+</p>
+</div>
+
+#if ($table.tableMap.actionDocMetaList)
+<table>
+    <thead>
+    <tr>
+        <th>No.</th>
+        <th>URL</th>
+        <th>description</th>
+        <th>class#method</th>
+        <th>Form or Body</th>
+        <th>return</th>
+    </tr>
+    </thead>
+    <tbody id="table-list-body">
+#foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
+    <tr>
+        <td class="rownumcell">${foreach.count}</td>
+        <td class="aliascell"><a href="#$manager.htmlEscape($actionDocMeta.url)">$manager.htmlEscape($actionDocMeta.url)</a></td>
+        <td class="aliascell">$!manager.htmlEscape($actionDocMeta.description)</td>
+        <td class="aliascell"><span title="$manager.htmlEscape($actionDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.simpleTypeName)</span>#${actionDocMeta.methodName}()</td>
+        <td class="aliascell">
+#if ($actionDocMeta.formTypeDocMeta)
+            <span title="$manager.htmlEscape($actionDocMeta.formTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.formTypeDocMeta.simpleTypeName)</span>
+#end
+        </td>
+        <td class="aliascell">
+#if ($actionDocMeta.returnTypeDocMeta)
+            <span title="$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.simpleTypeName)</span>
+#end
+        </td>
+    </tr>
+#end
+    </tbody>
+</table>
+
+#foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
+<h2 id="$manager.htmlEscape($actionDocMeta.url)">
+$manager.htmlEscape($actionDocMeta.url)
+</h2>
+<p>
+<span class="actiontitle">Execute Method:</span> <span class="actionmainvalue">$manager.htmlEscape($actionDocMeta.typeName)#${actionDocMeta.methodName}()</span>
+</p>
+#if ($actionDocMeta.annotationList)
+<p class="actionsubitem">
+<span class="actionsubtitle">annotations:</span> <span class="actionsubvalue">${actionDocMeta.annotationList}</span>
+</p>
+#end
+#if ($actionDocMeta.typeComment)
+<p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($actionDocMeta.typeComment)</p>
+#end
+#if ($actionDocMeta.methodComment)
+<p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($actionDocMeta.methodComment)</p>
+#end
+#if ($actionDocMeta.formTypeDocMeta)
+<span class="actiontitle">Form or Body:</span> <span class="actionsubvalue"><span title="$manager.htmlEscape($actionDocMeta.formTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.formTypeDocMeta.simpleTypeName)</span></span>
+$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.formTypeDocMeta)
+#end
+#if ($actionDocMeta.returnTypeDocMeta)
+<span class="actiontitle">Return as:</span> <span class="actionsubvalue"><span title="$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.simpleTypeName)</span></span>
+#if ($actionDocMeta.returnTypeDocMeta.simpleTypeName == 'HtmlResponse' && $actionDocMeta.returnTypeDocMeta.value)
+<p class="actionsubitem"><span class="actionsubtitle">implementations:</span> <span class="actionsubvalue">${actionDocMeta.returnTypeDocMeta.value}</span></p>
+#end
+$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.returnTypeDocMeta)
+#end
+#end
+#else
 #foreach ($column in $table.columnList)
-${column.url} :: ${column.className} <br>
+${column.url} :: ${column.className}<br>
+#end
 #end
 </body>
 </html>

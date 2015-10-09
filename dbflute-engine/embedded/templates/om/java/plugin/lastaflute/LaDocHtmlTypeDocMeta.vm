@@ -1,0 +1,42 @@
+#if ($typeDocMeta.nestTypeDocMetaList.size() > 0)
+<table>
+    <thead>
+    <tr>
+        <th class="rownumhead">No.</th>
+        <th>name</th>
+        <th>class</th>
+        <th>comment</th>
+        <th>annotations</th>
+    </tr>
+    </thead>
+#foreach ($nestTypeDocMeta in $typeDocMeta.nestTypeDocMetaList)
+#set($rowspan = 1)
+#if ($nestTypeDocMeta.nestTypeDocMetaList.size() > 0)
+#set($rowspan = 2)
+#end
+    <tr>
+        <td class="rownumcell" rowspan="$rowspan">${foreach.count}</td>
+        <td>${nestTypeDocMeta.name}</td>
+        <td><p title="$manager.htmlEscape($nestTypeDocMeta.typeName)">$manager.htmlEscape($nestTypeDocMeta.simpleTypeName)</p></td>
+        <td><p title="$!manager.htmlEscape($nestTypeDocMeta.comment)">$!manager.htmlEscape($nestTypeDocMeta.description)</p></td>
+        <td>
+#foreach ($annotation in $nestTypeDocMeta.annotationList)
+            ${annotation}
+#if (!$foreach.isLast())
+,
+#end
+#end
+        </td>
+    </tr>
+#if ($nestTypeDocMeta.nestTypeDocMetaList.size() > 0)
+    <tr>
+        <td colspan="4">
+            <div class="nestedbean">
+$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $nestTypeDocMeta)
+            </div>
+        </td>
+    </tr>
+#end
+#end
+</table>
+#end
