@@ -252,6 +252,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _selector.selectSchemaHtml(); // regular
         _selector.selectHistoryHtml(); // regular
         _selector.selectPropertiesHtml(); // option
+        _selector.selectLastaDocHtml(); // option
         fireVelocityProcess();
     }
 

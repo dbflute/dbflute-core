@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.torque.engine.database.model.ConstraintNameGenerator;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
@@ -55,7 +54,7 @@ import org.slf4j.LoggerFactory;
 public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
 
     /** The logger instance for this class. (NotNull) */
-    private static final Logger _log = LoggerFactory.getLogger(ConstraintNameGenerator.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfLastaDocTableLoader.class);
 
     private static boolean mvnTestDocumentExecuted;
 
@@ -114,7 +113,8 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         final Map<String, Object> tableMap = mapProp.getTableMap();
         List<Map<String, String>> appList;
         try {
-            appList = Files.list(Paths.get("./output/lasta")).filter(entry -> {
+            final String outputDirectory = getLastaFluteProperties().getLastaDocOutputDirectory();
+            appList = Files.list(Paths.get(outputDirectory)).filter(entry -> {
                 return entry.getFileName().toString().matches(".*lastadoc-.*\\.html");
             }).map(file -> {
                 Map<String, String> appMap = DfCollectionUtil.newLinkedHashMap();

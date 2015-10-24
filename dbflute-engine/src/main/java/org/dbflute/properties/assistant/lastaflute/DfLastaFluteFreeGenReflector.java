@@ -61,7 +61,7 @@ public final class DfLastaFluteFreeGenReflector {
     // ===================================================================================
     //                                                                     Prepare FreeGen
     //                                                                     ===============
-    public void reflectFrom(Map<String, Object> lastafluteMap) {
+    public void reflectFrom(Map<String, Object> lastafluteMap, String lastaDocOutputDirectory) {
         logger.info("Before refecting, existing freeGen settigs: " + _freeGenMap.keySet());
         boolean hasCommonEnv = false;
         boolean hasCommonConfig = false;
@@ -92,7 +92,7 @@ public final class DfLastaFluteFreeGenReflector {
                 } else if ("template".equals(freeGen)) {
                     setupPmTemplateGen(_uncapServiceName, path, lastafluteMap);
                 } else if ("doc".equals(freeGen)) {
-                    setupDocGen(_uncapServiceName, path);
+                    setupDocGen(_uncapServiceName, path, lastaDocOutputDirectory);
                 } else {
                     String msg = "Unkonwn type for commonMap's freeGen: " + freeGen;
                     throw new DfIllegalPropertySettingException(msg);
@@ -131,7 +131,7 @@ public final class DfLastaFluteFreeGenReflector {
                     } else if ("html".equals(freeGen)) {
                         setupHtmlPathGen(appName, path, lastafluteMap);
                     } else if ("doc".equals(freeGen)) {
-                        setupDocGen(appName, path);
+                        setupDocGen(appName, path, lastaDocOutputDirectory);
                     } else {
                         String msg = "Unkonwn type for appMap's freeGen: " + freeGen;
                         throw new DfIllegalPropertySettingException(msg);
@@ -379,7 +379,7 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                            Document
     //                                                                            ========
     // last process recommended for generated classes by others
-    protected void setupDocGen(String appName, String path) {
+    protected void setupDocGen(String appName, String path, String lastaDocOutputDirectory) {
         final Map<String, Map<String, Object>> docMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "lastaDoc";
         registerFreeGen(initCap(appName) + buildTitleSuffix(theme), docMap);
@@ -390,8 +390,8 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         docMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaDocHtml.vm");
-        outputMap.put("outputDirectory", "./output");
-        outputMap.put("package", "lasta");
+        outputMap.put("outputDirectory", lastaDocOutputDirectory);
+        outputMap.put("package", ""); // flat documents e.g. ./output/doc/lastadoc-harbor.html
         outputMap.put("className", "lastadoc-" + appName);
         outputMap.put("fileExt", "html");
         final Map<String, Object> tableMap = createTableMap();

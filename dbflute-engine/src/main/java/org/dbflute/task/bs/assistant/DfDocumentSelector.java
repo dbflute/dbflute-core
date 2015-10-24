@@ -15,6 +15,9 @@
  */
 package org.dbflute.task.bs.assistant;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.List;
 
 import org.dbflute.DfBuildProperties;
@@ -23,7 +26,9 @@ import org.dbflute.logic.doc.prophtml.DfPropHtmlManager;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfLastaFluteProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
+import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +51,11 @@ public class DfDocumentSelector {
     protected boolean _schemaSyncCheckResultHtml;
     protected boolean _alterCheckResultHtml;
     protected boolean _propertiesHtml;
+    protected boolean _lastaDocHtml;
     protected DocumentType _currentDocumentType;
     protected DfSchemaHistory _schemaHistory;
     protected DfPropHtmlManager _propHtmlManager;
+    protected List<String> cachedLastaDocNameList;
 
     // ===================================================================================
     //                                                                         Coin Method
@@ -186,6 +193,26 @@ public class DfDocumentSelector {
     }
 
     // ===================================================================================
+    //                                                                   LastsaDoc Request
+    //                                                                   =================
+    public boolean existsLastaDocHtml() {
+        return !getLastaDocHtmlNameList().isEmpty();
+    }
+
+    public List<String> getLastaDocHtmlNameList() {
+        if (cachedLastaDocNameList != null) {
+            return cachedLastaDocNameList;
+        }
+        final String[] docList = new File(getLastaDocOutputDirectory()).list(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.startsWith("lastadoc-") && name.endsWith(".html");
+            }
+        });
+        cachedLastaDocNameList = docList != null ? Arrays.asList(docList) : DfCollectionUtil.emptyList();
+        return cachedLastaDocNameList;
+    }
+
+    // ===================================================================================
     //                                                                           File Name
     //                                                                           =========
     public String getSchemaHtmlFileName() {
@@ -220,6 +247,10 @@ public class DfDocumentSelector {
 
     public boolean isSchemaHtmlToPropertiesHtmlLink() {
         return !isSuppressSchemaHtmlToSisterLink() && isPropertiesHtml() && existsPropertiesHtmlRequest();
+    }
+
+    public boolean isSchemaHtmlToLastaDocLink() {
+        return !isSuppressSchemaHtmlToSisterLink() && isLastaDocHtml() && existsLastaDocHtml();
     }
 
     public boolean isHistoryHtmlToSchemaHtmlLink() {
@@ -357,6 +388,14 @@ public class DfDocumentSelector {
         return getReplaceSchemaProperties().getMigrationAlterCheckDiffMapFile();
     }
 
+    protected DfLastaFluteProperties getLastaFluteProperties() {
+        return getProperties().getLastaFluteProperties();
+    }
+
+    protected String getLastaDocOutputDirectory() {
+        return getLastaFluteProperties().getLastaDocOutputDirectory();
+    }
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
@@ -402,6 +441,15 @@ public class DfDocumentSelector {
 
     public DfDocumentSelector selectPropertiesHtml() {
         _propertiesHtml = true;
+        return this;
+    }
+
+    public boolean isLastaDocHtml() {
+        return _lastaDocHtml;
+    }
+
+    public DfDocumentSelector selectLastaDocHtml() {
+        _lastaDocHtml = true;
         return this;
     }
 }

@@ -108,7 +108,9 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
         if (domainPackage == null) {
             throw new DfIllegalPropertySettingException("The property 'domainPackage' is required: " + lastafluteMap.keySet());
         }
-        new DfLastaFluteFreeGenReflector(freeGenMap, serviceName, domainPackage).reflectFrom(getLastafluteMap());
+        final DfLastaFluteFreeGenReflector reflector = new DfLastaFluteFreeGenReflector(freeGenMap, serviceName, domainPackage);
+        final String lastaDocOutputDirectory = getLastaDocOutputDirectory();
+        reflector.reflectFrom(lastafluteMap, lastaDocOutputDirectory);
     }
 
     // ===================================================================================
@@ -181,8 +183,12 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                            Accessor
+    //                                                                            LastaDoc
     //                                                                            ========
+    public String getLastaDocOutputDirectory() {
+        return getDocumentProperties().getDocumentOutputDirectory();
+    }
+
     public boolean isLastaDocMavenGeared() {
         return isProperty("isLastaDocMavenGeared", false, getLastafluteMap());
     }
