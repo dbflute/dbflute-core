@@ -249,9 +249,11 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     protected Path acceptLastaDocFile(Map<String, Object> tableMap) {
         final List<Path> candidateList = DfCollectionUtil.newArrayList();
         final String path = (String) tableMap.get("path");
-        candidateList.add(Paths.get(path, String.format("target/lastadoc/lastadoc.json")));
-        candidateList.add(Paths.get(path, String.format("build/lastadoc/lastadoc.json")));
-        final Path lastaDocFile = Paths.get(String.format("./schema/lastadoc-%s.json", tableMap.get("appName")));
+        candidateList.add(Paths.get(path, "target/lastadoc/analyzed-lastadoc.json"));
+        candidateList.add(Paths.get(path, "build/lastadoc/analyzed-lastadoc.json"));
+        candidateList.add(Paths.get(path, "target/lastadoc/lastadoc.json")); // for compatible
+        candidateList.add(Paths.get(path, "build/lastadoc/lastadoc.json")); // for compatible
+        final Path lastaDocFile = Paths.get(String.format("./schema/project-lastadoc-%s.json", tableMap.get("appName")));
         candidateList.forEach(candidate -> {
             if (!Files.exists(candidate)) {
                 return;
