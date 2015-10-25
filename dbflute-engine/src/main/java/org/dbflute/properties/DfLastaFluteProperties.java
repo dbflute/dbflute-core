@@ -24,6 +24,7 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.properties.assistant.lastaflute.DfLastaFluteFreeGenReflector;
 import org.dbflute.properties.assistant.lastaflute.DfLastaFlutePropertiesHtmlReflector;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,28 +109,36 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
         if (domainPackage == null) {
             throw new DfIllegalPropertySettingException("The property 'domainPackage' is required: " + lastafluteMap.keySet());
         }
-        final DfLastaFluteFreeGenReflector reflector = new DfLastaFluteFreeGenReflector(freeGenMap, serviceName, domainPackage);
-        final String lastaDocOutputDirectory = getLastaDocOutputDirectory();
-        reflector.reflectFrom(lastafluteMap, lastaDocOutputDirectory);
+        final String lastaDocDir = getLastaDocOutputDirectory();
+        newFreeGenReflector(freeGenMap, serviceName, domainPackage).reflectFrom(lastafluteMap, lastaDocDir);
+    }
+
+    protected DfLastaFluteFreeGenReflector newFreeGenReflector(Map<String, Object> freeGenMap, String serviceName, String domainPackage) {
+        return new DfLastaFluteFreeGenReflector(freeGenMap, serviceName, domainPackage);
     }
 
     // ===================================================================================
     //                                                                      PropertiesHtml
     //                                                                      ==============
-    public void reflectPropertiesHtmlMap(Map<String, Object> propHtmlMap) {
+    public void reflectPropertiesHtmlMap(Map<String, Map<String, Object>> propHtmlMap) {
         final Map<String, Object> lastafluteMap = getLastafluteMap();
         final String serviceName = findServiceName(lastafluteMap);
         if (Srl.is_Null_or_TrimmedEmpty(serviceName)) { // no use
             return;
         }
         logger.info("...Loading propertiesHtml settings from lastafluteMap: " + serviceName);
-        @SuppressWarnings("unchecked")
-        final List<String> environmentList = (List<String>) lastafluteMap.get("environmentList");
-        if (environmentList == null) {
-            throw new DfIllegalPropertySettingException("The property 'environmentList' is required: " + lastafluteMap.keySet());
-        }
-        final DfLastaFlutePropertiesHtmlReflector reflector = new DfLastaFlutePropertiesHtmlReflector(propHtmlMap, serviceName, environmentList);
-        reflector.reflectFrom(getLastafluteMap());
+        final List<String> environmentList = getEnvironmentList(lastafluteMap);
+        newPropertiesHtmlReflector(propHtmlMap, serviceName, environmentList).reflectFrom(lastafluteMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected List<String> getEnvironmentList(Map<String, Object> lastafluteMap) {
+        return (List<String>) lastafluteMap.getOrDefault("environmentList", DfCollectionUtil.emptyList());
+    }
+
+    protected DfLastaFlutePropertiesHtmlReflector newPropertiesHtmlReflector(Map<String, Map<String, Object>> propHtmlMap, String serviceName,
+            List<String> environmentList) {
+        return new DfLastaFlutePropertiesHtmlReflector(propHtmlMap, serviceName, environmentList);
     }
 
     // ===================================================================================

@@ -201,7 +201,8 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
             sb.append(ln()).append("[").append(request.getRequestName()).append("]");
             sb.append(ln()).append(" resource : ").append(request.getResource());
             sb.append(ln()).append(" output   : ").append(request.getOutput());
-            sb.append(ln()).append(" tableMap : ").append(request.getTableMap());
+            final String tableMapExp = Srl.cut(request.getTableMap().toString(), 3000, "...");
+            sb.append(ln()).append(" tableMap : ").append(tableMapExp); // possible too big
         }
         _log.info(sb.toString());
         return createVelocityContext();

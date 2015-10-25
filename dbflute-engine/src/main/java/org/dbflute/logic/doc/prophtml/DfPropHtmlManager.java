@@ -172,7 +172,7 @@ public class DfPropHtmlManager {
             if (extendsAttribute != null) {
                 prepareExtendsProperties(request, reader, extendsAttribute);
             }
-            _log.info("...Reading properties file: " + fileKey);
+            _log.info("...Reading properties family file: " + fileKey);
             final JavaPropertiesResult jpropResult = reader.read();
 
             // only base-point properties are target here
@@ -204,7 +204,7 @@ public class DfPropHtmlManager {
             } else { // when default environment
                 attribute.toBeDefaultEnv();
                 if (familyFile.getName().equals(specifiedPureFileName)) {
-                    _log.info(" -> to be root file: " + specifiedPureFileName + " (" + envType + ")");
+                    _log.info(" -> root file: " + specifiedPureFileName + " (" + envType + ")");
                     attribute.toBeRootFile();
                     rootAttribute = attribute; // save for relation to root
                 }

@@ -139,7 +139,16 @@ public final class DfLastaFluteFreeGenReflector {
                 }
             }
         }
-        logger.info("After refecting, existing freeGen settigs: " + _freeGenMap.keySet());
+        showFreeGenSettings();
+    }
+
+    protected void showFreeGenSettings() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("After refecting, existing freeGen settigs: ").append(_freeGenMap.keySet());
+        for (Entry<String, Object> entry : _freeGenMap.entrySet()) {
+            sb.append("\n ").append(entry.getKey()).append(": ").append(entry.getValue());
+        }
+        logger.info(sb.toString());
     }
 
     // ===================================================================================

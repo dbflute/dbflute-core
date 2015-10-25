@@ -1101,8 +1101,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return _propertiesHtmlMap;
     }
 
-    protected Map<String, Object> preparePropertiesHtmlResourceMap() {
-        final Map<String, Object> propHtmlMap = newLinkedHashMap();
+    protected Map<String, Map<String, Object>> preparePropertiesHtmlResourceMap() {
+        final Map<String, Map<String, Object>> propHtmlMap = newLinkedHashMap();
         reflectEmbeddedPropertiesHtmlMap(propHtmlMap);
         @SuppressWarnings("unchecked")
         final Map<String, Object> specifiedMap = (Map<String, Object>) getDocumentMap().get("propertiesHtmlMap");
@@ -1110,17 +1110,18 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return propHtmlMap;
     }
 
-    protected void reflectEmbeddedPropertiesHtmlMap(Map<String, Object> propHtmlMap) {
+    protected void reflectEmbeddedPropertiesHtmlMap(Map<String, Map<String, Object>> propHtmlMap) {
         getLastaFluteProperties().reflectPropertiesHtmlMap(propHtmlMap);
     }
 
-    protected void reflectSpecifiedPropertiesHtmlMap(Map<String, Object> propHtmlMap, Map<String, Object> specifiedMap) {
+    protected void reflectSpecifiedPropertiesHtmlMap(Map<String, Map<String, Object>> propHtmlMap, Map<String, Object> specifiedMap) {
         if (specifiedMap == null) {
             return;
         }
         for (Entry<String, Object> entry : specifiedMap.entrySet()) {
             final String key = entry.getKey();
-            final Object value = entry.getValue();
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> value = (Map<String, Object>) entry.getValue();
             if (propHtmlMap.containsKey(key)) {
                 String msg = "Already embedded the propertiesHtml setting: " + key + ", " + value;
                 throw new DfIllegalPropertySettingException(msg);
@@ -1129,16 +1130,15 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
     }
 
-    protected Map<String, Map<String, Object>> resolvePropertiesHtmlMap(Map<String, Object> propertiesHtmlMap) {
+    protected Map<String, Map<String, Object>> resolvePropertiesHtmlMap(Map<String, Map<String, Object>> propertiesHtmlMap) {
         final String baseDirKey = "baseDir";
         final String baseDirVariable = "$$" + baseDirKey + "$$";
         final String rootFileKey = "rootFile";
         final String envMapKey = "environmentMap";
         final Map<String, Map<String, Object>> resolvedMap = newLinkedHashMap();
-        for (Entry<String, Object> requestEntry : propertiesHtmlMap.entrySet()) {
+        for (Entry<String, Map<String, Object>> requestEntry : propertiesHtmlMap.entrySet()) {
             final String requestName = requestEntry.getKey();
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> requestMap = (Map<String, Object>) requestEntry.getValue();
+            final Map<String, Object> requestMap = requestEntry.getValue();
             if (requestName.equals("df:header")) {
                 _propertiesHtmlHeaderMap = requestMap;
                 continue;
