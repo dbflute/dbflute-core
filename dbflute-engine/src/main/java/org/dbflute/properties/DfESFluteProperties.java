@@ -30,16 +30,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
- * @since 1.1.0-sp3 (2015/04/26 Sunday)
+ * @since 1.1.0-sp9 (2015/10/25 Sunday)
  */
-public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
+public final class DfESFluteProperties extends DfAbstractHelperProperties {
 
-    private static final Logger logger = LoggerFactory.getLogger(DfLastaFluteProperties.class);
+    private static final Logger logger = LoggerFactory.getLogger(DfESFluteProperties.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfLastaFluteProperties(Properties prop) {
+    public DfESFluteProperties(Properties prop) {
         super(prop);
     }
 
@@ -50,7 +50,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     //     ; serviceName = maihama
     //     ; domainPackage = org.docksidestage
     //     ; environmentList = list:{ integration ; production }
-    //     ; isUseLastaEnv = true
+    //     ; isMakeDocActionHtml = true
     //     ; commonMap = map:{
     //         ; path = ../
     //         ; freeGenList = list:{ env ; config ; label ; message ; jsp }
@@ -128,8 +128,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
         if (environmentList == null) {
             throw new DfIllegalPropertySettingException("The property 'environmentList' is required: " + lastafluteMap.keySet());
         }
-        final DfLastaFlutePropertiesHtmlReflector reflector = new DfLastaFlutePropertiesHtmlReflector(propHtmlMap, serviceName, environmentList);
-        reflector.reflectFrom(getLastafluteMap());
+        new DfLastaFlutePropertiesHtmlReflector(propHtmlMap, serviceName, environmentList).reflectFrom(getLastafluteMap());
     }
 
     // ===================================================================================

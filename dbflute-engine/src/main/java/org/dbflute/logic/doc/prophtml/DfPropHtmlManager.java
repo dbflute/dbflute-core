@@ -91,20 +91,20 @@ public class DfPropHtmlManager {
         final DfPropHtmlRequest request = createPropHtmlRequest(requestMap, requestName);
         final DfDocumentProperties prop = getDocumentProperties();
         final String rootFile = prop.getPropertiesHtmlRootFile(requestMap);
-        final Map<String, DfPropHtmlFileAttribute> defaultEnvMap = setupDefaultEnvProperty(request, rootFile);
+        final Map<String, DfPropHtmlFileAttribute> defaultEnvMap = setupDefaultEnvFamilyProperty(request, requestMap, rootFile);
         assertPropHtmlRootFileExists(defaultEnvMap, requestName, rootFile);
         final Map<String, String> environmentMap = prop.getPropertiesHtmlEnvironmentMap(requestMap);
         final String standardPureFileName = Srl.substringLastRear(rootFile, "/");
-        for (Entry<String, String> envEntry : environmentMap.entrySet()) {
-            final String envType = envEntry.getKey();
-            final String envDir = envEntry.getValue();
+        for (Entry<String, String> entry : environmentMap.entrySet()) {
+            final String envType = entry.getKey();
+            final String envDir = entry.getValue();
             final String envFile;
             if (envDir.endsWith(".properties")) { // file name specified
                 envFile = envDir;
             } else {
                 envFile = envDir + "/" + standardPureFileName;
             }
-            setupEnvironmentProperty(request, envFile, envType, defaultEnvMap);
+            setupSpecifiedEnvFamilyProperty(request, requestMap, envFile, envType, defaultEnvMap);
         }
         return request;
     }
@@ -134,20 +134,21 @@ public class DfPropHtmlManager {
     }
 
     // ===================================================================================
-    //                                                                     Set up Property
-    //                                                                     ===============
-    protected Map<String, DfPropHtmlFileAttribute> setupDefaultEnvProperty(DfPropHtmlRequest request, String propertiesFile) {
-        return doSetupEnvironmentProperty(request, propertiesFile, ENV_TYPE_DEFAULT, null);
+    //                                                              Set up Family Property
+    //                                                              ======================
+    protected Map<String, DfPropHtmlFileAttribute> setupDefaultEnvFamilyProperty(DfPropHtmlRequest request, Map<String, Object> requestMap,
+            String propertiesFile) {
+        return doSetupFamilyProperty(request, requestMap, propertiesFile, ENV_TYPE_DEFAULT, null);
     }
 
-    protected Map<String, DfPropHtmlFileAttribute> setupEnvironmentProperty(DfPropHtmlRequest request, String propertiesFile,
-            String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
-        return doSetupEnvironmentProperty(request, propertiesFile, envType, defaultEnvMap);
+    protected Map<String, DfPropHtmlFileAttribute> setupSpecifiedEnvFamilyProperty(DfPropHtmlRequest request,
+            Map<String, Object> requestMap, String propertiesFile, String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
+        return doSetupFamilyProperty(request, requestMap, propertiesFile, envType, defaultEnvMap);
     }
 
-    protected Map<String, DfPropHtmlFileAttribute> doSetupEnvironmentProperty(DfPropHtmlRequest request, String propertiesFile,
-            String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
-        final List<File> familyFileList = extractFamilyFileList(request.getRequestName(), propertiesFile);
+    protected Map<String, DfPropHtmlFileAttribute> doSetupFamilyProperty(DfPropHtmlRequest request, Map<String, Object> requestMap,
+            String propertiesFile, String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
+        final List<File> familyFileList = extractFamilyFileList(request.getRequestName(), requestMap, propertiesFile);
         if (familyFileList.isEmpty()) {
             return DfCollectionUtil.emptyMap();
         }
@@ -164,14 +165,14 @@ public class DfPropHtmlManager {
         final DfPropHtmlRequest extendsRequest = getExtendsRequest(request);
         for (final File familyFile : familyFileList) {
             final String langType = extractLangType(familyFile.getName());
-            final String fileKey = buildFileKey(familyFile, envType);
-            _log.info("...Reading properties file: " + fileKey);
+            final String fileKey = buildFileKey(envType, familyFile);
             final String title = fileKey + ":" + familyFile.getPath();
             final JavaPropertiesReader reader = createReader(request, title, familyFile);
             final DfPropHtmlFileAttribute extendsAttribute = findExtendsAttribute(extendsRequest, envType, langType);
             if (extendsAttribute != null) {
                 prepareExtendsProperties(request, reader, extendsAttribute);
             }
+            _log.info("...Reading properties file: " + fileKey);
             final JavaPropertiesResult jpropResult = reader.read();
 
             // only base-point properties are target here
@@ -203,6 +204,7 @@ public class DfPropHtmlManager {
             } else { // when default environment
                 attribute.toBeDefaultEnv();
                 if (familyFile.getName().equals(specifiedPureFileName)) {
+                    _log.info(" -> to be root file: " + specifiedPureFileName + " (" + envType + ")");
                     attribute.toBeRootFile();
                     rootAttribute = attribute; // save for relation to root
                 }
@@ -220,34 +222,61 @@ public class DfPropHtmlManager {
         return attributeMap;
     }
 
-    protected String buildFileKey(File familyFile, String envType) {
+    protected String extractLangType(String propertiesFile) {
+        final String pureFileName = Srl.substringLastRear(propertiesFile, "/");
+        final String pureFileNameNoExt = Srl.substringLastFront(pureFileName, ".");
+        if (pureFileNameNoExt.contains("_")) {
+            final String langType = Srl.substringLastRear(pureFileNameNoExt, "_");
+            if (langType.length() == 2) { // simple condition, but enough
+                return langType; // e.g. ja, en
+            }
+        }
+        return LANG_TYPE_DEFAULT; // as default
+    }
+
+    protected String buildFileKey(String envType, File familyFile) {
         return (ENV_TYPE_DEFAULT.equals(envType) ? "default" : envType) + ":" + familyFile.getName();
     }
 
     // ===================================================================================
     //                                                                         Family File
     //                                                                         ===========
-    protected List<File> extractFamilyFileList(String requestName, String propertiesFile) {
+    // contains root file
+    protected List<File> extractFamilyFileList(String requestName, Map<String, Object> requestMap, String propertiesFile) {
+        // country unsupported, two characters '_xx' is treated as language 
         final List<File> familyFileList = DfCollectionUtil.newArrayList();
         final File targetDir = new File(Srl.substringLastFront(propertiesFile, "/"));
         final String pureFileName = Srl.substringLastRear(propertiesFile, "/");
         final String pureFileNameNoExt = Srl.substringLastFront(pureFileName, ".");
         final String ext = Srl.substringLastRear(pureFileName, ".");
-        final String pureFileNameNoExtNoLang;
-        final String langType = extractLangType(propertiesFile);
-        if (!LANG_TYPE_DEFAULT.equals(langType)) { // the properties file has language type
-            pureFileNameNoExtNoLang = Srl.substringLastFront(pureFileNameNoExt, "_");
+        final String pureFileNameNoLangNoExt;
+        if (Srl.substringLastFront(propertiesFile, ".").endsWith("_ja")) { // for compatible
+            pureFileNameNoLangNoExt = Srl.substringLastFront(pureFileNameNoExt, "_"); // remove e.g. _ja
         } else {
-            pureFileNameNoExtNoLang = pureFileNameNoExt;
+            pureFileNameNoLangNoExt = pureFileNameNoExt; // standard file e.g. harbor_message.properties
         }
-        assertPropHtmlEnvironmentDirectoryExists(targetDir, requestName, propertiesFile);
+        assertPropHtmlPropertiesFileDirectoryExists(targetDir, requestName, propertiesFile);
+        final boolean detectLang = !getDocumentProperties().isPropertiesHtmlSuppressLangFileDetect(requestMap);
+        final String dotExt = "." + ext;
         final File[] listFiles = targetDir.listFiles(new FileFilter() {
             public boolean accept(File file) {
                 if (file.isDirectory()) {
                     return false;
                 }
                 final String pureName = file.getName();
-                return pureName.startsWith(pureFileNameNoExtNoLang) && pureName.endsWith("." + ext);
+                if (pureName.equals(pureFileNameNoLangNoExt + dotExt)) { // self
+                    return true;
+                } else { // might be language files
+                    if (detectLang && pureName.startsWith(pureFileNameNoLangNoExt) && pureName.endsWith(dotExt)) {
+                        final String langPart = Srl.extractScopeFirst(pureName, pureFileNameNoLangNoExt, dotExt).getContent();
+                        if (langPart.startsWith("_") && langPart.length() == 3) { // e.g. _ja, _en
+                            return true;
+                        }
+                        // not language e.g. _sea, _lang, not family so ignore
+                        _log.info("...Ignoring not language file: " + pureName + " for " + propertiesFile);
+                    }
+                }
+                return false;
             }
         });
         if (listFiles != null && listFiles.length > 0) {
@@ -258,19 +287,7 @@ public class DfPropHtmlManager {
         return familyFileList;
     }
 
-    protected String extractLangType(String propertiesFile) {
-        final String pureFileName = Srl.substringLastRear(propertiesFile, "/");
-        final String pureFileNameNoExt = Srl.substringLastFront(pureFileName, ".");
-        if (pureFileNameNoExt.contains("_")) {
-            final String langType = Srl.substringLastRear(pureFileNameNoExt, "_");
-            if (langType.length() == 2) {
-                return langType; // e.g. ja, en
-            }
-        }
-        return LANG_TYPE_DEFAULT; // as default
-    }
-
-    protected void assertPropHtmlEnvironmentDirectoryExists(File targetDir, String requestName, String propertiesFile) {
+    protected void assertPropHtmlPropertiesFileDirectoryExists(File targetDir, String requestName, String propertiesFile) {
         if (targetDir.exists()) {
             return;
         }
@@ -302,7 +319,7 @@ public class DfPropHtmlManager {
                 break;
             }
             final File extendsFile = current.getPropertiesFile();
-            final String extendsFileKey = buildFileKey(extendsFile, current.getEnvType());
+            final String extendsFileKey = buildFileKey(current.getEnvType(), extendsFile);
             final String extendsTitle = extendsFileKey + ":" + extendsFile.getPath();
             reader.extendsProperties(extendsTitle, new JavaPropertiesStreamProvider() {
                 public InputStream provideStream() throws IOException {

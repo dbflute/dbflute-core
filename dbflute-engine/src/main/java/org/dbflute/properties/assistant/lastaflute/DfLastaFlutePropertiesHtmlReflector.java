@@ -228,6 +228,10 @@ public final class DfLastaFlutePropertiesHtmlReflector {
             environmentMap.put(envKey, path);
         }
         map.put("environmentMap", environmentMap);
+        if (envSuffixOnFile) {
+            // cannot support language type, because cannot detect correctly
+            map.put("isSuppressLangFileDetect", "true");
+        }
     }
 
     protected void registerExtendsProp(Map<String, Object> map, String parentName, String parentTheme) {

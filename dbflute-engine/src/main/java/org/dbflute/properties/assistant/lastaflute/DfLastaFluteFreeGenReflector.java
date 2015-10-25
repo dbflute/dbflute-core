@@ -341,7 +341,7 @@ public final class DfLastaFluteFreeGenReflector {
     }
 
     protected void setupHtmlPathGen(String appName, String path, Map<String, Object> lastafluteMap) {
-        // TODO jflute lastaflute: thinking Thymeleaf localtion
+        // daone jflute lastaflute: thinking Thymeleaf localtion => same as JSP for now
         //final String targetDir = "$$baseDir$$/resources/templates";
         final String targetDir = "$$baseDir$$/webapp/WEB-INF/view";
         doSetupHtmlTemplatePathGen(appName, path, targetDir, "html", lastafluteMap);

@@ -1087,6 +1087,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //         ; maskedKeyList = list:{ errors.masked.key }
     //         ; extendsPropRequest = MaihamaConfig
     //         ; isCheckImplicitOverride = true
+    //         ; isSuppressFamilyFileDetect = true
     //     }
     // }
     protected Map<String, Object> _propertiesHtmlHeaderMap;
@@ -1187,23 +1188,19 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String getPropertiesHtmlHeaderTitle() {
-        final String title = (String) getPropertiesHtmlHeaderMap().get("title");
-        return title != null ? title : null;
+        return (String) getPropertiesHtmlHeaderMap().get("title");
     }
 
     protected String getPropertiesHtmlHeaderHtmlFileName() {
-        final String fileName = (String) getPropertiesHtmlHeaderMap().get("htmlFileName");
-        return fileName != null ? fileName : null;
+        return (String) getPropertiesHtmlHeaderMap().get("htmlFileName");
     }
 
     protected String getPropertiesHtmlHeaderStyleSheet() {
-        final String sheet = (String) getPropertiesHtmlHeaderMap().get("styleSheet");
-        return sheet != null ? sheet : null;
+        return (String) getPropertiesHtmlHeaderMap().get("styleSheet");
     }
 
     protected String getPropertiesHtmlHeaderJavaScript() {
-        final String js = (String) getPropertiesHtmlHeaderMap().get("javaScript");
-        return js != null ? js : null;
+        return (String) getPropertiesHtmlHeaderMap().get("javaScript");
     }
 
     public boolean isSuppressPropertiesHtmlToSisterLink() { // closet
@@ -1254,6 +1251,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public boolean isPropertiesHtmlCheckImplicitOverride(Map<String, Object> requestMap) {
         return isProperty("isCheckImplicitOverride", false, requestMap);
+    }
+
+    public boolean isPropertiesHtmlSuppressLangFileDetect(Map<String, Object> requestMap) {
+        return isProperty("isSuppressLangFileDetect", false, requestMap);
     }
 
     // -----------------------------------------------------
