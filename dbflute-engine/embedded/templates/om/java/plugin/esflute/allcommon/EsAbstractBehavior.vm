@@ -53,19 +53,13 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
     protected Client client;
 
     protected int sizeForDelete = 100;
-
     protected String scrollForDelete = "1m";
-
     protected int sizeForCursor = 100;
-
     protected String scrollForCursor = "1m";
 
     protected abstract String asEsIndex();
-
     protected abstract String asEsIndexType();
-
     protected abstract String asEsSearchType();
-
     protected abstract <RESULT extends ENTITY> RESULT createEntity(Map<String, Object> source, Class<? extends RESULT> entityType);
 
     @Override

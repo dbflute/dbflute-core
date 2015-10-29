@@ -32,14 +32,11 @@ import org.elasticsearch.common.unit.TimeValue;
  */
 public abstract class EsAbstractConditionBean implements ConditionBean {
 
-    protected int _safetyMaxResultSize;
-
     protected final SqlClause _sqlClause = new EsSqlClause(asTableDbName());
-
+    protected int _safetyMaxResultSize;
     private SearchRequestParams _searchRequestParams = new SearchRequestParams();
 
     public abstract CountRequestBuilder build(CountRequestBuilder builder);
-
     public abstract SearchRequestBuilder build(SearchRequestBuilder builder);
 
     @Override

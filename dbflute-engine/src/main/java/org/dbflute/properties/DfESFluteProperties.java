@@ -56,7 +56,7 @@ public final class DfESFluteProperties extends DfAbstractHelperProperties {
     //         }
     //     }
     //     # not required
-    //     ; continueIfNotFound = false
+    //     ; isContinueIfUrlFailure = false
     //     ; mappingMap = map:{
     //         ; type = map:{
     //             ; string = String
@@ -124,6 +124,13 @@ public final class DfESFluteProperties extends DfAbstractHelperProperties {
     protected DfESFluteFreeGenReflector newFreeGenReflector(Map<String, Object> freeGenMap, String outputDirectory, String basePackage,
             String basePath) {
         return new DfESFluteFreeGenReflector(freeGenMap, outputDirectory, basePackage, basePath);
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public boolean isContinueIfUrlFailure() {
+        return isProperty("isContinueIfUrlFailure", false, getEsfluteMap());
     }
 
     // ===================================================================================

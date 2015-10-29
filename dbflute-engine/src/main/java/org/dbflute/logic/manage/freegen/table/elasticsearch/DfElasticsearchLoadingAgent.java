@@ -20,14 +20,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.exception.DfFreeGenCancelException;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenLazyReflector;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenMethodConverter;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonFreeAgent;
+import org.dbflute.logic.manage.freegen.table.json.DfJsonFreeAgent.DfJsonUrlCannotRequestException;
+import org.dbflute.properties.DfESFluteProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
@@ -114,7 +118,17 @@ public class DfElasticsearchLoadingAgent {
         final Map<String, Object> tableMap = _mapProp.getTableMap();
         prepareReflectorList();
         final Map<String, Map<String, Object>> schemaMap = DfCollectionUtil.newLinkedHashMap();
-        final Map<String, Object> rootMap = decodeJsonMap();
+        final String resourceFile = _resource.getResourceFile();
+        final Map<String, Object> rootMap;
+        try {
+            rootMap = decodeJsonMap(resourceFile);
+        } catch (DfJsonUrlCannotRequestException e) {
+            if (getESFluteProperties().isContinueIfUrlFailure()) {
+                throw new DfFreeGenCancelException("Cannot access to the URL: " + resourceFile, e);
+            } else {
+                throw e;
+            }
+        }
         final String tablePath = (String) tableMap.get("tablePath");
         if (Srl.is_Null_or_TrimmedEmpty(tablePath)) {
             throwJsonTablePathPropertyNotFoundException();
@@ -136,6 +150,10 @@ public class DfElasticsearchLoadingAgent {
         reflectLazyProcess();
         prepareFinalDetermination(schemaMap);
         return new DfFreeGenTable(tableMap, schemaMap);
+    }
+
+    protected DfESFluteProperties getESFluteProperties() {
+        return DfBuildProperties.getInstance().getESFluteProperties();
     }
 
     protected void prepareFinalDetermination(final Map<String, Map<String, Object>> schemaMap) {
@@ -341,8 +359,7 @@ public class DfElasticsearchLoadingAgent {
     // ===================================================================================
     //                                                                         Decode JSON
     //                                                                         ===========
-    protected Map<String, Object> decodeJsonMap() {
-        final String resourceFile = _resource.getResourceFile();
+    protected Map<String, Object> decodeJsonMap(String resourceFile) {
         return new DfJsonFreeAgent().decodeJsonMap(_requestName, resourceFile);
     }
 

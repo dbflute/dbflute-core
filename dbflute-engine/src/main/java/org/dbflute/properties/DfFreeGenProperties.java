@@ -33,13 +33,22 @@ import org.dbflute.logic.manage.freegen.DfFreeGenOutput;
 import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenResourceType;
+import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
+import org.dbflute.logic.manage.freegen.exception.DfFreeGenCancelException;
 import org.dbflute.util.DfCollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
  */
 public final class DfFreeGenProperties extends DfAbstractHelperProperties {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Logger _log = LoggerFactory.getLogger(DfFreeGenProperties.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -162,8 +171,14 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             if (tableLoader == null) {
                 throwFreeGenResourceTypeUnknownException(requestName, resource);
             }
-            request.setTable(tableLoader.loadTable(requestName, resource, mapProp));
-
+            final DfFreeGenTable table;
+            try {
+                table = tableLoader.loadTable(requestName, resource, mapProp);
+            } catch (DfFreeGenCancelException continued) {
+                showCancelledRequest(requestName, continued);
+                continue;
+            }
+            request.setTable(table);
             request.setPackagePathHandler(new DfPackagePathHandler(getBasicProperties()));
             _freeGenRequestList.add(request);
             requestMap.put(requestName, request);
@@ -229,6 +244,24 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
         br.addElement(resource.getResourceType());
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg);
+    }
+
+    protected void showCancelledRequest(final String requestName, DfFreeGenCancelException continued) {
+        // e.g.
+        // - *Cancelled the freeGen request: ESFluteFessConfig
+        // -   |-DfFreeGenCancelException: Cannot access to the URL: http://localhost:8080/fess_config
+        // -       |-DfJsonUrlCannotRequestException: Failed to access to the URL: http://localhost:8080/fess_config
+        // -           |-ConnectException: Connection refused
+        _log.info("*Cancelled the freeGen request: " + requestName);
+        _log.info("  |-" + continued.getClass().getSimpleName() + ": " + continued.getMessage());
+        final Throwable cause = continued.getCause();
+        if (cause != null && !cause.equals(continued)) {
+            _log.info("      |-" + cause.getClass().getSimpleName() + ": " + cause.getMessage());
+            final Throwable more = cause.getCause();
+            if (more != null && !more.equals(cause)) {
+                _log.info("          |-" + more.getClass().getSimpleName() + ": " + more.getMessage());
+            }
+        }
     }
 
     // ===================================================================================

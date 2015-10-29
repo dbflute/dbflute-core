@@ -42,9 +42,7 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
     protected static final String CQ_PROPERTY = "conditionQuery";
 
     protected List<QueryBuilder> queryBuilderList;
-
     protected List<FieldSortBuilder> fieldSortBuilderList;
-
     private DocMetaCQ docMetaCQ;
 
     public DocMetaCQ docMeta() {
