@@ -110,6 +110,10 @@ public class DfLanguageDependencyCSharp implements DfLanguageDependency {
         return "om/ControlSql2EntityCSharp.vm";
     }
 
+    public String getESFluteFreeGenControl() {
+        throw new UnsupportedOperationException("Unsupported at CSharp");
+    }
+    
     public String getLastaFluteFreeGenControl() {
         throw new UnsupportedOperationException("Unsupported at CSharp");
     }

@@ -29,6 +29,7 @@ import org.dbflute.properties.DfCommonColumnProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDependencyInjectionProperties;
 import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfESFluteProperties;
 import org.dbflute.properties.DfFlexDtoProperties;
 import org.dbflute.properties.DfFreeGenProperties;
 import org.dbflute.properties.DfHibernateProperties;
@@ -203,6 +204,13 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
+    //                                               ESFlute
+    //                                               -------
+    public DfESFluteProperties getESFluteProperties() {
+        return getHandler().getESFluteProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
     //                                              Flex DTO
     //                                              --------
     public DfFlexDtoProperties getFlexDtoProperties() {
@@ -243,7 +251,7 @@ public final class DfBuildProperties {
     public DfLastaFluteProperties getLastaFluteProperties() {
         return getHandler().getLastaFluteProperties(getProperties());
     }
-    
+
     // -----------------------------------------------------
     //                                     Little Adjustment
     //                                     -----------------

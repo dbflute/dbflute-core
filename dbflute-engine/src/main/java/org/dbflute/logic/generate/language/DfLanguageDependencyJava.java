@@ -112,8 +112,12 @@ public class DfLanguageDependencyJava implements DfLanguageDependency {
         return "om/ControlSql2EntityJava.vm";
     }
 
+    public String getESFluteFreeGenControl() {
+        return "om/java/plugin/esflute/ControlFreeGenEsJava.vm";
+    }
+
     public String getLastaFluteFreeGenControl() {
-        return "om/java/plugin/lastaflute/LaControlFreeGenJava.vm";
+        return "om/java/plugin/lastaflute/ControlFreeGenLastaJava.vm";
     }
 
     public String getGenerateOutputDirectory() {

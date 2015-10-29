@@ -62,7 +62,7 @@ public final class DfLastaFlutePropertiesHtmlReflector {
     //                                                                     Prepare FreeGen
     //                                                                     ===============
     public void reflectFrom(Map<String, Object> lastafluteMap) {
-        logger.info("Before refecting, existing propertiesHtml settigs: " + _propHtmlMap.keySet());
+        logger.info("Before LastaFlute refecting, existing propertiesHtml settigs: " + _propHtmlMap.keySet());
         final boolean lastaEnv = isUseLastaEnv(lastafluteMap);
         boolean hasCommonEnv = false;
         boolean hasCommonConfig = false;
@@ -134,7 +134,7 @@ public final class DfLastaFlutePropertiesHtmlReflector {
 
     protected void showPropertiesHtmlSettings() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("After refecting, existing propertiesHtml settigs: ").append(_propHtmlMap.keySet());
+        sb.append("After LastaFlute refecting, existing propertiesHtml settigs: ").append(_propHtmlMap.keySet());
         for (Entry<String, Map<String, Object>> entry : _propHtmlMap.entrySet()) {
             sb.append("\n ").append(entry.getKey()).append(": ").append(entry.getValue());
         }

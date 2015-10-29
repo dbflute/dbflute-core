@@ -117,6 +117,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     }
 
     protected void reflectEmbeddedProperties() {
+        getESFluteProperties().reflectFreeGenMap(_freeGenMap);
         getLastaFluteProperties().reflectFreeGenMap(_freeGenMap);
     }
 

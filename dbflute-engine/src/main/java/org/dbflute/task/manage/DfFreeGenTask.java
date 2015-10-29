@@ -86,6 +86,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     @Override
     protected void doExecute() {
         prepareFreeGenRequestList();
+        processESFluteFreeGen();
         processLastaFluteFreeGen();
         processApplicationFreeGen();
         refreshResources();
@@ -99,6 +100,49 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
                 continue;
             }
             _freeGenRequestList.add(request);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                             ESFlute
+    //                                                                             =======
+    protected void processESFluteFreeGen() {
+        if (!hasESFluteRequest()) {
+            return;
+        }
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final String control = lang.getESFluteFreeGenControl();
+        _log.info("");
+        _log.info("* * * * * * * * * * * * * *");
+        _log.info("* Process ESFlute FreeGen *");
+        _log.info("* * * * * * * * * * * * * *");
+        _log.info("...Using control: " + control);
+        setControlTemplate(control);
+        fireVelocityProcess();
+        removeESFluteDoneRequest();
+    }
+
+    protected boolean hasESFluteRequest() {
+        for (DfFreeGenRequest request : _freeGenRequestList) {
+            final Object es = request.getTableMap().get("isESFlute");
+            if (es != null && (boolean) es) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void removeESFluteDoneRequest() {
+        final List<DfFreeGenRequest> doneList = new ArrayList<DfFreeGenRequest>();
+        for (DfFreeGenRequest request : _freeGenRequestList) {
+            final Object la = request.getTableMap().get("isESFlute");
+            if (la != null && (boolean) la) {
+                doneList.add(request);
+            }
+        }
+        _log.info("...Removing esflute requests: " + doneList.size());
+        for (DfFreeGenRequest request : doneList) {
+            _freeGenRequestList.remove(request);
         }
     }
 
