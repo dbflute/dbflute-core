@@ -71,7 +71,13 @@ public class DfJsonFreeAgent {
         final ScriptEngineManager manager = new ScriptEngineManager();
         final ScriptEngine engine = manager.getEngineByName("javascript");
         try {
-            engine.eval("var result = " + json);
+            final String realExp;
+            if (json.startsWith("{") || json.startsWith("[")) { // map, list style
+                realExp = json;
+            } else { // map omitted?
+                realExp = "{" + json + "}";
+            }
+            engine.eval("var result = " + realExp);
         } catch (ScriptException e) {
             throwJsonParseFailureException(requestName, resourceFile, e);
         }
