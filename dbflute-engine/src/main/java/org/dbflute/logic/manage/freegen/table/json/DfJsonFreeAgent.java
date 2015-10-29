@@ -16,16 +16,12 @@
 package org.dbflute.logic.manage.freegen.table.json;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,7 +38,6 @@ import javax.script.ScriptException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.Srl;
 
 /**
@@ -52,106 +47,36 @@ import org.dbflute.util.Srl;
 public class DfJsonFreeAgent {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    // TODO jflute want to use JavaScript (2015/10/29)
-    protected static final String JSON_DECODER_NAME = "net.arnx.jsonic.JSON";
-
-    // ===================================================================================
     //                                                                         Decode JSON
     //                                                                         ===========
-    public Map<String, Object> decodeJsonMap(String requestName, String resourceFile) {
-        final String decoderName = JSON_DECODER_NAME;
-        final Class<?> jsonType;
-        try {
-            jsonType = Class.forName(decoderName);
-        } catch (ClassNotFoundException e) {
-            throwJsonDecoderNotFoundException(requestName, resourceFile, decoderName, e);
-            return null; // unreachable
-        }
-        final String decodeMethodName = "decode";
-        final Class<?>[] argTypes = new Class<?>[] { InputStream.class };
-        final Method decodeMethod = DfReflectionUtil.getPublicMethod(jsonType, decodeMethodName, argTypes);
-        FileInputStream ins = null;
-        final Object decodedObj;
-        if (resourceFile.startsWith("http://")) {
-            try {
-                decodedObj = requestJsonResponse(resourceFile);
-            } catch (IOException e) {
-                throw new DfJsonUrlCannotRequestException("Failed to access to the URL: " + resourceFile, e);
-            }
+    public <RESULT> RESULT decodeJsonMap(String requestName, String resourceFile) throws DfJsonUrlCannotRequestException {
+        final String json;
+        if (resourceFile.startsWith("http://")) { // JSON response
+            json = requestJsonResponse(resourceFile);
         } else { // relative path to local file
-            try {
-                ins = new FileInputStream(new File(resourceFile));
-                decodedObj = DfReflectionUtil.invokeStatic(decodeMethod, new Object[] { ins });
-            } catch (FileNotFoundException e) {
+            try (Scanner scanner = new Scanner(Paths.get(resourceFile))) {
+                json = scanner.useDelimiter("\\Z").next();
+            } catch (NoSuchFileException e) {
                 throwJsonFileNotFoundException(requestName, resourceFile, e);
                 return null; // unreachable
-            } catch (RuntimeException e) {
-                throwJsonParseFailureException(requestName, resourceFile, e);
+            } catch (IOException e) {
+                throwJsonFileCannotAccessException(requestName, resourceFile, e);
                 return null; // unreachable
-            } finally {
-                if (ins != null) {
-                    try {
-                        ins.close();
-                    } catch (IOException ignored) {}
-                }
             }
         }
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> rootMap = (Map<String, Object>) decodedObj;
-        return rootMap;
+        return fromJson(requestName, resourceFile, json);
     }
 
-    protected String requestJsonResponse(String resourceFile) throws MalformedURLException, IOException {
-        final URL url = new URL(resourceFile);
-        final URLConnection uc = url.openConnection();
-        final InputStream is = uc.getInputStream();
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(is));
-            final StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-            return sb.toString();
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
-        }
-    }
-
-    public static class DfJsonUrlCannotRequestException extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
-
-        public DfJsonUrlCannotRequestException(String msg) {
-            super(msg);
-        }
-
-        public DfJsonUrlCannotRequestException(String msg, Throwable cause) {
-            super(msg, cause);
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                         by JavaScript
-    //                                         -------------
-    public <RESULT> RESULT decodeJsonMapByJs(String requestName, String resourceFile) {
+    protected <RESULT> RESULT fromJson(String requestName, String resourceFile, String json) {
         final ScriptEngineManager manager = new ScriptEngineManager();
         final ScriptEngine engine = manager.getEngineByName("javascript");
-        try (Scanner scanner = new Scanner(Paths.get(resourceFile))) {
-            engine.eval("var result = " + scanner.useDelimiter("\\Z").next());
-        } catch (IOException e) {
-            throwJsonFileNotFoundException(requestName, resourceFile, e);
+        try {
+            engine.eval("var result = " + json);
         } catch (ScriptException e) {
             throwJsonParseFailureException(requestName, resourceFile, e);
         }
-
         @SuppressWarnings("unchecked")
-        RESULT result = (RESULT) engine.get("result");
+        final RESULT result = (RESULT) engine.get("result");
         return filterJavaScriptObject(result);
     }
 
@@ -195,31 +120,20 @@ public class DfJsonFreeAgent {
         return new ArrayList<Object>(map.values());
     }
 
-    protected void throwJsonDecoderNotFoundException(String requestName, String resourceFile, String decoderName, ClassNotFoundException e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the JSON decoder for FreeGen.");
-        br.addItem("Advice");
-        br.addElement("You should put the JSONIC jar file to the 'extlib' directory");
-        br.addElement("on DBFlute client when you use JSON handling of FreeGen.");
-        br.addElement("For example:");
-        br.addElement("  {DBFluteClient}");
-        br.addElement("    |-dfprop");
-        br.addElement("    |-extlib");
-        br.addElement("    |  |-jsonic-1.2.5.jar");
-        br.addElement("    |-...");
-        br.addItem("Request Name");
-        br.addElement(requestName);
-        br.addItem("Resource File");
-        br.addElement(resourceFile);
-        br.addItem("Decoder Name");
-        br.addElement(decoderName);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg, e);
-    }
-
     protected void throwJsonFileNotFoundException(String requestName, String resourceFile, IOException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the JSON file for FreeGen.");
+        br.addItem("FreeGen Request");
+        br.addElement(requestName);
+        br.addItem("JSON File");
+        br.addElement(resourceFile);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg, cause);
+    }
+
+    protected void throwJsonFileCannotAccessException(String requestName, String resourceFile, IOException cause) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Cannot access the JSON file for FreeGen.");
         br.addItem("FreeGen Request");
         br.addElement(requestName);
         br.addItem("JSON File");
@@ -237,6 +151,46 @@ public class DfJsonFreeAgent {
         br.addElement(resourceFile);
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg, cause);
+    }
+
+    // -----------------------------------------------------
+    //                                           Request URL
+    //                                           -----------
+    protected String requestJsonResponse(String resourceFile) {
+        BufferedReader reader = null;
+        try {
+            final URL url = new URL(resourceFile);
+            final URLConnection uc = url.openConnection();
+            final InputStream is = uc.getInputStream();
+            reader = new BufferedReader(new InputStreamReader(is));
+            final StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            throw new DfJsonUrlCannotRequestException("Failed to access to the URL: " + resourceFile, e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ignored) {}
+            }
+        }
+    }
+
+    public static class DfJsonUrlCannotRequestException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        public DfJsonUrlCannotRequestException(String msg) {
+            super(msg);
+        }
+
+        public DfJsonUrlCannotRequestException(String msg, Throwable cause) {
+            super(msg, cause);
+        }
     }
 
     // ===================================================================================

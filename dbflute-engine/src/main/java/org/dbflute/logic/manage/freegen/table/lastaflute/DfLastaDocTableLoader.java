@@ -53,6 +53,9 @@ import org.slf4j.LoggerFactory;
  */
 public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
     private static final Logger _log = LoggerFactory.getLogger(DfLastaDocTableLoader.class);
 
@@ -100,12 +103,9 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         executeTestDocument(tableMap);
         final Path lastaDocFile = acceptLastaDocFile(tableMap);
         if (Files.exists(lastaDocFile)) {
-            tableMap.putAll(new DfJsonFreeAgent().decodeJsonMapByJs("lastadoc", lastaDocFile.toFile().getPath()));
-
+            tableMap.putAll(decodeJsonMap(lastaDocFile));
         }
-
         tableMap.put("appList", findAppList(mapProp));
-
         return new DfFreeGenTable(tableMap, "unused", columnList);
     }
 
@@ -154,6 +154,10 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         } else {
             return "/" + Srl.decamelize(Srl.removeSuffix(className, "Action"), "/").toLowerCase() + "/";
         }
+    }
+
+    protected Map<? extends String, ? extends Object> decodeJsonMap(final Path lastaDocFile) {
+        return new DfJsonFreeAgent().decodeJsonMap("lastadoc", lastaDocFile.toFile().getPath());
     }
 
     // -----------------------------------------------------
