@@ -145,6 +145,7 @@ table.child, table.child td, table.child th {
     </style>
 </head>
 <body>
+<div style="position:fixed; width:95%"><div align="right"><a href="#top">▲Page Top</a></div></div>
 <h1>lastadoc for ${table.tableMap.appName}</h1>
 <div class="navilinkarea">
 #set ($linkDelimiter = "")
@@ -215,10 +216,12 @@ $manager.htmlEscape($actionDocMeta.url)
 #end
 #if ($actionDocMeta.formTypeDocMeta)
 <span class="actiontitle">Form or Body:</span> <span class="actionsubvalue"><span title="$manager.htmlEscape($actionDocMeta.formTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.formTypeDocMeta.simpleTypeName)</span></span>
+<p class="tablecomment" title="$!manager.htmlEscape($actionDocMeta.formTypeDocMeta.comment)">$!manager.htmlEscape($actionDocMeta.formTypeDocMeta.description)</p>
 $generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.formTypeDocMeta)
 #end
 #if ($actionDocMeta.returnTypeDocMeta)
 <span class="actiontitle">Return as:</span> <span class="actionsubvalue"><span title="$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.simpleTypeName)</span></span>
+<p class="tablecomment" title="$!manager.htmlEscape($actionDocMeta.returnTypeDocMeta.comment)">$!manager.htmlEscape($actionDocMeta.returnTypeDocMeta.description)</p>
 #if ($actionDocMeta.returnTypeDocMeta.simpleTypeName == 'HtmlResponse' && $actionDocMeta.returnTypeDocMeta.value)
 <p class="actionsubitem"><span class="actionsubtitle">implementations:</span> <span class="actionsubvalue">${actionDocMeta.returnTypeDocMeta.value}</span></p>
 #end
