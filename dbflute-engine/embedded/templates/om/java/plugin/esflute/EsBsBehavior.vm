@@ -27,6 +27,9 @@ import org.elasticsearch.action.index.IndexRequestBuilder;
  */
 public abstract class Bs${table.camelizedName}Bhv extends EsAbstractBehavior<${table.camelizedName}, ${table.camelizedName}CB> {
 
+    // ===================================================================================
+    //                                                                    Control Override
+    //                                                                    ================
     @Override
     public String asTableDbName() {
         return asEsIndexType();
@@ -74,6 +77,9 @@ public abstract class Bs${table.camelizedName}Bhv extends EsAbstractBehavior<${t
         }
     }
 
+    // ===================================================================================
+    //                                                                              Select
+    //                                                                              ======
     public int selectCount(CBCall<${table.camelizedName}CB> cbLambda) {
         return facadeSelectCount(createCB(cbLambda));
     }
@@ -158,6 +164,9 @@ public abstract class Bs${table.camelizedName}Bhv extends EsAbstractBehavior<${t
         delegateSelectBulk(createCB(cbLambda), entityLambda,typeOfSelectedEntity());
     }
 
+    // ===================================================================================
+    //                                                                              Update
+    //                                                                              ======
     public void insert(${table.camelizedName} entity) {
         doInsert(entity, null);
     }
@@ -231,10 +240,5 @@ public abstract class Bs${table.camelizedName}Bhv extends EsAbstractBehavior<${t
     }
 
     // #pending create, modify, remove
-
-    @Override
-    protected boolean isCompatibleBatchInsertDefaultEveryColumn() {
-        return true;
-    }
 }
 

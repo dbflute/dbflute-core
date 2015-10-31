@@ -1,8 +1,8 @@
 package ${request.package}.bsentity.dbmeta;
 
+import java.time.*;
 import java.util.List;
 import java.util.Map;
-import java.time.LocalDateTime;
 
 import ${request.package}.exentity.${table.camelizedName};
 
@@ -35,6 +35,29 @@ public class ${table.camelizedName}Dbm extends AbstractDBMeta {
     }
 
     // ===================================================================================
+    //                                                                       Current DBDef
+    //                                                                       =============
+    @Override
+    public String getProjectName() {
+        return null;
+    }
+
+    @Override
+    public String getProjectPrefix() {
+        return null;
+    }
+
+    @Override
+    public String getGenerationGapBasePrefix() {
+        return null;
+    }
+
+    @Override
+    public DBDef getCurrentDBDef() {
+        return null;
+    }
+
+    // ===================================================================================
     //                                                                    Property Gateway
     //                                                                    ================
     // -----------------------------------------------------
@@ -63,6 +86,20 @@ public class ${table.camelizedName}Dbm extends AbstractDBMeta {
     }
 
     // ===================================================================================
+    //                                                                          Table Info
+    //                                                                          ==========
+    protected final String _tableDbName = "${table.name}";
+    protected final String _tableDispName = "${table.name}";
+    protected final String _tablePropertyName = "${table.camelizedName}";
+    public String getTableDbName() { return _tableDbName; }
+    @Override
+    public String getTableDispName() { return _tableDispName; }
+    @Override
+    public String getTablePropertyName() { return _tablePropertyName; }
+    @Override
+    public TableSqlName getTableSqlName() { return null; }
+
+    // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
 #foreach ($col in $table.columnList)
@@ -88,39 +125,8 @@ public class ${table.camelizedName}Dbm extends AbstractDBMeta {
     }
 
     // ===================================================================================
-    //                                                                          Table Info
-    //                                                                          ==========
-    protected final String _tableDbName = "${table.name}";
-    protected final String _tableDispName = "${table.name}";
-    protected final String _tablePropertyName = "${table.camelizedName}";
-    public String getTableDbName() { return _tableDbName; }
-    @Override
-    public String getTableDispName() { return _tableDispName; }
-    @Override
-    public String getTablePropertyName() { return _tablePropertyName; }
-    @Override
-    public TableSqlName getTableSqlName() { return null; }
-
-    @Override
-    public String getProjectName() {
-        return null;
-    }
-
-    @Override
-    public String getProjectPrefix() {
-        return null;
-    }
-
-    @Override
-    public String getGenerationGapBasePrefix() {
-        return null;
-    }
-
-    @Override
-    public DBDef getCurrentDBDef() {
-        return null;
-    }
-
+    //                                                                         Unique Info
+    //                                                                         ===========
     @Override
     public boolean hasPrimaryKey() {
         return false;
@@ -131,6 +137,14 @@ public class ${table.camelizedName}Dbm extends AbstractDBMeta {
         return false;
     }
 
+    @Override
+    protected UniqueInfo cpui() {
+        return null;
+    }
+
+    // ===================================================================================
+    //                                                                           Type Name
+    //                                                                           =========
     @Override
     public String getEntityTypeName() {
         return "${request.package}.exentity.${table.camelizedName}";
@@ -146,16 +160,25 @@ public class ${table.camelizedName}Dbm extends AbstractDBMeta {
         return "${request.package}.exbhv.${table.camelizedName}Bhv";
     }
 
+    // ===================================================================================
+    //                                                                         Object Type
+    //                                                                         ===========
     @Override
     public Class<? extends Entity> getEntityType() {
         return ${table.camelizedName}.class;
     }
 
+    // ===================================================================================
+    //                                                                     Object Instance
+    //                                                                     ===============
     @Override
     public Entity newEntity() {
         return new ${table.camelizedName}();
     }
 
+    // ===================================================================================
+    //                                                                   Map Communication
+    //                                                                   =================
     @Override
     public void acceptPrimaryKeyMap(Entity entity, Map<String, ? extends Object> primaryKeyMap) {
     }
@@ -171,11 +194,6 @@ public class ${table.camelizedName}Dbm extends AbstractDBMeta {
 
     @Override
     public Map<String, Object> extractAllColumnMap(Entity entity) {
-        return null;
-    }
-
-    @Override
-    protected UniqueInfo cpui() {
         return null;
     }
 }

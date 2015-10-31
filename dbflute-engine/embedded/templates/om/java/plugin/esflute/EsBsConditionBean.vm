@@ -19,10 +19,15 @@ import org.elasticsearch.index.query.QueryBuilder;
  */
 public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected Bs${table.camelizedName}CQ _conditionQuery;
-
     protected HpSpecification _specification;
 
+    // ===================================================================================
+    //                                                                             Control
+    //                                                                             =======
     @Override
     public ${table.camelizedName}Dbm asDBMeta() {
         return ${table.camelizedName}Dbm.getInstance();
@@ -43,6 +48,9 @@ public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
         return doGetConditionQuery();
     }
 
+    // ===================================================================================
+    //                                                                         Primary Key
+    //                                                                         ===========
     public ${table.camelizedName}CB acceptPK(String id) {
         assertObjectNotNull("id", id);
         Bs${table.camelizedName}CB cb = this;
@@ -55,6 +63,9 @@ public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
         acceptPK((String)primaryKeyMap.get("_id"));
     }
 
+    // ===================================================================================
+    //                                                                               Build
+    //                                                                               =====
     @Override
     public CountRequestBuilder build(CountRequestBuilder builder) {
         if (_conditionQuery != null) {
@@ -85,6 +96,9 @@ public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
         return builder;
     }
 
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
     public Bs${table.camelizedName}CQ query() {
         assertQueryPurpose();
         return doGetConditionQuery();
@@ -101,6 +115,9 @@ public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
         return new ${table.camelizedName}CQ();
     }
 
+    // ===================================================================================
+    //                                                                             Specify
+    //                                                                             =======
     public HpSpecification specify() {
         assertSpecifyPurpose();
         if (_specification == null) {

@@ -32,13 +32,22 @@ import org.elasticsearch.common.unit.TimeValue;
  */
 public abstract class EsAbstractConditionBean implements ConditionBean {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final SqlClause _sqlClause = new EsSqlClause(asTableDbName());
     protected int _safetyMaxResultSize;
     private SearchRequestParams _searchRequestParams = new SearchRequestParams();
 
+    // ===================================================================================
+    //                                                                             Builder
+    //                                                                             =======
     public abstract CountRequestBuilder build(CountRequestBuilder builder);
     public abstract SearchRequestBuilder build(SearchRequestBuilder builder);
 
+    // ===================================================================================
+    //                                                                              Paging
+    //                                                                              ======
     @Override
     public boolean isPaging() {
         return false;
@@ -69,17 +78,6 @@ public abstract class EsAbstractConditionBean implements ConditionBean {
 
     protected ConditionBeanExceptionThrower createCBExThrower() {
         return new ConditionBeanExceptionThrower();
-    }
-
-    protected void assertObjectNotNull(String variableName, Object value) {
-        if (variableName == null) {
-            String msg = "The value should not be null: variableName=null value=" + value;
-            throw new IllegalArgumentException(msg);
-        }
-        if (value == null) {
-            String msg = "The value should not be null: variableName=" + variableName;
-            throw new IllegalArgumentException(msg);
-        }
     }
 
     @Override
@@ -126,15 +124,14 @@ public abstract class EsAbstractConditionBean implements ConditionBean {
         return this;
     }
 
-    protected String ln() {
-        return DBFluteSystem.ln();
-    }
-
     @Override
     public <ENTITY> PagingInvoker<ENTITY> createPagingInvoker(String tableDbName) {
         return null;
     }
 
+    // ===================================================================================
+    //                                                              Various Implementation
+    //                                                              ======================
     @Override
     public int getFetchStartIndex() {
         return getSqlClause().getFetchStartIndex();
@@ -580,10 +577,34 @@ public abstract class EsAbstractConditionBean implements ConditionBean {
         return false;
     }
 
+    // ===================================================================================
+    //                                                                   Request Parameter
+    //                                                                   =================
     public SearchRequestParams request() {
         return _searchRequestParams;
     }
 
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DBFluteSystem.ln();
+    }
+
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=null value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Class
+    //                                                                        ============
     public static class SearchRequestParams {
 
         private Boolean explain;

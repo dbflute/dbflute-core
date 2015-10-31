@@ -62,6 +62,9 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
     protected abstract String asEsSearchType();
     protected abstract <RESULT extends ENTITY> RESULT createEntity(Map<String, Object> source, Class<? extends RESULT> entityType);
 
+    // ===================================================================================
+    //                                                                              Select
+    //                                                                              ======
     @Override
     protected int delegateSelectCountUniquely(final ConditionBean cb) {
         // #pending check response and cast problem
@@ -196,6 +199,9 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
         throw new IllegalBehaviorStateException("selectedList is not EsPagingResultBean.");
     }
 
+    // ===================================================================================
+    //                                                                              Update
+    //                                                                              ======
     @Override
     protected int delegateInsert(final Entity entity, final InsertOption<? extends ConditionBean> option) {
         final EsAbstractEntity esEntity = (EsAbstractEntity) entity;
@@ -355,13 +361,20 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
         return results;
     }
 
+    // to suppress xacceptUpdateColumnModifiedPropertiesIfNeeds()'s specify process
     @Override
     protected UpdateOption<CB> createPlainUpdateOption() {
         UpdateOption<CB> updateOption = new UpdateOption<CB>();
         updateOption.xtoBeCompatibleBatchUpdateDefaultEveryColumn();
         return updateOption;
     }
+    protected boolean isCompatibleBatchInsertDefaultEveryColumn() {
+        return true;
+    }
 
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
     public static String[] toStringArray(final Object value) {
         if (value instanceof String[]) {
             return (String[]) value;

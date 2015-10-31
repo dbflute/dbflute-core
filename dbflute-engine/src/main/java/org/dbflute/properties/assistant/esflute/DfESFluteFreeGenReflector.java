@@ -15,7 +15,9 @@
  */
 package org.dbflute.properties.assistant.esflute;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,15 +44,22 @@ public final class DfESFluteFreeGenReflector {
     protected final String _outputDirectory;
     protected final String _basePackage;
     protected final String _basePath;
+    protected final DfESFluteSupportContainer _supportContainer;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfESFluteFreeGenReflector(Map<String, Object> freeGenMap, String outputDirectory, String basePackage, String basePath) {
+    public DfESFluteFreeGenReflector(Map<String, Object> freeGenMap, String outputDirectory, String basePackage, String basePath,
+            DfESFluteSupportContainer supportContainer) {
         _freeGenMap = freeGenMap;
         _outputDirectory = outputDirectory;
         _basePackage = basePackage;
         _basePath = basePath;
+        _supportContainer = supportContainer;
+    }
+
+    public static enum DfESFluteSupportContainer {
+        LASTA_DI, NONE
     }
 
     // ===================================================================================
@@ -59,11 +68,13 @@ public final class DfESFluteFreeGenReflector {
     public void reflectFrom(Map<String, Object> esfluteMap) {
         logger.info("Before ESFlute refecting, existing freeGen settigs: " + _freeGenMap.keySet());
         // ; indexMap = map:{
-        //     ; fess_user = map:{
+        //     ; .fess_user = map:{
         //         ; package = user
         //     }
-        //     ; fess_config = map:{
+        //     ; .fess_config = map:{
         //         ; package = config
+        //         ; esclientDiFile = esclient.xml
+        //         ; esfluteDiFile = esflute_fess_config.xml
         //     }
         // }
         @SuppressWarnings("unchecked")
@@ -77,10 +88,12 @@ public final class DfESFluteFreeGenReflector {
             final Map<String, Object> optionMap = (Map<String, Object>) entry.getValue();
             final Map<String, Map<String, Object>> elementMap = new LinkedHashMap<String, Map<String, Object>>();
             final String indexPackage = (String) optionMap.get("package");
+            final String esclientDiFile = (String) optionMap.get("esclientDiFile"); // null allowed
+            final String esfluteDiFile = (String) optionMap.get("esfluteDiFile"); // null allowed
             registerFreeGen("ESFlute" + Srl.initCap(Srl.camelize(indexName)), elementMap);
             setupResourceMap(elementMap, indexName);
             setupOutputMap(elementMap, indexName, indexPackage);
-            setupTableMap(elementMap, indexName);
+            setupTableMap(elementMap, indexName, indexPackage, esclientDiFile, esfluteDiFile);
         }
         showFreeGenSettings();
     }
@@ -110,7 +123,13 @@ public final class DfESFluteFreeGenReflector {
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         elementMap.put("resourceMap", resourceMap);
         resourceMap.put("resourceType", DfFreeGenResourceType.ELASTICSEARCH.name());
-        resourceMap.put("resourceFile", _basePath + "/" + indexName + (_basePath.startsWith("http:") ? "" : ".json"));
+        final String resourceFile;
+        if (_basePath.startsWith("http:")) {
+            resourceFile = _basePath + "/" + indexName;
+        } else { // relative path
+            resourceFile = _basePath + "/" + buildIndexFileExp(indexName) + ".json";
+        }
+        resourceMap.put("resourceFile", resourceFile);
     }
 
     protected void setupOutputMap(Map<String, Map<String, Object>> elementMap, String indexName, String indexPackage) {
@@ -118,14 +137,19 @@ public final class DfESFluteFreeGenReflector {
         elementMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "unused");
         outputMap.put("outputDirectory", _outputDirectory);
-        outputMap.put("package", _basePackage + "." + indexPackage);
+        outputMap.put("package", buildIndexPackage(indexPackage));
         outputMap.put("className", "unused");
     }
 
-    protected void setupTableMap(Map<String, Map<String, Object>> elementMap, String indexName) {
+    protected String buildIndexPackage(String indexPackage) {
+        return _basePackage + "." + indexPackage;
+    }
+
+    protected void setupTableMap(Map<String, Map<String, Object>> elementMap, String indexName, String indexPackage, String esclientDiFile,
+            String esfluteDiFile) {
         final Map<String, Object> tableMap = createTableMap();
         elementMap.put("tableMap", tableMap);
-        tableMap.put("tablePath", "." + indexName + " -> mappings -> map");
+        tableMap.put("tablePath", indexName + " -> mappings -> map");
         final Map<String, Object> mappingMap = new LinkedHashMap<String, Object>();
         tableMap.put("mappingMap", mappingMap);
         final Map<String, String> typeMap = new HashMap<String, String>();
@@ -137,15 +161,49 @@ public final class DfESFluteFreeGenReflector {
         typeMap.put("double", Double.class.getSimpleName());
         typeMap.put("boolean", Boolean.class.getSimpleName());
         typeMap.put("date", LocalDateTime.class.getSimpleName());
+        typeMap.put("date@date", LocalDate.class.getSimpleName());
+        typeMap.put("date@date_time", LocalDateTime.class.getSimpleName());
+        typeMap.put("date@time", LocalTime.class.getSimpleName());
+        tableMap.put("resourcesDir", "../resources");
+        tableMap.put("exbhvPackage", buildIndexPackage(indexPackage) + ".exbhv");
+        tableMap.put("indexName", indexName);
+        tableMap.put("esclientDiFile", esclientDiFile != null ? esclientDiFile : deriveESClientDiFile(indexName));
+        tableMap.put("esfluteDiFile", esfluteDiFile != null ? esfluteDiFile : deriveESFluteDiFile(indexName));
     }
 
     protected Map<String, Object> createTableMap() {
         final Map<String, Object> tableMap = new LinkedHashMap<String, Object>();
         tableMap.put("isESFlute", true);
+        tableMap.put("isUseLastaDi", isUseLastaDi());
         return tableMap;
     }
 
-    protected String getTrueLiteral() {
-        return "true";
+    protected boolean isUseLastaDi() {
+        return DfESFluteSupportContainer.LASTA_DI.equals(_supportContainer);
+    }
+
+    protected String deriveESClientDiFile(String indexName) {
+        final String esclientDiFile;
+        if (isUseLastaDi()) {
+            esclientDiFile = "esclient.xml";
+        } else { // no use
+            esclientDiFile = "";
+        }
+        return esclientDiFile;
+    }
+
+    protected String deriveESFluteDiFile(String indexName) {
+        final String esfluteDiFile;
+        if (isUseLastaDi()) {
+            // e.g. .fess.user -> esflute_fess_user.xml
+            esfluteDiFile = "esflute_" + buildIndexFileExp(indexName) + ".xml";
+        } else { // no use
+            esfluteDiFile = "";
+        }
+        return esfluteDiFile;
+    }
+
+    protected String buildIndexFileExp(String indexName) {
+        return Srl.replace(Srl.ltrim(indexName, "."), ".", "_");
     }
 }

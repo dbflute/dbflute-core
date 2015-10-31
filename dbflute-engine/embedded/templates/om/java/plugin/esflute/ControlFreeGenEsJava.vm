@@ -57,6 +57,13 @@ $manager.makeDirectory($path)
 $request.info("parse('${path}')")
 $generator.parse("om/java/plugin/esflute/allcommon/EsSqlClause.vm", $path, "", "")
 
+#if ($tableMap.isUseLastaDi)
+  #set ($path = "${tableMap.resourcesDir}/${tableMap.esfluteDiFile}")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  $generator.parse("om/java/plugin/esflute/allcommon/container/lasta/ESFluteDiXml.vm", $path, "", "")
+#end
+
 ##
 ## <<<  ESFlute Gen  >>>
 ##

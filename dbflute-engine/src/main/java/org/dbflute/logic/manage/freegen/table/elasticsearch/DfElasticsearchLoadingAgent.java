@@ -213,11 +213,26 @@ public class DfElasticsearchLoadingAgent {
             final String columnName = columnEntry.getKey();
             @SuppressWarnings("unchecked")
             final Map<String, Object> columnAttrMap = (Map<String, Object>) columnEntry.getValue();
+            adjustDateFormat(columnAttrMap);
             columnList.add(prepareColumnBeanMap(schemaMap, tableName, columnName, columnAttrMap));
         }
         tableBeanMap.put("columnList", columnList);
         markTableOrColumn(tableBeanMap, true, false, false);
         return tableBeanMap;
+    }
+
+    protected void adjustDateFormat(Map<String, Object> columnAttrMap) {
+        String formatName = null;
+        for (Entry<String, Object> attrEntry : columnAttrMap.entrySet()) {
+            final String key = attrEntry.getKey();
+            if ("format".equals(key) && "date".equals(columnAttrMap.get("type"))) {
+                formatName = (String) attrEntry.getValue();
+                break;
+            }
+        }
+        if (formatName != null) {
+            columnAttrMap.put("type", "date@" + formatName); // override
+        }
     }
 
     protected void markTableOrColumn(Map<String, Object> beanMap, boolean table, boolean column, boolean refColumn) {

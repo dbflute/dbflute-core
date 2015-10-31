@@ -16,6 +16,7 @@ import org.dbflute.cbean.sqlclause.SqlClause;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.name.ColumnRealName;
 import org.dbflute.dbmeta.name.ColumnSqlName;
+import org.dbflute.exception.InvalidQueryRegisteredException;
 import org.dbflute.util.Srl;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
@@ -41,10 +42,16 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
 
     protected static final String CQ_PROPERTY = "conditionQuery";
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected List<QueryBuilder> queryBuilderList;
     protected List<FieldSortBuilder> fieldSortBuilderList;
     private DocMetaCQ docMetaCQ;
 
+    // ===================================================================================
+    //                                                                             Control
+    //                                                                             =======
     public DocMetaCQ docMeta() {
         if (docMetaCQ == null) {
             docMetaCQ = new DocMetaCQ();
@@ -73,15 +80,26 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
         return boolQuery;
     }
 
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
     public void addQuery(QueryBuilder queryBuilder) {
+        assertObjectNotNull("queryBuilder", queryBuilder);
         regQ(queryBuilder);
     }
 
     public void queryString(String queryString) {
-        queryString(queryString, null);
+        checkEsInvalidQuery("queryString", queryString);
+        doQueryString(queryString, null);
     }
 
     public void queryString(String queryString, ConditionOptionCall<QueryStringQueryBuilder> opLambda) {
+        checkEsInvalidQuery("queryString", queryString);
+        assertObjectNotNull("opLambda", opLambda);
+        doQueryString(queryString, opLambda);
+    }
+
+    protected void doQueryString(String queryString, ConditionOptionCall<QueryStringQueryBuilder> opLambda) {
         QueryStringQueryBuilder queryStringQuery = QueryBuilders.queryStringQuery(queryString);
         regQ(queryStringQuery);
         if (opLambda != null) {
@@ -90,10 +108,15 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
     }
 
     public void matchAll() {
-        matchAll(null);
+        doMatchAll(null);
     }
 
     public void matchAll(ConditionOptionCall<MatchAllQueryBuilder> opLambda) {
+        assertObjectNotNull("opLambda", opLambda);
+        doMatchAll(opLambda);
+    }
+
+    protected void doMatchAll(ConditionOptionCall<MatchAllQueryBuilder> opLambda) {
         MatchAllQueryBuilder builder = QueryBuilders.matchAllQuery();
         regQ(builder);
         if (opLambda != null) {
@@ -101,11 +124,19 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
         }
     }
 
+    // ===================================================================================
+    //                                                                            Register
+    //                                                                            ========
     protected FilteredQueryBuilder regFilteredQ(QueryBuilder queryBuilder, FilterBuilder filterBuilder) {
+        assertObjectNotNull("queryBuilder", queryBuilder);
+        assertObjectNotNull("filterBuilder", filterBuilder);
         return QueryBuilders.filteredQuery(queryBuilder, filterBuilder);
     }
 
     protected BoolQueryBuilder regBoolCQ(List<QueryBuilder> mustList, List<QueryBuilder> shouldList, List<QueryBuilder> mustNotList) {
+        assertObjectNotNull("mustList", mustList);
+        assertObjectNotNull("shouldList", shouldList);
+        assertObjectNotNull("mustNotList", mustNotList);
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         mustList.forEach(query -> {
             boolQuery.must(query);
@@ -120,48 +151,57 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
     }
 
     protected TermQueryBuilder regTermQ(String name, Object value) {
+        checkEsInvalidQuery(name, value);
         TermQueryBuilder termQuery = QueryBuilders.termQuery(name, value);
         regQ(termQuery);
         return termQuery;
     }
 
-    protected TermsQueryBuilder regTermsQ(String name, Collection<?> value) {
-        TermsQueryBuilder termsQuery = QueryBuilders.termsQuery(name, value);
+    protected TermsQueryBuilder regTermsQ(String name, Collection<?> values) {
+        checkEsInvalidQueryCollection(name, values);
+        TermsQueryBuilder termsQuery = QueryBuilders.termsQuery(name, values);
         regQ(termsQuery);
         return termsQuery;
     }
 
     protected MatchQueryBuilder regMatchQ(String name, Object value) {
+        checkEsInvalidQuery(name, value);
         MatchQueryBuilder matchQuery = QueryBuilders.matchQuery(name, value);
         regQ(matchQuery);
         return matchQuery;
     }
 
     protected MatchQueryBuilder regMatchPhraseQ(String name, Object value) {
+        checkEsInvalidQuery(name, value);
         MatchQueryBuilder matchQuery = QueryBuilders.matchPhraseQuery(name, value);
         regQ(matchQuery);
         return matchQuery;
     }
 
     protected MatchQueryBuilder regMatchPhrasePrefixQ(String name, Object value) {
+        checkEsInvalidQuery(name, value);
         MatchQueryBuilder matchQuery = QueryBuilders.matchPhrasePrefixQuery(name, value);
         regQ(matchQuery);
         return matchQuery;
     }
 
     protected FuzzyQueryBuilder regFuzzyQ(String name, Object value) {
+        checkEsInvalidQuery(name, value);
         FuzzyQueryBuilder fuzzyQuery = QueryBuilders.fuzzyQuery(name, value);
         regQ(fuzzyQuery);
         return fuzzyQuery;
     }
 
     protected PrefixQueryBuilder regPrefixQ(String name, String prefix) {
+        checkEsInvalidQuery(name, prefix);
         PrefixQueryBuilder prefixQuery = QueryBuilders.prefixQuery(name, prefix);
         regQ(prefixQuery);
         return prefixQuery;
     }
 
     protected RangeQueryBuilder regRangeQ(String name, ConditionKey ck, Object value) {
+        checkEsInvalidQuery(name, value);
+        assertObjectNotNull("ck", ck);
         if (queryBuilderList != null) {
             for (QueryBuilder builder : queryBuilderList) {
                 if (builder instanceof RangeQueryBuilder) {
@@ -180,6 +220,7 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
     }
 
     protected void addRangeC(RangeQueryBuilder builder, ConditionKey ck, Object value) {
+        assertObjectNotNull("ck", ck);
         if (ck.equals(ConditionKey.CK_GREATER_THAN)) {
             builder.gt(value);
         } else if (ck.equals(ConditionKey.CK_GREATER_EQUAL)) {
@@ -192,6 +233,7 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
     }
 
     protected void regQ(QueryBuilder builder) {
+        assertObjectNotNull("builder", builder);
         if (queryBuilderList == null) {
             queryBuilderList = new ArrayList<>();
         }
@@ -206,13 +248,35 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
         registerOrderBy(field, false);
     }
 
+
     protected void registerOrderBy(String field, boolean ascOrDesc) {
+        assertObjectNotNull("field", field);
         if (fieldSortBuilderList == null) {
             fieldSortBuilderList = new ArrayList<>();
         }
         fieldSortBuilderList.add(SortBuilders.fieldSort(field).order(ascOrDesc ? SortOrder.ASC : SortOrder.DESC));
     }
 
+    // ===================================================================================
+    //                                                                       Invalid Query
+    //                                                                       =============
+    protected void checkEsInvalidQuery(String name, Object value) {
+        if (value == null || (value instanceof String && ((String)value).isEmpty())) {
+            String msg = "Cannot register null or empty query: name=" + name + " value=" + value;
+            throw new InvalidQueryRegisteredException(msg);
+        }
+    }
+
+    protected void checkEsInvalidQueryCollection(String name, Collection<?> values) {
+        if (values == null || values.isEmpty()) {
+            String msg = "Cannot register null or empty query collection: name=" + name + " values=" + values;
+            throw new InvalidQueryRegisteredException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                              DBFlute Implementation
+    //                                                              ======================
     @Override
     public ColumnRealName toColumnRealName(String columnDbName) {
         return ColumnRealName.create(xgetAliasName(), toColumnSqlName(columnDbName));
@@ -288,15 +352,11 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
                     msg = msg + " query=" + query;
                     throw new IllegalStateException(msg);
                 }
-                sb.insert(0, CQ_PROPERTY + initCap(foreignPropertyName) + ".");
+                sb.insert(0, CQ_PROPERTY + Srl.initCap(foreignPropertyName) + ".");
             }
             query = query.xgetReferrerQuery();
         }
         return sb.toString();
-    }
-
-    protected String initCap(String str) {
-        return Srl.initCap(str);
     }
 
     @Override
@@ -344,6 +404,23 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
         // nothing
     }
 
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=null value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Class
+    //                                                                        ============
     public class DocMetaCQ {
 
         public void setId_Equal(String id) {

@@ -17,16 +17,22 @@ import org.elasticsearch.action.index.IndexRequestBuilder;
  */
 public abstract class EsAbstractEntity implements Entity, Serializable, Cloneable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final long serialVersionUID = 1L;
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected DocMeta docMeta;
-
     protected final EntityUniqueDrivenProperties __uniqueDrivenProperties = newUniqueDrivenProperties();
-
     protected final EntityModifiedProperties __modifiedProperties = newModifiedProperties();
-
     protected EntityModifiedProperties __specifiedProperties;
 
+    // ===================================================================================
+    //                                                                            Doc Meta
+    //                                                                            ========
     public DocMeta asDocMeta() {
         if (docMeta == null) {
             docMeta = new DocMeta();
@@ -34,6 +40,9 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
         return docMeta;
     }
 
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
     public Set<String> mymodifiedProperties() {
         return __modifiedProperties.getPropertyNames();
     }
@@ -71,6 +80,9 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
         __specifiedProperties.accept(__modifiedProperties);
     }
 
+    // ===================================================================================
+    //                                                                Specified Properties
+    //                                                                ====================
     public Set<String> myspecifiedProperties() {
         if (__specifiedProperties != null) {
             return __specifiedProperties.getPropertyNames();
@@ -104,6 +116,9 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
         }
     }
 
+    // ===================================================================================
+    //                                                                          Unique Key
+    //                                                                          ==========
     @Override
     public boolean hasPrimaryKeyValue() {
         return asDocMeta().id() != null;
@@ -133,6 +148,9 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
         __uniqueDrivenProperties.clear();
     }
 
+    // ===================================================================================
+    //                                                                     Birthplace Mark
+    //                                                                     ===============
     @Override
     public void markAsSelect() {
     }
@@ -142,6 +160,9 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
         return false;
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     @Override
     public int instanceHash() { // #pending
         return 0;
@@ -157,6 +178,9 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
         return null;
     }
 
+    // ===================================================================================
+    //                                                                      Classification
+    //                                                                      ==============
     @Override
     public void myunlockUndefinedClassificationAccess() {
     }
@@ -166,8 +190,14 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
         return false;
     }
 
+    // ===================================================================================
+    //                                                                              Source
+    //                                                                              ======
     public abstract Map<String, Object> toSource();
 
+    // ===================================================================================
+    //                                                                        Assist Class
+    //                                                                        ============
     public class DocMeta implements Serializable {
 
         private static final long serialVersionUID = 1L;

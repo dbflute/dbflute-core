@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.dbflute.properties.assistant.esflute.DfESFluteFreeGenReflector;
+import org.dbflute.properties.assistant.esflute.DfESFluteFreeGenReflector.DfESFluteSupportContainer;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +67,9 @@ public final class DfESFluteProperties extends DfAbstractHelperProperties {
     //             ; double = Double
     //             ; boolean = Boolean
     //             ; date = LocalDateTime
+    //             ; date.date = LocalDate
+    //             ; date.date_time = LocalDateTime
+    //             ; date.time = LocalTime
     //         }
     //     }
     // }
@@ -118,12 +122,23 @@ public final class DfESFluteProperties extends DfAbstractHelperProperties {
         logger.info("...Loading freeGen settings from lastafluteMap: " + basePackage);
         final String outputDirectory = getOutputDirectory(esfluteMap);
         final String basePath = getBasePath(esfluteMap);
-        newFreeGenReflector(freeGenMap, outputDirectory, basePackage, basePath).reflectFrom(esfluteMap);
+        createFreeGenReflector(freeGenMap, outputDirectory, basePackage, basePath).reflectFrom(esfluteMap);
     }
 
-    protected DfESFluteFreeGenReflector newFreeGenReflector(Map<String, Object> freeGenMap, String outputDirectory, String basePackage,
+    protected DfESFluteFreeGenReflector createFreeGenReflector(Map<String, Object> freeGenMap, String outputDirectory, String basePackage,
             String basePath) {
-        return new DfESFluteFreeGenReflector(freeGenMap, outputDirectory, basePackage, basePath);
+        final DfESFluteSupportContainer supportContainer = deriveSupportContainer();
+        return new DfESFluteFreeGenReflector(freeGenMap, outputDirectory, basePackage, basePath, supportContainer);
+    }
+
+    protected DfESFluteSupportContainer deriveSupportContainer() {
+        final DfESFluteSupportContainer supportContainer;
+        if (getBasicProperties().isTargetContainerLastaDi()) {
+            supportContainer = DfESFluteSupportContainer.LASTA_DI;
+        } else {
+            supportContainer = DfESFluteSupportContainer.NONE;
+        }
+        return supportContainer;
     }
 
     // ===================================================================================

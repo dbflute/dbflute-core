@@ -1,6 +1,6 @@
 package ${request.package}.cbean.cq.bs;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.Collection;
 
 import ${request.package}.allcommon.EsAbstractConditionQuery;
@@ -23,6 +23,9 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
 
     protected static final Class<?> suppressUnusedImportLocalDateTime = LocalDateTime.class;
 
+    // ===================================================================================
+    //                                                                       Name Override
+    //                                                                       =============
     @Override
     public String asTableDbName() {
         return "${table.name}";
@@ -33,6 +36,9 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
         return "${table.name}";
     }
 
+    // ===================================================================================
+    //                                                                       Query Control
+    //                                                                       =============
     public void filtered(FilteredCall<${table.camelizedName}CQ, ${table.camelizedName}CF> filteredLambda) {
         filtered(filteredLambda, null);
     }
@@ -67,6 +73,9 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
         }
     }
 
+    // ===================================================================================
+    //                                                                           Query Set
+    //                                                                           =========
 #foreach ($column in $table.columnList)
 #if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})

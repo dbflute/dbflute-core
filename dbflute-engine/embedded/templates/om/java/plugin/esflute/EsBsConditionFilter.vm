@@ -1,6 +1,6 @@
 package ${request.package}.cbean.cf.bs;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.Collection;
 
 import ${request.package}.allcommon.EsAbstractConditionFilter;
@@ -27,6 +27,9 @@ public abstract class Bs${table.camelizedName}CF extends EsAbstractConditionFilt
 
     protected static final Class<?> suppressUnusedImportLocalDateTime = LocalDateTime.class;
 
+    // ===================================================================================
+    //                                                                       Query Control
+    //                                                                       =============
     public void bool(BoolCall<${table.camelizedName}CF> boolLambda) {
         bool(boolLambda, null);
     }
@@ -110,11 +113,12 @@ public abstract class Bs${table.camelizedName}CF extends EsAbstractConditionFilt
         }
     }
 
-
+    // ===================================================================================
+    //                                                                           Query Set
+    //                                                                           =========
 #foreach ($column in $table.columnList)
 #if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
-
     public void set${column.capCamelName}_NotEqual($javaNative ${column.uncapCamelName}) {
         set${column.capCamelName}_NotEqual(${column.uncapCamelName}, null, null);
     }

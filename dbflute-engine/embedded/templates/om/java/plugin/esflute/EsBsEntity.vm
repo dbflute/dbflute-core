@@ -3,7 +3,7 @@ package ${request.package}.bsentity;
 #set ($idColumn = $table.get("_id").get("path"))
 #end
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.HashMap;
 import java.util.Map;
 
