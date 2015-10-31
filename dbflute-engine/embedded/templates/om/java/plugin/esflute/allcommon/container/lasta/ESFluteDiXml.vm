@@ -22,6 +22,6 @@
 
 	<!-- The components of Behavior. -->
 #foreach ($table in $request.tableList)
-	<component name="${table.uncapCamelName}" class="${tableMap.exbhvPackage}${table.camelizedName}Bhv"/>
+	<component name="${table.uncapCamelName}" class="${tableMap.exbhvPackage}.${table.camelizedName}Bhv"/>
 #end
 </components>
