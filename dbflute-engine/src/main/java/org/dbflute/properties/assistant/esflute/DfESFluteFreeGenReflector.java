@@ -127,7 +127,7 @@ public final class DfESFluteFreeGenReflector {
         if (_basePath.startsWith("http:")) {
             resourceFile = _basePath + "/" + indexName;
         } else { // relative path
-            resourceFile = _basePath + "/" + buildIndexFileExp(indexName) + ".json";
+            resourceFile = _basePath + "/" + buildIndexSmartName(indexName) + ".json";
         }
         resourceMap.put("resourceFile", resourceFile);
     }
@@ -165,6 +165,7 @@ public final class DfESFluteFreeGenReflector {
         typeMap.put("date@date_time", LocalDateTime.class.getSimpleName());
         typeMap.put("date@time", LocalTime.class.getSimpleName());
         tableMap.put("resourcesDir", "../resources");
+        tableMap.put("namespace", buildIndexSmartName(indexName));
         tableMap.put("exbhvPackage", buildIndexPackage(indexPackage) + ".exbhv");
         tableMap.put("indexName", indexName);
         tableMap.put("esclientDiFile", esclientDiFile != null ? esclientDiFile : deriveESClientDiFile(indexName));
@@ -196,14 +197,14 @@ public final class DfESFluteFreeGenReflector {
         final String esfluteDiFile;
         if (isUseLastaDi()) {
             // e.g. .fess.user -> esflute_fess_user.xml
-            esfluteDiFile = "esflute_" + buildIndexFileExp(indexName) + ".xml";
+            esfluteDiFile = "esflute_" + buildIndexSmartName(indexName) + ".xml";
         } else { // no use
             esfluteDiFile = "";
         }
         return esfluteDiFile;
     }
 
-    protected String buildIndexFileExp(String indexName) {
+    protected String buildIndexSmartName(String indexName) {
         return Srl.replace(Srl.ltrim(indexName, "."), ".", "_");
     }
 }
