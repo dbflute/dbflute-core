@@ -129,8 +129,8 @@ public final class DfESFluteProperties extends DfAbstractHelperProperties {
     protected DfESFluteFreeGenReflector createFreeGenReflector(Map<String, Object> freeGenMap, String outputDirectory, String basePackage,
             String basePath) {
         final DfESFluteSupportContainer supportContainer = deriveSupportContainer();
-        final boolean version1 = isCompatibleElasticsearchVersion1();
-        return new DfESFluteFreeGenReflector(freeGenMap, outputDirectory, basePackage, basePath, supportContainer, version1);
+        final String elasticsearchVersion = getElasticsearchVersion();
+        return new DfESFluteFreeGenReflector(freeGenMap, outputDirectory, basePackage, basePath, supportContainer, elasticsearchVersion);
     }
 
     protected DfESFluteSupportContainer deriveSupportContainer() {
@@ -146,8 +146,8 @@ public final class DfESFluteProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public boolean isCompatibleElasticsearchVersion1() {
-        return isProperty("isCompatibleElasticsearchVersion1", false, getEsfluteMap());
+    public String getElasticsearchVersion() {
+        return getProperty("elasticsearchVersion", null, getEsfluteMap());
     }
 
     public boolean isContinueIfUrlFailure() {

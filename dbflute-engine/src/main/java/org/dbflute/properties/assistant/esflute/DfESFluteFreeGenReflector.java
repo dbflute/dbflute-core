@@ -45,19 +45,19 @@ public final class DfESFluteFreeGenReflector {
     protected final String _basePackage;
     protected final String _basePath;
     protected final DfESFluteSupportContainer _supportContainer;
-    protected final boolean _version1;
+    protected final String _elasticsearchVersion; // not null, default is 9.9.9
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfESFluteFreeGenReflector(Map<String, Object> freeGenMap, String outputDirectory, String basePackage, String basePath,
-            DfESFluteSupportContainer supportContainer, boolean version1) {
+            DfESFluteSupportContainer supportContainer, String elasticsearchVersion) {
         _freeGenMap = freeGenMap;
         _outputDirectory = outputDirectory;
         _basePackage = basePackage;
         _basePath = basePath;
         _supportContainer = supportContainer;
-        _version1 = version1;
+        _elasticsearchVersion = elasticsearchVersion;
     }
 
     public static enum DfESFluteSupportContainer {
@@ -167,12 +167,39 @@ public final class DfESFluteFreeGenReflector {
         final Map<String, Object> tableMap = new LinkedHashMap<String, Object>();
         tableMap.put("isESFlute", true);
         tableMap.put("isUseLastaDi", isUseLastaDi());
-        tableMap.put("isVersion1", _version1);
+        tableMap.put("esVersion", new DfElasticsearchVersion());
         return tableMap;
     }
 
     protected boolean isUseLastaDi() {
         return DfESFluteSupportContainer.LASTA_DI.equals(_supportContainer);
+    }
+
+    public class DfElasticsearchVersion {
+
+        public boolean isGreaterThan(String version) {
+            return comparedVersion().compareTo(version) > 0;
+        }
+
+        public boolean isGreaterEqual(String version) {
+            return comparedVersion().compareTo(version) >= 0;
+        }
+
+        public boolean isLessThan(String version) {
+            return comparedVersion().compareTo(version) < 0;
+        }
+
+        public boolean isLessEqual(String version) {
+            return comparedVersion().compareTo(version) <= 0;
+        }
+
+        protected String comparedVersion() {
+            return _elasticsearchVersion != null ? _elasticsearchVersion : "9.9.9"; // super latest if null
+        }
+
+        public String getVersionExp() {
+            return _elasticsearchVersion != null ? _elasticsearchVersion : "*no specified";
+        }
     }
 
     protected Map<String, String> prepareTypeMap() {
