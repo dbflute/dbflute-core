@@ -2155,6 +2155,10 @@ public class Database {
         return getLittleAdjustmentProperties().isQueryUpdateCountPreCheck();
     }
 
+    public boolean isZeroUpdateCheckExistenceForPassing() {
+        return getLittleAdjustmentProperties().isZeroUpdateCheckExistenceForPassing();
+    }
+
     public boolean isStopGenerateExtendedBhv() {
         return getLittleAdjustmentProperties().isStopGenerateExtendedBhv();
     }

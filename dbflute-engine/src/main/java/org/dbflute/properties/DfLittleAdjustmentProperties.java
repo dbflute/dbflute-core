@@ -1210,6 +1210,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isQueryUpdateCountPreCheck", defaultValue);
     }
 
+    // ===================================================================================
+    //                                                                         Zero Update
+    //                                                                         ===========
+    public boolean isZeroUpdateCheckExistenceForPassing() { // closet, for e.g. Atlas
+        // e.g. Atlas (MySQL proxy) returns changed, not matched, so needs to check after zero update
+        return isProperty("isZeroUpdateCheckExistenceForPassing", false);
+    }
+
     // *quit support because of incomplete, not look much like DBFlute policy
     //// ===================================================================================
     ////                                                         SetupSelect Forced Relation
