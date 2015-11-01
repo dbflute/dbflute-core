@@ -1805,6 +1805,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
 
     @Override
     protected int delegateUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
+        // ignore optimistic lock failure because optimistic lock column is
+        // always updated so 'changed' count cannot be zero, means no problem
         int result = super.delegateUpdate(entity, option);
         return checkZeroUpdateExistence(entity, result);
     }
