@@ -1094,6 +1094,9 @@ public class Table {
      * @return The determination, true or false.
      */
     public boolean isWritable() {
+        if (getLittleAdjustmentProperties().isReadOnlySchema()) {
+            return false;
+        }
         return hasPrimaryKey();
     }
 

@@ -1218,6 +1218,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isZeroUpdateCheckExistenceForPassing", false);
     }
 
+    // ===================================================================================
+    //                                                                     ReadOnly Schema
+    //                                                                     ===============
+    public boolean isReadOnlySchema() { // for compile speed, safety
+        return isProperty("isReadOnlySchema", false);
+    }
+
     // *quit support because of incomplete, not look much like DBFlute policy
     //// ===================================================================================
     ////                                                         SetupSelect Forced Relation
