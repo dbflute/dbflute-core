@@ -57,6 +57,7 @@ public final class DfESFluteProperties extends DfAbstractHelperProperties {
     //         }
     //     }
     //     # not required
+    //     ; isCompatibleElasticsearchVersion1 = false
     //     ; isContinueIfUrlFailure = false
     //     ; mappingMap = map:{
     //         ; type = map:{
@@ -128,7 +129,8 @@ public final class DfESFluteProperties extends DfAbstractHelperProperties {
     protected DfESFluteFreeGenReflector createFreeGenReflector(Map<String, Object> freeGenMap, String outputDirectory, String basePackage,
             String basePath) {
         final DfESFluteSupportContainer supportContainer = deriveSupportContainer();
-        return new DfESFluteFreeGenReflector(freeGenMap, outputDirectory, basePackage, basePath, supportContainer);
+        final boolean version1 = isCompatibleElasticsearchVersion1();
+        return new DfESFluteFreeGenReflector(freeGenMap, outputDirectory, basePackage, basePath, supportContainer, version1);
     }
 
     protected DfESFluteSupportContainer deriveSupportContainer() {
@@ -144,6 +146,10 @@ public final class DfESFluteProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
+    public boolean isCompatibleElasticsearchVersion1() {
+        return isProperty("isCompatibleElasticsearchVersion1", false, getEsfluteMap());
+    }
+
     public boolean isContinueIfUrlFailure() {
         return isProperty("isContinueIfUrlFailure", false, getEsfluteMap());
     }

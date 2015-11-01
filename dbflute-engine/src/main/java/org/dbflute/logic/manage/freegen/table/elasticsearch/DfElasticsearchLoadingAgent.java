@@ -231,7 +231,15 @@ public class DfElasticsearchLoadingAgent {
             }
         }
         if (formatName != null) {
-            columnAttrMap.put("type", "date@" + formatName); // override
+            final Map<String, Object> tableMap = _mapProp.getTableMap();
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> mappingMap = (Map<String, Object>) tableMap.get("mappingMap");
+            @SuppressWarnings("unchecked")
+            final Map<String, String> typeMapping = (Map<String, String>) mappingMap.get("type");
+            final String formattedType = "date@" + formatName;
+            if (typeMapping.containsKey(formattedType)) {
+                columnAttrMap.put("type", formattedType); // override
+            }
         }
     }
 

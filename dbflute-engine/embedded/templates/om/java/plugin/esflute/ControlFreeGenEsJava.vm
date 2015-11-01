@@ -19,6 +19,7 @@ $manager.info("requestList: ${requestList.size()}")
 #set ($tableMap = $request.tableMap)
 #if ($tableMap.isESFlute)
 #set ($existsESFlute = true)
+#set ($isVersion1 = $tableMap.isVersion1)
 $request.enableOutputDirectory()
 $manager.makeDirectory($request.generateDirPath)
 

@@ -45,17 +45,19 @@ public final class DfESFluteFreeGenReflector {
     protected final String _basePackage;
     protected final String _basePath;
     protected final DfESFluteSupportContainer _supportContainer;
+    protected final boolean _version1;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfESFluteFreeGenReflector(Map<String, Object> freeGenMap, String outputDirectory, String basePackage, String basePath,
-            DfESFluteSupportContainer supportContainer) {
+            DfESFluteSupportContainer supportContainer, boolean version1) {
         _freeGenMap = freeGenMap;
         _outputDirectory = outputDirectory;
         _basePackage = basePackage;
         _basePath = basePath;
         _supportContainer = supportContainer;
+        _version1 = version1;
     }
 
     public static enum DfESFluteSupportContainer {
@@ -152,18 +154,7 @@ public final class DfESFluteFreeGenReflector {
         tableMap.put("tablePath", indexName + " -> mappings -> map");
         final Map<String, Object> mappingMap = new LinkedHashMap<String, Object>();
         tableMap.put("mappingMap", mappingMap);
-        final Map<String, String> typeMap = new HashMap<String, String>();
-        mappingMap.put("type", typeMap);
-        typeMap.put("string", String.class.getSimpleName());
-        typeMap.put("integer", Integer.class.getSimpleName());
-        typeMap.put("long", Long.class.getSimpleName());
-        typeMap.put("float", Float.class.getSimpleName());
-        typeMap.put("double", Double.class.getSimpleName());
-        typeMap.put("boolean", Boolean.class.getSimpleName());
-        typeMap.put("date", LocalDateTime.class.getSimpleName());
-        typeMap.put("date@date", LocalDate.class.getSimpleName());
-        typeMap.put("date@date_time", LocalDateTime.class.getSimpleName());
-        typeMap.put("date@time", LocalTime.class.getSimpleName());
+        mappingMap.put("type", prepareTypeMap());
         tableMap.put("resourcesDir", "../resources");
         tableMap.put("namespace", buildIndexSmartName(indexName));
         tableMap.put("exbhvPackage", buildIndexPackage(indexPackage) + ".exbhv");
@@ -176,11 +167,35 @@ public final class DfESFluteFreeGenReflector {
         final Map<String, Object> tableMap = new LinkedHashMap<String, Object>();
         tableMap.put("isESFlute", true);
         tableMap.put("isUseLastaDi", isUseLastaDi());
+        tableMap.put("isVersion1", _version1);
         return tableMap;
     }
 
     protected boolean isUseLastaDi() {
         return DfESFluteSupportContainer.LASTA_DI.equals(_supportContainer);
+    }
+
+    protected Map<String, String> prepareTypeMap() {
+        final Map<String, String> typeMap = new HashMap<String, String>();
+        typeMap.put("string", String.class.getSimpleName());
+        typeMap.put("integer", Integer.class.getSimpleName());
+        typeMap.put("long", Long.class.getSimpleName());
+        typeMap.put("float", Float.class.getSimpleName());
+        typeMap.put("double", Double.class.getSimpleName());
+        typeMap.put("boolean", Boolean.class.getSimpleName());
+        typeMap.put("date", LocalDateTime.class.getSimpleName());
+        typeMap.put("date@date", LocalDate.class.getSimpleName());
+        typeMap.put("date@date_time", LocalDateTime.class.getSimpleName());
+        typeMap.put("date@time", LocalTime.class.getSimpleName());
+        // elasticsearch may return both pattern
+        typeMap.put("date@dateOptionalTime", LocalDateTime.class.getSimpleName());
+        typeMap.put("date@date_optional_time", LocalDateTime.class.getSimpleName());
+        return typeMap;
+    }
+
+    protected boolean isVersionGreaterEqual(String specifiedVersion) {
+        String version = "1.1.1";
+        return specifiedVersion.compareTo(version) >= 0;
     }
 
     protected String deriveESClientDiFile(String indexName) {
