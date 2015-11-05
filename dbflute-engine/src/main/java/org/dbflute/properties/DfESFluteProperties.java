@@ -57,22 +57,8 @@ public final class DfESFluteProperties extends DfAbstractHelperProperties {
     //         }
     //     }
     //     # not required
-    //     ; isCompatibleElasticsearchVersion1 = false
+    //     ; elasticsearchVersion = 1.0
     //     ; isContinueIfUrlFailure = false
-    //     ; mappingMap = map:{
-    //         ; type = map:{
-    //             ; string = String
-    //             ; integer = Integer
-    //             ; long = Long
-    //             ; float = Float
-    //             ; double = Double
-    //             ; boolean = Boolean
-    //             ; date = LocalDateTime
-    //             ; date.date = LocalDate
-    //             ; date.date_time = LocalDateTime
-    //             ; date.time = LocalTime
-    //         }
-    //     }
     // }
     protected Map<String, Object> _esfluteMap;
 
