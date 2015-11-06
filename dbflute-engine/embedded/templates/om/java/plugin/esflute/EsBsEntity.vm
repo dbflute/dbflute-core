@@ -149,5 +149,6 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
         asDocMeta().id(value);
     }
 #end
+#set ($propertyLoopIndex = $propertyLoopIndex + 1)
 #end
 }
