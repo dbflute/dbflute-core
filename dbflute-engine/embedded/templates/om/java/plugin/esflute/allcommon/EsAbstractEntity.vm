@@ -202,7 +202,7 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
     //                                                                      ==============
     @Override
     public String toString() {
-        return getClass().getSimpleName() + ":{" + doBuildColumnString(", ") + "}@" + Integer.toHexString(hashCode());
+        return getClass().getSimpleName() + ":" + doBuildColumnString(", ") + "@" + Integer.toHexString(hashCode());
     }
 
     protected abstract String doBuildColumnString(String dm);

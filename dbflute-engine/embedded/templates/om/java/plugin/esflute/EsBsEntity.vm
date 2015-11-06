@@ -66,13 +66,11 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
     @Override
     protected String doBuildColumnString(String dm) {
         StringBuilder sb = new StringBuilder();
-#foreach ($col in $table.columns)
-#if ($col.isJavaNativeUtilDate())
-        sb.append(dm).append(xfUD(_${col.uncapitalisedJavaName}));
-#elseif ($col.isJavaNativeByteArray())
-        sb.append(dm).append(xfBA(_${col.uncapitalisedJavaName}));
+#foreach ($column in $table.columnList)
+#if ($column.name != $idColumn)
+        sb.append(dm).append(${column.uncapCamelName});
 #else
-        sb.append(dm).append(xfND(_${col.uncapitalisedJavaName}));
+        sb.append(dm).append(asDocMeta().id());
 #end
 #end
         if (sb.length() > dm.length()) {
@@ -83,9 +81,36 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
     }
 
     // ===================================================================================
+    //                                                                              Source
+    //                                                                              ======
+    @Override
+    public Map<String, Object> toSource() {
+        Map<String, Object> sourceMap = new HashMap<>();
+#foreach ($column in $table.columnList)
+#if ($column.isNormalColumn)
+#if ($column.name != $idColumn)
+        if (${column.uncapCamelName} != null) {
+            sourceMap.put("${column.name}", ${column.uncapCamelName});
+        }
+#else
+        if (asDocMeta().id() != null) {
+            sourceMap.put("${column.name}", asDocMeta().id());
+        }
+#end
+#end
+#end
+        return sourceMap;
+    }
+
+#set ($propertyLoopIndex = 0)
+#foreach ($column in $table.columnList)
+#if ($propertyLoopIndex == 0)
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#foreach ($column in $table.columnList)
+#else
+
+#end
 #if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
 #elseif ($column.isRefColumn)
@@ -113,7 +138,6 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
         registerModifiedProperty("${column.uncapCamelName}");
         this.${column.uncapCamelName} = value;
     }
-
 #else
     public ${javaNative} get${column.capCamelName}() {
         checkSpecifiedProperty("${column.uncapCamelName}");
@@ -124,29 +148,6 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
         registerModifiedProperty("${column.uncapCamelName}");
         asDocMeta().id(value);
     }
-
 #end
 #end
-
-    // ===================================================================================
-    //                                                                              Source
-    //                                                                              ======
-    @Override
-    public Map<String, Object> toSource() {
-        Map<String, Object> sourceMap = new HashMap<>();
-#foreach ($column in $table.columnList)
-#if ($column.isNormalColumn)
-#if ($column.name != $idColumn)
-        if (${column.uncapCamelName} != null) {
-            sourceMap.put("${column.name}", ${column.uncapCamelName});
-        }
-#else
-        if (asDocMeta().id() != null) {
-            sourceMap.put("${column.name}", asDocMeta().id());
-        }
-#end
-#end
-#end
-        return sourceMap;
-    }
 }
