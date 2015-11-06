@@ -61,26 +61,6 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
     }
 
     // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    @Override
-    protected String doBuildColumnString(String dm) {
-        StringBuilder sb = new StringBuilder();
-#foreach ($column in $table.columnList)
-#if ($column.name != $idColumn)
-        sb.append(dm).append(${column.uncapCamelName});
-#else
-        sb.append(dm).append(asDocMeta().id());
-#end
-#end
-        if (sb.length() > dm.length()) {
-            sb.delete(0, dm.length());
-        }
-        sb.insert(0, "{").append("}");
-        return sb.toString();
-    }
-
-    // ===================================================================================
     //                                                                              Source
     //                                                                              ======
     @Override
@@ -100,6 +80,26 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
 #end
 #end
         return sourceMap;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    protected String doBuildColumnString(String dm) {
+        StringBuilder sb = new StringBuilder();
+#foreach ($column in $table.columnList)
+#if ($column.name != $idColumn)
+        sb.append(dm).append(${column.uncapCamelName});
+#else
+        sb.append(dm).append(asDocMeta().id());
+#end
+#end
+        if (sb.length() > dm.length()) {
+            sb.delete(0, dm.length());
+        }
+        sb.insert(0, "{").append("}");
+        return sb.toString();
     }
 
 #set ($propertyLoopIndex = 0)
