@@ -19,18 +19,11 @@ import ${request.package}.exentity.*;
  */
 public class Bs${table.camelizedName} extends EsAbstractEntity {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final long serialVersionUID = 1L;
     protected static final Class<?> suppressUnusedImportLocalDateTime = LocalDateTime.class;
-
-    @Override
-    public ${table.camelizedName}Dbm asDBMeta() {
-        return ${table.camelizedName}Dbm.getInstance();
-    }
-
-    @Override
-    public String asTableDbName() {
-        return "${table.name}";
-    }
 
     // ===================================================================================
     //                                                                           Attribute
@@ -55,6 +48,41 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
 #end
 
     // ===================================================================================
+    //                                                                             DB Meta
+    //                                                                             =======
+    @Override
+    public ${table.camelizedName}Dbm asDBMeta() {
+        return ${table.camelizedName}Dbm.getInstance();
+    }
+
+    @Override
+    public String asTableDbName() {
+        return "${table.name}";
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    protected String doBuildColumnString(String dm) {
+        StringBuilder sb = new StringBuilder();
+#foreach ($col in $table.columns)
+#if ($col.isJavaNativeUtilDate())
+        sb.append(dm).append(xfUD(_${col.uncapitalisedJavaName}));
+#elseif ($col.isJavaNativeByteArray())
+        sb.append(dm).append(xfBA(_${col.uncapitalisedJavaName}));
+#else
+        sb.append(dm).append(xfND(_${col.uncapitalisedJavaName}));
+#end
+#end
+        if (sb.length() > dm.length()) {
+            sb.delete(0, dm.length());
+        }
+        sb.insert(0, "{").append("}");
+        return sb.toString();
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
 #foreach ($column in $table.columnList)
@@ -73,7 +101,11 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
 #else
     public ${javaNative}${arrayType} get${column.capCamelName}() {
         checkSpecifiedProperty("${column.uncapCamelName}");
+#if ($javaNative == "String")
+        return convertEmptyToNull(${column.uncapCamelName});
+#else
         return ${column.uncapCamelName};
+#end
     }
 #end
 
@@ -85,7 +117,7 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
 #else
     public ${javaNative} get${column.capCamelName}() {
         checkSpecifiedProperty("${column.uncapCamelName}");
-        return asDocMeta().id();
+        return convertEmptyToNull(asDocMeta().id());
     }
 
     public void set${column.capCamelName}(${javaNative} value) {
@@ -96,6 +128,9 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
 #end
 #end
 
+    // ===================================================================================
+    //                                                                              Source
+    //                                                                              ======
     @Override
     public Map<String, Object> toSource() {
         Map<String, Object> sourceMap = new HashMap<>();
