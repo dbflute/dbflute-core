@@ -491,11 +491,15 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         helpSelectCursorCheckingOrderByPK(cb, option);
         final int pageSize = option.getPageSize();
         int pageNumber = 1;
+        rootLoop: // to stop on the way
         while (true) {
             cb.paging(pageSize, pageNumber);
-            List<RESULT> pageList = delegateSelectList(cb, entityType);
+            final List<RESULT> pageList = delegateSelectList(cb, entityType);
             for (RESULT entity : pageList) {
                 entityRowHandler.handle(entity);
+                if (entityRowHandler.isBreakCursor()) {
+                    break rootLoop;
+                }
             }
             if (pageList.size() < pageSize) { // means last page
                 break;
