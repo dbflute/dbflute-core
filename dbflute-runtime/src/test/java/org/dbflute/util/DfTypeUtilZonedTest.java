@@ -281,7 +281,7 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
             log(e.getMessage());
         }
         try {
-            assertNull(DfTypeUtil.toLocalDate("2009-12-13 01:23:45.123", (String) null, (TimeZone) null));
+            assertNull(DfTypeUtil.toLocalDate("2009-12-13 01:23:45.123", (TimeZone) null, (String) null));
             fail();
         } catch (IllegalArgumentException e) {
             log(e.getMessage());
@@ -406,7 +406,7 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
             log(e.getMessage());
         }
         try {
-            assertNull(toLocalDateTime("2009-12-13 01:23:45.123", (String) null, (TimeZone) null));
+            assertNull(toLocalDateTime("2009-12-13 01:23:45.123", (TimeZone) null, (String) null));
             fail();
         } catch (IllegalArgumentException e) {
             log(e.getMessage());
