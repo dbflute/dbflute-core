@@ -777,9 +777,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                         -------------
     protected int delegateInsert(Entity entity, InsertOption<? extends ConditionBean> option) {
         final OptionalThing<InsertOption<? extends ConditionBean>> optOption = createOptionalInsertOption(option);
-        if (!adjustEntityBeforeInsert(entity, optOption)) {
-            return 0;
-        }
+        adjustEntityBeforeInsert(entity, optOption);
         final InsertEntityCommand command = createInsertEntityCommand(entity, option);
         RuntimeException cause = null;
         try {
@@ -805,9 +803,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     protected int delegateUpdate(Entity entity, UpdateOption<? extends ConditionBean> option) {
         final OptionalThing<UpdateOption<? extends ConditionBean>> optOption = createOptionalUpdateOption(option);
-        if (!adjustEntityBeforeUpdate(entity, optOption)) {
-            return 0;
-        }
+        adjustEntityBeforeUpdate(entity, optOption);
         if (asDBMeta().hasOptimisticLock()) {
             final UpdateEntityCommand command = createUpdateEntityCommand(entity, option);
             RuntimeException cause = null;
@@ -827,9 +823,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     protected int delegateUpdateNonstrict(Entity entity, UpdateOption<? extends ConditionBean> option) {
         final OptionalThing<UpdateOption<? extends ConditionBean>> optOption = createOptionalUpdateOption(option);
-        if (!adjustEntityBeforeUpdate(entity, optOption)) {
-            return 0;
-        }
+        adjustEntityBeforeUpdate(entity, optOption);
         final UpdateNonstrictEntityCommand command = createUpdateNonstrictEntityCommand(entity, option);
         RuntimeException cause = null;
         try {
@@ -851,9 +845,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     protected int delegateDelete(Entity entity, DeleteOption<? extends ConditionBean> option) {
         final OptionalThing<DeleteOption<? extends ConditionBean>> optOption = createOptionalDeleteOption(option);
-        if (!adjustEntityBeforeDelete(entity, optOption)) {
-            return 0;
-        }
+        adjustEntityBeforeDelete(entity, optOption);
         if (asDBMeta().hasOptimisticLock()) {
             final DeleteEntityCommand command = createDeleteEntityCommand(entity, option);
             final OptionalThing<Object> optEntity = OptionalThing.of(entity);
@@ -874,22 +866,17 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     protected int delegateDeleteNonstrict(Entity entity, DeleteOption<? extends ConditionBean> option) {
         final OptionalThing<DeleteOption<? extends ConditionBean>> optOption = createOptionalDeleteOption(option);
-        if (!adjustEntityBeforeDelete(entity, optOption)) {
-            return 0;
-        }
+        adjustEntityBeforeDelete(entity, optOption);
         final DeleteNonstrictEntityCommand command = createDeleteNonstrictEntityCommand(entity, option);
         final OptionalThing<Object> optEntity = OptionalThing.of(entity);
         RuntimeException cause = null;
         try {
-            System.out.println("****1: " + cause);
             hookBeforeDelete(command, optEntity, emptyOpt(), optOption);
             return invoke(command);
         } catch (RuntimeException e) {
-            System.out.println("****2: " + cause);
             cause = e;
             throw e;
         } finally {
-            System.out.println("****3: " + cause);
             hookFinallyDelete(command, optEntity, emptyOpt(), optOption, createOptionalCause(cause));
         }
     }
@@ -908,11 +895,11 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
             return EMPTY_INT_ARRAY;
         }
         final OptionalThing<InsertOption<? extends ConditionBean>> optOption = createOptionalInsertOption(option);
-        final List<? extends Entity> insertedList = adjustEntityListBeforeBatchInsert(entityList, option);
-        if (insertedList.isEmpty()) { // might be filtered
+        adjustEntityListBeforeBatchInsert(entityList, option);
+        if (entityList.isEmpty()) { // might be filtered
             return EMPTY_INT_ARRAY;
         }
-        final BatchInsertCommand command = createBatchInsertCommand(insertedList, option);
+        final BatchInsertCommand command = createBatchInsertCommand(entityList, option);
         RuntimeException cause = null;
         try {
             hookBeforeInsert(command, entityList, emptyOpt(), optOption);
@@ -930,11 +917,11 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
             return EMPTY_INT_ARRAY;
         }
         if (asDBMeta().hasOptimisticLock()) {
-            final List<? extends Entity> updatedList = adjustEntityListBeforeBatchUpdate(entityList, option, false);
-            if (updatedList.isEmpty()) { // might be filtered
+            adjustEntityListBeforeBatchUpdate(entityList, option, false);
+            if (entityList.isEmpty()) { // might be filtered
                 return EMPTY_INT_ARRAY;
             }
-            final BatchUpdateCommand command = createBatchUpdateCommand(updatedList, option);
+            final BatchUpdateCommand command = createBatchUpdateCommand(entityList, option);
             final OptionalThing<UpdateOption<? extends ConditionBean>> optOption = createOptionalUpdateOption(option);
             RuntimeException cause = null;
             try {
@@ -956,11 +943,11 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
             return EMPTY_INT_ARRAY;
         }
         final OptionalThing<UpdateOption<? extends ConditionBean>> optOption = createOptionalUpdateOption(option);
-        final List<? extends Entity> updatedList = adjustEntityListBeforeBatchUpdate(entityList, option, true);
-        if (updatedList.isEmpty()) { // might be filtered
+        adjustEntityListBeforeBatchUpdate(entityList, option, true);
+        if (entityList.isEmpty()) { // might be filtered
             return EMPTY_INT_ARRAY;
         }
-        final BatchUpdateNonstrictCommand command = createBatchUpdateNonstrictCommand(updatedList, option);
+        final BatchUpdateNonstrictCommand command = createBatchUpdateNonstrictCommand(entityList, option);
         RuntimeException cause = null;
         try {
             hookBeforeUpdate(command, entityList, emptyOpt(), optOption);
@@ -1028,9 +1015,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                          ------------
     protected int delegateQueryInsert(Entity entity, ConditionBean inCB, ConditionBean resCB, InsertOption<? extends ConditionBean> option) {
         final OptionalThing<InsertOption<? extends ConditionBean>> optOption = createOptionalInsertOption(option);
-        if (!adjustEntityBeforeQueryInsert(entity, inCB, resCB, optOption)) {
-            return 0;
-        }
+        adjustEntityBeforeQueryInsert(entity, inCB, resCB, optOption);
         final QueryInsertCBCommand command = createQueryInsertCBCommand(entity, inCB, resCB, option);
         final OptionalThing<ConditionBean> optInCB = OptionalThing.of(inCB);
         RuntimeException cause = null;
@@ -1047,9 +1032,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     protected int delegateQueryUpdate(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
         final OptionalThing<UpdateOption<? extends ConditionBean>> optOption = createOptionalUpdateOption(option);
-        if (!adjustEntityBeforeQueryUpdate(entity, cb, optOption)) {
-            return 0;
-        }
+        adjustEntityBeforeQueryUpdate(entity, cb, optOption);
         final QueryUpdateCBCommand command = createQueryUpdateCBCommand(entity, cb, option);
         final OptionalThing<ConditionBean> optCB = OptionalThing.of(cb);
         RuntimeException cause = null;
@@ -1066,9 +1049,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     protected int delegateQueryDelete(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
         final OptionalThing<DeleteOption<? extends ConditionBean>> optOption = createOptionalDeleteOption(option);
-        if (!adjustEntityBeforeQueryDelete(cb, optOption)) {
-            return 0;
-        }
+        adjustEntityBeforeQueryDelete(cb, optOption);
         final QueryDeleteCBCommand command = createQueryDeleteCBCommand(cb, option);
         final OptionalThing<ConditionBean> optCB = OptionalThing.of(cb);
         RuntimeException cause = null;
@@ -1092,13 +1073,11 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     /**
      * Adjust entity before insert. <br>
      * Called when entity insert, batch insert and also contains varying methods <br>
-     * But attention: plural calls in batch insert, per one entity. <br>
-     * You can stop the process by your extension.
+     * But attention: plural calls in batch insert, per one entity.
      * @param entity The entity for insert. (NotNull)
      * @param option The optional option of insert. (NotNull, EmptyAllowed: when no option)
-     * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean adjustEntityBeforeInsert(Entity entity, OptionalThing<InsertOption<? extends ConditionBean>> option) {
+    protected void adjustEntityBeforeInsert(Entity entity, OptionalThing<InsertOption<? extends ConditionBean>> option) {
         assertEntityNotNull(entity); // primary key is checked later
         frameworkFilterEntityOfInsert(entity, option);
         filterEntityOfInsert(entity, option);
@@ -1109,19 +1088,16 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         if (!entity.asDBMeta().hasIdentity()) { // identity does not need primary key value here
             assertEntityNotNullAndHasPrimaryKeyValue(entity);
         }
-        return true;
     }
 
     /**
-     * Adjust entity before query-insert. <br>
-     * You can stop the process by your extension.
+     * Adjust entity before query-insert.
      * @param entity The entity for query-insert. (NotNull)
      * @param intoCB The condition-bean for inserted table. (NotNull)
      * @param resourceCB The condition-bean for resource table. (NotNull)
      * @param option The optional option of insert. (NotNull, EmptyAllowed: when no option)
-     * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean adjustEntityBeforeQueryInsert(Entity entity, ConditionBean intoCB, ConditionBean resourceCB,
+    protected void adjustEntityBeforeQueryInsert(Entity entity, ConditionBean intoCB, ConditionBean resourceCB,
             OptionalThing<InsertOption<? extends ConditionBean>> option) {
         assertEntityNotNull(entity); // query-insert doesn't need to check primary key
         assertObjectNotNull("intoCB", intoCB);
@@ -1133,7 +1109,6 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         setupExclusiveControlColumnOfQueryInsert(entity);
         filterEntityOfInsert(entity, option);
         assertEntityOfInsert(entity, option);
-        return true;
     }
 
     protected void setupExclusiveControlColumnOfQueryInsert(Entity entity) {
@@ -1234,29 +1209,24 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                                Update
     //                                                ------
     /**
-     * Adjust entity before update. <br>
-     * You can stop the process by your extension.
+     * Adjust entity before update.
      * @param entity The entity for update that has primary key. (NotNull)
      * @param option The optional option of update. (NotNull, EmptyAllowed: when no option)
-     * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean adjustEntityBeforeUpdate(Entity entity, OptionalThing<UpdateOption<? extends ConditionBean>> option) {
+    protected void adjustEntityBeforeUpdate(Entity entity, OptionalThing<UpdateOption<? extends ConditionBean>> option) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         frameworkFilterEntityOfUpdate(entity, option);
         filterEntityOfUpdate(entity, option);
         assertEntityOfUpdate(entity, option);
-        return true;
     }
 
     /**
-     * Adjust entity before query-update. <br>
-     * You can stop the process by your extension.
+     * Adjust entity before query-update.
      * @param entity The entity for update that is not needed primary key. (NotNull)
      * @param cb The condition-bean for query. (NotNull)
      * @param option The optional option of update. (NotNull, EmptyAllowed: when no option)
-     * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean adjustEntityBeforeQueryUpdate(Entity entity, ConditionBean cb,
+    protected void adjustEntityBeforeQueryUpdate(Entity entity, ConditionBean cb,
             OptionalThing<UpdateOption<? extends ConditionBean>> option) {
         assertEntityNotNull(entity); // query-update doesn't need to check primary key
         assertCBStateValid(cb);
@@ -1264,7 +1234,6 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         filterEntityOfUpdate(entity, option);
         assertEntityOfUpdate(entity, option);
         assertQueryUpdateStatus(entity, cb, option);
-        return true;
     }
 
     /**
@@ -1353,31 +1322,25 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     //                                                Delete
     //                                                ------
     /**
-     * Adjust entity before delete. <br>
-     * You can stop the process by your extension.
+     * Adjust entity before delete.
      * @param entity The entity for delete that has primary key. (NotNull)
      * @param option The optional option of delete. (NotNull, EmptyAllowed: when no option)
-     * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean adjustEntityBeforeDelete(Entity entity, OptionalThing<DeleteOption<? extends ConditionBean>> option) {
+    protected void adjustEntityBeforeDelete(Entity entity, OptionalThing<DeleteOption<? extends ConditionBean>> option) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         frameworkFilterEntityOfDelete(entity, option);
         filterEntityOfDelete(entity, option);
         assertEntityOfDelete(entity, option);
-        return true;
     }
 
     /**
-     * Ready entity before query-delete. <br>
-     * You can stop the process by your extension.
+     * Ready entity before query-delete.
      * @param cb The condition-bean for query. (NotNull)
      * @param option The optional option of delete. (NotNull, EmptyAllowed: when no option)
-     * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean adjustEntityBeforeQueryDelete(ConditionBean cb, OptionalThing<DeleteOption<? extends ConditionBean>> option) {
+    protected void adjustEntityBeforeQueryDelete(ConditionBean cb, OptionalThing<DeleteOption<? extends ConditionBean>> option) {
         assertCBStateValid(cb);
         assertQueryDeleteStatus(cb, option);
-        return true;
     }
 
     /**
@@ -1496,35 +1459,25 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                                 Batch
     //                                                 -----
-    protected <ELEMENT extends Entity> List<ELEMENT> adjustEntityListBeforeBatchInsert(List<ELEMENT> entityList,
+    protected <ELEMENT extends Entity> void adjustEntityListBeforeBatchInsert(List<ELEMENT> entityList,
             InsertOption<? extends ConditionBean> option) {
         assertObjectNotNull("entityList", entityList);
         final OptionalThing<InsertOption<? extends ConditionBean>> optOption = createOptionalInsertOption(option);
-        final List<ELEMENT> filteredList = new ArrayList<ELEMENT>(entityList.size());
         for (ELEMENT entity : entityList) {
-            if (!adjustEntityBeforeInsert(entity, optOption)) {
-                continue;
-            }
-            filteredList.add(entity);
+            adjustEntityBeforeInsert(entity, optOption);
         }
-        return filteredList;
     }
 
-    protected <ELEMENT extends Entity> List<ELEMENT> adjustEntityListBeforeBatchUpdate(List<ELEMENT> entityList,
+    protected <ELEMENT extends Entity> void adjustEntityListBeforeBatchUpdate(List<ELEMENT> entityList,
             UpdateOption<? extends ConditionBean> option, boolean nonstrict) {
         assertObjectNotNull("entityList", entityList);
         final OptionalThing<UpdateOption<? extends ConditionBean>> optOption = createOptionalUpdateOption(option);
-        final List<ELEMENT> filteredList = new ArrayList<ELEMENT>(entityList.size());
         for (ELEMENT entity : entityList) {
-            if (!adjustEntityBeforeUpdate(entity, optOption)) {
-                continue;
-            }
+            adjustEntityBeforeUpdate(entity, optOption);
             if (!nonstrict) {
                 assertEntityHasOptimisticLockValue(entity);
             }
-            filteredList.add(entity);
         }
-        return filteredList;
     }
 
     protected <ELEMENT extends Entity> List<ELEMENT> adjustEntityListBeforeBatchDelete(List<ELEMENT> entityList,
@@ -1533,9 +1486,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         final OptionalThing<DeleteOption<? extends ConditionBean>> optOption = createOptionalDeleteOption(option);
         final List<ELEMENT> filteredList = new ArrayList<ELEMENT>(entityList.size());
         for (ELEMENT entity : entityList) {
-            if (!adjustEntityBeforeDelete(entity, optOption)) {
-                continue;
-            }
+            adjustEntityBeforeDelete(entity, optOption);
             if (!nonstrict) {
                 assertEntityHasOptimisticLockValue(entity);
             }
