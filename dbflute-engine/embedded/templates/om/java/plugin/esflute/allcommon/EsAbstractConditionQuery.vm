@@ -198,7 +198,12 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
 
     protected IdsQueryBuilder regIdsQ(Collection<String> values) {
         checkEsInvalidQueryCollection("_id", values);
+#if ($esVersion.isLessThan("2.0.0"))
+## elasticsearch-1.x.x does not have method of collection type argument
+        IdsQueryBuilder idsQuery = QueryBuilders.idsQuery(asTableDbName()).addIds(values.toArray(new String[values.size()]));
+#else
         IdsQueryBuilder idsQuery = QueryBuilders.idsQuery(asTableDbName()).addIds(values);
+#end
         regQ(idsQuery);
         return idsQuery;
     }

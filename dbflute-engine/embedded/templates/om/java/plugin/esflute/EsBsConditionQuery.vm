@@ -6,14 +6,20 @@ import java.util.Collection;
 import ${request.package}.allcommon.EsAbstractConditionQuery;
 import ${request.package}.cbean.cq.${table.camelizedName}CQ;
 import org.dbflute.cbean.ckey.ConditionKey;
+#if ($esVersion.isGreaterEqual("2.0.0"))
 import org.dbflute.exception.IllegalConditionBeanOperationException;
+#end
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FuzzyQueryBuilder;
 import org.elasticsearch.index.query.IdsQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
+#if ($esVersion.isGreaterEqual("2.0.0"))
 import org.elasticsearch.index.query.NotQueryBuilder;
+#end
 import org.elasticsearch.index.query.PrefixQueryBuilder;
+#if ($esVersion.isGreaterEqual("2.0.0"))
 import org.elasticsearch.index.query.QueryBuilders;
+#end
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -145,6 +151,7 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
             opLambda.callback(builder);
         }
     }
+#if ($esVersion.isGreaterEqual("2.0.0"))
 
     public void setId_NotEqual(String id) {
         setId_NotTerm(id, null);
@@ -164,6 +171,7 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
             opLambda.callback(builder);
         }
     }
+#end
 
     public void setId_Terms(Collection<String> idList) {
         setId_Terms(idList, null);
@@ -216,6 +224,7 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
             opLambda.callback(builder);
         }
     }
+#if ($esVersion.isGreaterEqual("2.0.0"))
 
     public void set${column.capCamelName}_NotEqual($javaNative ${column.uncapCamelName}) {
         set${column.capCamelName}_NotTerm(${column.uncapCamelName}, null);
@@ -235,6 +244,7 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
             opLambda.callback(builder);
         }
     }
+#end
 
     public void set${column.capCamelName}_Terms(Collection<$javaNative> ${column.uncapCamelName}List) {
         set${column.capCamelName}_Terms(${column.uncapCamelName}List, null);
