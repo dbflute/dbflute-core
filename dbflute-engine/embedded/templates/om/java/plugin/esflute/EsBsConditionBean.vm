@@ -139,6 +139,12 @@ public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
             columnList.add(name);
         }
 
+#if (!$table.columnList.contains("id"))
+        public void columnId() {
+            doColumn("_id");
+        }
+
+#end
 #foreach ($column in $table.columnList)
 #if ($column.isNormalColumn)
         public void column${column.capCamelName}() {

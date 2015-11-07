@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import ${request.package}.allcommon.EsAbstractConditionFilter;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
 import org.dbflute.cbean.ckey.ConditionKey;
@@ -19,9 +18,8 @@ import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.exception.InvalidQueryRegisteredException;
 import org.dbflute.util.Srl;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilteredQueryBuilder;
 import org.elasticsearch.index.query.FuzzyQueryBuilder;
+import org.elasticsearch.index.query.IdsQueryBuilder;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
@@ -34,6 +32,11 @@ import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+#if ($esVersion.isLessThan("2.0.0"))
+import ${request.package}.allcommon.EsAbstractConditionFilter;
+import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.index.query.FilteredQueryBuilder;
+#end
 
 /**
  * @author ESFlute (using FreeGen)
@@ -78,6 +81,10 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
             boolQuery.must(query);
         });
         return boolQuery;
+    }
+
+    public List<QueryBuilder> getQueryBuilderList() {
+        return queryBuilderList != null ? queryBuilderList : Collections.emptyList();
     }
 
     // ===================================================================================
@@ -127,12 +134,15 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                            Register
     //                                                                            ========
+#if ($esVersion.isLessThan("2.0.0"))
     protected FilteredQueryBuilder regFilteredQ(QueryBuilder queryBuilder, FilterBuilder filterBuilder) {
         assertObjectNotNull("queryBuilder", queryBuilder);
         assertObjectNotNull("filterBuilder", filterBuilder);
         return QueryBuilders.filteredQuery(queryBuilder, filterBuilder);
     }
+#end
 
+#if ($esVersion.isLessThan("2.0.0"))
     protected BoolQueryBuilder regBoolCQ(List<QueryBuilder> mustList, List<QueryBuilder> shouldList, List<QueryBuilder> mustNotList) {
         assertObjectNotNull("mustList", mustList);
         assertObjectNotNull("shouldList", shouldList);
@@ -149,6 +159,28 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
         });
         return boolQuery;
     }
+#else
+    protected BoolQueryBuilder regBoolCQ(List<QueryBuilder> mustList, List<QueryBuilder> shouldList, List<QueryBuilder> mustNotList, List<QueryBuilder> filterList) {
+        assertObjectNotNull("mustList", mustList);
+        assertObjectNotNull("shouldList", shouldList);
+        assertObjectNotNull("mustNotList", mustNotList);
+        assertObjectNotNull("filterList", filterList);
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        mustList.forEach(query -> {
+            boolQuery.must(query);
+        });
+        shouldList.forEach(query -> {
+            boolQuery.should(query);
+        });
+        mustNotList.forEach(query -> {
+            boolQuery.mustNot(query);
+        });
+        filterList.forEach(query -> {
+            boolQuery.filter(query);
+        });
+        return boolQuery;
+    }
+#end
 
     protected TermQueryBuilder regTermQ(String name, Object value) {
         checkEsInvalidQuery(name, value);
@@ -162,6 +194,13 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
         TermsQueryBuilder termsQuery = QueryBuilders.termsQuery(name, values);
         regQ(termsQuery);
         return termsQuery;
+    }
+
+    protected IdsQueryBuilder regIdsQ(Collection<String> values) {
+        checkEsInvalidQueryCollection("_id", values);
+        IdsQueryBuilder idsQuery = QueryBuilders.idsQuery(asTableDbName()).addIds(values);
+        regQ(idsQuery);
+        return idsQuery;
     }
 
     protected MatchQueryBuilder regMatchQ(String name, Object value) {
@@ -440,14 +479,26 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
     @FunctionalInterface
     public interface BoolCall<CQ extends EsAbstractConditionQuery> {
 
+#if ($esVersion.isLessThan("2.0.0"))
         void callback(CQ must, CQ should, CQ mustNot);
+#else
+        void callback(CQ must, CQ should, CQ mustNot, CQ filter);
+#end
     }
 
+#if ($esVersion.isLessThan("2.0.0"))
     @FunctionalInterface
     public interface FilteredCall<CQ extends EsAbstractConditionQuery, CF extends EsAbstractConditionFilter> {
 
         void callback(CQ query, CF filter);
     }
+#else
+    @FunctionalInterface
+    public interface FilteredCall<CQ extends EsAbstractConditionQuery, CF extends EsAbstractConditionQuery> {
+
+        void callback(CQ query, CF filter);
+    }
+#end
 
     @FunctionalInterface
     public interface OperatorCall<CQ extends EsAbstractConditionQuery> {

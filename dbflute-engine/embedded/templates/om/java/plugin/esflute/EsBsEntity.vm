@@ -126,7 +126,7 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
 #else
     public ${javaNative}${arrayType} get${column.capCamelName}() {
         checkSpecifiedProperty("${column.uncapCamelName}");
-#if ($javaNative == "String")
+#if ($javaNative == "String" && $arrayType.length() == 0)
         return convertEmptyToNull(${column.uncapCamelName});
 #else
         return ${column.uncapCamelName};
