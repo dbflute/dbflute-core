@@ -24,39 +24,39 @@ $request.info("Elasticsearch version: ${esVersion.versionExp}")
 $request.enableOutputDirectory()
 $manager.makeDirectory($request.generateDirPath)
 
-#set ($path = "${request.generateDirPath}/allcommon/EsAbstractConditionBean.java")
+#set ($path = "${request.generateDirPath}allcommon/EsAbstractConditionBean.java")
 $manager.makeDirectory($path)
 $request.info("parse('${path}')")
 $generator.parse("om/java/plugin/esflute/allcommon/EsAbstractConditionBean.vm", $path, "", "")
 
-#set ($path = "${request.generateDirPath}/allcommon/EsAbstractConditionQuery.java")
+#set ($path = "${request.generateDirPath}allcommon/EsAbstractConditionQuery.java")
 $manager.makeDirectory($path)
 $request.info("parse('${path}')")
 $generator.parse("om/java/plugin/esflute/allcommon/EsAbstractConditionQuery.vm", $path, "", "")
 
 #if ($esVersion.isLessThan("2.0.0"))
-  #set ($path = "${request.generateDirPath}/allcommon/EsAbstractConditionFilter.java")
+  #set ($path = "${request.generateDirPath}allcommon/EsAbstractConditionFilter.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("om/java/plugin/esflute/allcommon/EsAbstractConditionFilter.vm", $path, "", "")
 #end
 
-#set ($path = "${request.generateDirPath}/allcommon/EsAbstractEntity.java")
+#set ($path = "${request.generateDirPath}allcommon/EsAbstractEntity.java")
 $manager.makeDirectory($path)
 $request.info("parse('${path}')")
 $generator.parse("om/java/plugin/esflute/allcommon/EsAbstractEntity.vm", $path, "", "")
 
-#set ($path = "${request.generateDirPath}/allcommon/EsAbstractBehavior.java")
+#set ($path = "${request.generateDirPath}allcommon/EsAbstractBehavior.java")
 $manager.makeDirectory($path)
 $request.info("parse('${path}')")
 $generator.parse("om/java/plugin/esflute/allcommon/EsAbstractBehavior.vm", $path, "", "")
 
-#set ($path = "${request.generateDirPath}/allcommon/EsPagingResultBean.java")
+#set ($path = "${request.generateDirPath}allcommon/EsPagingResultBean.java")
 $manager.makeDirectory($path)
 $request.info("parse('${path}')")
 $generator.parse("om/java/plugin/esflute/allcommon/EsPagingResultBean.vm", $path, "", "")
 
-#set ($path = "${request.generateDirPath}/allcommon/EsSqlClause.java")
+#set ($path = "${request.generateDirPath}allcommon/EsSqlClause.java")
 $manager.makeDirectory($path)
 $request.info("parse('${path}')")
 $generator.parse("om/java/plugin/esflute/allcommon/EsSqlClause.vm", $path, "", "")
@@ -72,41 +72,41 @@ $generator.parse("om/java/plugin/esflute/allcommon/EsSqlClause.vm", $path, "", "
 ## <<<  ESFlute Gen  >>>
 ##
 #foreach ($table in $request.tableList)
-  #set ($path = "${request.generateDirPath}/bsentity/dbmeta/${table.camelizedName}Dbm.java")
+  #set ($path = "${request.generateDirPath}bsentity/dbmeta/${table.camelizedName}Dbm.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("om/java/plugin/esflute/EsDBMeta.vm", $path, "", "")
 
-  #set ($path = "${request.generateDirPath}/bsentity/Bs${table.camelizedName}.java")
+  #set ($path = "${request.generateDirPath}bsentity/Bs${table.camelizedName}.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("om/java/plugin/esflute/EsBsEntity.vm", $path, "", "")
 
-  #set ($path = "${request.generateDirPath}/exentity/${table.camelizedName}.java")
+  #set ($path = "${request.generateDirPath}exentity/${table.camelizedName}.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   #if (!$files.file(${generator.outputPath},$path).exists())
     $generator.parse("om/java/plugin/esflute/EsExEntity.vm", $path, "", "")
   #end
 
-  #set ($path = "${request.generateDirPath}/cbean/bs/Bs${table.camelizedName}CB.java")
+  #set ($path = "${request.generateDirPath}cbean/bs/Bs${table.camelizedName}CB.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("om/java/plugin/esflute/EsBsConditionBean.vm", $path, "", "")
 
-  #set ($path = "${request.generateDirPath}/cbean/${table.camelizedName}CB.java")
+  #set ($path = "${request.generateDirPath}cbean/${table.camelizedName}CB.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   #if (!$files.file(${generator.outputPath},$path).exists())
     $generator.parse("om/java/plugin/esflute/EsExConditionBean.vm", $path, "", "")
   #end
 
-  #set ($path = "${request.generateDirPath}/cbean/cq/bs/Bs${table.camelizedName}CQ.java")
+  #set ($path = "${request.generateDirPath}cbean/cq/bs/Bs${table.camelizedName}CQ.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("om/java/plugin/esflute/EsBsConditionQuery.vm", $path, "", "")
 
-  #set ($path = "${request.generateDirPath}/cbean/cq/${table.camelizedName}CQ.java")
+  #set ($path = "${request.generateDirPath}cbean/cq/${table.camelizedName}CQ.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   #if (!$files.file(${generator.outputPath},$path).exists())
@@ -114,12 +114,12 @@ $generator.parse("om/java/plugin/esflute/allcommon/EsSqlClause.vm", $path, "", "
   #end
 
   #if ($esVersion.isLessThan("2.0.0"))
-    #set ($path = "${request.generateDirPath}/cbean/cf/bs/Bs${table.camelizedName}CF.java")
+    #set ($path = "${request.generateDirPath}cbean/cf/bs/Bs${table.camelizedName}CF.java")
     $manager.makeDirectory($path)
     $request.info("parse('${path}')")
     $generator.parse("om/java/plugin/esflute/EsBsConditionFilter.vm", $path, "", "")
 
-    #set ($path = "${request.generateDirPath}/cbean/cf/${table.camelizedName}CF.java")
+    #set ($path = "${request.generateDirPath}cbean/cf/${table.camelizedName}CF.java")
     $manager.makeDirectory($path)
     $request.info("parse('${path}')")
     #if (!$files.file(${generator.outputPath},$path).exists())
@@ -127,12 +127,12 @@ $generator.parse("om/java/plugin/esflute/allcommon/EsSqlClause.vm", $path, "", "
     #end
   #end
 
-  #set ($path = "${request.generateDirPath}/bsbhv/Bs${table.camelizedName}Bhv.java")
+  #set ($path = "${request.generateDirPath}bsbhv/Bs${table.camelizedName}Bhv.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("om/java/plugin/esflute/EsBsBehavior.vm", $path, "", "")
 
-  #set ($path = "${request.generateDirPath}/exbhv/${table.camelizedName}Bhv.java")
+  #set ($path = "${request.generateDirPath}exbhv/${table.camelizedName}Bhv.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   #if (!$files.file(${generator.outputPath},$path).exists())
