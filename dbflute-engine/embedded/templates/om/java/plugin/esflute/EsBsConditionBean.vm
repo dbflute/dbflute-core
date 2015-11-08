@@ -1,4 +1,4 @@
-package ${request.package}.cbean.bs;
+${manager.allClassCopyright}package ${request.package}.cbean.bs;
 
 import java.util.ArrayList;
 import java.util.List;

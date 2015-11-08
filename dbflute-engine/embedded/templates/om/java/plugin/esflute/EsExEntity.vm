@@ -1,4 +1,4 @@
-package ${request.package}.exentity;
+${manager.allClassCopyright}package ${request.package}.exentity;
 
 import ${request.package}.bsentity.Bs${table.camelizedName};
 

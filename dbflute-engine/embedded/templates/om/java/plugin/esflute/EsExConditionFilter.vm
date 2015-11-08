@@ -1,4 +1,4 @@
-package ${request.package}.cbean.cf;
+${manager.allClassCopyright}package ${request.package}.cbean.cf;
 
 import ${request.package}.cbean.cf.bs.Bs${table.camelizedName}CF;
 

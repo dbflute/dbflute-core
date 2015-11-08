@@ -1,4 +1,4 @@
-package ${request.package}.bsbhv;
+${manager.allClassCopyright}package ${request.package}.bsbhv;
 
 import java.util.List;
 import java.util.Map;

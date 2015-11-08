@@ -1,4 +1,4 @@
-package ${request.package}.allcommon;
+${manager.allClassCopyright}package ${request.package}.allcommon;
 
 import java.io.Serializable;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package ${request.package}.cbean.cq;
+${manager.allClassCopyright}package ${request.package}.cbean.cq;
 
 import ${request.package}.cbean.cq.bs.Bs${table.camelizedName}CQ;
 

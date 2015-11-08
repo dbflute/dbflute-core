@@ -1,4 +1,4 @@
-package ${request.package}.exbhv;
+${manager.allClassCopyright}package ${request.package}.exbhv;
 
 import ${request.package}.bsbhv.Bs${table.camelizedName}Bhv;
 

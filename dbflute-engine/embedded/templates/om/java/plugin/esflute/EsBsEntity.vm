@@ -1,4 +1,4 @@
-package ${request.package}.bsentity;
+${manager.allClassCopyright}package ${request.package}.bsentity;
 #if ($table.get("_id") && $table.get("_id").get("path"))
 #set ($idColumn = $table.get("_id").get("path"))
 #end

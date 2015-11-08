@@ -1,4 +1,4 @@
-package ${request.package}.allcommon;
+${manager.allClassCopyright}package ${request.package}.allcommon;
 
 import ${request.package}.allcommon.EsSqlClause;
 import org.dbflute.cbean.ConditionBean;
