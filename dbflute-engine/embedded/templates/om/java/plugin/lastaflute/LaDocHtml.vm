@@ -69,6 +69,18 @@ h4 {
 .navilinkarea {
     text-align: right;
 }
+.sisterlink {
+	margin-top: 0.6em;
+	font-size: 120%;
+}
+.sistersublink {
+	margin-top: 0.6em;
+	font-size: 85%;
+}
+.sisterneighborlink {
+	margin-top: 0.6em;
+	font-size: 100%;
+}
 .actiontitle {
     font-size: 1.2em;
     color: #889977;
@@ -149,6 +161,10 @@ table.child, table.child td, table.child th {
 <h1>lastadoc for ${table.tableMap.appName}</h1>
 <div class="navilinkarea">
 #set ($linkDelimiter = "")
+#if ($table.tableMap.hasSchemaHtml)
+<p class="sisterneighborlink"><a href="${table.tableMap.schemaHtmlPath}">to SchemaHTML</a></p>
+#end
+#if ($table.tableMap.appList.size() > 1)
 <p class="sisterneighborlink">
 #foreach ($app in $table.tableMap.appList)
 ${linkDelimiter}
@@ -160,6 +176,7 @@ to ${app.appName}
 #set ($linkDelimiter = "|")
 #end
 </p>
+#end
 </div>
 
 #if ($table.tableMap.actionDocMetaList)

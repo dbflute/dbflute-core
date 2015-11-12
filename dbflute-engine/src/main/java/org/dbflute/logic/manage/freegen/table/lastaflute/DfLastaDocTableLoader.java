@@ -39,6 +39,8 @@ import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonFreeAgent;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
 import org.dbflute.task.manage.DfFreeGenTask;
 import org.dbflute.util.DfCollectionUtil;
@@ -106,7 +108,34 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
             tableMap.putAll(decodeJsonMap(lastaDocFile));
         }
         tableMap.put("appList", findAppList(mapProp));
+        prepareSchemaHtmlLink(tableMap);
         return new DfFreeGenTable(tableMap, "unused", columnList);
+    }
+
+    protected List<Map<String, Object>> prepareColumnList(DfLastaInfo lastaInfo) {
+        final List<Map<String, Object>> columnList = new ArrayList<Map<String, Object>>();
+        final List<File> actionList = lastaInfo.getActionList();
+        for (File action : actionList) {
+            final Map<String, Object> columnMap = new LinkedHashMap<String, Object>();
+            final String className = Srl.substringLastFront(action.getName(), ".");
+            final String url = calculateUrl(className);
+            columnMap.put("className", className);
+            columnMap.put("url", url);
+            columnList.add(columnMap);
+        }
+        return columnList;
+    }
+
+    protected String calculateUrl(String className) {
+        if ("RootAction".equals(className)) {
+            return "/";
+        } else {
+            return "/" + Srl.decamelize(Srl.removeSuffix(className, "Action"), "/").toLowerCase() + "/";
+        }
+    }
+
+    protected Map<? extends String, ? extends Object> decodeJsonMap(final Path lastaDocFile) {
+        return new DfJsonFreeAgent().decodeJsonMap("lastadoc", lastaDocFile.toFile().getPath());
     }
 
     protected List<Map<String, String>> findAppList(DfFreeGenMapProp mapProp) {
@@ -134,30 +163,15 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         return appList;
     }
 
-    protected List<Map<String, Object>> prepareColumnList(DfLastaInfo lastaInfo) {
-        final List<Map<String, Object>> columnList = new ArrayList<Map<String, Object>>();
-        final List<File> actionList = lastaInfo.getActionList();
-        for (File action : actionList) {
-            final Map<String, Object> columnMap = new LinkedHashMap<String, Object>();
-            final String className = Srl.substringLastFront(action.getName(), ".");
-            final String url = calculateUrl(className);
-            columnMap.put("className", className);
-            columnMap.put("url", url);
-            columnList.add(columnMap);
+    protected void prepareSchemaHtmlLink(final Map<String, Object> tableMap) {
+        final String outputDirectory = getLastaFluteProperties().getLastaDocOutputDirectory();
+        final String schemaHtmlFileName = getDocumentProperties().getSchemaHtmlFileName(getBasicProperties().getProjectName());
+        final File schemaHtmlFile = new File(outputDirectory + "/" + schemaHtmlFileName);
+        final boolean exists = schemaHtmlFile.exists();
+        tableMap.put("hasSchemaHtml", exists);
+        if (exists) {
+            tableMap.put("schemaHtmlPath", "./" + schemaHtmlFileName); // current directory only supported
         }
-        return columnList;
-    }
-
-    protected String calculateUrl(String className) {
-        if ("RootAction".equals(className)) {
-            return "/";
-        } else {
-            return "/" + Srl.decamelize(Srl.removeSuffix(className, "Action"), "/").toLowerCase() + "/";
-        }
-    }
-
-    protected Map<? extends String, ? extends Object> decodeJsonMap(final Path lastaDocFile) {
-        return new DfJsonFreeAgent().decodeJsonMap("lastadoc", lastaDocFile.toFile().getPath());
     }
 
     // -----------------------------------------------------
@@ -297,6 +311,14 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return DfBuildProperties.getInstance().getDocumentProperties();
+    }
+
     protected DfLastaFluteProperties getLastaFluteProperties() {
         return DfBuildProperties.getInstance().getLastaFluteProperties();
     }
