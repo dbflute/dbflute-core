@@ -199,6 +199,10 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
         return getDocumentProperties().getDocumentOutputDirectory();
     }
 
+    public boolean isSuppressLastaDocSchemaHtmlLink() {
+        return isProperty("isSuppressLastaDocSchemaHtmlLink", false, getLastafluteMap());
+    }
+
     public boolean isLastaDocMavenGeared() {
         return isProperty("isLastaDocMavenGeared", false, getLastafluteMap());
     }

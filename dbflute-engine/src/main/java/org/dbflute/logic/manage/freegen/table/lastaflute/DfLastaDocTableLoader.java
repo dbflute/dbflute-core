@@ -164,13 +164,22 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     }
 
     protected void prepareSchemaHtmlLink(final Map<String, Object> tableMap) {
-        final String outputDirectory = getLastaFluteProperties().getLastaDocOutputDirectory();
-        final String schemaHtmlFileName = getDocumentProperties().getSchemaHtmlFileName(getBasicProperties().getProjectName());
-        final File schemaHtmlFile = new File(outputDirectory + "/" + schemaHtmlFileName);
-        final boolean exists = schemaHtmlFile.exists();
-        tableMap.put("hasSchemaHtml", exists);
-        if (exists) {
-            tableMap.put("schemaHtmlPath", "./" + schemaHtmlFileName); // current directory only supported
+        final DfLastaFluteProperties prop = getLastaFluteProperties();
+        final boolean hasSchemaHtml;
+        final String schemaHtmlPath;
+        if (prop.isSuppressLastaDocSchemaHtmlLink()) {
+            hasSchemaHtml = false;
+            schemaHtmlPath = null;
+        } else {
+            final String outputDirectory = prop.getLastaDocOutputDirectory();
+            final String schemaHtmlFileName = getDocumentProperties().getSchemaHtmlFileName(getBasicProperties().getProjectName());
+            final File schemaHtmlFile = new File(outputDirectory + "/" + schemaHtmlFileName);
+            hasSchemaHtml = schemaHtmlFile.exists();
+            schemaHtmlPath = "./" + schemaHtmlFileName; // current directory only supported
+        }
+        tableMap.put("hasSchemaHtml", hasSchemaHtml);
+        if (hasSchemaHtml) {
+            tableMap.put("schemaHtmlPath", schemaHtmlPath);
         }
     }
 
