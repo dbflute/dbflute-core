@@ -2204,6 +2204,13 @@ public class Database {
     }
 
     // -----------------------------------------------------
+    //                                       Lasta Migration
+    //                                       ---------------
+    public boolean isLastaMigrationAlsoGenearteDiXml() {
+        return getLittleAdjustmentProperties().isLastaMigrationAlsoGenearteDiXml();
+    }
+
+    // -----------------------------------------------------
     //                                       Optional Entity
     //                                       ---------------
     public String getBasicOptionalEntityClassName() {

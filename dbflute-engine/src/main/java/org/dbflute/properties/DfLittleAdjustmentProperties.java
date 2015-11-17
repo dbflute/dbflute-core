@@ -1644,6 +1644,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                     Lasta Migration
+    //                                                                     ===============
+    public boolean isLastaMigrationAlsoGenearteDiXml() {
+        return isProperty("isLastaMigrationAlsoGenearteDiXml", false);
+    }
+
+    // ===================================================================================
     //                                                                            Language
     //                                                                            ========
     protected DfLanguageDependency getLanguageDependency() {

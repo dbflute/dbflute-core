@@ -219,7 +219,7 @@ $database.info("public void parseContainerConfig() {")
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/cdi/ExtensionConfig.${glTemplateFileExtension}", $path, "", "")
 #end
-#if ($database.isTargetContainerLastaDi())
+#if ($database.isTargetContainerLastaDi() || $database.isLastaMigrationAlsoGenearteDiXml())
 #foreach ($dbfluteDiXmlPackageName in $database.DBFluteDiXmlPackageNameList)
   #set ($path = "${dbfluteDiXmlPackageName}" )
   $database.makeDirectory($path)
