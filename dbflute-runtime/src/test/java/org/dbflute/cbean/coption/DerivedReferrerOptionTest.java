@@ -31,7 +31,7 @@ public class DerivedReferrerOptionTest extends RuntimeTestCase {
         option.acceptParameterKey("key", "path");
 
         // ## Act ##
-        String actual = option.processSimpleFunction("max(foo.COL)", "func", null, false, "param0");
+        String actual = option.processSimpleFunction("max(foo.COL)", "func", null, false, "param0", null);
 
         // ## Assert ##
         log(actual);
@@ -45,7 +45,7 @@ public class DerivedReferrerOptionTest extends RuntimeTestCase {
         option.acceptParameterKey("key", "path");
 
         // ## Act ##
-        String actual = option.processSimpleFunction("max(foo.COL)", "func", "third", false, "param0");
+        String actual = option.processSimpleFunction("max(foo.COL)", "func", "third", false, "param0", null);
 
         // ## Assert ##
         log(actual);
@@ -59,7 +59,7 @@ public class DerivedReferrerOptionTest extends RuntimeTestCase {
         option.acceptParameterKey("key", "path");
 
         // ## Act ##
-        String actual = option.processSimpleFunction("max(foo.COL)", "func", "third", true, "param0");
+        String actual = option.processSimpleFunction("max(foo.COL)", "func", "third", true, "param0", null);
 
         // ## Assert ##
         log(actual);
@@ -80,7 +80,7 @@ public class DerivedReferrerOptionTest extends RuntimeTestCase {
         sb.append(ln()).append(")").append(sqend).append(identity);
 
         // ## Act ##
-        String actual = option.processSimpleFunction(sb.toString(), "func", null, false, "param0");
+        String actual = option.processSimpleFunction(sb.toString(), "func", null, false, "param0", null);
 
         // ## Assert ##
         log(ln() + actual);
@@ -104,7 +104,7 @@ public class DerivedReferrerOptionTest extends RuntimeTestCase {
         sb.append(ln()).append(")").append(sqend).append(identity);
 
         // ## Act ##
-        String actual = option.processSimpleFunction(sb.toString(), "func", "third", false, "param0");
+        String actual = option.processSimpleFunction(sb.toString(), "func", "third", false, "param0", null);
 
         // ## Assert ##
         log(ln() + actual);
@@ -128,7 +128,7 @@ public class DerivedReferrerOptionTest extends RuntimeTestCase {
         sb.append(ln()).append(")").append(sqend).append(identity);
 
         // ## Act ##
-        String actual = option.processSimpleFunction(sb.toString(), "func", "third", true, "param0");
+        String actual = option.processSimpleFunction(sb.toString(), "func", "third", true, "param0", null);
 
         // ## Assert ##
         log(ln() + actual);
@@ -156,7 +156,7 @@ public class DerivedReferrerOptionTest extends RuntimeTestCase {
         sb.append(ln()).append(")").append(sqend).append(identity);
 
         // ## Act ##
-        String actual = option.processSimpleFunction(sb.toString(), "func", null, false, "param0");
+        String actual = option.processSimpleFunction(sb.toString(), "func", null, false, "param0", null);
 
         // ## Assert ##
         log(ln() + actual);
