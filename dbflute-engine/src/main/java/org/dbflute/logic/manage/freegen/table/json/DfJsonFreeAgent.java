@@ -38,6 +38,7 @@ import javax.script.ScriptException;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 
 /**
@@ -221,7 +222,11 @@ public class DfJsonFreeAgent {
             }
             if (pathElement.startsWith("map.")) {
                 if (!(current instanceof Map<?, ?>)) {
-                    throwKeyPathExpectedMapButNotMapException(requestName, resource, keyPath, pathElement, current);
+                    if (current instanceof List<?> && ((List<?>) current).isEmpty()) {
+                        current = DfCollectionUtil.emptyMap(); // if 'emptyKey: {}', empty List...
+                    } else {
+                        throwKeyPathExpectedMapButNotMapException(requestName, resource, keyPath, pathElement, current);
+                    }
                 }
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> currentMap = (Map<String, Object>) current;
