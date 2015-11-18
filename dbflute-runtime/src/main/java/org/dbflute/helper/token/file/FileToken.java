@@ -544,26 +544,34 @@ public class FileToken {
         assertMakingDelimiter(option);
         assertMakingEncoding(option);
 
+        final String lineSep = prepareWritingLineSeparator(option);
         Writer writer = null; // is interface not to use newLine() for fixed line separator
         try {
             writer = new BufferedWriter(new OutputStreamWriter(ous, option.getEncoding()));
+            doWriteFirst(writer, option, lineSep);
+
             final Set<String> doneMarkSet = new HashSet<String>(2);
 
             // write header
             final FileMakingHeaderInfo headerInfo = option.getFileMakingHeaderInfo();
             if (headerInfo != null) {
                 final List<String> columnNameList = headerInfo.getColumnNameList();
-                doWriterHeader(writer, columnNameList, option, doneMarkSet);
+                doWriteHeader(writer, columnNameList, option, doneMarkSet);
             }
 
             // write data row
-            final String lineSep = prepareWritingLineSeparator(option);
             callbackDataRowWriter(handlingCall, option, lineSep, writer, doneMarkSet);
             writer.flush();
         } finally {
             if (writer != null) {
                 writer.close();
             }
+        }
+    }
+
+    protected void doWriteFirst(Writer writer, FileMakingOption option, String lineSep) throws IOException {
+        if (option.isWriteLineSeparatorFirst()) {
+            writer.write(lineSep);
         }
     }
 
@@ -578,25 +586,30 @@ public class FileToken {
         return new FileMakingOption();
     }
 
-    protected void doWriterHeader(Writer writer, List<String> columnNameList, FileMakingOption option, Set<String> doneMarkSet)
+    protected void doWriteHeader(Writer writer, List<String> columnNameList, FileMakingOption option, Set<String> doneMarkSet)
             throws IOException {
         if (doneMarkSet.contains(HEADER_DONE_MARK)) { // basically no way but just in case
             return;
         }
         if (columnNameList != null && !columnNameList.isEmpty()) {
-            final String columnHeaderString = _lineToken.make(columnNameList, lineOp -> {
-                lineOp.delimitateBy(option.getDelimiter());
-                lineOp.trimSpace(); /* trimming is header only */
-                reflectQuoteMinimally(option, lineOp);
-            });
-            writer.write(columnHeaderString);
-            doneMarkSet.add(HEADER_DONE_MARK);
-            doneMarkSet.add(FIRST_LINE_DONE_MARK);
+            actuallyWriteHeader(writer, columnNameList, option, doneMarkSet);
         }
     }
 
-    protected void callbackDataRowWriter(FileMakingCallback callback, final FileMakingOption option, final String lineSep,
-            final Writer writer, final Set<String> doneMarkSet) throws IOException {
+    protected void actuallyWriteHeader(Writer writer, List<String> columnNameList, FileMakingOption option, Set<String> doneMarkSet)
+            throws IOException {
+        final String columnHeaderString = _lineToken.make(columnNameList, lineOp -> {
+            lineOp.delimitateBy(option.getDelimiter());
+            lineOp.trimSpace(); /* trimming is header only */
+            reflectQuoteMinimally(option, lineOp);
+        });
+        writer.write(columnHeaderString);
+        doneMarkSet.add(HEADER_DONE_MARK);
+        doneMarkSet.add(FIRST_LINE_DONE_MARK);
+    }
+
+    protected void callbackDataRowWriter(FileMakingCallback callback, FileMakingOption option, String lineSep, Writer writer,
+            Set<String> doneMarkSet) throws IOException {
         final FileMakingRowResource resource = createFileMakingRowResource();
         try {
             callback.write(new FileMakingRowWriter() {
@@ -644,7 +657,7 @@ public class FileToken {
             if (!doneMarkSet.contains(HEADER_DONE_MARK)) {
                 final List<String> columnNameList = new ArrayList<String>(valueMap.keySet());
                 option.headerInfo(columnNameList);
-                doWriterHeader(writer, columnNameList, option, doneMarkSet);
+                doWriteHeader(writer, columnNameList, option, doneMarkSet);
                 doneMarkSet.add(HEADER_DONE_MARK);
             }
             final FileMakingHeaderInfo headerInfo = option.getFileMakingHeaderInfo();

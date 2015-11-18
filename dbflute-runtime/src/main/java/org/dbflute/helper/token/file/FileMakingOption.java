@@ -45,6 +45,9 @@ public class FileMakingOption {
     /** Does it suppress value count check? (NotRequired) */
     protected boolean _suppressValueCountCheck;
 
+    /** Does it write line separator first? (for appending) (NotRequired) */
+    protected boolean _writeLineSeparatorFirst;
+
     /** The header info of file-making. (NotRequired) */
     protected FileMakingHeaderInfo _headerInfo;
 
@@ -124,6 +127,16 @@ public class FileMakingOption {
     }
 
     /**
+     * Write line separator first. (for appending)
+     * @param lineSeparatorFirst Does it write line separator first?
+     * @return this. (NotNull)
+     */
+    public FileMakingOption writeLineSeparatorFirst(boolean lineSeparatorFirst) {
+        _writeLineSeparatorFirst = lineSeparatorFirst;
+        return this;
+    }
+
+    /**
      * Set the header info with the list of column name.
      * @param columnNameList The list of column name. (NullAllowed: means no header)
      * @return this. (NotNull)
@@ -180,6 +193,10 @@ public class FileMakingOption {
 
     public boolean isSuppressValueCountCheck() {
         return _suppressValueCountCheck;
+    }
+
+    public boolean isWriteLineSeparatorFirst() {
+        return _writeLineSeparatorFirst;
     }
 
     public FileMakingHeaderInfo getFileMakingHeaderInfo() {
