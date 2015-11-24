@@ -157,6 +157,7 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
         mustNotList.forEach(query -> {
             boolQuery.mustNot(query);
         });
+        regQ(boolQuery);
         return boolQuery;
     }
 #else
@@ -178,6 +179,7 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
         filterList.forEach(query -> {
             boolQuery.filter(query);
         });
+        regQ(boolQuery);
         return boolQuery;
     }
 #end
