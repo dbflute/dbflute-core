@@ -17,6 +17,7 @@ package org.dbflute.properties;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1227,25 +1228,32 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     protected List<String> _readOnlyTableNameList;
+    protected Set<String> _exceptReadOnlyTableNameSet;
 
-    protected List<String> getReadOnlyTableTargetList() {
+    protected List<String> getReadOnlyTableNameList() {
         if (_readOnlyTableNameList != null) {
             return _readOnlyTableNameList;
         }
-        final String key = "readOnlyTableTargetList";
+        final String key = "readOnlyTableNameList";
         final Object obj = getLittleAdjustmentMap().get(key);
-        _readOnlyTableNameList = obj != null ? castToList(obj, key) : new ArrayList<String>();
-        // use isReadOnlySchema instead 
-        //for (String tableName : _readOnlyTableNameList) {
-        //    if ("$$ALL$$".equalsIgnoreCase(tableName)) {
-        //        ...
-        //    }
-        //}
+        final List<String> plainList = obj != null ? castToList(obj, key) : new ArrayList<String>();
+        _readOnlyTableNameList = new ArrayList<String>();
+        _exceptReadOnlyTableNameSet = new LinkedHashSet<String>();
+        for (String element : plainList) {
+            if (element.startsWith("!")) {
+                _exceptReadOnlyTableNameSet.add(Srl.ltrim(element, "!"));
+            } else {
+                _readOnlyTableNameList.add(element);
+            }
+        }
         return _readOnlyTableNameList;
     }
 
     public boolean isReadOnlyTable(String tableDbName) {
-        final List<String> targetList = getReadOnlyTableTargetList();
+        final List<String> targetList = getReadOnlyTableNameList(); // also initialize
+        if (_exceptReadOnlyTableNameSet.contains(tableDbName)) { // after initialization
+            return false;
+        }
         return !targetList.isEmpty() && isTargetByHint(tableDbName, targetList, DfCollectionUtil.emptyList());
     }
 
