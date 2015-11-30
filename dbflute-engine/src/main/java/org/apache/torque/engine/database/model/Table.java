@@ -3348,9 +3348,6 @@ public class Table {
     }
 
     protected boolean doHasAllCommonColumn() {
-        if (!isWritable()) {
-            return false;
-        }
         if (isAdditionalSchema()) {
             final DfDatabaseProperties prop = getDatabaseProperties();
             final DfAdditionalSchemaInfo schemaInfo = prop.getAdditionalSchemaInfo(_unifiedSchema);
