@@ -143,7 +143,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     //                                      Check Definition
     //                                      ----------------
     public void checkDefinition(DfTableListProvider provider) {
-        if (!hasCommonColumn()) {
+        if (!hasCommonColumn() || getLittleAdjustmentProperties().isReadOnlySchema()) {
             return;
         }
         final List<Table> tableList = provider.provideTableList();

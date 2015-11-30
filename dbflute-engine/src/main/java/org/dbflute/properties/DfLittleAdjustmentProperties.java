@@ -15,6 +15,7 @@
  */
 package org.dbflute.properties;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -1219,10 +1220,33 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                                     ReadOnly Schema
-    //                                                                     ===============
+    //                                                                   ReadOnly Generate
+    //                                                                   =================
     public boolean isReadOnlySchema() { // for compile speed, safety
         return isProperty("isReadOnlySchema", false);
+    }
+
+    protected List<String> _readOnlyTableNameList;
+
+    protected List<String> getReadOnlyTableTargetList() {
+        if (_readOnlyTableNameList != null) {
+            return _readOnlyTableNameList;
+        }
+        final String key = "readOnlyTableTargetList";
+        final Object obj = getLittleAdjustmentMap().get(key);
+        _readOnlyTableNameList = obj != null ? castToList(obj, key) : new ArrayList<String>();
+        // use isReadOnlySchema instead 
+        //for (String tableName : _readOnlyTableNameList) {
+        //    if ("$$ALL$$".equalsIgnoreCase(tableName)) {
+        //        ...
+        //    }
+        //}
+        return _readOnlyTableNameList;
+    }
+
+    public boolean isReadOnlyTable(String tableDbName) {
+        final List<String> targetList = getReadOnlyTableTargetList();
+        return !targetList.isEmpty() && isTargetByHint(tableDbName, targetList, DfCollectionUtil.emptyList());
     }
 
     // *quit support because of incomplete, not look much like DBFlute policy
