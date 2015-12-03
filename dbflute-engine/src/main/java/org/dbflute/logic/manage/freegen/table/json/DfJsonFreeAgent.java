@@ -55,7 +55,7 @@ public class DfJsonFreeAgent {
         if (resourceFile.startsWith("http://")) { // JSON response
             json = requestJsonResponse(resourceFile);
         } else { // relative path to local file
-            try (Scanner scanner = new Scanner(Paths.get(resourceFile))) {
+            try (Scanner scanner = new Scanner(Paths.get(resourceFile), "UTF-8")) {
                 json = scanner.useDelimiter("\\Z").next();
             } catch (NoSuchFileException e) {
                 throwJsonFileNotFoundException(requestName, resourceFile, e);
@@ -168,8 +168,8 @@ public class DfJsonFreeAgent {
         try {
             final URL url = new URL(resourceFile);
             final URLConnection uc = url.openConnection();
-            final InputStream is = uc.getInputStream();
-            reader = new BufferedReader(new InputStreamReader(is));
+            final InputStream ins = uc.getInputStream();
+            reader = new BufferedReader(new InputStreamReader(ins, "UTF-8"));
             final StringBuilder sb = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
