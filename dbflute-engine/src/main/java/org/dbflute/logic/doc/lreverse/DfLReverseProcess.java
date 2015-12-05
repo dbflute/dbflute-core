@@ -259,7 +259,7 @@ public class DfLReverseProcess {
         final Map<File, DfLReverseOutputResource> orderedMap = createOrderedMap();
         final String dataDirPath = resolvePath(baseDir);
         final Map<String, String> tableNameMap = _tableNameProp.getTableNameMap(dataDirPath);
-        final Map<String, File> translatedXlsMap = preparetranslatedXlsMap(existingXlsInfo, tableNameMap);
+        final Map<String, File> translatedXlsMap = prepareTranslatedXlsMap(existingXlsInfo, tableNameMap);
         final List<Table> addedTableList = DfCollectionUtil.newArrayList();
         int sectionNo = 1;
         for (List<Table> nestedList : orderedList) {
@@ -293,7 +293,7 @@ public class DfLReverseProcess {
         });
     }
 
-    protected Map<String, File> preparetranslatedXlsMap(DfLReverseExistingXlsInfo existingXlsInfo, Map<String, String> tableNameMap) {
+    protected Map<String, File> prepareTranslatedXlsMap(DfLReverseExistingXlsInfo existingXlsInfo, Map<String, String> tableNameMap) {
         final Map<String, File> existingXlsMap = existingXlsInfo.getTableExistingXlsMap();
         final Map<String, File> translatedXlsMap = StringKeyMap.createAsFlexible();
         for (Entry<String, File> entry : existingXlsMap.entrySet()) {

@@ -289,9 +289,21 @@ public class FunctionFilterOption implements ParameterOption {
         } else {
             realParam = coalesce;
         }
-        final Object bindKey = registerBindParameter(index, realParam);
         final String functionName = "coalesce";
-        return processSimpleFunction(functionExp, functionName, null, false, bindKey);
+        final Object bindKey;
+        final Number embedableNumber;
+        if (isEmbedableNumber(realParam)) { // for DreamCruise convert() in ColumnQuery
+            bindKey = null;
+            embedableNumber = (Number) realParam;
+        } else {
+            bindKey = registerBindParameter(index, realParam);
+            embedableNumber = null;
+        }
+        return processSimpleFunction(functionExp, functionName, null, false, bindKey, embedableNumber);
+    }
+
+    protected boolean isEmbedableNumber(Object realParam) {
+        return realParam instanceof Integer || realParam instanceof Long;
     }
 
     // ===================================================================================
@@ -303,7 +315,7 @@ public class FunctionFilterOption implements ParameterOption {
         }
         final Object bindKey = registerBindParameter(index, round);
         final String functionName = "round";
-        return processSimpleFunction(functionExp, functionName, null, false, bindKey);
+        return processSimpleFunction(functionExp, functionName, null, false, bindKey, null);
     }
 
     // ===================================================================================
@@ -459,7 +471,7 @@ public class FunctionFilterOption implements ParameterOption {
             functionName = "trunc";
         }
         final Object bindKey = registerBindParameter(index, trunc);
-        return processSimpleFunction(functionExp, functionName, thirdArg, leftArg, bindKey);
+        return processSimpleFunction(functionExp, functionName, thirdArg, leftArg, bindKey, null);
     }
 
     protected boolean isTruncNamedTruncate() {
@@ -764,8 +776,9 @@ public class FunctionFilterOption implements ParameterOption {
     // -----------------------------------------------------
     //                                       Simple Function
     //                                       ---------------
-    protected String processSimpleFunction(String functionExp, String functionName, String thirdArg, boolean leftArg, Object bindKey) {
-        final String bindExp = buildBindParameter(bindKey);
+    protected String processSimpleFunction(String functionExp, String functionName, String thirdArg, boolean leftArg, Object bindKey,
+            Number embedableNumber) {
+        final String bindExp = embedableNumber != null ? embedableNumber.toString() : buildBindParameter(bindKey);
         final StringBuilder sb = new StringBuilder();
         sb.append(functionName).append("(");
         final String sqend = SubQueryIndentProcessor.END_MARK_PREFIX;

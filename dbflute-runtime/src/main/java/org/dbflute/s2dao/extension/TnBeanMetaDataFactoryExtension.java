@@ -334,7 +334,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     }
 
     protected DBMeta provideDBMeta(Class<?> entityType) {
-        return ResourceContext.provideDBMeta(entityType);
+        return ResourceContext.provideDBMeta(entityType); // exists when DBFlute entity
     }
 
     protected TnBeanMetaData getMetaFromCache(Class<?> beanClass) {

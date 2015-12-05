@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.torque.engine.database.model.ConstraintNameGenerator;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
@@ -40,6 +39,8 @@ import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonFreeAgent;
+import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
 import org.dbflute.task.manage.DfFreeGenTask;
 import org.dbflute.util.DfCollectionUtil;
@@ -54,8 +55,11 @@ import org.slf4j.LoggerFactory;
  */
 public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Logger _log = LoggerFactory.getLogger(ConstraintNameGenerator.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfLastaDocTableLoader.class);
 
     private static boolean mvnTestDocumentExecuted;
 
@@ -101,37 +105,11 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         executeTestDocument(tableMap);
         final Path lastaDocFile = acceptLastaDocFile(tableMap);
         if (Files.exists(lastaDocFile)) {
-            tableMap.putAll(new DfJsonFreeAgent().decodeJsonMapByJs("lastadoc", lastaDocFile.toFile().getPath()));
-
+            tableMap.putAll(decodeJsonMap(lastaDocFile));
         }
-
         tableMap.put("appList", findAppList(mapProp));
-
+        prepareSchemaHtmlLink(tableMap);
         return new DfFreeGenTable(tableMap, "unused", columnList);
-    }
-
-    protected List<Map<String, String>> findAppList(DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
-        List<Map<String, String>> appList;
-        try {
-            appList = Files.list(Paths.get("./output/lasta")).filter(entry -> {
-                return entry.getFileName().toString().matches(".*lastadoc-.*\\.html");
-            }).map(file -> {
-                Map<String, String> appMap = DfCollectionUtil.newLinkedHashMap();
-                appMap.put("appName", file.toFile().getName().replaceAll("(lastadoc-|\\.html)", ""));
-                appMap.put("lastadocPath", file.toFile().getName());
-                return appMap;
-            }).collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new IllegalStateException("can't read directory", e);
-        }
-        Map<String, String> appMap = DfCollectionUtil.newLinkedHashMap();
-        appMap.put("appName", (String) tableMap.get("appName"));
-        appMap.put("lastadocPath", "lastadoc-" + tableMap.get("appName") + ".html");
-        appList = appList.stream().distinct().sorted((app, app2) -> {
-            return app.get("appName").compareTo(app2.get("appName"));
-        }).collect(Collectors.toList());
-        return appList;
     }
 
     protected List<Map<String, Object>> prepareColumnList(DfLastaInfo lastaInfo) {
@@ -153,6 +131,55 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
             return "/";
         } else {
             return "/" + Srl.decamelize(Srl.removeSuffix(className, "Action"), "/").toLowerCase() + "/";
+        }
+    }
+
+    protected Map<? extends String, ? extends Object> decodeJsonMap(final Path lastaDocFile) {
+        return new DfJsonFreeAgent().decodeJsonMap("lastadoc", lastaDocFile.toFile().getPath());
+    }
+
+    protected List<Map<String, String>> findAppList(DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getTableMap();
+        List<Map<String, String>> appList;
+        try {
+            final String outputDirectory = getLastaFluteProperties().getLastaDocOutputDirectory();
+            appList = Files.list(Paths.get(outputDirectory)).filter(entry -> {
+                return entry.getFileName().toString().matches(".*lastadoc-.*\\.html");
+            }).map(file -> {
+                Map<String, String> appMap = DfCollectionUtil.newLinkedHashMap();
+                appMap.put("appName", file.toFile().getName().replaceAll("(lastadoc-|\\.html)", ""));
+                appMap.put("lastadocPath", file.toFile().getName());
+                return appMap;
+            }).collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new IllegalStateException("can't read directory", e);
+        }
+        Map<String, String> appMap = DfCollectionUtil.newLinkedHashMap();
+        appMap.put("appName", (String) tableMap.get("appName"));
+        appMap.put("lastadocPath", "lastadoc-" + tableMap.get("appName") + ".html");
+        appList = appList.stream().distinct().sorted((app, app2) -> {
+            return app.get("appName").compareTo(app2.get("appName"));
+        }).collect(Collectors.toList());
+        return appList;
+    }
+
+    protected void prepareSchemaHtmlLink(final Map<String, Object> tableMap) {
+        final DfLastaFluteProperties prop = getLastaFluteProperties();
+        final boolean hasSchemaHtml;
+        final String schemaHtmlPath;
+        if (prop.isSuppressLastaDocSchemaHtmlLink()) {
+            hasSchemaHtml = false;
+            schemaHtmlPath = null;
+        } else {
+            final String outputDirectory = prop.getLastaDocOutputDirectory();
+            final String schemaHtmlFileName = getDocumentProperties().getSchemaHtmlFileName(getBasicProperties().getProjectName());
+            final File schemaHtmlFile = new File(outputDirectory + "/" + schemaHtmlFileName);
+            hasSchemaHtml = schemaHtmlFile.exists();
+            schemaHtmlPath = "./" + schemaHtmlFileName; // current directory only supported
+        }
+        tableMap.put("hasSchemaHtml", hasSchemaHtml);
+        if (hasSchemaHtml) {
+            tableMap.put("schemaHtmlPath", schemaHtmlPath);
         }
     }
 
@@ -249,9 +276,11 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     protected Path acceptLastaDocFile(Map<String, Object> tableMap) {
         final List<Path> candidateList = DfCollectionUtil.newArrayList();
         final String path = (String) tableMap.get("path");
-        candidateList.add(Paths.get(path, String.format("target/lastadoc/lastadoc.json")));
-        candidateList.add(Paths.get(path, String.format("build/lastadoc/lastadoc.json")));
-        final Path lastaDocFile = Paths.get(String.format("./schema/lastadoc-%s.json", tableMap.get("appName")));
+        candidateList.add(Paths.get(path, "target/lastadoc/analyzed-lastadoc.json"));
+        candidateList.add(Paths.get(path, "build/lastadoc/analyzed-lastadoc.json"));
+        candidateList.add(Paths.get(path, "target/lastadoc/lastadoc.json")); // for compatible
+        candidateList.add(Paths.get(path, "build/lastadoc/lastadoc.json")); // for compatible
+        final Path lastaDocFile = Paths.get(String.format("./schema/project-lastadoc-%s.json", tableMap.get("appName")));
         candidateList.forEach(candidate -> {
             if (!Files.exists(candidate)) {
                 return;
@@ -291,6 +320,14 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return DfBuildProperties.getInstance().getDocumentProperties();
+    }
+
     protected DfLastaFluteProperties getLastaFluteProperties() {
         return DfBuildProperties.getInstance().getLastaFluteProperties();
     }

@@ -618,6 +618,10 @@ public abstract class DfAbstractHelperProperties {
         return handler().getReplaceSchemaProperties(getProperties());
     }
 
+    protected DfESFluteProperties getESFluteProperties() {
+        return handler().getESFluteProperties(getProperties());
+    }
+
     protected DfLastaFluteProperties getLastaFluteProperties() {
         return handler().getLastaFluteProperties(getProperties());
     }

@@ -43,4 +43,26 @@ public class OptionalThingTest extends RuntimeTestCase {
             assertContains(message, "land");
         }
     }
+
+    public void test_translatedFrom() throws Exception {
+        assertTrue(OptionalThing.translatedFrom(OptionalThing.of("sea"), () -> {
+            throw new IllegalStateException();
+        }).isPresent());
+        assertFalse(OptionalThing.translatedFrom(OptionalThing.empty(), () -> {
+            throw new IllegalStateException();
+        }).isPresent());
+        try {
+            OptionalThing.translatedFrom(OptionalThing.ofNullable(null, () -> {
+                throw new IllegalStateException("sea");
+            }), () -> {
+                throw new IllegalStateException("land");
+            }).get();
+            fail();
+        } catch (IllegalStateException e) {
+            String message = e.getMessage();
+            log(message);
+            assertNotContains(message, "sea");
+            assertContains(message, "land");
+        }
+    }
 }

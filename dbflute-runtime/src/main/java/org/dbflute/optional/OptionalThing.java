@@ -67,6 +67,16 @@ public interface OptionalThing<THING> {
         return OptionalObject.ofNullable(java8opt.orElse(null), noArgLambda);
     }
 
+    /**
+     * @param <THING> The type of thing wrapped in the optional thing.
+     * @param dfopt The optional instance as optional thing DBFlute provides. (NotNull)
+     * @param noArgLambda The callback for exception when illegal access. (NotNull)
+     * @return The new-created instance as existing or empty optional thing. (NotNull)
+     */
+    public static <THING> OptionalThing<THING> translatedFrom(OptionalThing<THING> dfopt, OptionalThingExceptionThrower noArgLambda) {
+        return OptionalObject.ofNullable(dfopt.orElse(null), noArgLambda);
+    }
+
     // ===================================================================================
     //                                                                   Standard Handling
     //                                                                   =================

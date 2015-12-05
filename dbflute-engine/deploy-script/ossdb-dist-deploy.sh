@@ -60,6 +60,9 @@ mvn -e compile
 cd ../dbflute-test-dbms-sqlite/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
+cd ../dbflute_readonlydb
+rm ./log/*.log
+. manage.sh renewal
 cd ..
 mvn -e compile
 cd ../dbflute-test-dbms-derby/dbflute_maihamadb

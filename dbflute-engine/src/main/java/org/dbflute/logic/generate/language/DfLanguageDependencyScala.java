@@ -95,8 +95,13 @@ public class DfLanguageDependencyScala extends DfLanguageDependencyJava {
     }
 
     @Override
+    public String getESFluteFreeGenControl() {
+        return "om/scala/plugin/esflute/ControlFreeGenEsScala.vm";
+    }
+
+    @Override
     public String getLastaFluteFreeGenControl() {
-        return "om/java/plugin/freegen/EmbeddedControlFreeGenScala.vm";
+        return "om/scala/plugin/lastaflute/ControlFreeGenLastaScala.vm";
     }
 
     @Override

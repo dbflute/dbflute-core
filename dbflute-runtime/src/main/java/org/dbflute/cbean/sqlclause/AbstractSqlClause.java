@@ -3060,16 +3060,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                  ColumnQuery Object
     //                                                                  ==================
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Map<String, Object> getColumnQueryObjectMap() {
         return _columyQueryObjectMap;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public String registerColumnQueryObjectToThemeList(String themeKey, Object addedValue) {
         if (_columyQueryObjectMap == null) {
             _columyQueryObjectMap = new LinkedHashMap<String, Object>();

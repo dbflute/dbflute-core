@@ -15,7 +15,9 @@
  */
 package org.dbflute.properties;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1210,6 +1212,51 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isQueryUpdateCountPreCheck", defaultValue);
     }
 
+    // ===================================================================================
+    //                                                                         Zero Update
+    //                                                                         ===========
+    public boolean isZeroUpdateCheckExistenceForPassing() { // closet, for e.g. Atlas
+        // e.g. Atlas (MySQL proxy) returns changed, not matched, so needs to check after zero update
+        return isProperty("isZeroUpdateCheckExistenceForPassing", false);
+    }
+
+    // ===================================================================================
+    //                                                                   ReadOnly Generate
+    //                                                                   =================
+    public boolean isReadOnlySchema() { // for compile speed, safety
+        return isProperty("isReadOnlySchema", false);
+    }
+
+    protected List<String> _readOnlyTableNameList;
+    protected Set<String> _exceptReadOnlyTableNameSet;
+
+    protected List<String> getReadOnlyTableNameList() {
+        if (_readOnlyTableNameList != null) {
+            return _readOnlyTableNameList;
+        }
+        final String key = "readOnlyTableNameList";
+        final Object obj = getLittleAdjustmentMap().get(key);
+        final List<String> plainList = obj != null ? castToList(obj, key) : new ArrayList<String>();
+        _readOnlyTableNameList = new ArrayList<String>();
+        _exceptReadOnlyTableNameSet = new LinkedHashSet<String>();
+        for (String element : plainList) {
+            if (element.startsWith("!")) {
+                _exceptReadOnlyTableNameSet.add(Srl.ltrim(element, "!"));
+            } else {
+                _readOnlyTableNameList.add(element);
+            }
+        }
+        return _readOnlyTableNameList;
+    }
+
+    public boolean isReadOnlyTable(String tableDbName) {
+        final List<String> targetList = getReadOnlyTableNameList(); // also initialize
+        if (_exceptReadOnlyTableNameSet.contains(tableDbName)) { // after initialization
+            return false;
+        }
+        return !targetList.isEmpty() && isTargetByHint(tableDbName, targetList, DfCollectionUtil.emptyList());
+    }
+
     // *quit support because of incomplete, not look much like DBFlute policy
     //// ===================================================================================
     ////                                                         SetupSelect Forced Relation
@@ -1626,6 +1673,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isCompatibleBeforeJava8() { // closet
         final boolean defaultValue = getLanguageDependency().getLanguageImplStyle().isCompatibleBeforeJava8();
         return isProperty("isCompatibleBeforeJava8", defaultValue);
+    }
+
+    // ===================================================================================
+    //                                                                     Lasta Migration
+    //                                                                     ===============
+    public boolean isLastaMigrationAlsoGenearteDiXml() {
+        return isProperty("isLastaMigrationAlsoGenearteDiXml", false);
     }
 
     // ===================================================================================

@@ -60,9 +60,15 @@ public class DfFreeGenManager {
         generator.setOutputPath(outputDirectory);
     }
 
-    public void makeDirectory(String filePath) {
-        final String basePath = Srl.substringLastFront(filePath, "/");
-        FileUtil.mkdir(getGenerator().getOutputPath() + "/" + basePath);
+    public void makeDirectory(String filePath) { // may be slash or back-slash see DfPackagePathHandler
+        final String fileName = Srl.substringLastRear(filePath, "/", "\\");
+        final String realPath;
+        if (fileName.contains(".")) { // may be file
+            realPath = Srl.substringLastFront(filePath, "/", "\\");
+        } else {
+            realPath = filePath;
+        }
+        FileUtil.mkdir(getGenerator().getOutputPath() + "/" + realPath);
     }
 
     // ===================================================================================

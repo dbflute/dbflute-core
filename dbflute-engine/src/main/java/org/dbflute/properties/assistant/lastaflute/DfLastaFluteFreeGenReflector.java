@@ -61,8 +61,8 @@ public final class DfLastaFluteFreeGenReflector {
     // ===================================================================================
     //                                                                     Prepare FreeGen
     //                                                                     ===============
-    public void reflectFrom(Map<String, Object> lastafluteMap) {
-        logger.info("Before refecting, existing freeGen settigs: " + _freeGenMap.keySet());
+    public void reflectFrom(Map<String, Object> lastafluteMap, String lastaDocOutputDirectory) {
+        logger.info("Before LastaFlute refecting, existing freeGen settigs: " + _freeGenMap.keySet());
         boolean hasCommonEnv = false;
         boolean hasCommonConfig = false;
         boolean hasCommonLabel = false;
@@ -92,7 +92,7 @@ public final class DfLastaFluteFreeGenReflector {
                 } else if ("template".equals(freeGen)) {
                     setupPmTemplateGen(_uncapServiceName, path, lastafluteMap);
                 } else if ("doc".equals(freeGen)) {
-                    setupDocGen(_uncapServiceName, path);
+                    setupDocGen(_uncapServiceName, path, lastaDocOutputDirectory);
                 } else {
                     String msg = "Unkonwn type for commonMap's freeGen: " + freeGen;
                     throw new DfIllegalPropertySettingException(msg);
@@ -131,7 +131,7 @@ public final class DfLastaFluteFreeGenReflector {
                     } else if ("html".equals(freeGen)) {
                         setupHtmlPathGen(appName, path, lastafluteMap);
                     } else if ("doc".equals(freeGen)) {
-                        setupDocGen(appName, path);
+                        setupDocGen(appName, path, lastaDocOutputDirectory);
                     } else {
                         String msg = "Unkonwn type for appMap's freeGen: " + freeGen;
                         throw new DfIllegalPropertySettingException(msg);
@@ -139,20 +139,29 @@ public final class DfLastaFluteFreeGenReflector {
                 }
             }
         }
-        logger.info("After refecting, existing freeGen settigs: " + _freeGenMap.keySet());
+        showFreeGenSettings();
+    }
+
+    protected void showFreeGenSettings() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("After LastaFlute refecting, existing freeGen settigs: ").append(_freeGenMap.keySet());
+        for (Entry<String, Object> entry : _freeGenMap.entrySet()) {
+            sb.append("\n ").append(entry.getKey()).append(": ").append(entry.getValue());
+        }
+        logger.info(sb.toString());
     }
 
     // ===================================================================================
     //                                                                       Configuration
     //                                                                       =============
     protected void setupEnvGen(String appName, String path, boolean hasCommonEnv, boolean hasCommonConfig) {
-        final Map<String, Map<String, Object>> envMap = new LinkedHashMap<String, Map<String, Object>>();
+        final Map<String, Map<String, Object>> elementMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "env";
-        registerFreeGen(initCap(appName) + buildTitleSuffix(theme), envMap);
-        doSetupResourceMap(appName, path, envMap, theme);
-        doSetupOutputConfigMap(appName, envMap, theme);
+        registerFreeGen(initCap(appName) + buildTitleSuffix(theme), elementMap);
+        doSetupResourceMap(appName, path, elementMap, theme);
+        doSetupOutputConfigMap(appName, elementMap, theme);
         final Map<String, Object> tableMap = createTableMap();
-        envMap.put("tableMap", tableMap);
+        elementMap.put("tableMap", tableMap);
         if (!hasCommonEnv && !hasCommonConfig) { // root
             doSetupConfigTableMapRoot(tableMap);
         } else {
@@ -163,14 +172,14 @@ public final class DfLastaFluteFreeGenReflector {
     }
 
     protected void setupConfigGen(String appName, String path, boolean hasCommonEnv, boolean hasCommonConfig, boolean hasAppEnv) {
-        final Map<String, Map<String, Object>> configMap = new LinkedHashMap<String, Map<String, Object>>();
+        final Map<String, Map<String, Object>> elementMap = new LinkedHashMap<String, Map<String, Object>>();
         final String capAppName = initCap(appName);
         final String theme = "config";
-        registerFreeGen(capAppName + buildTitleSuffix(theme), configMap);
-        doSetupResourceMap(appName, path, configMap, theme);
-        doSetupOutputConfigMap(appName, configMap, theme);
+        registerFreeGen(capAppName + buildTitleSuffix(theme), elementMap);
+        doSetupResourceMap(appName, path, elementMap, theme);
+        doSetupOutputConfigMap(appName, elementMap, theme);
         final Map<String, Object> tableMap = createTableMap();
-        configMap.put("tableMap", tableMap);
+        elementMap.put("tableMap", tableMap);
         if (!hasCommonEnv && !hasCommonConfig && !hasAppEnv) { // root
             doSetupConfigTableMapRoot(tableMap);
         } else {
@@ -180,9 +189,9 @@ public final class DfLastaFluteFreeGenReflector {
         }
     }
 
-    protected void doSetupOutputConfigMap(String appName, Map<String, Map<String, Object>> map, String theme) {
+    protected void doSetupOutputConfigMap(String appName, Map<String, Map<String, Object>> elementMap, String theme) {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
-        map.put("outputMap", outputMap);
+        elementMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaSystemConfig.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", _mylastaPackage + ".direction");
@@ -208,13 +217,13 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                            ========
     protected void setupLabelGen(String appName, String path, boolean hasCommonLabel, boolean hasCommonMessage,
             Map<String, Object> lastafluteMap) {
-        final Map<String, Map<String, Object>> labelMap = new LinkedHashMap<String, Map<String, Object>>();
+        final Map<String, Map<String, Object>> elementMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "label";
-        registerFreeGen(initCap(appName) + buildTitleSuffix(theme), labelMap);
-        doSetupResourceMap(appName, path, labelMap, theme);
-        doSetupMessageOutputMap(appName, labelMap, theme, lastafluteMap);
+        registerFreeGen(initCap(appName) + buildTitleSuffix(theme), elementMap);
+        doSetupResourceMap(appName, path, elementMap, theme);
+        doSetupMessageOutputMap(appName, elementMap, theme, lastafluteMap);
         final Map<String, Object> tableMap = createTableMap();
-        labelMap.put("tableMap", tableMap);
+        elementMap.put("tableMap", tableMap);
         tableMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap(theme, "prefix:labels."));
         if (hasCommonLabel || hasCommonMessage) {
             final String parentName = _uncapServiceName;
@@ -225,13 +234,13 @@ public final class DfLastaFluteFreeGenReflector {
 
     protected void setupMessageGen(String appName, String path, boolean hasCommonLabel, boolean hasCommonMessage, boolean hasAppLabel,
             Map<String, Object> lastafluteMap) {
-        final Map<String, Map<String, Object>> labelMap = new LinkedHashMap<String, Map<String, Object>>();
+        final Map<String, Map<String, Object>> elementMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "message";
-        registerFreeGen(initCap(appName) + buildTitleSuffix(theme), labelMap);
-        doSetupResourceMap(appName, path, labelMap, theme);
-        doSetupMessageOutputMap(appName, labelMap, theme, lastafluteMap);
+        registerFreeGen(initCap(appName) + buildTitleSuffix(theme), elementMap);
+        doSetupResourceMap(appName, path, elementMap, theme);
+        doSetupMessageOutputMap(appName, elementMap, theme, lastafluteMap);
         final Map<String, Object> tableMap = createTableMap();
-        labelMap.put("tableMap", tableMap);
+        elementMap.put("tableMap", tableMap);
         tableMap.put("groupingKeyMap", DfCollectionUtil.newLinkedHashMap("label", "prefix:labels."));
         if (hasCommonLabel || hasCommonMessage || hasAppLabel) {
             final String parentName = hasAppLabel ? appName : _uncapServiceName;
@@ -240,10 +249,10 @@ public final class DfLastaFluteFreeGenReflector {
         }
     }
 
-    protected void doSetupMessageOutputMap(String appName, Map<String, Map<String, Object>> map, String theme,
+    protected void doSetupMessageOutputMap(String appName, Map<String, Map<String, Object>> elementMap, String theme,
             Map<String, Object> lastafluteMap) {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
-        map.put("outputMap", outputMap);
+        elementMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaUserMessages.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", buildMessagesPackage(appName, lastafluteMap));
@@ -341,7 +350,7 @@ public final class DfLastaFluteFreeGenReflector {
     }
 
     protected void setupHtmlPathGen(String appName, String path, Map<String, Object> lastafluteMap) {
-        // TODO jflute lastaflute: thinking Thymeleaf localtion
+        // daone jflute lastaflute: thinking Thymeleaf localtion => same as JSP for now
         //final String targetDir = "$$baseDir$$/resources/templates";
         final String targetDir = "$$baseDir$$/webapp/WEB-INF/view";
         doSetupHtmlTemplatePathGen(appName, path, targetDir, "html", lastafluteMap);
@@ -379,7 +388,7 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                            Document
     //                                                                            ========
     // last process recommended for generated classes by others
-    protected void setupDocGen(String appName, String path) {
+    protected void setupDocGen(String appName, String path, String lastaDocOutputDirectory) {
         final Map<String, Map<String, Object>> docMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "lastaDoc";
         registerFreeGen(initCap(appName) + buildTitleSuffix(theme), docMap);
@@ -390,8 +399,8 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         docMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaDocHtml.vm");
-        outputMap.put("outputDirectory", "./output");
-        outputMap.put("package", "lasta");
+        outputMap.put("outputDirectory", lastaDocOutputDirectory);
+        outputMap.put("package", ""); // flat documents e.g. ./output/doc/lastadoc-harbor.html
         outputMap.put("className", "lastadoc-" + appName);
         outputMap.put("fileExt", "html");
         final Map<String, Object> tableMap = createTableMap();
@@ -402,12 +411,8 @@ public final class DfLastaFluteFreeGenReflector {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected String buildTitleSuffix(String theme) {
-        return initCap(theme);
-    }
-
+    //                                                                           Core Info
+    //                                                                           =========
     protected void registerFreeGen(String key, Map<String, Map<String, Object>> map) {
         final Object existing = _freeGenMap.get(key);
         if (existing != null) {
@@ -431,14 +436,9 @@ public final class DfLastaFluteFreeGenReflector {
         return map;
     }
 
-    protected String getTrueLiteral() {
-        return "true";
-    }
-
-    protected String initCap(String project) {
-        return Srl.initCap(project);
-    }
-
+    // ===================================================================================
+    //                                                                          Overridden
+    //                                                                          ==========
     protected <VALUE> VALUE filterOverridden(VALUE overriddenValue, Map<String, Object> lastafluteMap, String appName, String title,
             String key) {
         @SuppressWarnings("unchecked")
@@ -448,5 +448,20 @@ public final class DfLastaFluteFreeGenReflector {
         }
         final String fullKey = appName + ".freeGen." + title + "." + key;
         return (VALUE) overrideMap.getOrDefault(fullKey, overriddenValue);
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected String buildTitleSuffix(String theme) {
+        return initCap(theme);
+    }
+
+    protected String getTrueLiteral() {
+        return "true";
+    }
+
+    protected String initCap(String project) {
+        return Srl.initCap(project);
     }
 }

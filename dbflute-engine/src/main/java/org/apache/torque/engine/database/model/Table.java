@@ -1094,7 +1094,8 @@ public class Table {
      * @return The determination, true or false.
      */
     public boolean isWritable() {
-        return hasPrimaryKey();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return !prop.isReadOnlySchema() && !prop.isReadOnlyTable(getTableDbName()) && hasPrimaryKey();
     }
 
     /**
@@ -3347,9 +3348,6 @@ public class Table {
     }
 
     protected boolean doHasAllCommonColumn() {
-        if (!isWritable()) {
-            return false;
-        }
         if (isAdditionalSchema()) {
             final DfDatabaseProperties prop = getDatabaseProperties();
             final DfAdditionalSchemaInfo schemaInfo = prop.getAdditionalSchemaInfo(_unifiedSchema);

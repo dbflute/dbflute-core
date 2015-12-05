@@ -18,7 +18,10 @@
         <td class="rownumcell" rowspan="$rowspan">${foreach.count}</td>
         <td>${nestTypeDocMeta.name}</td>
         <td><p title="$manager.htmlEscape($nestTypeDocMeta.typeName)">$manager.htmlEscape($nestTypeDocMeta.simpleTypeName)</p></td>
-        <td><p title="$!manager.htmlEscape($nestTypeDocMeta.comment)">$!manager.htmlEscape($nestTypeDocMeta.description)</p></td>
+        <td>
+        	<p title="$!manager.htmlEscape($nestTypeDocMeta.comment)">$!manager.htmlEscape($nestTypeDocMeta.description)</p>
+        	<p>$!manager.htmlEscape($nestTypeDocMeta.value)</p>
+        </td>
         <td>
 #foreach ($annotation in $nestTypeDocMeta.annotationList)
             ${annotation}

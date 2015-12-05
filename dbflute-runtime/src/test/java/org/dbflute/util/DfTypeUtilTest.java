@@ -234,6 +234,12 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals(LocalDateTime.of(2014, 01, 01, 0, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
     }
 
+    public void test_toLocalDate_withTimeZoneLocale() {
+        TimeZone jstZone = TimeZone.getTimeZone("JST");
+        LocalDate actual = toLocalDate("3 Dec 2011", jstZone, "d MMM uuuu", Locale.ENGLISH);
+        assertEquals(LocalDate.of(2011, 12, 03), actual);
+    }
+
     public void test_toLocalDate_illegal() {
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
         assertNotNull(toLocalDate("2009-12-13 01:23:45.123", gmt2hour));
@@ -250,7 +256,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
             log(e.getMessage());
         }
         try {
-            assertNull(toLocalDate("2009-12-13 01:23:45.123", (String) null, (TimeZone) null));
+            assertNull(toLocalDate("2009-12-13 01:23:45.123", (TimeZone) null, (String) null));
             fail();
         } catch (IllegalArgumentException e) {
             log(e.getMessage());
@@ -378,6 +384,12 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals(LocalDateTime.of(2014, 01, 01, 0, 0, 0), toLocalDateTime(toDate("2014/01/01"), jstZone));
     }
 
+    public void test_toLocalDateTime_withTimeZoneLocale() {
+        TimeZone jstZone = TimeZone.getTimeZone("JST");
+        LocalDateTime actual = toLocalDateTime("3 Dec 2011 12:34:56", jstZone, "d MMM uuuu HH:mm:ss", Locale.ENGLISH);
+        assertEquals(LocalDateTime.of(2011, 12, 03, 12, 34, 56), actual);
+    }
+
     public void test_toLocalDateTime_illegal() {
         TimeZone gmt2hour = TimeZone.getTimeZone("GMT+2");
         assertNotNull(DfTypeUtil.toLocalDateTime("2009-12-13 01:23:45.123", gmt2hour));
@@ -394,7 +406,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
             log(e.getMessage());
         }
         try {
-            assertNull(toLocalDateTime("2009-12-13 01:23:45.123", (String) null, (TimeZone) null));
+            assertNull(toLocalDateTime("2009-12-13 01:23:45.123", (TimeZone) null, (String) null));
             fail();
         } catch (IllegalArgumentException e) {
             log(e.getMessage());

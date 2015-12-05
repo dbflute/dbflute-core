@@ -105,6 +105,11 @@ public interface DfLanguageDependency {
     /**
      * @return The path of velocity control file for freeGen. (NotNull) 
      */
+    String getESFluteFreeGenControl();
+
+    /**
+     * @return The path of velocity control file for freeGen. (NotNull) 
+     */
     String getLastaFluteFreeGenControl();
 
     /**

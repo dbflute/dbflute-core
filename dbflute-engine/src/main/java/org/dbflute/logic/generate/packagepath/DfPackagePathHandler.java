@@ -88,6 +88,7 @@ public class DfPackagePathHandler {
         if (_fileSeparatorSlash) {
             return pckge.replace('.', '/') + "/";
         } else {
+            // no need to use environment separator?...but no fix because of long logic by jflute (2015/11/15)
             return pckge.replace('.', File.separator.charAt(0)) + File.separator;
         }
     }

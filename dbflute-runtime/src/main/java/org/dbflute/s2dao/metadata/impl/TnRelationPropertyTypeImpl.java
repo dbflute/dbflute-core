@@ -24,8 +24,10 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.info.PrimaryInfo;
+import org.dbflute.exception.DBMetaNotFoundException;
 import org.dbflute.helper.beans.DfPropertyAccessor;
 import org.dbflute.helper.beans.DfPropertyDesc;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
@@ -98,6 +100,7 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
 
     protected DfPropertyAccessor createPropertyAccessor(final DfPropertyDesc propertyDesc, TnBeanMetaData myBeanMetaData) {
         final DBMeta dbmeta = myBeanMetaData.getDBMeta();
+        assertDBMetaExists(dbmeta, myBeanMetaData);
         final String propertyName = propertyDesc.getPropertyName();
         final ForeignInfo foreignInfo = dbmeta.hasForeign(propertyName) ? dbmeta.findForeignInfo(propertyName) : null;
         return new DfPropertyAccessor() {
@@ -138,6 +141,22 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
                 return propertyDesc.isWritable();
             }
         };
+    }
+
+    protected void assertDBMetaExists(DBMeta dbmeta, TnBeanMetaData myBeanMetaData) {
+        if (dbmeta == null) { // basically no way
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Not found the DB meta for the entity");
+            br.addItem("Advice");
+            br.addElement("Basically no way!");
+            br.addElement("So confirm your DBFlute environment.");
+            br.addElement(" e.g. DBMetaInstanceHandler, table name's case");
+            br.addItem("Corresponding Table");
+            br.addElement(myBeanMetaData.getTableName());
+            br.addElement(myBeanMetaData.getBeanClass());
+            final String msg = br.buildExceptionMessage();
+            throw new DBMetaNotFoundException(msg);
+        }
     }
 
     // ===================================================================================

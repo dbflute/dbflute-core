@@ -327,9 +327,21 @@ ${linkDelimiter} <a href="#diagram">Schema Diagram</a>
 #if ($selector.isSchemaHtmlToHistoryHtmlLink())
 <p class="sisterlink"><a href="./${selector.historyHtmlFileName}">to HistoryHTML</a></p>
 #end
-## PropertiesHtml is minor case
+## PropertiesHtml and LastaDoc is also on fixed location
+#if ($selector.isSchemaHtmlToPropertiesHtmlLink() || $selector.isSchemaHtmlToLastaDocLink())
+<p class="sistersublink">
+#set ($linkDelimiter = "")
 #if ($selector.isSchemaHtmlToPropertiesHtmlLink())
-<p class="sistersublink"><a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a></p>
+<a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a>
+#set ($linkDelimiter = "|")
+#end
+#if ($selector.isSchemaHtmlToLastaDocLink())
+#foreach ($lastaDocHtmlName in $selector.lastaDocHtmlNameList)
+${linkDelimiter} <a href="./${lastaDocHtmlName}">to ${lastaDocHtmlName}</a>
+#set ($linkDelimiter = "|")
+#end
+#end
+</p>
 #end
 #if ($selector.hasNeighborhoodSchemaHtml())
 #set ($linkDelimiter = "")

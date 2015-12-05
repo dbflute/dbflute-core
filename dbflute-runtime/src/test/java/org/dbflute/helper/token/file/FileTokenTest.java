@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.dbflute.helper.token.file.exception.FileMakingInvalidValueCountException;
 import org.dbflute.unit.RuntimeTestCase;
+import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -496,6 +497,79 @@ public class FileTokenTest extends RuntimeTestCase {
         assertEquals("\"a\",\"\"\"\",\"c\"\"c\",\"d\"\"\",\"e\"", split[2]);
         assertEquals("\"a\",\"b,b\",\"c\"\",c\",\"d", split[3]);
         assertEquals("\",\"e\"", split[4]);
+    }
+
+    // -----------------------------------------------------
+    //                                   LineSeparator First
+    //                                   -------------------
+    public void test_make_LineSeparatorFirst_default() throws Exception {
+        // ## Arrange ##
+        FileToken impl = new FileToken();
+        ByteArrayOutputStream ous = new ByteArrayOutputStream();
+        impl.make(ous, new FileMakingCallback() {
+            public void write(FileMakingRowWriter writer) throws IOException, SQLException {
+                {
+                    Map<String, String> valueMap = new LinkedHashMap<String, String>();
+                    valueMap.put("A", "a");
+                    valueMap.put("B", "b");
+                    valueMap.put("C", "cc");
+                    writer.writeRow(valueMap);
+                }
+            }
+        }, op -> op.delimitateByComma().encodeAsUTF8().separateByLf());
+        impl.make(ous, new FileMakingCallback() {
+            public void write(FileMakingRowWriter writer) throws IOException, SQLException {
+                {
+                    Map<String, String> valueMap = new LinkedHashMap<String, String>();
+                    valueMap.put("A", "a");
+                    valueMap.put("B", "b");
+                    valueMap.put("C", "cc");
+                    writer.writeRow(valueMap);
+                }
+            }
+        }, op -> op.delimitateByComma().encodeAsUTF8().separateByLf());
+
+        // ## Act ##
+        String actual = ous.toString();
+        log(actual);
+
+        // ## Assert ##
+        assertEquals(3, Srl.splitList(actual, "\n").size());
+    }
+
+    public void test_make_LineSeparatorFirst_resolved() throws Exception {
+        // ## Arrange ##
+        FileToken impl = new FileToken();
+        ByteArrayOutputStream ous = new ByteArrayOutputStream();
+        impl.make(ous, new FileMakingCallback() {
+            public void write(FileMakingRowWriter writer) throws IOException, SQLException {
+                {
+                    Map<String, String> valueMap = new LinkedHashMap<String, String>();
+                    valueMap.put("A", "a");
+                    valueMap.put("B", "b");
+                    valueMap.put("C", "cc");
+                    writer.writeRow(valueMap);
+                }
+            }
+        }, op -> op.delimitateByComma().encodeAsUTF8().separateByLf());
+        impl.make(ous, new FileMakingCallback() {
+            public void write(FileMakingRowWriter writer) throws IOException, SQLException {
+                {
+                    Map<String, String> valueMap = new LinkedHashMap<String, String>();
+                    valueMap.put("A", "a");
+                    valueMap.put("B", "b");
+                    valueMap.put("C", "cc");
+                    writer.writeRow(valueMap);
+                }
+            }
+        }, op -> op.delimitateByComma().encodeAsUTF8().separateByLf().writeLineSeparatorFirst(true));
+
+        // ## Act ##
+        String actual = ous.toString();
+        log(actual);
+
+        // ## Assert ##
+        assertEquals(4, Srl.splitList(actual, "\n").size());
     }
 
     // ===================================================================================

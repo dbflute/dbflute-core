@@ -2155,6 +2155,10 @@ public class Database {
         return getLittleAdjustmentProperties().isQueryUpdateCountPreCheck();
     }
 
+    public boolean isZeroUpdateCheckExistenceForPassing() {
+        return getLittleAdjustmentProperties().isZeroUpdateCheckExistenceForPassing();
+    }
+
     public boolean isStopGenerateExtendedBhv() {
         return getLittleAdjustmentProperties().isStopGenerateExtendedBhv();
     }
@@ -2197,6 +2201,13 @@ public class Database {
 
     public boolean isCompatibleConditionBeanOldNamingOption() {
         return getLittleAdjustmentProperties().isCompatibleConditionBeanOldNamingOption();
+    }
+
+    // -----------------------------------------------------
+    //                                       Lasta Migration
+    //                                       ---------------
+    public boolean isLastaMigrationAlsoGenearteDiXml() {
+        return getLittleAdjustmentProperties().isLastaMigrationAlsoGenearteDiXml();
     }
 
     // -----------------------------------------------------

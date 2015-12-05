@@ -29,6 +29,7 @@ import org.dbflute.properties.DfCommonColumnProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDependencyInjectionProperties;
 import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfESFluteProperties;
 import org.dbflute.properties.DfFlexDtoProperties;
 import org.dbflute.properties.DfFreeGenProperties;
 import org.dbflute.properties.DfHibernateProperties;
@@ -218,6 +219,18 @@ public final class DfPropertiesHandler {
             _documentProperties = new DfDocumentProperties(prop);
         }
         return _documentProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                               ESFlute
+    //                                               -------
+    protected DfESFluteProperties _esfluteProperties;
+
+    public DfESFluteProperties getESFluteProperties(Properties prop) {
+        if (_esfluteProperties == null) {
+            _esfluteProperties = new DfESFluteProperties(prop);
+        }
+        return _esfluteProperties;
     }
 
     // -----------------------------------------------------
