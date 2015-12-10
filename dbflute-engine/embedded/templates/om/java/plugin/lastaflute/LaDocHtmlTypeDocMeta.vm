@@ -4,7 +4,7 @@
     <tr>
         <th class="rownumhead">No.</th>
         <th>name</th>
-        <th>class</th>
+        <th>type</th>
         <th>comment</th>
         <th>annotations</th>
     </tr>
@@ -18,13 +18,13 @@
         <td class="rownumcell" rowspan="$rowspan">${foreach.count}</td>
         <td>${nestTypeDocMeta.name}</td>
         <td><p title="$manager.htmlEscape($nestTypeDocMeta.typeName)">$manager.htmlEscape($nestTypeDocMeta.simpleTypeName)</p></td>
-        <td>
+        <td class="fieldcomment">
         	<p title="$!manager.htmlEscape($nestTypeDocMeta.comment)">$!manager.htmlEscape($nestTypeDocMeta.description)</p>
         	<p>$!manager.htmlEscape($nestTypeDocMeta.value)</p>
         </td>
-        <td>
+        <td class="fieldannotations">
 #foreach ($annotation in $nestTypeDocMeta.annotationList)
-            ${annotation}
+            &#64;${annotation}
 #if (!$foreach.isLast())
 ,
 #end
