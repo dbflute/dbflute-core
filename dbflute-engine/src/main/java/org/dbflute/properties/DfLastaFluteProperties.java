@@ -148,7 +148,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
         final Map<String, Object> lastafluteMap = getLastafluteMap();
         @SuppressWarnings("unchecked")
         final Map<String, Map<String, Object>> appMap = (Map<String, Map<String, Object>>) lastafluteMap.get("appMap");
-        if (appMap == null) {
+        if (appMap == null) { // just in case
             return;
         }
         logger.info("...Loading application outsideSql settings from lastafluteMap.");
@@ -159,7 +159,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
             final Map<String, Object> map = entry.getValue();
             if (map != null) {
                 final String path = (String) map.get("path");
-                if (path != null) {
+                if (path != null && !path.equals("..")) { // e.g. except DBFlute central project e.g. harbor
                     final Map<String, String> elementMap = newLinkedHashMap();
                     elementMap.put("sqlDirectory", resourceDirectory);
                     elementMap.put("sql2EntityOutputDirectory", programDirectory);
