@@ -4,11 +4,15 @@ import org.lastaflute.core.mail.LaTypicalPostcard;
 import org.lastaflute.core.mail.MPCall;
 import org.lastaflute.core.mail.Postbox;
 
+#set ($pluginDef = "")
+#if ($request.tableMap.pluginInterface)
+#set ($pluginDef = " implements ${request.tableMap.pluginInterface}")
+#end
 /**
  * The postcard for MailFlute on LastaFlute.
  * @author FreeGen
  */
-public class ${table.className} extends LaTypicalPostcard {
+public class ${table.className} extends LaTypicalPostcard${pluginDef} {
 
     // ===================================================================================
     //                                                                          Definition

@@ -67,6 +67,8 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     //             ; path = ../../maihama-hanger
     //             ; freeGenList = list:{ env ; config ; label ; message ; jsp }
     //             ; propertiesHtmlList = list:{ env ; config ; label ; message }
+    //             ; configPluginInterface = org.docksidestage.mylasta.direction.MyProp
+    //             ; mailPluginInterface = org.docksidestage.mylasta.direction.MyMail
     //         }
     //     }
     // }

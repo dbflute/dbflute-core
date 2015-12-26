@@ -10,10 +10,17 @@ import org.lastaflute.core.direction.exception.ConfigPropertyNotFoundException;
 /**
  * @author FreeGen
  */
+#set ($$pluginDef = "")
 #if ($request.tableMap.interfaceSimpleName)
-public interface ${request.className} extends ${request.tableMap.interfaceSimpleName} {
+#if ($request.tableMap.pluginInterface)
+#set ($pluginDef = ", ${request.tableMap.pluginInterface}")
+#end
+public interface ${request.className} extends ${request.tableMap.interfaceSimpleName}${pluginDef} {
 #else
-public interface ${request.className} {
+#if ($request.tableMap.pluginInterface)
+#set ($pluginDef = " extends ${request.tableMap.pluginInterface}")
+#end
+public interface ${request.className}${pluginDef} {
 #end
 #foreach ($column in $table.columnList)
 #if (!$column.isExtends)
