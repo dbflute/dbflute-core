@@ -46,16 +46,16 @@ public interface ClassificationMeta {
 
     /**
      * Get the list of all classification elements. (returns new copied list)
-     * @return The list of classification elements. (NotNull)
+     * @return The snapshot list of classification elements. (NotNull, NotEmpty)
      */
-    List<Classification> listAll();
+    List<Classification> listAll(); // actually want to change unmodifiable but for compatible
 
     /**
      * Get the list of group classification elements. (returns new copied list)
      * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
-     * @return The list of classification elements. (NotNull)
+     * @return The snapshot list of classification elements. (NotNull, EmptyAllowed: if the group is not found)
      */
-    List<Classification> groupOf(String groupName);
+    List<Classification> groupOf(String groupName); // actually want to change error if not found but for compatible
 
     /**
      * Get the code type of the classification. e.g. String, Number
