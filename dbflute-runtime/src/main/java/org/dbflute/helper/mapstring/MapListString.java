@@ -1153,10 +1153,6 @@ public class MapListString {
         } while (true);
     }
 
-    protected String lnd() {
-        return ln() + "    ";
-    }
-
     protected String ln() {
         return "\n";
     }

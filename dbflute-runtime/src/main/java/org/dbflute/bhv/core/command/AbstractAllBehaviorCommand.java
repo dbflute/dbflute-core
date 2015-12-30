@@ -118,6 +118,10 @@ public abstract class AbstractAllBehaviorCommand<RESULT> implements BehaviorComm
         return _resultSetHandlerFactory.createBeanListResultSetHandler(bmd, _beanMetaDataFactory.getRelationRowOptionalHandler());
     }
 
+    protected TnResultSetHandler createBeanOneResultSetHandler(TnBeanMetaData bmd, Object searchKey) {
+        return _resultSetHandlerFactory.createBeanOneResultSetHandler(bmd, _beanMetaDataFactory.getRelationRowOptionalHandler(), searchKey);
+    }
+
     protected TnResultSetHandler createBeanCursorResultSetHandler(TnBeanMetaData bmd) {
         return _resultSetHandlerFactory.createBeanCursorResultSetHandler(bmd, _beanMetaDataFactory.getRelationRowOptionalHandler());
     }

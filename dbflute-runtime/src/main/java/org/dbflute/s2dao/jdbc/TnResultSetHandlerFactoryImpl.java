@@ -22,6 +22,7 @@ import org.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.rshandler.TnBeanCursorResultSetHandler;
 import org.dbflute.s2dao.rshandler.TnBeanListResultSetHandler;
+import org.dbflute.s2dao.rshandler.TnBeanOneResultSetHandler;
 import org.dbflute.s2dao.rshandler.TnScalarDynamicResultSetHandler;
 import org.dbflute.s2dao.rshandler.TnScalarListResultSetHandler;
 import org.dbflute.s2dao.rshandler.TnScalarResultSetHandler;
@@ -43,6 +44,13 @@ public class TnResultSetHandlerFactoryImpl implements TnResultSetHandlerFactory 
         final TnRowCreatorExtension rowCreator = createRowCreator(bmd);
         final TnRelationRowCreatorExtension relationRowCreator = createRelationRowCreator(bmd, optionalHandler);
         return new TnBeanListResultSetHandler(bmd, rowCreator, relationRowCreator);
+    }
+
+    public TnResultSetHandler createBeanOneResultSetHandler(TnBeanMetaData bmd, TnRelationRowOptionalHandler optionalHandler,
+            Object searchKey) {
+        final TnRowCreatorExtension rowCreator = createRowCreator(bmd);
+        final TnRelationRowCreatorExtension relationRowCreator = createRelationRowCreator(bmd, optionalHandler);
+        return new TnBeanOneResultSetHandler(bmd, rowCreator, relationRowCreator, searchKey);
     }
 
     public TnResultSetHandler createBeanCursorResultSetHandler(TnBeanMetaData bmd, TnRelationRowOptionalHandler optionalHandler) {

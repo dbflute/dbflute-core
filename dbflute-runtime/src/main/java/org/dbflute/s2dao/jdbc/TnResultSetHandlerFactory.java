@@ -27,6 +27,8 @@ public interface TnResultSetHandlerFactory {
 
     TnResultSetHandler createBeanListResultSetHandler(TnBeanMetaData bmd, TnRelationRowOptionalHandler optionalHandler);
 
+    TnResultSetHandler createBeanOneResultSetHandler(TnBeanMetaData bmd, TnRelationRowOptionalHandler optionalHandler, Object searchKey);
+
     TnResultSetHandler createBeanCursorResultSetHandler(TnBeanMetaData bmd, TnRelationRowOptionalHandler optionalHandler);
 
     TnResultSetHandler createScalarResultSetHandler(Class<?> objectType);

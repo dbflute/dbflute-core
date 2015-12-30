@@ -74,11 +74,7 @@ public abstract class AbstractQueryUpdateCommand extends AbstractCountableUpdate
 
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
-        return new SqlExecutionCreator() {
-            public SqlExecution createSqlExecution() {
-                return createQueryEntityCBExecution();
-            }
-        };
+        return () -> createQueryEntityCBExecution();
     }
 
     protected abstract SqlExecution createQueryEntityCBExecution();

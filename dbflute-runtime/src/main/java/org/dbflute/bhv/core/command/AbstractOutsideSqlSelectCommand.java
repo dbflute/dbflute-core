@@ -100,11 +100,9 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
 
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
-        return new SqlExecutionCreator() {
-            public SqlExecution createSqlExecution() {
-                final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
-                return createOutsideSqlSelectExecution(outsideSqlContext);
-            }
+        return () -> {
+            final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
+            return createOutsideSqlSelectExecution(outsideSqlContext);
         };
     }
 

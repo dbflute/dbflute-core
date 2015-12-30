@@ -130,11 +130,9 @@ public class SelectNextValCommand<RESULT> extends AbstractAllBehaviorCommand<RES
 
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
-        return new SqlExecutionCreator() {
-            public SqlExecution createSqlExecution() {
-                final TnResultSetHandler handler = createDynamicScalarResultSetHandler(_resultType);
-                return createSelectNextValExecution(handler);
-            }
+        return () -> {
+            final TnResultSetHandler handler = createDynamicScalarResultSetHandler(_resultType);
+            return createSelectNextValExecution(handler);
         };
     }
 

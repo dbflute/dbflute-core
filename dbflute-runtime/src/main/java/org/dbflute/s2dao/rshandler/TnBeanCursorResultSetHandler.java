@@ -47,24 +47,27 @@ public class TnBeanCursorResultSetHandler extends TnBeanListResultSetHandler {
     // ===================================================================================
     //                                                                              Handle
     //                                                                              ======
+    @Override
     public Object handle(ResultSet rs) throws SQLException {
         if (!hasEntityRowHandler()) {
             String msg = "Bean cursor handling should have condition-bean!";
             throw new IllegalStateException(msg);
         }
         final EntityRowHandler<Entity> entityRowHandler = getEntityRowHandler();
-        mappingBean(rs, new BeanRowHandler() {
-            public boolean handle(Object row) throws SQLException {
-                if (!(row instanceof Entity)) {
-                    String msg = "The row object should be an entity at bean cursor handling:";
-                    msg = msg + " row=" + (row != null ? row.getClass().getName() + ":" + row : null);
-                    throw new IllegalStateException(msg);
-                }
-                entityRowHandler.handle((Entity) row);
-                return !entityRowHandler.isBreakCursor(); // continue to next records?
+        mappingBean(rs, row -> {
+            if (!(row instanceof Entity)) { /* just in case */
+                throwCursorRowNotEntityException(row);
             }
+            entityRowHandler.handle((Entity) row);
+            return !entityRowHandler.isBreakCursor(); /* continue to next records? */
         });
         return null;
+    }
+
+    protected void throwCursorRowNotEntityException(Object row) {
+        String msg = "The row object should be an entity at bean cursor handling:";
+        msg = msg + " row=" + (row != null ? row.getClass().getName() + ":" + row : null);
+        throw new IllegalStateException(msg);
     }
 
     @Override

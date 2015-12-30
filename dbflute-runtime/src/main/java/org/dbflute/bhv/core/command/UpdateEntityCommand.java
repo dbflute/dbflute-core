@@ -53,11 +53,9 @@ public class UpdateEntityCommand extends AbstractEntityUpdateCommand {
     //                                                               =====================
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
-        return new SqlExecutionCreator() {
-            public SqlExecution createSqlExecution() {
-                final TnBeanMetaData bmd = createBeanMetaData();
-                return createUpdateEntitySqlExecution(bmd);
-            }
+        return () -> {
+            final TnBeanMetaData bmd = createBeanMetaData();
+            return createUpdateEntitySqlExecution(bmd);
         };
     }
 

@@ -17,29 +17,33 @@ package org.dbflute.bhv.core.command;
 
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
+import org.dbflute.bhv.core.context.FetchAssistContext;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
+import org.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
+ * @param <RESULT> The type of result, e.g. entity, list.
  */
-public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
+public abstract class AbstractSelectCBReturnEntityCommand<RESULT> extends AbstractSelectCBCommand<RESULT> {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Is it unique-count select? (NotNull) */
-    protected Boolean _uniqueCount;
+    /** The type of entity. (Required) */
+    protected Class<?> _entityType; // generic 'extends' to specify extended type
 
     // ===================================================================================
-    //                                                                   Basic Information
-    //                                                                   =================
-    public String getCommandName() {
-        return "selectCount";
+    //                                                                  Detail Information
+    //                                                                  ==================
+    public boolean isSelectCount() {
+        return false;
     }
 
-    public Class<?> getCommandReturnType() {
-        return Integer.class;
+    public boolean isSelectCursor() {
+        return false;
     }
 
     // ===================================================================================
@@ -48,25 +52,12 @@ public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
         final ConditionBean cb = _conditionBean;
-        cb.xsetupSelectCountIgnoreFetchScope(_uniqueCount); // *Point!
+        FetchAssistContext.setFetchBeanOnThread(cb);
         ConditionBeanContext.setConditionBeanOnThread(cb);
     }
 
     public void afterExecuting() {
         assertStatus("afterExecuting");
-        final ConditionBean cb = _conditionBean;
-        cb.xafterCareSelectCountIgnoreFetchScope();
-    }
-
-    // ===================================================================================
-    //                                                                  Detail Information
-    //                                                                  ==================
-    public boolean isSelectCount() {
-        return true;
-    }
-
-    public boolean isSelectCursor() {
-        return false;
     }
 
     // ===================================================================================
@@ -74,31 +65,40 @@ public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
     //                                                               =====================
     @Override
     public String buildSqlExecutionKey() {
-        return super.buildSqlExecutionKey() + ":" + (_uniqueCount ? "unique" : "plain");
+        final String entityName = DfTypeUtil.toClassTitle(_entityType);
+        return super.buildSqlExecutionKey() + ":" + entityName;
     }
 
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
         return () -> {
-            final TnResultSetHandler handler = createScalarResultSetHandler(getCommandReturnType());
+            final TnBeanMetaData bmd = createBeanMetaData();
+            final TnResultSetHandler handler = createReturnEntityResultSetHandler(bmd);
             return createSelectCBExecution(_conditionBean.getClass(), handler);
         };
+    }
+
+    protected abstract TnResultSetHandler createReturnEntityResultSetHandler(TnBeanMetaData bmd);
+
+    protected TnBeanMetaData createBeanMetaData() {
+        return _beanMetaDataFactory.createBeanMetaData(_entityType);
     }
 
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
+    @Override
     protected void assertStatus(String methodName) {
         super.assertStatus(methodName);
-        if (_uniqueCount == null) {
-            throw new IllegalStateException(buildAssertMessage("_uniqueCount", methodName));
+        if (_entityType == null) {
+            throw new IllegalStateException(buildAssertMessage("_entityType", methodName));
         }
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setUniqueCount(boolean uniqueCount) {
-        _uniqueCount = uniqueCount;
+    public void setEntityType(Class<?> entityType) {
+        _entityType = entityType;
     }
 }
