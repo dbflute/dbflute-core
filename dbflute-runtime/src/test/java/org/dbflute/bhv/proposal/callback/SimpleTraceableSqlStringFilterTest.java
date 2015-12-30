@@ -57,7 +57,7 @@ public class SimpleTraceableSqlStringFilterTest extends RuntimeTestCase {
 
         // ## Assert ##
         log(invokeMark);
-        assertEquals("maihama#sea()", invokeMark);
+        assertEquals("maihama@sea()", invokeMark);
     }
 
     public void test_buildInvokeMark_noMethod_overrideDeclaringClassOnly() throws Exception {
