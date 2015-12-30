@@ -90,17 +90,18 @@ public class SpecifyDerivedReferrer extends DerivedReferrer {
         createCBExThrower().throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, _aliasName);
     }
 
-    @Override
-    protected void doAssertDerivedReferrerColumnType(String function, String derivedColumnDbName, Class<?> derivedColumnType) {
-        if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
-            if (!Number.class.isAssignableFrom(derivedColumnType)) {
-                throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
-            }
-        }
-    }
-
-    protected void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
-            Class<?> derivedColumnType) {
-        createCBExThrower().throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
-    }
+    // *see DerivedReferrer@assertDerivedReferrerColumnType()'s comment
+    //@Override
+    //protected void doAssertDerivedReferrerColumnType(String function, String derivedColumnDbName, Class<?> derivedColumnType) {
+    //    if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
+    //        if (!Number.class.isAssignableFrom(derivedColumnType)) {
+    //            throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
+    //        }
+    //    }
+    //}
+    //
+    //protected void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
+    //        Class<?> derivedColumnType) {
+    //    createCBExThrower().throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
+    //}
 }

@@ -42,7 +42,6 @@ import org.dbflute.exception.PagingPageSizeNotPlusException;
 import org.dbflute.exception.QueryAlreadyRegisteredException;
 import org.dbflute.exception.QueryDerivedReferrerInvalidColumnSpecificationException;
 import org.dbflute.exception.QueryDerivedReferrerSelectAllPossibleException;
-import org.dbflute.exception.QueryDerivedReferrerUnmatchedColumnTypeException;
 import org.dbflute.exception.QueryIllegalPurposeException;
 import org.dbflute.exception.QueryThatsBadTimingException;
 import org.dbflute.exception.RequiredOptionNotFoundException;
@@ -64,7 +63,6 @@ import org.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.dbflute.exception.SpecifyDerivedReferrerInvalidColumnSpecificationException;
 import org.dbflute.exception.SpecifyDerivedReferrerSelectAllPossibleException;
 import org.dbflute.exception.SpecifyDerivedReferrerTwoOrMoreException;
-import org.dbflute.exception.SpecifyDerivedReferrerUnmatchedColumnTypeException;
 import org.dbflute.exception.SpecifyEveryColumnAlreadySpecifiedColumnException;
 import org.dbflute.exception.SpecifyExceptColumnAlreadySpecifiedColumnException;
 import org.dbflute.exception.SpecifyIllegalPurposeException;
@@ -662,25 +660,26 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new SpecifyDerivedReferrerInvalidColumnSpecificationException(msg);
     }
 
-    public void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
-            Class<?> derivedColumnType) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Unmatched the type of the specified the column for (Specify)DerivedReferrer.");
-        br.addItem("Advice");
-        br.addElement("The type of the specified the column unmatched with the function!");
-        br.addElement("You should confirm the list as follow:");
-        br.addElement("    count() : String, Number, Date *with distinct same");
-        br.addElement("    max()   : String, Number, Date");
-        br.addElement("    min()   : String, Number, Date");
-        br.addElement("    sum()   : Number");
-        br.addElement("    avg()   : Number");
-        br.addItem("Function");
-        br.addElement(function);
-        br.addItem("Derive Column");
-        br.addElement(derivedColumnDbName + "(" + derivedColumnType.getName() + ")");
-        final String msg = br.buildExceptionMessage();
-        throw new SpecifyDerivedReferrerUnmatchedColumnTypeException(msg);
-    }
+    // *see DerivedReferrer@assertDerivedReferrerColumnType()'s comment
+    //public void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
+    //        Class<?> derivedColumnType) {
+    //    final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+    //    br.addNotice("Unmatched the type of the specified the column for (Specify)DerivedReferrer.");
+    //    br.addItem("Advice");
+    //    br.addElement("The type of the specified the column unmatched with the function!");
+    //    br.addElement("You should confirm the list as follow:");
+    //    br.addElement("    count() : String, Number, Date *with distinct same");
+    //    br.addElement("    max()   : String, Number, Date");
+    //    br.addElement("    min()   : String, Number, Date");
+    //    br.addElement("    sum()   : Number");
+    //    br.addElement("    avg()   : Number");
+    //    br.addItem("Function");
+    //    br.addElement(function);
+    //    br.addItem("Derive Column");
+    //    br.addElement(derivedColumnDbName + "(" + derivedColumnType.getName() + ")");
+    //    final String msg = br.buildExceptionMessage();
+    //    throw new SpecifyDerivedReferrerUnmatchedColumnTypeException(msg);
+    //}
 
     public void throwSpecifyDerivedReferrerSelectAllPossibleException(String function, ConditionQuery subQuery, String aliasName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -752,28 +751,29 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new QueryDerivedReferrerInvalidColumnSpecificationException(msg);
     }
 
-    public void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
-            Class<?> derivedColumnType, Object value) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Unmatched he type of the specified the column for (Query)DerivedReferrer.");
-        br.addItem("Advice");
-        br.addElement("The type of the specified the column unmatched");
-        br.addElement("with the function or the parameter.");
-        br.addElement("You should confirm the list as follow:");
-        br.addElement("    count() : String, Number, Date *with distinct same");
-        br.addElement("    max()   : String, Number, Date");
-        br.addElement("    min()   : String, Number, Date");
-        br.addElement("    sum()   : Number");
-        br.addElement("    avg()   : Number");
-        br.addItem("Function Method");
-        br.addElement(xconvertFunctionToMethod(function));
-        br.addItem("Derived Column");
-        br.addElement(derivedColumnDbName + "(" + derivedColumnType.getName() + ")");
-        br.addItem("Parameter Type");
-        br.addElement((value != null ? value.getClass() : null));
-        final String msg = br.buildExceptionMessage();
-        throw new QueryDerivedReferrerUnmatchedColumnTypeException(msg);
-    }
+    // *see DerivedReferrer@assertDerivedReferrerColumnType()'s comment
+    //public void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
+    //        Class<?> derivedColumnType, Object value) {
+    //    final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+    //    br.addNotice("Unmatched he type of the specified the column for (Query)DerivedReferrer.");
+    //    br.addItem("Advice");
+    //    br.addElement("The type of the specified the column unmatched");
+    //    br.addElement("with the function or the parameter.");
+    //    br.addElement("You should confirm the list as follow:");
+    //    br.addElement("    count() : String, Number, Date *with distinct same");
+    //    br.addElement("    max()   : String, Number, Date");
+    //    br.addElement("    min()   : String, Number, Date");
+    //    br.addElement("    sum()   : Number");
+    //    br.addElement("    avg()   : Number");
+    //    br.addItem("Function Method");
+    //    br.addElement(xconvertFunctionToMethod(function));
+    //    br.addItem("Derived Column");
+    //    br.addElement(derivedColumnDbName + "(" + derivedColumnType.getName() + ")");
+    //    br.addItem("Parameter Type");
+    //    br.addElement((value != null ? value.getClass() : null));
+    //    final String msg = br.buildExceptionMessage();
+    //    throw new QueryDerivedReferrerUnmatchedColumnTypeException(msg);
+    //}
 
     public void throwQueryDerivedReferrerSelectAllPossibleException(String function, ConditionQuery subQuery) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
