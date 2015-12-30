@@ -260,5 +260,13 @@ public interface ${glCDef} extends Classification {
 #end
             return ClassificationUndefinedHandlingType.LOGGING; // as default
         }
+
+        public static ${glCDef}.DefMeta meta(String classificationName) { // instead of valueOf()
+            if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
+#foreach ($classificationName in $database.classificationNameList)
+            if ("${classificationName}".equals(classificationName)) { return ${glCDef}.${classificationName}; }
+#end
+            throw new IllegalStateException("Unknown classification: " + classificationName);
+        }
     }
 }
