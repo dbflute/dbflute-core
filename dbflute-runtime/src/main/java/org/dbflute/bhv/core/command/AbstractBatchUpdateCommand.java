@@ -141,6 +141,10 @@ public abstract class AbstractBatchUpdateCommand extends AbstractAllBehaviorComm
         return null;
     }
 
+    public Entity getEntity() {
+        return null; // because of non one entity here
+    }
+
     public String getOutsideSqlPath() {
         return null;
     }

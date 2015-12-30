@@ -15,6 +15,7 @@
  */
 package org.dbflute.mock;
 
+import org.dbflute.Entity;
 import org.dbflute.bhv.core.BehaviorCommand;
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.cbean.ConditionBean;
@@ -57,6 +58,10 @@ public class MockBehaviorCommand implements BehaviorCommand<Object> {
     }
 
     public ConditionBean getConditionBean() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Entity getEntity() {
         throw new UnsupportedOperationException();
     }
 

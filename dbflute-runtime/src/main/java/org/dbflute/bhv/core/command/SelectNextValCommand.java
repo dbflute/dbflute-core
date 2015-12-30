@@ -17,6 +17,7 @@ package org.dbflute.bhv.core.command;
 
 import java.util.Map;
 
+import org.dbflute.Entity;
 import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.bhv.core.execution.SelectNextValExecution;
@@ -231,6 +232,10 @@ public class SelectNextValCommand<RESULT> extends AbstractAllBehaviorCommand<RES
     //                                                                Argument Information
     //                                                                ====================
     public ConditionBean getConditionBean() {
+        return null;
+    }
+
+    public Entity getEntity() {
         return null;
     }
 

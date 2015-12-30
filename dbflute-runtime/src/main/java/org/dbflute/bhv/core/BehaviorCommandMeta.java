@@ -15,6 +15,7 @@
  */
 package org.dbflute.bhv.core;
 
+import org.dbflute.Entity;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.outsidesql.OutsideSqlOption;
@@ -165,9 +166,15 @@ public interface BehaviorCommandMeta {
     //                                                                ====================
     /**
      * Get the instance of condition-bean specified as argument if it exists.
-     * @return The instance of condition-bean. (NullAllowed)
+     * @return The instance of condition-bean. (NullAllowed: when CB unused)
      */
     ConditionBean getConditionBean();
+
+    /**
+     * Get the instance of entity specified as one argument if it exists.
+     * @return The instance of entity. (NullAllowed: when entity unused and batch update, query delete...)
+     */
+    Entity getEntity();
 
     /**
      * Get the path of outside-SQL if it's outside-SQL.
