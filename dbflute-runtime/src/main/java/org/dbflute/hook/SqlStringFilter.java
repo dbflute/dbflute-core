@@ -28,8 +28,8 @@ import org.dbflute.bhv.core.BehaviorCommandMeta;
  *     ...
  * });
  * </pre>
- * This filter does not have all SQL call-back point.
- * For example, you cannot filter SQL of sequence next value.
+ * <p>This filter does not have all SQL call-back point.
+ * For example, you cannot filter SQL of sequence next value.</p>
  * @author jflute
  */
 public interface SqlStringFilter {
@@ -40,7 +40,9 @@ public interface SqlStringFilter {
      * @param executedSql The string of actually-executed SQL. (NotNull)
      * @return The filtered SQL string. (NullAllowed: if null, means no filter)
      */
-    String filterSelectCB(BehaviorCommandMeta meta, String executedSql);
+    default String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
+        return null;
+    }
 
     /**
      * Filter the executed SQL of entity update, insert and delete. (contains batch)
@@ -48,7 +50,9 @@ public interface SqlStringFilter {
      * @param executedSql The string of actually-executed SQL. (NotNull)
      * @return The filtered SQL string. (NullAllowed: if null, means no filter)
      */
-    String filterEntityUpdate(BehaviorCommandMeta meta, String executedSql);
+    default String filterEntityUpdate(BehaviorCommandMeta meta, String executedSql) {
+        return null;
+    }
 
     /**
      * Filter the executed SQL of query update, insert and delete (by condition-bean).
@@ -56,7 +60,9 @@ public interface SqlStringFilter {
      * @param executedSql The string of actually-executed SQL. (NotNull)
      * @return The filtered SQL string. (NullAllowed: if null, means no filter)
      */
-    String filterQueryUpdate(BehaviorCommandMeta meta, String executedSql);
+    default String filterQueryUpdate(BehaviorCommandMeta meta, String executedSql) {
+        return null;
+    }
 
     /**
      * Filter the executed SQL of outside-SQL. <br>
@@ -65,7 +71,9 @@ public interface SqlStringFilter {
      * @param executedSql The string of actually-executed SQL. (NotNull)
      * @return The filtered SQL string. (NullAllowed: if null, means no filter)
      */
-    String filterOutsideSql(BehaviorCommandMeta meta, String executedSql);
+    default String filterOutsideSql(BehaviorCommandMeta meta, String executedSql) {
+        return null;
+    }
 
     /**
      * Filter the executed SQL of procedure call.
@@ -73,5 +81,16 @@ public interface SqlStringFilter {
      * @param executedSql The string of actually-executed SQL. (NotNull)
      * @return The filtered SQL string. (NullAllowed: if null, means no filter)
      */
-    String filterProcedure(BehaviorCommandMeta meta, String executedSql);
+    default String filterProcedure(BehaviorCommandMeta meta, String executedSql) {
+        return null;
+    }
+
+    /**
+     * Does it inherit the existing filter? <br>
+     * Completely overriding as default but you can inherit it by this determination.
+     * @return The determination, true or false.
+     */
+    default boolean inheritsExistingFilter() {
+        return true; // inherits as default since 1.1.1
+    }
 }

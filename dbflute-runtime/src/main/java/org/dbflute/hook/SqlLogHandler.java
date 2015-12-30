@@ -38,4 +38,13 @@ public interface SqlLogHandler {
      * @param info The information of SQL log. (NotNull)
      */
     void handle(SqlLogInfo info);
+
+    /**
+     * Does it inherit the existing handler? <br>
+     * Completely overriding as default but you can inherit it by this determination.
+     * @return The determination, true or false.
+     */
+    default boolean inheritsExistingHandler() {
+        return true; // inherits as default since 1.1.1
+    }
 }

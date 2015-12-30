@@ -43,6 +43,6 @@ public interface BehaviorCommandHook {
      * @return The determination, true or false.
      */
     default boolean inheritsExistingHook() {
-        return false;
+        return true; // inherits as default since 1.1.1
     }
 }

@@ -195,6 +195,45 @@ public class CallbackContextTest extends RuntimeTestCase {
     }
 
     // ===================================================================================
+    //                                                                     SqlStringFilter
+    //                                                                     ===============
+    public void test_SqlStringFilter_twiceSet_inherits() throws Exception {
+        // ## Arrange ##
+        CallbackContext context = new CallbackContext();
+        assertNull(context.getSqlFireHook());
+        context.setSqlStringFilter(new SqlStringFilter() {
+            @Override
+            public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
+                return executedSql + ":first";
+            }
+
+            @Override
+            public String filterEntityUpdate(BehaviorCommandMeta meta, String executedSql) {
+                return executedSql + ":first";
+            }
+        });
+        context.setSqlStringFilter(new SqlStringFilter() {
+            @Override
+            public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
+                return executedSql + ":second";
+            }
+
+            @Override
+            public String filterQueryUpdate(BehaviorCommandMeta meta, String executedSql) {
+                return executedSql + ":second";
+            }
+        });
+
+        // ## Act ##
+        // ## Assert ##
+        assertEquals("base:first:second", context.getSqlStringFilter().filterSelectCB(null, "base"));
+        assertEquals("base:first", context.getSqlStringFilter().filterEntityUpdate(null, "base"));
+        assertEquals("base:second", context.getSqlStringFilter().filterQueryUpdate(null, "base"));
+        assertEquals("base", context.getSqlStringFilter().filterOutsideSql(null, "base"));
+        assertNull(context.getSqlStringFilter().filterOutsideSql(null, null));
+    }
+
+    // ===================================================================================
     //                                                                          Management
     //                                                                          ==========
     public void test_useThreadLocalProvider_basic() throws Exception {
