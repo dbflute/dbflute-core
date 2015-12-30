@@ -157,6 +157,12 @@ public class OptionalObject<OBJ> extends BaseOptional<OBJ> {
         return directlyGetOrElseThrow(noArgLambda);
     }
 
+    /** {@inheritDoc} */
+    public <CAUSE extends Throwable, TRANSLATED extends Throwable> OBJ orElseTranslatingThrow(
+            OptionalThingFunction<CAUSE, TRANSLATED> oneArgLambda) throws TRANSLATED {
+        return directlyGetOrElseTranslatingThrow(oneArgLambda);
+    }
+
     // ===================================================================================
     //                                                                   DBFlute Extension
     //                                                                   =================

@@ -148,6 +148,17 @@ public interface OptionalThing<THING> {
      */
     <CAUSE extends Throwable> THING orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE;
 
+    /**
+     * Get the thing or throw the exception with translating the cause.
+     * @param <CAUSE> The type of original cause.
+     * @param <TRANSLATED> The type of translated cause.
+     * @param oneArgLambda The translator function of exception if null. (NotNull)
+     * @return The object instance wrapped in this optional object. (NotNull: if null, exception)
+     * @throws TRANSLATED When the value is null.
+     */
+    <CAUSE extends Throwable, TRANSLATED extends Throwable> THING orElseTranslatingThrow(
+            OptionalThingFunction<CAUSE, TRANSLATED> oneArgLambda) throws TRANSLATED;
+
     // ===================================================================================
     //                                                                   Standard Optional
     //                                                                   =================

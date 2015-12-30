@@ -157,6 +157,12 @@ public class OptionalScalar<SCALAR> extends BaseOptional<SCALAR> {
         return directlyGetOrElseThrow(noArgLambda);
     }
 
+    /** {@inheritDoc} */
+    public <CAUSE extends Throwable, TRANSLATED extends Throwable> SCALAR orElseTranslatingThrow(
+            OptionalThingFunction<CAUSE, TRANSLATED> oneArgLambda) throws TRANSLATED {
+        return directlyGetOrElseTranslatingThrow(oneArgLambda);
+    }
+
     // ===================================================================================
     //                                                                   DBFlute Extension
     //                                                                   =================
