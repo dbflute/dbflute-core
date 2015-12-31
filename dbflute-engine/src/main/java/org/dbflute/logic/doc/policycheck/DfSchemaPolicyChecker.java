@@ -204,6 +204,10 @@ public class DfSchemaPolicyChecker {
             if (Srl.isLowerCaseAny(tableDbName)) {
                 unmatchedList.add("The table name should be on upper case basis: " + tableDbName);
             }
+        } else if (theme.equals("lowerCaseBasis")) {
+            if (Srl.isUpperCaseAny(tableDbName)) {
+                unmatchedList.add("The table name should be on lower case basis: " + tableDbName);
+            }
         } else {
             throwSchemaPolicyCheckUnknownThemeException(theme, "Table");
         }
@@ -239,6 +243,10 @@ public class DfSchemaPolicyChecker {
         if (theme.equals("upperCaseBasis")) {
             if (Srl.isLowerCaseAny(tableDbName)) {
                 vioList.add("The table name should be on upper case basis: " + tableDbName);
+            }
+        } else if (theme.equals("lowerCaseBasis")) {
+            if (Srl.isUpperCaseAny(tableDbName)) {
+                vioList.add("The table name should be on lower case basis: " + tableDbName);
             }
         } else {
             throwSchemaPolicyCheckUnknownThemeException(theme, "Column");
@@ -383,8 +391,8 @@ public class DfSchemaPolicyChecker {
         br.addNotice("Unknown theme for SchemaPolicyCheck.");
         br.addItem("Advice");
         br.addElement("You can use following themes:");
-        br.addElement(" Table  : hasPK, identityIfPureIDPK, upperCaseBasis");
-        br.addElement(" Column : upperCaseBasis");
+        br.addElement(" Table  : hasPK, identityIfPureIDPK, upperCaseBasis, lowerCaseBasis");
+        br.addElement(" Column : upperCaseBasis, lowerCaseBasis");
         br.addItem("Target");
         br.addElement(targetType);
         br.addItem("Unknown Theme");
