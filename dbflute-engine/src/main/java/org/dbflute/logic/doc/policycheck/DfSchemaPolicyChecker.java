@@ -391,7 +391,7 @@ public class DfSchemaPolicyChecker {
         br.addNotice("Unknown theme for SchemaPolicyCheck.");
         br.addItem("Advice");
         br.addElement("You can use following themes:");
-        br.addElement(" Table  : hasPK, identityIfPureIDPK, upperCaseBasis, lowerCaseBasis");
+        br.addElement(" Table  : hasPK, upperCaseBasis, lowerCaseBasis, identityIfPureIDPK");
         br.addElement(" Column : upperCaseBasis, lowerCaseBasis");
         br.addItem("Target");
         br.addElement(targetType);
