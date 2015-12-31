@@ -134,9 +134,11 @@ import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.lreverse.DfLReverseProcess;
+import org.dbflute.logic.doc.policycheck.DfSchemaPolicyChecker;
 import org.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfSchemaPolicyProperties;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractDbMetaTexenTask;
@@ -215,6 +217,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             return;
         }
         processSchemaHtml();
+        processSchemaPolicyCheck();
         // these processes are independent since 0.9.9.7B
         //processLoadDataReverse();
         //processSchemaSyncCheck();
@@ -254,6 +257,18 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _selector.selectPropertiesHtml(); // option
         _selector.selectLastaDocHtml(); // option
         fireVelocityProcess();
+    }
+
+    // -----------------------------------------------------
+    //                                     SchemaPolicyCheck
+    //                                     -----------------
+    protected void processSchemaPolicyCheck() {
+        if (_schemaData == null) {
+            throw new IllegalStateException("SchemaPolicyCheck should be before making SchemaHTML because of schema data.");
+        }
+        final DfSchemaPolicyProperties prop = getSchemaPolicyCheckProperties();
+        final DfSchemaPolicyChecker checker = prop.createChecker(() -> _schemaData.getDatabase().getTableList());
+        checker.checkPolicyIfNeeds();
     }
 
     // -----------------------------------------------------
@@ -395,6 +410,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     protected boolean isSchemaSyncCheckValid() {
         return getDocumentProperties().isSchemaSyncCheckValid();
+    }
+
+    protected DfSchemaPolicyProperties getSchemaPolicyCheckProperties() {
+        return getProperties().getSchemaPolicyCheckProperties();
     }
 
     // ===================================================================================
