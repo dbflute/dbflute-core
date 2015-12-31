@@ -251,11 +251,10 @@ public class DfSchemaPolicyChecker {
     protected void processColumnStatement(Table table, Column column, Map<String, Object> columnMap, List<String> vioList) {
         @SuppressWarnings("unchecked")
         final List<String> statementList = (List<String>) columnMap.get("statementList");
-        if (statementList == null) {
-            return;
-        }
-        for (String statement : statementList) {
-            doProcessColumnStatement(table, column, statement, vioList);
+        if (statementList != null) {
+            for (String statement : statementList) {
+                doProcessColumnStatement(table, column, statement, vioList);
+            }
         }
     }
 
@@ -280,23 +279,26 @@ public class DfSchemaPolicyChecker {
         final String ifItem = Srl.substringFirstFront(ifClause, " is ").trim();
         final String ifValue = Srl.substringFirstRear(ifClause, " is ").trim();
         final String thenClause = ifClauseScope.substringInterspaceToNext();
-        if (ifItem.equals("columnName")) {
-            if (!isHitColumn(column.getName(), ifValue)) {
-                return;
+        if (ifItem.equalsIgnoreCase("columnName")) {
+            if (isHitColumn(column.getName(), ifValue)) {
+                evaluateColumnThenClause(table, column, statement, vioList, thenClause);
             }
-            evaluateColumnThenClause(table, column, statement, vioList, thenClause);
+        } else if (ifItem.equalsIgnoreCase("dbType")) {
+            if (column.hasDbType() && isHitExp(column.getDbType(), ifValue)) {
+                evaluateColumnThenClause(table, column, statement, vioList, thenClause);
+            }
         } else {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-item: " + ifItem);
         }
     }
 
     protected void evaluateColumnThenClause(Table table, Column column, String statement, List<String> vioList, String thenClause) {
-        if (thenClause.equals("notNull")) {
+        if (thenClause.equalsIgnoreCase("notNull")) {
             if (!column.isNotNull()) {
                 vioList.add("The column should be not-null: " + toColumnDisp(table, column));
             }
-        } else if (thenClause.equals("bad")) {
-            vioList.add("The column name is no good: " + toColumnDisp(table, column));
+        } else if (thenClause.equalsIgnoreCase("bad")) {
+            vioList.add("The column is no good: " + toColumnDisp(table, column));
         } else if (thenClause.contains(" is ")) { // e.g. dbType is integer
             evaluateColumnThenItemValue(table, column, statement, vioList, thenClause);
         } else {
@@ -307,21 +309,21 @@ public class DfSchemaPolicyChecker {
     protected void evaluateColumnThenItemValue(Table table, Column column, String statement, List<String> vioList, String thenClause) {
         final String thenItem = Srl.substringFirstFront(thenClause, " is ").trim();
         final String thenValue = Srl.substringFirstRear(thenClause, " is ").trim();
-        if (thenItem.equals("dbType")) { // e.g. dbType is integer
+        if (thenItem.equalsIgnoreCase("dbType")) { // e.g. dbType is integer
             if (column.hasDbType()) {
                 final String dbType = column.getDbType();
                 if (!isHitExp(dbType, thenValue)) {
                     vioList.add("The column db-type should be " + thenValue + " but " + dbType + ": " + toColumnDisp(table, column));
                 }
             }
-        } else if (thenItem.equals("alias")) { // e.g. alias is suffix:ID
+        } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:ID
             if (column.hasAlias()) {
                 final String alias = column.getAlias();
                 if (!isHitExp(alias, thenValue)) {
                     vioList.add("The column alias should be " + thenValue + " but " + alias + ": " + toColumnDisp(table, column));
                 }
             }
-        } else if (thenItem.equals("comment")) { // e.g. comment is contain:SEA
+        } else if (thenItem.equalsIgnoreCase("comment")) { // e.g. comment is contain:SEA
             if (column.hasAlias()) {
                 final String comment = column.getComment();
                 if (!isHitExp(comment, thenValue)) {
@@ -333,16 +335,44 @@ public class DfSchemaPolicyChecker {
         }
     }
 
+    protected String toColumnDisp(Table table, Column column) {
+        final String notNull = column.isNotNull() ? "*" : "";
+        final String dbType = column.hasDbType() ? column.getDbType() : "(unknownType)";
+        final String size = column.hasColumnSize() ? "(" + column.getColumnSize() + ")" : "";
+        return notNull + table.getTableDbName() + "." + column.getName() + " " + dbType + size;
+    }
+
+    // ===================================================================================
+    //                                                                          Hit Helper
+    //                                                                          ==========
     public boolean isHitColumn(String columnName, String hint) {
-        return DfNameHintUtil.isHitByTheHint(columnName, hint);
+        return determineHitBy(columnName, hint);
     }
 
     public boolean isHitExp(String exp, String hint) {
-        return DfNameHintUtil.isHitByTheHint(exp, hint);
+        return determineHitBy(exp, hint);
     }
 
-    protected String toColumnDisp(Table table, Column column) {
-        return table.getTableDbName() + "." + column.getName();
+    protected boolean determineHitBy(String name, String hint) {
+        if (hint.contains(" and ")) {
+            final List<String> elementHintList = Srl.splitListTrimmed(hint, " and ");
+            for (String elementHint : elementHintList) {
+                if (!DfNameHintUtil.isHitByTheHint(name, elementHint)) {
+                    return false;
+                }
+            }
+            return true;
+        } else if (hint.contains(" or ")) {
+            final List<String> elementHintList = Srl.splitListTrimmed(hint, " or ");
+            for (String elementHint : elementHintList) {
+                if (DfNameHintUtil.isHitByTheHint(name, elementHint)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return DfNameHintUtil.isHitByTheHint(name, hint);
+        }
     }
 
     // ===================================================================================
