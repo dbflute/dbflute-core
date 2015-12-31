@@ -76,7 +76,7 @@ public class DfSchemaPolicyChecker {
         //     ; tableExceptList = list:{}
         //     ; tableTargetList = list:{}
         //     ; tableMap = map:{
-        //         ; themeList = list:{ hasPK ; identityIfPureIDPK ; upperCaseBasis }
+        //         ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
         //     }
         //     ; columnMap = map:{
         //         ; statementList = list:{ upperCaseBasis }
