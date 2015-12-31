@@ -254,7 +254,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     }
 
     protected <RESULT extends ENTITY> void helpReloadPrimaryKeyIfUniqueByIfNeeds(RESULT entity, UpdateOption<CB> option) {
-        if (!option.isReloadPrimaryKeyIfUniqueBy()) {
+        if (option == null || !option.isReloadPrimaryKeyIfUniqueBy()) {
             return;
         }
         final Set<String> uniqueProp = entity.myuniqueDrivenProperties();
