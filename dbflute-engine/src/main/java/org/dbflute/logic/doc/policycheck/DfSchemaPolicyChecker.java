@@ -23,8 +23,9 @@ import java.util.function.Supplier;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
-import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfSchemaPolicyCheckIllegalIfThenStatementException;
+import org.dbflute.exception.DfSchemaPolicyCheckUnknownPropertyException;
+import org.dbflute.exception.DfSchemaPolicyCheckUnknownThemeException;
 import org.dbflute.exception.DfSchemaPolicyCheckViolationException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.DfNameHintUtil;
@@ -101,7 +102,7 @@ public class DfSchemaPolicyChecker {
         if (!vioList.isEmpty()) {
             throwSchemaPolicyCheckViolationException(vioList);
         } else {
-            _log.info("No violation of schema policy, good!");
+            _log.info("No violation of schema policy, good!\n[Schema Policy]\n" + buildPolicyExp());
         }
     }
 
@@ -119,7 +120,7 @@ public class DfSchemaPolicyChecker {
                 doCheckColumnMap(table, columnMap, vioList);
             } else {
                 if (!Srl.equalsPlain(key, "tableExceptList", "tableTargetList")) {
-                    throw new DfIllegalPropertySettingException("Unknown key of schema policy check: " + key);
+                    throwSchemaPolicyCheckUnknownPropertyException(key);
                 }
             }
         }
@@ -133,15 +134,7 @@ public class DfSchemaPolicyChecker {
         br.addElement("And after that, execute renewal (or regenerate) again.");
         br.addElement("(tips: The schema policy is on schemaPolicyMap.dfprop)");
         br.addItem("Schema Policy");
-        _policyMap.forEach((key, value) -> {
-            if (key.equals("tableMap")) {
-                setupTableColumnMapDisp(br, key, value);
-            } else if (key.equals("columnMap")) {
-                setupTableColumnMapDisp(br, key, value);
-            } else {
-                br.addElement(key + ": " + value);
-            }
-        });
+        br.addElement(buildPolicyExp());
         br.addItem("Violation");
         for (String vio : vioList) {
             br.addElement(vio);
@@ -150,20 +143,34 @@ public class DfSchemaPolicyChecker {
         throw new DfSchemaPolicyCheckViolationException(msg, vioList);
     }
 
-    protected void setupTableColumnMapDisp(ExceptionMessageBuilder br, String mapTitle, Object mapObj) {
-        br.addElement(mapTitle + ":");
+    protected String buildPolicyExp() {
+        final StringBuilder policySb = new StringBuilder();
+        _policyMap.forEach((key, value) -> {
+            if (key.equals("tableMap")) {
+                setupTableColumnMapDisp(policySb, key, value);
+            } else if (key.equals("columnMap")) {
+                setupTableColumnMapDisp(policySb, key, value);
+            } else {
+                policySb.append("\n").append(key).append(": ").append(value);
+            }
+        });
+        return Srl.ltrim(policySb.toString());
+    }
+
+    protected void setupTableColumnMapDisp(StringBuilder policySb, String mapTitle, Object mapObj) {
+        policySb.append("\n").append(mapTitle).append(":");
         @SuppressWarnings("unchecked")
         final Map<String, Object> map = (Map<String, Object>) mapObj;
         map.forEach((key, value) -> {
             if (key.equals("statementList")) {
-                br.addElement("  " + key + ":");
+                policySb.append("\n  " + key + ":");
                 @SuppressWarnings("unchecked")
                 final List<String> statementList = (List<String>) value;
                 for (Object statement : statementList) {
-                    br.addElement("    " + statement);
+                    policySb.append("\n    " + statement);
                 }
             } else {
-                br.addElement("  " + key + ": " + value);
+                policySb.append("\n  " + key + ": " + value);
             }
         });
     }
@@ -390,10 +397,22 @@ public class DfSchemaPolicyChecker {
     // ===================================================================================
     //                                                                           Exception
     //                                                                           =========
+    protected void throwSchemaPolicyCheckUnknownPropertyException(String property) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unknown property for SchemaPolicyCheck.");
+        br.addItem("Advice");
+        br.addElement("Make sure your schemaPolicyMap.dfprop.");
+        br.addItem("Unknown Property");
+        br.addElement(property);
+        final String msg = br.buildExceptionMessage();
+        throw new DfSchemaPolicyCheckUnknownPropertyException(msg);
+    }
+
     protected void throwSchemaPolicyCheckUnknownThemeException(String theme, String targetType) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Unknown theme for SchemaPolicyCheck.");
         br.addItem("Advice");
+        br.addElement("Make sure your schemaPolicyMap.dfprop.");
         br.addElement("You can use following themes:");
         br.addElement(" Table  : hasPK, upperCaseBasis, lowerCaseBasis, identityIfPureIDPK");
         br.addElement(" Column : upperCaseBasis, lowerCaseBasis");
@@ -402,13 +421,14 @@ public class DfSchemaPolicyChecker {
         br.addItem("Unknown Theme");
         br.addElement(theme);
         final String msg = br.buildExceptionMessage();
-        throw new DfSchemaPolicyCheckIllegalIfThenStatementException(msg);
+        throw new DfSchemaPolicyCheckUnknownThemeException(msg);
     }
 
     protected void throwSchemaPolicyCheckIllegalIfThenStatementException(String statement, String additional) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Illegal if-then statement for SchemaPolicyCheck.");
         br.addItem("Advice");
+        br.addElement("Make sure your schemaPolicyMap.dfprop.");
         br.addElement("If-then statement should be like this:");
         br.addElement(" if [if-clause] then [then-clause]");
         br.addElement("");
