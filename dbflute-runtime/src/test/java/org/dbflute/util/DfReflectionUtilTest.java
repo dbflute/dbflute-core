@@ -17,7 +17,9 @@ package org.dbflute.util;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -36,14 +38,103 @@ import org.dbflute.unit.RuntimeTestCase;
 public class DfReflectionUtilTest extends RuntimeTestCase {
 
     // ===================================================================================
+    //                                                                               Field
+    //                                                                               =====
+    // -----------------------------------------------------
+    //                                            Field List
+    //                                            ----------
+    public void test_getAccessibleFieldList_basic() throws Exception {
+        // ## Arrange ##
+        // ## Act ##
+        List<Field> fieldList = DfReflectionUtil.getAccessibleFieldList(FooFieldTarget.class);
+        // ## Assert ##
+        assertHasAnyElement(fieldList);
+        for (Field field : fieldList) {
+            log(field);
+            if (field.getDeclaringClass().equals(FooFieldBase.class)) {
+                markHere("existsSuper");
+                assertFalse(Modifier.isPrivate(field.getModifiers()));
+            }
+            if (field.getDeclaringClass().equals(FooFieldTarget.class)) {
+                markHere("existsTarget");
+            }
+        }
+        assertMarked("existsSuper");
+        assertMarked("existsTarget");
+    }
+
+    public void test_getPublicFieldList_basic() throws Exception {
+        // ## Arrange ##
+        // ## Act ##
+        List<Field> fieldList = DfReflectionUtil.getPublicFieldList(FooFieldTarget.class);
+        // ## Assert ##
+        assertHasAnyElement(fieldList);
+        for (Field field : fieldList) {
+            log(field);
+            assertTrue(Modifier.isPublic(field.getModifiers()));
+        }
+    }
+
+    public void test_getWholeFieldList_basic() throws Exception {
+        // ## Arrange ##
+        // ## Act ##
+        List<Field> fieldList = DfReflectionUtil.getWholeFieldList(FooFieldTarget.class);
+        // ## Assert ##
+        assertHasAnyElement(fieldList);
+        for (Field field : fieldList) {
+            log(field);
+            if (field.getDeclaringClass().equals(FooFieldBase.class)) {
+                markHere("existsSuper");
+                if (Modifier.isPrivate(field.getModifiers())) {
+                    markHere("existsSuperPrivate");
+                }
+            }
+            if (field.getDeclaringClass().equals(FooFieldTarget.class)) {
+                markHere("existsTarget");
+            }
+        }
+        assertMarked("existsSuper");
+        assertMarked("existsSuperPrivate");
+        assertMarked("existsTarget");
+    }
+
+    // -----------------------------------------------------
+    //                                           Test Helper
+    //                                           -----------
+    public static class FooFieldBase {
+
+        private String superPrivateField;
+        protected String superProtectedField;
+        public String superPublicField;
+
+        public String getSuperPrivateField() {
+            return superPrivateField;
+        }
+    }
+
+    public static class FooFieldTarget extends FooFieldBase {
+
+        private String privateField;
+        protected String protectedField;
+        public String publicField;
+
+        public String getPrivateField() {
+            return privateField;
+        }
+    }
+
+    // ===================================================================================
     //                                                                              Method
     //                                                                              ======
+    // -----------------------------------------------------
+    //                                        Method by Name
+    //                                        --------------
     public void test_getPublicMethod_basic() throws Exception {
         // ## Arrange ##
         String methodName = "fooNoArg";
 
         // ## Act ##
-        Method method = DfReflectionUtil.getPublicMethod(FooTarget.class, methodName, null);
+        Method method = DfReflectionUtil.getPublicMethod(FooMethodTarget.class, methodName, null);
 
         // ## Assert ##
         assertNotNull(method);
@@ -55,7 +146,7 @@ public class DfReflectionUtilTest extends RuntimeTestCase {
         String methodName = "fooDateArg";
 
         // ## Act ##
-        Method method = DfReflectionUtil.getPublicMethod(FooTarget.class, methodName, new Class<?>[] { Date.class });
+        Method method = DfReflectionUtil.getPublicMethod(FooMethodTarget.class, methodName, new Class<?>[] { Date.class });
 
         // ## Assert ##
         assertNotNull(method);
@@ -64,7 +155,7 @@ public class DfReflectionUtilTest extends RuntimeTestCase {
 
     public void test_getPublicMethod_args_SubClass() throws Exception {
         // ## Arrange ##
-        Class<?> clazz = FooTarget.class;
+        Class<?> clazz = FooMethodTarget.class;
         String methodName = "fooDateArg";
         Class<?>[] argType = new Class<?>[] { Timestamp.class };
 
@@ -75,7 +166,7 @@ public class DfReflectionUtilTest extends RuntimeTestCase {
 
     public void test_getPublicMethod_args_SuperClass() throws Exception {
         // ## Arrange ##
-        Class<?> clazz = FooTarget.class;
+        Class<?> clazz = FooMethodTarget.class;
         String methodName = "fooTimestampArg";
         Class<?>[] argType = new Class<?>[] { Date.class };
 
@@ -106,29 +197,110 @@ public class DfReflectionUtilTest extends RuntimeTestCase {
         assertNull(DfReflectionUtil.getPublicMethodFlexibly(clazz, methodName, argType));
     }
 
+    // -----------------------------------------------------
+    //                                           Method List
+    //                                           -----------
+    public void test_getAccessibleMethodList_basic() throws Exception {
+        // ## Arrange ##
+        // ## Act ##
+        List<Method> methodList = DfReflectionUtil.getAccessibleMethodList(FooMethodTarget.class);
+        // ## Assert ##
+        assertHasAnyElement(methodList);
+        for (Method method : methodList) {
+            log(method);
+            if (method.getDeclaringClass().equals(FooMethodBase.class)) {
+                markHere("existsSuper");
+                assertFalse(Modifier.isPrivate(method.getModifiers()));
+            }
+            if (method.getDeclaringClass().equals(FooMethodTarget.class)) {
+                markHere("existsTarget");
+            }
+        }
+        assertMarked("existsSuper");
+        assertMarked("existsTarget");
+    }
+
+    public void test_getPublicMethodList_basic() throws Exception {
+        // ## Arrange ##
+        // ## Act ##
+        List<Method> methodList = DfReflectionUtil.getPublicMethodList(FooMethodTarget.class);
+        // ## Assert ##
+        assertHasAnyElement(methodList);
+        for (Method method : methodList) {
+            log(method);
+            assertTrue(Modifier.isPublic(method.getModifiers()));
+        }
+    }
+
+    public void test_getWholeMethodList_basic() throws Exception {
+        // ## Arrange ##
+        // ## Act ##
+        List<Method> methodList = DfReflectionUtil.getWholeMethodList(FooMethodTarget.class);
+        // ## Assert ##
+        assertHasAnyElement(methodList);
+        for (Method method : methodList) {
+            log(method);
+            if (method.getDeclaringClass().equals(FooMethodBase.class)) {
+                markHere("existsSuper");
+                if (Modifier.isPrivate(method.getModifiers())) {
+                    markHere("existsSuperPrivate");
+                }
+            }
+            if (method.getDeclaringClass().equals(FooMethodTarget.class)) {
+                markHere("existsTarget");
+            }
+        }
+        assertMarked("existsSuper");
+        assertMarked("existsSuperPrivate");
+        assertMarked("existsTarget");
+    }
+
+    // -----------------------------------------------------
+    //                                         Invoke Method
+    //                                         -------------
     public void test_invoke_basic() throws Exception {
         // ## Arrange ##
         String methodName = "fooNoArg";
-        Method method = DfReflectionUtil.getPublicMethod(FooTarget.class, methodName, null);
+        Method method = DfReflectionUtil.getPublicMethod(FooMethodTarget.class, methodName, null);
 
         // ## Act ##
-        Object result = DfReflectionUtil.invoke(method, new FooTarget(), null);
+        Object result = DfReflectionUtil.invoke(method, new FooMethodTarget(), null);
 
         // ## Assert ##
         assertEquals("foo", result);
     }
 
-    public static class FooTarget {
+    // -----------------------------------------------------
+    //                                           Test Helper
+    //                                           -----------
+    public static class FooMethodBase {
+
+        @SuppressWarnings("unused")
+        private String superPrivateMethod() {
+            return "superPrivateMethod";
+        }
+
+        protected String superProtectedMethod() {
+            return "superProtectedMethod";
+        }
+
+        public String superPublicMethod() {
+            return "superPublicMethod";
+        }
+    }
+
+    public static class FooMethodTarget extends FooMethodBase {
+
         public String fooNoArg() {
             return "foo";
         }
 
         public String fooDateArg(Date date) {
-            return "foo";
+            return "fooDate";
         }
 
         public String fooTimestampArg(Timestamp timestamp) {
-            return "foo";
+            return "fooTimestamp";
         }
     }
 
