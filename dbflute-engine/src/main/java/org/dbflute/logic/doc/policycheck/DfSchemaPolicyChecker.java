@@ -100,6 +100,8 @@ public class DfSchemaPolicyChecker {
         }
         if (!vioList.isEmpty()) {
             throwSchemaPolicyCheckViolationException(vioList);
+        } else {
+            _log.info("No violation of schema policy, good!");
         }
     }
 
@@ -182,13 +184,13 @@ public class DfSchemaPolicyChecker {
         if (themeList == null) {
             return;
         }
-        final String tableDbName = table.getTableDbName();
         for (String theme : themeList) {
-            evaluateTableTheme(table, unmatchedList, tableDbName, theme);
+            evaluateTableTheme(table, unmatchedList, theme);
         }
     }
 
-    protected void evaluateTableTheme(Table table, List<String> unmatchedList, final String tableDbName, String theme) {
+    protected void evaluateTableTheme(Table table, List<String> unmatchedList, String theme) {
+        final String tableDbName = table.getTableDbName();
         if (theme.equals("hasPK")) {
             if (!table.hasPrimaryKey()) {
                 unmatchedList.add("The table should have primary key: " + tableDbName);
@@ -201,11 +203,11 @@ public class DfSchemaPolicyChecker {
                 }
             }
         } else if (theme.equals("upperCaseBasis")) {
-            if (Srl.isLowerCaseAny(tableDbName)) {
+            if (Srl.isLowerCaseAny(table.getTableSqlName())) { // use SQL name because DB name may be control name
                 unmatchedList.add("The table name should be on upper case basis: " + tableDbName);
             }
         } else if (theme.equals("lowerCaseBasis")) {
-            if (Srl.isUpperCaseAny(tableDbName)) {
+            if (Srl.isUpperCaseAny(table.getTableSqlName())) { // same reason
                 unmatchedList.add("The table name should be on lower case basis: " + tableDbName);
             }
         } else {
@@ -239,17 +241,19 @@ public class DfSchemaPolicyChecker {
     }
 
     protected void evaluateColumnTheme(Table table, List<String> vioList, String theme) {
-        final String tableDbName = table.getTableDbName();
-        if (theme.equals("upperCaseBasis")) {
-            if (Srl.isLowerCaseAny(tableDbName)) {
-                vioList.add("The table name should be on upper case basis: " + tableDbName);
+        final List<Column> columnList = table.getColumnList();
+        for (Column column : columnList) {
+            if (theme.equals("upperCaseBasis")) {
+                if (Srl.isLowerCaseAny(column.getColumnSqlName())) { // use SQL name because DB name may be control name
+                    vioList.add("The column name should be on upper case basis: " + toColumnDisp(table, column));
+                }
+            } else if (theme.equals("lowerCaseBasis")) {
+                if (Srl.isUpperCaseAny(column.getColumnSqlName())) { // same reason
+                    vioList.add("The column name should be on lower case basis: " + toColumnDisp(table, column));
+                }
+            } else {
+                throwSchemaPolicyCheckUnknownThemeException(theme, "Column");
             }
-        } else if (theme.equals("lowerCaseBasis")) {
-            if (Srl.isUpperCaseAny(tableDbName)) {
-                vioList.add("The table name should be on lower case basis: " + tableDbName);
-            }
-        } else {
-            throwSchemaPolicyCheckUnknownThemeException(theme, "Column");
         }
     }
 
