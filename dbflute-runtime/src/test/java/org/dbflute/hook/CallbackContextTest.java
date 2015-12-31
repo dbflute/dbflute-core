@@ -29,7 +29,7 @@ public class CallbackContextTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                 BehaviorCommandHook
     //                                                                 ===================
-    public void test_BehaviorCommandHook_twiceSet_default() throws Exception {
+    public void test_BehaviorCommandHook_twiceSet_noInherits() throws Exception {
         // ## Arrange ##
         CallbackContext context = new CallbackContext();
         assertNull(context.getBehaviorCommandHook());
@@ -53,6 +53,11 @@ public class CallbackContextTest extends RuntimeTestCase {
             public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
                 log("3");
                 markHere("secondFinally");
+            }
+
+            @Override
+            public boolean inheritsExistingHook() {
+                return false;
             }
         });
 
@@ -101,7 +106,7 @@ public class CallbackContextTest extends RuntimeTestCase {
 
         // ## Assert ##
         BehaviorCommandHook hook = context.getBehaviorCommandHook();
-        assertFalse(hook.inheritsExistingHook());
+        assertTrue(hook.inheritsExistingHook());
         hook.hookBefore(null);
         hook.hookFinally(null, null);
         assertMarked("firstBefore");
@@ -113,7 +118,7 @@ public class CallbackContextTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                         SqlFireHook
     //                                                                         ===========
-    public void test_SqlFireHook_twiceSet_default() throws Exception {
+    public void test_SqlFireHook_twiceSet_noInherits() throws Exception {
         // ## Arrange ##
         CallbackContext context = new CallbackContext();
         assertNull(context.getSqlFireHook());
@@ -137,6 +142,11 @@ public class CallbackContextTest extends RuntimeTestCase {
             public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
                 log("3");
                 markHere("secondFinally");
+            }
+
+            @Override
+            public boolean inheritsExistingHook() {
+                return false;
             }
         });
 
@@ -185,7 +195,7 @@ public class CallbackContextTest extends RuntimeTestCase {
 
         // ## Assert ##
         SqlFireHook hook = context.getSqlFireHook();
-        assertFalse(hook.inheritsExistingHook());
+        assertTrue(hook.inheritsExistingHook());
         hook.hookBefore(null, null);
         hook.hookFinally(null, null);
         assertMarked("firstBefore");

@@ -268,7 +268,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         final CB cb = newConditionBean();
         final List<ColumnInfo> pkList = dbmeta.getPrimaryInfo().getPrimaryColumnList();
         for (ColumnInfo pk : pkList) {
-            cb.invokeSpecifyColumn(pk.getColumnDbName());
+            cb.invokeSpecifyColumn(pk.getPropertyName());
         }
         for (String uq : uniqueProp) {
             cb.localCQ().invokeQueryEqual(uq, dbmeta.findColumnInfo(uq).read(entity));
