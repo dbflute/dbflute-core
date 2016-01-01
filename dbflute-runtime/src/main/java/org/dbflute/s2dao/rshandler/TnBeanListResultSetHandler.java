@@ -61,14 +61,16 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     //                                                                              Handle
     //                                                                              ======
     public Object handle(ResultSet rs) throws SQLException {
-        final List<Object> list = new ArrayList<Object>();
-        mappingBean(rs, new BeanRowHandler() {
-            public boolean handle(Object row) throws SQLException {
-                list.add(row);
-                return true; // continue to next records
-            }
+        final List<Object> list = newResultList();
+        mappingBean(rs, row -> {
+            list.add(row);
+            return true; /* continue to next records */
         });
         return list;
+    }
+
+    protected List<Object> newResultList() {
+        return new ArrayList<Object>();
     }
 
     // ===================================================================================

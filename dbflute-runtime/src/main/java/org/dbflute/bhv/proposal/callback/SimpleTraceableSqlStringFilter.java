@@ -113,10 +113,18 @@ public class SimpleTraceableSqlStringFilter implements SqlStringFilter, Executed
         final boolean hasMethodName = methodName != null && methodName.trim().length() > 0;
         if (hasMethodName) {
             if (hasDeclaringClass) {
-                sb.append("#");
+                sb.append(getMethodDelimiter(methodName));
             }
-            sb.append(methodName).append("()");
+            sb.append(methodName).append(getMethodSuffix(methodName));
         }
+    }
+
+    protected String getMethodDelimiter(String methodName) {
+        return "@"; // DBFlute, LastaFlute basically uses (avoid batting with hashtag's '#')
+    }
+
+    protected String getMethodSuffix(String methodName) {
+        return "()";
     }
 
     protected void doBuildInvokeMarkAdditionalInfo(final StringBuilder sb) {

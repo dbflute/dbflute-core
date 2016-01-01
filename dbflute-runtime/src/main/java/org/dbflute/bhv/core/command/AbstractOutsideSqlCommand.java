@@ -15,6 +15,7 @@
  */
 package org.dbflute.bhv.core.command;
 
+import org.dbflute.Entity;
 import org.dbflute.bhv.core.context.ResourceContext;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMetaProvider;
@@ -101,6 +102,10 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractAllBehav
     //                                                                Argument Information
     //                                                                ====================
     public ConditionBean getConditionBean() {
+        return null;
+    }
+
+    public Entity getEntity() {
         return null;
     }
 

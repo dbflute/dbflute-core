@@ -79,7 +79,8 @@ public final class DfLastaFluteFreeGenReflector {
                     setupEnvGen(_uncapServiceName, path, false, false);
                     hasCommonEnv = true;
                 } else if ("config".equals(freeGen)) {
-                    setupConfigGen(_uncapServiceName, path, hasCommonEnv, false, false);
+                    final String pluginInterface = (String) commonMap.get("configPluginInterface");
+                    setupConfigGen(_uncapServiceName, path, hasCommonEnv, false, false, pluginInterface);
                     hasCommonConfig = true;
                 } else if ("label".equals(freeGen)) {
                     setupLabelGen(_uncapServiceName, path, false, false, lastafluteMap);
@@ -88,7 +89,8 @@ public final class DfLastaFluteFreeGenReflector {
                     setupMessageGen(_uncapServiceName, path, hasCommonLabel, false, false, lastafluteMap);
                     hasCommonMessage = true;
                 } else if ("mail".equals(freeGen)) {
-                    setupMailFluteGen(_uncapServiceName, path, lastafluteMap);
+                    final String pluginInterface = (String) commonMap.get("mailPluginInterface");
+                    setupMailFluteGen(_uncapServiceName, path, lastafluteMap, pluginInterface);
                 } else if ("template".equals(freeGen)) {
                     setupPmTemplateGen(_uncapServiceName, path, lastafluteMap);
                 } else if ("doc".equals(freeGen)) {
@@ -116,14 +118,16 @@ public final class DfLastaFluteFreeGenReflector {
                         setupEnvGen(appName, path, hasCommonEnv, hasCommonConfig);
                         hasAppEnv = true;
                     } else if ("config".equals(freeGen)) {
-                        setupConfigGen(appName, path, hasCommonEnv, hasCommonConfig, hasAppEnv);
+                        final String pluginInterface = (String) defMap.get("configPluginInterface");
+                        setupConfigGen(appName, path, hasCommonEnv, hasCommonConfig, hasAppEnv, pluginInterface);
                     } else if ("label".equals(freeGen)) {
                         setupLabelGen(appName, path, hasCommonLabel, hasCommonMessage, lastafluteMap);
                         hasAppLabel = true;
                     } else if ("message".equals(freeGen)) {
                         setupMessageGen(appName, path, hasCommonLabel, hasCommonMessage, hasAppLabel, lastafluteMap);
                     } else if ("mail".equals(freeGen)) {
-                        setupMailFluteGen(appName, path, lastafluteMap);
+                        final String pluginInterface = (String) defMap.get("mailPluginInterface");
+                        setupMailFluteGen(appName, path, lastafluteMap, pluginInterface);
                     } else if ("template".equals(freeGen)) {
                         setupPmTemplateGen(appName, path, lastafluteMap);
                     } else if ("jsp".equals(freeGen)) {
@@ -171,7 +175,8 @@ public final class DfLastaFluteFreeGenReflector {
         }
     }
 
-    protected void setupConfigGen(String appName, String path, boolean hasCommonEnv, boolean hasCommonConfig, boolean hasAppEnv) {
+    protected void setupConfigGen(String appName, String path, boolean hasCommonEnv, boolean hasCommonConfig, boolean hasAppEnv,
+            String pluginInterface) {
         final Map<String, Map<String, Object>> elementMap = new LinkedHashMap<String, Map<String, Object>>();
         final String capAppName = initCap(appName);
         final String theme = "config";
@@ -180,6 +185,9 @@ public final class DfLastaFluteFreeGenReflector {
         doSetupOutputConfigMap(appName, elementMap, theme);
         final Map<String, Object> tableMap = createTableMap();
         elementMap.put("tableMap", tableMap);
+        if (pluginInterface != null) {
+            tableMap.put("pluginInterface", pluginInterface);
+        }
         if (!hasCommonEnv && !hasCommonConfig && !hasAppEnv) { // root
             doSetupConfigTableMapRoot(tableMap);
         } else {
@@ -276,11 +284,12 @@ public final class DfLastaFluteFreeGenReflector {
     // ===================================================================================
     //                                                                           MailFlute
     //                                                                           =========
-    protected void setupMailFluteGen(String appName, String path, Map<String, Object> lastafluteMap) {
-        doSetupMailFluteGen(appName, path, "$$baseDir$$/resources/mail", "dfmail", lastafluteMap);
+    protected void setupMailFluteGen(String appName, String path, Map<String, Object> lastafluteMap, String pluginInterface) {
+        doSetupMailFluteGen(appName, path, "$$baseDir$$/resources/mail", "dfmail", lastafluteMap, pluginInterface);
     }
 
-    protected void doSetupMailFluteGen(String appName, String path, String targetDir, String ext, Map<String, Object> lastafluteMap) {
+    protected void doSetupMailFluteGen(String appName, String path, String targetDir, String ext, Map<String, Object> lastafluteMap,
+            String pluginInterface) {
         final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
         final String capAppName = initCap(appName);
         registerFreeGen(capAppName + "MailFlute", pathMap);
@@ -300,6 +309,9 @@ public final class DfLastaFluteFreeGenReflector {
         tableMap.put("targetExt", filterOverridden("." + ext, lastafluteMap, appName, "mail", "targetExt"));
         final List<String> exceptPathList = DfCollectionUtil.newArrayList("contain:/mail/common/");
         tableMap.put("exceptPathList", filterOverridden(exceptPathList, lastafluteMap, appName, "mail", "exceptPathList"));
+        if (pluginInterface != null) {
+            tableMap.put("pluginInterface", pluginInterface);
+        }
     }
 
     protected String buildMailPostcardPackage(String appName, Map<String, Object> lastafluteMap) {

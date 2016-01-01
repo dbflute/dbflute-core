@@ -15,10 +15,7 @@
  */
 package org.dbflute.bhv.core.command;
 
-import java.util.List;
-
 import org.dbflute.Entity;
-import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.bhv.core.context.FetchAssistContext;
@@ -32,7 +29,7 @@ import org.dbflute.util.DfTypeUtil;
  * @author jflute
  * @param <ENTITY> The type of entity.
  */
-public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelectCBCommand<List<ENTITY>> {
+public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelectCBCommand<ENTITY> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -93,12 +90,10 @@ public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelect
 
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
-        return new SqlExecutionCreator() {
-            public SqlExecution createSqlExecution() {
-                TnBeanMetaData bmd = createBeanMetaData();
-                TnResultSetHandler handler = createBeanCursorResultSetHandler(bmd);
-                return createSelectCBExecution(_conditionBean.getClass(), handler);
-            }
+        return () -> {
+            final TnBeanMetaData bmd = createBeanMetaData();
+            final TnResultSetHandler handler = createBeanCursorResultSetHandler(bmd);
+            return createSelectCBExecution(_conditionBean.getClass(), handler);
         };
     }
 

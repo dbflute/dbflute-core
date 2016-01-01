@@ -492,10 +492,10 @@ public class CallbackContext {
      *     }
      * });
      * </pre>
-     * @param behaviorCommandHook The hook interface of behavior commands. (NullAllowed)
+     * @param behaviorCommandHook The hook interface of behavior commands. (NullAllowed, Inheritable)
      */
     public void setBehaviorCommandHook(BehaviorCommandHook behaviorCommandHook) {
-        if (behaviorCommandHook != null && behaviorCommandHook.inheritsExistingHook()) {
+        if (_behaviorCommandHook != null && behaviorCommandHook != null && behaviorCommandHook.inheritsExistingHook()) {
             _behaviorCommandHook = createInheritableBehaviorCommandHook(behaviorCommandHook);
         } else {
             _behaviorCommandHook = behaviorCommandHook;
@@ -508,7 +508,7 @@ public class CallbackContext {
 
     protected static class InheritableBehaviorCommandHook implements BehaviorCommandHook {
 
-        protected final BehaviorCommandHook _originally; // might be null
+        protected final BehaviorCommandHook _originally; // might be null e.g. when first one
         protected final BehaviorCommandHook _yourHook;
 
         public InheritableBehaviorCommandHook(BehaviorCommandHook originally, BehaviorCommandHook yourHook) {
@@ -566,10 +566,10 @@ public class CallbackContext {
      *     }
      * });
      * </pre>
-     * @param sqlFireHook The hook interface of SQL fires. (NullAllowed)
+     * @param sqlFireHook The hook interface of SQL fires. (NullAllowed, Inheritable)
      */
     public void setSqlFireHook(SqlFireHook sqlFireHook) {
-        if (sqlFireHook != null && sqlFireHook.inheritsExistingHook()) {
+        if (_sqlFireHook != null && sqlFireHook != null && sqlFireHook.inheritsExistingHook()) {
             _sqlFireHook = createInheritableSqlFireHook(sqlFireHook);
         } else {
             _sqlFireHook = sqlFireHook;
@@ -582,7 +582,7 @@ public class CallbackContext {
 
     protected static class InheritableSqlFireHook implements SqlFireHook {
 
-        protected final SqlFireHook _originally; // might be null
+        protected final SqlFireHook _originally; // might be null e.g. when first one
         protected final SqlFireHook _yourHook;
 
         public InheritableSqlFireHook(SqlFireHook originally, SqlFireHook yourHook) {
@@ -614,7 +614,7 @@ public class CallbackContext {
 
     /**
      * Set the handler of SQL log. <br>
-     * This handler is called back before executing the SQL. 
+     * This handler is called back before executing the SQL.
      * <pre>
      * context.setSqlLogHandler(new SqlLogHandler() {
      *     public void handle(String executedSql, String displaySql
@@ -623,10 +623,36 @@ public class CallbackContext {
      *     }
      * });
      * </pre>
-     * @param sqlLogHandler The handler of SQL log. (NullAllowed)
+     * @param sqlLogHandler The handler of SQL log. (NullAllowed, Inheritable)
      */
     public void setSqlLogHandler(SqlLogHandler sqlLogHandler) {
-        _sqlLogHandler = sqlLogHandler;
+        if (_sqlLogHandler != null && sqlLogHandler != null && sqlLogHandler.inheritsExistingHandler()) {
+            _sqlLogHandler = createInheritableSqlLogHandler(sqlLogHandler);
+        } else {
+            _sqlLogHandler = sqlLogHandler;
+        }
+    }
+
+    protected InheritableSqlLogHandler createInheritableSqlLogHandler(SqlLogHandler sqlLogHandler) {
+        return new InheritableSqlLogHandler(_sqlLogHandler, sqlLogHandler);
+    }
+
+    protected static class InheritableSqlLogHandler implements SqlLogHandler {
+
+        protected final SqlLogHandler _originally; // might be null e.g. when first one
+        protected final SqlLogHandler _yourHandler;
+
+        public InheritableSqlLogHandler(SqlLogHandler originally, SqlLogHandler yourHandler) {
+            _originally = originally;
+            _yourHandler = yourHandler;
+        }
+
+        public void handle(SqlLogInfo info) {
+            if (_originally != null) {
+                _originally.handle(info);
+            }
+            _yourHandler.handle(info);
+        }
     }
 
     // -----------------------------------------------------
@@ -646,10 +672,36 @@ public class CallbackContext {
      *     }
      * });
      * </pre>
-     * @param sqlResultHandler The handler of SQL result. (NullAllowed)
+     * @param sqlResultHandler The handler of SQL result. (NullAllowed, Inheritable)
      */
     public void setSqlResultHandler(SqlResultHandler sqlResultHandler) {
-        _sqlResultHandler = sqlResultHandler;
+        if (_sqlResultHandler != null && sqlResultHandler != null && sqlResultHandler.inheritsExistingHandler()) {
+            _sqlResultHandler = createInheritableSqlResultHandler(sqlResultHandler);
+        } else {
+            _sqlResultHandler = sqlResultHandler;
+        }
+    }
+
+    protected InheritableSqlResultHandler createInheritableSqlResultHandler(SqlResultHandler sqlResultHandler) {
+        return new InheritableSqlResultHandler(_sqlResultHandler, sqlResultHandler);
+    }
+
+    protected static class InheritableSqlResultHandler implements SqlResultHandler {
+
+        protected final SqlResultHandler _originally; // might be null e.g. when first one
+        protected final SqlResultHandler _yourHandler;
+
+        public InheritableSqlResultHandler(SqlResultHandler originally, SqlResultHandler yourHandler) {
+            _originally = originally;
+            _yourHandler = yourHandler;
+        }
+
+        public void handle(SqlResultInfo info) {
+            if (_originally != null) {
+                _originally.handle(info);
+            }
+            _yourHandler.handle(info);
+        }
     }
 
     // -----------------------------------------------------
@@ -667,11 +719,96 @@ public class CallbackContext {
      *     public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
      *         // You can filter your SQL string here.
      *     }
+     *     ...
      * });
      * </pre>
-     * @param sqlStringFilter The filter of SQL string. (NullAllowed)
+     * @param sqlStringFilter The filter of SQL string. (NullAllowed, Inheritable)
      */
     public void setSqlStringFilter(SqlStringFilter sqlStringFilter) {
-        _sqlStringFilter = sqlStringFilter;
+        if (_sqlStringFilter != null && sqlStringFilter != null && sqlStringFilter.inheritsExistingFilter()) {
+            _sqlStringFilter = createInheritableSqlStringFilter(sqlStringFilter);
+        } else {
+            _sqlStringFilter = sqlStringFilter;
+        }
+    }
+
+    protected InheritableSqlStringFilter createInheritableSqlStringFilter(SqlStringFilter sqlStringFilter) {
+        return new InheritableSqlStringFilter(_sqlStringFilter, sqlStringFilter);
+    }
+
+    protected static class InheritableSqlStringFilter implements SqlStringFilter {
+
+        protected final SqlStringFilter _originally; // might be null e.g. when first one
+        protected final SqlStringFilter _yourHandler;
+
+        public InheritableSqlStringFilter(SqlStringFilter originally, SqlStringFilter yourHandler) {
+            _originally = originally;
+            _yourHandler = yourHandler;
+        }
+
+        @Override
+        public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
+            final String first;
+            if (_originally != null) {
+                final String filtered = _originally.filterSelectCB(meta, executedSql);
+                first = filtered != null ? filtered : executedSql;
+            } else {
+                first = executedSql;
+            }
+            final String second = _yourHandler.filterSelectCB(meta, first);
+            return second != null ? second : first;
+        }
+
+        @Override
+        public String filterEntityUpdate(BehaviorCommandMeta meta, String executedSql) {
+            final String first;
+            if (_originally != null) {
+                final String filtered = _originally.filterEntityUpdate(meta, executedSql);
+                first = filtered != null ? filtered : executedSql;
+            } else {
+                first = executedSql;
+            }
+            final String second = _yourHandler.filterEntityUpdate(meta, first);
+            return second != null ? second : first;
+        }
+
+        @Override
+        public String filterQueryUpdate(BehaviorCommandMeta meta, String executedSql) {
+            final String first;
+            if (_originally != null) {
+                final String filtered = _originally.filterQueryUpdate(meta, executedSql);
+                first = filtered != null ? filtered : executedSql;
+            } else {
+                first = executedSql;
+            }
+            final String second = _yourHandler.filterQueryUpdate(meta, first);
+            return second != null ? second : first;
+        }
+
+        @Override
+        public String filterOutsideSql(BehaviorCommandMeta meta, String executedSql) {
+            final String first;
+            if (_originally != null) {
+                final String filtered = _originally.filterOutsideSql(meta, executedSql);
+                first = filtered != null ? filtered : executedSql;
+            } else {
+                first = executedSql;
+            }
+            final String second = _yourHandler.filterOutsideSql(meta, first);
+            return second != null ? second : first;
+        }
+
+        @Override
+        public String filterProcedure(BehaviorCommandMeta meta, String executedSql) {
+            final String first;
+            if (_originally != null) {
+                final String filtered = _originally.filterProcedure(meta, executedSql);
+                first = filtered != null ? filtered : executedSql;
+            } else {
+                first = executedSql;
+            }
+            final String second = _yourHandler.filterProcedure(meta, first);
+            return second != null ? second : first;
+        }
     }
 }

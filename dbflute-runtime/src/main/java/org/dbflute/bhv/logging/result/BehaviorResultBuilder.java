@@ -45,8 +45,6 @@ public class BehaviorResultBuilder {
                 final List<?> ls = (java.util.List<?>) ret;
                 if (ls.isEmpty()) {
                     resultExp = prefix + "(0)]";
-                } else if (ls.size() == 1) {
-                    resultExp = prefix + "(1) result=" + buildEntityExp(ls.get(0)) + "]";
                 } else {
                     resultExp = prefix + "(" + ls.size() + ") first=" + buildEntityExp(ls.get(0)) + "]";
                 }
@@ -56,7 +54,7 @@ public class BehaviorResultBuilder {
                 resultExp = prefix + "(null)" + "]";
             } else {
                 final Entity entity = (Entity) ret;
-                resultExp = prefix + "(1) result=" + buildEntityExp(entity) + "]";
+                resultExp = prefix + "(1) entity=" + buildEntityExp(entity) + "]";
             }
         } else if (int[].class.isAssignableFrom(retType)) {
             if (ret == null) { // basically not come here

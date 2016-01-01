@@ -208,6 +208,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         } else if (updatedCount > 1) {
             throwUpdateEntityDuplicatedException(entity, updatedCount);
         }
+        helpReloadPrimaryKeyIfUniqueByIfNeeds(entity, option);
     }
 
     protected <RESULT extends ENTITY> void helpUpdateNonstrictInternally(RESULT entity, UpdateOption<CB> option) {
@@ -218,6 +219,7 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         } else if (updatedCount > 1) {
             throwUpdateEntityDuplicatedException(entity, updatedCount);
         }
+        helpReloadPrimaryKeyIfUniqueByIfNeeds(entity, option);
     }
 
     protected void throwUpdateEntityAlreadyDeletedException(ENTITY entity) {
@@ -249,6 +251,30 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
 
     protected void assertUpdateOpCallNotNull(WritableOptionCall<CB, UpdateOption<CB>> opCall) { // for varyingUpdate()
         assertObjectNotNull("opLambda (for update)", opCall);
+    }
+
+    protected <RESULT extends ENTITY> void helpReloadPrimaryKeyIfUniqueByIfNeeds(RESULT entity, UpdateOption<CB> option) {
+        if (option == null || !option.isReloadPrimaryKeyIfUniqueBy()) {
+            return;
+        }
+        final Set<String> uniqueProp = entity.myuniqueDrivenProperties();
+        if (uniqueProp.isEmpty()) { // updated by PK normally
+            return;
+        }
+        final DBMeta dbmeta = entity.asDBMeta();
+        if (!dbmeta.hasPrimaryKey()) { // no PK table but has unique key
+            return;
+        }
+        final CB cb = newConditionBean();
+        final List<ColumnInfo> pkList = dbmeta.getPrimaryInfo().getPrimaryColumnList();
+        for (ColumnInfo pk : pkList) {
+            cb.invokeSpecifyColumn(pk.getPropertyName());
+        }
+        for (String uq : uniqueProp) {
+            cb.localCQ().invokeQueryEqual(uq, dbmeta.findColumnInfo(uq).read(entity));
+        }
+        final Entity read = readEntityWithDeletedCheck(cb);
+        dbmeta.acceptPrimaryKeyMap(entity, dbmeta.extractPrimaryKeyMap(read));
     }
 
     // -----------------------------------------------------

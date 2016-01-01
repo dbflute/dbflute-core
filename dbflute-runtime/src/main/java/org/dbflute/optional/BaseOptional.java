@@ -160,6 +160,28 @@ public abstract class BaseOptional<OBJ> implements OptionalThing<OBJ>, Serializa
         }
     }
 
+    /**
+     * @param <CAUSE> The type of original cause.
+     * @param <TRANSLATED> The type of translated cause.
+     * @param translator The translator function of exception if null. (NotNull)
+     * @return The object instance wrapped in this optional object. (NotNull: if null, exception)
+     * @throws TRANSLATED When the value is null.
+     */
+    protected <CAUSE extends Throwable, TRANSLATED extends Throwable> OBJ directlyGetOrElseTranslatingThrow(
+            OptionalThingFunction<CAUSE, TRANSLATED> translator) throws TRANSLATED {
+        if (translator == null) {
+            String msg = "The argument 'supplier' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        try {
+            return directlyGet();
+        } catch (Throwable e) {
+            @SuppressWarnings("unchecked")
+            final CAUSE cause = (CAUSE) e;
+            throw translator.apply(cause);
+        }
+    }
+
     // -----------------------------------------------------
     //                                              filter()
     //                                              --------

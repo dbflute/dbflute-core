@@ -438,15 +438,16 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     //                                                                    ================
     protected abstract void throwDerivedReferrerInvalidColumnSpecificationException(String function);
 
-    protected void assertDerivedReferrerColumnType(String function, String derivedColumnDbName) {
-        if (derivedColumnDbName.contains(".")) {
-            derivedColumnDbName = derivedColumnDbName.substring(derivedColumnDbName.lastIndexOf(".") + ".".length());
-        }
-        final Class<?> derivedColumnType = _subQueryDBMeta.findColumnInfo(derivedColumnDbName).getObjectNativeType();
-        doAssertDerivedReferrerColumnType(function, derivedColumnDbName, derivedColumnType);
-    }
-
-    protected abstract void doAssertDerivedReferrerColumnType(String function, String derivedColumnDbName, Class<?> deriveColumnType);
+    // *unused for a long time, DBMS checks it in many cases and cannot help keeping compatible 
+    //protected void assertDerivedReferrerColumnType(String function, String derivedColumnDbName) {
+    //    if (derivedColumnDbName.contains(".")) {
+    //        derivedColumnDbName = derivedColumnDbName.substring(derivedColumnDbName.lastIndexOf(".") + ".".length());
+    //    }
+    //    final Class<?> derivedColumnType = _subQueryDBMeta.findColumnInfo(derivedColumnDbName).getObjectNativeType();
+    //    doAssertDerivedReferrerColumnType(function, derivedColumnDbName, derivedColumnType);
+    //}
+    //
+    //protected abstract void doAssertDerivedReferrerColumnType(String function, String derivedColumnDbName, Class<?> deriveColumnType);
 
     // ===================================================================================
     //                                                                  Function Connector

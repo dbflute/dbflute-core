@@ -43,6 +43,7 @@ public class CountDownRace {
     //                                                                           Attribute
     //                                                                           =========
     protected final int _runnerCount;
+    protected final ExecutorService _service;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -53,6 +54,11 @@ public class CountDownRace {
             throw new IllegalArgumentException(msg);
         }
         _runnerCount = runnerCount;
+        _service = prepareExecutorService();
+    }
+
+    protected ExecutorService prepareExecutorService() {
+        return Executors.newCachedThreadPool();
     }
 
     // ===================================================================================
@@ -67,7 +73,6 @@ public class CountDownRace {
     }
 
     protected void doReadyGo(CountDownRaceExecution execution) {
-        final ExecutorService service = Executors.newCachedThreadPool();
         final CountDownLatch ready = new CountDownLatch(_runnerCount);
         final CountDownLatch start = new CountDownLatch(1);
         final CountDownLatch goal = new CountDownLatch(_runnerCount);
@@ -77,7 +82,7 @@ public class CountDownRace {
         for (int i = 0; i < _runnerCount; i++) { // basically synchronized with parameter size
             final int entryNumber = i + 1;
             final Callable<Void> callable = createCallable(execution, ready, start, goal, ourLatch, entryNumber, lockObj);
-            final Future<Void> future = service.submit(callable);
+            final Future<Void> future = _service.submit(callable);
             futureList.add(future);
         }
 
@@ -98,7 +103,7 @@ public class CountDownRace {
         handleFuture(futureList);
     }
 
-    protected void handleFuture(final List<Future<Void>> futureList) {
+    protected void handleFuture(List<Future<Void>> futureList) {
         for (Future<Void> future : futureList) {
             try {
                 future.get();

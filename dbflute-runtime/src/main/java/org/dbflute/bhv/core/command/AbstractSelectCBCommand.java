@@ -17,6 +17,7 @@ package org.dbflute.bhv.core.command;
 
 import java.util.Map;
 
+import org.dbflute.Entity;
 import org.dbflute.bhv.core.execution.SelectCBExecution;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.outsidesql.OutsideSqlOption;
@@ -105,6 +106,10 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractAllBehavio
     //                                                                ====================
     public ConditionBean getConditionBean() {
         return _conditionBean;
+    }
+
+    public Entity getEntity() {
+        return null;
     }
 
     public String getOutsideSqlPath() {

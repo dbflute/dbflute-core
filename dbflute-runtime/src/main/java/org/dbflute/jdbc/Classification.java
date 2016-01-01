@@ -45,7 +45,7 @@ public interface Classification {
 
     /**
      * Get the set of sisters (alternate codes) for the classification.
-     * @return The set of sister code for the classification. (NotNull, EmptyAllowed, ReadOnly)
+     * @return The read-only set of sister code for the classification. (NotNull, EmptyAllowed)
      */
     Set<String> sisterSet();
 
@@ -58,7 +58,7 @@ public interface Classification {
 
     /**
      * Get the map of sub items that are your original attributes.
-     * @return The map of sub-items. (NotNull, EmptyAllowed, ReadOnly)
+     * @return The read-only map of sub-items. (NotNull, EmptyAllowed)
      */
     Map<String, Object> subItemMap();
 

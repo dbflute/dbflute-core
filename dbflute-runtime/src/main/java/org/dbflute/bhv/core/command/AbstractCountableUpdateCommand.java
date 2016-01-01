@@ -130,6 +130,10 @@ public abstract class AbstractCountableUpdateCommand extends AbstractAllBehavior
         return null;
     }
 
+    public Entity getEntity() {
+        return _entity; // but null when query delete
+    }
+
     public String getOutsideSqlPath() {
         return null;
     }

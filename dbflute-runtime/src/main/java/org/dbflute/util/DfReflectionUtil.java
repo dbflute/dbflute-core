@@ -27,9 +27,11 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -172,18 +174,24 @@ public class DfReflectionUtil {
     // ===================================================================================
     //                                                                               Field
     //                                                                               =====
+    // -----------------------------------------------------
+    //                                         Field by Name
+    //                                         -------------
     public static Field getAccessibleField(Class<?> clazz, String fieldName) {
         assertObjectNotNull("clazz", clazz);
+        assertStringNotNullAndNotTrimmedEmpty("fieldName", fieldName);
         return findField(clazz, fieldName, VisibilityType.ACCESSIBLE);
     }
 
     public static Field getPublicField(Class<?> clazz, String fieldName) {
         assertObjectNotNull("clazz", clazz);
+        assertStringNotNullAndNotTrimmedEmpty("fieldName", fieldName);
         return findField(clazz, fieldName, VisibilityType.PUBLIC);
     }
 
     public static Field getWholeField(Class<?> clazz, String fieldName) {
         assertObjectNotNull("clazz", clazz);
+        assertStringNotNullAndNotTrimmedEmpty("fieldName", fieldName);
         return findField(clazz, fieldName, VisibilityType.WHOLE);
     }
 
@@ -211,6 +219,46 @@ public class DfReflectionUtil {
         return null;
     }
 
+    // -----------------------------------------------------
+    //                                            Field List
+    //                                            ----------
+    public static List<Field> getAccessibleFieldList(Class<?> clazz) {
+        assertObjectNotNull("clazz", clazz);
+        return findFieldList(clazz, VisibilityType.ACCESSIBLE);
+    }
+
+    public static List<Field> getPublicFieldList(Class<?> clazz) {
+        assertObjectNotNull("clazz", clazz);
+        return findFieldList(clazz, VisibilityType.PUBLIC);
+    }
+
+    public static List<Field> getWholeFieldList(Class<?> clazz) {
+        assertObjectNotNull("clazz", clazz);
+        return findFieldList(clazz, VisibilityType.WHOLE);
+    }
+
+    protected static List<Field> findFieldList(Class<?> clazz, VisibilityType visibilityType) {
+        final List<Field> fieldList = new ArrayList<Field>();
+        assertObjectNotNull("clazz", clazz);
+        for (Class<?> target = clazz; target != null && target != Object.class; target = target.getSuperclass()) {
+            Field[] declaredFields = target.getDeclaredFields();
+            for (Field declaredField : declaredFields) {
+                final int modifier = declaredField.getModifiers();
+                if (isOutOfTargetForPublic(visibilityType, modifier)) {
+                    continue;
+                }
+                if (isOutOfTargetForAccessible(visibilityType, modifier, clazz, target)) {
+                    continue;
+                }
+                fieldList.add(declaredField);
+            }
+        }
+        return fieldList;
+    }
+
+    // -----------------------------------------------------
+    //                                           Field Value
+    //                                           -----------
     public static Object getValue(Field field, Object target) {
         assertObjectNotNull("field", field);
         try {
@@ -271,6 +319,9 @@ public class DfReflectionUtil {
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
+    // -----------------------------------------------------
+    //                                        Method by Name
+    //                                        --------------
     /**
      * Get the accessible method that means as follows:
      * <pre>
@@ -458,6 +509,45 @@ public class DfReflectionUtil {
         return visibilityType == VisibilityType.ACCESSIBLE && clazz != target && isDefaultOrPrivate(modifier);
     }
 
+    // -----------------------------------------------------
+    //                                           Method List
+    //                                           -----------
+    public static List<Method> getAccessibleMethodList(Class<?> clazz) {
+        assertObjectNotNull("clazz", clazz);
+        return findMethodList(clazz, VisibilityType.ACCESSIBLE);
+    }
+
+    public static List<Method> getPublicMethodList(Class<?> clazz) {
+        assertObjectNotNull("clazz", clazz);
+        return findMethodList(clazz, VisibilityType.PUBLIC);
+    }
+
+    public static List<Method> getWholeMethodList(Class<?> clazz) {
+        assertObjectNotNull("clazz", clazz);
+        return findMethodList(clazz, VisibilityType.WHOLE);
+    }
+
+    protected static List<Method> findMethodList(Class<?> clazz, VisibilityType visibilityType) {
+        final List<Method> methodList = new ArrayList<Method>();
+        for (Class<?> target = clazz; target != null && target != Object.class; target = target.getSuperclass()) {
+            final Method[] declaredMethods = target.getDeclaredMethods();
+            for (Method declaredMethod : declaredMethods) {
+                final int modifier = declaredMethod.getModifiers();
+                if (isOutOfTargetForPublic(visibilityType, modifier)) {
+                    continue;
+                }
+                if (isOutOfTargetForAccessible(visibilityType, modifier, clazz, target)) {
+                    continue;
+                }
+                methodList.add(declaredMethod);
+            }
+        }
+        return methodList;
+    }
+
+    // -----------------------------------------------------
+    //                                         Invoke Method
+    //                                         -------------
     /**
      * Invoke the method by reflection.
      * @param method The instance of method. (NotNull)
@@ -508,6 +598,9 @@ public class DfReflectionUtil {
         return invoke(method, null, args);
     }
 
+    // -----------------------------------------------------
+    //                                      Determine Method
+    //                                      ----------------
     public static boolean isPublicMethod(Method method) {
         final int mod = method.getModifiers();
         return Modifier.isPublic(mod);

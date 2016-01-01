@@ -263,7 +263,6 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     /** {@inheritDoc} */
-    @Override
     protected <ARG> OptionalEntity<ARG> createOptionalFilteredObject(ARG obj) {
         return new OptionalEntity<ARG>(obj, _thrower);
     }
@@ -289,7 +288,6 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     /** {@inheritDoc} */
-    @Override
     protected <ARG> OptionalEntity<ARG> createOptionalMappedObject(ARG obj) {
         return new OptionalEntity<ARG>(obj, _thrower);
     }
@@ -314,7 +312,6 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     }
 
     /** {@inheritDoc} */
-    @Override
     protected <ARG> OptionalEntity<ARG> createOptionalFlatMappedObject(ARG obj) {
         return new OptionalEntity<ARG>(obj, _thrower);
     }
@@ -324,21 +321,24 @@ public class OptionalEntity<ENTITY> extends BaseOptional<ENTITY> {
     // _/_/_/_/_/_/_/_/_/_/
 
     /** {@inheritDoc} */
-    @Override
     public ENTITY orElse(ENTITY other) {
         return directlyGetOrElse(other);
     }
 
     /** {@inheritDoc} */
-    @Override
     public ENTITY orElseGet(OptionalThingSupplier<ENTITY> noArgLambda) {
         return directlyGetOrElseGet(noArgLambda);
     }
 
     /** {@inheritDoc} */
-    @Override
     public <CAUSE extends Throwable> ENTITY orElseThrow(OptionalThingSupplier<? extends CAUSE> noArgLambda) throws CAUSE {
         return directlyGetOrElseThrow(noArgLambda);
+    }
+
+    /** {@inheritDoc} */
+    public <CAUSE extends Throwable, TRANSLATED extends Throwable> ENTITY orElseTranslatingThrow(
+            OptionalThingFunction<CAUSE, TRANSLATED> oneArgLambda) throws TRANSLATED {
+        return directlyGetOrElseTranslatingThrow(oneArgLambda);
     }
 
     // ===================================================================================

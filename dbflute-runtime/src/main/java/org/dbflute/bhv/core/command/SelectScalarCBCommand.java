@@ -15,7 +15,6 @@
  */
 package org.dbflute.bhv.core.command;
 
-import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.bhv.core.SqlExecutionCreator;
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 import org.dbflute.cbean.ConditionBean;
@@ -85,11 +84,9 @@ public class SelectScalarCBCommand<RESULT> extends AbstractSelectCBCommand<RESUL
     //                                                               =====================
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
-        return new SqlExecutionCreator() {
-            public SqlExecution createSqlExecution() {
-                TnResultSetHandler handler = createScalarResultSetHandler(getCommandReturnType());
-                return createSelectCBExecution(_conditionBean.getClass(), handler);
-            }
+        return () -> {
+            final TnResultSetHandler handler = createScalarResultSetHandler(getCommandReturnType());
+            return createSelectCBExecution(_conditionBean.getClass(), handler);
         };
     }
 

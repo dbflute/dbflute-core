@@ -134,36 +134,37 @@ public class QueryDerivedReferrer extends DerivedReferrer {
         createCBExThrower().throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
     }
 
-    @Override
-    protected void doAssertDerivedReferrerColumnType(String function, String derivedColumnDbName, Class<?> derivedColumnType) {
-        final Object value = _value;
-        if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
-            if (!Number.class.isAssignableFrom(derivedColumnType)) {
-                throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
-            }
-        }
-        if (value != null) {
-            final Class<?> parameterType = value.getClass();
-            if (String.class.isAssignableFrom(derivedColumnType)) {
-                if (!String.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
-                }
-            }
-            if (Number.class.isAssignableFrom(derivedColumnType)) {
-                if (!Number.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
-                }
-            }
-            if (java.util.Date.class.isAssignableFrom(derivedColumnType)) {
-                if (!java.util.Date.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
-                }
-            }
-        }
-    }
-
-    protected void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
-            Class<?> derivedColumnType) {
-        createCBExThrower().throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType, _value);
-    }
+    // *see DerivedReferrer@assertDerivedReferrerColumnType()'s comment
+    //@Override
+    //protected void doAssertDerivedReferrerColumnType(String function, String derivedColumnDbName, Class<?> derivedColumnType) {
+    //    final Object value = _value;
+    //    if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
+    //        if (!Number.class.isAssignableFrom(derivedColumnType)) {
+    //            throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
+    //        }
+    //    }
+    //    if (value != null) {
+    //        final Class<?> parameterType = value.getClass();
+    //        if (String.class.isAssignableFrom(derivedColumnType)) {
+    //            if (!String.class.isAssignableFrom(parameterType)) {
+    //                throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
+    //            }
+    //        }
+    //        if (Number.class.isAssignableFrom(derivedColumnType)) {
+    //            if (!Number.class.isAssignableFrom(parameterType)) {
+    //                throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
+    //            }
+    //        }
+    //        if (java.util.Date.class.isAssignableFrom(derivedColumnType)) {
+    //            if (!java.util.Date.class.isAssignableFrom(parameterType)) {
+    //                throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
+    //            }
+    //        }
+    //    }
+    //}
+    //
+    //protected void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String derivedColumnDbName,
+    //        Class<?> derivedColumnType) {
+    //    createCBExThrower().throwQueryDerivedReferrerUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType, _value);
+    //}
 }

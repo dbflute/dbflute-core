@@ -100,6 +100,9 @@ h4 {
 p.actionsubitem {
     padding: 0.2em 0 0 1.5em;
 }
+.actionannotations {
+    color: #666666;
+}
 
 /* table */
 table {
@@ -112,6 +115,7 @@ table, th {
 th {
     background-color: #E4AAA4;
     font-size: 0.8em;
+    padding: 0 0.2em 0 0.2em;
 }
 td {
     border-bottom: 1px dotted #aaa;
@@ -126,6 +130,14 @@ td {
     color: #3F7E5E;
     padding:0.5em 0 0.5em 1em;
     margin-bottom: 1em;
+}
+.fieldcomment {
+    font-size: 0.9em;
+    color: #3F7E5E;
+}
+.fieldannotations {
+    font-size: 0.9em;
+    color: #666666;
 }
 .rownumcell {
     text-align: center;
@@ -222,7 +234,10 @@ $manager.htmlEscape($actionDocMeta.url)
 </p>
 #if ($actionDocMeta.annotationList)
 <p class="actionsubitem">
-<span class="actionsubtitle">annotations:</span> <span class="actionsubvalue">${actionDocMeta.annotationList}</span>
+<span class="actionsubtitle">annotations:</span>
+#foreach($annotation in $actionDocMeta.annotationList)
+<span class="actionannotations actionsubvalue">&#64;${annotation}</span>
+#end
 </p>
 #end
 #if ($actionDocMeta.typeComment)

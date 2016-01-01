@@ -59,11 +59,9 @@ public class DeleteEntityCommand extends AbstractEntityUpdateCommand {
 
     public SqlExecutionCreator createSqlExecutionCreator() {
         assertStatus("createSqlExecutionCreator");
-        return new SqlExecutionCreator() {
-            public SqlExecution createSqlExecution() {
-                final TnBeanMetaData bmd = createBeanMetaData();
-                return createDeleteEntitySqlExecution(bmd);
-            }
+        return () -> {
+            final TnBeanMetaData bmd = createBeanMetaData();
+            return createDeleteEntitySqlExecution(bmd);
         };
     }
 

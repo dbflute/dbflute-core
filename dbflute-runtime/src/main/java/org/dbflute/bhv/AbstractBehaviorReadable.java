@@ -35,6 +35,7 @@ import org.dbflute.bhv.core.command.AbstractCountableUpdateCommand;
 import org.dbflute.bhv.core.command.InsertEntityCommand;
 import org.dbflute.bhv.core.command.SelectCountCBCommand;
 import org.dbflute.bhv.core.command.SelectCursorCBCommand;
+import org.dbflute.bhv.core.command.SelectEntityCBCommand;
 import org.dbflute.bhv.core.command.SelectListCBCommand;
 import org.dbflute.bhv.core.command.SelectNextValCommand;
 import org.dbflute.bhv.core.command.SelectNextValSubCommand;
@@ -74,7 +75,6 @@ import org.dbflute.dbmeta.info.ForeignInfo;
 import org.dbflute.dbmeta.info.ReferrerInfo;
 import org.dbflute.dbmeta.info.RelationInfo;
 import org.dbflute.exception.EntityAlreadyDeletedException;
-import org.dbflute.exception.EntityDuplicatedException;
 import org.dbflute.exception.FetchingOverSafetySizeException;
 import org.dbflute.exception.IllegalBehaviorStateException;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
@@ -207,20 +207,14 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             throwSelectEntityConditionNotFoundException(cb);
         }
         final int preSafetyMaxResultSize = xcheckSafetyResultAsOne(cb);
-        final List<RESULT> ls;
         try {
-            ls = delegateSelectList(cb, entityType);
+            return delegateSelectEntity(cb, entityType);
         } catch (FetchingOverSafetySizeException e) {
             throwSelectEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
             return null; // unreachable
         } finally {
             xrestoreSafetyResult(cb, preSafetyMaxResultSize);
         }
-        if (ls.isEmpty()) {
-            return null;
-        }
-        assertEntitySelectedAsOne(ls, cb);
-        return (RESULT) ls.get(0);
     }
 
     protected <RESULT extends ENTITY> RESULT helpSelectEntityWithDeletedCheckInternally(CB cb, Class<? extends RESULT> entityType) {
@@ -251,34 +245,6 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     protected void assertEntityNotDeleted(Entity entity, Object searchKey) {
         if (entity == null) {
             throwSelectEntityAlreadyDeletedException(searchKey);
-        }
-    }
-
-    /**
-     * Assert that the entity is not deleted.
-     * @param ls Selected list. (NullAllowed)
-     * @param searchKey Search-key for logging. (NotNull)
-     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     */
-    protected void assertEntityNotDeleted(List<? extends Entity> ls, Object searchKey) {
-        if (ls == null || ls.isEmpty()) {
-            throwSelectEntityAlreadyDeletedException(searchKey);
-        }
-    }
-
-    /**
-     * Assert that the entity is selected as one.
-     * @param ls Selected list. (NotNull)
-     * @param searchKey Search-key for logging. (NotNull)
-     * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
-     * @throws EntityDuplicatedException When the entity has been duplicated.
-     */
-    protected void assertEntitySelectedAsOne(List<? extends Entity> ls, Object searchKey) {
-        if (ls == null || ls.isEmpty()) {
-            throwSelectEntityAlreadyDeletedException(searchKey);
-        }
-        if (ls.size() > 1) {
-            throwSelectEntityDuplicatedException(String.valueOf(ls.size()), searchKey, null);
         }
     }
 
@@ -1386,6 +1352,10 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return invoke(createSelectCountCBCommand(cb, false));
     }
 
+    protected <RESULT extends ENTITY> RESULT delegateSelectEntity(ConditionBean cb, Class<? extends RESULT> entityType) {
+        return invoke(createSelectEntityCBCommand(cb, entityType));
+    }
+
     protected <RESULT extends ENTITY> List<RESULT> delegateSelectList(ConditionBean cb, Class<? extends RESULT> entityType) {
         return invoke(createSelectListCBCommand(cb, entityType));
     }
@@ -1437,6 +1407,13 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         {
             @SuppressWarnings("unchecked")
             final Class<? extends ENTITY> entityType = (Class<? extends ENTITY>) asDBMeta().getEntityType();
+            final SelectEntityCBCommand<? extends ENTITY> cmd = createSelectEntityCBCommand(newConditionBean(), entityType);
+            cmd.setInitializeOnly(true);
+            invoke(cmd);
+        }
+        {
+            @SuppressWarnings("unchecked")
+            final Class<? extends ENTITY> entityType = (Class<? extends ENTITY>) asDBMeta().getEntityType();
             final SelectListCBCommand<? extends ENTITY> cmd = createSelectListCBCommand(newConditionBean(), entityType);
             cmd.setInitializeOnly(true);
             invoke(cmd);
@@ -1457,6 +1434,20 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
 
     protected SelectCountCBCommand newSelectCountCBCommand() {
         return new SelectCountCBCommand();
+    }
+
+    protected <RESULT extends ENTITY> SelectEntityCBCommand<RESULT> createSelectEntityCBCommand(ConditionBean cb,
+            Class<? extends RESULT> entityType) {
+        assertBehaviorCommandInvoker("createSelectEntityCBCommand");
+        final SelectEntityCBCommand<RESULT> cmd = newSelectEntityCBCommand();
+        xsetupSelectCommand(cmd);
+        cmd.setConditionBean(cb);
+        cmd.setEntityType(entityType);
+        return cmd;
+    }
+
+    protected <RESULT extends ENTITY> SelectEntityCBCommand<RESULT> newSelectEntityCBCommand() {
+        return new SelectEntityCBCommand<RESULT>();
     }
 
     protected <RESULT extends ENTITY> SelectListCBCommand<RESULT> createSelectListCBCommand(ConditionBean cb,

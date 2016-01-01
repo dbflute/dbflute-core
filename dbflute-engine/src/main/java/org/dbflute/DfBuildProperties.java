@@ -42,6 +42,7 @@ import org.dbflute.properties.DfOptimisticLockProperties;
 import org.dbflute.properties.DfOutsideSqlProperties;
 import org.dbflute.properties.DfRefreshProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
+import org.dbflute.properties.DfSchemaPolicyProperties;
 import org.dbflute.properties.DfSequenceIdentityProperties;
 import org.dbflute.properties.DfSimpleDtoProperties;
 import org.dbflute.properties.DfTypeMappingProperties;
@@ -299,6 +300,13 @@ public final class DfBuildProperties {
     //                                 ---------------------
     public DfSequenceIdentityProperties getSequenceIdentityProperties() {
         return getHandler().getSequenceIdentityProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
+    //                                   Schema Policy Check
+    //                                   -------------------
+    public DfSchemaPolicyProperties getSchemaPolicyCheckProperties() {
+        return getHandler().getSchemaPolicyCheckProperties(getProperties());
     }
 
     // -----------------------------------------------------

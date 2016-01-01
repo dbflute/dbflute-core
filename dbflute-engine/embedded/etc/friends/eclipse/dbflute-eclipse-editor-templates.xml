@@ -6,19 +6,19 @@
     ${cursor}
 }</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as HTML response with ID and Form" enabled="true" name="_lahtml">${:import(org.lastaflute.web.Execute
     , org.lastaflute.web.response.HtmlResponse)}@Execute
-public HtmlResponse ${method}(long ${object}Id, ${form}Form form) {
+public HtmlResponse ${method}(Long ${object}Id, ${form}Form form) {
     return asHtml(path_${newName});
 }</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as JSON response with ID and Body" enabled="true" name="_lajson">${:import(org.lastaflute.web.Execute
     , org.lastaflute.web.response.JsonResponse)}@Execute
-public JsonResponse&lt;${bean}&gt; ${method}(long ${object}Id, ${body}Body body) {
+public JsonResponse&lt;${bean}&gt; ${method}(Long ${object}Id, ${body}Body body) {
     return asJson(bean);
 }</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow as Inline" enabled="true" name="_li">${var} -&gt; ${var}.${newName}</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow with Linefeed" enabled="true" name="_ll">${var} -&gt; {
     ${var}.${newName}
-}</template><template autoinsert="true" context="java-members" deleted="false" description="Commons Logging Logger" enabled="true" name="_logger">${:import(org.apache.commons.logging.Log,
+}</template><template autoinsert="true" context="java-members" deleted="false" description="Commons Logging Logger" enabled="true" name="_clogger">${:import(org.apache.commons.logging.Log,
 	org.apache.commons.logging.LogFactory)}private static final Log
 	LOG = LogFactory.getLog(${enclosing_type}.class);</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: .addOrderBy_..." enabled="true" name="_order">.addOrderBy_${columnName}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: cb.query()" enabled="true" name="_query">${var}.query()</template><template autoinsert="true" context="java" deleted="false" description="Java8: collect toList()" enabled="true" name="_scolist">${:import(java.util.stream.Collectors)}.collect(Collectors.toList())</template><template autoinsert="true" context="java" deleted="false" description="Java8: collect toMap()" enabled="true" name="_scomap">${:import(java.util.stream.Collectors)}.collect(Collectors.toMap(bean -&gt; bean.get${newName}, bean -&gt; bean))</template><template autoinsert="true" context="java" deleted="false" description="Java8: stream().filter()" enabled="true" name="_sfilter">${var}.stream().filter(${newName} -&gt; {
     return ${newName}${cursor};
-});</template><template autoinsert="true" context="java-members" deleted="false" description="Slf4j Logger" enabled="true" name="_slogger">${:import(org.slf4j.Logger,
+});</template><template autoinsert="true" context="java-members" deleted="false" description="Slf4j Logger" enabled="true" name="_logger">${:import(org.slf4j.Logger,
 	org.slf4j.LoggerFactory)}private static final Logger
 	logger = LoggerFactory.getLogger(${enclosing_type}.class);</template><template autoinsert="true" context="java" deleted="false" description="Java8: stream().map()" enabled="true" name="_smap">${var}.stream().map(${newName} -&gt; {
     return ${newName}${cursor};
@@ -64,7 +64,7 @@ public JsonResponse&lt;${bean}&gt; ${method}(long ${object}Id, ${body}Body body)
     //                                                                              Update
     //                                                                              ======</template><template autoinsert="true" context="java" deleted="false" description="Validation methods for Action" enabled="true" name="_tavalid">    // ===================================================================================
     //                                                                          Validation
-    //                                                                          ==========</template><template autoinsert="true" context="java" deleted="false" description="TodoComment: To Be Fixed Sometime" enabled="true" name="_tdreview">// #review by ${user}(${date}) ${content}</template><template autoinsert="true" context="java" deleted="false" description="TODO comment" enabled="true" name="_todo">    // TODO ${user} ${cursor} (${date})</template><template autoinsert="true" context="java" deleted="false" description="TODO review comment" enabled="true" name="_trev">    // TODO ${newName} ${cursor} by ${user} (${date})</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQueryAndPart" enabled="true" name="andCBLambda">andCB -&gt; {
+    //                                                                          ==========</template><template autoinsert="true" context="java" deleted="false" description="TODO comment" enabled="true" name="_todo">    // TODO ${user} ${cursor} (${date})</template><template autoinsert="true" context="java" deleted="false" description="TODO review comment" enabled="true" name="_trev">    // TODO ${newName} ${cursor} by ${user} (${date})</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQueryAndPart" enabled="true" name="andCBLambda">andCB -&gt; {
     andCB.query().set${columnName}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ConditionBean" enabled="true" name="cbLambda">cb -&gt; {
     cb.${method}

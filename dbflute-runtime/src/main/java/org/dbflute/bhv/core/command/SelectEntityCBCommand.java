@@ -15,8 +15,6 @@
  */
 package org.dbflute.bhv.core.command;
 
-import java.util.List;
-
 import org.dbflute.Entity;
 import org.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -25,23 +23,23 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
  * @author jflute
  * @param <ENTITY> The type of entity.
  */
-public class SelectListCBCommand<ENTITY extends Entity> extends AbstractSelectCBReturnEntityCommand<List<ENTITY>> {
+public class SelectEntityCBCommand<ENTITY extends Entity> extends AbstractSelectCBReturnEntityCommand<ENTITY> {
 
     // ===================================================================================
     //                                                                   Basic Information
     //                                                                   =================
     public String getCommandName() {
-        return "selectList";
+        return "selectEntity";
     }
 
     public Class<?> getCommandReturnType() {
-        return List.class;
+        return _entityType;
     }
 
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
     protected TnResultSetHandler createReturnEntityResultSetHandler(TnBeanMetaData bmd) {
-        return super.createBeanListResultSetHandler(bmd);
+        return super.createBeanOneResultSetHandler(bmd, _conditionBean);
     }
 }

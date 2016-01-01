@@ -1,0 +1,42 @@
+# /---------------------------------------------------------------------------
+# schemaPolicyMap: (Default map:{})
+#
+# The definition of schema policy.
+# You can check your schema as the policy.
+# The table and column names are treated as case insensitive.
+#
+# Example:
+# map:{
+#     ; tableExceptList = list:{}
+#     ; tableTargetList = list:{}
+#     ; tableMap = map:{
+#         ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
+#     }
+#     ; columnMap = map:{
+#         ; themeList = list:{ upperCaseBasis }
+#         ; statementList = list:{
+#             ; if columnName is suffix:_FLAG then bad
+#             ; if columnName is suffix:_FLG then notNull
+#             ; if columnName is suffix:_FLG then dbType is INTEGER 
+#         }
+#     }
+# }
+#
+# *The line that starts with '#' means comment-out.
+#
+map:{
+    #; tableExceptList = list:{}
+    #; tableTargetList = list:{}
+    #; tableMap = map:{
+    #    ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
+    #}
+    #; columnMap = map:{
+    #    ; themeList = list:{ upperCaseBasis }
+    #    ; statementList = list:{
+    #        ; if columnName is suffix:_FLAG then bad
+    #        ; if columnName is suffix:_FLG then notNull
+    #        ; if columnName is suffix:_FLG then dbType is INTEGER
+    #    }
+    #}
+}
+# ----------------/

@@ -1,6 +1,7 @@
 cd ..
 ant -f build.xml reflect-to-test-dbms-sqlserver
 
+cd ..
 export answer=y
 
 cd ../dbflute-test-dbms-sqlserver/dbflute_maihamadb

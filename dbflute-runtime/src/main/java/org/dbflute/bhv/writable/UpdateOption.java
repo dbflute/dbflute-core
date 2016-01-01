@@ -72,6 +72,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     protected boolean _nonQueryUpdateAllowed;
     protected boolean _queryUpdateForcedDirectAllowed;
     protected Integer _batchLoggingUpdateLimit;
+    protected boolean _reloadPrimaryKeyIfUniqueBy;
     protected StatementConfig _updateStatementConfig;
 
     // ===================================================================================
@@ -703,6 +704,23 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
 
     public Integer getBatchUpdateLoggingLimit() {
         return _batchLoggingUpdateLimit;
+    }
+
+    // ===================================================================================
+    //                                                               Reload PK if UniqueBy
+    //                                                               =====================
+    /**
+     * Reload primary key for the unique key after update if you use uniqueBy(). <br>
+     * So you can get primary key from updated entity after update by this option.
+     * @return this. (NotNull)
+     */
+    public UpdateOption<CB> reloadPrimaryKeyIfUniqueBy() {
+        _reloadPrimaryKeyIfUniqueBy = true;
+        return this;
+    }
+
+    public boolean isReloadPrimaryKeyIfUniqueBy() {
+        return _reloadPrimaryKeyIfUniqueBy;
     }
 
     // ===================================================================================
