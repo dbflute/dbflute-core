@@ -165,6 +165,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
                     final Map<String, String> elementMap = newLinkedHashMap();
                     elementMap.put("sqlDirectory", resourceDirectory);
                     elementMap.put("sql2EntityOutputDirectory", programDirectory);
+                    elementMap.put("isSuppressDirectoryCheck", "true"); // because of automatic settings
                     logger.info("...Reflecting application outsideSql: " + path + ", " + elementMap);
                     appOutqlMap.put(path, elementMap);
                 }
