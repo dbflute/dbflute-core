@@ -299,6 +299,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #if ($col.hasClassification())
 #if (!$col.isTableClassification())
 #if ($col.hasClassificationName())
+#if ($col.isMakeClassificationGetterOfNameEnabled())
     /**
      * Get the value of the column '${col.uncapitalisedJavaName}' as classification name.
      * @return The string of classification name. (NullAllowed: when the column value is null)
@@ -309,7 +310,9 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
     }
 
 #end
+#end
 #if (${col.hasClassificationAlias()})
+#if ($col.isMakeClassificationGetterOfAliasEnabled())
     /**
      * Get the value of the column '${col.uncapitalisedJavaName}' as classification alias.
      * @return The string of classification alias. (NullAllowed: when the column value is null)
@@ -319,6 +322,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
         return cdef != null ? cdef.alias() : null;
     }
 
+#end
 #end
 #end
 #end

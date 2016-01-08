@@ -2450,11 +2450,19 @@ public class Column {
         return getClassificationProperties().hasClassificationName(getTable().getTableDbName(), getName());
     }
 
+    public boolean isMakeClassificationGetterOfNameEnabled() { // for checking column name conflict
+        return hasClassificationName() && getTable().getColumn(getName() + "_NAME") == null;
+    }
+
     public boolean hasClassificationAlias() {
         if (hasSql2EntityRelatedTableClassificationAlias()) {
             return true;
         }
         return getClassificationProperties().hasClassificationAlias(getTable().getTableDbName(), getName());
+    }
+
+    public boolean isMakeClassificationGetterOfAliasEnabled() { // for checking column name conflict
+        return hasClassificationName() && getTable().getColumn(getName() + "_ALIAS") == null;
     }
 
     public String getClassificationName() {
