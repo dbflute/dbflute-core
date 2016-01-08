@@ -76,18 +76,29 @@ public class DfSchemaPolicyChecker {
         // map:{
         //     ; tableExceptList = list:{}
         //     ; tableTargetList = list:{}
+        //     ; isMainSchemaOnly = false
         //     ; tableMap = map:{
         //         ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
         //     }
         //     ; columnMap = map:{
-        //         ; statementList = list:{ upperCaseBasis }
-        //         ; ifThenList = list:{
+        //         ; themeList = list:{ upperCaseBasis }
+        //         ; statementList = list:{
         //             ; if columnName is suffix:_FLAG then bad
         //             ; if columnName is suffix:_FLG then notNull
         //             ; if columnName is suffix:_FLG then dbType is INTEGER 
         //         }
         //     }
+        //     ; additionalSchemaPolicyMap = list:{
+        //         ; tableExceptList = list:{}
+        //         ; tableTargetList = list:{}
+        //         ; tableMap = map:{
+        //             ; inheritsMainSchema = false
+        //         }
+        //         ; columnMap = map:{
+        //         }
+        //     }
         // }
+        final boolean mainSchemaOnly = isMainSchemaOnly();
         final List<String> vioList = new ArrayList<String>();
         final List<Table> tableList = _tableListSupplier.get();
         for (Table table : tableList) {
@@ -97,6 +108,9 @@ public class DfSchemaPolicyChecker {
             if (!isTargetTable(table.getTableDbName())) {
                 continue;
             }
+            if (mainSchemaOnly && table.isAdditionalSchema()) {
+                continue;
+            }
             doCheck(table, vioList);
         }
         if (!vioList.isEmpty()) {
@@ -104,6 +118,10 @@ public class DfSchemaPolicyChecker {
         } else {
             _log.info("No violation of schema policy, good!\n[Schema Policy]\n" + buildPolicyExp());
         }
+    }
+
+    protected boolean isMainSchemaOnly() {
+        return ((String) _policyMap.getOrDefault("isMainSchemaOnly", "false")).equalsIgnoreCase("true");
     }
 
     protected void doCheck(Table table, List<String> vioList) {
@@ -119,7 +137,7 @@ public class DfSchemaPolicyChecker {
                 final Map<String, Object> columnMap = (Map<String, Object>) value;
                 doCheckColumnMap(table, columnMap, vioList);
             } else {
-                if (!Srl.equalsPlain(key, "tableExceptList", "tableTargetList")) {
+                if (!Srl.equalsPlain(key, "isMainSchemaOnly", "tableExceptList", "tableTargetList")) {
                     throwSchemaPolicyCheckUnknownPropertyException(key);
                 }
             }
