@@ -30,7 +30,7 @@ import org.dbflute.util.Srl;
  */
 public class DfClassificationLiteralArranger {
 
-    public void arrange(String classificationName, Map<String, Object> elementMap, List<Map<String, Object>> elementList) {
+    public void arrange(String classificationName, Map<String, Object> elementMap) {
         final String codeKey = DfClassificationElement.KEY_CODE;
         final String code = (String) elementMap.get(codeKey);
         if (code == null) { // required check
@@ -71,8 +71,6 @@ public class DfClassificationLiteralArranger {
                 }
             }
         }
-
-        elementList.add(elementMap);
     }
 
     protected String filterLineStringOnMapListString(String mapListString) {

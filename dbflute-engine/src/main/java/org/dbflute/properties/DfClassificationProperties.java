@@ -165,7 +165,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                     throwClassificationMapValueIllegalListTypeException(objValue);
                 }
                 final List<?> plainList = (List<?>) objValue;
-                final List<Map<String, Object>> elementMapList = new ArrayList<Map<String, Object>>();
                 final List<DfClassificationElement> elementList = new ArrayList<DfClassificationElement>();
                 boolean tableClassification = false;
                 for (Object element : plainList) {
@@ -190,7 +189,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                     if (isElementMapClassificationTop(elementMap)) { // top definition
                         processClassificationTopFromLiteralIfNeeds(classificationTop, elementMap);
                     } else {
-                        literalArranger.arrange(classificationName, elementMap, elementMapList);
+                        literalArranger.arrange(classificationName, elementMap);
                         final DfClassificationElement classificationElement = new DfClassificationElement();
                         classificationElement.setClassificationName(classificationName);
                         classificationElement.acceptBasicItemMap(elementMap);
