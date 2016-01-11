@@ -236,6 +236,51 @@ public class DfClassificationElement {
     }
 
     // ===================================================================================
+    //                                                                        Code Builder
+    //                                                                        ============
+    public String buildClassificationCodeAliasVariables() {
+        return doBuildClassificationCodeAliasVariables();
+    }
+
+    public String buildClassificationCodeAliasSisterCodeVariables() {
+        final StringBuilder sb = new StringBuilder();
+        final String codeAliasVariables = buildClassificationCodeAliasVariables();
+        sb.append(codeAliasVariables);
+        final String[] sisters = getSisters();
+        sb.append(", ");
+        if (sisters != null && sisters.length > 0) {
+            sb.append("new String[] {");
+            if (sisters != null && sisters.length > 0) {
+                int index = 0;
+                for (String sister : sisters) {
+                    if (index > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append("\"").append(sister).append("\"");
+                    ++index;
+                }
+            }
+            sb.append("}");
+        } else {
+            sb.append("EMPTY_SISTERS");
+        }
+        return sb.toString();
+    }
+
+    protected String doBuildClassificationCodeAliasVariables() {
+        final StringBuilder sb = new StringBuilder();
+        final String code = getCode();
+        final String alias = getAlias();
+        sb.append("\"").append(code).append("\"");
+        if (alias != null && alias.trim().length() > 0) {
+            sb.append(", \"").append(alias).append("\"");
+        } else {
+            sb.append(", null");
+        }
+        return sb.toString();
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override

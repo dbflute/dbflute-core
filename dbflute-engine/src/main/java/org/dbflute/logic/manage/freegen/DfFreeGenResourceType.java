@@ -27,6 +27,7 @@ import org.dbflute.logic.manage.freegen.table.mailflute.DfMailFluteTableLoader;
 import org.dbflute.logic.manage.freegen.table.pmfile.DfPmFileTableLoader;
 import org.dbflute.logic.manage.freegen.table.prop.DfPropTableLoader;
 import org.dbflute.logic.manage.freegen.table.solr.DfSolrXmlTableLoader;
+import org.dbflute.logic.manage.freegen.table.webcls.DfWebClsTableLoader;
 import org.dbflute.logic.manage.freegen.table.xls.DfXlsTableLoader;
 
 /**
@@ -34,7 +35,7 @@ import org.dbflute.logic.manage.freegen.table.xls.DfXlsTableLoader;
  */
 public enum DfFreeGenResourceType {
 
-    PROP, XLS, FILE_PATH, JSON_KEY, JSON_SCHEMA, SOLR, ELASTICSEARCH, MAIL_FLUTE, PM_FILE, LASTA_DOC;
+    PROP, XLS, FILE_PATH, JSON_KEY, JSON_SCHEMA, SOLR, ELASTICSEARCH, MAIL_FLUTE, PM_FILE, LASTA_DOC, WEB_CLS;
 
     public static final Map<DfFreeGenResourceType, DfFreeGenTableLoader> tableLoaderMap;
     static {
@@ -49,5 +50,6 @@ public enum DfFreeGenResourceType {
         tableLoaderMap.put(DfFreeGenResourceType.MAIL_FLUTE, new DfMailFluteTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.PM_FILE, new DfPmFileTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.LASTA_DOC, new DfLastaDocTableLoader());
+        tableLoaderMap.put(DfFreeGenResourceType.WEB_CLS, new DfWebClsTableLoader());
     }
 }

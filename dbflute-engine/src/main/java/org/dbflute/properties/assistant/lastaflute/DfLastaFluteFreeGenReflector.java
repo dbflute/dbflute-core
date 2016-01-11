@@ -136,6 +136,8 @@ public final class DfLastaFluteFreeGenReflector {
                         setupHtmlPathGen(appName, path, lastafluteMap);
                     } else if ("doc".equals(freeGen)) {
                         setupDocGen(appName, path, lastaDocOutputDirectory);
+                    } else if ("webcls".equals(freeGen)) {
+                        setupWebClsGen(appName, path, lastafluteMap);
                     } else {
                         String msg = "Unkonwn type for appMap's freeGen: " + freeGen;
                         throw new DfIllegalPropertySettingException(msg);
@@ -420,6 +422,28 @@ public final class DfLastaFluteFreeGenReflector {
         tableMap.put("path", path);
         tableMap.put("targetDir", "$$baseDir$$/java");
         tableMap.put("appName", appName);
+    }
+
+    // ===================================================================================
+    //                                                                              WebCls
+    //                                                                              ======
+    protected void setupWebClsGen(String appName, String path, Map<String, Object> lastafluteMap) {
+        final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
+        final String capAppName = initCap(appName);
+        registerFreeGen(capAppName + "WebCls", pathMap);
+        final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
+        pathMap.put("resourceMap", resourceMap);
+        resourceMap.put("baseDir", path + "/src/main");
+        resourceMap.put("resourceFile", "$$baseDir$$/resources/" + appName + "_webcls.dfprop");
+        resourceMap.put("resourceType", DfFreeGenResourceType.WEB_CLS.name());
+        final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
+        pathMap.put("outputMap", outputMap);
+        outputMap.put("templateFile", "LaWebCDef.vm");
+        outputMap.put("outputDirectory", "$$baseDir$$/java");
+        outputMap.put("package", _mylastaPackage + ".action");
+        outputMap.put("className", "WebCDef");
+        final Map<String, Object> tableMap = createTableMap();
+        pathMap.put("tableMap", tableMap);
     }
 
     // ===================================================================================

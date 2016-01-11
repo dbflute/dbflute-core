@@ -90,6 +90,7 @@ public class DfClassificationTop {
     protected boolean _deprecated;
     protected final Map<String, Map<String, Object>> _groupingMap = new LinkedHashMap<String, Map<String, Object>>();
     protected final Map<String, String> _deprecatedMap = new LinkedHashMap<String, String>();
+    protected final List<DfRefClsElement> _refClsElementList = new ArrayList<DfRefClsElement>(); // for webCls
 
     // ===================================================================================
     //                                                                              Accept
@@ -674,5 +675,16 @@ public class DfClassificationTop {
 
     public void putDeprecatedAll(Map<String, String> deprecatedMap) {
         _deprecatedMap.putAll(deprecatedMap);
+    }
+
+    // -----------------------------------------------------
+    //                                     RefClsElementList
+    //                                     -----------------
+    public List<DfRefClsElement> getRefClsElementList() { // for webCls
+        return _refClsElementList;
+    }
+
+    public void addRefClsElement(DfRefClsElement classificationElement) {
+        _refClsElementList.add(classificationElement);
     }
 }

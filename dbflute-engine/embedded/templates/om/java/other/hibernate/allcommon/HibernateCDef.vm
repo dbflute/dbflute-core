@@ -64,7 +64,7 @@ public interface ${glCDef} {
         ,
 #end
         /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
-        ${classificationElement.name}($database.buildClassificationCodeAliasSisterCodeVariables($classificationElement))
+        ${classificationElement.name}($classificationElement.buildClassificationCodeAliasSisterCodeVariables())
 #set ($count = $count + 1)
 #end
         ;

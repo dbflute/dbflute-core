@@ -1007,41 +1007,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     }
 
     public String buildClassificationCodeAliasVariables(DfClassificationElement classificationElement) {
-        final StringBuilder sb = new StringBuilder();
-        final String code = classificationElement.getCode();
-        final String alias = classificationElement.getAlias();
-        sb.append("\"").append(code).append("\"");
-        if (alias != null && alias.trim().length() > 0) {
-            sb.append(", \"").append(alias).append("\"");
-        } else {
-            sb.append(", null");
-        }
-        return sb.toString();
+        return classificationElement.buildClassificationCodeAliasVariables();
     }
 
     public String buildClassificationCodeAliasSisterCodeVariables(DfClassificationElement classificationElement) {
-        final StringBuilder sb = new StringBuilder();
-        final String codeAliasVariables = buildClassificationCodeAliasVariables(classificationElement);
-        sb.append(codeAliasVariables);
-        final String[] sisters = classificationElement.getSisters();
-        sb.append(", ");
-        if (sisters != null && sisters.length > 0) {
-            sb.append("new String[] {");
-            if (sisters != null && sisters.length > 0) {
-                int index = 0;
-                for (String sister : sisters) {
-                    if (index > 0) {
-                        sb.append(", ");
-                    }
-                    sb.append("\"").append(sister).append("\"");
-                    ++index;
-                }
-            }
-            sb.append("}");
-        } else {
-            sb.append("EMPTY_SISTERS");
-        }
-        return sb.toString();
+        return classificationElement.buildClassificationCodeAliasSisterCodeVariables();
     }
 
     public String buildClassificationCodeNameAliasVariables(DfClassificationElement classificationElement) {

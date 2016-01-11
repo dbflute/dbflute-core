@@ -123,7 +123,7 @@ object ${glCDef} {
 #if ($classificationElement.isDeprecated())
         @Deprecated
 #end
-        case object ${classificationElement.name} extends ${classificationName}($database.buildClassificationCodeAliasSisterCodeVariables($classificationElement));
+        case object ${classificationElement.name} extends ${classificationName}($classificationElement.buildClassificationCodeAliasSisterCodeVariables());
 #end
 
         private val _codeValueMap: Map[String, ${classificationName}] = new HashMap();
