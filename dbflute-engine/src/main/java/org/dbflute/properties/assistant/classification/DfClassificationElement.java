@@ -318,7 +318,14 @@ public class DfClassificationElement {
     //                                                                      ==============
     @Override
     public String toString() {
-        return _classificationName + ":{" + _table + ", " + _code + ", " + _name + ", " + _alias + ", " + _comment + "}";
+        final String clsType = _table != null ? "table(" + _table + ")" : "implicit";
+        final StringBuilder sb = new StringBuilder();
+        sb.append(_classificationName);
+        sb.append(":{").append(clsType);
+        sb.append(", code=").append(_code).append(", name=").append(_name);
+        sb.append(", alias=").append(_alias).append(", comment=").append(_comment);
+        sb.append("}");
+        return sb.toString();
     }
 
     // ===================================================================================

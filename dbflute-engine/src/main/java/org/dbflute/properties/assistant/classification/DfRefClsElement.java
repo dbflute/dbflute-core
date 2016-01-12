@@ -98,20 +98,29 @@ public class DfRefClsElement { // for webCls
             br.addItem("Advice");
             br.addElement("The codes of the web classification should be included");
             br.addElement("in the DB classification because of refType='exists'.");
+            br.addElement("For example:");
+            br.addElement("  (x): web(A), db(B, C)");
+            br.addElement("  (x): web(A, B), db(A, C)");
+            br.addElement("  (x): web(A, B, C), db(A, B)");
+            br.addElement("  (o): web(A), db(A, B)");
+            br.addElement("  (o): web(A, B), db(A, B, C)");
+            br.addElement("  (o): web(A, B, C), db(A, B, C)");
             br.addItem("WebCls");
-            br.addElement(classificationTop.getClassificationName());
-            br.addElement(classificationTop.getClassificationElementList().stream().map(element -> {
+            final String webCodes = classificationTop.getClassificationElementList().stream().map(element -> {
                 return element.getCode();
-            }).collect(Collectors.toList()));
+            }).collect(Collectors.joining(", "));
+            br.addElement(classificationTop.getClassificationName() + ": " + webCodes);
             br.addItem("DBCls");
-            br.addElement(_dbClsTop.getClassificationName());
-            br.addElement(_dbClsTop.getClassificationElementList().stream().map(element -> {
+            final String dbCodes = _dbClsTop.getClassificationElementList().stream().map(element -> {
                 return element.getCode();
-            }).collect(Collectors.toList()));
+            }).collect(Collectors.joining(", "));
+            br.addElement(_dbClsTop.getClassificationName() + ": " + dbCodes);
             br.addItem("Ref Type");
             br.addElement(_refType);
             br.addItem("Non-Existing Code");
-            br.addElement(nonExistingList);
+            br.addElement(nonExistingList.stream().map(element -> {
+                return element.getCode();
+            }).collect(Collectors.joining(", ")));
             final String msg = br.buildExceptionMessage();
             throw new DfIllegalPropertySettingException(msg);
         }
@@ -120,7 +129,7 @@ public class DfRefClsElement { // for webCls
     protected void checkRefMatches(DfClassificationTop classificationTop) {
         final List<DfClassificationElement> webElementList = classificationTop.getClassificationElementList();
         final List<DfClassificationElement> dbElementList = _dbClsTop.getClassificationElementList();
-        boolean hasNonExisting = webElementList.stream().anyMatch(webElement -> {
+        final boolean hasNonExisting = webElementList.stream().anyMatch(webElement -> {
             return !dbElementList.stream().anyMatch(dbElement -> {
                 return webElement.getCode().equals(dbElement.getCode());
             });
@@ -131,16 +140,21 @@ public class DfRefClsElement { // for webCls
             br.addItem("Advice");
             br.addElement("The codes of the web classification should match");
             br.addElement("with DB classification because of refType='matches'.");
+            br.addElement("For example:");
+            br.addElement("  (x): web(A), db(A, C)");
+            br.addElement("  (x): web(A, B), db(A, C)");
+            br.addElement("  (o): web(A, B), db(A, B)");
+            br.addElement("  (o): web(A, B, C), db(A, B, C)");
             br.addItem("WebCls");
-            br.addElement(classificationTop.getClassificationName());
-            br.addElement(classificationTop.getClassificationElementList().stream().map(element -> {
+            final String webCodes = classificationTop.getClassificationElementList().stream().map(element -> {
                 return element.getCode();
-            }).collect(Collectors.toList()));
+            }).collect(Collectors.joining(", "));
+            br.addElement(classificationTop.getClassificationName() + ": " + webCodes);
             br.addItem("DBCls");
-            br.addElement(_dbClsTop.getClassificationName());
-            br.addElement(_dbClsTop.getClassificationElementList().stream().map(element -> {
+            final String dbCodes = _dbClsTop.getClassificationElementList().stream().map(element -> {
                 return element.getCode();
-            }).collect(Collectors.toList()));
+            }).collect(Collectors.joining(", "));
+            br.addElement(_dbClsTop.getClassificationName() + ": " + dbCodes);
             br.addItem("Ref Type");
             br.addElement(_refType);
             br.addItem("Code Count");
@@ -155,7 +169,8 @@ public class DfRefClsElement { // for webCls
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _projectName + ", " + _classificationName + ", " + _classificationType + ", " + _refType + "}";
+        final String projectExp = _projectName != null ? "(" + _projectName + ")" : "";
+        return "{" + projectExp + _classificationName + ", " + _refType + "}";
     }
 
     // ===================================================================================

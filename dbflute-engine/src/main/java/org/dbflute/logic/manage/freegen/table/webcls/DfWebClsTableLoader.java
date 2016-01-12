@@ -126,6 +126,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
                     } else {
                         literalArranger.arrange(classificationName, elementMap);
                         final DfClassificationElement element = new DfClassificationElement();
+                        element.setClassificationName(classificationName);
                         element.acceptBasicItemMap(elementMap);
                         classificationTop.addClassificationElement(element);
                     }
