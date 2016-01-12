@@ -346,8 +346,8 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("tableMap", tableMap);
         tableMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, "template", "targetDir"));
         tableMap.put("targetExt", filterOverridden("." + ext, lastafluteMap, appName, "template", "targetExt"));
-        tableMap.put("isConventionSuffix", "true");
-        tableMap.put("isLastaTemplate", "true");
+        tableMap.put("isConventionSuffix", getTrueLiteral());
+        tableMap.put("isLastaTemplate", getTrueLiteral());
     }
 
     protected String buildPmTemplateBeanPackage(String appName, Map<String, Object> lastafluteMap) {
@@ -386,9 +386,11 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("className", initCap(appName) + "HtmlPath");
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
-        tableMap.put("targetDir", targetDir);
-        tableMap.put("targetExt", ext.equals("html") ? ".html" : ("." + ext + "|.html"));
-        tableMap.put("exceptPathList", DfCollectionUtil.newArrayList("contain:/view/common/"));
+        tableMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, ext, "targetDir"));
+        final String targetExt = ext.equals("html") ? ".html" : ("." + ext + "|.html");
+        tableMap.put("targetExt", filterOverridden(targetExt, lastafluteMap, appName, ext, "targetExt"));
+        final List<String> exceptPathList = DfCollectionUtil.newArrayList("contain:/view/common/");
+        tableMap.put("exceptPathList", filterOverridden(exceptPathList, lastafluteMap, appName, ext, "exceptPathList"));
     }
 
     protected String buildHtmlTemplatePackage(String appName, Map<String, Object> lastafluteMap, String ext) {
@@ -434,14 +436,15 @@ public final class DfLastaFluteFreeGenReflector {
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         pathMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
-        resourceMap.put("resourceFile", "$$baseDir$$/resources/" + appName + "_webcls.dfprop");
+        final String resourceFile = "$$baseDir$$/resources/" + appName + "_webcls.dfprop";
+        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, "webcls", "resourceFile"));
         resourceMap.put("resourceType", DfFreeGenResourceType.WEB_CLS.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaWebCDef.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
-        outputMap.put("package", _mylastaPackage + ".webcls");
-        outputMap.put("className", "WebCDef");
+        outputMap.put("package", filterOverridden(_mylastaPackage + ".webcls", lastafluteMap, appName, "webcls", "package"));
+        outputMap.put("className", filterOverridden("WebCDef", lastafluteMap, appName, "webcls", "className"));
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
     }
