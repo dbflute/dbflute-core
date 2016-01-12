@@ -29,11 +29,13 @@ import java.util.stream.Collectors;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.mapstring.MapListFile;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.dbflute.properties.assistant.classification.DfClassificationLiteralArranger;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
@@ -98,6 +100,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
         } catch (IOException e) {
             throw new DfIllegalPropertySettingException("Cannot read the the dfprop file: " + resourceFile, e);
         }
+        Map<String, DfClassificationTop> dbClsMap = null; // lazy load because it might be unused
         boolean hasRefCls = false;
         final DfClassificationLiteralArranger literalArranger = new DfClassificationLiteralArranger();
         final List<DfClassificationTop> topList = new ArrayList<DfClassificationTop>();
@@ -106,22 +109,31 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
             final DfClassificationTop classificationTop = new DfClassificationTop();
             topList.add(classificationTop);
             classificationTop.setClassificationName(classificationName);
+            DfRefClsElement refClsElement = null;
             @SuppressWarnings("unchecked")
             final List<Map<String, Object>> elementMapList = (List<Map<String, Object>>) entry.getValue();
             for (Map<String, Object> elementMap : elementMapList) {
                 if (isElementMapClassificationTop(elementMap)) {
                     classificationTop.acceptClassificationTopBasicItemMap(elementMap);
                 } else {
-                    final DfClassificationElement element = new DfClassificationElement();
                     if (isElementMapRefCls(elementMap)) {
-                        classificationTop.addRefClsElement(createRefClsElement(elementMap));
-                        hasRefCls = true;
+                        assertRefClsOnlyOne(classificationName, refClsElement, elementMap);
+                        if (dbClsMap == null) {
+                            dbClsMap = getClassificationProperties().getClassificationTopMap();
+                        }
+                        refClsElement = createRefClsElement(classificationName, elementMap, dbClsMap);
+                        handleRefCls(classificationTop, refClsElement);
                     } else {
                         literalArranger.arrange(classificationName, elementMap);
+                        final DfClassificationElement element = new DfClassificationElement();
                         element.acceptBasicItemMap(elementMap);
                         classificationTop.addClassificationElement(element);
                     }
                 }
+            }
+            if (refClsElement != null) {
+                refClsElement.checkRelationshipByRefTypeIfNeeds(classificationTop);
+                hasRefCls = true;
             }
         }
         tableMap.put("classificationTopList", topList);
@@ -137,16 +149,36 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
         return elementMap.get(DfClassificationTop.KEY_TOP_COMMENT) != null;
     }
 
+    // ===================================================================================
+    //                                                                              refCls
+    //                                                                              ======
     protected boolean isElementMapRefCls(Map<String, Object> elementMap) {
         return elementMap.get(DfRefClsElement.KEY_REFCLS) != null;
     }
 
-    protected DfRefClsElement createRefClsElement(Map<String, Object> elementMap) {
-        // TODO jflute webcls (2016/01/11)
+    protected void assertRefClsOnlyOne(String classificationName, DfRefClsElement refClsElement, Map<String, Object> elementMap) {
+        if (refClsElement != null) { // only-one refCls is supported #for_now
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Duplicate refCls in the web classification.");
+            br.addItem("Advice");
+            br.addElement("Only-one refCls is supported in one web classification.");
+            br.addItem("WebCls");
+            br.addElement(classificationName);
+            br.addItem("Existing refCls");
+            br.addElement(refClsElement);
+            br.addItem("Duplicate refCls");
+            br.addElement(elementMap);
+            final String msg = br.buildExceptionMessage();
+            throw new DfIllegalPropertySettingException(msg);
+        }
+    }
+
+    protected DfRefClsElement createRefClsElement(String classificationName, Map<String, Object> elementMap,
+            Map<String, DfClassificationTop> dbClsMap) {
         final String refCls = (String) elementMap.get(DfRefClsElement.KEY_REFCLS);
         final String projectName;
         final String refClsName;
-        if (refCls.contains("@")) {
+        if (refCls.contains("@")) { // #hope other schema's reference
             projectName = Srl.substringFirstFront(refCls, "@");
             refClsName = Srl.substringFirstRear(refCls, "@");
         } else {
@@ -154,14 +186,54 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
             refClsName = refCls;
         }
         final String classificationType = buildClassificationType(refClsName);
-        return new DfRefClsElement(projectName, refClsName, classificationType);
+        final String refType = (String) elementMap.get(DfRefClsElement.KEY_REFTYPE);
+        if (refType == null) {
+            String msg = "Not found the refType in refCls elementMap: " + classificationName + " " + elementMap;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+        final DfClassificationTop dbClsTop = findDBCls(classificationName, refClsName, dbClsMap);
+        return new DfRefClsElement(projectName, refClsName, classificationType, refType, dbClsTop);
     }
 
     protected String buildClassificationType(String refClsName) {
         return getBasicProperties().getProjectPrefix() + "CDef." + refClsName;
     }
 
+    protected DfClassificationTop findDBCls(String classificationName, String refClsName, Map<String, DfClassificationTop> dbClsMap) {
+        final DfClassificationTop refTop = dbClsMap.get(refClsName);
+        if (refTop == null) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Not found the DB classification for web classification.");
+            br.addItem("Advice");
+            br.addElement("Make sure your DB classification name.");
+            br.addItem("WebCls");
+            br.addElement(classificationName);
+            br.addItem("NotFound DBCls");
+            br.addElement(refClsName);
+            br.addItem("Existing DBCls");
+            br.addElement(dbClsMap.keySet());
+            final String msg = br.buildExceptionMessage();
+            throw new DfIllegalPropertySettingException(msg);
+        }
+        return refTop;
+    }
+
+    protected void handleRefCls(DfClassificationTop classificationTop, DfRefClsElement refClsElement) {
+        refClsElement.checkFormalRefType(classificationTop);
+        classificationTop.addRefClsElement(refClsElement);
+        if (refClsElement.isRefTypeIncluded()) {
+            classificationTop.addClassificationElementAll(refClsElement.getDBClsTop().getClassificationElementList());
+        }
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
     protected DfBasicProperties getBasicProperties() {
         return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
+    protected DfClassificationProperties getClassificationProperties() {
+        return DfBuildProperties.getInstance().getClassificationProperties();
     }
 }

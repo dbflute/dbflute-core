@@ -281,6 +281,39 @@ public class DfClassificationElement {
     }
 
     // ===================================================================================
+    //                                                                     Comment Builder
+    //                                                                     ===============
+    public String buildClassificationApplicationCommentForJavaDoc() {
+        final String comment = buildClassificationApplicationComment();
+        return getDocumentProperties().resolveTextForJavaDoc(comment, "    "); // basically indent is unused
+    }
+
+    public String buildClassificationApplicationCommentForSchemaHtml() {
+        final String comment = buildClassificationApplicationComment();
+        return getDocumentProperties().resolveTextForSchemaHtml(comment);
+    }
+
+    protected String buildClassificationApplicationComment() {
+        final StringBuilder sb = new StringBuilder();
+        if (hasAlias()) {
+            sb.append(getAlias());
+        }
+        if (hasCommentDisp()) {
+            if (sb.length() > 0) {
+                sb.append(": ");
+            }
+            final String comment = getCommentDisp();
+            final String filtered = Srl.replace(comment, "\n", comment); // just in case (basically one line)
+            sb.append(filtered);
+        }
+        return sb.toString();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return DfBuildProperties.getInstance().getDocumentProperties();
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override

@@ -890,14 +890,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                                                                         SubItem Map
     //                                                                         ===========
     public boolean hasClassificationSubItemMap(String classificationName) {
-        final List<DfClassificationElement> elementList = getClassificationElementList(classificationName);
-        for (DfClassificationElement element : elementList) {
-            final Map<String, Object> subItemMap = element.getSubItemMap();
-            if (subItemMap != null && !subItemMap.isEmpty()) {
-                return true;
-            }
-        }
-        return false;
+        return getClassificationTop(classificationName).hasSubItem();
     }
 
     public List<String> getClassificationSubItemList(Map<String, Object> classificationMap) {
@@ -997,13 +990,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     }
 
     public String buildClassificationApplicationCommentForJavaDoc(DfClassificationElement classificationElement) {
-        final String comment = buildClassificationApplicationComment(classificationElement);
-        return getDocumentProperties().resolveTextForJavaDoc(comment, "    "); // basically indent is unused
+        return classificationElement.buildClassificationApplicationCommentForJavaDoc();
     }
 
     public String buildClassificationApplicationCommentForSchemaHtml(DfClassificationElement classificationElement) {
-        final String comment = buildClassificationApplicationComment(classificationElement);
-        return getDocumentProperties().resolveTextForSchemaHtml(comment);
+        return classificationElement.buildClassificationApplicationCommentForSchemaHtml();
     }
 
     public String buildClassificationCodeAliasVariables(DfClassificationElement classificationElement) {

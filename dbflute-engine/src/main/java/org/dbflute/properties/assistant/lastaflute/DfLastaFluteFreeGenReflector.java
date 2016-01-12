@@ -440,7 +440,7 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("outputMap", outputMap);
         outputMap.put("templateFile", "LaWebCDef.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
-        outputMap.put("package", _mylastaPackage + ".action");
+        outputMap.put("package", _mylastaPackage + ".webcls");
         outputMap.put("className", "WebCDef");
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);

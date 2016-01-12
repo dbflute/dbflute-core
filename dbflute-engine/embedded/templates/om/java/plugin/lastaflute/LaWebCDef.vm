@@ -56,7 +56,7 @@ public interface ${glCDef} extends Classification {
 #if ($count != 0)
         ,
 #end
-        /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
+        /** ${classificationElement.buildClassificationApplicationCommentForJavaDoc()} */
 #if ($classificationElement.isDeprecated())
         @Deprecated
 #end
@@ -71,7 +71,7 @@ public interface ${glCDef} extends Classification {
                 for (String sister : value.sisterSet()) { _codeValueMap.put(sister.toLowerCase(), value); }
             }
         }
-#if ($database.hasClassificationSubItemMap($classificationName))
+#if ($classificationTop.hasSubItem())
         private static final Map<String, Map<String, Object>> _subItemMapMap = new HashMap<String, Map<String, Object>>();
         static {
 #foreach ($classificationElement in $classificationTop.classificationElementList)
@@ -95,7 +95,7 @@ public interface ${glCDef} extends Classification {
         { _code = code; _alias = alias; _sisterSet = Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(sisters))); }
         public String code() { return _code; } public String alias() { return _alias; }
         public Set<String> sisterSet() { return _sisterSet; }
-#if ($database.hasClassificationSubItemMap($classificationName))
+#if ($classificationTop.hasSubItem())
         public Map<String, Object> subItemMap() { return _subItemMapMap.get(code()); }
 #else
         public Map<String, Object> subItemMap() { return EMPTY_SUB_ITEM_MAP; }
@@ -195,11 +195,11 @@ public interface ${glCDef} extends Classification {
 #foreach ($refClsElement in $classificationTop.refClsElementList)
 
         /**
-         * @param dbCDef The classification definition for DB. (NullAllowed: if null, returns empty) 
+         * @param dbCls The DB classification to find. (NullAllowed: if null, returns empty) 
          * @return The the web classification corresponding to the DB classification. (NotNull, EmptyAllowed: when null specified, not found)
          */
-        public static OptionalThing<${classificationName}> fromDBCls${refClsElement.classificationName}(${refClsElement.classificationType} dbCDef) {
-            String dbCode = dbCDef != null ? dbCDef.code() : null;
+        public static OptionalThing<${classificationName}> fromDBCls(${refClsElement.classificationType} dbCls) {
+            String dbCode = dbCls != null ? dbCls.code() : null;
             return OptionalThing.ofNullable(codeOf(dbCode), () -> {
                 throw new IllegalStateException("Cannot convert ${refClsElement.classificationType} to ${classificationName} by the DB code: " + dbCode);
             });
@@ -208,7 +208,7 @@ public interface ${glCDef} extends Classification {
         /**
          * @return The DB classification corresponding to the web classification. (NotNull, EmptyAllowed: when no-related to DB)
          */
-        public OptionalThing<${refClsElement.classificationType}> toDBCls${refClsElement.classificationName}() {
+        public OptionalThing<${refClsElement.classificationType}> toDBCls() {
             String webCode = code();
             return OptionalThing.ofNullable(${refClsElement.classificationType}.codeOf(webCode), () -> {
                 throw new IllegalStateException("Cannot convert ${classificationName} to ${refClsElement.classificationName} by the web code: " + webCode);
