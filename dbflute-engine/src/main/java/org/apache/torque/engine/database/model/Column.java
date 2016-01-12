@@ -2462,7 +2462,7 @@ public class Column {
     }
 
     public boolean isMakeClassificationGetterOfAliasEnabled() { // for checking column name conflict
-        return hasClassificationName() && getTable().getColumn(getName() + "_ALIAS") == null;
+        return hasClassificationAlias() && getTable().getColumn(getName() + "_ALIAS") == null;
     }
 
     public String getClassificationName() {
