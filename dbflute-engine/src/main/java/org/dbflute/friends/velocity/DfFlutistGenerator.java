@@ -211,7 +211,7 @@ public class DfFlutistGenerator extends DfGenerator {
                 return newContent;
             }
 
-            final File oldFile = new File(getOutputPath() + "/" + outputFile);
+            final File oldFile = new File(buildOutputFullPath(outputFile));
             if (oldFile.exists()) { // then it might skip to generate if it's completely same
                 final String oldContent = new String(getBytes(oldFile), specifiedOutputEncoding);
                 if (newContent.equals(oldContent)) {
@@ -232,17 +232,22 @@ public class DfFlutistGenerator extends DfGenerator {
     }
 
     protected Writer findOutputWriter(String outputFile, String specifiedOutputEncoding) throws Exception {
-        Writer writer = null;
+        final String uniqueKey = buildOutputFullPath(outputFile);
+        final Writer writer;
         if (writers.get(outputFile) == null) {
             // We have never seen this file before so create a new file writer for it.
             writer = getWriter(getOutputPath() + File.separator + outputFile, specifiedOutputEncoding);
 
             // Place the file writer in our collection of file writers.
-            writers.put(outputFile, writer);
+            writers.put(uniqueKey, writer);
         } else {
-            writer = (Writer) writers.get(outputFile);
+            writer = (Writer) writers.get(uniqueKey);
         }
         return writer;
+    }
+
+    protected String buildOutputFullPath(String outputFile) {
+        return getOutputPath() + "/" + outputFile;
     }
 
     protected String resolveLineSeparatorIfNeeds(String contents) {
