@@ -37,6 +37,7 @@ import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.dbflute.properties.assistant.classification.DfClassificationGroup;
 import org.dbflute.properties.assistant.classification.DfClassificationLiteralArranger;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.properties.assistant.classification.DfRefClsElement;
@@ -179,12 +180,26 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
         final String refCls = (String) elementMap.get(DfRefClsElement.KEY_REFCLS);
         final String projectName;
         final String refClsName;
+        final String groupName;
         if (refCls.contains("@")) { // #hope other schema's reference
             projectName = Srl.substringFirstFront(refCls, "@");
-            refClsName = Srl.substringFirstRear(refCls, "@");
+            final String rearName = Srl.substringFirstRear(refCls, "@");
+            if (rearName.contains(".")) {
+                refClsName = Srl.substringFirstFront(rearName, ".");
+                groupName = Srl.substringFirstRear(rearName, ".");
+            } else {
+                refClsName = rearName;
+                groupName = null;
+            }
         } else {
             projectName = null;
-            refClsName = refCls;
+            if (refCls.contains(".")) {
+                refClsName = Srl.substringFirstFront(refCls, ".");
+                groupName = Srl.substringFirstRear(refCls, ".");
+            } else {
+                refClsName = refCls;
+                groupName = null;
+            }
         }
         final String classificationType = buildClassificationType(refClsName);
         final String refType = (String) elementMap.get(DfRefClsElement.KEY_REFTYPE);
@@ -193,7 +208,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
             throw new DfIllegalPropertySettingException(msg);
         }
         final DfClassificationTop dbClsTop = findDBCls(classificationName, refClsName, dbClsMap);
-        return new DfRefClsElement(projectName, refClsName, classificationType, refType, dbClsTop);
+        return new DfRefClsElement(projectName, refClsName, classificationType, groupName, refType, dbClsTop);
     }
 
     protected String buildClassificationType(String refClsName) {
@@ -223,7 +238,21 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
         refClsElement.checkFormalRefType(classificationTop);
         classificationTop.addRefClsElement(refClsElement);
         if (refClsElement.isRefTypeIncluded()) {
-            classificationTop.addClassificationElementAll(refClsElement.getDBClsTop().getClassificationElementList());
+            final DfClassificationTop dbClsTop = refClsElement.getDBClsTop();
+            final String groupName = refClsElement.getGroupName();
+            if (groupName != null) {
+                final DfClassificationGroup group = dbClsTop.getGroupList().stream().filter(gr -> {
+                    return gr.getGroupName().equals(groupName);
+                }).findFirst().orElseThrow(() -> {
+                    String msg = "Not found the group";
+                    return new DfIllegalPropertySettingException(msg);
+                });
+                classificationTop.addClassificationElementAll(group.getElementList());
+            } else {
+                final List<DfClassificationElement> dbElementList = dbClsTop.getClassificationElementList();
+                classificationTop.addClassificationElementAll(dbElementList);
+                classificationTop.acceptGroupList(dbClsTop.getGroupList());
+            }
         }
     }
 

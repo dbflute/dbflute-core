@@ -288,6 +288,10 @@ public class DfClassificationTop {
     //                                                                        ============
     protected List<DfClassificationGroup> _cachedGroupList;
 
+    public void acceptGroupList(List<DfClassificationGroup> _cachedGroupList) { // for e.g. webcls
+        this._cachedGroupList = _cachedGroupList;
+    }
+
     public List<DfClassificationGroup> getGroupList() {
         if (_cachedGroupList != null) {
             return _cachedGroupList;

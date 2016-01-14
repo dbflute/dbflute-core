@@ -39,17 +39,19 @@ public class DfRefClsElement { // for webCls
     protected final String _projectName;
     protected final String _classificationName;
     protected final String _classificationType;
+    protected final String _groupName; // null allowed
     protected final String _refType;
     protected final DfClassificationTop _dbClsTop;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfRefClsElement(String projectName, String classificationName, String classificationType, String refType,
+    public DfRefClsElement(String projectName, String classificationName, String classificationType, String groupName, String refType,
             DfClassificationTop dbClsTop) {
         _projectName = projectName;
         _classificationName = classificationName;
         _classificationType = classificationType;
+        _groupName = groupName;
         _refType = refType;
         _dbClsTop = dbClsTop;
     }
@@ -186,6 +188,10 @@ public class DfRefClsElement { // for webCls
 
     public String getClassificationType() {
         return _classificationType;
+    }
+
+    public String getGroupName() {
+        return _groupName;
     }
 
     public boolean isRefTypeExists() {
