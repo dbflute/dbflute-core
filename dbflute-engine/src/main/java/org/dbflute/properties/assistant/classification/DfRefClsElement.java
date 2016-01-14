@@ -202,7 +202,7 @@ public class DfRefClsElement { // for webCls
         return _refType.equals("matches");
     }
 
-    public boolean isRefTypeIncluded() { // as default
+    public boolean isRefTypeIncluded() {
         return _refType.equals("included");
     }
 

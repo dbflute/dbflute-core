@@ -19,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -47,32 +46,6 @@ import org.dbflute.util.Srl;
  * @author jflute
  */
 public class DfWebClsTableLoader implements DfFreeGenTableLoader {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    // *very similar logic also exists on MailFlute
-    public static final String META_DELIMITER = ">>>";
-    public static final String COMMENT_BEGIN = "/*";
-    public static final String COMMENT_END = "*/";
-    public static final String TITLE_BEGIN = "[";
-    public static final String TITLE_END = "]";
-    public static final String SUBJECT_LABEL = "subject:";
-    public static final String OPTION_LABEL = "option:";
-    public static final String PLUS_HTML_OPTION = "+html";
-    public static final String PROPDEF_PREFIX = "-- !!";
-    // option check is not here because it can be added in MailFlute
-    //public static final Set<String> optionSet;
-    //static {
-    //    optionSet = Collections.unmodifiableSet(DfCollectionUtil.newLinkedHashSet(PLUS_HTML_OPTION));
-    //}
-    public static final List<String> allowedPrefixList; // except first line (comment)
-    static {
-        allowedPrefixList = Arrays.asList(OPTION_LABEL, PROPDEF_PREFIX);
-    }
-    protected static final String LF = "\n";
-    protected static final String CR = "\r";
-    protected static final String CRLF = "\r\n";
 
     // ===================================================================================
     //                                                                          Load Table
@@ -244,7 +217,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
                 final DfClassificationGroup group = dbClsTop.getGroupList().stream().filter(gr -> {
                     return gr.getGroupName().equals(groupName);
                 }).findFirst().orElseThrow(() -> {
-                    String msg = "Not found the group";
+                    String msg = "Not found the group name: " + refClsElement.getClassificationName() + "." + groupName;
                     return new DfIllegalPropertySettingException(msg);
                 });
                 classificationTop.addClassificationElementAll(group.getElementList());
