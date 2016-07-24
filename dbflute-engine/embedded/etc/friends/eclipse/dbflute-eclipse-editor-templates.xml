@@ -69,7 +69,7 @@ public JsonResponse&lt;${bean}&gt; ${method}(Long ${object}Id, ${body}Body body)
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for DerivedReferrer" enabled="true" name="derivedCBLambda">${table}CB -&gt; {
     ${table}CB.specify().column${Column}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Entity" enabled="true" name="entityLambda">${table} -&gt; {
-    ${var}.${method}
+    ${table}.${method}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Entity List" enabled="true" name="entityListLambda">${table}List -&gt; {
     ${cursor}
 }</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for general Error Response" enabled="true" name="errorResponseLambda">() -&gt; {
