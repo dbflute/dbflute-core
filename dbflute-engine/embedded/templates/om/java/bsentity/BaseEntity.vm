@@ -78,31 +78,31 @@ import ${table.relationalNullObjectProviderPackage}.*;
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
- * 
+ *
  * [column]
  *     ${table.columnNameCommaString}
- * 
+ *
  * [sequence]
  *     ${table.definedSequenceName}
- * 
+ *
  * [identity]
  *     ${table.identityColumnName}
- * 
+ *
  * [version-no]
  *     ${table.versionNoColumnName}
- * 
+ *
  * [foreign table]
  *     ${table.foreignTableNameCommaString}
- * 
+ *
  * [referrer table]
  *     ${table.referrerTableNameCommaString}
- * 
+ *
  * [foreign property]
  *     ${table.foreignPropertyNameCommaString}
- * 
+ *
  * [referrer property]
  *     ${table.referrerPropertyNameCommaString}
- * 
+ *
  * [get/set template]
  * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #foreach ($col in $table.columns)
@@ -499,7 +499,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 
     /** {@inheritDoc} */
     public void disableColumnNullObject() {
-        _columnNullObjectEnabled = true;
+        _columnNullObjectEnabled = false;
     }
 #end
 
@@ -666,7 +666,8 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
         if (_columnNullObjectEnabled && convertEmptyToNull(_${col.uncapitalisedJavaName}) == null)
         { _${col.uncapitalisedJavaName} = ${col.columnNullObjectProviderExp}; }
 #else
-        if (_${col.uncapitalisedJavaName} == null) { _${col.uncapitalisedJavaName} = ${col.columnNullObjectProviderExp}; }
+        if (_columnNullObjectEnabled && _${col.uncapitalisedJavaName} == null)
+        { _${col.uncapitalisedJavaName} = ${col.columnNullObjectProviderExp}; }
 #end
 #end
 #if ($col.isEntityConvertEmptyStringToNull())
