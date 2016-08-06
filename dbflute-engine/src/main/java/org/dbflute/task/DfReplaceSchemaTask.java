@@ -311,8 +311,9 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     protected DfTakeFinallyProcess createTakeFinallyProcess(String sqlRootDir, boolean previous) {
         if (previous) {
             return DfTakeFinallyProcess.createAsPrevious(sqlRootDir, getDataSource());
+        } else {
+            return DfTakeFinallyProcess.createAsCore(sqlRootDir, getDataSource());
         }
-        return DfTakeFinallyProcess.createAsCore(sqlRootDir, getDataSource());
     }
 
     protected void setupReplaceSchemaFinalInfo() {

@@ -117,10 +117,12 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     public static DfTakeFinallyProcess createAsPrevious(final String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
         final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null);
-        return process.suppressSequenceIncrement().rollbackTransaction();
+        // previous may not match with current sequence definition
+        // and other settings are same as core
+        return process.suppressSequenceIncrement();
     }
 
-    public static DfTakeFinallyProcess createAsAlterCheck(final String sqlRootDir, DataSource dataSource) {
+    public static DfTakeFinallyProcess createAsAlterSchema(final String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
         final DfTakeFinallySqlFileProvider provider = new DfTakeFinallySqlFileProvider() {
             public List<File> provide() {
@@ -128,7 +130,9 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
             }
         };
         final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, provider);
-        return process.restrictIfNonAssetionSql();
+        // this take-finally is only for assertion (so roll-back transaction)
+        // but increment sequences for development after AlterCheck
+        return process.restrictIfNonAssetionSql().rollbackTransaction();
     }
 
     protected DfTakeFinallyProcess suppressSequenceIncrement() {

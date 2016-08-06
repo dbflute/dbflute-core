@@ -831,7 +831,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                          ------------
     protected void takeFinally(DfAlterCheckFinalInfo finalInfo) {
         final String sqlRootDir = getMigrationAlterDirectory();
-        final DfTakeFinallyProcess process = DfTakeFinallyProcess.createAsAlterCheck(sqlRootDir, _dataSource);
+        final DfTakeFinallyProcess process = DfTakeFinallyProcess.createAsAlterSchema(sqlRootDir, _dataSource);
         final DfTakeFinallyFinalInfo takeFinally = process.execute();
         finalInfo.addAlterSqlFileAll(takeFinally.getTakeFinallySqlFileList());
         reflectTakeFinallyResultToFinalInfo(finalInfo, takeFinally);
