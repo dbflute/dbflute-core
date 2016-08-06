@@ -114,6 +114,12 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         return process.suppressSequenceIncrement().skipIfNonAssetionSql().rollbackTransaction().continueIfAssetionFailure();
     }
 
+    public static DfTakeFinallyProcess createAsPrevious(final String sqlRootDir, DataSource dataSource) {
+        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
+        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null);
+        return process.suppressSequenceIncrement().rollbackTransaction();
+    }
+
     public static DfTakeFinallyProcess createAsAlterCheck(final String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
         final DfTakeFinallySqlFileProvider provider = new DfTakeFinallySqlFileProvider() {
@@ -122,7 +128,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
             }
         };
         final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, provider);
-        return process.suppressSequenceIncrement().restrictIfNonAssetionSql().rollbackTransaction();
+        return process.restrictIfNonAssetionSql();
     }
 
     protected DfTakeFinallyProcess suppressSequenceIncrement() {
