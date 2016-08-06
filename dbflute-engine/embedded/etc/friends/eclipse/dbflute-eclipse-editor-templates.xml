@@ -6,7 +6,20 @@
     ${cursor}
 });</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda KeyValue as Inline" enabled="true" name="_kvli">(key, value) -&gt; ${cursor}</template><template autoinsert="true" context="java" deleted="false" description="Java8: Lambda KeyValue as Linefeed" enabled="true" name="_kvll">(key, value) -&gt; {
     ${cursor}
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as HTML response with ID and Form" enabled="true" name="_lahtml">${:import(org.lastaflute.web.Execute
+}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for Anything" enabled="true" name="_ladany">${:import(javax.annotation.Resource)}@Resource
+private ${component} anything;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for AsyncManager" enabled="true" name="_ladasync">${:import(javax.annotation.Resource,org.lastaflute.core.magic.async.AsyncManager)}@Resource
+private AsyncManager asyncManager;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for Application Config" enabled="true" name="_ladconfig">${:import(javax.annotation.Resource)}@Resource
+private ${app}Config config;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for CookieManager" enabled="true" name="_ladcookie">${:import(javax.annotation.Resource,org.lastaflute.web.servlet.cookie.CookieManager)}@Resource
+private CookieManager cookieManager;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for MessageManager" enabled="true" name="_ladmessage">${:import(javax.annotation.Resource,org.lastaflute.core.message.MessageManager)}@Resource
+private MessageManager messageManager;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for Postbox" enabled="true" name="_ladpostbox">${:import(javax.annotation.Resource,org.lastaflute.core.mail.Postbox)}@Resource
+private Postbox postbox;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for PrimaryCipher" enabled="true" name="_ladprimcipher">${:import(javax.annotation.Resource,org.lastaflute.core.security.PrimaryCipher)}@Resource
+private PrimaryCipher primaryCipher;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for RequestManager" enabled="true" name="_ladrequest">${:import(javax.annotation.Resource,org.lastaflute.web.servlet.request.RequestManager)}@Resource
+private RequestManager requestManager;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for ResponseManager" enabled="true" name="_ladresponse">${:import(javax.annotation.Resource,org.lastaflute.web.servlet.request.ResponseManager)}@Resource
+private ResponseManager responseManager;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for SessionManager" enabled="true" name="_ladsession">${:import(javax.annotation.Resource,org.lastaflute.web.servlet.session.SessionManager)}@Resource
+private SessionManager sessionManager;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for TemplateManager" enabled="true" name="_ladtemplate">${:import(javax.annotation.Resource,org.lastaflute.core.template.TemplateManager)}@Resource
+private TemplateManager templateManager;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: DI for TimeManager" enabled="true" name="_ladtime">${:import(javax.annotation.Resource,org.lastaflute.core.time.TimeManager)}@Resource
+private TimeManager timeManager;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute DI for TransactionStage" enabled="true" name="_ladtransaction">${:import(javax.annotation.Resource,org.lastaflute.db.jta.stage.TransactionStage)}@Resource
+private TransactionStage transactionStage;</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Execute Method as HTML response with ID and Form" enabled="true" name="_lahtml">${:import(org.lastaflute.web.Execute
     , org.lastaflute.web.response.HtmlResponse)}@Execute
 public HtmlResponse ${method}(Long ${object}Id, ${form}Form form) {
     return asHtml(path_${newName});
@@ -60,7 +73,14 @@ public JsonResponse&lt;${bean}&gt; ${method}(Long ${object}Id, ${body}Body body)
     //                                                                              Update
     //                                                                              ======</template><template autoinsert="true" context="java" deleted="false" description="Validation methods for Action" enabled="true" name="_tavalid">    // ===================================================================================
     //                                                                          Validation
-    //                                                                          ==========</template><template autoinsert="true" context="java" deleted="false" description="TODO comment" enabled="true" name="_todo">    // TODO ${user} ${cursor} (${date})</template><template autoinsert="true" context="java" deleted="false" description="TODO review comment" enabled="true" name="_trev">    // TODO ${newName} ${cursor} by ${user} (${date})</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQueryAndPart" enabled="true" name="andCBLambda">andCB -&gt; {
+    //                                                                          ==========</template><template autoinsert="true" context="java" deleted="false" description="Unit Test for UTFlute" enabled="true" name="_test">public void test_${name}() {
+	// ## Arrange ##
+	${cursor}
+
+	// ## Act ##
+
+	// ## Assert ##
+}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQueryAndPart" enabled="true" name="andCBLambda">andCB -&gt; {
     andCB.query().set${Column}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ConditionBean" enabled="true" name="cbLambda">cb -&gt; {
     cb.${method}
@@ -72,8 +92,6 @@ public JsonResponse&lt;${bean}&gt; ${method}(Long ${object}Id, ${body}Body body)
     ${table}.${method}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Entity List" enabled="true" name="entityListLambda">${table}List -&gt; {
     ${cursor}
-}</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for general Error Response" enabled="true" name="errorResponseLambda">() -&gt; {
-    return asHtml(path_${newName});
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ReferrerLoader" enabled="true" name="loaderLambda">${base}Loader -&gt; {
     ${base}Loader.load${Referrer}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for many arguments" enabled="true" name="manyArgLambda">(${arg1}, ${arg2}) -&gt; {
@@ -97,8 +115,6 @@ public JsonResponse&lt;${bean}&gt; ${method}(Long ${object}Id, ${body}Body body)
     postcard.addTo(${toAddress});
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Referrer" enabled="true" name="refCBLambda">${referrer}CB -&gt; {
     ${referrer}CB.query().addOrderBy_${Column}
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ScalarCondition" enabled="true" name="scalarCBLambda">${table}CB -&gt; {
-    ${table}CB.specify().column${Column}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for SubQuery" enabled="true" name="subCBLambda">${table}CB -&gt; {
     ${table}CB.query().set${Column}
 }</template><template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Transaction Stage" enabled="true" name="txLambda">tx -&gt; {
