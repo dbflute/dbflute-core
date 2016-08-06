@@ -136,6 +136,8 @@ public final class DfLastaFluteFreeGenReflector {
                         setupHtmlPathGen(appName, path, lastafluteMap);
                     } else if ("doc".equals(freeGen)) {
                         setupDocGen(appName, path, lastaDocOutputDirectory);
+                    } else if ("appcls".equals(freeGen)) {
+                        setupAppClsGen(appName, path, lastafluteMap);
                     } else if ("webcls".equals(freeGen)) {
                         setupWebClsGen(appName, path, lastafluteMap);
                     } else {
@@ -424,6 +426,29 @@ public final class DfLastaFluteFreeGenReflector {
         tableMap.put("path", path);
         tableMap.put("targetDir", "$$baseDir$$/java");
         tableMap.put("appName", appName);
+    }
+
+    // ===================================================================================
+    //                                                                              AppCls
+    //                                                                              ======
+    protected void setupAppClsGen(String appName, String path, Map<String, Object> lastafluteMap) {
+        final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
+        final String capAppName = initCap(appName);
+        registerFreeGen(capAppName + "AppCls", pathMap);
+        final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
+        pathMap.put("resourceMap", resourceMap);
+        resourceMap.put("baseDir", path + "/src/main");
+        final String resourceFile = "$$baseDir$$/resources/" + appName + "_appcls.dfprop";
+        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, "appcls", "resourceFile"));
+        resourceMap.put("resourceType", DfFreeGenResourceType.APP_CLS.name());
+        final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
+        pathMap.put("outputMap", outputMap);
+        outputMap.put("templateFile", "LaAppCDef.vm");
+        outputMap.put("outputDirectory", "$$baseDir$$/java");
+        outputMap.put("package", filterOverridden(_mylastaPackage + ".appcls", lastafluteMap, appName, "appcls", "package"));
+        outputMap.put("className", filterOverridden("AppCDef", lastafluteMap, appName, "appcls", "className"));
+        final Map<String, Object> tableMap = createTableMap();
+        pathMap.put("tableMap", tableMap);
     }
 
     // ===================================================================================

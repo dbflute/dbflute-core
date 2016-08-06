@@ -18,6 +18,8 @@ package org.dbflute.logic.manage.freegen;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.dbflute.logic.manage.freegen.table.appcls.DfAppClsTableLoader;
+import org.dbflute.logic.manage.freegen.table.appcls.DfWebClsTableLoader;
 import org.dbflute.logic.manage.freegen.table.elasticsearch.DfElasticsearchTableLoader;
 import org.dbflute.logic.manage.freegen.table.filepath.DfFilePathTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonKeyTableLoader;
@@ -27,7 +29,6 @@ import org.dbflute.logic.manage.freegen.table.mailflute.DfMailFluteTableLoader;
 import org.dbflute.logic.manage.freegen.table.pmfile.DfPmFileTableLoader;
 import org.dbflute.logic.manage.freegen.table.prop.DfPropTableLoader;
 import org.dbflute.logic.manage.freegen.table.solr.DfSolrXmlTableLoader;
-import org.dbflute.logic.manage.freegen.table.webcls.DfWebClsTableLoader;
 import org.dbflute.logic.manage.freegen.table.xls.DfXlsTableLoader;
 
 /**
@@ -35,7 +36,7 @@ import org.dbflute.logic.manage.freegen.table.xls.DfXlsTableLoader;
  */
 public enum DfFreeGenResourceType {
 
-    PROP, XLS, FILE_PATH, JSON_KEY, JSON_SCHEMA, SOLR, ELASTICSEARCH, MAIL_FLUTE, PM_FILE, LASTA_DOC, WEB_CLS;
+    PROP, XLS, FILE_PATH, JSON_KEY, JSON_SCHEMA, SOLR, ELASTICSEARCH, MAIL_FLUTE, PM_FILE, LASTA_DOC, APP_CLS, WEB_CLS;
 
     public static final Map<DfFreeGenResourceType, DfFreeGenTableLoader> tableLoaderMap;
     static {
@@ -50,6 +51,7 @@ public enum DfFreeGenResourceType {
         tableLoaderMap.put(DfFreeGenResourceType.MAIL_FLUTE, new DfMailFluteTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.PM_FILE, new DfPmFileTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.LASTA_DOC, new DfLastaDocTableLoader());
+        tableLoaderMap.put(DfFreeGenResourceType.APP_CLS, new DfAppClsTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.WEB_CLS, new DfWebClsTableLoader());
     }
 }

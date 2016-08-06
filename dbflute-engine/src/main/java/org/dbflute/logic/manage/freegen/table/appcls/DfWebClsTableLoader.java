@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.manage.freegen.table.webcls;
+package org.dbflute.logic.manage.freegen.table.appcls;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -43,6 +43,7 @@ import org.dbflute.properties.assistant.classification.DfRefClsElement;
 import org.dbflute.util.Srl;
 
 /**
+ * basically use AppCls, this is the sub function.
  * @author jflute
  */
 public class DfWebClsTableLoader implements DfFreeGenTableLoader {
