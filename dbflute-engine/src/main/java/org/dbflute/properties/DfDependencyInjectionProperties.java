@@ -111,6 +111,22 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
     }
 
     // ===================================================================================
+    //                                                                    Filter Component
+    //                                                                    ================
+    public String filterRuntimeComponentPrefix(String componentName) {
+        if (getBasicProperties().isTargetContainerSpring()) {
+            final String prefix = getDBFluteBeansRuntimeComponentPrefix();
+            if (prefix == null || prefix.trim().length() == 0) {
+                return componentName;
+            }
+            final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
+            return filteredPrefix + componentName.substring(0, 1).toUpperCase() + componentName.substring(1);
+        } else {
+            return componentName;
+        }
+    }
+
+    // ===================================================================================
     //                                                                       Dicon(Seasar)
     //                                                                       =============
     public String getDBFluteDiconNamespace() { // Java Only
@@ -243,6 +259,11 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
 
     public boolean isDBFluteBeansJavaConfigLazy() { // closet, Java Only, for compatible
         return isProperty("isDBFluteBeansJavaConfigLazy", true); // default: lazy
+    }
+
+    protected String getDBFluteBeansRuntimeComponentPrefix() { // Java Only
+        // #for_now only for XML style now, needs adjustment of JavaConfig class's component name
+        return getProperty("dbfluteBeansRuntimeComponentPrefix", null);
     }
 
     // ===================================================================================
