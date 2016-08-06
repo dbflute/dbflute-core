@@ -28,7 +28,7 @@ import ${tableMap.allcommonPackage}.*;
 
 #set ($glCDef = "${request.className}")
 /**
- * The definition of app classification.
+ * The definition of application classification.
  * @author FreeGen
  */
 public interface ${glCDef} extends Classification {
