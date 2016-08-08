@@ -291,7 +291,8 @@ public interface ${glCDef} extends Classification {
 
         public static ${glCDef}.DefMeta meta(String classificationName) { // instead of valueOf()
             if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
-#foreach ($classificationName in $table.classificationNameList)
+#foreach ($classificationName in $tableMap.classificationNameList)
+#set ($classificationName = $classificationTop.classificationName)
             if ("${classificationName}".equalsIgnoreCase(classificationName)) { return ${glCDef}.DefMeta.${classificationName}; }
 #end
             throw new IllegalStateException("Unknown classification: " + classificationName);
