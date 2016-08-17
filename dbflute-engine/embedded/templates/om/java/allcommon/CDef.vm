@@ -21,6 +21,7 @@ import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationCodeType;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
+import org.dbflute.optional.OptionalThing;
 
 /**
  * The definition of classification.
@@ -60,10 +61,12 @@ public interface ${glCDef} extends Classification {
 #end
         ;
         private static final Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
+        private static final Map<String, ${classificationName}> _nameValueMap = new HashMap<String, ${classificationName}>();
         static {
             for (${classificationName} value : values()) {
                 _codeValueMap.put(value.code().toLowerCase(), value);
                 for (String sister : value.sisterSet()) { _codeValueMap.put(sister.toLowerCase(), value); }
+                _nameValueMap.put(value.name().toLowerCase(), value);
             }
         }
 #if ($database.hasClassificationSubItemMap($classificationName))
@@ -134,6 +137,32 @@ public interface ${glCDef} extends Classification {
         }
 
         /**
+         * Get the classification of the code. (CaseInsensitive)
+         * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns empty)
+         * @return The optional classification corresponding to the code. (NotNull, EmptyAllowed: if not found, returns empty)
+         */
+        public static OptionalThing<${classificationName}> of(Object code) {
+            if (code == null) { return OptionalThing.ofNullable(null, () -> throw new ClassificationNotFoundException("null code specified")); }
+            if (code instanceof ${classificationName}) { return OptionalThing.of((${classificationName})code); }
+            if (code instanceof OptionalThing<?>) { return of(((OptionalThing<?>)code).orElse(null)); }
+            return OptionalThing.ofNullable(_codeValueMap.get(code.toString().toLowerCase()), () ->{
+                throw new ClassificationNotFoundException("Unknown classification code: " + code);
+            });
+        }
+
+        /**
+         * Find the classification by the name. (CaseInsensitive)
+         * @param name The string of name, which is case-insensitive. (NotNull)
+         * @return The optional classification corresponding to the name. (NotNull, EmptyAllowed: if not found, returns empty)
+         */
+        public static OptionalThing<${classificationName}> byName(String name) {
+            if (name == null) { throw new IllegalArgumentException("The argument 'name' should not be null."); }
+            return OptionalThing.ofNullable(_nameValueMap.get(name.toLowerCase()), () ->{
+                throw new ClassificationNotFoundException("Unknown classification name: " + name);
+            });
+        }
+
+        /**
          * Get the classification by the code. (CaseInsensitive)
          * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
          * @return The instance of the corresponding classification to the code. (NullAllowed: if not found, returns null)
@@ -161,6 +190,19 @@ public interface ${glCDef} extends Classification {
         public static List<${classificationName}> listAll() {
             return new ArrayList<${classificationName}>(Arrays.asList(values()));
         }
+
+        /**
+         * Get the list of classification elements in the specified group. (returns new copied list) <br>
+         * @param groupName The string of group name, which is case-insensitive. (NotNull)
+         * @return The snapshot list of classification elements in the group. (NotNull, EmptyAllowed: if not found, throws exception)
+         */
+        public static List<${classificationName}> listByGroup(String groupName) {
+            if (groupName == null) { throw new IllegalArgumentException("The argument 'groupName' should not be null."); }
+#foreach ($group in $classificationTop.groupList)
+            if ("${group.groupName}".equalsIgnoreCase(groupName)) { return listOf${group.groupNameInitCap}(); }
+#end
+            throw new ClassificationNotFoundException("Unknown classification group: ${classificationName}." + groupName);
+        }
 #foreach ($group in $classificationTop.groupList)
 
         /**
@@ -180,6 +222,7 @@ public interface ${glCDef} extends Classification {
          * Get the list of classification elements in the specified group. (returns new copied list) <br>
          * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
          * @return The snapshot list of classification elements in the group. (NotNull, EmptyAllowed: if the group is not found)
+         * @deprecated use listByGroup()
          */
         public static List<${classificationName}> groupOf(String groupName) {
 #foreach ($group in $classificationTop.groupList)
@@ -210,14 +253,28 @@ public interface ${glCDef} extends Classification {
             return name(); // same as definition name
         }
 
-        public Classification codeOf(Object code) {
+        public OptionalThing<Classification> classificationOf(Object code) {
+#foreach ($classificationName in $database.classificationNameList)
+            if ("${classificationName}".equals(name())) { return ${glCDef}.${classificationName}.of(code); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+
+        public OptionalThing<Classification> classificationByName(String name) {
+#foreach ($classificationName in $database.classificationNameList)
+            if ("${classificationName}".equals(name())) { return ${glCDef}.${classificationName}.byName(name); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+
+        public Classification codeOf(Object code) { // null if not found
 #foreach ($classificationName in $database.classificationNameList)
             if ("${classificationName}".equals(name())) { return ${glCDef}.${classificationName}.codeOf(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
-        public Classification nameOf(String name) {
+        public Classification nameOf(String name) { // null if not found
 #foreach ($classificationName in $database.classificationNameList)
             if ("${classificationName}".equals(name())) { return ${glCDef}.${classificationName}.valueOf(name); }
 #end
@@ -261,12 +318,29 @@ public interface ${glCDef} extends Classification {
             return ClassificationUndefinedHandlingType.LOGGING; // as default
         }
 
+        public static OptionalThing<${glCDef}.DefMeta> byName(String classificationName) { // instead of valueOf()
+            if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
+#foreach ($classificationName in $database.classificationNameList)
+            if ("${classificationName}".equalsIgnoreCase(classificationName)) { return OptionalThing.of(${glCDef}.DefMeta.${classificationName}); }
+#end
+            return OptionalThing.ofNullable(null, () -> {
+                throw new ClassificationNotFoundException("Unknown classification: " + classificationName);
+            });
+        }
+
         public static ${glCDef}.DefMeta meta(String classificationName) { // instead of valueOf()
             if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
 #foreach ($classificationName in $database.classificationNameList)
             if ("${classificationName}".equalsIgnoreCase(classificationName)) { return ${glCDef}.DefMeta.${classificationName}; }
 #end
             throw new IllegalStateException("Unknown classification: " + classificationName);
+        }
+    }
+
+    public static class ClassificationNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        public ClassificationNotFoundException(String msg) {
+            super(msg);
         }
     }
 }
