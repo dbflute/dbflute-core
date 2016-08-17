@@ -142,7 +142,7 @@ public interface ${glCDef} extends Classification {
          * @return The optional classification corresponding to the code. (NotNull, EmptyAllowed: if not found, returns empty)
          */
         public static OptionalThing<${classificationName}> of(Object code) {
-            if (code == null) { return OptionalThing.ofNullable(null, () -> throw new ClassificationNotFoundException("null code specified")); }
+            if (code == null) { return OptionalThing.ofNullable(null, () -> { throw new ClassificationNotFoundException("null code specified"); }); }
             if (code instanceof ${classificationName}) { return OptionalThing.of((${classificationName})code); }
             if (code instanceof OptionalThing<?>) { return of(((OptionalThing<?>)code).orElse(null)); }
             return OptionalThing.ofNullable(_codeValueMap.get(code.toString().toLowerCase()), () ->{
@@ -253,14 +253,14 @@ public interface ${glCDef} extends Classification {
             return name(); // same as definition name
         }
 
-        public OptionalThing<Classification> classificationOf(Object code) {
+        public OptionalThing<? extends Classification> classificationOf(Object code) {
 #foreach ($classificationName in $database.classificationNameList)
             if ("${classificationName}".equals(name())) { return ${glCDef}.${classificationName}.of(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
-        public OptionalThing<Classification> classificationByName(String name) {
+        public OptionalThing<? extends Classification> classificationByName(String name) {
 #foreach ($classificationName in $database.classificationNameList)
             if ("${classificationName}".equals(name())) { return ${glCDef}.${classificationName}.byName(name); }
 #end
