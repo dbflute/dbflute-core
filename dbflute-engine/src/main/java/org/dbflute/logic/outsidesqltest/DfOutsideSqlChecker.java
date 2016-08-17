@@ -42,8 +42,9 @@ public class DfOutsideSqlChecker {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final String EMECHA_DEFAULT_TITLE = "SQL title here.";
-    private static final String EMECHA_DEFAULT_DESCRIPTION = "SQL Description here.";
+    // without dot here to ignore it (actual value's dot is removed when check)
+    private static final String EMECHA_DEFAULT_TITLE = "SQL title here";
+    private static final String EMECHA_DEFAULT_DESCRIPTION = "SQL description here";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -181,7 +182,11 @@ public class DfOutsideSqlChecker {
     }
 
     protected boolean isInvalidTitle(String title) {
-        return Srl.is_Null_or_TrimmedEmpty(title) || EMECHA_DEFAULT_TITLE.equalsIgnoreCase(title.trim());
+        if (Srl.is_Null_or_TrimmedEmpty(title)) {
+            return true;
+        } else {
+            return EMECHA_DEFAULT_TITLE.equalsIgnoreCase(Srl.rtrim(title.trim(), ".")); // also ignore dot
+        }
     }
 
     protected void throwRequiredOutsideSqlTitleNotFoundException(String title, String fileName, String sql) {
@@ -260,7 +265,11 @@ public class DfOutsideSqlChecker {
     }
 
     protected boolean isInvalidDescription(String desc) {
-        return Srl.is_Null_or_TrimmedEmpty(desc) || EMECHA_DEFAULT_DESCRIPTION.equalsIgnoreCase(desc.trim());
+        if (Srl.is_Null_or_TrimmedEmpty(desc)) {
+            return true;
+        } else {
+            return EMECHA_DEFAULT_DESCRIPTION.equalsIgnoreCase(Srl.rtrim(desc.trim(), ".")); // also ignore dot
+        }
     }
 
     protected void throwRequiredOutsideSqlDescriptionNotFoundException(String desc, String fileName, String sql) {
