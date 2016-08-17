@@ -17,6 +17,7 @@ package org.dbflute.logic.replaceschema.loaddata.impl;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.torque.engine.database.model.TypeMap;
+import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.dbflute.system.DBFluteSystem;
@@ -41,6 +44,7 @@ public class DfColumnValueConverter {
     protected final Map<String, String> _defaultValueMap;
     protected final DfColumnBindTypeProvider _bindTypeProvider;
     protected Map<String, String> _allColumnConvertMap; // derived lazily
+    protected Map<String, Map<String, String>> _typedColumnConvertMap; // derived lazily
     protected boolean _emptyToNullIfNoConvert;
 
     public DfColumnValueConverter(Map<String, Map<String, String>> convertValueMap, Map<String, String> defaultValueMap,
@@ -92,7 +96,7 @@ public class DfColumnValueConverter {
         if (_convertValueMap == null || _convertValueMap.isEmpty()) {
             return plainValue;
         }
-        final Map<String, String> valueMapping = findConvertValueMapping(columnName);
+        final Map<String, String> valueMapping = findConvertValueMapping(columnName, columnMetaMap);
         if (valueMapping == null || valueMapping.isEmpty()) {
             return plainValue;
         }
@@ -205,28 +209,52 @@ public class DfColumnValueConverter {
         return value;
     }
 
-    protected Map<String, String> findConvertValueMapping(String columnName) {
-        if (_allColumnConvertMap == null) { // initialize
-            _allColumnConvertMap = _convertValueMap.get("$$ALL$$");
-            if (_allColumnConvertMap == null) {
-                _allColumnConvertMap = new HashMap<String, String>();
-            }
-        }
+    protected Map<String, String> findConvertValueMapping(String columnName, Map<String, DfColumnMeta> columnMetaMap) {
         // convertValueMap should be case insensitive (or flexible) map
         // (must be already resolved here)
-        final Map<String, String> resultMap = _convertValueMap.get(columnName);
-        if (resultMap != null && !resultMap.isEmpty()) {
-            if (!_allColumnConvertMap.isEmpty()) {
-                final Map<String, String> mergedMap = new HashMap<String, String>();
-                mergedMap.putAll(_allColumnConvertMap);
-                mergedMap.putAll(resultMap); // override if same value
-                return mergedMap;
-            } else {
-                return resultMap;
+        final Map<String, String> allMap = findeAllColumnConvertMap();
+        final Map<String, String> typedMap = findTypedColumnConvertMap(columnName, columnMetaMap);
+        final Map<String, String> columnMap = _convertValueMap.getOrDefault(columnName, Collections.emptyMap());
+        inheritMap(columnMap, inheritMap(typedMap, allMap));
+        return columnMap;
+    }
+
+    protected Map<String, String> findeAllColumnConvertMap() {
+        if (_allColumnConvertMap != null) {
+            return _allColumnConvertMap;
+        }
+        _allColumnConvertMap = _convertValueMap.getOrDefault("$$ALL$$", Collections.emptyMap());
+        return _allColumnConvertMap;
+    }
+
+    protected Map<String, String> findTypedColumnConvertMap(String columnName, Map<String, DfColumnMeta> columnMetaMap) {
+        final DfColumnMeta meta = columnMetaMap.get(columnName);
+        if (meta == null) { // no way, just in case
+            throw new IllegalStateException("Not found the column meta: " + columnName);
+        }
+        final String jdbcType = TypeMap.findJdbcTypeByJdbcDefValue(meta.getJdbcDefValue());
+        if (jdbcType == null) { // basically no way!?, just in case
+            return Collections.emptyMap(); // as not found
+        }
+        if (_typedColumnConvertMap != null) {
+            final Map<String, String> existingMap = _typedColumnConvertMap.get(jdbcType);
+            if (existingMap != null) {
+                return existingMap;
             }
         } else {
-            return !_allColumnConvertMap.isEmpty() ? _allColumnConvertMap : null;
+            _typedColumnConvertMap = StringKeyMap.createAsCaseInsensitive();
         }
+        final String typedKey = "$$type(" + jdbcType + ")$$"; // e.g. $$type(VARCHAR)$$
+        final Map<String, String> valueMap = _convertValueMap.getOrDefault(typedKey, Collections.emptyMap());
+        _typedColumnConvertMap.put(jdbcType, valueMap);
+        return _typedColumnConvertMap.get(jdbcType);
+    }
+
+    protected Map<String, String> inheritMap(Map<String, String> subMap, Map<String, String> superMap) {
+        final Map<String, String> mergedMap = new HashMap<String, String>();
+        mergedMap.putAll(superMap);
+        mergedMap.putAll(subMap); // override if same value
+        return mergedMap;
     }
 
     // ===================================================================================
