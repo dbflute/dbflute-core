@@ -499,6 +499,50 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
     public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object vl);
 #end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${fk.foreignLambdaSubQueryCBName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up InScopeRelation (sub-query). <br />
+     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param ${relatedLambdaName} The callback for sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
+     */
+    public void inScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}", false);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${fk.foreignLambdaSubQueryCBName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up NotInScopeRelation (sub-query). <br />
+     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param ${relatedLambdaName} The callback for sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
+     */
+    public void notInScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}", true);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+#end
 #end
 #if (${col.isJavaNativeNumberObject()})
     /**
@@ -869,6 +913,50 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
     public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object vl);
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${fk.foreignLambdaSubQueryCBName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up InScopeRelation (sub-query). <br />
+     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param ${relatedLambdaName} The callback for sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
+     */
+    public void inScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}", false);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${fk.foreignLambdaSubQueryCBName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up NotInScopeRelation (sub-query). <br />
+     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param ${relatedLambdaName} The callback for sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
+     */
+    public void notInScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", pp, "${fk.foreignPropertyName}", true);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
 #end
 #end
 #if (${col.isJavaNativeDateObject()})
