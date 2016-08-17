@@ -428,7 +428,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         assertOldStyleAdditionalSchema();
         _additionalSchemaMap = StringKeyMap.createAsCaseInsensitive();
         final Map<String, Object> additionalSchemaMap = getVairousStringKeyMap("additionalSchemaMap");
-        if (additionalSchemaMap == null) {
+        if (additionalSchemaMap.isEmpty()) {
             return _additionalSchemaMap;
         }
         final Set<Entry<String, Object>> entrySet = additionalSchemaMap.entrySet();
@@ -612,8 +612,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                 Type Mapping Facade
     //                                                                 ===================
-    public Map<String, Object> getTypeMappingFacadeMap() { // null allowed
-        return getVairousStringKeyMap("typeMappingMap", null);
+    public Map<String, Object> getTypeMappingFacadeMap() { // not null
+        return getVairousStringKeyMap("typeMappingMap");
     }
 
     // ===================================================================================
@@ -709,7 +709,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     @SuppressWarnings("unchecked")
-    protected Map<String, Object> getVairousStringKeyMap(String key) {
+    protected Map<String, Object> getVairousStringKeyMap(String key) { // not null
         return getVairousStringKeyMap(key, Collections.EMPTY_MAP);
     }
 
@@ -717,7 +717,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     protected Map<String, Object> getVairousStringKeyMap(String key, Map<String, Object> defaultMap) {
         final Object value = getVariousObject(key);
         if (value == null) {
-            return defaultMap != null ? defaultMap : Collections.EMPTY_MAP;
+            return defaultMap;
         }
         assertVariousPropertyMap(key, value);
         return (Map<String, Object>) value;

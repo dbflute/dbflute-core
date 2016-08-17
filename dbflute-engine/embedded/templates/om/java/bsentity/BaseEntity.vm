@@ -484,7 +484,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 ##
 ## it uses List and ArrayList to be able to specify detail import clause
 ##
-    protected <ELEMENT> List<ELEMENT> newReferrerList() {
+    protected <ELEMENT> List<ELEMENT> newReferrerList() { // overriding to import
         return new ArrayList<ELEMENT>();
     }
 #if (${table.canBeColumnNullObject()})

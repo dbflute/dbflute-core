@@ -48,13 +48,11 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
         if (_typeMappingMap == null) {
             Map<String, Object> map = mapProp("torque." + KEY_typeMappingMap, null);
             if (map == null) {
-                map = getDatabaseProperties().getTypeMappingFacadeMap();
-                if (map == null) {
-                    map = prepareDefaultMappingMap();
-                }
+                map = getDatabaseProperties().getTypeMappingFacadeMap(); // not null
             }
             _typeMappingMap = newLinkedHashMap();
-            _typeMappingMap.putAll(map);
+            _typeMappingMap.putAll(prepareDefaultMappingMap());
+            _typeMappingMap.putAll(map); // overriding default if specified
         }
         return _typeMappingMap;
     }
