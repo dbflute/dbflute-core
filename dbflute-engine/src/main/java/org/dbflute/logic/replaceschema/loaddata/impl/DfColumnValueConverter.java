@@ -48,6 +48,7 @@ public class DfColumnValueConverter {
     protected final DfColumnBindTypeProvider _bindTypeProvider;
     protected Map<String, String> _allColumnConvertMap; // derived lazily
     protected Map<String, Map<String, String>> _typedColumnConvertMap; // derived lazily
+    protected boolean emptyBeforeAsNull; // for compatible with old TSV settings e.g. $$empty$$ = $$empty$$
 
     // ===================================================================================
     //                                                                         Constructor
@@ -57,6 +58,10 @@ public class DfColumnValueConverter {
         _convertValueMap = convertValueMap;
         _defaultValueMap = defaultValueMap;
         _bindTypeProvider = bindTypeProvider;
+    }
+
+    public void treatEmptyBeforeAsNull() {
+        emptyBeforeAsNull = true;
     }
 
     // ===================================================================================
@@ -98,7 +103,7 @@ public class DfColumnValueConverter {
         final String containMark = DfNameHintUtil.CONTAIN_MARK;
         for (Entry<String, String> entry : valueMapping.entrySet()) {
             final String before = entry.getKey();
-            final String after = resolveVariable(entry.getValue());
+            final String after = resolveVariableAsAfter(entry.getValue());
 
             final String typed = processType(tableName, columnName, columnMetaMap, filteredValue, before, after);
             if (typed != null) {
@@ -108,7 +113,7 @@ public class DfColumnValueConverter {
             }
 
             if (Srl.startsWithIgnoreCase(before, containMark)) {
-                final String realBefore = resolveVariable(Srl.substringFirstRear(before, containMark));
+                final String realBefore = resolveVariableAsBefore(Srl.substringFirstRear(before, containMark));
                 if (realBefore == null) {
                     throw new IllegalStateException("Cannot use contain:$$null$$: " + tableName + "." + columnName);
                 }
@@ -117,7 +122,7 @@ public class DfColumnValueConverter {
                     converted = true;
                 }
             } else {
-                final String realBefore = resolveVariable(before);
+                final String realBefore = resolveVariableAsBefore(before);
                 if (filteredValue != null && filteredValue.equals(realBefore)) {
                     filteredValue = after;
                     converted = true;
@@ -147,9 +152,19 @@ public class DfColumnValueConverter {
         return plainValue.toString();
     }
 
-    protected String resolveVariable(String value) {
+    protected String resolveVariableAsAfter(String value) {
         if ("$$empty$$".equalsIgnoreCase(value)) {
             return "";
+        }
+        if ("$$null$$".equalsIgnoreCase(value)) {
+            return null;
+        }
+        return value;
+    }
+
+    protected String resolveVariableAsBefore(String value) {
+        if ("$$empty$$".equalsIgnoreCase(value)) {
+            return emptyBeforeAsNull ? null : "";
         }
         if ("$$null$$".equalsIgnoreCase(value)) {
             return null;

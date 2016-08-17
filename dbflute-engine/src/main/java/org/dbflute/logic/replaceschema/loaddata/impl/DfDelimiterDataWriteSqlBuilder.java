@@ -90,6 +90,7 @@ public class DfDelimiterDataWriteSqlBuilder {
         //}
         adjustColumnValueBeforeConvert(columnValueMap);
         final DfColumnValueConverter converter = createColumnValueConverter();
+        converter.treatEmptyBeforeAsNull(); // for compatible with e.g. $$empty$$ = $$empty$$
         converter.convert(_tableDbName, columnValueMap, _columnMetaMap);
     }
 
