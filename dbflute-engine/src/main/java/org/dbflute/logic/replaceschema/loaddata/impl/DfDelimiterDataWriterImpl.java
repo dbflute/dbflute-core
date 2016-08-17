@@ -169,7 +169,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         lineString = preContinueString + "\n" + lineString;
                     }
                     final ValueLineInfo valueLineInfo = arrangeValueList(lineString, _delimiter);
-                    final List<String> ls = valueLineInfo.getValueList();
+                    final List<String> ls = valueLineInfo.getValueList(); // empty string resolved later
                     if (valueLineInfo.isContinueNextLine()) {
                         preContinueString = ls.remove(ls.size() - 1);
                         valueList.addAll(ls);

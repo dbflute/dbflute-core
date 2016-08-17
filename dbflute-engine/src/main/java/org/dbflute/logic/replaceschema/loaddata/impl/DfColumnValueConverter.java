@@ -40,13 +40,18 @@ import org.dbflute.util.Srl;
  */
 public class DfColumnValueConverter {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final Map<String, Map<String, String>> _convertValueMap;
     protected final Map<String, String> _defaultValueMap;
     protected final DfColumnBindTypeProvider _bindTypeProvider;
     protected Map<String, String> _allColumnConvertMap; // derived lazily
     protected Map<String, Map<String, String>> _typedColumnConvertMap; // derived lazily
-    protected boolean _emptyToNullIfNoConvert;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfColumnValueConverter(Map<String, Map<String, String>> convertValueMap, Map<String, String> defaultValueMap,
             DfColumnBindTypeProvider bindTypeProvider) {
         _convertValueMap = convertValueMap;
@@ -54,22 +59,17 @@ public class DfColumnValueConverter {
         _bindTypeProvider = bindTypeProvider;
     }
 
-    public DfColumnValueConverter emptyToNullIfNoConvert() {
-        _emptyToNullIfNoConvert = true;
-        return this;
-    }
-
+    // ===================================================================================
+    //                                                                             Convert
+    //                                                                             =======
     public void convert(String tableName, Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap) {
         final Map<String, Object> resolvedMap = new LinkedHashMap<String, Object>(columnValueMap.size());
         final Set<String> convertedSet = new HashSet<String>(1);
         for (Entry<String, Object> entry : columnValueMap.entrySet()) {
             final String columnName = entry.getKey();
-            final Object plainValue = entry.getValue();
+            final Object plainValue = entry.getValue(); // null allowed
             Object resolvedValue = resolveConvertValue(tableName, columnName, plainValue, convertedSet, columnMetaMap);
             if (convertedSet.isEmpty()) { // if no convert
-                if (_emptyToNullIfNoConvert) {
-                    resolvedValue = filterEmptyAsNull(resolvedValue);
-                }
                 resolvedValue = resolveDefaultValue(columnName, resolvedValue);
             } else {
                 convertedSet.clear(); // recycle
@@ -79,13 +79,6 @@ public class DfColumnValueConverter {
         for (Entry<String, Object> entry : resolvedMap.entrySet()) { // to keep original map instance
             columnValueMap.put(entry.getKey(), entry.getValue());
         }
-    }
-
-    protected Object filterEmptyAsNull(Object value) {
-        if (value instanceof String && Srl.isEmpty((String) value)) {
-            return null;
-        }
-        return value;
     }
 
     // ===================================================================================
@@ -100,7 +93,7 @@ public class DfColumnValueConverter {
         if (valueMapping == null || valueMapping.isEmpty()) {
             return plainValue;
         }
-        String filteredValue = prepareStringPlainValue(plainValue);
+        String filteredValue = prepareStringPlainValue(plainValue); // null allowed
         boolean converted = false;
         final String containMark = DfNameHintUtil.CONTAIN_MARK;
         for (Entry<String, String> entry : valueMapping.entrySet()) {
@@ -116,6 +109,9 @@ public class DfColumnValueConverter {
 
             if (Srl.startsWithIgnoreCase(before, containMark)) {
                 final String realBefore = resolveVariable(Srl.substringFirstRear(before, containMark));
+                if (realBefore == null) {
+                    throw new IllegalStateException("Cannot use contain:$$null$$: " + tableName + "." + columnName);
+                }
                 if (filteredValue != null && filteredValue.contains(realBefore)) {
                     filteredValue = Srl.replace(filteredValue, realBefore, (after != null ? after : ""));
                     converted = true;
@@ -133,9 +129,9 @@ public class DfColumnValueConverter {
         }
         if (converted) {
             convertedSet.add("converted");
-            return filteredValue;
+            return filteredValue; // null allowed
         } else {
-            return plainValue;
+            return plainValue; // null allowed
         }
     }
 
@@ -151,54 +147,6 @@ public class DfColumnValueConverter {
         return plainValue.toString();
     }
 
-    protected String processType(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap, String filteredValue,
-            String before, String after) {
-        String processed = null;
-
-        processed = processTimestamp(tableName, columnName, columnMetaMap, filteredValue, before, after);
-        if (processed != null) {
-            return processed;
-        }
-
-        return null;
-    }
-
-    protected String processTimestamp(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap, String filteredValue,
-            String before, String after) {
-        if (!"$$timestamp$$".equalsIgnoreCase(before)) {
-            return null;
-        }
-        final DfColumnMeta columnMeta = columnMetaMap.get(columnName);
-        final Class<?> boundType = _bindTypeProvider.provide(tableName, columnMeta);
-        if (!Timestamp.class.isAssignableFrom(boundType)) {
-            return null;
-        }
-        // process target here
-        if (after.equalsIgnoreCase("$$ZeroPrefixMillis$$")) { // DBFlute default
-            if (filteredValue != null && filteredValue.contains(".")) {
-                final String front = Srl.substringLastFront(filteredValue, ".");
-                final String millis = Srl.substringLastRear(filteredValue, ".");
-                if (millis.length() == 1) {
-                    filteredValue = front + ".00" + millis;
-                } else if (millis.length() == 2) {
-                    filteredValue = front + ".0" + millis;
-                }
-                return filteredValue; // processed
-            }
-        } else if (after.equalsIgnoreCase("$$ZeroSuffixMillis$$")) {
-            if (filteredValue != null && filteredValue.contains(".")) {
-                final String millis = Srl.substringLastRear(filteredValue, ".");
-                if (millis.length() == 1) {
-                    filteredValue = filteredValue + "00";
-                } else if (millis.length() == 2) {
-                    filteredValue = filteredValue + "0";
-                }
-                return filteredValue; // processed
-            }
-        }
-        return null; // no converted
-    }
-
     protected String resolveVariable(String value) {
         if ("$$empty$$".equalsIgnoreCase(value)) {
             return "";
@@ -209,6 +157,9 @@ public class DfColumnValueConverter {
         return value;
     }
 
+    // ===================================================================================
+    //                                                                       Value Mapping
+    //                                                                       =============
     protected Map<String, String> findConvertValueMapping(String columnName, Map<String, DfColumnMeta> columnMetaMap) {
         // convertValueMap should be case insensitive (or flexible) map
         // (must be already resolved here)
@@ -255,6 +206,77 @@ public class DfColumnValueConverter {
         mergedMap.putAll(superMap);
         mergedMap.putAll(subMap); // override if same value
         return mergedMap;
+    }
+
+    // ===================================================================================
+    //                                                                        Type Process
+    //                                                                        ============
+    protected String processType(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap, String filteredValue,
+            String before, String after) {
+        String processed = null;
+        processed = processString(tableName, columnName, columnMetaMap, filteredValue, before, after);
+        if (processed != null) {
+            return processed;
+        }
+        processed = processTimestamp(tableName, columnName, columnMetaMap, filteredValue, before, after);
+        if (processed != null) {
+            return processed;
+        }
+        return null;
+    }
+
+    protected String processString(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap, String filteredValue,
+            String before, String after) {
+        if (!"$$String$$".equalsIgnoreCase(before)) {
+            return null; // no converted
+        }
+        final DfColumnMeta columnMeta = columnMetaMap.get(columnName);
+        final Class<?> boundType = _bindTypeProvider.provide(tableName, columnMeta);
+        if (!String.class.isAssignableFrom(boundType)) {
+            return null; // no converted
+        }
+        if (after.equalsIgnoreCase("$$NullToEmpty$$")) {
+            if (filteredValue == null) {
+                return "";
+            }
+        }
+        return null; // no converted
+    }
+
+    protected String processTimestamp(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap, String filteredValue,
+            String before, String after) {
+        if (!"$$Timestamp$$".equalsIgnoreCase(before)) {
+            return null; // no converted
+        }
+        final DfColumnMeta columnMeta = columnMetaMap.get(columnName);
+        final Class<?> boundType = _bindTypeProvider.provide(tableName, columnMeta);
+        if (!Timestamp.class.isAssignableFrom(boundType)) {
+            return null; // no converted
+        }
+        // process target here
+        if (after.equalsIgnoreCase("$$ZeroPrefixMillis$$")) { // DBFlute default
+            if (filteredValue != null && filteredValue.contains(".")) {
+                final String front = Srl.substringLastFront(filteredValue, ".");
+                final String millis = Srl.substringLastRear(filteredValue, ".");
+                if (millis.length() == 1) {
+                    filteredValue = front + ".00" + millis;
+                } else if (millis.length() == 2) {
+                    filteredValue = front + ".0" + millis;
+                }
+                return filteredValue; // processed
+            }
+        } else if (after.equalsIgnoreCase("$$ZeroSuffixMillis$$")) {
+            if (filteredValue != null && filteredValue.contains(".")) {
+                final String millis = Srl.substringLastRear(filteredValue, ".");
+                if (millis.length() == 1) {
+                    filteredValue = filteredValue + "00";
+                } else if (millis.length() == 2) {
+                    filteredValue = filteredValue + "0";
+                }
+                return filteredValue; // processed
+            }
+        }
+        return null; // no converted
     }
 
     // ===================================================================================
