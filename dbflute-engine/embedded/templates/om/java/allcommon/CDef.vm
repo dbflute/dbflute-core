@@ -56,13 +56,13 @@ public interface ${glCDef} extends Classification {
 #set ($count = $count + 1)
 #end
         ;
-        private static final Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
-        private static final Map<String, ${classificationName}> _nameValueMap = new HashMap<String, ${classificationName}>();
+        private static final Map<String, ${classificationName}> _codeClsMap = new HashMap<String, ${classificationName}>();
+        private static final Map<String, ${classificationName}> _nameClsMap = new HashMap<String, ${classificationName}>();
         static {
             for (${classificationName} value : values()) {
-                _codeValueMap.put(value.code().toLowerCase(), value);
-                for (String sister : value.sisterSet()) { _codeValueMap.put(sister.toLowerCase(), value); }
-                _nameValueMap.put(value.name().toLowerCase(), value);
+                _codeClsMap.put(value.code().toLowerCase(), value);
+                for (String sister : value.sisterSet()) { _codeClsMap.put(sister.toLowerCase(), value); }
+                _nameClsMap.put(value.name().toLowerCase(), value);
             }
         }
 #if ($database.hasClassificationSubItemMap($classificationName))
@@ -141,7 +141,7 @@ public interface ${glCDef} extends Classification {
             if (code == null) { return OptionalThing.ofNullable(null, () -> { throw new ClassificationNotFoundException("null code specified"); }); }
             if (code instanceof ${classificationName}) { return OptionalThing.of((${classificationName})code); }
             if (code instanceof OptionalThing<?>) { return of(((OptionalThing<?>)code).orElse(null)); }
-            return OptionalThing.ofNullable(_codeValueMap.get(code.toString().toLowerCase()), () ->{
+            return OptionalThing.ofNullable(_codeClsMap.get(code.toString().toLowerCase()), () ->{
                 throw new ClassificationNotFoundException("Unknown classification code: " + code);
             });
         }
@@ -153,7 +153,7 @@ public interface ${glCDef} extends Classification {
          */
         public static OptionalThing<${classificationName}> byName(String name) {
             if (name == null) { throw new IllegalArgumentException("The argument 'name' should not be null."); }
-            return OptionalThing.ofNullable(_nameValueMap.get(name.toLowerCase()), () ->{
+            return OptionalThing.ofNullable(_nameClsMap.get(name.toLowerCase()), () ->{
                 throw new ClassificationNotFoundException("Unknown classification name: " + name);
             });
         }
@@ -167,7 +167,7 @@ public interface ${glCDef} extends Classification {
         public static ${classificationName} codeOf(Object code) {
             if (code == null) { return null; }
             if (code instanceof ${classificationName}) { return (${classificationName})code; }
-            return _codeValueMap.get(code.toString().toLowerCase());
+            return _codeClsMap.get(code.toString().toLowerCase());
         }
 
         /**
