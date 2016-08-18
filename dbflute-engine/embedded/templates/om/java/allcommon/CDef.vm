@@ -163,6 +163,7 @@ public interface ${glCDef} extends Classification {
         }
 
         /**
+         * <span style="color: #AD4747; font-size: 120%">Old style so use of(code).</span> <br>
          * Get the classification by the code. (CaseInsensitive)
          * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
          * @return The instance of the corresponding classification to the code. (NullAllowed: if not found, returns null)
@@ -174,6 +175,7 @@ public interface ${glCDef} extends Classification {
         }
 
         /**
+         * <span style="color: #AD4747; font-size: 120%">Old style so use byName(name).</span> <br>
          * Get the classification by the name (also called 'value' in ENUM world).
          * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
          * @return The instance of the corresponding classification to the name. (NullAllowed: if not found, returns null)
@@ -267,14 +269,14 @@ public interface ${glCDef} extends Classification {
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
-        public Classification codeOf(Object code) { // null if not found
+        public Classification codeOf(Object code) { // null if not found, old style so use classificationOf(code)
 #foreach ($classificationName in $database.classificationNameList)
             if ("${classificationName}".equals(name())) { return ${glCDef}.${classificationName}.codeOf(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
-        public Classification nameOf(String name) { // null if not found
+        public Classification nameOf(String name) { // null if not found, old style so use classificationByName(name)
 #foreach ($classificationName in $database.classificationNameList)
             if ("${classificationName}".equals(name())) { return ${glCDef}.${classificationName}.valueOf(name); }
 #end
@@ -328,7 +330,7 @@ public interface ${glCDef} extends Classification {
             });
         }
 
-        public static ${glCDef}.DefMeta meta(String classificationName) { // instead of valueOf()
+        public static ${glCDef}.DefMeta meta(String classificationName) { // old style so use byName(name)
             if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
 #foreach ($classificationName in $database.classificationNameList)
             if ("${classificationName}".equalsIgnoreCase(classificationName)) { return ${glCDef}.DefMeta.${classificationName}; }
