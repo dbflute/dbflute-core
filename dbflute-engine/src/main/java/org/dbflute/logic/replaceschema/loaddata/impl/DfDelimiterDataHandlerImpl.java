@@ -131,7 +131,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                 }
             }
         } catch (IOException e) {
-            String msg = "Failed to register delimiter data.";
+            String msg = "Failed to register delimiter data: " + resource;
             throw new DfDelimiterDataRegistrationFailureException(msg, e);
         }
         return resultInfo;

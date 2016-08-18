@@ -29,6 +29,14 @@ public class DfDelimiterDataResource {
     protected String _delimiter;
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _loadType + ", " + _basePath + ", " + _fileType + "}";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getLoadType() {

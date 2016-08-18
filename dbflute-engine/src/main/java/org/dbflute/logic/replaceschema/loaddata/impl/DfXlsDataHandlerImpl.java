@@ -42,6 +42,7 @@ import javax.sql.DataSource;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.bhv.exception.SQLExceptionAdviser;
 import org.dbflute.dbway.DBDef;
+import org.dbflute.exception.DfJDBCException;
 import org.dbflute.exception.DfXlsDataEmptyColumnDefException;
 import org.dbflute.exception.DfXlsDataEmptyRowDataException;
 import org.dbflute.exception.DfXlsDataRegistrationFailureException;
@@ -366,18 +367,14 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             , SQLException mainEx // an exception of main process
             , SQLException retryEx, DfDataRow retryDataRow // retry
             , List<String> columnNameList) { // supplement
-        final SQLException nextEx = mainEx.getNextException();
-        if (nextEx != null && !mainEx.equals(nextEx)) { // focus on next exception
-            _log.warn("*Failed to register the xls data: " + mainEx.getMessage()); // trace just in case
-            mainEx = nextEx; // switch
-        }
+        final DfJDBCException wrappedEx = DfJDBCException.voice(mainEx);
         final String tableDbName = dataTable.getTableDbName();
-        final String msg = buildWriteFailureMessage(dataDirectory, file, tableDbName, mainEx, retryEx, retryDataRow, columnNameList);
-        throw new DfXlsDataRegistrationFailureException(msg, mainEx);
+        final String msg = buildWriteFailureMessage(dataDirectory, file, tableDbName, wrappedEx, retryEx, retryDataRow, columnNameList);
+        throw new DfXlsDataRegistrationFailureException(msg, wrappedEx);
     }
 
     protected String buildWriteFailureMessage(String dataDirectory, File file, String tableDbName // basic
-            , SQLException mainEx // an exception of main process
+            , DfJDBCException mainEx // an exception of main process
             , SQLException retryEx, DfDataRow retryDataRow // retry
             , List<String> columnNameList) { // supplement
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();

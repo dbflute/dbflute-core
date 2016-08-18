@@ -36,6 +36,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.dbflute.exception.DfDelimiterDataColumnDefNotFoundException;
 import org.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.dbflute.exception.DfDelimiterDataTableNotFoundException;
+import org.dbflute.exception.DfJDBCException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.StringSet;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -92,14 +93,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
 
         final String dataDirectory = Srl.substringLastFront(_fileName, "/");
         final LoggingInsertType loggingInsertType = getLoggingInsertType(dataDirectory);
-        final String tableDbName;
-        {
-            String tmp = _fileName.substring(_fileName.lastIndexOf("/") + 1, _fileName.lastIndexOf("."));
-            if (tmp.indexOf("-") >= 0) {
-                tmp = tmp.substring(tmp.indexOf("-") + "-".length());
-            }
-            tableDbName = tmp;
-        }
+        final String tableDbName = extractTableDbName();
         final Map<String, DfColumnMeta> columnMetaMap = getColumnMetaMap(tableDbName);
         if (columnMetaMap.isEmpty()) {
             throwTableNotFoundException(_fileName, tableDbName);
@@ -183,11 +177,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // check definition differences
                 // - - - - - - - - - -/
                 if (isDifferentColumnValueCount(firstLineInfo, valueList)) {
-                    String msg = "The count of values wasn't correct:";
-                    msg = msg + " column=" + firstLineInfo.getColumnNameList().size();
-                    msg = msg + " value=" + valueList.size();
-                    msg = msg + " -> " + valueList;
-                    resultInfo.registerWarningFile(_fileName, msg);
+                    handleDifferentColumnValueCount(resultInfo, valueList, firstLineInfo);
 
                     // clear temporary variables
                     valueList.clear();
@@ -200,20 +190,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // /- - - - - - - - - - - - - - - -
                 // process registration to database
                 // - - - - - - - - - -/
-                final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
-                sqlBuilder.setTableDbName(tableDbName);
-                sqlBuilder.setColumnMetaMap(columnMetaMap);
-                sqlBuilder.setColumnNameList(columnNameList);
-                sqlBuilder.setValueList(valueList);
-                sqlBuilder.setNotFoundColumnMap(resultInfo.getNotFoundColumnMap());
-                sqlBuilder.setConvertValueMap(_convertValueMap);
-                sqlBuilder.setDefaultValueMap(_defaultValueMap);
-                sqlBuilder.setBindTypeProvider(new DfColumnBindTypeProvider() {
-                    public Class<?> provide(String tableName, DfColumnMeta columnMeta) {
-                        return getBindType(tableName, columnMeta);
-                    }
-                });
-                sqlBuilder.setDefaultValueProp(_defaultValueProp);
+                final DfDelimiterDataWriteSqlBuilder sqlBuilder =
+                        createSqlBuilder(resultInfo, tableDbName, columnMetaMap, columnNameList, valueList);
                 if (conn == null) {
                     conn = _dataSource.getConnection();
                 }
@@ -228,8 +206,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 handleLoggingInsert(tableDbName, columnValueMap, loggingInsertType, rowNumber);
 
                 int bindCount = 1;
-                final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
-                for (Entry<String, Object> entry : entrySet) {
+                for (Entry<String, Object> entry : columnValueMap.entrySet()) {
                     final String columnName = entry.getKey();
                     final Object obj = entry.getValue();
 
@@ -297,32 +274,14 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         } catch (IOException e) {
             throw e;
         } catch (SQLException e) {
-            final SQLException nextEx = e.getNextException();
-            if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
-                _log.warn("*Failed to register: " + e.getMessage());
-                String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, nextEx);
-                throw new DfDelimiterDataRegistrationFailureException(msg, nextEx); // switch!
-            } else {
-                String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, e);
-                throw new DfDelimiterDataRegistrationFailureException(msg, e);
-            }
+            DfJDBCException wrapped = DfJDBCException.voice(e);
+            String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, wrapped);
+            throw new DfDelimiterDataRegistrationFailureException(msg, wrapped);
         } catch (RuntimeException e) {
-            String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, e);
+            String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, null);
             throw new DfDelimiterDataRegistrationFailureException(msg, e);
         } finally {
-            try {
-                if (fis != null) {
-                    fis.close();
-                }
-                if (ir != null) {
-                    ir.close();
-                }
-                if (br != null) {
-                    br.close();
-                }
-            } catch (IOException continued) {
-                _log.warn("File-close threw the exception: ", continued);
-            }
+            closeStream(fis, ir, br);
             commitJustInCase(conn);
             close(ps);
             close(conn);
@@ -331,117 +290,47 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         }
     }
 
-    protected void beginTransaction(Connection conn) throws SQLException {
-        conn.setAutoCommit(false);
-    }
-
-    protected PreparedStatement prepareStatement(Connection conn, String executedSql) throws SQLException {
-        return conn.prepareStatement(executedSql);
-    }
-
-    protected boolean isBatchSizeLimit(int addedBatchSize) {
-        return addedBatchSize == 100000;
-    }
-
-    protected void commitTransaction(Connection conn) throws SQLException {
-        conn.commit();
-    }
-
-    protected void commitJustInCase(Connection conn) {
-        final Boolean autoCommit = getAutoCommit(conn);
-        if (autoCommit != null && !autoCommit) { // basically no way, just in case
-            try {
-                commitTransaction(conn);
-            } catch (SQLException continued) {
-                _log.warn("Failed to commit the transaction.", continued);
+    protected String extractTableDbName() {
+        final String tableDbName;
+        {
+            String tmp = _fileName.substring(_fileName.lastIndexOf("/") + 1, _fileName.lastIndexOf("."));
+            if (tmp.indexOf("-") >= 0) {
+                tmp = tmp.substring(tmp.indexOf("-") + "-".length());
             }
+            tableDbName = tmp;
         }
+        return tableDbName;
     }
 
-    protected Boolean getAutoCommit(Connection conn) {
-        Boolean autoCommit = null;
-        try {
-            autoCommit = conn != null ? conn.getAutoCommit() : null;
-        } catch (SQLException continued) {
-            // because it is possible that the connection would have already closed
-            _log.warn("Connection#getAutoCommit() said: " + continued.getMessage());
-        }
-        return autoCommit;
+    protected void handleDifferentColumnValueCount(DfDelimiterDataResultInfo resultInfo, List<String> valueList, FirstLineInfo firstLineInfo) {
+        String msg = "The count of values wasn't correct:";
+        msg = msg + " column=" + firstLineInfo.getColumnNameList().size() + " value=" + valueList.size();
+        msg = msg + " -> " + valueList;
+        resultInfo.registerWarningFile(_fileName, msg);
     }
 
-    protected void close(PreparedStatement ps) {
-        if (ps != null) {
-            try {
-                ps.close();
-            } catch (SQLException ignored) {
-                _log.info("Statement.close() threw the exception!", ignored);
+    protected DfDelimiterDataWriteSqlBuilder createSqlBuilder(DfDelimiterDataResultInfo resultInfo, String tableDbName,
+            final Map<String, DfColumnMeta> columnMetaMap, List<String> columnNameList, List<String> valueList) {
+        final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
+        sqlBuilder.setTableDbName(tableDbName);
+        sqlBuilder.setColumnMetaMap(columnMetaMap);
+        sqlBuilder.setColumnNameList(columnNameList);
+        sqlBuilder.setValueList(valueList);
+        sqlBuilder.setNotFoundColumnMap(resultInfo.getNotFoundColumnMap());
+        sqlBuilder.setConvertValueMap(_convertValueMap);
+        sqlBuilder.setDefaultValueMap(_defaultValueMap);
+        sqlBuilder.setBindTypeProvider(new DfColumnBindTypeProvider() {
+            public Class<?> provide(String tableName, DfColumnMeta columnMeta) {
+                return getBindType(tableName, columnMeta);
             }
-        }
+        });
+        sqlBuilder.setDefaultValueProp(_defaultValueProp);
+        return sqlBuilder;
     }
 
-    protected void close(Connection conn) {
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException ignored) {
-                _log.info("Connection.close() threw the exception!", ignored);
-            }
-        }
-    }
-
-    protected void throwTableNotFoundException(String fileName, String tableDbName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The table specified on the delimiter file was not found in the schema.");
-        br.addItem("Advice");
-        br.addElement("Please confirm the name about its spelling.");
-        br.addElement("And confirm that whether the DLL executions have errors.");
-        br.addItem("Delimiter File");
-        br.addElement(fileName);
-        br.addItem("Table");
-        br.addElement(tableDbName);
-        final String msg = br.buildExceptionMessage();
-        throw new DfDelimiterDataTableNotFoundException(msg);
-    }
-
-    protected String buildRegExpMessage(String fileName, String tableDbName, String executedSql, List<String> valueList, Exception e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to register the table data.");
-        br.addItem("Advice");
-        br.addElement("If you don't know the cause, suppress batch update and retry it.");
-        br.addElement("Change the property 'isSuppressBatchUpdate' to false temporarily,");
-        br.addElement("and loading process is executed per one record,");
-        br.addElement("and you can find a record that causes the exception with logs.");
-        br.addItem("Delimiter File");
-        br.addElement(fileName);
-        br.addItem("Table");
-        br.addElement(tableDbName);
-        br.addItem("Executed SQL");
-        br.addElement(executedSql);
-        if (!valueList.isEmpty()) { // basically when batch update is suppressed
-            br.addItem("Bound Values");
-            br.addElement(valueList);
-        }
-        br.addItem("Message");
-        br.addElement(e.getMessage());
-        final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableDbName);
-        if (bindTypeCacheMap != null) {
-            br.addItem("Bind Type");
-            final Set<Entry<String, Class<?>>> entrySet = bindTypeCacheMap.entrySet();
-            for (Entry<String, Class<?>> entry : entrySet) {
-                br.addElement(entry.getKey() + " = " + entry.getValue());
-            }
-        }
-        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableDbName);
-        if (bindTypeCacheMap != null) {
-            br.addItem("String Processor");
-            final Set<Entry<String, StringProcessor>> entrySet = stringProcessorCacheMap.entrySet();
-            for (Entry<String, StringProcessor> entry : entrySet) {
-                br.addElement(entry.getKey() + " = " + entry.getValue());
-            }
-        }
-        return br.buildExceptionMessage();
-    }
-
+    // ===================================================================================
+    //                                                                      Before/Finally
+    //                                                                      ==============
     protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
             _dataWritingInterceptor.processBeforeHandlingTable(tableDbName, columnInfoMap);
@@ -452,19 +341,6 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         if (_dataWritingInterceptor != null) {
             _dataWritingInterceptor.processFinallyHandlingTable(tableDbName, columnInfoMap);
         }
-    }
-
-    protected void throwDelimiterDataColumnDefNotFoundException(String fileName, String tableDbName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The column definition on the delimiter file was not found.");
-        br.addItem("Advice");
-        br.addElement("Make sure the header definition of the delimiter file exists.");
-        br.addItem("Delimiter File");
-        br.addElement(fileName);
-        br.addItem("Table");
-        br.addElement(tableDbName);
-        final String msg = br.buildExceptionMessage();
-        throw new DfDelimiterDataColumnDefNotFoundException(msg);
     }
 
     // ===================================================================================
@@ -722,6 +598,160 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             _convertLineMap = DfCollectionUtil.emptyMap();
         }
         return _convertLineMap;
+    }
+
+    // ===================================================================================
+    //                                                                   Batch Transaction
+    //                                                                   =================
+    protected void beginTransaction(Connection conn) throws SQLException {
+        conn.setAutoCommit(false);
+    }
+
+    protected PreparedStatement prepareStatement(Connection conn, String executedSql) throws SQLException {
+        return conn.prepareStatement(executedSql);
+    }
+
+    protected boolean isBatchSizeLimit(int addedBatchSize) {
+        return addedBatchSize == 100000;
+    }
+
+    protected void commitTransaction(Connection conn) throws SQLException {
+        conn.commit();
+    }
+
+    protected void commitJustInCase(Connection conn) {
+        final Boolean autoCommit = getAutoCommit(conn);
+        if (autoCommit != null && !autoCommit) { // basically no way, just in case
+            try {
+                commitTransaction(conn);
+            } catch (SQLException continued) {
+                _log.warn("Failed to commit the transaction.", continued);
+            }
+        }
+    }
+
+    protected Boolean getAutoCommit(Connection conn) {
+        Boolean autoCommit = null;
+        try {
+            autoCommit = conn != null ? conn.getAutoCommit() : null;
+        } catch (SQLException continued) {
+            // because it is possible that the connection would have already closed
+            _log.warn("Connection#getAutoCommit() said: " + continued.getMessage());
+        }
+        return autoCommit;
+    }
+
+    // ===================================================================================
+    //                                                                              Closer
+    //                                                                              ======
+    protected void closeStream(FileInputStream fis, InputStreamReader ir, BufferedReader br) {
+        try {
+            if (fis != null) {
+                fis.close();
+            }
+            if (ir != null) {
+                ir.close();
+            }
+            if (br != null) {
+                br.close();
+            }
+        } catch (IOException continued) {
+            _log.warn("File-close threw the exception: ", continued);
+        }
+    }
+
+    protected void close(PreparedStatement ps) {
+        if (ps != null) {
+            try {
+                ps.close();
+            } catch (SQLException ignored) {
+                _log.info("Statement.close() threw the exception!", ignored);
+            }
+        }
+    }
+
+    protected void close(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ignored) {
+                _log.info("Connection.close() threw the exception!", ignored);
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                   Exception Thrower
+    //                                                                   =================
+    protected void throwTableNotFoundException(String fileName, String tableDbName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The table specified on the delimiter file was not found in the schema.");
+        br.addItem("Advice");
+        br.addElement("Please confirm the name about its spelling.");
+        br.addElement("And confirm that whether the DLL executions have errors.");
+        br.addItem("Delimiter File");
+        br.addElement(fileName);
+        br.addItem("Table");
+        br.addElement(tableDbName);
+        final String msg = br.buildExceptionMessage();
+        throw new DfDelimiterDataTableNotFoundException(msg);
+    }
+
+    protected String buildRegExpMessage(String fileName, String tableDbName, String executedSql, List<String> valueList, SQLException sqlEx) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to register the table data.");
+        br.addItem("Advice");
+        br.addElement("If you don't know the cause, suppress batch update and retry it.");
+        br.addElement("Change the property isSuppressBatchUpdate");
+        br.addElement("of loadingControlMap.dataprop to false temporarily,");
+        br.addElement("and loading process is executed per one record,");
+        br.addElement("and you can find a record that causes the exception with logs.");
+        br.addItem("Delimiter File");
+        br.addElement(fileName);
+        br.addItem("Table");
+        br.addElement(tableDbName);
+        if (sqlEx != null) {
+            br.addItem("SQLException");
+            br.addElement(sqlEx.getClass().getName());
+            br.addElement(sqlEx.getMessage());
+        }
+        // #hope show non-batch retry by jflute
+        br.addItem("Executed SQL");
+        br.addElement(executedSql);
+        if (!valueList.isEmpty()) { // basically when batch update is suppressed
+            br.addItem("Bound Values");
+            br.addElement(valueList);
+        }
+        final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableDbName);
+        if (bindTypeCacheMap != null) {
+            br.addItem("Bind Type");
+            final Set<Entry<String, Class<?>>> entrySet = bindTypeCacheMap.entrySet();
+            for (Entry<String, Class<?>> entry : entrySet) {
+                br.addElement(entry.getKey() + " = " + entry.getValue());
+            }
+        }
+        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableDbName);
+        if (bindTypeCacheMap != null) {
+            br.addItem("String Processor");
+            final Set<Entry<String, StringProcessor>> entrySet = stringProcessorCacheMap.entrySet();
+            for (Entry<String, StringProcessor> entry : entrySet) {
+                br.addElement(entry.getKey() + " = " + entry.getValue());
+            }
+        }
+        return br.buildExceptionMessage();
+    }
+
+    protected void throwDelimiterDataColumnDefNotFoundException(String fileName, String tableDbName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The column definition on the delimiter file was not found.");
+        br.addItem("Advice");
+        br.addElement("Make sure the header definition of the delimiter file exists.");
+        br.addItem("Delimiter File");
+        br.addElement(fileName);
+        br.addItem("Table");
+        br.addElement(tableDbName);
+        final String msg = br.buildExceptionMessage();
+        throw new DfDelimiterDataColumnDefNotFoundException(msg);
     }
 
     // ===================================================================================

@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.dbflute.exception.DfJDBCException;
 import org.dbflute.helper.StringSet;
 import org.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
@@ -178,7 +179,7 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
         msg = msg + ln();
         msg = msg + "[Sequence SQL Name]" + ln() + sequenceSqlName + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new IllegalStateException(msg);
+        throw new IllegalStateException(msg, DfJDBCException.voice(e));
     }
 
     // ===================================================================================

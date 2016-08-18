@@ -257,16 +257,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected void throwProcedureSetupFailureException(SQLException e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to set up procedures.");
-        br.addItem("SQL Exception");
-        br.addElement(DfJDBCException.extractMessage(e));
-        SQLException nextEx = e.getNextException();
-        if (nextEx != null) {
-            br.addElement(DfJDBCException.extractMessage(nextEx));
-        }
-        String msg = br.buildExceptionMessage();
-        throw new DfProcedureSetupFailureException(msg, e);
+        String msg = "Failed to set up procedures.";
+        throw new DfProcedureSetupFailureException(msg, DfJDBCException.voice(e));
     }
 
     // ===================================================================================

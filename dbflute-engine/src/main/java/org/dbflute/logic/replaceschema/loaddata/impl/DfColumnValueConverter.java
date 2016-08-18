@@ -19,7 +19,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -176,13 +175,10 @@ public class DfColumnValueConverter {
     //                                                                       Value Mapping
     //                                                                       =============
     protected Map<String, String> findConvertValueMapping(String columnName, Map<String, DfColumnMeta> columnMetaMap) {
-        // convertValueMap should be case insensitive (or flexible) map
-        // (must be already resolved here)
         final Map<String, String> allMap = findeAllColumnConvertMap();
         final Map<String, String> typedMap = findTypedColumnConvertMap(columnName, columnMetaMap);
         final Map<String, String> columnMap = _convertValueMap.getOrDefault(columnName, Collections.emptyMap());
-        inheritMap(columnMap, inheritMap(typedMap, allMap));
-        return columnMap;
+        return inheritMap(columnMap, inheritMap(typedMap, allMap)); // should be case sensitive map
     }
 
     protected Map<String, String> findeAllColumnConvertMap() {
@@ -217,7 +213,7 @@ public class DfColumnValueConverter {
     }
 
     protected Map<String, String> inheritMap(Map<String, String> subMap, Map<String, String> superMap) {
-        final Map<String, String> mergedMap = new HashMap<String, String>();
+        final Map<String, String> mergedMap = new LinkedHashMap<String, String>(); // case sensitive and ordered
         mergedMap.putAll(superMap);
         mergedMap.putAll(subMap); // override if same value
         return mergedMap;
