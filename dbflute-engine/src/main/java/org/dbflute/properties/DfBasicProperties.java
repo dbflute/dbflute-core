@@ -15,6 +15,7 @@
  */
 package org.dbflute.properties;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -504,8 +505,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                              Naming
-    //                                                                              ======
+    //                                                                 Class/Method Naming
+    //                                                                 ===================
     public boolean isTableNameCamelCase() {
         final boolean defaultProperty = false;
         final boolean property = isProperty("isTableNameCamelCase", defaultProperty);
@@ -524,9 +525,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return isProperty("isJavaNameOfColumnSameAsDbName", defaultProperty); // old style or default
     }
 
-    // ===================================================================================
-    //                                                                              Prefix
-    //                                                                              ======
     public String getProjectPrefix() {
         return getProperty("projectPrefix", "");
     }
@@ -536,10 +534,55 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                        Class Author
-    //                                                                        ============
+    //                                                                   Source & Template
+    //                                                                   =================
     public String getClassAuthor() {
         return getProperty("classAuthor", "DBFlute(AutoGenerator)");
+    }
+
+    public String getSourceFileEncoding() {
+        return getProperty("sourceFileEncoding", DEFAULT_sourceFileEncoding);
+    }
+
+    protected String _sourceCodeLineSeparator;
+    protected boolean _convertSourceCodeLineSeparator;
+
+    public String getSourceCodeLineSeparator() {
+        if (_sourceCodeLineSeparator != null) {
+            return _sourceCodeLineSeparator;
+        }
+        final String prop = getProperty("sourceCodeLineSeparator", null);
+        if (prop != null) {
+            _convertSourceCodeLineSeparator = true; // convert if specified
+            if ("LF".equalsIgnoreCase(prop)) {
+                _sourceCodeLineSeparator = "\n";
+            } else if ("CRLF".equalsIgnoreCase(prop)) {
+                _sourceCodeLineSeparator = "\r\n";
+            } else {
+                String msg = "Unknown line separator (only supported LF or CRLF): " + prop;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+        } else { // null
+            final String defaultSeparator = getLanguageDependency().getSourceCodeLineSeparator();
+            _sourceCodeLineSeparator = defaultSeparator; // as default but no convert
+        }
+        return _sourceCodeLineSeparator;
+    }
+
+    public boolean isConvertSourceCodeLineSeparator() {
+        return _convertSourceCodeLineSeparator;
+    }
+
+    public boolean isSourceCodeLineSeparatorLf() {
+        return "\n".equals(getSourceCodeLineSeparator());
+    }
+
+    public boolean isSourceCodeLineSeparatorCrLf() {
+        return "\r\n".equals(getSourceCodeLineSeparator());
+    }
+
+    public String getTemplateFileEncoding() { // closet
+        return getProperty("templateFileEncoding", DEFAULT_templateFileEncoding);
     }
 
     // ===================================================================================
@@ -632,51 +675,26 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                   Source & Template
-    //                                                                   =================
-    public String getSourceFileEncoding() {
-        return getProperty("sourceFileEncoding", DEFAULT_sourceFileEncoding);
-    }
+    //                                                                    GenerationGapile
+    //                                                                    ================
+    // generationGapileMap = map:{
+    //     ; gapileDirectory = ../../maihama-dfgenerated/src/main/java
+    // }
+    // @since 1.1.2 (2016/08/25)
+    protected Map<String, Object> _generationGapileMap;
 
-    protected String _sourceCodeLineSeparator;
-    protected boolean _convertSourceCodeLineSeparator;
-
-    public String getSourceCodeLineSeparator() {
-        if (_sourceCodeLineSeparator != null) {
-            return _sourceCodeLineSeparator;
+    protected Map<String, Object> getGenerationGapileMap() { // closet
+        if (_generationGapileMap != null) {
+            return _generationGapileMap;
         }
-        final String prop = getProperty("sourceCodeLineSeparator", null);
-        if (prop != null) {
-            _convertSourceCodeLineSeparator = true; // convert if specified
-            if ("LF".equalsIgnoreCase(prop)) {
-                _sourceCodeLineSeparator = "\n";
-            } else if ("CRLF".equalsIgnoreCase(prop)) {
-                _sourceCodeLineSeparator = "\r\n";
-            } else {
-                String msg = "Unknown line separator (only supported LF or CRLF): " + prop;
-                throw new DfIllegalPropertySettingException(msg);
-            }
-        } else { // null
-            final String defaultSeparator = getLanguageDependency().getSourceCodeLineSeparator();
-            _sourceCodeLineSeparator = defaultSeparator; // as default but no convert
-        }
-        return _sourceCodeLineSeparator;
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> map = (Map<String, Object>) getBasicInfoMap().get("generationGapileMap");
+        _generationGapileMap = map != null ? map : Collections.emptyMap();
+        return _generationGapileMap;
     }
 
-    public boolean isConvertSourceCodeLineSeparator() {
-        return _convertSourceCodeLineSeparator;
-    }
-
-    public boolean isSourceCodeLineSeparatorLf() {
-        return "\n".equals(getSourceCodeLineSeparator());
-    }
-
-    public boolean isSourceCodeLineSeparatorCrLf() {
-        return "\r\n".equals(getSourceCodeLineSeparator());
-    }
-
-    public String getTemplateFileEncoding() { // closet
-        return getProperty("templateFileEncoding", DEFAULT_templateFileEncoding);
+    public String getGenerationGapileDirectory() { // null allowed
+        return getProperty("gapileDirectory", null, getGenerationGapileMap());
     }
 
     // ===================================================================================
@@ -703,8 +721,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return _outputPackageAdjustmentMap;
     }
 
-    // CSharp Only
-    public boolean isFlatDirectoryPackageValid() {
+    public boolean isFlatDirectoryPackageValid() { // CSharp Only
         final String str = getFlatDirectoryPackage();
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
@@ -713,14 +730,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
      * Get the package for flat directory. Normally, this property is only for C#.
      * @return The package for flat directory. (NullAllowed)
      */
-    public String getFlatDirectoryPackage() {
+    public String getFlatDirectoryPackage() { // CSharp Only
         final String key = "flatDirectoryPackage";
         final String defaultProp = getProperty(key, null); // for compatibility
         return getProperty(key, defaultProp, getOutputPackageAdjustmentMap());
     }
 
-    // CSharp Only
-    public boolean isOmitDirectoryPackageValid() {
+    public boolean isOmitDirectoryPackageValid() { // CSharp Only
         final String str = getOmitDirectoryPackage();
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
@@ -729,7 +745,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
      * Get the package for omit directory. Normally, this property is only for C#.
      * @return The package for omit directory. (NullAllowed)
      */
-    public String getOmitDirectoryPackage() {
+    public String getOmitDirectoryPackage() { // CSharp Only
         final String key = "omitDirectoryPackage";
         final String defaultProp = getProperty(key, null); // for compatibility
         return getProperty(key, defaultProp, getOutputPackageAdjustmentMap());

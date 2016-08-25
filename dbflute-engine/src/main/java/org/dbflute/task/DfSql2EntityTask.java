@@ -39,6 +39,7 @@ import org.dbflute.helper.jdbc.DfRunnerInformation;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.generate.gapile.DfGapileProcess;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
@@ -153,6 +154,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         fireVelocityProcess();
         setupBehaviorQueryPath();
         setupExtendedClassDescription();
+        reflectGapileClassIfNeeds();
 
         showTargetSqlFileInformation(outsideSqlPack);
         showSkippedFileInformation();
@@ -270,9 +272,20 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         setupper.setupBehaviorQueryPath(sqlFileList);
     }
 
+    // ===================================================================================
+    //                                                          Extended Class Description
+    //                                                          ==========================
     protected void setupExtendedClassDescription() {
         final DfPmbCommentSetupper reflector = new DfPmbCommentSetupper(_database.getPmbMetaDataList());
         reflector.setupExtendedClassDescription();
+    }
+
+    // ===================================================================================
+    //                                                                        Gapile Class
+    //                                                                        ============
+    protected void reflectGapileClassIfNeeds() {
+        final DfGapileProcess process = new DfGapileProcess();
+        process.reflectIfNeeds();
     }
 
     // ===================================================================================
