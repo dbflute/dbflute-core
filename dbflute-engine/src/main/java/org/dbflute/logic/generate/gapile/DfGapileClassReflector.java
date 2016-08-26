@@ -21,8 +21,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.dbflute.helper.filesystem.FileTextIO;
@@ -65,6 +67,8 @@ public class DfGapileClassReflector {
     //                                                                             Process
     //                                                                             =======
     public void reflect() {
+        show("/===========================================================================");
+        show("...Reflecting GenerationGapile classes: " + _gapileDirectory);
         final String outputDirectory = _outputDirectory;
         final String packageBase = _packageBase;
         final String gapileDirectory = _gapileDirectory;
@@ -78,13 +82,15 @@ public class DfGapileClassReflector {
         moveBsClassToGapile(mainBasePath, gapileBasePath, _classPackage.getBaseCommonPackage());
         moveBsClassToGapile(mainBasePath, gapileBasePath, _classPackage.getBaseBehaviorPackage());
         moveBsClassToGapile(mainBasePath, gapileBasePath, _classPackage.getBaseEntityPackage());
-        moveBsClassToGapile(mainBasePath, gapileBasePath, "cbean/bs");
-        moveBsClassToGapile(mainBasePath, gapileBasePath, "cbean/cq/bs");
-        moveBsClassToGapile(mainBasePath, gapileBasePath, "cbean/cq/ciq");
-        moveBsClassToGapile(mainBasePath, gapileBasePath, "cbean/nss");
-        copyExClassToGapile(mainBasePath, gapileBasePath, "cbean");
-        copyExClassToGapile(mainBasePath, gapileBasePath, "exbhv");
-        copyExClassToGapile(mainBasePath, gapileBasePath, "exentity");
+        final String cbPkg = _classPackage.getConditionBeanPackage();
+        moveBsClassToGapile(mainBasePath, gapileBasePath, cbPkg + "/bs"); // #hope resolve by language
+        moveBsClassToGapile(mainBasePath, gapileBasePath, cbPkg + "/cq/bs");
+        moveBsClassToGapile(mainBasePath, gapileBasePath, cbPkg + "/cq/ciq");
+        moveBsClassToGapile(mainBasePath, gapileBasePath, cbPkg + "/nss");
+        moveExClassToGapile(mainBasePath, gapileBasePath, cbPkg);
+        moveExClassToGapile(mainBasePath, gapileBasePath, _classPackage.getExtendedBehaviorPackage());
+        moveExClassToGapile(mainBasePath, gapileBasePath, _classPackage.getExtendedEntityPackage());
+        show("==========/");
     }
 
     // ===================================================================================
@@ -99,23 +105,23 @@ public class DfGapileClassReflector {
             if (!parentDir.exists()) {
                 parentDir.mkdirs();
             }
-            _log.info("...Moving {} to gapile directory: {}", resourcePath, gapileDir.getPath());
+            show("...Moving " + resourcePath + " to gapile directory.");
             final boolean renamed = currentDir.renameTo(gapileDir);
             if (!renamed) {
-                _log.info("*Failed to move {} to gapile directory: {}", resourcePath, gapileDir.getPath());
+                show("*Failed to move " + resourcePath + " to gapile directory: " + gapileDir.getPath());
             }
         }
     }
 
     // ===================================================================================
-    //                                                                 Copy Extended Class
+    //                                                                 Move Extended Class
     //                                                                 ===================
-    protected void copyExClassToGapile(String mainBasePath, String gapileBasePath, String resourceDir) {
+    protected void moveExClassToGapile(String mainBasePath, String gapileBasePath, String resourceDir) {
         final File currentDir = new File(mainBasePath + "/" + resourceDir);
-        doCopyToGapile(gapileBasePath, resourceDir, currentDir);
+        doMoveToGapile(gapileBasePath, resourceDir, currentDir);
     }
 
-    protected void doCopyToGapile(String gapileBasePath, String resourcePath, File currentDir) {
+    protected void doMoveToGapile(String gapileBasePath, String resourcePath, File currentDir) {
         if (!currentDir.exists()) { // e.g. cbean/bs, cbean/cq/bs (already moved here)
             return;
         }
@@ -126,36 +132,42 @@ public class DfGapileClassReflector {
         });
         if (subDirs != null) {
             for (File subDir : subDirs) {
-                doCopyToGapile(gapileBasePath, resourcePath + "/" + subDir.getName(), subDir);
+                final String subResourcePath = resourcePath + "/" + subDir.getName();
+                doMoveToGapile(gapileBasePath, subResourcePath, subDir); // recursive call
             }
         }
         final File gapileDir = new File(gapileBasePath + "/" + resourcePath);
         final File[] mainClassFiles = gatherClassFiles(currentDir);
-        final Set<String> existingClassNameSet = new HashSet<>();
         if (mainClassFiles.length > 0) {
             gapileDir.mkdirs();
         }
-        _log.info("...Copying {} to gapile directory: {}", resourcePath, gapileDir.getPath());
+
+        final Set<String> existingClassNameSet = new HashSet<>();
         for (File mainClassFile : mainClassFiles) {
             existingClassNameSet.add(mainClassFile.getName());
         }
+
+        final Map<File, File> copiedFileMap = new LinkedHashMap<File, File>();
         for (File mainClassFile : mainClassFiles) {
-            File gapileClassFile;
-            try {
-                gapileClassFile = new File(gapileDir.getCanonicalPath() + "/" + mainClassFile.getName());
-            } catch (IOException e) {
-                throw new IllegalStateException("Failed to get the cannonical path: " + gapileDir, e);
-            }
+            final File gapileClassFile = new File(gapileDir.getPath() + "/" + mainClassFile.getName());
             if (!gapileClassFile.exists()) {
-                copyText(mainClassFile, gapileClassFile); // new table
+                copiedFileMap.put(mainClassFile, gapileClassFile);
             }
         }
-        final File[] deletedGapileClassFiles = gatherClassFile(gapileDir, existingClassNameSet);
-        for (File deletedResourceFile : deletedGapileClassFiles) {
+        final File[] deletedFiles = gatherClassFile(gapileDir, existingClassNameSet);
+
+        show("...Moving " + resourcePath + " to gapile directory: new=" + copiedFileMap.size() + ", old=" + deletedFiles.length);
+        for (Entry<File, File> entry : copiedFileMap.entrySet()) {
+            copyText(entry.getKey(), entry.getValue()); // new table
+        }
+        for (File deletedResourceFile : deletedFiles) {
             deletedResourceFile.delete(); // old table
         }
     }
 
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
     protected void copyText(File mainClassFile, File gapileClassFile) {
         final FileTextIO textIO = new FileTextIO().encodeAsUTF8();
         String text;
@@ -203,5 +215,9 @@ public class DfGapileClassReflector {
             }
             dir.delete();
         }
+    }
+
+    protected void show(String msg) {
+        _log.info(msg);
     }
 }

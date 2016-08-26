@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
 
-    private static final Logger logger = LoggerFactory.getLogger(DfLastaFluteProperties.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfLastaFluteProperties.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -106,7 +106,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
         if (Srl.is_Null_or_TrimmedEmpty(serviceName)) { // no use
             return;
         }
-        logger.info("...Loading freeGen settings from lastafluteMap: " + serviceName);
+        show("...Loading freeGen settings from lastafluteMap: " + serviceName);
         final String domainPackage = (String) lastafluteMap.get("domainPackage");
         if (domainPackage == null) {
             throw new DfIllegalPropertySettingException("The property 'domainPackage' is required: " + lastafluteMap.keySet());
@@ -128,7 +128,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
         if (Srl.is_Null_or_TrimmedEmpty(serviceName)) { // no use
             return;
         }
-        logger.info("...Loading propertiesHtml settings from lastafluteMap: " + serviceName);
+        show("...Loading propertiesHtml settings from lastafluteMap: " + serviceName);
         final List<String> environmentList = getEnvironmentList(lastafluteMap);
         newPropertiesHtmlReflector(propHtmlMap, serviceName, environmentList).reflectFrom(lastafluteMap);
     }
@@ -153,7 +153,8 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
         if (appMap == null) { // just in case
             return;
         }
-        logger.info("...Loading application outsideSql settings from lastafluteMap.");
+        show("/===========================================================================");
+        show("...Loading application outsideSql settings from lastafluteMap.");
         final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
         final String resourceDirectory = lang.getMainResourceDirectory();
         final String programDirectory = lang.getMainProgramDirectory();
@@ -166,11 +167,12 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
                     elementMap.put("sqlDirectory", resourceDirectory);
                     elementMap.put("sql2EntityOutputDirectory", programDirectory);
                     elementMap.put("isSuppressDirectoryCheck", "true"); // because of automatic settings
-                    logger.info("...Reflecting application outsideSql: " + path + ", " + elementMap);
+                    show("...Reflecting application outsideSql: " + path + ", " + elementMap);
                     appOutqlMap.put(path, elementMap);
                 }
             }
         }
+        show("==========/");
     }
 
     // ===================================================================================
@@ -212,5 +214,12 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
 
     public boolean isLastaDocGradleGeared() {
         return isProperty("isLastaDocGradleGeared", false, getLastafluteMap());
+    }
+
+    // ===================================================================================
+    //                                                                        Small Helper
+    //                                                                        ============
+    protected void show(String msg) {
+        _log.info(msg);
     }
 }

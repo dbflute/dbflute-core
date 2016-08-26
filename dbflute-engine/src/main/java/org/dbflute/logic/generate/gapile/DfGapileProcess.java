@@ -18,19 +18,12 @@ package org.dbflute.logic.generate.gapile;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.properties.DfBasicProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
  * @since 1.1.2 (2016/08/25 Thursday)
  */
 public class DfGapileProcess {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final Logger _log = LoggerFactory.getLogger(DfGapileProcess.class);
 
     // ===================================================================================
     //                                                                             Reflect
@@ -40,7 +33,6 @@ public class DfGapileProcess {
         if (gapileDirectory == null) {
             return; // normally here
         }
-        _log.info("...Reflecting generation-gapile classes: " + gapileDirectory);
         final DfGapileClassReflector reflector = createReflector(gapileDirectory);
         reflector.reflect();
     }

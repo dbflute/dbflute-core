@@ -70,6 +70,7 @@ public class DfRefreshResourceProcess {
         if (!isRefresh()) {
             return;
         }
+        show("/===========================================================================");
         show("...Refreshing " + _projectNameList + " by " + _requestUrl); // not null here
         final DfRefreshResourceRequest request = createRefreshResourceRequest(_requestUrl);
         try {
@@ -78,6 +79,7 @@ public class DfRefreshResourceProcess {
         } catch (IOException e) {
             handleRefreshIOException(e);
         }
+        show("==========/");
     }
 
     protected void handleResultMap(Map<String, Map<String, Object>> resultMap) {
