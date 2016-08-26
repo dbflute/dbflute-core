@@ -297,7 +297,7 @@ public class DfBehaviorQueryPathSetupper {
                     final String projectPrefixLib = getLibraryProjectPrefix();
                     String retryName = behaviorName;
                     if (retryName.startsWith(projectPrefixLib)) { // e.g. LbFooBhv --> FooBhv
-                        retryName.substring(projectPrefixLib.length());
+                        retryName = retryName.substring(projectPrefixLib.length());
                     }
                     final String projectPrefixAp = getBasicProperties().getProjectPrefix();
                     retryName = projectPrefixAp + retryName; // e.g. FooBhv --> BpFooBhv
