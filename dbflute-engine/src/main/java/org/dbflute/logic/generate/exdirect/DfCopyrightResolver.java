@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.generate.exmange;
+package org.dbflute.logic.generate.exdirect;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -29,19 +29,20 @@ import java.io.UnsupportedEncodingException;
 /**
  * @author jflute
  */
-public class DfSerialVersionUIDResolver {
+public class DfCopyrightResolver {
 
     protected final String _sourceEncoding;
     protected final String _sourceLn;
 
-    public DfSerialVersionUIDResolver(String sourceEncoding, String sourceLn) {
+    public DfCopyrightResolver(String sourceEncoding, String sourceLn) {
         _sourceEncoding = sourceEncoding;
         _sourceLn = sourceLn;
     }
 
-    public void reflectAllExSerialUID(String path) {
-        final String serialComment = "/** The serial version UID for object serialization. (Default) */";
-        final String serialDefinition = "private static final long serialVersionUID = 1L;";
+    public void reflectAllExCopyright(String path, String copyright) {
+        if (copyright == null || copyright.trim().length() == 0) {
+            return;
+        }
         final File exfile = new File(path);
         final String encoding = _sourceEncoding;
         final StringBuilder sb = new StringBuilder();
@@ -50,20 +51,21 @@ public class DfSerialVersionUIDResolver {
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(exfile), encoding));
             final String sourceCodeLn = _sourceLn;
+            int index = 0;
             while (true) {
                 line = br.readLine();
                 if (line == null) {
                     break;
                 }
-                if (line.contains("serialVersionUID")) {
-                    return;
+                if (index == 0) { // first line
+                    if (!line.trim().startsWith("package ")) { // unsupported
+                        return;
+                    }
+                    sb.append(copyright);
                 }
-                sb.append(line).append(sourceCodeLn);
-                if (line.startsWith("public class") && line.contains(" extends ") && line.endsWith("{")) {
-                    sb.append(sourceCodeLn); // for empty line
-                    sb.append("    ").append(serialComment).append(sourceCodeLn);
-                    sb.append("    ").append(serialDefinition).append(sourceCodeLn);
-                }
+                sb.append(line);
+                sb.append(sourceCodeLn);
+                ++index;
             }
         } catch (IOException e) {
             String msg = "bufferedReader.readLine() threw the exception: current line=" + line;

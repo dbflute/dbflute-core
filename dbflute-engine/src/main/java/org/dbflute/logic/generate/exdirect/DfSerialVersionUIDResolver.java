@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.generate.exmange;
+package org.dbflute.logic.generate.exdirect;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,29 +26,25 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.torque.engine.database.model.Table;
-
 /**
  * @author jflute
- * @since 1.1.0-sp2 (2015/04/01 Wednesday)
  */
-public class DfSpringComponentResolver {
+public class DfSerialVersionUIDResolver {
 
-    protected static final String COMPONENT_SHORT_DEF = "@Component";
-    protected static final String COMPONENT_FULL_DEF = "@org.springframework.stereotype.Component";
     protected final String _sourceEncoding;
     protected final String _sourceLn;
 
-    public DfSpringComponentResolver(String sourceEncoding, String sourceLn) {
+    public DfSerialVersionUIDResolver(String sourceEncoding, String sourceLn) {
         _sourceEncoding = sourceEncoding;
         _sourceLn = sourceLn;
     }
 
-    public void reflectAllExComponent(Table table, String path) {
+    public void reflectAllExSerialUID(String path) {
+        final String serialComment = "/** The serial version UID for object serialization. (Default) */";
+        final String serialDefinition = "private static final long serialVersionUID = 1L;";
         final File exfile = new File(path);
         final String encoding = _sourceEncoding;
         final StringBuilder sb = new StringBuilder();
-        boolean componentDone = false;
         String line = null;
         BufferedReader br = null;
         try {
@@ -59,19 +55,15 @@ public class DfSpringComponentResolver {
                 if (line == null) {
                     break;
                 }
-                if (line.equals(COMPONENT_SHORT_DEF) || line.equals(COMPONENT_FULL_DEF)) { // no name
-                    continue; // replace it because of old style or original settings (ignore next line's style)
-                }
-                if (line.startsWith(COMPONENT_SHORT_DEF) || line.startsWith(COMPONENT_FULL_DEF)) { // with no name?
-                    return; // already exists, because might have name
-                }
-                if (!componentDone && line.startsWith("public class") && line.contains("Bhv extends ")) {
-                    sb.append(COMPONENT_FULL_DEF);
-                    sb.append("(\"").append(table.getBehaviorComponentName()).append("\")");
-                    sb.append(sourceCodeLn);
-                    componentDone = true;
+                if (line.contains("serialVersionUID")) {
+                    return;
                 }
                 sb.append(line).append(sourceCodeLn);
+                if (line.startsWith("public class") && line.contains(" extends ") && line.endsWith("{")) {
+                    sb.append(sourceCodeLn); // for empty line
+                    sb.append("    ").append(serialComment).append(sourceCodeLn);
+                    sb.append("    ").append(serialDefinition).append(sourceCodeLn);
+                }
             }
         } catch (IOException e) {
             String msg = "bufferedReader.readLine() threw the exception: current line=" + line;

@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.generate.exmange;
+package org.dbflute.logic.generate.exdirect;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,46 +26,52 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.torque.engine.database.model.Table;
+
 /**
  * @author jflute
+ * @since 1.1.0-sp2 (2015/04/01 Wednesday)
  */
-public class DfCopyrightResolver {
+public class DfSpringComponentResolver {
 
+    protected static final String COMPONENT_SHORT_DEF = "@Component";
+    protected static final String COMPONENT_FULL_DEF = "@org.springframework.stereotype.Component";
     protected final String _sourceEncoding;
     protected final String _sourceLn;
 
-    public DfCopyrightResolver(String sourceEncoding, String sourceLn) {
+    public DfSpringComponentResolver(String sourceEncoding, String sourceLn) {
         _sourceEncoding = sourceEncoding;
         _sourceLn = sourceLn;
     }
 
-    public void reflectAllExCopyright(String path, String copyright) {
-        if (copyright == null || copyright.trim().length() == 0) {
-            return;
-        }
+    public void reflectAllExComponent(Table table, String path) {
         final File exfile = new File(path);
         final String encoding = _sourceEncoding;
         final StringBuilder sb = new StringBuilder();
+        boolean componentDone = false;
         String line = null;
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(exfile), encoding));
             final String sourceCodeLn = _sourceLn;
-            int index = 0;
             while (true) {
                 line = br.readLine();
                 if (line == null) {
                     break;
                 }
-                if (index == 0) { // first line
-                    if (!line.trim().startsWith("package ")) { // unsupported
-                        return;
-                    }
-                    sb.append(copyright);
+                if (line.equals(COMPONENT_SHORT_DEF) || line.equals(COMPONENT_FULL_DEF)) { // no name
+                    continue; // replace it because of old style or original settings (ignore next line's style)
                 }
-                sb.append(line);
-                sb.append(sourceCodeLn);
-                ++index;
+                if (line.startsWith(COMPONENT_SHORT_DEF) || line.startsWith(COMPONENT_FULL_DEF)) { // with no name?
+                    return; // already exists, because might have name
+                }
+                if (!componentDone && line.startsWith("public class") && line.contains("Bhv extends ")) {
+                    sb.append(COMPONENT_FULL_DEF);
+                    sb.append("(\"").append(table.getBehaviorComponentName()).append("\")");
+                    sb.append(sourceCodeLn);
+                    componentDone = true;
+                }
+                sb.append(line).append(sourceCodeLn);
             }
         } catch (IOException e) {
             String msg = "bufferedReader.readLine() threw the exception: current line=" + line;
