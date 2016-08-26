@@ -132,8 +132,7 @@ public class DfBehaviorQueryPathSetupper {
         }
         final Map<String, Map<String, String>> bqpMap = doExtractBehaviorQueryPathMap(outsideSqlPack);
         final Map<File, Map<String, Map<String, String>>> resourceMap = createTableResourceMap(bqpMap);
-        final Set<Entry<File, Map<String, Map<String, String>>>> entrySet = resourceMap.entrySet();
-        for (Entry<File, Map<String, Map<String, String>>> entry : entrySet) {
+        for (Entry<File, Map<String, Map<String, String>>> entry : resourceMap.entrySet()) {
             final File bsbhvFile = entry.getKey();
             final DfBqpBehaviorFile bqpBehaviorFile = new DfBqpBehaviorFile(bsbhvFile);
             final String tableKeyName = bqpBehaviorFile.getTableKeyName();
@@ -233,6 +232,30 @@ public class DfBehaviorQueryPathSetupper {
     }
 
     /**
+     * @param reflectResourceMap The map of reflect resource. (NotNull)
+     */
+    protected void handleReflectResource(Map<File, Map<String, Map<String, String>>> reflectResourceMap) {
+        final Set<Entry<File, Map<String, Map<String, String>>>> entrySet = reflectResourceMap.entrySet();
+        for (Entry<File, Map<String, Map<String, String>>> entry : entrySet) {
+            final File bsbhvFile = entry.getKey();
+            final Map<String, Map<String, String>> resourceElementMap = entry.getValue();
+            writeBehaviorQueryPath(bsbhvFile, resourceElementMap);
+        }
+    }
+
+    /**
+     * @param bsbhvFile The file of base behavior. (NotNull)
+     * @param resourceElementMap The map of resource element. (NotNull) 
+     */
+    protected void writeBehaviorQueryPath(File bsbhvFile, Map<String, Map<String, String>> resourceElementMap) {
+        final DfBqpBehaviorFile bqpBehaviorFile = new DfBqpBehaviorFile(bsbhvFile);
+        bqpBehaviorFile.writeBehaviorQueryPath(resourceElementMap);
+    }
+
+    // ===================================================================================
+    //                                                                      Table Resource
+    //                                                                      ==============
+    /**
      * @param behaviorQueryPathMap The map of behavior query path. (NotNull)
      * @return The map of table resource. (NotNull)
      * @throws DfBehaviorNotFoundException When the behavior is not found.
@@ -260,22 +283,9 @@ public class DfBehaviorQueryPathSetupper {
         if (behaviorQueryPathMap.isEmpty()) {
             return new HashMap<File, Map<String, Map<String, String>>>();
         }
-        final String outputDir;
-        {
-            String tmp = getBasicProperties().getGenerateOutputDirectory();
-            if (tmp.endsWith("/")) {
-                tmp = tmp.substring(0, tmp.length() - "/".length());
-            }
-            outputDir = tmp;
-        }
-        final String bsbhvPackage = getBasicProperties().getBaseBehaviorPackage();
-        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
-        packagePathHandler.setFileSeparatorSlash(true);
-        final String bsbhvPathBase = outputDir + "/" + packagePathHandler.getPackageAsPath(bsbhvPackage);
-
-        final File bsbhvDir = new File(bsbhvPathBase);
-        if (!bsbhvDir.exists()) {
-            _log.warn("The base behavior directory was not found: bsbhvDir=" + bsbhvDir);
+        final DfBasicProperties basicProp = getBasicProperties();
+        final File bsbhvDir = findBsBhvDirOrWarining();
+        if (bsbhvDir == null) { // warning-only ending
             return new HashMap<File, Map<String, Map<String, String>>>();
         }
         final Map<String, File> bsbhvFileMap = createBsBhvFileMap(bsbhvDir);
@@ -299,14 +309,14 @@ public class DfBehaviorQueryPathSetupper {
                     if (retryName.startsWith(projectPrefixLib)) { // e.g. LbFooBhv --> FooBhv
                         retryName = retryName.substring(projectPrefixLib.length());
                     }
-                    final String projectPrefixAp = getBasicProperties().getProjectPrefix();
+                    final String projectPrefixAp = basicProp.getProjectPrefix();
                     retryName = projectPrefixAp + retryName; // e.g. FooBhv --> BpFooBhv
                     final String additionalSuffix = getApplicationBehaviorAdditionalSuffix();
                     retryName = retryName + additionalSuffix; // e.g. BpFooBhv --> BpFooBhvAp
                     bsbhvFile = bsbhvFileMap.get(retryName);
                 }
                 if (bsbhvFile == null) {
-                    throwBehaviorNotFoundException(bsbhvFileMap, behaviorQueryElementMap, bsbhvPathBase);
+                    throwBehaviorNotFoundException(bsbhvFileMap, behaviorQueryElementMap, bsbhvDir);
                 }
             }
 
@@ -322,6 +332,66 @@ public class DfBehaviorQueryPathSetupper {
         return reflectResourceMap;
     }
 
+    // -----------------------------------------------------
+    //                                       BsBhv Directory
+    //                                       ---------------
+    protected File findBsBhvDirOrWarining() { // null allowed
+        final DfBasicProperties basicProp = getBasicProperties();
+        final String outputDirectory = basicProp.getGenerateOutputDirectory();
+        final String mainPath = buildBsBhvPathBase(basicProp, outputDirectory);
+        final File mainBsbhvDir = new File(mainPath);
+        if (mainBsbhvDir.exists() && hasProgramFile(basicProp, mainBsbhvDir)) { // normally here
+            return mainBsbhvDir;
+        }
+        // not exception just in case (sub function here)
+        if (basicProp.isGenerationGapileValid()) {
+            final String gapileDirectory = basicProp.getGenerationGapileDirectory();
+            final String gapilePath = buildBsBhvPathBase(basicProp, gapileDirectory);
+            final File gapileBsbhvDir = new File(gapilePath);
+            if (gapileBsbhvDir.exists() && hasProgramFile(basicProp, gapileBsbhvDir)) {
+                return gapileBsbhvDir;
+            } else {
+                _log.warn("*Not found the base behavior for behavior query path: " + gapilePath);
+                return null;
+            }
+        } else {
+            _log.warn("*Not found the base behavior for behavior query path: " + mainPath);
+            return null;
+        }
+    }
+
+    protected String buildBsBhvPathBase(DfBasicProperties basicProp, String outputDirectory) {
+        final String outputDir;
+        {
+            String tmp = outputDirectory;
+            if (tmp.endsWith("/")) {
+                tmp = tmp.substring(0, tmp.length() - "/".length());
+            }
+            outputDir = tmp;
+        }
+        final String bsbhvPackage = basicProp.getBaseBehaviorPackage();
+        return outputDir + "/" + convertPackageToPath(bsbhvPackage);
+    }
+
+    protected boolean hasProgramFile(DfBasicProperties basicProp, File bsbhvDir) {
+        final String ext = "." + basicProp.getLanguageDependency().getLanguageGrammar().getClassFileExtension();
+        final File[] programFile = bsbhvDir.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isFile() && file.getName().endsWith(ext);
+            }
+        });
+        return programFile != null && programFile.length > 0;
+    }
+
+    protected String convertPackageToPath(String bsbhvPackage) {
+        final DfPackagePathHandler handler = new DfPackagePathHandler(getBasicProperties());
+        handler.setFileSeparatorSlash(true);
+        return handler.getPackageAsPath(bsbhvPackage);
+    }
+
+    // -----------------------------------------------------
+    //                                            BsBhv File
+    //                                            ----------
     protected Map<String, File> createBsBhvFileMap(File bsbhvDir) {
         final String classFileExtension = getBasicProperties().getLanguageDependency().getLanguageGrammar().getClassFileExtension();
         final List<File> bsbhvFileList = extractBsBhvFileList(bsbhvDir, classFileExtension);
@@ -341,8 +411,8 @@ public class DfBehaviorQueryPathSetupper {
         return bsbhvFileMap;
     }
 
-    protected List<File> extractBsBhvFileList(File bsbhvDir, final String classFileExtension) {
-        final FileFilter filefilter = new FileFilter() {
+    protected List<File> extractBsBhvFileList(File bsbhvDir, String classFileExtension) {
+        final List<File> bsbhvFileList = Arrays.asList(bsbhvDir.listFiles(new FileFilter() {
             public boolean accept(File file) {
                 final String path = file.getPath();
                 if (isApplicationBehaviorProject()) {
@@ -353,8 +423,7 @@ public class DfBehaviorQueryPathSetupper {
                     return path.endsWith("Bhv." + classFileExtension);
                 }
             }
-        };
-        final List<File> bsbhvFileList = Arrays.asList(bsbhvDir.listFiles(filefilter));
+        }));
         final TreeSet<File> treeSet = new TreeSet<File>(new Comparator<File>() {
             public int compare(File o1, File o2) {
                 return o1.getName().compareTo(o2.getName());
@@ -362,50 +431,6 @@ public class DfBehaviorQueryPathSetupper {
         });
         treeSet.addAll(bsbhvFileList); // not to depends on OS varying behavior
         return new ArrayList<File>(treeSet);
-    }
-
-    protected void throwBehaviorNotFoundException(Map<String, File> bsbhvFileMap, Map<String, String> behaviorQueryElementMap,
-            String bsbhvPathBase) {
-        final String path = behaviorQueryElementMap.get(KEY_PATH);
-        final String behaviorName = behaviorQueryElementMap.get(KEY_BEHAVIOR_NAME);
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The behavior was Not Found!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the existence of the behavior." + ln();
-        msg = msg + "And confirm your SQL file name." + ln();
-        msg = msg + ln();
-        msg = msg + "[Your SQL File]" + ln() + path + ln();
-        msg = msg + ln();
-        msg = msg + "[Not Found Behavior]" + ln() + behaviorName + ln();
-        msg = msg + ln();
-        msg = msg + "[Behavior Directory]" + ln() + bsbhvPathBase + ln();
-        msg = msg + ln();
-        msg = msg + "[Behavior List]" + ln() + bsbhvFileMap.keySet() + ln();
-        msg = msg + "* * * * * * * * * */" + ln();
-        throw new DfBehaviorNotFoundException(msg);
-    }
-
-    /**
-     * @param reflectResourceMap The map of reflect resource. (NotNull)
-     */
-    protected void handleReflectResource(Map<File, Map<String, Map<String, String>>> reflectResourceMap) {
-        final Set<Entry<File, Map<String, Map<String, String>>>> entrySet = reflectResourceMap.entrySet();
-        for (Entry<File, Map<String, Map<String, String>>> entry : entrySet) {
-            final File bsbhvFile = entry.getKey();
-            final Map<String, Map<String, String>> resourceElementMap = entry.getValue();
-            writeBehaviorQueryPath(bsbhvFile, resourceElementMap);
-        }
-    }
-
-    /**
-     * @param bsbhvFile The file of base behavior. (NotNull)
-     * @param resourceElementMap The map of resource element. (NotNull) 
-     */
-    protected void writeBehaviorQueryPath(File bsbhvFile, Map<String, Map<String, String>> resourceElementMap) {
-        final DfBqpBehaviorFile bqpBehaviorFile = new DfBqpBehaviorFile(bsbhvFile);
-        bqpBehaviorFile.writeBehaviorQueryPath(resourceElementMap);
     }
 
     protected String removeBasePrefix(String bsbhvSimpleName) {
@@ -425,6 +450,28 @@ public class DfBehaviorQueryPathSetupper {
             return bsbhvSimpleName;
         }
         return projectPrefix + pureName;
+    }
+
+    protected void throwBehaviorNotFoundException(Map<String, File> bsbhvFileMap, Map<String, String> behaviorQueryElementMap, File bsbhvDir) {
+        final String path = behaviorQueryElementMap.get(KEY_PATH);
+        final String behaviorName = behaviorQueryElementMap.get(KEY_BEHAVIOR_NAME);
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Not found the behavior." + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the existence of the behavior." + ln();
+        msg = msg + "And confirm your SQL file name." + ln();
+        msg = msg + ln();
+        msg = msg + "[Your SQL File]" + ln() + path + ln();
+        msg = msg + ln();
+        msg = msg + "[NotFound Behavior]" + ln() + behaviorName + ln();
+        msg = msg + ln();
+        msg = msg + "[Behavior Directory]" + ln() + bsbhvDir.getPath() + ln();
+        msg = msg + ln();
+        msg = msg + "[Behavior List]" + ln() + bsbhvFileMap.keySet() + ln();
+        msg = msg + "* * * * * * * * * */" + ln();
+        throw new DfBehaviorNotFoundException(msg);
     }
 
     // ===================================================================================

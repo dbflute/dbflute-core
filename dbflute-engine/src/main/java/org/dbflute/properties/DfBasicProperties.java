@@ -693,6 +693,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return _generationGapileMap;
     }
 
+    public boolean isGenerationGapileValid() {
+        return getGenerationGapileDirectory() != null;
+    }
+
     public String getGenerationGapileDirectory() { // null allowed
         return getProperty("gapileDirectory", null, getGenerationGapileMap());
     }

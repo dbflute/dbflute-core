@@ -16,6 +16,8 @@
 package org.dbflute.logic.generate.gapile;
 
 import org.dbflute.DfBuildProperties;
+import org.dbflute.logic.generate.language.DfLanguageDependency;
+import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.properties.DfBasicProperties;
 
@@ -29,10 +31,10 @@ public class DfGapileProcess {
     //                                                                             Reflect
     //                                                                             =======
     public void reflectIfNeeds() {
-        final String gapileDirectory = getBasicProperties().getGenerationGapileDirectory();
-        if (gapileDirectory == null) {
-            return; // normally here
+        if (!getBasicProperties().isGenerationGapileValid()) {
+            return;
         }
+        final String gapileDirectory = getBasicProperties().getGenerationGapileDirectory(); // not null here
         final DfGapileClassReflector reflector = createReflector(gapileDirectory);
         reflector.reflect();
     }
@@ -41,8 +43,10 @@ public class DfGapileProcess {
         final DfBasicProperties prop = getBasicProperties();
         final String outputDirectory = prop.getGenerateOutputDirectory();
         final String packageBase = prop.getPackageBase();
-        final DfLanguageClassPackage classPackage = prop.getLanguageDependency().getLanguageClassPackage();
-        return new DfGapileClassReflector(outputDirectory, packageBase, classPackage, gapileDirectory);
+        final DfLanguageDependency lang = prop.getLanguageDependency();
+        final DfLanguageClassPackage classPackage = lang.getLanguageClassPackage();
+        final DfLanguageGrammar grammar = lang.getLanguageGrammar();
+        return new DfGapileClassReflector(outputDirectory, packageBase, classPackage, grammar, gapileDirectory);
     }
 
     // ===================================================================================

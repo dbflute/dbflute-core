@@ -21,6 +21,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.dbflute.helper.filesystem.FileTextIO;
+import org.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -51,15 +54,18 @@ public class DfGapileClassReflector {
     protected final String _outputDirectory;
     protected final String _packageBase;
     protected final DfLanguageClassPackage _classPackage;
+    protected final DfLanguageGrammar _grammar;
     protected final String _gapileDirectory;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfGapileClassReflector(String outputDirectory, String packageBase, DfLanguageClassPackage classPackage, String gapileDirectory) {
+    public DfGapileClassReflector(String outputDirectory, String packageBase, DfLanguageClassPackage classPackage,
+            DfLanguageGrammar grammar, String gapileDirectory) {
         _outputDirectory = outputDirectory;
         _packageBase = packageBase;
         _classPackage = classPackage;
+        _grammar = grammar;
         _gapileDirectory = gapileDirectory;
     }
 
@@ -98,19 +104,50 @@ public class DfGapileClassReflector {
     //                                                                     ===============
     protected void moveBsClassToGapile(String mainBasePath, String gapileBasePath, String resourcePath) {
         final File currentDir = new File(mainBasePath + "/" + resourcePath);
+        doMoveBsClassToGapile(gapileBasePath, resourcePath, currentDir);
+    }
+
+    protected void doMoveBsClassToGapile(String gapileBasePath, String resourcePath, File currentDir) {
         final File gapileDir = new File(gapileBasePath + "/" + resourcePath);
-        if (currentDir.exists()) {
-            completelyDeleteDirIfExists(gapileDir);
-            final File parentDir = gapileDir.getParentFile();
-            if (!parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-            show("...Moving " + resourcePath + " to gapile directory.");
-            final boolean renamed = currentDir.renameTo(gapileDir);
-            if (!renamed) {
-                show("*Failed to move " + resourcePath + " to gapile directory: " + gapileDir.getPath());
+        if (currentDir.exists()) { // exists but no files when e.g. sql2entity
+            if (hasProgramFile(currentDir)) {
+                completelyDeleteDirIfExists(gapileDir);
+                final File parentDir = gapileDir.getParentFile();
+                if (!parentDir.exists()) {
+                    parentDir.mkdirs();
+                }
+                show("...Moving " + resourcePath + " to gapile directory.");
+                final boolean renamed = currentDir.renameTo(gapileDir);
+                if (!renamed) {
+                    show("*Failed to move " + resourcePath + " to gapile directory: " + gapileDir.getPath());
+                }
+            } else { // e.g. sql2entity, bsbhv/pmbean
+                final File[] subDirs = currentDir.listFiles(new FileFilter() {
+                    public boolean accept(File file) {
+                        return file.isDirectory();
+                    }
+                });
+                if (subDirs != null) {
+                    for (File subDir : subDirs) {
+                        final String subResourcePath = resourcePath + "/" + subDir.getName();
+                        doMoveBsClassToGapile(gapileBasePath, subResourcePath, subDir); // recursive call
+                    }
+                }
+                // give up:
+                // lonely empty bsbhv directory for now
+                // cannot be reflected all deleted outsideSqls for now (but reflected when generate)
             }
         }
+    }
+
+    protected boolean hasProgramFile(File dir) {
+        final String ext = "." + _grammar.getClassFileExtension();
+        final File[] programFile = dir.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isFile() && file.getName().endsWith(ext);
+            }
+        });
+        return programFile != null && programFile.length > 0;
     }
 
     // ===================================================================================
@@ -156,13 +193,41 @@ public class DfGapileClassReflector {
         }
         final File[] deletedFiles = gatherClassFile(gapileDir, existingClassNameSet);
 
-        show("...Moving " + resourcePath + " to gapile directory: new=" + copiedFileMap.size() + ", old=" + deletedFiles.length);
+        show(buildExNewOldShowMessage(resourcePath, copiedFileMap, deletedFiles));
         for (Entry<File, File> entry : copiedFileMap.entrySet()) {
             copyText(entry.getKey(), entry.getValue()); // new table
         }
         for (File deletedResourceFile : deletedFiles) {
             deletedResourceFile.delete(); // old table
         }
+    }
+
+    protected String buildExNewOldShowMessage(String resourcePath, Map<File, File> copiedFileMap, File[] deletedFiles) {
+        final String newFilesExp = toExNewOldFilesExp(copiedFileMap.keySet());
+        final String oldFilesExp = toExNewOldFilesExp(Arrays.asList(deletedFiles));
+        final StringBuilder msgSb = new StringBuilder();
+        msgSb.append("...Moving ").append(resourcePath).append(" to gapile directory");
+        msgSb.append(": new=").append(copiedFileMap.size()).append(newFilesExp);
+        msgSb.append(", old=").append(deletedFiles.length).append(oldFilesExp);
+        return msgSb.toString();
+    }
+
+    protected String toExNewOldFilesExp(Collection<File> files) {
+        if (files.isEmpty()) {
+            return "";
+        }
+        final StringBuilder sb = new StringBuilder();
+        int index = 0;
+        for (File copiedFile : files) {
+            if (index >= 2) { // limit
+                sb.append(", ...");
+                break;
+            }
+            final String withoutExt = Srl.substringLastFront(copiedFile.getName(), ".");
+            sb.append(index > 0 ? ", " : "").append(withoutExt);
+            ++index;
+        }
+        return " (" + sb.toString() + ")";
     }
 
     // ===================================================================================
