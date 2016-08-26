@@ -133,9 +133,9 @@ public class DfGapileClassReflector {
                         doMoveBsClassToGapile(gapileBasePath, subResourcePath, subDir); // recursive call
                     }
                 }
-                // give up:
-                // lonely empty bsbhv directory for now
-                // cannot be reflected all deleted outsideSqls for now (but reflected when generate)
+                // give up when sql2entity:
+                // o lonely empty bsbhv directory (but deleted when generate)
+                // o cannot be reflected when all outsideSqls deleted (but reflected when generate)
             }
         }
     }
