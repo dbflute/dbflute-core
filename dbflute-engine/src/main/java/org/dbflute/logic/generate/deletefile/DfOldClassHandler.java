@@ -446,6 +446,10 @@ public class DfOldClassHandler {
         deletor.setClassSuffix(classSuffix);
         deletor.setClassExtension(getClassFileExtension());
         deletor.setNotDeleteClassNameSet(createNotDeleteTCNSet(setuppers));
+        if (getBasicProperties().isGenerationGapileValid()) {
+            deletor.setMainOutputDirectory(getBasicProperties().getGenerateOutputDirectory());
+            deletor.setGapileDirectory(getBasicProperties().getGapileDirectory());
+        }
         return deletor;
     }
 
@@ -756,6 +760,10 @@ public class DfOldClassHandler {
         deletor.setClassSuffix(classSuffix);
         deletor.setClassExtension(getClassFileExtension());
         deletor.setNotDeleteClassNameSet(notDeleteClassNameSet);
+        if (getBasicProperties().isGenerationGapileValid()) {
+            deletor.setMainOutputDirectory(getOutsideSqlProperties().getSql2EntityOutputDirectory());
+            deletor.setGapileDirectory(getBasicProperties().getGapileDirectory());
+        }
         return deletor;
     }
 
@@ -1045,19 +1053,19 @@ public class DfOldClassHandler {
     }
 
     protected DfBasicProperties getBasicProperties() {
-        return DfBuildProperties.getInstance().getBasicProperties();
+        return getProperties().getBasicProperties();
     }
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
-        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     protected DfOutsideSqlProperties getOutsideSqlProperties() {
-        return DfBuildProperties.getInstance().getOutsideSqlProperties();
+        return getProperties().getOutsideSqlProperties();
     }
 
     protected DfSimpleDtoProperties getSimpleDtoProperties() {
-        return DfBuildProperties.getInstance().getSimpleDtoProperties();
+        return getProperties().getSimpleDtoProperties();
     }
 
     // ===================================================================================

@@ -34,7 +34,7 @@ public class DfGapileProcess {
         if (!getBasicProperties().isGenerationGapileValid()) {
             return;
         }
-        final String gapileDirectory = getBasicProperties().getGenerationGapileDirectory(); // not null here
+        final String gapileDirectory = getBasicProperties().getGapileDirectory(); // not null here
         final DfGapileClassReflector reflector = createReflector(gapileDirectory);
         reflector.reflect();
     }

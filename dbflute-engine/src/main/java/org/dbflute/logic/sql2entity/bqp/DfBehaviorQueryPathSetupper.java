@@ -345,7 +345,7 @@ public class DfBehaviorQueryPathSetupper {
         }
         // not exception just in case (sub function here)
         if (basicProp.isGenerationGapileValid()) {
-            final String gapileDirectory = basicProp.getGenerationGapileDirectory();
+            final String gapileDirectory = basicProp.getGapileDirectory();
             final String gapilePath = buildBsBhvPathBase(basicProp, gapileDirectory);
             final File gapileBsbhvDir = new File(gapilePath);
             if (gapileBsbhvDir.exists() && hasProgramFile(basicProp, gapileBsbhvDir)) {

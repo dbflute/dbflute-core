@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -47,6 +48,7 @@ public class DfGapileClassReflector {
     //                                                                          ==========
     /** The _log instance for this class. (NotNull) */
     protected static final Logger _log = LoggerFactory.getLogger(DfGapileClassReflector.class);
+    protected static final File[] EMPTY_FILES = new File[] {};
 
     // ===================================================================================
     //                                                                           Attribute
@@ -89,92 +91,95 @@ public class DfGapileClassReflector {
         moveBsClassToGapile(mainBasePath, gapileBasePath, _classPackage.getBaseBehaviorPackage());
         moveBsClassToGapile(mainBasePath, gapileBasePath, _classPackage.getBaseEntityPackage());
         final String cbPkg = _classPackage.getConditionBeanPackage();
-        moveBsClassToGapile(mainBasePath, gapileBasePath, cbPkg + "/bs"); // #hope resolve by language
-        moveBsClassToGapile(mainBasePath, gapileBasePath, cbPkg + "/cq/bs");
-        moveBsClassToGapile(mainBasePath, gapileBasePath, cbPkg + "/cq/ciq");
-        moveBsClassToGapile(mainBasePath, gapileBasePath, cbPkg + "/nss");
-        moveExClassToGapile(mainBasePath, gapileBasePath, cbPkg);
-        moveExClassToGapile(mainBasePath, gapileBasePath, _classPackage.getExtendedBehaviorPackage());
-        moveExClassToGapile(mainBasePath, gapileBasePath, _classPackage.getExtendedEntityPackage());
+        final Set<String> cbeanBaseSubSet = prepareCBeanBaseSubSet();
+        for (String cbeanBaseSub : cbeanBaseSubSet) {
+            moveBsClassToGapile(mainBasePath, gapileBasePath, cbPkg + "/" + cbeanBaseSub);
+        }
+
+        final Set<String> baseSubSet = cbeanBaseSubSet; // only cbean has both base and extended classes
+        moveExClassToGapile(mainBasePath, gapileBasePath, cbPkg, baseSubSet);
+        moveExClassToGapile(mainBasePath, gapileBasePath, _classPackage.getExtendedBehaviorPackage(), baseSubSet);
+        moveExClassToGapile(mainBasePath, gapileBasePath, _classPackage.getExtendedEntityPackage(), baseSubSet);
         show("==========/");
+    }
+
+    protected Set<String> prepareCBeanBaseSubSet() { // #hope resolve by language
+        return new LinkedHashSet<String>(Arrays.asList("bs", "cq/bs", "cq/ciq", "nss"));
     }
 
     // ===================================================================================
     //                                                                     Move Base Class
     //                                                                     ===============
     protected void moveBsClassToGapile(String mainBasePath, String gapileBasePath, String resourcePath) {
-        final File currentDir = new File(mainBasePath + "/" + resourcePath);
-        doMoveBsClassToGapile(gapileBasePath, resourcePath, currentDir);
+        final File mainDir = new File(mainBasePath + "/" + resourcePath);
+        doMoveBsClassToGapile(gapileBasePath, resourcePath, mainDir);
     }
 
-    protected void doMoveBsClassToGapile(String gapileBasePath, String resourcePath, File currentDir) {
+    protected void doMoveBsClassToGapile(String gapileBasePath, String resourcePath, File mainDir) {
+        if (!mainDir.exists()) { // e.g. bsbhv of first sql2entity
+            return;
+        }
         final File gapileDir = new File(gapileBasePath + "/" + resourcePath);
-        if (currentDir.exists()) { // exists but no files when e.g. sql2entity
-            if (hasProgramFile(currentDir)) {
-                completelyDeleteDirIfExists(gapileDir);
-                final File parentDir = gapileDir.getParentFile();
-                if (!parentDir.exists()) {
-                    parentDir.mkdirs();
+        if (hasJustBelowFile(mainDir)) { // to avoid deleting e.g. behaviors when sql2entity
+            if (gapileDir.exists()) {
+                final File[] gapileClassFiles = gatherJustBelowFiles(gapileDir); // contains e.g. .gitignore
+                for (File gapileClassFile : gapileClassFiles) {
+                    gapileClassFile.delete();
                 }
-                show("...Moving " + resourcePath + " to gapile directory.");
-                final boolean renamed = currentDir.renameTo(gapileDir);
+            } else {
+                gapileDir.mkdirs();
+            }
+            show("...Moving base " + resourcePath + " to gapile directory.");
+            // quit directory renaming because of deleting sql2entity classes
+            //final boolean renamed = currentDir.renameTo(gapileDir);
+            final File[] mainClassFiles = gatherJustBelowFiles(mainDir); // contains e.g. .gitignore
+            for (File mainClassFile : mainClassFiles) {
+                final File gapileClassFile = new File(gapileDir.getPath() + "/" + mainClassFile.getName());
+                final boolean renamed = mainClassFile.renameTo(gapileClassFile);
                 if (!renamed) {
-                    show("*Failed to move " + resourcePath + " to gapile directory: " + gapileDir.getPath());
+                    show("*Failed to move " + resourcePath + " to gapile file: " + gapileClassFile.getPath());
                 }
-            } else { // e.g. sql2entity, bsbhv/pmbean
-                final File[] subDirs = currentDir.listFiles(new FileFilter() {
-                    public boolean accept(File file) {
-                        return file.isDirectory();
-                    }
-                });
-                if (subDirs != null) {
-                    for (File subDir : subDirs) {
-                        final String subResourcePath = resourcePath + "/" + subDir.getName();
-                        doMoveBsClassToGapile(gapileBasePath, subResourcePath, subDir); // recursive call
-                    }
-                }
-                // give up when sql2entity:
-                // o lonely empty bsbhv directory (but deleted when generate)
-                // o cannot be reflected when all outsideSqls deleted (but reflected when generate)
             }
         }
-    }
-
-    protected boolean hasProgramFile(File dir) {
-        final String ext = "." + _grammar.getClassFileExtension();
-        final File[] programFile = dir.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                return file.isFile() && file.getName().endsWith(ext);
-            }
-        });
-        return programFile != null && programFile.length > 0;
+        // e.g. generate (cbean/bs), sql2entity (bsbhv/pmbean)
+        final File[] subDirs = gatherSubDirs(mainDir);
+        for (File subDir : subDirs) {
+            final String subResourcePath = resourcePath + "/" + subDir.getName();
+            doMoveBsClassToGapile(gapileBasePath, subResourcePath, subDir); // recursive call
+        }
+        final boolean deleted = mainDir.delete(); // basically success
+        if (!deleted) {
+            show("*Failed to delete " + resourcePath + " of main directory: " + mainDir.getPath());
+        }
+        // give up when sql2entity:
+        // cannot be reflected when all outsideSqls are deleted
+        // because main process itself cannot delete them
     }
 
     // ===================================================================================
     //                                                                 Move Extended Class
     //                                                                 ===================
-    protected void moveExClassToGapile(String mainBasePath, String gapileBasePath, String resourceDir) {
-        final File currentDir = new File(mainBasePath + "/" + resourceDir);
-        doMoveToGapile(gapileBasePath, resourceDir, currentDir);
+    protected void moveExClassToGapile(String mainBasePath, String gapileBasePath, String resourceDir, Set<String> baseSubSet) {
+        final File mainDir = new File(mainBasePath + "/" + resourceDir);
+        doMoveToGapile(gapileBasePath, resourceDir, mainDir, baseSubSet);
     }
 
-    protected void doMoveToGapile(String gapileBasePath, String resourcePath, File currentDir) {
-        if (!currentDir.exists()) { // e.g. cbean/bs, cbean/cq/bs (already moved here)
+    protected void doMoveToGapile(String gapileBasePath, String resourcePath, File mainDir, Set<String> baseSubSet) {
+        if (!mainDir.exists()) { // e.g. cbean/bs, cbean/cq/bs (already moved here)
             return;
         }
-        final File[] subDirs = currentDir.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
-        });
-        if (subDirs != null) {
-            for (File subDir : subDirs) {
-                final String subResourcePath = resourcePath + "/" + subDir.getName();
-                doMoveToGapile(gapileBasePath, subResourcePath, subDir); // recursive call
-            }
+        if (baseSubSet.contains(resourcePath)) { // also e.g. cbean/bs, cbean/cq/bs (just in case)
+            return;
+        }
+        final File[] subDirs = gatherSubDirs(mainDir); // e.g. cbean/cq, exbhv/pmbean
+        for (File subDir : subDirs) {
+            final String subResourcePath = resourcePath + "/" + subDir.getName();
+            doMoveToGapile(gapileBasePath, subResourcePath, subDir, baseSubSet); // recursive call
         }
         final File gapileDir = new File(gapileBasePath + "/" + resourcePath);
-        final File[] mainClassFiles = gatherClassFiles(currentDir);
+
+        // class files only because extended area is developer world so keep other files
+        final File[] mainClassFiles = gatherClassFiles(mainDir);
         if (mainClassFiles.length > 0) {
             gapileDir.mkdirs();
         }
@@ -206,7 +211,7 @@ public class DfGapileClassReflector {
         final String newFilesExp = toExNewOldFilesExp(copiedFileMap.keySet());
         final String oldFilesExp = toExNewOldFilesExp(Arrays.asList(deletedFiles));
         final StringBuilder msgSb = new StringBuilder();
-        msgSb.append("...Moving ").append(resourcePath).append(" to gapile directory");
+        msgSb.append("...Moving extended ").append(resourcePath).append(" to gapile directory");
         msgSb.append(": new=").append(copiedFileMap.size()).append(newFilesExp);
         msgSb.append(", old=").append(deletedFiles.length).append(oldFilesExp);
         return msgSb.toString();
@@ -248,38 +253,65 @@ public class DfGapileClassReflector {
         }
     }
 
-    protected File[] gatherClassFiles(File mainDir) {
-        final File[] files = mainDir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".java");
+    protected boolean hasClassFile(File dir) {
+        final String ext = getClassExt();
+        final File[] programFile = dir.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isFile() && file.getName().endsWith(ext);
             }
         });
-        return files != null ? files : new File[] {};
+        return programFile != null && programFile.length > 0;
     }
 
-    protected File[] gatherClassFile(File gapileDir, Set<String> existingClassNameSet) {
-        final File[] files = gapileDir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".java") && !existingClassNameSet.contains(name);
+    protected boolean hasJustBelowFile(File dir) {
+        final File[] files = dir.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isFile();
             }
         });
-        return files != null ? files : new File[] {};
+        return files != null && files.length > 0;
     }
 
-    protected void completelyDeleteDirIfExists(File dir) {
-        if (dir.exists()) { // to override
-            final File[] files = dir.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        completelyDeleteDirIfExists(file);
-                    } else {
-                        file.delete();
-                    }
-                }
+    protected File[] gatherClassFiles(File dir) {
+        final String ext = getClassExt();
+        final File[] files = dir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(ext);
             }
-            dir.delete();
-        }
+        });
+        return files != null ? files : EMPTY_FILES;
+    }
+
+    protected File[] gatherClassFile(File dir, Set<String> existingClassNameSet) {
+        final String ext = getClassExt();
+        final File[] files = dir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(ext) && !existingClassNameSet.contains(name);
+            }
+        });
+        return files != null ? files : EMPTY_FILES;
+    }
+
+    protected String getClassExt() {
+        return "." + _grammar.getClassFileExtension();
+    }
+
+    protected File[] gatherJustBelowFiles(File dir) {
+        final File[] files = dir.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isFile();
+            }
+        });
+        return files != null ? files : EMPTY_FILES;
+    }
+
+    private File[] gatherSubDirs(File currentDir) {
+        final File[] dirs = currentDir.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isDirectory();
+            }
+        });
+        return dirs != null ? dirs : EMPTY_FILES;
     }
 
     protected void show(String msg) {
