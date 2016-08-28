@@ -98,17 +98,14 @@ public class DfOldTableClassDeletor {
     protected List<File> findPackageFileList(String packagePath, final String classPrefix, final String classSuffix) {
         final String packageAsPath = _packagePathHandler.getPackageAsPath(packagePath);
         final File dir = new File(_outputDirectory + "/" + packageAsPath);
-        if (!dir.exists() || !dir.isDirectory()) {
-            return Collections.emptyList();
-        }
         final FilenameFilter filter = createTargetFileFilter(classPrefix, classSuffix);
-        final File[] targetFiles = dir.listFiles(filter);
+        final File[] targetFiles = dir.exists() ? dir.listFiles(filter) : null;
         if (targetFiles != null && targetFiles.length > 0) {
             return Arrays.asList(targetFiles);
         } else {
-            if (isUseGapileDirectory(packageAsPath)) {
+            if (isUseGapileDirectory()) {
                 final File gapileDir = new File(_gapileDirectory + "/" + packageAsPath);
-                final File[] gapileFiles = gapileDir.listFiles(filter);
+                final File[] gapileFiles = gapileDir.exists() ? gapileDir.listFiles(filter) : null;
                 if (gapileFiles != null && gapileFiles.length > 0) {
                     return Arrays.asList(gapileFiles);
                 }
@@ -138,7 +135,7 @@ public class DfOldTableClassDeletor {
         };
     }
 
-    protected boolean isUseGapileDirectory(String packageAsPath) {
+    protected boolean isUseGapileDirectory() {
         return _mainOutputDirectory != null && _gapileDirectory != null // has gapileDirectory
                 && _outputDirectory.equals(_mainOutputDirectory); // main directory
     }

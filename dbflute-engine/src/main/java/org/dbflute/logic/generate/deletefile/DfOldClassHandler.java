@@ -941,10 +941,7 @@ public class DfOldClassHandler {
         deletor.setClassSuffix(classSuffix);
         deletor.setClassExtension(getClassFileExtension());
         deletor.setNotDeleteClassNameSet(createNotDeleteTCNSet(setuppers));
-        if (getBasicProperties().isGenerationGapileValid()) {
-            deletor.setMainOutputDirectory(getBasicProperties().getGenerateOutputDirectory());
-            deletor.setGapileDirectory(getBasicProperties().getGapileDirectory());
-        }
+        setupGapileDirectoryIfNeeds(deletor, getBasicProperties().getGenerateOutputDirectory());
         return deletor;
     }
 
@@ -965,10 +962,7 @@ public class DfOldClassHandler {
         deletor.setClassSuffix(classSuffix);
         deletor.setClassExtension(getClassFileExtension());
         deletor.setNotDeleteClassNameSet(notDeleteClassNameSet);
-        if (getBasicProperties().isGenerationGapileValid()) {
-            deletor.setMainOutputDirectory(getOutsideSqlProperties().getSql2EntityOutputDirectory());
-            deletor.setGapileDirectory(getBasicProperties().getGapileDirectory());
-        }
+        setupGapileDirectoryIfNeeds(deletor, getOutsideSqlProperties().getSql2EntityOutputDirectory());
         return deletor;
     }
 
@@ -991,6 +985,13 @@ public class DfOldClassHandler {
             }
         }
         return notDeleteClassNameSet;
+    }
+
+    protected void setupGapileDirectoryIfNeeds(DfOldTableClassDeletor deletor, String mainOutputDirectory) {
+        if (getBasicProperties().isGenerationGapileValid()) {
+            deletor.setMainOutputDirectory(mainOutputDirectory);
+            deletor.setGapileDirectory(getBasicProperties().getGapileDirectory());
+        }
     }
 
     // ===================================================================================
