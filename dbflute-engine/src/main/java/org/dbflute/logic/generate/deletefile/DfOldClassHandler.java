@@ -419,58 +419,6 @@ public class DfOldClassHandler {
         return getBasicProperties().getExtendedEntityPackage();
     }
 
-    // -----------------------------------------------------
-    //                                         Common Helper
-    //                                         -------------
-    protected void showDeleteOldTableFile(List<String> deletedClassNameList) {
-        for (Object className : deletedClassNameList) {
-            info("    delete('" + className + "');");
-        }
-    }
-
-    protected void showDeleteOldTableFile(Map<String, List<String>> deletedClassNameListMap) {
-        Set<Entry<String, List<String>>> entrySet = deletedClassNameListMap.entrySet();
-        for (Entry<String, List<String>> entry : entrySet) {
-            final List<String> deletedClassNameList = entry.getValue();
-            for (Object className : deletedClassNameList) {
-                info("    delete('" + className + "');");
-            }
-        }
-    }
-
-    protected DfOldTableClassDeletor createTCD(String packagePath, String classPrefix, String classSuffix,
-            NotDeleteTCNSetupper... setuppers) { // createOldTableClassDeletor()
-        final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(_generator.getOutputPath(), createPackagePathHandler());
-        deletor.addPackagePath(packagePath);
-        deletor.setClassPrefix(classPrefix);
-        deletor.setClassSuffix(classSuffix);
-        deletor.setClassExtension(getClassFileExtension());
-        deletor.setNotDeleteClassNameSet(createNotDeleteTCNSet(setuppers));
-        if (getBasicProperties().isGenerationGapileValid()) {
-            deletor.setMainOutputDirectory(getBasicProperties().getGenerateOutputDirectory());
-            deletor.setGapileDirectory(getBasicProperties().getGapileDirectory());
-        }
-        return deletor;
-    }
-
-    protected static interface NotDeleteTCNSetupper { // NotDeleteTableClassNameSetupper
-        public String setup(Table table);
-    }
-
-    protected Set<String> createNotDeleteTCNSet(NotDeleteTCNSetupper... setuppers) {
-        final Set<String> notDeleteClassNameSet = new HashSet<String>();
-        for (NotDeleteTCNSetupper setupper : setuppers) {
-            final List<Table> tableList = getTableList();
-            for (Table table : tableList) {
-                final String tableName = setupper.setup(table);
-                if (tableName != null) {
-                    notDeleteClassNameSet.add(tableName);
-                }
-            }
-        }
-        return notDeleteClassNameSet;
-    }
-
     // ===================================================================================
     //                                                                 Old Customize Class
     //                                                                 ===================
@@ -743,30 +691,6 @@ public class DfOldClassHandler {
         return deletedBaseListMap != null && !deletedBaseListMap.isEmpty();
     }
 
-    // -----------------------------------------------------
-    //                                         Common Helper
-    //                                         -------------
-    protected DfOldTableClassDeletor createCCD(String outputDirectory, String packagePath, String classPrefix, String classSuffix,
-            NotDeleteTCNSetupper... setuppers) { // createOldCustomizeClassDeletor()
-        return createCCD(outputDirectory, packagePath, classPrefix, classSuffix, createNotDeleteTCNSet(setuppers));
-    }
-
-    protected DfOldTableClassDeletor createCCD(String outputDirectory, String packagePath, String classPrefix, String classSuffix,
-            Set<String> notDeleteClassNameSet) { // createOldCustomizeClassDeletor()
-        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
-        final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(outputDirectory, packagePathHandler);
-        deletor.addPackagePath(packagePath);
-        deletor.setClassPrefix(classPrefix);
-        deletor.setClassSuffix(classSuffix);
-        deletor.setClassExtension(getClassFileExtension());
-        deletor.setNotDeleteClassNameSet(notDeleteClassNameSet);
-        if (getBasicProperties().isGenerationGapileValid()) {
-            deletor.setMainOutputDirectory(getOutsideSqlProperties().getSql2EntityOutputDirectory());
-            deletor.setGapileDirectory(getBasicProperties().getGapileDirectory());
-        }
-        return deletor;
-    }
-
     protected void deleteCustomizeExtendedClass(Map<String, List<String>> deletedBaseListMap, String... packagePathList) {
         final Set<Entry<String, List<String>>> entrySet = deletedBaseListMap.entrySet();
         for (Entry<String, List<String>> entry : entrySet) {
@@ -1004,8 +928,90 @@ public class DfOldClassHandler {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                      Create Deleter
+    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                             for Table
+    //                                             ---------
+    protected DfOldTableClassDeletor createTCD(String packagePath, String classPrefix, String classSuffix,
+            NotDeleteTCNSetupper... setuppers) { // createOldTableClassDeletor()
+        final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(_generator.getOutputPath(), createPackagePathHandler());
+        deletor.addPackagePath(packagePath);
+        deletor.setClassPrefix(classPrefix);
+        deletor.setClassSuffix(classSuffix);
+        deletor.setClassExtension(getClassFileExtension());
+        deletor.setNotDeleteClassNameSet(createNotDeleteTCNSet(setuppers));
+        if (getBasicProperties().isGenerationGapileValid()) {
+            deletor.setMainOutputDirectory(getBasicProperties().getGenerateOutputDirectory());
+            deletor.setGapileDirectory(getBasicProperties().getGapileDirectory());
+        }
+        return deletor;
+    }
+
+    // -----------------------------------------------------
+    //                                   for Customize Class
+    //                                   -------------------
+    protected DfOldTableClassDeletor createCCD(String outputDirectory, String packagePath, String classPrefix, String classSuffix,
+            NotDeleteTCNSetupper... setuppers) { // createOldCustomizeClassDeletor()
+        return createCCD(outputDirectory, packagePath, classPrefix, classSuffix, createNotDeleteTCNSet(setuppers));
+    }
+
+    protected DfOldTableClassDeletor createCCD(String outputDirectory, String packagePath, String classPrefix, String classSuffix,
+            Set<String> notDeleteClassNameSet) { // createOldCustomizeClassDeletor()
+        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
+        final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(outputDirectory, packagePathHandler);
+        deletor.addPackagePath(packagePath);
+        deletor.setClassPrefix(classPrefix);
+        deletor.setClassSuffix(classSuffix);
+        deletor.setClassExtension(getClassFileExtension());
+        deletor.setNotDeleteClassNameSet(notDeleteClassNameSet);
+        if (getBasicProperties().isGenerationGapileValid()) {
+            deletor.setMainOutputDirectory(getOutsideSqlProperties().getSql2EntityOutputDirectory());
+            deletor.setGapileDirectory(getBasicProperties().getGapileDirectory());
+        }
+        return deletor;
+    }
+
+    // -----------------------------------------------------
+    //                                         Common Helper
+    //                                         -------------
+    protected static interface NotDeleteTCNSetupper { // NotDeleteTableClassNameSetupper
+        public String setup(Table table);
+    }
+
+    protected Set<String> createNotDeleteTCNSet(NotDeleteTCNSetupper... setuppers) {
+        final Set<String> notDeleteClassNameSet = new HashSet<String>();
+        for (NotDeleteTCNSetupper setupper : setuppers) {
+            final List<Table> tableList = getTableList();
+            for (Table table : tableList) {
+                final String tableName = setupper.setup(table);
+                if (tableName != null) {
+                    notDeleteClassNameSet.add(tableName);
+                }
+            }
+        }
+        return notDeleteClassNameSet;
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected void showDeleteOldTableFile(List<String> deletedClassNameList) {
+        for (Object className : deletedClassNameList) {
+            info("    delete('" + className + "');");
+        }
+    }
+
+    protected void showDeleteOldTableFile(Map<String, List<String>> deletedClassNameListMap) {
+        Set<Entry<String, List<String>>> entrySet = deletedClassNameListMap.entrySet();
+        for (Entry<String, List<String>> entry : entrySet) {
+            final List<String> deletedClassNameList = entry.getValue();
+            for (Object className : deletedClassNameList) {
+                info("    delete('" + className + "');");
+            }
+        }
+    }
+
     protected DfPackagePathHandler createPackagePathHandler() {
         return new DfPackagePathHandler(getBasicProperties());
     }
@@ -1034,9 +1040,6 @@ public class DfOldClassHandler {
         return _tableList;
     }
 
-    // -----------------------------------------------------
-    //                                               Logging
-    //                                               -------
     public void info(String msg) {
         _log.info(msg);
     }

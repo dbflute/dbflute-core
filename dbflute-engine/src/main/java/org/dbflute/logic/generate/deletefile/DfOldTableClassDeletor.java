@@ -49,8 +49,12 @@ public class DfOldTableClassDeletor {
     protected String _classSuffix;
     protected String _classExtension;
     protected Set<String> _notDeleteClassNameSet;
-    protected String _mainOutputDirectory; // null allowed, option
-    protected String _gapileDirectory; // null allowed, option
+
+    // -----------------------------------------------------
+    //                                         Gapile Option
+    //                                         -------------
+    protected String _mainOutputDirectory; // null allowed
+    protected String _gapileDirectory; // null allowed
 
     // ===================================================================================
     //                                                                         Constructor
@@ -93,11 +97,28 @@ public class DfOldTableClassDeletor {
      */
     protected List<File> findPackageFileList(String packagePath, final String classPrefix, final String classSuffix) {
         final String packageAsPath = _packagePathHandler.getPackageAsPath(packagePath);
-        final File dir = findPackageDir(packageAsPath);
+        final File dir = new File(_outputDirectory + "/" + packageAsPath);
         if (!dir.exists() || !dir.isDirectory()) {
             return Collections.emptyList();
         }
-        final FilenameFilter filter = new FilenameFilter() {
+        final FilenameFilter filter = createTargetFileFilter(classPrefix, classSuffix);
+        final File[] targetFiles = dir.listFiles(filter);
+        if (targetFiles != null && targetFiles.length > 0) {
+            return Arrays.asList(targetFiles);
+        } else {
+            if (isUseGapileDirectory(packageAsPath)) {
+                final File gapileDir = new File(_gapileDirectory + "/" + packageAsPath);
+                final File[] gapileFiles = gapileDir.listFiles(filter);
+                if (gapileFiles != null && gapileFiles.length > 0) {
+                    return Arrays.asList(gapileFiles);
+                }
+            }
+            return Collections.emptyList();
+        }
+    }
+
+    protected FilenameFilter createTargetFileFilter(String classPrefix, String classSuffix) {
+        return new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 if (!name.endsWith(_classExtension)) {
                     return false;
@@ -115,24 +136,9 @@ public class DfOldTableClassDeletor {
                 return true;
             }
         };
-        final File[] listFiles = dir.listFiles(filter);
-        if (listFiles == null || listFiles.length == 0) {
-            return Collections.emptyList();
-        } else {
-            return Arrays.asList(listFiles);
-        }
     }
 
-    protected File findPackageDir(final String packageAsPath) {
-        final File dir = new File(_outputDirectory + "/" + packageAsPath);
-        if (!dir.exists() && isUseGapileDirectory()) {
-            return new File(_gapileDirectory + "/" + packageAsPath);
-        } else {
-            return dir;
-        }
-    }
-
-    protected boolean isUseGapileDirectory() {
+    protected boolean isUseGapileDirectory(String packageAsPath) {
         return _mainOutputDirectory != null && _gapileDirectory != null // has gapileDirectory
                 && _outputDirectory.equals(_mainOutputDirectory); // main directory
     }
