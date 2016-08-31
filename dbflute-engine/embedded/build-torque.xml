@@ -37,7 +37,7 @@
       <include name="${logprop.dir}"/>
     </dirset>
 
-  	<!-- Embedded Libraries -->
+    <!-- Embedded Libraries -->
     <fileset dir="${torque.lib.dir}">
       <include name="**/*.jar"/>
     </fileset>
@@ -210,20 +210,20 @@
   <!--                                                                          Manage -->
   <!--                                                                          nnnnnn -->
   <target name="renewal" description="Renewal task">
-  	<antcall target="replace-schema"/>
-  	<antcall target="jdbc"/>
-  	<antcall target="doc"/>
-  	<antcall target="generate"/>
-  	<antcall target="outside-sql-test"/>
-  	<antcall target="sql2entity"/>
+    <antcall target="replace-schema"/>
+    <antcall target="jdbc"/>
+    <antcall target="doc"/>
+    <antcall target="generate"/>
+    <antcall target="outside-sql-test"/>
+    <antcall target="sql2entity"/>
   </target>
 
   <target name="regenerate" description="Regenerate task">
-  	<antcall target="jdbc"/>
-  	<antcall target="doc"/>
-  	<antcall target="generate"/>
-  	<antcall target="outside-sql-test"/>
-  	<antcall target="sql2entity"/>
+    <antcall target="jdbc"/>
+    <antcall target="doc"/>
+    <antcall target="generate"/>
+    <antcall target="outside-sql-test"/>
+    <antcall target="sql2entity"/>
   </target>
 
   <target name="refresh" description="Refresh task">
@@ -237,7 +237,7 @@
   <target name="freegen" description="FreeGen task">
     <df-freegen
         contextProperties="${torque.contextProperties}"
-    	templatePath="${torque.templatePath}"
+        templatePath="${torque.templatePath}"
         environmentType="${dfenv}"
         genTarget="${gentgt}">
     </df-freegen>
@@ -262,7 +262,7 @@
     <df-upgrade
         contextProperties="${torque.contextProperties}"
         environmentType="${dfenv}"
-    	version="${dfver}">
+        version="${dfver}">
     </df-upgrade>
   </target>
 </project>
