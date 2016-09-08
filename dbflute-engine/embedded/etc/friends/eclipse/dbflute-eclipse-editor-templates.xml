@@ -71,9 +71,9 @@ public static class ${objectType} {
     @Required
     public ${propertyType} ${propertyName};
 }</template>
-<template autoinsert="true" context="java-members" deleted="false" description="LastaFlute: toString() with LaTo" enabled="true" name="_latostring">${:import(org.lastaflute.core.util.Lato)}@Override
+<template autoinsert="true" context="java-members" deleted="false" description="LastaFlute: toString() with Lato" enabled="true" name="_latostring">${:import(org.lastaflute.core.util.Lato)}@Override
 public String toString() {
-    return LaTo.string(this);
+    return Lato.string(this);
 }</template>
 <template autoinsert="true" context="java" deleted="false" description="LastaFlute: Validator groups=ClientError.class" enabled="true" name="_lavclienterr">${:import(org.lastaflute.web.validation.ClientError)}groups = ClientError.class</template>
 <template autoinsert="true" context="java" deleted="false" description="LastaFlute: Validator moreValidate(form|body, messages)" enabled="true" name="_lavmorevalidate">moreValidate(${localVar}, messages)</template>
