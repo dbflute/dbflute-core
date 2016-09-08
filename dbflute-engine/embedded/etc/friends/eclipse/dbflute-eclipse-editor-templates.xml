@@ -71,6 +71,10 @@ public static class ${objectType} {
     @Required
     public ${propertyType} ${propertyName};
 }</template>
+<template autoinsert="true" context="java-members" deleted="false" description="LastaFlute: toString() with LaTo" enabled="true" name="_latostring">${:import(org.lastaflute.core.util.Lato)}@Override
+public String toString() {
+    return LaTo.string(this);
+}</template>
 <template autoinsert="true" context="java" deleted="false" description="LastaFlute: Validator groups=ClientError.class" enabled="true" name="_lavclienterr">${:import(org.lastaflute.web.validation.ClientError)}groups = ClientError.class</template>
 <template autoinsert="true" context="java" deleted="false" description="LastaFlute: Validator moreValidate(form|body, messages)" enabled="true" name="_lavmorevalidate">moreValidate(${localVar}, messages)</template>
 <template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow as Inline" enabled="true" name="_li">${var} -&gt; ${var}.${newName}</template>
@@ -134,7 +138,11 @@ public static class ${objectType} {
 	// ## Act ##
 
 	// ## Assert ##
-}</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQueryAndPart" enabled="true" name="andCBLambda">andCB -&gt; {
+}</template><template autoinsert="true" context="java" deleted="false" description="TODO comment" enabled="true" name="_todo">    // TODO ${user} ${cursor} (${date})</template>
+<template autoinsert="true" context="java" deleted="false" description="TODO review comment" enabled="true" name="_trev">    // TODO ${newName} ${cursor} by ${user} (${date})</template>
+<template autoinsert="true" context="java-statements" deleted="false" description="throw new IllegalArgumentException(...)" enabled="true" name="_tharg">throw new IllegalArgumentException("The argument '${localVar}' should not be null.");</template>
+<template autoinsert="true" context="java-statements" deleted="false" description="throw new IllegalStateException(...)" enabled="true" name="_thstate">throw new IllegalStateException("${message}", ${e:localVar(java.lang.Throwable)});</template>
+<template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQueryAndPart" enabled="true" name="andCBLambda">andCB -&gt; {
     andCB.query().set${Column}
 }</template><template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ConditionBean" enabled="true" name="cbLambda">cb -&gt; {
     cb.${method}
