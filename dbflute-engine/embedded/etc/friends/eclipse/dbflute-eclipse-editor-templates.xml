@@ -75,12 +75,12 @@ public static class ${objectType} {
 public String toString() {
     return Lato.string(this);
 }</template>
-<template autoinsert="true" context="java-statements" deleted="false" description="LastaFlute: Validator for Body" enabled="true" name="_lavabody">validate${}(form, messages -> {});</template>
-<template autoinsert="true" context="java-statements" deleted="false" description="LastaFlute: Validator for Form" enabled="true" name="_lavaform">validate(form, messages -> {}, () -> {
-    return asHtml(${htmlPath:var(org.lastaflute.web.response.next.HtmlNext)});
-});</template>
 <template autoinsert="true" context="java" deleted="false" description="LastaFlute: Validator groups=ClientError.class" enabled="true" name="_lavclienterr">${:import(org.lastaflute.web.validation.ClientError)}groups = ClientError.class</template>
+<template autoinsert="true" context="java" deleted="false" description="LastaFlute: Validator for moreValidationLambda" enabled="true" name="_lavmessages">messages -> {}</template>
 <template autoinsert="true" context="java" deleted="false" description="LastaFlute: Validator moreValidate(form|body, messages)" enabled="true" name="_lavmorevalidate">moreValidate(${localVar}, messages)</template>
+<template autoinsert="true" context="java" deleted="false" description="LastaFlute: Validator for validationErrorLambda" enabled="true" name="_lavreterrorhtml">() -> {
+    return asHtml(${path_:var(org.lastaflute.web.response.next.HtmlNext)});
+}</template>
 <template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow as Inline" enabled="true" name="_li">${var} -&gt; ${var}.${newName}</template>
 <template autoinsert="true" context="java" deleted="false" description="Java8: Lambda Arrow with Linefeed" enabled="true" name="_ll">${var} -&gt; {
     ${var}.${newName}
