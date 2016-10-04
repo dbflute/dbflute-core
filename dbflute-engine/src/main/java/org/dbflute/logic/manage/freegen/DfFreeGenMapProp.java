@@ -22,19 +22,19 @@ import java.util.Map;
  */
 public class DfFreeGenMapProp {
 
-    protected final Map<String, Object> tableMap;
+    protected final Map<String, Object> optionMap;
     protected final Map<String, Map<String, String>> mappingMap;
     protected final Map<String, DfFreeGenRequest> requestMap;
 
-    public DfFreeGenMapProp(Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap,
+    public DfFreeGenMapProp(Map<String, Object> optionMap, Map<String, Map<String, String>> mappingMap,
             Map<String, DfFreeGenRequest> requestMap) {
-        this.tableMap = tableMap;
+        this.optionMap = optionMap;
         this.mappingMap = mappingMap;
         this.requestMap = requestMap;
     }
 
-    public Map<String, Object> getTableMap() {
-        return tableMap;
+    public Map<String, Object> getOptionMap() {
+        return optionMap;
     }
 
     public Map<String, Map<String, String>> getMappingMap() {

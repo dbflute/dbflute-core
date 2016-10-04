@@ -31,7 +31,7 @@ import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.helper.io.xls.DfXlsFactory;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenLazyReflector;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenMethodConverter;
@@ -75,8 +75,8 @@ public class DfXlsTableLoader implements DfFreeGenTableLoader {
     //         }
     //     }
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
+    public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getOptionMap();
         final Map<String, Map<String, String>> mappingMap = mapProp.getMappingMap();
         if (tableMap == null || tableMap.isEmpty()) {
             String msg = "The tableMap was not found in the FreeGen property: " + requestName;
@@ -136,7 +136,7 @@ public class DfXlsTableLoader implements DfFreeGenTableLoader {
             }
         }
         final String tableName = sheetName; // basically unused, also for compatible
-        return new DfFreeGenTable(tableMap, tableName, columnList);
+        return new DfFreeGenMetaData(tableMap, tableName, columnList);
     }
 
     protected boolean processColumnValue(final String requestName, final Map<String, String> columnMap, final Row row,

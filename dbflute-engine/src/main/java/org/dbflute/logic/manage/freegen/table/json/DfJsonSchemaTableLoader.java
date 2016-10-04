@@ -17,7 +17,7 @@ package org.dbflute.logic.manage.freegen.table.json;
 
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 
 /**
@@ -28,7 +28,7 @@ public class DfJsonSchemaTableLoader implements DfFreeGenTableLoader {
     // ===================================================================================
     //                                                                          Load Table
     //                                                                          ==========
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+    public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         return new DfJsonSchemaLoadingAgent(requestName, resource, mapProp).loadTable();
     }
 }

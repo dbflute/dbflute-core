@@ -36,7 +36,7 @@ import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonFreeAgent;
 import org.dbflute.properties.DfBasicProperties;
@@ -80,8 +80,8 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     // ; tableMap = map:{
     //     ; targetDir = $$baseDir$$/java
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
+    public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getOptionMap();
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
         final File rootDir = new File(targetDir);
         if (!rootDir.exists()) {
@@ -109,7 +109,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
         }
         tableMap.put("appList", findAppList(mapProp));
         prepareSchemaHtmlLink(tableMap);
-        return new DfFreeGenTable(tableMap, "unused", columnList);
+        return new DfFreeGenMetaData(tableMap, "unused", columnList);
     }
 
     protected List<Map<String, Object>> prepareColumnList(DfLastaInfo lastaInfo) {
@@ -139,7 +139,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     }
 
     protected List<Map<String, String>> findAppList(DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
+        final Map<String, Object> tableMap = mapProp.getOptionMap();
         List<Map<String, String>> appList;
         try {
             final String outputDirectory = getLastaFluteProperties().getLastaDocOutputDirectory();

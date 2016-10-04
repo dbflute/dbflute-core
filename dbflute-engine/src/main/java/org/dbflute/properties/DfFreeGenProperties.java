@@ -15,30 +15,11 @@
  */
 package org.dbflute.properties;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfIllegalPropertySettingException;
-import org.dbflute.exception.DfIllegalPropertyTypeException;
-import org.dbflute.helper.StringKeyMap;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.logic.generate.packagepath.DfPackagePathHandler;
-import org.dbflute.logic.manage.freegen.DfFreeGenManager;
-import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
-import org.dbflute.logic.manage.freegen.DfFreeGenOutput;
-import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
-import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenResourceType;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
-import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
-import org.dbflute.logic.manage.freegen.exception.DfFreeGenCancelException;
-import org.dbflute.util.DfCollectionUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author jflute
@@ -46,24 +27,10 @@ import org.slf4j.LoggerFactory;
 public final class DfFreeGenProperties extends DfAbstractHelperProperties {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final Logger _log = LoggerFactory.getLogger(DfFreeGenProperties.class);
-
-    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfFreeGenProperties(Properties prop) {
         super(prop);
-    }
-
-    // ===================================================================================
-    //                                                                             Manager
-    //                                                                             =======
-    protected final DfFreeGenManager _manager = new DfFreeGenManager();
-
-    public DfFreeGenManager getFreeGenManager() {
-        return _manager;
     }
 
     // ===================================================================================
@@ -92,7 +59,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     //     ; package = org.dbflute...
     //     ; className = FooDto
     // }
-    // ; tableMap = map:{
+    // ; optionMap = map:{
     //     ; sheetName = [sheet-name]
     //     ; rowBeginNumber = 3
     //     ; columnMap = map:{
@@ -112,7 +79,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     // }
     protected Map<String, Object> _freeGenMap;
 
-    protected Map<String, Object> getFreeGenMap() {
+    public Map<String, Object> getFreeGenMap() {
         if (_freeGenMap == null) {
             Map<String, Object> specifiedMap = mapProp("torque.freeGenMap", null);
             if (specifiedMap == null) {
@@ -139,128 +106,6 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
                 throw new DfIllegalPropertySettingException(msg);
             }
             _freeGenMap.put(key, value);
-        }
-    }
-
-    protected List<DfFreeGenRequest> _freeGenRequestList;
-
-    public List<DfFreeGenRequest> getFreeGenRequestList() {
-        if (_freeGenRequestList != null) {
-            return _freeGenRequestList;
-        }
-        _freeGenRequestList = new ArrayList<DfFreeGenRequest>();
-        final Map<String, Object> freeGenMap = getFreeGenMap();
-        final Map<String, DfFreeGenRequest> requestMap = StringKeyMap.createAsCaseInsensitive(); // for correlation relation
-        for (Entry<String, Object> entry : freeGenMap.entrySet()) {
-            final String requestName = entry.getKey();
-            final Object obj = entry.getValue();
-            if (!(obj instanceof Map<?, ?>)) {
-                String msg = "The property 'freeGenDefinitionMap.value' should be Map: " + obj.getClass();
-                throw new DfIllegalPropertyTypeException(msg);
-            }
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> elementMap = (Map<String, Object>) obj;
-            final DfFreeGenRequest request = createFreeGenerateRequest(requestName, elementMap);
-
-            final Map<String, Object> tableMap = extractTableMap(elementMap);
-            final Map<String, Map<String, String>> mappingMap = extractMappingMap(tableMap);
-            final DfFreeGenMapProp mapProp = new DfFreeGenMapProp(tableMap, mappingMap, requestMap);
-
-            final DfFreeGenResource resource = request.getResource();
-            final DfFreeGenTableLoader tableLoader = DfFreeGenResourceType.tableLoaderMap.get(request.getResourceType());
-            if (tableLoader == null) {
-                throwFreeGenResourceTypeUnknownException(requestName, resource);
-            }
-            final DfFreeGenTable table;
-            try {
-                table = tableLoader.loadTable(requestName, resource, mapProp);
-            } catch (DfFreeGenCancelException continued) {
-                showCancelledRequest(requestName, continued);
-                continue;
-            }
-            request.setTable(table);
-            request.setPackagePathHandler(new DfPackagePathHandler(getBasicProperties()));
-            _freeGenRequestList.add(request);
-            requestMap.put(requestName, request);
-        }
-        return _freeGenRequestList;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected Map<String, Object> extractTableMap(Map<String, Object> elementMap) {
-        final Object obj = elementMap.get("tableMap");
-        if (obj == null) {
-            return DfCollectionUtil.emptyMap();
-        }
-        return (Map<String, Object>) obj;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected Map<String, Map<String, String>> extractMappingMap(Map<String, Object> tableMap) {
-        final Object obj = tableMap.get("mappingMap");
-        if (obj == null) {
-            return DfCollectionUtil.emptyMap();
-        }
-        return (Map<String, Map<String, String>>) obj;
-    }
-
-    protected DfFreeGenRequest createFreeGenerateRequest(String requestName, Map<String, Object> elementMap) {
-        final DfFreeGenResource resource;
-        {
-            @SuppressWarnings("unchecked")
-            final Map<String, String> resourceMap = (Map<String, String>) elementMap.get("resourceMap");
-            final String baseDir = resourceMap.get("baseDir");
-            final String resourceTypeStr = resourceMap.get("resourceType"); // required
-            final DfFreeGenResourceType resourceType = DfFreeGenResourceType.valueOf(resourceTypeStr);
-            final String resourceFile = resourceMap.get("resourceFile");
-            final String encoding = resourceMap.get("encoding");
-            resource = new DfFreeGenResource(baseDir, resourceType, resourceFile, encoding);
-        }
-        final DfFreeGenOutput output;
-        {
-            @SuppressWarnings("unchecked")
-            final Map<String, String> outputMap = (Map<String, String>) elementMap.get("outputMap");
-            final String templateFile = resource.resolveBaseDir(outputMap.get("templateFile"));
-            final String outputDirectory = resource.resolveBaseDir(outputMap.get("outputDirectory"));
-            final String pkg = outputMap.get("package");
-            final String className = outputMap.get("className");
-            final String fileExt = outputMap.getOrDefault("fileExt", getLanguageClassExt());
-            output = new DfFreeGenOutput(templateFile, outputDirectory, pkg, className, fileExt);
-        }
-        return new DfFreeGenRequest(_manager, requestName, resource, output);
-    }
-
-    protected String getLanguageClassExt() {
-        final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
-        return basicProp.getLanguageDependency().getLanguageGrammar().getClassFileExtension();
-    }
-
-    protected void throwFreeGenResourceTypeUnknownException(String requestName, DfFreeGenResource resource) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Unknown resource type for FreeGen.");
-        br.addItem("Request Name");
-        br.addElement(requestName);
-        br.addItem("Resource Type");
-        br.addElement(resource.getResourceType());
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
-    }
-
-    protected void showCancelledRequest(final String requestName, DfFreeGenCancelException continued) {
-        // e.g.
-        // - *Cancelled the freeGen request: ESFluteFessConfig
-        // -   |-DfFreeGenCancelException: Cannot access to the URL: http://localhost:8080/fess_config
-        // -       |-DfJsonUrlCannotRequestException: Failed to access to the URL: http://localhost:8080/fess_config
-        // -           |-ConnectException: Connection refused
-        _log.info("*Cancelled the freeGen request: " + requestName);
-        _log.info("  |-" + continued.getClass().getSimpleName() + ": " + continued.getMessage());
-        final Throwable cause = continued.getCause();
-        if (cause != null && !cause.equals(continued)) {
-            _log.info("      |-" + cause.getClass().getSimpleName() + ": " + cause.getMessage());
-            final Throwable more = cause.getCause();
-            if (more != null && !more.equals(cause)) {
-                _log.info("          |-" + more.getClass().getSimpleName() + ": " + more.getMessage());
-            }
         }
     }
 

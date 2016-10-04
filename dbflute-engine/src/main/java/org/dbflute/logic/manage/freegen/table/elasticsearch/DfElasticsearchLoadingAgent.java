@@ -25,7 +25,7 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.exception.DfFreeGenCancelException;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenLazyReflector;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenMethodConverter;
@@ -114,8 +114,8 @@ public class DfElasticsearchLoadingAgent {
     //     }
     //   }
     // }
-    public DfFreeGenTable loadTable() {
-        final Map<String, Object> tableMap = _mapProp.getTableMap();
+    public DfFreeGenMetaData loadTable() {
+        final Map<String, Object> tableMap = _mapProp.getOptionMap();
         prepareReflectorList();
         final Map<String, Map<String, Object>> schemaMap = DfCollectionUtil.newLinkedHashMap();
         final String resourceFile = _resource.getResourceFile();
@@ -149,7 +149,7 @@ public class DfElasticsearchLoadingAgent {
         }
         reflectLazyProcess();
         prepareFinalDetermination(schemaMap);
-        return new DfFreeGenTable(tableMap, schemaMap);
+        return new DfFreeGenMetaData(tableMap, schemaMap);
     }
 
     protected DfESFluteProperties getESFluteProperties() {
@@ -231,7 +231,7 @@ public class DfElasticsearchLoadingAgent {
             }
         }
         if (formatName != null) {
-            final Map<String, Object> tableMap = _mapProp.getTableMap();
+            final Map<String, Object> tableMap = _mapProp.getOptionMap();
             @SuppressWarnings("unchecked")
             final Map<String, Object> mappingMap = (Map<String, Object>) tableMap.get("mappingMap");
             @SuppressWarnings("unchecked")
@@ -356,7 +356,7 @@ public class DfElasticsearchLoadingAgent {
         br.addItem("JSON File");
         br.addElement(_resource.getResourceFile());
         br.addItem("tableMap");
-        br.addElement(_mapProp.getTableMap());
+        br.addElement(_mapProp.getOptionMap());
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }

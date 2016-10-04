@@ -36,7 +36,7 @@ import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectAssist;
 import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectBindNode;
@@ -101,15 +101,15 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     //     ; exceptPathList = list:{ contain:/mail/common/ }
     //     ; isConventionSuffix = false
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
+    public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getOptionMap();
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
         final String targetExt = extractTargetExt(tableMap);
         final String targetKeyword = extractTargetKeyword(tableMap);
         final List<String> exceptPathList = extractExceptPathList(tableMap);
 
         final Map<String, Map<String, Object>> schemaMap = doLoad(targetDir, targetExt, targetKeyword, exceptPathList, tableMap);
-        return new DfFreeGenTable(tableMap, schemaMap);
+        return new DfFreeGenMetaData(tableMap, schemaMap);
     }
 
     protected Map<String, Map<String, Object>> doLoad(String targetDir, String targetExt, String targetKeyword,

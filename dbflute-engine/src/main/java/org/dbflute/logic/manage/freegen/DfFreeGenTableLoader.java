@@ -20,5 +20,5 @@ package org.dbflute.logic.manage.freegen;
  */
 public interface DfFreeGenTableLoader {
 
-    DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp);
+    DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp);
 }

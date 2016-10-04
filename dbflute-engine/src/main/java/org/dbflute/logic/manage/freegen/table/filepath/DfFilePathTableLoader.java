@@ -24,7 +24,7 @@ import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
@@ -54,8 +54,8 @@ public class DfFilePathTableLoader implements DfFreeGenTableLoader {
     //     ; targetKeyword = 
     //     ; exceptPathList = list:{ contain:/view/common/ }
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
+    public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getOptionMap();
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
 
         final String[] targetExts = extractTargetExt(tableMap);
@@ -91,7 +91,7 @@ public class DfFilePathTableLoader implements DfFreeGenTableLoader {
             }
             columnList.add(columnMap);
         }
-        return new DfFreeGenTable(tableMap, "unused", columnList);
+        return new DfFreeGenMetaData(tableMap, "unused", columnList);
     }
 
     protected String[] extractTargetExt(Map<String, Object> tableMap) {

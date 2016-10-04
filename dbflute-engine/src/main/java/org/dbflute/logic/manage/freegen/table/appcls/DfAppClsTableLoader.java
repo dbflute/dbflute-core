@@ -30,8 +30,8 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.mapstring.MapListFile;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
@@ -56,15 +56,15 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     //     ; resourceFile = ../../../dockside_appcls.properties
     // }
     // ; outputMap = map:{
-    //     ; templateFile = LaAppCDef.vm
     //     ; outputDirectory = $$baseDir$$/java
     //     ; package = org.dbflute...
+    //     ; templateFile = LaAppCDef.vm
     //     ; className = unused
     // }
-    // ; tableMap = map:{
+    // ; optionMap = map:{
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
+    public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> optionMap = mapProp.getOptionMap();
         final String resourceFile = resource.getResourceFile();
         final Map<String, Object> appClsMap;
         try {
@@ -111,13 +111,13 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                 hasRefCls = true;
             }
         }
-        tableMap.put("classificationTopList", topList);
-        tableMap.put("classificationNameList", topList.stream().map(top -> {
+        optionMap.put("classificationTopList", topList);
+        optionMap.put("classificationNameList", topList.stream().map(top -> {
             return top.getClassificationName();
         }).collect(Collectors.toList()));
-        tableMap.put("hasRefCls", hasRefCls);
-        tableMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
-        return new DfFreeGenTable(tableMap, "appcls", Collections.emptyList());
+        optionMap.put("hasRefCls", hasRefCls);
+        optionMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
+        return new DfFreeGenMetaData(optionMap, "appcls", Collections.emptyList());
     }
 
     protected boolean isElementMapClassificationTop(Map<String, Object> elementMap) {

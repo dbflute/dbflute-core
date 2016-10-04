@@ -34,7 +34,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.DfCollectionUtil;
@@ -67,8 +67,8 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
     //     ; extendsPropFileList = list:{ ../../../bar.properties }
     //     ; isCheckImplicitOverride = false
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
+    public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getOptionMap();
         final Map<String, DfFreeGenRequest> requestMap = mapProp.getRequestMap();
         final JavaPropertiesReader reader = createReader(requestName, resource, tableMap, requestMap);
         final JavaPropertiesResult result;
@@ -82,7 +82,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         final String resourceFile = resource.getResourceFile();
         final String tableName = buildTableName(resourceFile);
         final List<Map<String, Object>> columnList = toMapList(result, tableMap);
-        return new DfFreeGenTable(tableMap, tableName, columnList);
+        return new DfFreeGenMetaData(tableMap, tableName, columnList);
     }
 
     protected void throwFreeGenPropReadFailureException(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
@@ -142,7 +142,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
                 if (!extendsRequest.isResourceTypeProp()) {
                     throwFreeGenPropExtendsRequestNotPropException(requestName, extendsPropRequest, extendsRequest);
                 }
-                final String extendsFile = extendsRequest.getResourceFile();
+                final String extendsFile = extendsRequest.getResource().getResourceFile();
                 extendsPropFileList.add(extendsFile);
                 final Map<String, Object> extendsTableMap = extendsRequest.getTableMap();
                 extendsPropRequest = (String) extendsTableMap.get(extendsPropRequestKey);
@@ -204,7 +204,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         br.addElement(requestName);
         br.addItem("Not PROP Extended Request");
         br.addElement(extendsPropRequest);
-        br.addElement(extendsRequest.getResourceType());
+        br.addElement(extendsRequest.getResource().getResourceType());
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }

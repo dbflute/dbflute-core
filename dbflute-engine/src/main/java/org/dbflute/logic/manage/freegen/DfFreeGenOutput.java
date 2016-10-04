@@ -23,19 +23,19 @@ public class DfFreeGenOutput {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _templateFile;
-    protected final String _outputDirectory;
-    protected final String _package;
-    protected final String _className; // null allowed: when table list
-    protected final String _fileExt;
+    protected final String _outputDirectory; // not null
+    protected final String _package; // not null
+    protected final String _templateFile; // for one-to-one, one-to-many, null allowed: when one-to-free
+    protected final String _className; // for one-to-one, null allowed: when one-to-many, one-to-free
+    protected final String _fileExt; // not null (has default)
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenOutput(String templateFile, String outputDirectory, String pkg, String className, String fileExt) {
-        _templateFile = templateFile;
+    public DfFreeGenOutput(String outputDirectory, String pkg, String templateFile, String className, String fileExt) {
         _outputDirectory = outputDirectory;
         _package = pkg;
+        _templateFile = templateFile;
         _className = className;
         _fileExt = fileExt;
     }
@@ -45,30 +45,30 @@ public class DfFreeGenOutput {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{templateFile=" + _templateFile + ", outputDirectory=" + _outputDirectory + ", package=" + _package + ", className="
-                + _className + ", " + _fileExt + "}";
+        return "{output=" + _outputDirectory + ", package=" + _package + ", template=" + _templateFile + ", class=" + _className + ", "
+                + _fileExt + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getTemplateFile() {
-        return _templateFile;
-    }
-
-    public String getOutputDirectory() {
+    public String getOutputDirectory() { // not null
         return _outputDirectory;
     }
 
-    public String getPackage() {
+    public String getPackage() { // not null
         return _package;
     }
 
-    public String getClassName() {
+    public String getTemplateFile() { // for one-to-one, one-to-many, null allowed when one-to-free
+        return _templateFile;
+    }
+
+    public String getClassName() { // for one-to-one, null allowed when one-to-many, one-to-free
         return _className;
     }
 
-    public String getFileExt() {
+    public String getFileExt() { // not null
         return _fileExt;
     }
 }

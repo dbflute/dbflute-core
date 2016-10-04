@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.util.Srl;
 
@@ -52,8 +52,8 @@ public class DfJsonKeyTableLoader implements DfFreeGenTableLoader {
     // ; tableMap = map:{
     //     ; keyPath = categories -> map.key
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
+    public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getOptionMap();
         final String resourceFile = resource.getResourceFile();
 
         final Map<String, Object> rootMap = decodeJsonMap(requestName, resourceFile);
@@ -63,7 +63,7 @@ public class DfJsonKeyTableLoader implements DfFreeGenTableLoader {
 
         final String tableName = buildTableName(resourceFile);
         final List<Map<String, Object>> columnList = setupColumnList(requestName, resource, keyList);
-        return new DfFreeGenTable(tableMap, tableName, columnList);
+        return new DfFreeGenMetaData(tableMap, tableName, columnList);
     }
 
     protected String buildTableName(final String resourceFile) {

@@ -204,9 +204,9 @@ public final class DfLastaFluteFreeGenReflector {
     protected void doSetupOutputConfigMap(String appName, Map<String, Map<String, Object>> elementMap, String theme) {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         elementMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaSystemConfig.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", _mylastaPackage + ".direction");
+        outputMap.put("templateFile", "LaSystemConfig.vm");
         outputMap.put("className", initCap(appName) + initCap(theme));
     }
 
@@ -265,9 +265,9 @@ public final class DfLastaFluteFreeGenReflector {
             Map<String, Object> lastafluteMap) {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         elementMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaUserMessages.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", buildMessagesPackage(appName, lastafluteMap));
+        outputMap.put("templateFile", "LaUserMessages.vm");
         outputMap.put("className", initCap(appName) + initCap(theme) + "s");
     }
 
@@ -303,9 +303,9 @@ public final class DfLastaFluteFreeGenReflector {
         resourceMap.put("resourceType", DfFreeGenResourceType.MAIL_FLUTE.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaMailFlute.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", buildMailPostcardPackage(capAppName, lastafluteMap));
+        outputMap.put("templateFile", "LaMailFlute.vm");
         outputMap.put("className", initCap(appName) + "Postcard");
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
@@ -340,9 +340,9 @@ public final class DfLastaFluteFreeGenReflector {
         resourceMap.put("resourceType", DfFreeGenResourceType.PM_FILE.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaPmTemplate.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", buildPmTemplateBeanPackage(capAppName, lastafluteMap));
+        outputMap.put("templateFile", "LaPmTemplate.vm");
         outputMap.put("className", "unused");
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
@@ -382,9 +382,9 @@ public final class DfLastaFluteFreeGenReflector {
         resourceMap.put("resourceType", DfFreeGenResourceType.FILE_PATH.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaHtmlPath.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", buildHtmlTemplatePackage(capAppName, lastafluteMap, ext));
+        outputMap.put("templateFile", "LaHtmlPath.vm");
         outputMap.put("className", initCap(appName) + "HtmlPath");
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
@@ -416,9 +416,9 @@ public final class DfLastaFluteFreeGenReflector {
         resourceMap.put("resourceType", DfFreeGenResourceType.LASTA_DOC.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         docMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaDocHtml.vm");
         outputMap.put("outputDirectory", lastaDocOutputDirectory);
         outputMap.put("package", ""); // flat documents e.g. ./output/doc/lastadoc-harbor.html
+        outputMap.put("templateFile", "LaDocHtml.vm");
         outputMap.put("className", "lastadoc-" + appName);
         outputMap.put("fileExt", "html");
         final Map<String, Object> tableMap = createTableMap();
@@ -443,9 +443,9 @@ public final class DfLastaFluteFreeGenReflector {
         resourceMap.put("resourceType", DfFreeGenResourceType.APP_CLS.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaAppCDef.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", filterOverridden(_mylastaPackage + ".appcls", lastafluteMap, appName, "appcls", "package"));
+        outputMap.put("templateFile", "LaAppCDef.vm");
         outputMap.put("className", filterOverridden("AppCDef", lastafluteMap, appName, "appcls", "className"));
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
@@ -466,9 +466,9 @@ public final class DfLastaFluteFreeGenReflector {
         resourceMap.put("resourceType", DfFreeGenResourceType.WEB_CLS.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaWebCDef.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", filterOverridden(_mylastaPackage + ".webcls", lastafluteMap, appName, "webcls", "package"));
+        outputMap.put("templateFile", "LaWebCDef.vm");
         outputMap.put("className", filterOverridden("WebCDef", lastafluteMap, appName, "webcls", "className"));
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
