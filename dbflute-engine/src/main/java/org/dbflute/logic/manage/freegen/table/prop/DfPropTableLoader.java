@@ -144,7 +144,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
                 }
                 final String extendsFile = extendsRequest.getResource().getResourceFile();
                 extendsPropFileList.add(extendsFile);
-                final Map<String, Object> extendsTableMap = extendsRequest.getTableMap();
+                final Map<String, Object> extendsTableMap = extendsRequest.getOptionMap();
                 extendsPropRequest = (String) extendsTableMap.get(extendsPropRequestKey);
                 if (extendsPropRequest == null) {
                     break;
