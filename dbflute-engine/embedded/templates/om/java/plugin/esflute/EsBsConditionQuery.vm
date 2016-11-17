@@ -6,28 +6,13 @@ import java.util.Collection;
 import ${request.package}.allcommon.EsAbstractConditionQuery;
 import ${request.package}.cbean.cq.${table.camelizedName}CQ;
 import org.dbflute.cbean.ckey.ConditionKey;
+import org.elasticsearch.index.query.*;
 #if ($esVersion.isGreaterEqual("2.0.0"))
 import org.dbflute.exception.IllegalConditionBeanOperationException;
-#end
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.FuzzyQueryBuilder;
-import org.elasticsearch.index.query.IdsQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-#if ($esVersion.isGreaterEqual("2.0.0") && $esVersion.isLessThan("2.3.0"))
-import org.elasticsearch.index.query.NotQueryBuilder;
-#end
-import org.elasticsearch.index.query.PrefixQueryBuilder;
-#if ($esVersion.isGreaterEqual("2.0.0"))
-import org.elasticsearch.index.query.QueryBuilders;
-#end
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
-import org.elasticsearch.index.query.TermsQueryBuilder;
-
+#end##
 #if ($esVersion.isLessThan("2.0.0"))
 import ${request.package}.cbean.cf.${table.camelizedName}CF;
-import org.elasticsearch.index.query.FilteredQueryBuilder;
-#end
+#end##
 
 /**
  * @author ESFlute (using FreeGen)
@@ -209,12 +194,12 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
     }
 
     public Bs${table.camelizedName}CQ addOrderBy_Id_Asc() {
-        regOBA("_id");
+        regOBA("_uid");
         return this;
     }
 
     public Bs${table.camelizedName}CQ addOrderBy_Id_Desc() {
-        regOBD("_id");
+        regOBD("_uid");
         return this;
     }
 
@@ -347,6 +332,28 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
         }
     }
 
+    public void set${column.capCamelName}_Wildcard($javaNative ${column.uncapCamelName}) {
+        set${column.capCamelName}_Wildcard(${column.uncapCamelName}, null);
+    }
+
+    public void set${column.capCamelName}_Wildcard($javaNative ${column.uncapCamelName}, ConditionOptionCall<WildcardQueryBuilder> opLambda) {
+        WildcardQueryBuilder builder = regWildcardQ("${column.name}", ${column.uncapCamelName});
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
+
+    public void set${column.capCamelName}_Regexp($javaNative ${column.uncapCamelName}) {
+        set${column.capCamelName}_Regexp(${column.uncapCamelName}, null);
+    }
+
+    public void set${column.capCamelName}_Regexp($javaNative ${column.uncapCamelName}, ConditionOptionCall<RegexpQueryBuilder> opLambda) {
+        RegexpQueryBuilder builder = regRegexpQ("${column.name}", ${column.uncapCamelName});
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
+
 #end
     public void set${column.capCamelName}_GreaterThan($javaNative ${column.uncapCamelName}) {
         set${column.capCamelName}_GreaterThan(${column.uncapCamelName}, null);
@@ -387,6 +394,28 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
 
     public void set${column.capCamelName}_LessEqual($javaNative ${column.uncapCamelName}, ConditionOptionCall<RangeQueryBuilder> opLambda) {
         RangeQueryBuilder builder = regRangeQ("${column.name}", ConditionKey.CK_LESS_EQUAL, ${column.uncapCamelName});
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
+
+    public void set${column.capCamelName}_Exists() {
+        set${column.capCamelName}_Exists(null);
+    }
+
+    public void set${column.capCamelName}_Exists(ConditionOptionCall<ExistsQueryBuilder> opLambda) {
+        ExistsQueryBuilder builder = regExistsQ("${column.name}");
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
+
+    public void set${column.capCamelName}_CommonTerms($javaNative ${column.uncapCamelName}) {
+        set${column.capCamelName}_CommonTerms(${column.uncapCamelName}, null);
+    }
+
+    public void set${column.capCamelName}_CommonTerms($javaNative ${column.uncapCamelName}, ConditionOptionCall<CommonTermsQueryBuilder> opLambda) {
+        CommonTermsQueryBuilder builder = regCommonTermsQ("${column.name}", ${column.uncapCamelName});
         if (opLambda != null) {
             opLambda.callback(builder);
         }
