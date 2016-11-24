@@ -7,12 +7,8 @@ import ${request.package}.allcommon.EsAbstractConditionQuery;
 import ${request.package}.cbean.cq.${table.camelizedName}CQ;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.elasticsearch.index.query.*;
-#if ($esVersion.isGreaterEqual("2.0.0"))
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
-#end##
-#if ($esVersion.isLessThan("2.0.0"))
-import ${request.package}.cbean.cf.${table.camelizedName}CF;
-#end##
 
 /**
  * @author ESFlute (using FreeGen)
@@ -37,24 +33,23 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
     // ===================================================================================
     //                                                                       Query Control
     //                                                                       =============
-#if ($esVersion.isLessThan("2.0.0"))
-    public void filtered(FilteredCall<${table.camelizedName}CQ, ${table.camelizedName}CF> filteredLambda) {
-        filtered(filteredLambda, null);
-    }
-
-    public void filtered(FilteredCall<${table.camelizedName}CQ, ${table.camelizedName}CF> filteredLambda,
-            ConditionOptionCall<FilteredQueryBuilder> opLambda) {
-        ${table.camelizedName}CQ query = new ${table.camelizedName}CQ();
-        ${table.camelizedName}CF filter = new ${table.camelizedName}CF();
-        filteredLambda.callback(query, filter);
-        if (query.hasQueries()) {
-            FilteredQueryBuilder builder = regFilteredQ(query.getQuery(), filter.getFilter());
-            if (opLambda != null) {
-                opLambda.callback(builder);
-            }
+    public void functionScore(OperatorCall<${table.camelizedName}CQ> queryLambda, ScoreFunctionCall<ScoreFunctionCreator<${table.camelizedName}CQ>> functionsLambda,
+            final ConditionOptionCall<FunctionScoreQueryBuilder> opLambda) {
+        ${table.camelizedName}CQ cq = new ${table.camelizedName}CQ();
+        queryLambda.callback(cq);
+        final FunctionScoreQueryBuilder builder = regFunctionScoreQ(cq.getQuery());
+        if (functionsLambda != null) {
+            functionsLambda.callback((cqLambda, scoreFunctionBuilder) -> {
+                ${table.camelizedName}CQ cf = new ${table.camelizedName}CQ();
+                cqLambda.callback(cf);
+                builder.add(cf.getQuery(), scoreFunctionBuilder);
+            });
+        }
+        if (opLambda != null) {
+            opLambda.callback(builder);
         }
     }
-#else
+
     public void filtered(FilteredCall<${table.camelizedName}CQ, ${table.camelizedName}CQ> filteredLambda) {
         filtered(filteredLambda, null);
     }
@@ -70,27 +65,9 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
         not(notLambda, null);
     }
 
-#if ($esVersion.isLessThan("2.3.0"))##
-    public void not(OperatorCall<${table.camelizedName}CQ> notLambda, ConditionOptionCall<NotQueryBuilder> opLambda) {
-        ${table.camelizedName}CQ notQuery = new ${table.camelizedName}CQ();
-        notLambda.callback(notQuery);
-        if (notQuery.hasQueries()) {
-            if (notQuery.getQueryBuilderList().size() > 1) {
-                final String msg = "not query must be one query.";
-                throw new IllegalConditionBeanOperationException(msg);
-            }
-            NotQueryBuilder builder = QueryBuilders.notQuery(notQuery.getQueryBuilderList().get(0));
-            if (opLambda != null) {
-                opLambda.callback(builder);
-            }
-        }
-    }
-#else##
     public void not(final OperatorCall<${table.camelizedName}CQ> notLambda, final ConditionOptionCall<BoolQueryBuilder> opLambda) {
         bool((must, should, mustNot, filter) -> notLambda.callback(mustNot), opLambda);
     }
-#end##
-#end
 
     public void bool(BoolCall<${table.camelizedName}CQ> boolLambda) {
         bool(boolLambda, null);
@@ -100,15 +77,6 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
         ${table.camelizedName}CQ mustQuery = new ${table.camelizedName}CQ();
         ${table.camelizedName}CQ shouldQuery = new ${table.camelizedName}CQ();
         ${table.camelizedName}CQ mustNotQuery = new ${table.camelizedName}CQ();
-#if ($esVersion.isLessThan("2.0.0"))
-        boolLambda.callback(mustQuery, shouldQuery, mustNotQuery);
-        if (mustQuery.hasQueries() || shouldQuery.hasQueries() || mustNotQuery.hasQueries()) {
-            BoolQueryBuilder builder = regBoolCQ(mustQuery.getQueryBuilderList(), shouldQuery.getQueryBuilderList(), mustNotQuery.getQueryBuilderList());
-            if (opLambda != null) {
-                opLambda.callback(builder);
-            }
-        }
-#else
         ${table.camelizedName}CQ filterQuery = new ${table.camelizedName}CQ();
         boolLambda.callback(mustQuery, shouldQuery, mustNotQuery, filterQuery);
         if (mustQuery.hasQueries() || shouldQuery.hasQueries() || mustNotQuery.hasQueries() || filterQuery.hasQueries()) {
@@ -117,7 +85,6 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
                 opLambda.callback(builder);
             }
         }
-#end
     }
 
     // ===================================================================================
@@ -142,7 +109,6 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
             opLambda.callback(builder);
         }
     }
-#if ($esVersion.isGreaterEqual("2.0.0"))
 
     public void setId_NotEqual(String id) {
         setId_NotTerm(id, null);
@@ -152,18 +118,6 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
         setId_NotTerm(id, null);
     }
 
-#if ($esVersion.isLessThan("2.3.0"))##
-    public void setId_NotEqual(String id, ConditionOptionCall<NotQueryBuilder> opLambda) {
-        setId_NotTerm(id, opLambda);
-    }
-
-    public void setId_NotTerm(String id, ConditionOptionCall<NotQueryBuilder> opLambda) {
-        NotQueryBuilder builder = QueryBuilders.notQuery(regTermQ("_id", id));
-        if (opLambda != null) {
-            opLambda.callback(builder);
-        }
-    }
-#else##
     public void setId_NotEqual(String id, ConditionOptionCall<BoolQueryBuilder> opLambda) {
         setId_NotTerm(id, opLambda);
     }
@@ -171,8 +125,6 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
     public void setId_NotTerm(String id, ConditionOptionCall<BoolQueryBuilder> opLambda) {
         not(not -> not.setId_Term(id), opLambda);
     }
-#end##
-#end
 
     public void setId_Terms(Collection<String> idList) {
         setId_Terms(idList, null);
@@ -225,7 +177,6 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
             opLambda.callback(builder);
         }
     }
-#if ($esVersion.isGreaterEqual("2.0.0"))
 
     public void set${column.capCamelName}_NotEqual($javaNative ${column.uncapCamelName}) {
         set${column.capCamelName}_NotTerm(${column.uncapCamelName}, null);
@@ -235,18 +186,6 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
         set${column.capCamelName}_NotTerm(${column.uncapCamelName}, null);
     }
 
-#if ($esVersion.isLessThan("2.3.0"))##
-    public void set${column.capCamelName}_NotEqual($javaNative ${column.uncapCamelName}, ConditionOptionCall<NotQueryBuilder> opLambda) {
-        set${column.capCamelName}_NotTerm(${column.uncapCamelName}, opLambda);
-    }
-
-    public void set${column.capCamelName}_NotTerm($javaNative ${column.uncapCamelName}, ConditionOptionCall<NotQueryBuilder> opLambda) {
-        NotQueryBuilder builder = QueryBuilders.notQuery(regTermQ("${column.name}", ${column.uncapCamelName}));
-        if (opLambda != null) {
-            opLambda.callback(builder);
-        }
-    }
-#else##
     public void set${column.capCamelName}_NotEqual($javaNative ${column.uncapCamelName}, ConditionOptionCall<BoolQueryBuilder> opLambda) {
         set${column.capCamelName}_NotTerm(${column.uncapCamelName}, opLambda);
     }
@@ -254,8 +193,6 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
     public void set${column.capCamelName}_NotTerm($javaNative ${column.uncapCamelName}, ConditionOptionCall<BoolQueryBuilder> opLambda) {
         not(not -> not.set${column.capCamelName}_Term(${column.uncapCamelName}), opLambda);
     }
-#end##
-#end
 
     public void set${column.capCamelName}_Terms(Collection<$javaNative> ${column.uncapCamelName}List) {
         set${column.capCamelName}_Terms(${column.uncapCamelName}List, null);
@@ -354,6 +291,16 @@ public abstract class Bs${table.camelizedName}CQ extends EsAbstractConditionQuer
         }
     }
 
+    public void set${column.capCamelName}_SpanTerm($javaNative ${column.uncapCamelName}) {
+        set${column.capCamelName}_SpanTerm("${column.name}", null);
+    }
+
+    public void set${column.capCamelName}_SpanTerm($javaNative ${column.uncapCamelName}, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("${column.name}", ${column.uncapCamelName});
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
 #end
     public void set${column.capCamelName}_GreaterThan($javaNative ${column.uncapCamelName}) {
         set${column.capCamelName}_GreaterThan(${column.uncapCamelName}, null);

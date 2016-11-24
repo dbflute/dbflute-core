@@ -18,10 +18,8 @@ import org.dbflute.dbmeta.name.ColumnSqlName;
 import org.dbflute.exception.InvalidQueryRegisteredException;
 import org.dbflute.util.Srl;
 import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.functionscore.*;
 import org.elasticsearch.search.sort.*;
-#if ($esVersion.isLessThan("2.0.0"))
-import ${request.package}.allcommon.EsAbstractConditionFilter;
-#end
 
 /**
  * @author ESFlute (using FreeGen)
@@ -119,33 +117,13 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                            Register
     //                                                                            ========
-#if ($esVersion.isLessThan("2.0.0"))
-    protected FilteredQueryBuilder regFilteredQ(QueryBuilder queryBuilder, FilterBuilder filterBuilder) {
-        assertObjectNotNull("queryBuilder", queryBuilder);
-        assertObjectNotNull("filterBuilder", filterBuilder);
-        return QueryBuilders.filteredQuery(queryBuilder, filterBuilder);
-    }
-#end
 
-#if ($esVersion.isLessThan("2.0.0"))
-    protected BoolQueryBuilder regBoolCQ(List<QueryBuilder> mustList, List<QueryBuilder> shouldList, List<QueryBuilder> mustNotList) {
-        assertObjectNotNull("mustList", mustList);
-        assertObjectNotNull("shouldList", shouldList);
-        assertObjectNotNull("mustNotList", mustNotList);
-        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-        mustList.forEach(query -> {
-            boolQuery.must(query);
-        });
-        shouldList.forEach(query -> {
-            boolQuery.should(query);
-        });
-        mustNotList.forEach(query -> {
-            boolQuery.mustNot(query);
-        });
-        regQ(boolQuery);
-        return boolQuery;
+    protected FunctionScoreQueryBuilder regFunctionScoreQ(QueryBuilder queryBuilder) {
+        FunctionScoreQueryBuilder functionScoreQuery = QueryBuilders.functionScoreQuery(queryBuilder);
+        regQ(functionScoreQuery);
+        return functionScoreQuery;
     }
-#else
+
     protected BoolQueryBuilder regBoolCQ(List<QueryBuilder> mustList, List<QueryBuilder> shouldList, List<QueryBuilder> mustNotList, List<QueryBuilder> filterList) {
         assertObjectNotNull("mustList", mustList);
         assertObjectNotNull("shouldList", shouldList);
@@ -167,7 +145,6 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
         regQ(boolQuery);
         return boolQuery;
     }
-#end
 
     protected TermQueryBuilder regTermQ(String name, Object value) {
         checkEsInvalidQuery(name, value);
@@ -185,12 +162,7 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
 
     protected IdsQueryBuilder regIdsQ(Collection<String> values) {
         checkEsInvalidQueryCollection("_id", values);
-#if ($esVersion.isLessThan("2.0.0"))
-## elasticsearch-1.x.x does not have method of collection type argument
-        IdsQueryBuilder idsQuery = QueryBuilders.idsQuery(asTableDbName()).addIds(values.toArray(new String[values.size()]));
-#else
         IdsQueryBuilder idsQuery = QueryBuilders.idsQuery(asTableDbName()).addIds(values);
-#end
         regQ(idsQuery);
         return idsQuery;
     }
@@ -294,6 +266,13 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
         MoreLikeThisQueryBuilder moreLikeThisQuery = QueryBuilders.moreLikeThisQuery(name);
         regQ(moreLikeThisQuery);
         return moreLikeThisQuery;
+    }
+
+    protected SpanTermQueryBuilder regSpanTermQ(String name, String value) {
+        checkEsInvalidQuery(name, value);
+        SpanTermQueryBuilder spanTermQuery = QueryBuilders.spanTermQuery(name, value);
+        regQ(spanTermQuery);
+        return spanTermQuery;
     }
 
     protected void regQ(QueryBuilder builder) {
@@ -504,31 +483,31 @@ public abstract class EsAbstractConditionQuery implements ConditionQuery {
     @FunctionalInterface
     public interface BoolCall<CQ extends EsAbstractConditionQuery> {
 
-#if ($esVersion.isLessThan("2.0.0"))
-        void callback(CQ must, CQ should, CQ mustNot);
-#else
         void callback(CQ must, CQ should, CQ mustNot, CQ filter);
-#end
     }
 
-#if ($esVersion.isLessThan("2.0.0"))
-    @FunctionalInterface
-    public interface FilteredCall<CQ extends EsAbstractConditionQuery, CF extends EsAbstractConditionFilter> {
-
-        void callback(CQ query, CF filter);
-    }
-#else
     @FunctionalInterface
     public interface FilteredCall<CQ extends EsAbstractConditionQuery, CF extends EsAbstractConditionQuery> {
 
         void callback(CQ query, CF filter);
     }
-#end
 
     @FunctionalInterface
     public interface OperatorCall<CQ extends EsAbstractConditionQuery> {
 
         void callback(CQ query);
+    }
+
+
+    @FunctionalInterface
+    public interface ScoreFunctionCall<CC extends ScoreFunctionCreator<?>> {
+
+        void callback(CC creator);
+    }
+
+    @FunctionalInterface
+    public interface ScoreFunctionCreator<T extends EsAbstractConditionQuery> {
+        void filter(final OperatorCall<T> cqLambda, final ScoreFunctionBuilder scoreFunctionBuilder);
     }
 }
 

@@ -9,12 +9,12 @@ import ${request.package}.bsentity.dbmeta.${table.camelizedName}Dbm;
 import ${request.package}.cbean.${table.camelizedName}CB;
 import ${request.package}.cbean.cq.${table.camelizedName}CQ;
 import ${request.package}.cbean.cq.bs.Bs${table.camelizedName}CQ;
+import ${request.package}.cbean.ca.${table.camelizedName}CA;
+import ${request.package}.cbean.ca.bs.Bs${table.camelizedName}CA;
 import org.dbflute.cbean.ConditionQuery;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-#if ($esVersion.isLessThan("2.3.0"))##
-import org.elasticsearch.action.count.CountRequestBuilder;
-#end##
+import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 
 /**
  * @author ESFlute (using FreeGen)
@@ -25,6 +25,7 @@ public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
     //                                                                           Attribute
     //                                                                           =========
     protected Bs${table.camelizedName}CQ _conditionQuery;
+    protected Bs${table.camelizedName}CA _conditionAggregation;
     protected HpSpecification _specification;
 
     // ===================================================================================
@@ -68,18 +69,6 @@ public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
     // ===================================================================================
     //                                                                               Build
     //                                                                               =====
-#if ($esVersion.isLessThan("2.3.0"))##
-    @Override
-    public CountRequestBuilder build(CountRequestBuilder builder) {
-        if (_conditionQuery != null) {
-            QueryBuilder queryBuilder = _conditionQuery.getQuery();
-            if (queryBuilder != null) {
-                builder.setQuery(queryBuilder);
-            }
-        }
-        return builder;
-    }
-#end##
 
     @Override
     public SearchRequestBuilder build(SearchRequestBuilder builder) {
@@ -91,6 +80,10 @@ public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
             _conditionQuery.getFieldSortBuilderList().forEach(sort -> {
                 builder.addSort(sort);
             });
+        }
+
+        if (_conditionAggregation != null) {
+            _conditionAggregation.getAggregationBuilderList().forEach(builder::addAggregation);
         }
 
         if (_specification != null) {
@@ -120,6 +113,25 @@ public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
     }
 
     // ===================================================================================
+    //                                                                         Aggregation
+    //                                                                         ===========
+    public Bs${table.camelizedName}CA aggregation() {
+        assertAggregationPurpose();
+        return doGetConditionAggregation();
+    }
+
+    protected Bs${table.camelizedName}CA doGetConditionAggregation() {
+        if (_conditionAggregation == null) {
+            _conditionAggregation = createLocalCA();
+        }
+        return _conditionAggregation;
+    }
+
+    protected Bs${table.camelizedName}CA createLocalCA() {
+        return new ${table.camelizedName}CA();
+    }
+
+    // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
     public HpSpecification specify() {
@@ -131,6 +143,9 @@ public class Bs${table.camelizedName}CB extends EsAbstractConditionBean {
     }
 
     protected void assertQueryPurpose() {
+    }
+
+    protected void assertAggregationPurpose() {
     }
 
     protected void assertSpecifyPurpose() {

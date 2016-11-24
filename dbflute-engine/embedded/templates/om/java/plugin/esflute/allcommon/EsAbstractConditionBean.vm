@@ -25,9 +25,6 @@ import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.unit.TimeValue;
-#if ($esVersion.isLessThan("2.3.0"))##
-import org.elasticsearch.action.count.CountRequestBuilder;
-#end##
 
 /**
  * @author ESFlute (using FreeGen)
@@ -45,9 +42,6 @@ public abstract class EsAbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                             Builder
     //                                                                             =======
-#if ($esVersion.isLessThan("2.3.0"))##
-    public abstract CountRequestBuilder build(CountRequestBuilder builder);
-#end##
     public abstract SearchRequestBuilder build(SearchRequestBuilder builder);
 
     // ===================================================================================
