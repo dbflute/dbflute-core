@@ -32,9 +32,9 @@ import org.dbflute.helper.jprop.JavaPropertiesResult;
 import org.dbflute.helper.jprop.JavaPropertiesStreamProvider;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.DfCollectionUtil;
@@ -128,7 +128,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
             public InputStream provideStream() throws IOException {
                 return new FileInputStream(new File(resourceFile));
             }
-        });
+        }).encodeAsUTF8(); // as default
         final String extendsPropRequestKey = "extendsPropRequest";
         String extendsPropRequest = (String) tableMap.get(extendsPropRequestKey);
         final List<String> extendsPropFileList;

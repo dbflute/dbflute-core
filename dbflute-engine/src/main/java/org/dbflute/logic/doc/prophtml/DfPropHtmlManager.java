@@ -309,10 +309,11 @@ public class DfPropHtmlManager {
             public InputStream provideStream() throws IOException {
                 return new FileInputStream(familyFile);
             }
-        });
+        }).encodeAsUTF8(); // as default
     }
 
-    protected void prepareExtendsProperties(DfPropHtmlRequest request, JavaPropertiesReader reader, DfPropHtmlFileAttribute extendsAttribute) {
+    protected void prepareExtendsProperties(DfPropHtmlRequest request, JavaPropertiesReader reader,
+            DfPropHtmlFileAttribute extendsAttribute) {
         DfPropHtmlFileAttribute current = extendsAttribute;
         while (true) {
             if (current == null) {
