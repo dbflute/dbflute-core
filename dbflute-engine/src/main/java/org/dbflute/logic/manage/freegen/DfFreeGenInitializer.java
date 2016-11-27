@@ -199,11 +199,17 @@ public class DfFreeGenInitializer {
             @SuppressWarnings("unchecked")
             final Map<String, Object> settingsMap = (Map<String, Object>) entry.getValue();
             final String schemaDir = (String) settingsMap.get("schemaDir");
-            if (Srl.is_Null_or_TrimmedEmpty(schemaDir)) {
-                String msg = "Not found the schemaDir property in the " + databaseName + " for " + requestName;
-                throw new DfIllegalPropertySettingException(msg);
+            final String schemaXml;
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(schemaDir)) {
+                schemaXml = schemaDir + "/project-schema-" + databaseName + ".xml";
+            } else {
+                final String schemaFile = (String) settingsMap.get("schemaFile");
+                if (Srl.is_Null_or_TrimmedEmpty(schemaFile)) {
+                    String msg = "Not found the schemaDir or schemaFile property in the " + databaseName + " for " + requestName;
+                    throw new DfIllegalPropertySettingException(msg);
+                }
+                schemaXml = schemaFile;
             }
-            final String schemaXml = schemaDir + "/project-schema-" + databaseName + ".xml";
             final DfSchemaXmlReader reader = DfSchemaXmlReader.createAsFlexibleToManage(schemaXml);
             final Database database = prepareDatabase(reader);
             settingsMap.put("instance", database);
