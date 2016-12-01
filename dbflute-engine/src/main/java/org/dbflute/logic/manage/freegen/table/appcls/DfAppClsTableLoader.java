@@ -91,11 +91,11 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                     classificationTop.acceptClassificationTopBasicItemMap(elementMap);
                 } else {
                     if (isElementMapRefCls(elementMap)) {
-                        assertRefClsOnlyOne(classificationName, refClsElement, elementMap);
+                        assertRefClsOnlyOne(classificationName, refClsElement, elementMap, resource);
                         if (dbClsMap == null) {
                             dbClsMap = getClassificationProperties().getClassificationTopMap();
                         }
-                        refClsElement = createRefClsElement(classificationName, elementMap, dbClsMap);
+                        refClsElement = createRefClsElement(classificationName, elementMap, dbClsMap, resource);
                         handleRefCls(classificationTop, refClsElement);
                     } else {
                         literalArranger.arrange(classificationName, elementMap);
@@ -131,25 +131,28 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         return elementMap.get(DfRefClsElement.KEY_REFCLS) != null;
     }
 
-    protected void assertRefClsOnlyOne(String classificationName, DfRefClsElement refClsElement, Map<String, Object> elementMap) {
+    protected void assertRefClsOnlyOne(String classificationName, DfRefClsElement refClsElement, Map<String, Object> elementMap,
+            DfFreeGenResource resource) {
         if (refClsElement != null) { // only-one refCls is supported #for_now
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Duplicate refCls in the app classification.");
             br.addItem("Advice");
             br.addElement("Only-one refCls is supported in one app classification.");
-            br.addItem("WebCls");
+            br.addItem("AppCls");
             br.addElement(classificationName);
             br.addItem("Existing refCls");
             br.addElement(refClsElement);
             br.addItem("Duplicate refCls");
             br.addElement(elementMap);
+            br.addItem("dfprop File");
+            br.addElement(resource.getResourceFile());
             final String msg = br.buildExceptionMessage();
             throw new DfIllegalPropertySettingException(msg);
         }
     }
 
     protected DfRefClsElement createRefClsElement(String classificationName, Map<String, Object> elementMap,
-            Map<String, DfClassificationTop> dbClsMap) {
+            Map<String, DfClassificationTop> dbClsMap, DfFreeGenResource resource) {
         final String refCls = (String) elementMap.get(DfRefClsElement.KEY_REFCLS);
         final String projectName;
         final String refClsName;
@@ -180,7 +183,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
             String msg = "Not found the refType in refCls elementMap: " + classificationName + " " + elementMap;
             throw new DfIllegalPropertySettingException(msg);
         }
-        final DfClassificationTop dbClsTop = findDBCls(classificationName, refClsName, dbClsMap);
+        final DfClassificationTop dbClsTop = findDBCls(classificationName, refClsName, dbClsMap, resource);
         return new DfRefClsElement(projectName, refClsName, classificationType, groupName, refType, dbClsTop);
     }
 
@@ -188,19 +191,22 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         return getBasicProperties().getProjectPrefix() + "CDef." + refClsName;
     }
 
-    protected DfClassificationTop findDBCls(String classificationName, String refClsName, Map<String, DfClassificationTop> dbClsMap) {
+    protected DfClassificationTop findDBCls(String classificationName, String refClsName, Map<String, DfClassificationTop> dbClsMap,
+            DfFreeGenResource resource) {
         final DfClassificationTop refTop = dbClsMap.get(refClsName);
         if (refTop == null) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Not found the DB classification for app classification.");
             br.addItem("Advice");
             br.addElement("Make sure your DB classification name.");
-            br.addItem("WebCls");
+            br.addItem("AppCls");
             br.addElement(classificationName);
             br.addItem("NotFound DBCls");
             br.addElement(refClsName);
             br.addItem("Existing DBCls");
             br.addElement(dbClsMap.keySet());
+            br.addItem("dfprop File");
+            br.addElement(resource.getResourceFile());
             final String msg = br.buildExceptionMessage();
             throw new DfIllegalPropertySettingException(msg);
         }
