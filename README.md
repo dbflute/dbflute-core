@@ -6,7 +6,7 @@ DBFlute core libraries for Java8
 - dbflute-runtime: jar library for application
 
 ## to DB change
-DBFlute has resistance to DB change.
+DBFlute has tolerance to DB change.
 
 - Lean Startup & Incremental Development
 - Implementing with Designing Development
@@ -146,4 +146,5 @@ I appreciate every framework.
 # Thanks, Friends
 DBFlute is used by:  
 - Fess: https://github.com/codelibs/fess
-- and many business project, comming soon...
+- S2Robot: https://github.com/codelibs/s2robot
+- and other many business projects, comming soon...
