@@ -27,7 +27,7 @@ import org.dbflute.util.DfCollectionUtil;
  * @author jflute
  * @since 1.1.0 (2014/10/29 Monday)
  */
-public class EntityModifiedProperties implements Serializable {
+public class EntityModifiedProperties implements Serializable, Cloneable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -134,5 +134,20 @@ public class EntityModifiedProperties implements Serializable {
     @Override
     public String toString() {
         return "modifiedProp:" + _propertyNameSet;
+    }
+
+    @Override
+    public EntityModifiedProperties clone() { // deep copy
+        try {
+            final EntityModifiedProperties cloned = (EntityModifiedProperties) super.clone();
+            if (_propertyNameSet != null) {
+                final Set<String> copied = new LinkedHashSet<String>(_propertyNameSet);
+                copied.addAll(_propertyNameSet);
+                cloned._propertyNameSet = copied;
+            }
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("Failed to clone the properties: " + toString(), e);
+        }
     }
 }

@@ -16,6 +16,7 @@
 package org.dbflute.dbmeta;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.optional.OptionalScalar;
 import org.dbflute.twowaysql.DisplaySqlBuilder;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.Srl;
 
 /**
@@ -430,16 +432,48 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     //                                               clone()
     //                                               -------
     /**
-     * Clone entity instance using super.clone(). (shallow copy) 
+     * Clone entity instance using super.clone(). <br>
+     * Basically shallow copy, but might be changed to deep copy...!? 
      * @return The cloned instance of this entity. (NotNull)
      * @throws IllegalStateException When it fails to clone the entity.
      */
     @Override
     public Entity clone() {
         try {
-            return (Entity) super.clone();
+            final AbstractEntity cloned = (AbstractEntity) super.clone();
+
+            // deep copy framework data to suppress unexpected trouble
+            mydeepCopyUniqueDrivenProperties(cloned);
+            mydeepCopyModifiedProperties(cloned);
+            mydeepCopySpecifiedProperties(cloned);
+            mydeepCopyDerivedMap(cloned);
+            return cloned;
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException("Failed to clone the entity: " + toString(), e);
+        }
+    }
+
+    protected void mydeepCopyUniqueDrivenProperties(AbstractEntity cloned) { // uses reflection for final variable
+        final Field field = DfReflectionUtil.getAccessibleField(AbstractEntity.class, "__uniqueDrivenProperties");
+        final EntityUniqueDrivenProperties copied = __uniqueDrivenProperties.clone(); // deep copy
+        DfReflectionUtil.setValueForcedly(field, cloned, copied);
+    }
+
+    protected void mydeepCopyModifiedProperties(AbstractEntity cloned) { // uses reflection for final variable
+        final Field field = DfReflectionUtil.getAccessibleField(AbstractEntity.class, "__modifiedProperties");
+        final EntityModifiedProperties copied = __modifiedProperties.clone(); // deep copy
+        DfReflectionUtil.setValueForcedly(field, cloned, copied);
+    }
+
+    protected void mydeepCopySpecifiedProperties(AbstractEntity cloned) {
+        if (__specifiedProperties != null) {
+            cloned.__specifiedProperties = __specifiedProperties.clone(); // deep copy
+        }
+    }
+
+    protected void mydeepCopyDerivedMap(AbstractEntity cloned) {
+        if (__derivedMap != null) {
+            cloned.__derivedMap = __derivedMap.clone(); // almost deep copy
         }
     }
 }

@@ -27,7 +27,7 @@ import org.dbflute.util.DfCollectionUtil;
  * @author jflute
  * @since 1.1.0 (2014/10/29 Monday)
  */
-public class EntityUniqueDrivenProperties implements Serializable {
+public class EntityUniqueDrivenProperties implements Serializable, Cloneable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -121,5 +121,20 @@ public class EntityUniqueDrivenProperties implements Serializable {
     @Override
     public String toString() {
         return "uniqueDriven:" + _propertyNameSet;
+    }
+
+    @Override
+    public EntityUniqueDrivenProperties clone() { // deep copy
+        try {
+            final EntityUniqueDrivenProperties cloned = (EntityUniqueDrivenProperties) super.clone();
+            if (_propertyNameSet != null) {
+                final Set<String> copied = new LinkedHashSet<String>();
+                copied.addAll(_propertyNameSet);
+                cloned._propertyNameSet = copied;
+            }
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("Failed to clone the properties: " + toString(), e);
+        }
     }
 }
