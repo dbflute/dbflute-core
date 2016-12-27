@@ -634,9 +634,9 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     //                                      Loading Callback
     //                                      ----------------
     protected <LOCAL_ENTITY extends Entity, KEY, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> // generic
-    InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY> // return
-    xcreateLoadReferrerCallback(final String referrerProperty, final DBMeta dbmeta, final ReferrerInfo referrerInfo,
-            final BehaviorReadable referrerBhv, final ColumnInfo pkCol, final ColumnInfo fkCol) {
+            InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY> // return
+            xcreateLoadReferrerCallback(final String referrerProperty, final DBMeta dbmeta, final ReferrerInfo referrerInfo,
+                    final BehaviorReadable referrerBhv, final ColumnInfo pkCol, final ColumnInfo fkCol) {
         return new InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY>() { // for simple key
             public KEY getPKVal(LOCAL_ENTITY entity) {
                 return pkCol.read(entity); // (basically) PK cannot be optional because of not-null
@@ -653,7 +653,12 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
 
             public void qyFKIn(REFERRER_CB cb, Collection<KEY> pkList) {
                 final String conditionKey = ConditionKey.CK_IN_SCOPE.getConditionKey();
-                cb.localCQ().invokeQuery(fkCol.getColumnDbName(), conditionKey, pkList);
+                final String columnDbName = fkCol.getColumnDbName();
+                if (pkList.size() == 1) { // one local entity
+                    cb.localCQ().invokeQueryEqual(columnDbName, pkList.iterator().next());
+                } else { // multiple local entities
+                    cb.localCQ().invokeQuery(columnDbName, conditionKey, pkList);
+                }
             }
 
             public void qyOdFKAsc(REFERRER_CB cb) {
@@ -688,10 +693,10 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     }
 
     protected <LOCAL_ENTITY extends Entity, KEY, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> // generic
-    InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY> // return
-    xcreateLoadReferrerCallback(final String referrerProperty, final DBMeta dbmeta, final ReferrerInfo referrerInfo,
-            final BehaviorReadable referrerBhv, final Set<ColumnInfo> pkColSet, final Set<ColumnInfo> fkColSet,
-            final Map<ColumnInfo, ColumnInfo> mappingColMap) {
+            InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY> // return
+            xcreateLoadReferrerCallback(final String referrerProperty, final DBMeta dbmeta, final ReferrerInfo referrerInfo,
+                    final BehaviorReadable referrerBhv, final Set<ColumnInfo> pkColSet, final Set<ColumnInfo> fkColSet,
+                    final Map<ColumnInfo, ColumnInfo> mappingColMap) {
         return new InternalLoadReferrerCallback<LOCAL_ENTITY, KEY, REFERRER_CB, REFERRER_ENTITY>() { // for compound key
             @SuppressWarnings("unchecked")
             public KEY getPKVal(LOCAL_ENTITY entity) {
@@ -1381,7 +1386,8 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
         return invoke(createInsertEntityCommand(entity, option));
     }
 
-    protected OptionalThing<InsertOption<? extends ConditionBean>> createOptionalInsertOption(InsertOption<? extends ConditionBean> option) {
+    protected OptionalThing<InsertOption<? extends ConditionBean>> createOptionalInsertOption(
+            InsertOption<? extends ConditionBean> option) {
         return OptionalThing.ofNullable(option, () -> {
             throw new IllegalStateException("Not found the insert option.");
         });
