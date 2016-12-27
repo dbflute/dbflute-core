@@ -58,7 +58,7 @@ public class QLog {
     // ===================================================================================
     //                                                                  Logging Adjustment
     //                                                                  ==================
-    protected static boolean isQueryLogLevelInfo() {
+    public static boolean isQueryLogLevelInfo() {
         return _queryLogLevelInfo;
     }
 

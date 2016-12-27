@@ -58,7 +58,7 @@ public class XLog {
     // ===================================================================================
     //                                                                  Logging Adjustment
     //                                                                  ==================
-    protected static boolean isExecuteStatusLogLevelInfo() {
+    public static boolean isExecuteStatusLogLevelInfo() {
         return _executeStatusLogLevelInfo;
     }
 
