@@ -188,7 +188,29 @@ map:{
     #    ; schema = EXAMPLEDB
     #    ; user = exampuser
     #    ; password = exampword
+    #    # (if false, it needs to dump master table records)
+    #    ; isSuppressCraftDiff = true
     #}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o multipleSchemaSyncCheckMap: (NotRequired - Default map:{})
+    #
+    # created by #dbflute_intro
+    ; multipleSchemaSyncCheckMap = map:{
+        ; previow.EXAMPLEDB = map:{
+            ; url = jdbc:...
+            ; schema = EXAMPLEDB
+            ; user = exampuser
+            ; password = exampword
+        }
+        ; staging.EXAMPLEDB2 = map:{
+            ; url = jdbc:...
+            ; schema = EXAMPLEDB
+            ; user = exampuser
+            ; password = exampword
+        }
+    }
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
