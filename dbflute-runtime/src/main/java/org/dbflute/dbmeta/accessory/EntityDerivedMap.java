@@ -133,9 +133,13 @@ public class EntityDerivedMap implements Serializable, Cloneable {
     //                                                                         ===========
     protected Map<String, Object> getDerivedMap() {
         if (_derivedMap == null) {
-            _derivedMap = new HashMap<String, Object>(4);
+            _derivedMap = newDerivedMap();
         }
         return _derivedMap;
+    }
+
+    protected HashMap<String, Object> newDerivedMap() {
+        return new HashMap<String, Object>();
     }
 
     // ===================================================================================
@@ -313,7 +317,7 @@ public class EntityDerivedMap implements Serializable, Cloneable {
         try {
             final EntityDerivedMap cloned = (EntityDerivedMap) super.clone();
             if (_derivedMap != null) {
-                final Map<String, Object> copied = new HashMap<String, Object>();
+                final Map<String, Object> copied = newDerivedMap();
                 copied.putAll(_derivedMap);
                 cloned._derivedMap = copied;
             }

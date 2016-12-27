@@ -110,9 +110,13 @@ public class EntityUniqueDrivenProperties implements Serializable, Cloneable {
 
     protected Set<String> getPropertyNameSet() {
         if (_propertyNameSet == null) {
-            _propertyNameSet = new LinkedHashSet<String>(2);
+            _propertyNameSet = newPropertyNameSet();
         }
         return _propertyNameSet;
+    }
+
+    protected LinkedHashSet<String> newPropertyNameSet() {
+        return new LinkedHashSet<String>();
     }
 
     // ===================================================================================
@@ -128,7 +132,7 @@ public class EntityUniqueDrivenProperties implements Serializable, Cloneable {
         try {
             final EntityUniqueDrivenProperties cloned = (EntityUniqueDrivenProperties) super.clone();
             if (_propertyNameSet != null) {
-                final Set<String> copied = new LinkedHashSet<String>();
+                final Set<String> copied = newPropertyNameSet();
                 copied.addAll(_propertyNameSet);
                 cloned._propertyNameSet = copied;
             }
