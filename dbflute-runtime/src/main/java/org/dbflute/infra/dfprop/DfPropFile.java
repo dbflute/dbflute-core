@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.dbflute.exception.DfPropFileReadFailureException;
 import org.dbflute.exception.MapListStringDuplicateEntryException;
+import org.dbflute.exception.MapListStringParseFailureException;
 import org.dbflute.helper.mapstring.MapListFile;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
@@ -119,6 +120,9 @@ public class DfPropFile {
         } catch (MapListStringDuplicateEntryException e) {
             throwDfPropDuplicateEntryException(path, e);
             return null; // unreachable
+        } catch (MapListStringParseFailureException e) {
+            throwDfPropMapStringParseFailureException(path, e);
+            return null; // unreachable
         }
     }
 
@@ -141,6 +145,29 @@ public class DfPropFile {
         br.addElement("    }");
         br.addElement("    Sea = map:{");
         br.addElement("        ; ...");
+        br.addElement("    }");
+        br.addItem("DfProp Path");
+        br.addElement(path);
+        final String msg = br.buildExceptionMessage();
+        throw new DfPropFileReadFailureException(msg, e);
+    }
+
+    protected void throwDfPropMapStringParseFailureException(String path, MapListStringParseFailureException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to parse the map file.");
+        br.addItem("Advice");
+        br.addElement("Make sure your map file format.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    map:{");
+        br.addElement("        ; map:{");
+        br.addElement("            ...");
+        br.addElement("    }");
+        br.addElement("  (o):");
+        br.addElement("    map:{");
+        br.addElement("        ; map:{");
+        br.addElement("            ...");
+        br.addElement("        }");
         br.addElement("    }");
         br.addItem("DfProp Path");
         br.addElement(path);
@@ -388,7 +415,8 @@ public class DfPropFile {
         }
     }
 
-    protected <ELEMENT> boolean resolveOutsidePropInheritMap(DfPropReadingMapHandler<ELEMENT> handler, String path, Map<String, ELEMENT> map) {
+    protected <ELEMENT> boolean resolveOutsidePropInheritMap(DfPropReadingMapHandler<ELEMENT> handler, String path,
+            Map<String, ELEMENT> map) {
         if (map == null) { // no parent
             return false;
         }
