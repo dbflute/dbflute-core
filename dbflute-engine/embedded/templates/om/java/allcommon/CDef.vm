@@ -55,7 +55,6 @@ public interface ${glCDef} extends Classification {
 #set ($count = $count + 1)
 #end
         ;
-        private static final String[] EMPTY_SISTERS = DfTypeUtil.emptyStrings();
         private static final Map<String, ${classificationName}> _codeClsMap = new HashMap<String, ${classificationName}>();
         private static final Map<String, ${classificationName}> _nameClsMap = new HashMap<String, ${classificationName}>();
         static {
