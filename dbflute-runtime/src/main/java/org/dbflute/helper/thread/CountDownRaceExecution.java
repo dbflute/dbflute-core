@@ -24,7 +24,7 @@ public interface CountDownRaceExecution {
 
     /**
      * Execute the application code as thread-fire.
-     * @param resource The resource for the thread-fire. (NotNull)
+     * @param runner The resource for the thread-fire. (NotNull)
      */
-    void execute(CountDownRaceRunner resource);
+    void execute(CountDownRaceRunner runner);
 }

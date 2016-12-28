@@ -16,7 +16,10 @@
 package org.dbflute.helper.thread;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -42,19 +45,42 @@ public class CountDownRace {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final int _runnerCount;
+    protected final Map<Integer, Object> _runnerRequestMap; // map:{entryNumber, parameterObject} 
     protected final ExecutorService _service;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public CountDownRace(int runnerCount) {
+    public CountDownRace(int runnerCount) { // assigned by only runner count (without parameter)
         if (runnerCount < 1) {
             String msg = "The argument 'runnerCount' should not be minus or zero: " + runnerCount;
             throw new IllegalArgumentException(msg);
         }
-        _runnerCount = runnerCount;
+        _runnerRequestMap = newRunnerRequestMap(runnerCount);
+        for (int i = 0; i < runnerCount; i++) { // basically synchronized with parameter size
+            final int entryNumber = i + 1;
+            _runnerRequestMap.put(entryNumber, null);
+        }
         _service = prepareExecutorService();
+    }
+
+    public CountDownRace(List<Object> parameterList) { // assigned by parameters (the size is runner count)
+        if (parameterList == null || parameterList.isEmpty()) {
+            String msg = "The argument 'parameterList' should not be null or empty: " + parameterList;
+            throw new IllegalArgumentException(msg);
+        }
+        _runnerRequestMap = newRunnerRequestMap(parameterList.size());
+        int index = 0;
+        for (Object parameter : parameterList) {
+            final int entryNumber = index + 1;
+            _runnerRequestMap.put(entryNumber, parameter);
+            ++index;
+        }
+        _service = prepareExecutorService();
+    }
+
+    protected Map<Integer, Object> newRunnerRequestMap(int size) {
+        return new LinkedHashMap<Integer, Object>(size);
     }
 
     protected ExecutorService prepareExecutorService() {
@@ -73,27 +99,29 @@ public class CountDownRace {
     }
 
     protected void doReadyGo(CountDownRaceExecution execution) {
-        final CountDownLatch ready = new CountDownLatch(_runnerCount);
+        final int runnerCount = _runnerRequestMap.size();
+        final CountDownLatch ready = new CountDownLatch(runnerCount);
         final CountDownLatch start = new CountDownLatch(1);
-        final CountDownLatch goal = new CountDownLatch(_runnerCount);
-        final CountDownRaceLatch ourLatch = new CountDownRaceLatch(_runnerCount);
+        final CountDownLatch goal = new CountDownLatch(runnerCount);
+        final CountDownRaceLatch ourLatch = new CountDownRaceLatch(runnerCount);
         final Object lockObj = new Object();
         final List<Future<Void>> futureList = new ArrayList<Future<Void>>();
-        for (int i = 0; i < _runnerCount; i++) { // basically synchronized with parameter size
-            final int entryNumber = i + 1;
-            final Callable<Void> callable = createCallable(execution, ready, start, goal, ourLatch, entryNumber, lockObj);
+        for (Entry<Integer, Object> entry : _runnerRequestMap.entrySet()) {
+            final Integer entryNumber = entry.getKey();
+            final Object parameter = entry.getValue(); // null allowed
+            final Callable<Void> callable = createCallable(execution, ready, start, goal, ourLatch, entryNumber, parameter, lockObj);
             final Future<Void> future = _service.submit(callable);
             futureList.add(future);
         }
 
         if (_log.isDebugEnabled()) {
-            _log.debug("...Ready Go! Count Down Race just begun! (runner=" + _runnerCount + ")");
+            _log.debug("...Ready Go! CountDownRace just begun! (runner=" + runnerCount + ")");
         }
         start.countDown(); // fire!
         try {
             goal.await(); // wait until all threads are finished
             if (_log.isDebugEnabled()) {
-                _log.debug("All runners finished line! (runner=" + _runnerCount + ")");
+                _log.debug("All runners finished line! (runner=" + runnerCount + ")");
             }
         } catch (InterruptedException e) {
             String msg = "goal.await() was interrupted!";
@@ -121,7 +149,8 @@ public class CountDownRace {
     //                                                                            Callable
     //                                                                            ========
     protected Callable<Void> createCallable(final CountDownRaceExecution execution, final CountDownLatch ready, final CountDownLatch start,
-            final CountDownLatch goal, final CountDownRaceLatch ourLatch, final int entryNumber, final Object lockObj) {
+            final CountDownLatch goal, final CountDownRaceLatch ourLatch, final int entryNumber, final Object parameter,
+            final Object lockObj) {
         return new Callable<Void>() {
             public Void call() { // each thread here
                 final long threadId = Thread.currentThread().getId();
@@ -135,7 +164,7 @@ public class CountDownRace {
                     }
                     RuntimeException cause = null;
                     try {
-                        execution.execute(createRunner(threadId, ourLatch, entryNumber, lockObj));
+                        execution.execute(createRunner(threadId, ourLatch, entryNumber, parameter, lockObj));
                     } catch (RuntimeException e) {
                         cause = e;
                     }
@@ -151,7 +180,8 @@ public class CountDownRace {
         };
     }
 
-    protected CountDownRaceRunner createRunner(long threadId, CountDownRaceLatch ourLatch, int entryNumber, Object lockObj) {
-        return new CountDownRaceRunner(threadId, ourLatch, entryNumber, lockObj, _runnerCount);
+    protected CountDownRaceRunner createRunner(long threadId, CountDownRaceLatch ourLatch, int entryNumber, Object parameter,
+            Object lockObj) {
+        return new CountDownRaceRunner(threadId, ourLatch, entryNumber, parameter, lockObj, _runnerRequestMap.size());
     }
 }
