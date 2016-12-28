@@ -262,7 +262,7 @@ public class DfClassificationElement {
             }
             sb.append("}");
         } else {
-            sb.append("EMPTY_SISTERS");
+            sb.append("emptyStrings()"); // changed from EMPTY_SISTERS since 1.1.2
         }
         return sb.toString();
     }

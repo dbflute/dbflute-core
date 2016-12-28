@@ -23,15 +23,13 @@ import org.dbflute.jdbc.ClassificationCodeType;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.optional.OptionalThing;
+import static org.dbflute.util.DfTypeUtil.emptyStrings;
 
 /**
  * The definition of classification.
  * @author ${database.classAuthor}
  */
 public interface ${glCDef} extends Classification {
-
-    /** The empty array for no sisters. */
-    String[] EMPTY_SISTERS = new String[]{};
 
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
@@ -57,6 +55,7 @@ public interface ${glCDef} extends Classification {
 #set ($count = $count + 1)
 #end
         ;
+        private static final String[] EMPTY_SISTERS = DfTypeUtil.emptyStrings();
         private static final Map<String, ${classificationName}> _codeClsMap = new HashMap<String, ${classificationName}>();
         private static final Map<String, ${classificationName}> _nameClsMap = new HashMap<String, ${classificationName}>();
         static {

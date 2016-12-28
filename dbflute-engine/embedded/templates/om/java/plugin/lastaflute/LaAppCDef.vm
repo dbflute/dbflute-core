@@ -23,6 +23,7 @@ import org.dbflute.jdbc.ClassificationCodeType;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.optional.OptionalThing;
+import static org.dbflute.util.DfTypeUtil.emptyStrings;
 #if ($tableMap.hasRefCls)
 import ${tableMap.allcommonPackage}.*;
 #end
@@ -33,9 +34,6 @@ import ${tableMap.allcommonPackage}.*;
  * @author FreeGen
  */
 public interface ${glCDef} extends Classification {
-
-    /** The empty array for no sisters. */
-    String[] EMPTY_SISTERS = new String[]{};
 
 #foreach ($classificationTop in $tableMap.classificationTopList)
 #set ($classificationName = $classificationTop.classificationName)
