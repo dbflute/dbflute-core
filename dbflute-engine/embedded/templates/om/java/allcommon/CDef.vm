@@ -292,34 +292,34 @@ public interface ${glCDef} extends Classification {
 
         public List<Classification> listAll() {
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return toClassificationList(${glCDef}.${classificationName}.listAll()); }
+            if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.listAll()); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public List<Classification> listByGroup(String groupName) { // exception if not found
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return toClassificationList(${glCDef}.${classificationName}.listByGroup(groupName)); }
+            if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.listByGroup(groupName)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
-        public List<? extends Classification> listOf(Collection<String> codeList) {
+        public List<Classification> listOf(Collection<String> codeList) {
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return ${glCDef}.${classificationName}.listOf(codeList); }
+            if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.listOf(codeList)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         public List<Classification> groupOf(String groupName) { // old style
 #foreach ($classificationName in $database.classificationNameList)
-            if (${classificationName}.name().equals(name())) { return toClassificationList(${glCDef}.${classificationName}.groupOf(groupName)); }
+            if (${classificationName}.name().equals(name())) { return toClsList(${glCDef}.${classificationName}.groupOf(groupName)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
 
         @SuppressWarnings("unchecked")
-        private List<Classification> toClassificationList(List<?> clsList) {
+        private List<Classification> toClsList(List<?> clsList) {
             return (List<Classification>)clsList;
         }
 
