@@ -17,6 +17,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import java.util.*;
 
+import org.dbflute.exception.ClassificationNotFoundException;
 import org.dbflute.jdbc.Classification;
 import org.dbflute.jdbc.ClassificationCodeType;
 import org.dbflute.jdbc.ClassificationMeta;
@@ -357,13 +358,6 @@ public interface ${glCDef} extends Classification {
             if (${classificationName}.name().equalsIgnoreCase(classificationName)) { return ${glCDef}.DefMeta.${classificationName}; }
 #end
             throw new IllegalStateException("Unknown classification: " + classificationName);
-        }
-    }
-
-    public static class ClassificationNotFoundException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public ClassificationNotFoundException(String msg) {
-            super(msg);
         }
     }
 }
