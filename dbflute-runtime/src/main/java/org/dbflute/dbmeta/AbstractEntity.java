@@ -433,7 +433,7 @@ public abstract class AbstractEntity implements Entity, DerivedMappable, Seriali
     //                                               -------
     /**
      * Clone entity instance using super.clone(). <br>
-     * Basically shallow copy, but might be changed to deep copy...!? 
+     * Basically shallow copy, but might be changed to deep copy at the future...!? 
      * @return The cloned instance of this entity. (NotNull)
      * @throws IllegalStateException When it fails to clone the entity.
      */
