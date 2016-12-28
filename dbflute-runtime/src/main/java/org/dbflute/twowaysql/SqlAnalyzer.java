@@ -572,8 +572,8 @@ public class SqlAnalyzer {
 
     protected EmbeddedVariableNode newEmbeddedVariableNode(String expr, String testValue, String specifiedSql, boolean blockNullParameter,
             NodeAdviceFactory adviceFactory, boolean replaceOnly, boolean terminalDot, boolean overlookNativeBinding) {
-        return new EmbeddedVariableNode(expr, testValue, specifiedSql, blockNullParameter, getNodeAdviceFactory(), replaceOnly,
-                terminalDot, overlookNativeBinding);
+        return new EmbeddedVariableNode(expr, testValue, specifiedSql, blockNullParameter, adviceFactory, replaceOnly, terminalDot,
+                overlookNativeBinding);
     }
 
     // -----------------------------------------------------
