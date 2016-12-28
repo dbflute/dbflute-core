@@ -156,7 +156,8 @@ public abstract class AbstractDBMeta implements DBMeta {
         return null; // might be overridden
     }
 
-    protected <ENTITY extends Entity> PropertyGateway doFindEfpg(Map<String, PropertyGateway> propertyGatewayMap, String foreignPropertyName) {
+    protected <ENTITY extends Entity> PropertyGateway doFindEfpg(Map<String, PropertyGateway> propertyGatewayMap,
+            String foreignPropertyName) {
         return propertyGatewayMap.get(foreignPropertyName);
     }
 
@@ -263,9 +264,12 @@ public abstract class AbstractDBMeta implements DBMeta {
     /** {@inheritDoc} */
     public ColumnInfo findColumnInfo(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
-        final ColumnInfo columnInfo = getColumnInfoFlexibleMap().get(columnFlexibleName);
+        final Map<String, ColumnInfo> flexibleMap = getColumnInfoFlexibleMap();
+        final ColumnInfo columnInfo = flexibleMap.get(columnFlexibleName);
         if (columnInfo == null) {
-            throwDBMetaNotFoundException("The column info was not found.", "Column", columnFlexibleName);
+            final String notice = "The column info was not found.";
+            final String keyName = "Column";
+            throwDBMetaNotFoundException(notice, keyName, columnFlexibleName, flexibleMap.keySet());
         }
         return columnInfo;
     }
@@ -421,15 +425,28 @@ public abstract class AbstractDBMeta implements DBMeta {
     public OptionalObject<PrimaryInfo> searchPrimaryInfo(Collection<ColumnInfo> columnInfoList) {
         final PrimaryInfo primaryInfo = getPrimaryInfo(); // exception if no PK
         final Set<ColumnInfo> colSet = new HashSet<ColumnInfo>(columnInfoList);
-        final List<ColumnInfo> primaryColumnList = primaryInfo.getPrimaryColumnList();
-        for (ColumnInfo pk : primaryColumnList) {
+        final List<ColumnInfo> pkList = primaryInfo.getPrimaryColumnList();
+        for (ColumnInfo pk : pkList) {
             if (!colSet.contains(pk)) {
                 return OptionalObject.ofNullable(null, () -> {
-                    throwDBMetaNotFoundException("Not found the primary key by the columns", "Specified Column", columnInfoList);
+                    throwSpecifiedColumnNotPrimaryException(columnInfoList, pkList);
                 });
             }
         }
         return OptionalObject.of(primaryInfo);
+    }
+
+    protected void throwSpecifiedColumnNotPrimaryException(Collection<ColumnInfo> columnInfoList, List<ColumnInfo> pkList) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the primary key by the columns");
+        br.addItem("Table");
+        br.addElement(getTableDbName());
+        br.addItem("Specified Column List");
+        br.addElement(columnInfoList);
+        br.addItem("Existing PrimaryKey");
+        br.addElement(pkList);
+        final String msg = br.buildExceptionMessage();
+        throw new DBMetaNotFoundException(msg); // for compatible and uniformity
     }
 
     // -----------------------------------------------------
@@ -526,18 +543,24 @@ public abstract class AbstractDBMeta implements DBMeta {
     /** {@inheritDoc} */
     public ForeignInfo findForeignInfo(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final ForeignInfo foreignInfo = getForeignInfoFlexibleMap().get(foreignPropertyName);
+        final Map<String, ForeignInfo> flexibleMap = getForeignInfoFlexibleMap();
+        final ForeignInfo foreignInfo = flexibleMap.get(foreignPropertyName);
         if (foreignInfo == null) {
-            throwDBMetaNotFoundException("The foreign info was not found.", "Foreign Property", foreignPropertyName);
+            final String notice = "The foreign info was not found.";
+            final String keyName = "Foreign Property";
+            throwDBMetaNotFoundException(notice, keyName, foreignPropertyName, flexibleMap.keySet());
         }
         return foreignInfo;
     }
 
     /** {@inheritDoc} */
     public ForeignInfo findForeignInfo(int relationNo) {
-        final ForeignInfo foreignInfo = getForeignInfoRelationNoKeyMap().get(relationNo);
+        final Map<Integer, ForeignInfo> relationNoKeyMap = getForeignInfoRelationNoKeyMap();
+        final ForeignInfo foreignInfo = relationNoKeyMap.get(relationNo);
         if (foreignInfo == null) {
-            throwDBMetaNotFoundException("The foreign info was not found.", "Relation No", relationNo);
+            final String notice = "The foreign info was not found.";
+            final String keyName = "Relation No";
+            throwDBMetaNotFoundException(notice, keyName, relationNo, relationNoKeyMap.keySet());
         }
         return foreignInfo;
     }
@@ -664,9 +687,12 @@ public abstract class AbstractDBMeta implements DBMeta {
     /** {@inheritDoc} */
     public ReferrerInfo findReferrerInfo(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
-        final ReferrerInfo referrerInfo = getReferrerInfoFlexibleMap().get(referrerPropertyName);
+        final Map<String, ReferrerInfo> flexibleMap = getReferrerInfoFlexibleMap();
+        final ReferrerInfo referrerInfo = flexibleMap.get(referrerPropertyName);
         if (referrerInfo == null) {
-            throwDBMetaNotFoundException("The referrer info was not found.", "Referrer Property", referrerPropertyName);
+            final String notice = "The referrer info was not found.";
+            final String keyName = "Referrer Property";
+            throwDBMetaNotFoundException(notice, keyName, referrerPropertyName, flexibleMap.keySet());
         }
         return referrerInfo;
     }
@@ -678,8 +704,8 @@ public abstract class AbstractDBMeta implements DBMeta {
     ) { // createReferrerInfo()
         final Class<?> propertyAccessType = chooseReferrerPropertyAccessType(referrerDbm, oneToOne);
         final PropertyMethodFinder propertyMethodFinder = createReferrerPropertyMethodFinder();
-        return new ReferrerInfo(constraintName, referrerPropertyName, localDbm, referrerDbm, localReferrerColumnInfoMap,
-                propertyAccessType, oneToOne, reversePropertyName, propertyMethodFinder);
+        return new ReferrerInfo(constraintName, referrerPropertyName, localDbm, referrerDbm, localReferrerColumnInfoMap, propertyAccessType,
+                oneToOne, reversePropertyName, propertyMethodFinder);
     }
 
     protected Class<?> chooseReferrerPropertyAccessType(DBMeta referrerDbm, boolean oneToOne) {
@@ -946,13 +972,15 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
     }
 
-    protected void throwDBMetaNotFoundException(String notice, String keyName, Object value) {
+    protected void throwDBMetaNotFoundException(String notice, String keyName, Object value, Set<? extends Object> keySet) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
         br.addItem("Table");
         br.addElement(getTableDbName());
         br.addItem(keyName);
         br.addElement(value);
+        br.addItem("Existing KeySet");
+        br.addElement(keySet);
         final String msg = br.buildExceptionMessage();
         throw new DBMetaNotFoundException(msg);
     }
