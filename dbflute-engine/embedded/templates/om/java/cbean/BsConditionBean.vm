@@ -395,6 +395,9 @@ public class ${myClassName} extends AbstractConditionBean {
      * @deprecated ${fk.deprecated}
 #end
      */
+#if ($fk.isDeprecatedRelation())
+    @SuppressWarnings("deprecation")
+#end
     public ${setupSelectReturnType} setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
         assertSetupSelectPurpose("${tmpPropertyName}");
 #if ($fk.hasLocalColumnExceptPrimaryKey())
@@ -447,6 +450,9 @@ public class ${myClassName} extends AbstractConditionBean {
      * @deprecated ${referrer.deprecated}
 #end
      */
+#if ($referrer.isDeprecatedRelation())
+    @SuppressWarnings("deprecation")
+#end
     public ${setupSelectReturnType} setupSelect_${tmpPropertyNameInitCap}() {
         assertSetupSelectPurpose("${tmpPropertyName}");
         doSetupSelect(() -> query().query${tmpPropertyNameInitCap}());
@@ -566,6 +572,9 @@ public class ${myClassName} extends AbstractConditionBean {
          * @deprecated ${fk.deprecated}
 #end
          */
+#if ($fk.isDeprecatedRelation())
+    @SuppressWarnings("deprecation")
+#end
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionFinalArgs}) {
             assertRelation("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
@@ -590,6 +599,9 @@ public class ${myClassName} extends AbstractConditionBean {
          * @deprecated ${referrer.deprecated}
 #end
          */
+#if ($referrer.isDeprecatedRelation())
+    @SuppressWarnings("deprecation")
+#end
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}() {
             assertRelation("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
