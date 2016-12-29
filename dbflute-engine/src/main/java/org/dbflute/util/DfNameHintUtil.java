@@ -17,6 +17,7 @@ package org.dbflute.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @author jflute
@@ -29,11 +30,13 @@ public class DfNameHintUtil {
     public static final String PREFIX_MARK = "prefix:";
     public static final String SUFFIX_MARK = "suffix:";
     public static final String CONTAIN_MARK = "contain:";
+    public static final String PATTERN_MARK = "pattern:";
     public static final List<String> _markList = new ArrayList<String>();
     static {
         _markList.add(PREFIX_MARK);
         _markList.add(SUFFIX_MARK);
         _markList.add(CONTAIN_MARK);
+        _markList.add(PATTERN_MARK);
     }
 
     public static final List<String> getMarkList() {
@@ -83,6 +86,7 @@ public class DfNameHintUtil {
         final String prefixMark = PREFIX_MARK;
         final String suffixMark = SUFFIX_MARK;
         final String containMark = CONTAIN_MARK;
+        final String patternMark = PATTERN_MARK;
 
         if (hint.toLowerCase().startsWith(prefixMark.toLowerCase())) {
             final String pureHint = hint.substring(prefixMark.length(), hint.length());
@@ -97,6 +101,12 @@ public class DfNameHintUtil {
         } else if (hint.toLowerCase().startsWith(containMark.toLowerCase())) {
             final String pureHint = hint.substring(containMark.length(), hint.length());
             if (name.toLowerCase().contains(pureHint.toLowerCase())) {
+                return true;
+            }
+        } else if (hint.toLowerCase().startsWith(patternMark.toLowerCase())) {
+            final String pureHint = hint.substring(patternMark.length(), hint.length());
+            final Pattern pattern = Pattern.compile(pureHint);
+            if (pattern.matcher(name).matches()) {
                 return true;
             }
         } else {
