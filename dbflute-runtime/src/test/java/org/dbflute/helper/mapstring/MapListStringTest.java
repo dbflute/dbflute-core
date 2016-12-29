@@ -117,6 +117,48 @@ public class MapListStringTest extends RuntimeTestCase {
         assertEquals(map, generateMap);
     }
 
+    public void test_buildMapString_printOneLiner() {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString().printOneLiner();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+        {
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("key3-1", "value3-1");
+            valueMap.put("key3-2", "value3-2");
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value3-3-1");
+            valueList.add("value3-3-2");
+            valueMap.put("key3-3", valueList);
+            map.put("key3", valueMap);
+        }
+        {
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value4-1");
+            valueList.add("value4-2");
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("key4-3-1", "value4-3-1");
+            valueMap.put("key4-3-2", "value4-3-2");
+            valueList.add(valueMap);
+            map.put("key4", valueList);
+        }
+
+        // ## Act ##
+        String actual = maplist.buildMapString(map);
+
+        // ## Assert ##
+        log(ln() + actual);
+        assertTrue(actual.contains(" key1 = value1"));
+        assertTrue(actual.contains("; key2 = value2"));
+        assertTrue(actual.contains("; key3 = map:{"));
+        assertTrue(actual.contains(" key3-1 = value3-1"));
+        assertFalse(actual.contains(ln()));
+        Map<String, Object> generateMap = maplist.generateMap(actual);
+        log(ln() + generateMap);
+        assertEquals(map, generateMap);
+    }
+
     // ===================================================================================
     //                                                                            Generate
     //                                                                            ========
