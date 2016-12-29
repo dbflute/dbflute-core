@@ -92,12 +92,12 @@ public class DfSchemaPolicyTableTheme {
             }
         });
         themeMap.put("upperCaseBasis", (table, vioList) -> {
-            if (Srl.isLowerCaseAny(table.getTableSqlName())) { // use SQL name because DB name may be control name
+            if (Srl.isLowerCaseAny(buildCaseComparingTableName(table))) {
                 vioList.add("The table name should be on upper case basis: " + toTableDisp(table));
             }
         });
         themeMap.put("lowerCaseBasis", (table, vioList) -> {
-            if (Srl.isUpperCaseAny(table.getTableSqlName())) { // same reason
+            if (Srl.isUpperCaseAny(buildCaseComparingTableName(table))) {
                 vioList.add("The table name should be on lower case basis: " + toTableDisp(table));
             }
         });
@@ -119,6 +119,10 @@ public class DfSchemaPolicyTableTheme {
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
+    protected String buildCaseComparingTableName(Table table) {
+        return _secretary.buildCaseComparingTableName(table);
+    }
+
     protected String toTableDisp(Table table) {
         return _secretary.toTableDisp(table);
     }

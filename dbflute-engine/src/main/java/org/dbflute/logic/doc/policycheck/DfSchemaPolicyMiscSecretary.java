@@ -127,10 +127,23 @@ public class DfSchemaPolicyMiscSecretary {
     }
 
     // ===================================================================================
+    //                                                                             Compare
+    //                                                                             =======
+    public String buildCaseComparingTableName(Table table) {
+        // use SQL name because DB name may be controlled
+        // (and use resource name to be without schema prefix)
+        return table.getResourceNameForSqlName();
+    }
+
+    public String buildCaseComparingColumnName(Column column) {
+        return column.getResourceNameForSqlName(); // same reason as table name
+    }
+
+    // ===================================================================================
     //                                                                             Display
     //                                                                             =======
     public String toTableDisp(Table table) {
-        return table.getBasicInfoDispString();
+        return table.getAliasExpression() + table.getTableDbName();
     }
 
     public String toColumnDisp(Column column) {

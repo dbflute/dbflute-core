@@ -38,7 +38,7 @@ public class DfSchemaPolicyColumnTheme {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSchemaPolicyMiscSecretary _assist = new DfSchemaPolicyMiscSecretary();
+    protected final DfSchemaPolicyMiscSecretary _secretary = new DfSchemaPolicyMiscSecretary();
 
     // ===================================================================================
     //                                                                        Column Theme
@@ -90,12 +90,12 @@ public class DfSchemaPolicyColumnTheme {
         //     ; themeList = list:{ upperCaseBasis }
         // }
         themeMap.put("upperCaseBasis", (column, vioList) -> {
-            if (Srl.isLowerCaseAny(column.getColumnSqlName())) { // use SQL name because DB name may be control name
+            if (Srl.isLowerCaseAny(buildCaseComparingColumnName(column))) {
                 vioList.add("The column name should be on upper case basis: " + toColumnDisp(column));
             }
         });
         themeMap.put("lowerCaseBasis", (column, vioList) -> {
-            if (Srl.isUpperCaseAny(column.getColumnSqlName())) { // same reason
+            if (Srl.isUpperCaseAny(buildCaseComparingColumnName(column))) {
                 vioList.add("The column name should be on lower case basis: " + toColumnDisp(column));
             }
         });
@@ -104,14 +104,18 @@ public class DfSchemaPolicyColumnTheme {
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
+    protected String buildCaseComparingColumnName(Column column) {
+        return _secretary.buildCaseComparingColumnName(column);
+    }
+
     protected String toColumnDisp(Column column) {
-        return _assist.toColumnDisp(column);
+        return _secretary.toColumnDisp(column);
     }
 
     // ===================================================================================
     //                                                                           Exception
     //                                                                           =========
     protected void throwSchemaPolicyCheckUnknownThemeException(String theme, String targetType) {
-        _assist.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
+        _secretary.throwSchemaPolicyCheckUnknownThemeException(theme, targetType);
     }
 }

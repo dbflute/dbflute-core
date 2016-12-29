@@ -362,7 +362,7 @@ public class Column {
         return quoteColumnNameIfNeedsDirectUse(getResourceNameForSqlName());
     }
 
-    protected String getResourceNameForSqlName() {
+    public String getResourceNameForSqlName() { // public for e.g. SchemaPolicyCheck
         return isSqlNameUpperCase() ? getName().toUpperCase() : getName();
     }
 
