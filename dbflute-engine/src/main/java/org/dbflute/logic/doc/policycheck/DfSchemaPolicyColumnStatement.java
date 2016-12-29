@@ -105,18 +105,23 @@ public class DfSchemaPolicyColumnStatement {
         final String thenClause = ifClause.getThenClause();
         final String thenItem = Srl.substringFirstFront(thenClause, " is ").trim();
         final String thenValue = Srl.substringFirstRear(thenClause, " is ").trim();
-        if (thenItem.equalsIgnoreCase("dbType")) { // e.g. dbType is integer
-            if (column.hasDbType()) {
-                final String dbType = column.getDbType();
-                if (!isHitExp(dbType, thenValue)) {
-                    vioList.add("The column db-type should be " + thenValue + " but " + dbType + ": " + toColumnDisp(column));
-                }
+        if (thenItem.equalsIgnoreCase("columnName")) { // e.g. columnName is suffix:_ID
+            final String columnName = column.getName();
+            if (!isHitExp(columnName, thenValue)) {
+                vioList.add("The column name should be " + thenValue + " but " + columnName + ": " + toColumnDisp(column));
             }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:ID
             if (column.hasAlias()) {
                 final String alias = column.getAlias();
                 if (!isHitExp(alias, thenValue)) {
                     vioList.add("The column alias should be " + thenValue + " but " + alias + ": " + toColumnDisp(column));
+                }
+            }
+        } else if (thenItem.equalsIgnoreCase("dbType")) { // e.g. dbType is integer
+            if (column.hasDbType()) {
+                final String dbType = column.getDbType();
+                if (!isHitExp(dbType, thenValue)) {
+                    vioList.add("The column db-type should be " + thenValue + " but " + dbType + ": " + toColumnDisp(column));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("size")) { // e.g. size is 200

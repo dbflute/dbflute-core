@@ -100,7 +100,12 @@ public class DfSchemaPolicyMiscSecretary {
     }
 
     protected boolean determineHitBy(String name, String hint) {
-        if (hint.contains(" and ")) {
+        if (name == null) {
+            return false;
+        }
+        if ("$$ALL$$".equalsIgnoreCase(hint)) {
+            return true;
+        } else if (hint.contains(" and ")) {
             final List<String> elementHintList = Srl.splitListTrimmed(hint, " and ");
             for (String elementHint : elementHintList) {
                 if (!DfNameHintUtil.isHitByTheHint(name, elementHint)) {

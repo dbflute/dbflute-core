@@ -88,32 +88,39 @@ public class DfSchemaPolicyTableTheme {
         // }
         themeMap.put("hasPK", (table, vioList) -> {
             if (!table.hasPrimaryKey()) {
-                vioList.add("The table should have primary key: " + table.getTableDbName());
+                vioList.add("The table should have primary key: " + toTableDisp(table));
             }
         });
         themeMap.put("upperCaseBasis", (table, vioList) -> {
             if (Srl.isLowerCaseAny(table.getTableSqlName())) { // use SQL name because DB name may be control name
-                vioList.add("The table name should be on upper case basis: " + table.getTableDbName());
+                vioList.add("The table name should be on upper case basis: " + toTableDisp(table));
             }
         });
         themeMap.put("lowerCaseBasis", (table, vioList) -> {
             if (Srl.isUpperCaseAny(table.getTableSqlName())) { // same reason
-                vioList.add("The table name should be on lower case basis: " + table.getTableDbName());
+                vioList.add("The table name should be on lower case basis: " + toTableDisp(table));
             }
         });
         themeMap.put("identityIfPureIDPK", (table, vioList) -> {
             if (table.hasPrimaryKey() && table.hasSinglePrimaryKey()) {
                 final Column pk = table.getPrimaryKeyAsOne();
                 if (!pk.isForeignKey() && Srl.endsWith(pk.getName(), "ID") && !pk.isIdentity()) {
-                    vioList.add("The primary key should be identity: " + table.getTableDbName() + "." + pk.getName());
+                    vioList.add("The primary key should be identity: " + toTableDisp(table) + "." + pk.getName());
                 }
             }
         });
         themeMap.put("hasCommonColumn", (table, vioList) -> {
             if (!table.hasAllCommonColumn()) {
-                vioList.add("The table should have common columns: " + table.getTableDbName());
+                vioList.add("The table should have common columns: " + toTableDisp(table));
             }
         });
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected String toTableDisp(Table table) {
+        return _secretary.toTableDisp(table);
     }
 
     // ===================================================================================

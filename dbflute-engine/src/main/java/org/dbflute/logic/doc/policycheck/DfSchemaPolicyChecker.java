@@ -96,10 +96,9 @@ public class DfSchemaPolicyChecker {
         //         }
         //     }
         // }
+        final List<String> vioList = new ArrayList<String>(); // #hope needs to be structured, rule and message
         final boolean mainSchemaOnly = isMainSchemaOnly();
-        final List<String> vioList = new ArrayList<String>();
-        final List<Table> tableList = _tableListSupplier.get();
-        for (Table table : tableList) {
+        for (Table table : _tableListSupplier.get()) {
             if (table.isTypeView()) { // out of target
                 continue;
             }

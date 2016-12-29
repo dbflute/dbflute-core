@@ -18,7 +18,11 @@ package org.dbflute.logic.doc.policycheck;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.torque.engine.database.model.Column;
+import org.apache.torque.engine.database.model.ForeignKey;
+import org.apache.torque.engine.database.model.Index;
 import org.apache.torque.engine.database.model.Table;
+import org.apache.torque.engine.database.model.Unique;
 import org.dbflute.logic.doc.policycheck.DfSchemaPolicyMiscSecretary.DfSchemaPolicyIfClause;
 import org.dbflute.util.Srl;
 
@@ -57,9 +61,10 @@ public class DfSchemaPolicyTableStatement {
     //                                             If Clause
     //                                             ---------
     // e.g.
-    //  if tableName is suffix:_FLG then notNull
-    //  if tableName is suffix:_FLG then dbType is integer
+    //  if tableName is suffix:_ID then bad
+    //  if tableName is suffix:_HISTORY then pkDbType is bigint
     protected void evaluateTableIfClause(Table table, String statement, List<String> vioList, DfSchemaPolicyIfClause ifClause) {
+        // #hope if tableName is ... and pkDbType is ... then ... by jflute (2016/12/29)
         final String ifItem = ifClause.getIfItem();
         final String ifValue = ifClause.getIfValue();
         if (ifItem.equalsIgnoreCase("tableName")) {
@@ -67,6 +72,18 @@ public class DfSchemaPolicyTableStatement {
                 evaluateTableThenClause(table, statement, vioList, ifClause);
             }
         } else if (ifItem.equalsIgnoreCase("alias")) {
+            if (isHitTable(table.getAlias(), ifValue)) {
+                evaluateTableThenClause(table, statement, vioList, ifClause);
+            }
+        } else if (ifItem.equalsIgnoreCase("pkDbType")) { // e.g. if pkDbType is char
+            if (table.hasPrimaryKey()) {
+                final List<Column> pkList = table.getPrimaryKey();
+                for (Column pk : pkList) {
+                    if (isHitTable(pk.getDbType(), ifValue)) {
+                        evaluateTableThenClause(table, statement, vioList, ifClause);
+                    }
+                }
+            }
             if (isHitTable(table.getAlias(), ifValue)) {
                 evaluateTableThenClause(table, statement, vioList, ifClause);
             }
@@ -82,6 +99,10 @@ public class DfSchemaPolicyTableStatement {
         final String thenClause = ifClause.getThenClause();
         if (thenClause.equalsIgnoreCase("bad")) {
             vioList.add("The table is no good: " + toTableDisp(table));
+        } else if (thenClause.contains("hasCommonColumn")) {
+            if (!table.hasAllCommonColumn()) {
+                vioList.add("The table should have common columns: " + toTableDisp(table));
+            }
         } else if (thenClause.contains(" is ")) { // e.g. dbType is integer
             evaluateTableThenItemValue(table, statement, vioList, ifClause);
         } else {
@@ -93,7 +114,12 @@ public class DfSchemaPolicyTableStatement {
         final String thenClause = ifClause.getThenClause();
         final String thenItem = Srl.substringFirstFront(thenClause, " is ").trim();
         final String thenValue = Srl.substringFirstRear(thenClause, " is ").trim();
-        if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:ID
+        if (thenItem.equalsIgnoreCase("tableName")) { // e.g. tableName is prefix:CLS_
+            final String tableDbName = table.getTableDbName();
+            if (!isHitExp(tableDbName, thenValue)) {
+                vioList.add("The table name should be " + thenValue + " but " + tableDbName + ": " + toTableDisp(table));
+            }
+        } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:History
             if (table.hasAlias()) {
                 final String alias = table.getAlias();
                 if (!isHitExp(alias, thenValue)) {
@@ -105,6 +131,45 @@ public class DfSchemaPolicyTableStatement {
                 final String comment = table.getComment();
                 if (!isHitExp(comment, thenValue)) {
                     vioList.add("The table comment should be " + thenValue + " but " + comment + ": " + toTableDisp(table));
+                }
+            }
+        } else if (thenItem.equalsIgnoreCase("pkDbType")) { // e.g. pkDbType is char
+            if (table.hasPrimaryKey()) {
+                final List<Column> pkList = table.getPrimaryKey();
+                for (Column pk : pkList) {
+                    final String pkDbName = pk.getDbType();
+                    if (!isHitExp(pkDbName, thenValue)) {
+                        vioList.add("The PK column DB type should be " + thenValue + " but " + pkDbName + ": " + toTableDisp(table));
+                    }
+                }
+            }
+        } else if (thenItem.equalsIgnoreCase("pkName")) { // e.g. pkName is prefix:PK_
+            if (table.hasPrimaryKey()) {
+                final Column pk = table.getPrimaryKey().get(0); // same name if compound
+                final String pkName = pk.getPrimaryKeyName();
+                if (!isHitExp(pkName, thenValue)) {
+                    vioList.add("The PK constraint name should be " + thenValue + " but " + pkName + ": " + toTableDisp(table));
+                }
+            }
+        } else if (thenItem.equalsIgnoreCase("fkName")) { // e.g. fkName is prefix:FK_
+            for (ForeignKey fk : table.getForeignKeyList()) {
+                final String fkName = fk.getName();
+                if (!isHitExp(fkName, thenValue)) {
+                    vioList.add("The FK constraint name should be " + thenValue + " but " + fkName + ": " + toTableDisp(table));
+                }
+            }
+        } else if (thenItem.equalsIgnoreCase("uniqueName")) { // e.g. uniqueName is prefix:UQ_ 
+            for (Unique uq : table.getUniqueList()) {
+                final String uqName = uq.getName();
+                if (!isHitExp(uqName, thenValue)) {
+                    vioList.add("The unique constraint name should be " + thenValue + " but " + uqName + ": " + toTableDisp(table));
+                }
+            }
+        } else if (thenItem.equalsIgnoreCase("indexName")) { // e.g. indexName is prefix:IX_ 
+            for (Index ix : table.getIndexList()) {
+                final String ixName = ix.getName();
+                if (!isHitExp(ixName, thenValue)) {
+                    vioList.add("The index name should be " + thenValue + " but " + ixName + ": " + toTableDisp(table));
                 }
             }
         } else {
