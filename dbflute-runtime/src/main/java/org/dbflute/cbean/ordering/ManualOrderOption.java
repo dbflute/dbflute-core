@@ -345,7 +345,8 @@ public class ManualOrderOption implements ColumnCalculator {
         return new HpMobConnectedBean(this);
     }
 
-    protected void throwManualOrderPreviousConditionNotFoundException(HpMobConnectionMode mode, ConditionKey conditionKey, Object orderValue) {
+    protected void throwManualOrderPreviousConditionNotFoundException(HpMobConnectionMode mode, ConditionKey conditionKey,
+            Object orderValue) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found previous condition of 'case when' for connecting next condition.");
         br.addItem("Advice");

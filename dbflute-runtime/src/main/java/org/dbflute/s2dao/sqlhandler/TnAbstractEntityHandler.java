@@ -247,7 +247,8 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
         }
     }
 
-    protected void doRegisterUpdateWhereBindVariable(List<Object> varList, List<ValueType> varValueTypeList, Object bean, TnPropertyType pt) {
+    protected void doRegisterUpdateWhereBindVariable(List<Object> varList, List<ValueType> varValueTypeList, Object bean,
+            TnPropertyType pt) {
         final DfPropertyDesc pd = pt.getPropertyDesc();
         varList.add(pd.getValue(bean));
         varValueTypeList.add(pt.getValueType());

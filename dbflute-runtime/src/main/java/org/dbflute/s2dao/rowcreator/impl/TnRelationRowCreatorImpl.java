@@ -135,9 +135,8 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         for (TnRelationPropertyType rpt : relationPropertyTypeList) {
             final String baseSuffix = "";
             final String relationNoSuffix = rpt.getRelationNoSuffixPart();
-            final TnRelationRowCreationResource res =
-                    createResourceForPropertyCache(rpt, selectColumnMap, selectIndexMap, relPropCache, relSelector, baseSuffix,
-                            relationNoSuffix, getLimitRelationNestLevel());
+            final TnRelationRowCreationResource res = createResourceForPropertyCache(rpt, selectColumnMap, selectIndexMap, relPropCache,
+                    relSelector, baseSuffix, relationNoSuffix, getLimitRelationNestLevel());
             setupPropertyCache(res);
         }
         return relPropCache;

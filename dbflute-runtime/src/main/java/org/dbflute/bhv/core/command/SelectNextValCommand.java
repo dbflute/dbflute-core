@@ -216,8 +216,8 @@ public class SelectNextValCommand<RESULT> extends AbstractAllBehaviorCommand<RES
         return newSelectNextValExecution(argNameTypeMap, sql, handler, sequenceCache);
     }
 
-    protected SelectNextValExecution newSelectNextValExecution(Map<String, Class<?>> argNameTypeMap, String sql,
-            TnResultSetHandler handler, final SequenceCache sequenceCache) {
+    protected SelectNextValExecution newSelectNextValExecution(Map<String, Class<?>> argNameTypeMap, String sql, TnResultSetHandler handler,
+            final SequenceCache sequenceCache) {
         return new SelectNextValExecution(_dataSource, _statementFactory, argNameTypeMap, sql, handler, sequenceCache);
     }
 

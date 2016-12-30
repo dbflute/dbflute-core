@@ -173,7 +173,8 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
         return new OutsideSqlSelectCursorCommand();
     }
 
-    protected OutsideSqlSelectCursorCommand xsetupCommand(OutsideSqlSelectCursorCommand cmd, String path, Object pmb, CursorHandler handler) {
+    protected OutsideSqlSelectCursorCommand xsetupCommand(OutsideSqlSelectCursorCommand cmd, String path, Object pmb,
+            CursorHandler handler) {
         cmd.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setOutsideSqlPath(path);

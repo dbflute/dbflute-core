@@ -204,7 +204,8 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         return sb.toString();
     }
 
-    protected void throwUniqueDrivenColumnUpdateStatementException(String tableDbName, String columnDbName, Set<String> uniqueDrivenPropSet) {
+    protected void throwUniqueDrivenColumnUpdateStatementException(String tableDbName, String columnDbName,
+            Set<String> uniqueDrivenPropSet) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Cannot use the column specified as unique driven as update statement.");
         br.addItem("Table");
@@ -233,7 +234,8 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         return handler;
     }
 
-    protected TnUpdateEntityHandler newUpdateEntityHandler(TnPropertyType[] boundPropTypes, String sql, UpdateOption<ConditionBean> option) {
+    protected TnUpdateEntityHandler newUpdateEntityHandler(TnPropertyType[] boundPropTypes, String sql,
+            UpdateOption<ConditionBean> option) {
         return new TnUpdateEntityHandler(_dataSource, _statementFactory, sql, _beanMetaData, boundPropTypes);
     }
 

@@ -167,7 +167,8 @@ public class SubQueryIndentProcessor implements Serializable {
         throw new SubQueryIndentFailureException(msg);
     }
 
-    protected void throwSubQueryAnyBeginMarkNotHandledException(String subQueryIdentity, String sql, String filteredSql, String originalSql) {
+    protected void throwSubQueryAnyBeginMarkNotHandledException(String subQueryIdentity, String sql, String filteredSql,
+            String originalSql) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Any begin marks are not handled.");
         br.addItem("SubQueryIdentity");

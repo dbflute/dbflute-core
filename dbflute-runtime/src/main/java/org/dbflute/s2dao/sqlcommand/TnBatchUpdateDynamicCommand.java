@@ -75,7 +75,8 @@ public class TnBatchUpdateDynamicCommand extends TnUpdateEntityDynamicCommand {
     // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
-    protected TnBatchUpdateHandler createBatchUpdateHandler(TnPropertyType[] boundPropTypes, String sql, UpdateOption<ConditionBean> option) {
+    protected TnBatchUpdateHandler createBatchUpdateHandler(TnPropertyType[] boundPropTypes, String sql,
+            UpdateOption<ConditionBean> option) {
         final TnBatchUpdateHandler handler = newBatchUpdateHandler(boundPropTypes, sql);
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);

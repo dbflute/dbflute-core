@@ -26,6 +26,6 @@ import org.dbflute.outsidesql.typed.ManualPagingHandlingPmb;
  * @author jflute
  * @since 1.0.5J (2014/06/16 Monday)
  */
-public interface ImmutableManualPagingHandlingPmb<BEHAVIOR, IMMU, DBLE extends DBableEntity<IMMU>> extends
-        ManualPagingHandlingPmb<BEHAVIOR, DBLE> {
+public interface ImmutableManualPagingHandlingPmb<BEHAVIOR, IMMU, DBLE extends DBableEntity<IMMU>>
+        extends ManualPagingHandlingPmb<BEHAVIOR, DBLE> {
 }

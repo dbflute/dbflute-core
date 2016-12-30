@@ -272,7 +272,8 @@ public class FunCustodial {
         throw new UndefinedClassificationCodeException(msg);
     }
 
-    public static void showUndefinedClassificationCodeMessage(String tableDbName, String columnDbName, ClassificationMeta meta, Object code) {
+    public static void showUndefinedClassificationCodeMessage(String tableDbName, String columnDbName, ClassificationMeta meta,
+            Object code) {
         if (_clsMetaLog.isInfoEnabled()) {
             final String classificationName = meta.classificationName();
             final String exp = classificationName + "." + code + " of " + tableDbName + "." + columnDbName;

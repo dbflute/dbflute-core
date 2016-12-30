@@ -256,7 +256,8 @@ public class JavaPropertiesReader {
     // -----------------------------------------------------
     //                                        Prepare Result
     //                                        --------------
-    protected JavaPropertiesResult prepareResult(Properties prop, List<JavaPropertiesProperty> propertyList, List<String> duplicateKeyList) {
+    protected JavaPropertiesResult prepareResult(Properties prop, List<JavaPropertiesProperty> propertyList,
+            List<String> duplicateKeyList) {
         final JavaPropertiesResult propResult;
         if (!_extendsProviderMap.isEmpty()) {
             final JavaPropertiesReader extendsReader = createExtendsReader();

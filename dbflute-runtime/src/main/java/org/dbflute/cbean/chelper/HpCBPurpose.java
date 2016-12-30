@@ -32,29 +32,22 @@ public enum HpCBPurpose {
 
     , IN_SCOPE_RELATION(new HpSpec().noSetupSelect().noSpecify().noOrderBy().subQuery()) // InScopeRelation
 
-    , DERIVED_REFERRER(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
-            .noSpecifyDerivedReferrerTwoOrMore().noOrderBy().subQuery()) // DerivedReferrer
+    , DERIVED_REFERRER(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer().noSpecifyDerivedReferrerTwoOrMore().noOrderBy().subQuery()) // DerivedReferrer
 
-    , SCALAR_SELECT(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
-            .noSpecifyDerivedReferrerTwoOrMore().noOrderBy()) // ScalarSelect
+    , SCALAR_SELECT(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer().noSpecifyDerivedReferrerTwoOrMore().noOrderBy()) // ScalarSelect
 
-    , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation().noSpecifyDerivedReferrer().noOrderBy()
-            .subQuery()) // ScalarCondition
+    , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation().noSpecifyDerivedReferrer().noOrderBy().subQuery()) // ScalarCondition
 
-    , SCALAR_CONDITION_PARTITION_BY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation().noSpecifyDerivedReferrer()
-            .noQuery().noOrderBy().subQuery()) // ScalarConditionPartitionBy
+    , SCALAR_CONDITION_PARTITION_BY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation().noSpecifyDerivedReferrer().noQuery().noOrderBy().subQuery()) // ScalarConditionPartitionBy
 
-    , MYSELF_EXISTS(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
-            .noOrderBy().subQuery()) // MyselfExists
-    , MYSELF_IN_SCOPE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
-            .noOrderBy().subQuery()) // MyselfInScope
+    , MYSELF_EXISTS(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer().noOrderBy().subQuery()) // MyselfExists
+    , MYSELF_IN_SCOPE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer().noOrderBy().subQuery()) // MyselfInScope
 
     // A purpose that can specify but not allowed to query
     // needs to switch condition-bean used in specification
     // to non-checked condition-bean.
     // Because specification uses query internally.
-    , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
-            .noSpecifyDerivedReferrerTwoOrMore().noQuery()) // ColumnQuery
+    , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer().noSpecifyDerivedReferrerTwoOrMore().noQuery()) // ColumnQuery
 
     , OR_SCOPE_QUERY(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // OrScopeQuery
 

@@ -33,8 +33,8 @@ import org.dbflute.dbmeta.DBMetaProvider;
  * @author jflute
  * @since 1.1.0 (2014/10/15 Wednesday)
  */
-public class HpSDRFunctionMySql<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> extends
-        HpSDRFunction<REFERRER_CB, LOCAL_CQ> {
+public class HpSDRFunctionMySql<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery>
+        extends HpSDRFunction<REFERRER_CB, LOCAL_CQ> {
 
     // ===================================================================================
     //                                                                         Constructor

@@ -320,6 +320,15 @@ public class MockConditionBean implements ConditionBean {
         return false;
     }
 
+    public void enableSpecifyColumnRequired() {
+    }
+
+    public void disableSpecifyColumnRequired() {
+    }
+
+    public void xcheckSpecifyColumnRequiredIfNeeds() {
+    }
+
     public boolean hasWhereClauseOnBaseQuery() {
         return false;
     }

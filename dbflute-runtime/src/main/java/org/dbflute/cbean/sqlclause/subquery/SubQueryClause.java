@@ -100,8 +100,8 @@ public class SubQueryClause {
      * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause string of correlation sub-query. (NotNull)
      */
-    public String buildCorrelationSubQueryFromWhereClause(ColumnRealName[] correlatedColumnRealNames,
-            ColumnSqlName[] relatedColumnSqlNames, String correlatedFixedCondition) {
+    public String buildCorrelationSubQueryFromWhereClause(ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames,
+            String correlatedFixedCondition) {
         String clause = xprepareCorrelationSubQueryFromWhereClause();
 
         final String joinCondition;

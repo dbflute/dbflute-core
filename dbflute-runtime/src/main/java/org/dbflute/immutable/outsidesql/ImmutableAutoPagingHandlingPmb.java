@@ -26,6 +26,6 @@ import org.dbflute.outsidesql.typed.AutoPagingHandlingPmb;
  * @author jflute
  * @since 1.0.5J (2014/06/16 Monday)
  */
-public interface ImmutableAutoPagingHandlingPmb<BEHAVIOR, IMMU, DBLE extends DBableEntity<IMMU>> extends
-        AutoPagingHandlingPmb<BEHAVIOR, DBLE> {
+public interface ImmutableAutoPagingHandlingPmb<BEHAVIOR, IMMU, DBLE extends DBableEntity<IMMU>>
+        extends AutoPagingHandlingPmb<BEHAVIOR, DBLE> {
 }

@@ -119,13 +119,12 @@ public class ScalarCondition extends AbstractSubQuery {
         }
         final String subQueryClause;
         if (_subQuerySqlClause.hasUnionQuery()) {
-            subQueryClause =
-                    buildUnionSubQuerySql(function, tableAliasName, derivedColumnSqlName, derivedColumnRealName,
-                            partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName, option);
+            subQueryClause = buildUnionSubQuerySql(function, tableAliasName, derivedColumnSqlName, derivedColumnRealName,
+                    partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName, option);
         } else {
             final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option, false);
-            final String fromWhereClause =
-                    buildFromWhereClause(selectClause, tableAliasName, partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName);
+            final String fromWhereClause = buildFromWhereClause(selectClause, tableAliasName, partitionByCorrelatedColumnRealName,
+                    partitionByRelatedColumnSqlName);
             subQueryClause = selectClause + " " + fromWhereClause;
         }
         return resolveSubQueryLevelVariable(subQueryClause);
@@ -143,9 +142,8 @@ public class ScalarCondition extends AbstractSubQuery {
             ColumnSqlName partitionByRelatedColumnSqlName) {
         final String fromWhereClause;
         if (partitionByCorrelatedColumnRealName != null) {
-            fromWhereClause =
-                    buildCorrelationFromWhereClause(selectClause, tableAliasName, partitionByCorrelatedColumnRealName,
-                            partitionByRelatedColumnSqlName, null);
+            fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName, partitionByCorrelatedColumnRealName,
+                    partitionByRelatedColumnSqlName, null);
         } else {
             fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, null);
         }
@@ -317,7 +315,8 @@ public class ScalarCondition extends AbstractSubQuery {
         }
     }
 
-    protected void throwScalarConditionUnmatchedColumnTypeException(String function, String derivedColumnDbName, Class<?> derivedColumnType) {
+    protected void throwScalarConditionUnmatchedColumnTypeException(String function, String derivedColumnDbName,
+            Class<?> derivedColumnType) {
         createCBExThrower().throwScalarConditionUnmatchedColumnTypeException(function, derivedColumnDbName, derivedColumnType);
     }
 }

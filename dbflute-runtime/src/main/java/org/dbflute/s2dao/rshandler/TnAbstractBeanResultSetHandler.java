@@ -102,8 +102,8 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @return The created row. (NotNull)
      * @throws SQLException When it fails to handle the SQL.
      */
-    protected Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap,
-            Map<String, TnPropertyMapping> propertyCache, ConditionBean cb) throws SQLException {
+    protected Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap, Map<String, TnPropertyMapping> propertyCache,
+            ConditionBean cb) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -

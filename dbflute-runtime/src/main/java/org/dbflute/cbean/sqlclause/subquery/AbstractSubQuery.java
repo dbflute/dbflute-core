@@ -126,8 +126,8 @@ public abstract class AbstractSubQuery {
      * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause string of correlation sub-query. (NotNull)
      */
-    protected String buildCorrelationFromWhereClause(String selectClause, String localAliasName,
-            ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames, String correlatedFixedCondition) {
+    protected String buildCorrelationFromWhereClause(String selectClause, String localAliasName, ColumnRealName[] correlatedColumnRealNames,
+            ColumnSqlName[] relatedColumnSqlNames, String correlatedFixedCondition) {
         final SubQueryClause clause = createSubQueryClause(selectClause, localAliasName);
         return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealNames, relatedColumnSqlNames, correlatedFixedCondition);
     }

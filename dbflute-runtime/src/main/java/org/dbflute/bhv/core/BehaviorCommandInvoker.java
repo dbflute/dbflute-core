@@ -427,7 +427,8 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                      Log SqlCommand
     //                                                                      ==============
-    protected <RESULT> void logSqlExecution(BehaviorCommand<RESULT> behaviorCommand, SqlExecution execution, long beforeCmd, long afterCmd) {
+    protected <RESULT> void logSqlExecution(BehaviorCommand<RESULT> behaviorCommand, SqlExecution execution, long beforeCmd,
+            long afterCmd) {
         final String view = DfTraceViewUtil.convertToPerformanceView(afterCmd - beforeCmd);
         log("SqlExecution Initialization Cost: [" + view + "]");
     }

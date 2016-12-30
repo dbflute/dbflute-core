@@ -73,8 +73,8 @@ public class IfCommentEvaluator {
     protected static final String METHOD_SUFFIX = "()";
 
     protected static final String[] CONNECTORS = new String[] { AND.trim(), OR.trim() };
-    protected static final String[] OPERANDS = new String[] { EQUAL.trim(), NOT_EQUAL.trim(), GREATER_THAN.trim(), LESS_THAN.trim(),
-            GREATER_EQUAL.trim(), LESS_EQUAL.trim() };
+    protected static final String[] OPERANDS =
+            new String[] { EQUAL.trim(), NOT_EQUAL.trim(), GREATER_THAN.trim(), LESS_THAN.trim(), GREATER_EQUAL.trim(), LESS_EQUAL.trim() };
 
     public static String[] getConnectors() {
         return CONNECTORS;

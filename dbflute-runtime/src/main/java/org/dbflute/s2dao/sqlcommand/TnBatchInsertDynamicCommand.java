@@ -69,7 +69,8 @@ public class TnBatchInsertDynamicCommand extends TnInsertEntityDynamicCommand {
     // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
-    protected TnBatchInsertHandler createBatchInsertHandler(TnPropertyType[] boundPropTypes, String sql, InsertOption<ConditionBean> option) {
+    protected TnBatchInsertHandler createBatchInsertHandler(TnPropertyType[] boundPropTypes, String sql,
+            InsertOption<ConditionBean> option) {
         final TnBatchInsertHandler handler = newBatchInsertHandler(boundPropTypes, sql);
         handler.setInsertOption(option);
         return handler;
