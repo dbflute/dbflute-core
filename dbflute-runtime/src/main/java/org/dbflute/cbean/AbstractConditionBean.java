@@ -18,8 +18,6 @@ package org.dbflute.cbean;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,6 +36,7 @@ import org.dbflute.cbean.chelper.HpSpQyCall;
 import org.dbflute.cbean.chelper.HpSpQyDelegatingCall;
 import org.dbflute.cbean.chelper.HpSpQyHas;
 import org.dbflute.cbean.chelper.HpSpQyQy;
+import org.dbflute.cbean.chelper.HpSpecifyColumnRequiredChecker;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
@@ -64,7 +63,6 @@ import org.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.dbflute.cbean.sqlclause.query.QueryClause;
 import org.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
-import org.dbflute.cbean.sqlclause.select.SelectedRelationColumn;
 import org.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.DBMetaProvider;
@@ -1286,33 +1284,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /** {@inheritDoc} */
     public void xcheckSpecifyColumnRequiredIfNeeds() {
-        // cannot embed this to SQL clause because of too complex
-        // so simple implementation like this:
-        if (!_specifyColumnRequired) {
-            return;
-        }
-        final SqlClause sqlClause = getSqlClause();
-        final String basePointAliasName = sqlClause.getBasePointAliasName();
-        final Set<String> nonSpecifiedAliasSet = new LinkedHashSet<>();
-        if (!sqlClause.hasSpecifiedSelectColumn(basePointAliasName)) { // local table without SpecifyColumn
-            nonSpecifiedAliasSet.add(asDBMeta().getTableDispName() + " (" + basePointAliasName + ")");
-        }
-        for (Entry<String, Map<String, SelectedRelationColumn>> entry : sqlClause.getSelectedRelationColumnMap().entrySet()) {
-            final String tableAliasName = entry.getKey();
-            if (!sqlClause.hasSpecifiedSelectColumn(tableAliasName)) { // relation table without SpecifyColumn
-                final Collection<SelectedRelationColumn> values = entry.getValue().values();
-                final String dispName;
-                if (!values.isEmpty()) {
-                    final SelectedRelationColumn firstColumn = values.iterator().next();
-                    dispName = sqlClause.translateSelectedRelationPathToPropName(firstColumn.getRelationNoSuffix());
-                } else { // no way, just in case
-                    dispName = "*no name";
-                }
-                nonSpecifiedAliasSet.add(dispName + " (" + tableAliasName + ")");
-            }
-        }
-        if (!nonSpecifiedAliasSet.isEmpty()) {
-            createCBExThrower().throwRequiredSpecifyColumnNotFoundException(this, nonSpecifiedAliasSet);
+        if (_specifyColumnRequired) {
+            new HpSpecifyColumnRequiredChecker().checkSpecifyColumnRequiredIfNeeds(this, nonSpecifiedAliasSet -> {
+                createCBExThrower().throwRequiredSpecifyColumnNotFoundException(this, nonSpecifiedAliasSet);
+            });
         }
     }
 
