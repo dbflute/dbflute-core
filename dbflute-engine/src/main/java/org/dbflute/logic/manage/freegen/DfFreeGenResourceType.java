@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -48,10 +48,10 @@ public enum DfFreeGenResourceType {
         tableLoaderMap.put(DfFreeGenResourceType.JSON_SCHEMA, new DfJsonSchemaTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.SOLR, new DfSolrXmlTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.ELASTICSEARCH, new DfElasticsearchTableLoader());
-        tableLoaderMap.put(DfFreeGenResourceType.MAIL_FLUTE, new DfMailFluteTableLoader());
-        tableLoaderMap.put(DfFreeGenResourceType.PM_FILE, new DfPmFileTableLoader());
+        tableLoaderMap.put(DfFreeGenResourceType.MAIL_FLUTE, new DfMailFluteTableLoader(false));
+        tableLoaderMap.put(DfFreeGenResourceType.PM_FILE, new DfPmFileTableLoader(false));
         tableLoaderMap.put(DfFreeGenResourceType.LASTA_DOC, new DfLastaDocTableLoader());
-        tableLoaderMap.put(DfFreeGenResourceType.APP_CLS, new DfAppClsTableLoader());
-        tableLoaderMap.put(DfFreeGenResourceType.WEB_CLS, new DfWebClsTableLoader());
+        tableLoaderMap.put(DfFreeGenResourceType.APP_CLS, new DfAppClsTableLoader(false));
+        tableLoaderMap.put(DfFreeGenResourceType.WEB_CLS, new DfWebClsTableLoader(false));
     }
 }

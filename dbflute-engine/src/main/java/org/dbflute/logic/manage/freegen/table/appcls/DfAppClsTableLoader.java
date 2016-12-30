@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -48,6 +48,18 @@ import org.dbflute.util.Srl;
 public class DfAppClsTableLoader implements DfFreeGenTableLoader {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final boolean docProcess;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfAppClsTableLoader(boolean docProcess) {
+        this.docProcess = docProcess;
+    }
+
+    // ===================================================================================
     //                                                                          Load Table
     //                                                                          ==========
     // ; resourceMap = map:{
@@ -65,7 +77,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     // }
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> optionMap = mapProp.getOptionMap();
-        final String resourceFile = resource.getResourceFile();
+        final String resourceFile = this.docProcess ? (String) mapProp.getOptionMap().get("appclsResourceFile") : resource.getResourceFile();
         final Map<String, Object> appClsMap;
         try {
             appClsMap = new MapListFile().readMap(new FileInputStream(resourceFile));

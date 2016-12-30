@@ -1,0 +1,74 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#if ($templateList.size() > 0)
+<h2 id="lastadoc_template">template</h2>
+<table>
+    <thead>
+    <tr>
+        <th>No.</th>
+        <th>file</th>
+        <th>class</th>
+        <th>title</th>
+        <th>parameter count</th>
+    </tr>
+    </thead>
+    <tbody id="table-list-body">
+#foreach ($template in $templateList)
+    <tr>
+        <td class="rowcellnum">${foreach.count}</td>
+        <td class="rowcell"><a href="#$manager.htmlEscape($template.resourcePath)">$manager.htmlEscape($template.resourcePath)</a></td>
+        <td class="rowcell"><span title="$manager.htmlEscape($table.tableMap.templatePackage).$manager.htmlEscape($template.className)">$!manager.htmlEscape($template.className)</span></td>
+        <td class="rowcell">$!manager.htmlEscape($template.title)</td>
+        <td class="rowcellnum">$template.propertyList.size()</td>
+    </tr>
+#end
+    </tbody>
+</table>
+
+#foreach ($template in $templateList)
+<h3 id="$manager.htmlEscape($template.resourcePath)">
+$manager.htmlEscape($template.resourcePath)
+</h3>
+<h4>
+$manager.htmlEscape($template.title)
+</h4>
+<p>
+<span class="doctitle">Class:</span> <span class="docmainvalue">$manager.htmlEscape($table.tableMap.templatePackage).$manager.htmlEscape($template.className)</span>
+</p>
+
+<p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($template.headerComment)</p>
+
+#if ($template.propertyList.size() > 0)
+<table>
+    <thead>
+    <tr>
+        <th class="rownumhead">No.</th>
+        <th>name</th>
+        <th>type</th>
+    </tr>
+    </thead>
+#foreach ($property in $template.propertyList)
+    <tr>
+        <td class="rowcellnum">${foreach.count}</td>
+        <td>$manager.htmlEscape($property.propertyName)</td>
+        <td>$manager.htmlEscape($property.propertyType)</td>
+    </tr>
+#end
+</table>
+#end
+
+#end
+#end
