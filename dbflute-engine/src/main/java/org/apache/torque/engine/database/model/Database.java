@@ -2007,6 +2007,10 @@ public class Database {
         return getLittleAdjustmentProperties().isThatsBadTimingDetect();
     }
 
+    public boolean isSpecifyColumnRequired() {
+        return getLittleAdjustmentProperties().isSpecifyColumnRequired();
+    }
+
     public boolean isNullOrEmptyQueryAllowed() {
         return getLittleAdjustmentProperties().isNullOrEmptyQueryAllowed();
     }

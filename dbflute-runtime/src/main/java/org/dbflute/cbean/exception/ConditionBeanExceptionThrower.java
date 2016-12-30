@@ -18,6 +18,7 @@ package org.dbflute.cbean.exception;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionQuery;
@@ -45,6 +46,7 @@ import org.dbflute.exception.QueryDerivedReferrerSelectAllPossibleException;
 import org.dbflute.exception.QueryIllegalPurposeException;
 import org.dbflute.exception.QueryThatsBadTimingException;
 import org.dbflute.exception.RequiredOptionNotFoundException;
+import org.dbflute.exception.RequiredSpecifyColumnNotFoundException;
 import org.dbflute.exception.ScalarConditionInvalidColumnSpecificationException;
 import org.dbflute.exception.ScalarConditionUnmatchedColumnTypeException;
 import org.dbflute.exception.ScalarSelectInvalidColumnSpecificationException;
@@ -360,7 +362,8 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new SpecifyColumnAlreadySpecifiedExceptColumnException(msg);
     }
 
-    public void throwSpecifyEveryColumnAlreadySpecifiedColumnException(String tableDbName, Map<String, SpecifiedColumn> specifiedColumnMap) {
+    public void throwSpecifyEveryColumnAlreadySpecifiedColumnException(String tableDbName,
+            Map<String, SpecifiedColumn> specifiedColumnMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SpecifyEveryColumn is specified after SpecifyColumn.");
         br.addItem("Advice");
@@ -388,7 +391,8 @@ public class ConditionBeanExceptionThrower implements Serializable {
         throw new SpecifyEveryColumnAlreadySpecifiedColumnException(msg);
     }
 
-    public void throwSpecifyExceptColumnAlreadySpecifiedColumnException(String tableDbName, Map<String, SpecifiedColumn> specifiedColumnMap) {
+    public void throwSpecifyExceptColumnAlreadySpecifiedColumnException(String tableDbName,
+            Map<String, SpecifiedColumn> specifiedColumnMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SpecifyExceptColumn is specified after SpecifyColumn.");
         br.addItem("Advice");
@@ -443,8 +447,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("    memberBhv.scalarSelect(Date.class).max(scalarCB -> {");
         br.addElement("        scalarCB.specify().columnBirthdate(); // OK");
         br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + purpose + ")");
         br.addItem("Specified Relation");
@@ -468,8 +471,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("    cb.query().scalar_Equal().max(scalarCB -> {");
         br.addElement("        scalarCB.specify().columnPurchaseCount(); // OK");
         br.addElement("    });");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + purpose + ")");
         br.addItem("Specified Referrer");
@@ -494,8 +496,7 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement("    cb.columnQuery(colCB -> {");
         br.addElement("        colCB.specify().derivedPurchase().max(...); // OK");
         br.addElement("    }).greaterEqual(...);");
-        // don't use displaySql because of illegal CB's state
-        br.addItem("ConditionBean");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
         br.addElement(baseCB.getClass().getName());
         br.addElement("(" + purpose + ")");
         br.addItem("Specified Referrer");
@@ -1295,6 +1296,36 @@ public class ConditionBeanExceptionThrower implements Serializable {
         br.addElement(optionName);
         final String msg = br.buildExceptionMessage();
         throw new OptionThatsBadTimingException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                             CB Rule
+    //                                                                             =======
+    public void throwRequiredSpecifyColumnNotFoundException(ConditionBean cb, Set<String> nonSpecifiedAliasSet) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the SpecifyColumn (required) for the tables");
+        br.addItem("Advice");
+        br.addElement("SpecifyColumn is required in this application.");
+        br.addElement("(as your DBFlute settings: e.g. dfprop)");
+        br.addElement("");
+        br.addElement("So call specify()... like this:");
+        br.addElement("  (x)");
+        br.addElement("    cb.setupSelect_MemberStatus();");
+        br.addElement("    ... // *Bad");
+        br.addElement("  (o)");
+        br.addElement("    cb.specify().columnMemberName(); // Good");
+        br.addElement("    cb.setupSelect_MemberStatus();");
+        br.addElement("    cb.specify().specifyMemberStatus().columnMemberStatusName(); // Good");
+        br.addElement("    cb.specify().specifyMemberStatus().columnDisplayOrder(); // Good");
+        br.addElement("    ...");
+        br.addItem("ConditionBean"); // don't use displaySql because of illegal CB's state
+        br.addElement(cb.getClass().getName());
+        br.addItem("NonSpecified Tables");
+        for (String nonSpecifiedAlias : nonSpecifiedAliasSet) {
+            br.addElement(nonSpecifiedAlias);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new RequiredSpecifyColumnNotFoundException(msg);
     }
 
     // ===================================================================================

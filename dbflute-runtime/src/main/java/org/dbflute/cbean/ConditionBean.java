@@ -665,4 +665,25 @@ public interface ConditionBean extends PagingBean, WelcomeToDreamCruise {
      * Disable "that's bad timing" check. (default is enabled)
      */
     void disableThatsBadTiming();
+
+    // ===================================================================================
+    //                                                                             CB Rule
+    //                                                                             =======
+    /**
+     * Enable "SpecifyColumn required" (both local and relation) check. (default is disabled) <br>.
+     * You should call this for only base-point table (root condition-bean).
+     */
+    void enableSpecifyColumnRequired();
+
+    /**
+     * Disable "SpecifyColumn required" (both local and relation) check. (back to default) <br>
+     * You should call this for only base-point table (root condition-bean).
+     */
+    void disableSpecifyColumnRequired();
+
+    /**
+     * Check SpecifyColumn is required if it needs. <br>.
+     * You should call this for only base-point table (root condition-bean).
+     */
+    void xcheckSpecifyColumnRequiredIfNeeds(); // called by selectEntity(), selectList(), ...
 }

@@ -203,6 +203,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     //                                       ---------------
     protected <RESULT extends ENTITY> RESULT helpSelectEntityInternally(CB cb, Class<? extends RESULT> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
+        cb.xcheckSpecifyColumnRequiredIfNeeds();
         if (cb.hasSelectAllPossible() && cb.getFetchSize() != 1) { // if no condition for one
             throwSelectEntityConditionNotFoundException(cb);
         }
@@ -308,6 +309,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
     //                                       ---------------
     protected <RESULT extends ENTITY> ListResultBean<RESULT> helpSelectListInternally(CB cb, Class<? extends RESULT> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
+        cb.xcheckSpecifyColumnRequiredIfNeeds();
         try {
             final List<RESULT> selectedList = delegateSelectList(cb, entityType);
             return createListResultBean(cb, selectedList);
@@ -363,6 +365,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
 
     protected <RESULT extends ENTITY> PagingResultBean<RESULT> helpSelectPageInternally(CB cb, Class<? extends RESULT> entityType) {
         assertConditionBeanSelectResource(cb, entityType);
+        cb.xcheckSpecifyColumnRequiredIfNeeds();
         try {
             final PagingHandler<RESULT> handler = createPagingHandler(cb, entityType);
             final PagingInvoker<RESULT> invoker = createPagingInvoker(cb);
@@ -443,6 +446,7 @@ public abstract class AbstractBehaviorReadable<ENTITY extends Entity, CB extends
             Class<? extends RESULT> entityType) {
         assertObjectNotNull("entityRowHandler", handler);
         assertConditionBeanSelectResource(cb, entityType);
+        cb.xcheckSpecifyColumnRequiredIfNeeds();
         final CursorSelectOption option = cb.getCursorSelectOption();
         if (option != null && option.isByPaging()) {
             helpSelectCursorHandlingByPaging(cb, handler, entityType, option);

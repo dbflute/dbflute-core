@@ -65,6 +65,9 @@ public class ${myClassName} extends AbstractConditionBean {
         if (${glDBFluteConfig}.getInstance().isNonSpecifiedColumnAccessAllowed()) {
             enableNonSpecifiedColumnAccess();
         }
+        if (${glDBFluteConfig}.getInstance().isSpecifyColumnRequired()) {
+            enableSpecifyColumnRequired();
+        }
         if (${glDBFluteConfig}.getInstance().isQueryUpdateCountPreCheck()) {
             enableQueryUpdateCountPreCheck();
         }

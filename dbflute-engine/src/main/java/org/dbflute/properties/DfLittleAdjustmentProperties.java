@@ -427,6 +427,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isNonSpecifiedColumnAccessAllowed", isCompatibleBeforeJava8());
     }
 
+    public boolean isSpecifyColumnRequired() { // closet
+        return isProperty("isSpecifyColumnRequired", false);
+    }
+
     public boolean isMakeConditionQueryEqualEmptyString() { // closet
         return isProperty("isMakeConditionQueryEqualEmptyString", false);
     }
@@ -615,16 +619,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isPagingCountLeastJoin", true); // default true @since 0.9.9.0A
     }
 
-    // ===================================================================================
-    //                                                                          Inner Join
-    //                                                                          ==========
     public boolean isInnerJoinAutoDetect() { // closet since 1.1
         return isProperty("isInnerJoinAutoDetect", true); // default true @since 1.0.3
     }
 
-    // ===================================================================================
-    //                                                                   That's Bad Timing
-    //                                                                   =================
     public boolean isThatsBadTimingDetect() { // closet
         final boolean defaultValue = !isCompatibleBeforeJava8();
         return isProperty("isThatsBadTimingDetect", defaultValue);
