@@ -20,6 +20,7 @@ ant -f build.xml reflect-to-test-option-compatible10x
 ant -f build.xml reflect-to-example-on-parade
 ant -f build.xml reflect-to-example-on-springboot
 ant -f build.xml reflect-to-example-on-play2java
+ant -f build.xml reflect-to-example-with-non-rdb
 ant -f build.xml reflect-to-example-with-doma
 ant -f build.xml reflect-to-howto
 
@@ -110,6 +111,12 @@ rm ./log/*.log
 cd ..
 mvn -e compile
 
+cd ../dbflute-example-on-parade/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal,freegen
+cd ..
+mvn -e compile
+
 cd ../dbflute-example-on-springboot/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
@@ -119,6 +126,12 @@ mvn -e compile
 cd ../dbflute-example-on-play2java/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
+cd ..
+mvn -e compile
+
+cd ../dbflute-example-with-non-rdb/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal,freegen
 cd ..
 mvn -e compile
 
