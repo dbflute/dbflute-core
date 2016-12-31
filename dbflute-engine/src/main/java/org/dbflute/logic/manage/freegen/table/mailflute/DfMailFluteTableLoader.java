@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -82,6 +82,18 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     protected static final String CRLF = "\r\n";
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final boolean docProcess;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfMailFluteTableLoader(boolean docProcess) {
+        this.docProcess = docProcess;
+    }
+
+    // ===================================================================================
     //                                                                          Load Table
     //                                                                          ==========
     // ; resourceMap = map:{
@@ -97,13 +109,13 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     // ; tableMap = map:{
     //     ; targetDir = $$baseDir$$/resources/mail
     //     ; targetExt = .dfmail
-    //     ; targetKeyword = 
+    //     ; targetKeyword =
     //     ; exceptPathList = list:{ contain:/mail/common/ }
     //     ; isConventionSuffix = false
     // }
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> tableMap = mapProp.getOptionMap();
-        final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
+        final String targetDir = resource.resolveBaseDir((String) tableMap.get(deriveTableMapKey("targetDir")));
         final String targetExt = extractTargetExt(tableMap);
         final String targetKeyword = extractTargetKeyword(tableMap);
         final List<String> exceptPathList = extractExceptPathList(tableMap);
@@ -157,8 +169,15 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
                 throwBodyMetaNotFoundException(toPath(bodyFile), plainText);
             }
             verifyFormat(toPath(bodyFile), plainText, delimiter);
+            final String headerComment = Srl.extractScopeFirst(plainText, COMMENT_BEGIN, COMMENT_END).getContent();
+            final ScopeInfo titleScope = Srl.extractScopeFirst(headerComment, TITLE_BEGIN, TITLE_END);
+            final String desc = Srl.substringFirstRear(headerComment, TITLE_END);
+            table.put("headerComment", headerComment);
+            table.put("title", titleScope.getContent());
+            table.put("description", desc);
             final String bodyMeta = Srl.substringFirstFront(plainText, delimiter);
             final boolean hasOptionPlusHtml = hasOptionPlusHtml(bodyMeta, delimiter);
+            table.put("hasOptionPlusHtml", hasOptionPlusHtml);
             final String htmlFilePath = deriveHtmlFilePath(toPath(bodyFile));
             if (new File(htmlFilePath).exists()) {
                 if (!hasOptionPlusHtml) {
@@ -200,8 +219,12 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     // -----------------------------------------------------
     //                                      Extract Resource
     //                                      ----------------
+    protected String deriveTableMapKey(String key) {
+        return docProcess ? "mail" + Srl.initCap(key) : key;
+    }
+
     protected String extractTargetExt(Map<String, Object> tableMap) {
-        final String targetExt = (String) tableMap.get("targetExt"); // not required
+        final String targetExt = (String) tableMap.get(deriveTableMapKey("targetExt")); // not required
         if (targetExt != null && !targetExt.startsWith(".")) {
             return "." + targetExt;
         }
@@ -214,7 +237,7 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
 
     protected List<String> extractExceptPathList(Map<String, Object> tableMap) {
         @SuppressWarnings("unchecked")
-        List<String> exceptPathList = (List<String>) tableMap.get("exceptPathList"); // not required
+        List<String> exceptPathList = (List<String>) tableMap.get(deriveTableMapKey("exceptPathList")); // not required
         if (exceptPathList == null) {
             exceptPathList = DfCollectionUtil.newArrayListSized(4);
         }

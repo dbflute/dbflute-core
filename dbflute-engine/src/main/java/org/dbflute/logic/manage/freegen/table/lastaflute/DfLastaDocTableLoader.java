@@ -35,10 +35,14 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
-import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
+import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
+import org.dbflute.logic.manage.freegen.table.appcls.DfAppClsTableLoader;
+import org.dbflute.logic.manage.freegen.table.appcls.DfWebClsTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonFreeAgent;
+import org.dbflute.logic.manage.freegen.table.mailflute.DfMailFluteTableLoader;
+import org.dbflute.logic.manage.freegen.table.pmfile.DfPmFileTableLoader;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
@@ -108,6 +112,18 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
             tableMap.putAll(decodeJsonMap(lastaDocFile));
         }
         tableMap.put("appList", findAppList(mapProp));
+        if (mapProp.getOptionMap().get("mailPackage") != null) {
+            tableMap.put("mailList", new DfMailFluteTableLoader(true).loadTable(requestName, resource, mapProp).getTableList());
+        }
+        if (mapProp.getOptionMap().get("templatePackage") != null) {
+            tableMap.put("templateList", new DfPmFileTableLoader(true).loadTable(requestName, resource, mapProp).getTableList());
+        }
+        if (mapProp.getOptionMap().get("appclsPackage") != null) {
+            tableMap.put("appclsMap", new DfAppClsTableLoader(true).loadTable(requestName, resource, mapProp).getOptionMap());
+        }
+        if (mapProp.getOptionMap().get("webclsPackage") != null) {
+            tableMap.put("webclsMap", new DfWebClsTableLoader(true).loadTable(requestName, resource, mapProp).getOptionMap());
+        }
         prepareSchemaHtmlLink(tableMap);
         return new DfFreeGenMetaData(tableMap, "unused", columnList);
     }

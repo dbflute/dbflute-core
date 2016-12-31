@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -79,6 +79,18 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
     protected static final String CRLF = "\r\n";
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final boolean docProcess;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfPmFileTableLoader(boolean docProcess) {
+        this.docProcess = docProcess;
+    }
+
+    // ===================================================================================
     //                                                                          Load Table
     //                                                                          ==========
     // ; resourceMap = map:{
@@ -94,14 +106,14 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
     // ; tableMap = map:{
     //     ; targetDir = $$baseDir$$/resources
     //     ; targetExt = .dfpm
-    //     ; targetKeyword = 
+    //     ; targetKeyword =
     //     ; exceptPathList = list:{ contain:/common/ }
     //     ; targetSuffix = Bean
     //     ; isConventionSuffix = false
     // }
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> tableMap = mapProp.getOptionMap();
-        final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
+        final String targetDir = resource.resolveBaseDir((String) tableMap.get(deriveTableMapKey("targetDir")));
         final String targetExt = extractTargetExt(tableMap);
         final String targetKeyword = extractTargetKeyword(tableMap);
         final List<String> exceptPathList = extractExceptPathList(tableMap);
@@ -127,12 +139,18 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
                 throw new IllegalStateException("Not found the pmc file: " + pmFile, e);
             }
             final String delimiter = META_DELIMITER;
-            if (((String) tableMap.getOrDefault("isLastaTemplate", "false")).equalsIgnoreCase("true")) {
+            if (((String) tableMap.getOrDefault(deriveTableMapKey("isLastaTemplate"), "false")).equalsIgnoreCase("true")) {
                 final String templatePath = toPath(pmFile);
                 if (!fileText.contains(delimiter)) {
                     throwTemplateMetaNotFoundException(templatePath, fileText);
                 }
                 verifyFormat(templatePath, fileText, delimiter);
+                final String headerComment = Srl.extractScopeFirst(fileText, COMMENT_BEGIN, COMMENT_END).getContent();
+                final ScopeInfo titleScope = Srl.extractScopeFirst(headerComment, TITLE_BEGIN, TITLE_END);
+                final String desc = Srl.substringFirstRear(headerComment, TITLE_END);
+                table.put("headerComment", headerComment);
+                table.put("title", titleScope.getContent());
+                table.put("description", desc);
             }
             String option = null;
             if (fileText.contains(delimiter)) {
@@ -216,8 +234,15 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         return option != null && option.contains("genAsIs");
     }
 
+    // -----------------------------------------------------
+    //                                      Extract Resource
+    //                                      ----------------
+    protected String deriveTableMapKey(String key) {
+        return docProcess ? "template" + Srl.initCap(key) : key;
+    }
+
     protected String extractTargetExt(Map<String, Object> tableMap) {
-        final String targetExt = (String) tableMap.get("targetExt"); // not required
+        final String targetExt = (String) tableMap.get(deriveTableMapKey("targetExt")); // not required
         if (targetExt != null && !targetExt.startsWith(".")) {
             return "." + targetExt;
         }
@@ -225,12 +250,12 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
     }
 
     protected String extractTargetKeyword(Map<String, Object> tableMap) {
-        return (String) tableMap.get("targetKeyword"); // not required
+        return (String) tableMap.get(deriveTableMapKey("targetKeyword")); // not required
     }
 
     protected List<String> extractExceptPathList(Map<String, Object> tableMap) {
         @SuppressWarnings("unchecked")
-        List<String> exceptPathList = (List<String>) tableMap.get("exceptPathList"); // not required
+        List<String> exceptPathList = (List<String>) tableMap.get(deriveTableMapKey("exceptPathList")); // not required
         if (exceptPathList == null) {
             exceptPathList = DfCollectionUtil.newArrayListSized(4);
         }
@@ -239,7 +264,7 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
     }
 
     protected String deriveClassSuffix(Map<String, Object> tableMap, File baseDir, File pmFile) {
-        if (((String) tableMap.getOrDefault("isConventionSuffix", "true")).equalsIgnoreCase("true")) {
+        if (((String) tableMap.getOrDefault(deriveTableMapKey("isConventionSuffix"), "true")).equalsIgnoreCase("true")) {
             final String baseCano;
             try {
                 baseCano = toPath(baseDir.getCanonicalPath());
@@ -261,7 +286,7 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
             }
             return suffix;
         } else {
-            return (String) tableMap.getOrDefault("targetSuffix", "");
+            return (String) tableMap.getOrDefault(deriveTableMapKey("targetSuffix"), "");
         }
     }
 
