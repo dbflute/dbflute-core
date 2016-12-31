@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -49,6 +49,18 @@ import org.dbflute.util.Srl;
 public class DfWebClsTableLoader implements DfFreeGenTableLoader {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final boolean docProcess;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfWebClsTableLoader(boolean docProcess) {
+        this.docProcess = docProcess;
+    }
+
+    // ===================================================================================
     //                                                                          Load Table
     //                                                                          ==========
     // ; resourceMap = map:{
@@ -66,7 +78,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
     // }
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> optionMap = mapProp.getOptionMap();
-        final String resourceFile = resource.getResourceFile();
+        final String resourceFile = this.docProcess ? (String) mapProp.getOptionMap().get("webclsResourceFile") : resource.getResourceFile();
         final Map<String, Object> webclsMap;
         try {
             webclsMap = new MapListFile().readMap(new FileInputStream(resourceFile));
@@ -92,11 +104,11 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
                     classificationTop.acceptClassificationTopBasicItemMap(elementMap);
                 } else {
                     if (isElementMapRefCls(elementMap)) {
-                        assertRefClsOnlyOne(classificationName, refClsElement, elementMap);
+                        assertRefClsOnlyOne(classificationName, refClsElement, elementMap, resource);
                         if (dbClsMap == null) {
                             dbClsMap = getClassificationProperties().getClassificationTopMap();
                         }
-                        refClsElement = createRefClsElement(classificationName, elementMap, dbClsMap);
+                        refClsElement = createRefClsElement(classificationName, elementMap, dbClsMap, resource);
                         handleRefCls(classificationTop, refClsElement);
                     } else {
                         literalArranger.arrange(classificationName, elementMap);
@@ -132,7 +144,8 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
         return elementMap.get(DfRefClsElement.KEY_REFCLS) != null;
     }
 
-    protected void assertRefClsOnlyOne(String classificationName, DfRefClsElement refClsElement, Map<String, Object> elementMap) {
+    protected void assertRefClsOnlyOne(String classificationName, DfRefClsElement refClsElement, Map<String, Object> elementMap,
+            DfFreeGenResource resource) {
         if (refClsElement != null) { // only-one refCls is supported #for_now
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Duplicate refCls in the web classification.");
@@ -144,13 +157,15 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
             br.addElement(refClsElement);
             br.addItem("Duplicate refCls");
             br.addElement(elementMap);
+            br.addItem("dfprop File");
+            br.addElement(resource.getResourceFile());
             final String msg = br.buildExceptionMessage();
             throw new DfIllegalPropertySettingException(msg);
         }
     }
 
     protected DfRefClsElement createRefClsElement(String classificationName, Map<String, Object> elementMap,
-            Map<String, DfClassificationTop> dbClsMap) {
+            Map<String, DfClassificationTop> dbClsMap, DfFreeGenResource resource) {
         final String refCls = (String) elementMap.get(DfRefClsElement.KEY_REFCLS);
         final String projectName;
         final String refClsName;
@@ -181,7 +196,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
             String msg = "Not found the refType in refCls elementMap: " + classificationName + " " + elementMap;
             throw new DfIllegalPropertySettingException(msg);
         }
-        final DfClassificationTop dbClsTop = findDBCls(classificationName, refClsName, dbClsMap);
+        final DfClassificationTop dbClsTop = findDBCls(classificationName, refClsName, dbClsMap, resource);
         return new DfRefClsElement(projectName, refClsName, classificationType, groupName, refType, dbClsTop);
     }
 
@@ -189,7 +204,8 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
         return getBasicProperties().getProjectPrefix() + "CDef." + refClsName;
     }
 
-    protected DfClassificationTop findDBCls(String classificationName, String refClsName, Map<String, DfClassificationTop> dbClsMap) {
+    protected DfClassificationTop findDBCls(String classificationName, String refClsName, Map<String, DfClassificationTop> dbClsMap,
+            DfFreeGenResource resource) {
         final DfClassificationTop refTop = dbClsMap.get(refClsName);
         if (refTop == null) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -202,6 +218,8 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
             br.addElement(refClsName);
             br.addItem("Existing DBCls");
             br.addElement(dbClsMap.keySet());
+            br.addItem("dfprop File");
+            br.addElement(resource.getResourceFile());
             final String msg = br.buildExceptionMessage();
             throw new DfIllegalPropertySettingException(msg);
         }

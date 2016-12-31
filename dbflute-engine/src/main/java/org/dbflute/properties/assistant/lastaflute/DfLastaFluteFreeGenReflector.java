@@ -94,7 +94,8 @@ public final class DfLastaFluteFreeGenReflector {
                 } else if ("template".equals(freeGen)) {
                     setupPmTemplateGen(_uncapServiceName, path, lastafluteMap);
                 } else if ("doc".equals(freeGen)) {
-                    setupDocGen(_uncapServiceName, path, lastaDocOutputDirectory);
+                    final String mailPluginInterface = (String) commonMap.get("mailPluginInterface");
+                    setupDocGen(_uncapServiceName, path, lastafluteMap, lastaDocOutputDirectory, freeGenList, mailPluginInterface);
                 } else {
                     String msg = "Unkonwn type for commonMap's freeGen: " + freeGen;
                     throw new DfIllegalPropertySettingException(msg);
@@ -135,7 +136,8 @@ public final class DfLastaFluteFreeGenReflector {
                     } else if ("html".equals(freeGen)) {
                         setupHtmlPathGen(appName, path, lastafluteMap);
                     } else if ("doc".equals(freeGen)) {
-                        setupDocGen(appName, path, lastaDocOutputDirectory);
+                        final String mailPluginInterface = (String) commonMap.get("mailPluginInterface");
+                        setupDocGen(appName, path, lastafluteMap, lastaDocOutputDirectory, freeGenList, mailPluginInterface);
                     } else if ("appcls".equals(freeGen)) {
                         setupAppClsGen(appName, path, lastafluteMap);
                     } else if ("webcls".equals(freeGen)) {
@@ -406,10 +408,12 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                            Document
     //                                                                            ========
     // last process recommended for generated classes by others
-    protected void setupDocGen(String appName, String path, String lastaDocOutputDirectory) {
+    protected void setupDocGen(String appName, String path, Map<String, Object> lastafluteMap, String lastaDocOutputDirectory,
+            List<String> freeGenList, String mailPluginInterface) {
         final Map<String, Map<String, Object>> docMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "lastaDoc";
-        registerFreeGen(initCap(appName) + buildTitleSuffix(theme), docMap);
+        final String capAppName = initCap(appName);
+        registerFreeGen(capAppName + buildTitleSuffix(theme), docMap);
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         docMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
@@ -426,6 +430,37 @@ public final class DfLastaFluteFreeGenReflector {
         tableMap.put("path", path);
         tableMap.put("targetDir", "$$baseDir$$/java");
         tableMap.put("appName", appName);
+
+        if (freeGenList.contains("mail")) {
+            tableMap.put("mailPackage", buildMailPostcardPackage(capAppName, lastafluteMap));
+            tableMap.put("mailTargetDir", filterOverridden("$$baseDir$$/resources/mail", lastafluteMap, appName, "mail", "targetDir"));
+            tableMap.put("mailTargetExt", filterOverridden(".dfmail", lastafluteMap, appName, "mail", "targetExt"));
+            final List<String> mailExceptPathList = DfCollectionUtil.newArrayList("contain:/mail/common/");
+            tableMap.put("mailExceptPathList", filterOverridden(mailExceptPathList, lastafluteMap, appName, "mail", "exceptPathList"));
+            if (mailPluginInterface != null) {
+                tableMap.put("mailPluginInterface", mailPluginInterface);
+            }
+        }
+
+        if (freeGenList.contains("template")) {
+            tableMap.put("templatePackage", buildPmTemplateBeanPackage(capAppName, lastafluteMap));
+            tableMap.put("templateTargetDir", filterOverridden("$$baseDir$$/resources", lastafluteMap, appName, "template", "targetDir"));
+            tableMap.put("templateTargetExt", filterOverridden("." + "dfpm", lastafluteMap, appName, "template", "targetExt"));
+            tableMap.put("templateIsConventionSuffix", getTrueLiteral());
+            tableMap.put("templateIsLastaTemplate", getTrueLiteral());
+        }
+
+        if (freeGenList.contains("appcls")) {
+            final String appClsResourceFile = path + "/src/main/resources/" + appName + "_appcls.dfprop";
+            tableMap.put("appclsResourceFile", filterOverridden(appClsResourceFile, lastafluteMap, appName, "appcls", "resourceFile"));
+            tableMap.put("appclsPackage", filterOverridden(_mylastaPackage + ".appcls", lastafluteMap, appName, "appcls", "package"));
+        }
+
+        if (freeGenList.contains("webcls")) {
+            final String webclsResourceFile = path + "/src/main/resources/" + appName + "_webcls.dfprop";
+            tableMap.put("webclsResourceFile", filterOverridden(webclsResourceFile, lastafluteMap, appName, "webcls", "resourceFile"));
+            tableMap.put("webclsPackage", filterOverridden(_mylastaPackage + ".webcls", lastafluteMap, appName, "webcls", "package"));
+        }
     }
 
     // ===================================================================================
