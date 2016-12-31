@@ -150,37 +150,51 @@ public class DfSchemaPolicyTableStatement {
             if (table.hasPrimaryKey()) {
                 final Column pk = table.getPrimaryKey().get(0); // same name if compound
                 final String pkName = pk.getPrimaryKeyName();
-                if (!isHitExp(pkName, thenValue)) {
+                final String comparingValue = toConstraintComparingValue(table, thenValue);
+                if (!isHitExp(pkName, comparingValue)) {
                     result.addViolation(policy,
-                            "The PK constraint name should be " + thenValue + " but " + pkName + ": " + toTableDisp(table));
+                            "The PK constraint name should be " + comparingValue + " but " + pkName + ": " + toTableDisp(table));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("fkName")) { // e.g. fkName is prefix:FK_
             for (ForeignKey fk : table.getForeignKeyList()) {
                 final String fkName = fk.getName();
-                if (!isHitExp(fkName, thenValue)) {
+                final String comparingValue = toConstraintComparingValue(table, thenValue);
+                if (!isHitExp(fkName, comparingValue)) {
                     result.addViolation(policy,
-                            "The FK constraint name should be " + thenValue + " but " + fkName + ": " + toTableDisp(table));
+                            "The FK constraint name should be " + comparingValue + " but " + fkName + ": " + toTableDisp(table));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("uniqueName")) { // e.g. uniqueName is prefix:UQ_ 
             for (Unique uq : table.getUniqueList()) {
                 final String uqName = uq.getName();
-                if (!isHitExp(uqName, thenValue)) {
+                final String comparingValue = toConstraintComparingValue(table, thenValue);
+                if (!isHitExp(uqName, comparingValue)) {
                     result.addViolation(policy,
-                            "The unique constraint name should be " + thenValue + " but " + uqName + ": " + toTableDisp(table));
+                            "The unique constraint name should be " + comparingValue + " but " + uqName + ": " + toTableDisp(table));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("indexName")) { // e.g. indexName is prefix:IX_ 
             for (Index ix : table.getIndexList()) {
                 final String ixName = ix.getName();
-                if (!isHitExp(ixName, thenValue)) {
-                    result.addViolation(policy, "The index name should be " + thenValue + " but " + ixName + ": " + toTableDisp(table));
+                final String comparingValue = toConstraintComparingValue(table, thenValue);
+                if (!isHitExp(ixName, comparingValue)) {
+                    result.addViolation(policy,
+                            "The index name should be " + comparingValue + " but " + ixName + ": " + toTableDisp(table));
                 }
             }
         } else {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-item: " + thenItem);
         }
+    }
+
+    protected String toConstraintComparingValue(Table table, String thenValue) {
+        final String tableName = table.getResourceNameForSqlName(); // to remove schema prefix
+        String comparingValue = thenValue;
+        comparingValue = Srl.replace(comparingValue, "$$table$$", tableName);
+        comparingValue = Srl.replace(comparingValue, "$$Table$$", tableName);
+        comparingValue = Srl.replace(comparingValue, "$$TABLE$$", tableName);
+        return comparingValue;
     }
 
     // ===================================================================================
