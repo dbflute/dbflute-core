@@ -68,7 +68,7 @@ public class DfSchemaPolicyTableStatement {
         final String ifValue = ifClause.getIfValue();
         final boolean notIfValue = ifClause.isNotIfValue();
         if (ifItem.equalsIgnoreCase("tableName")) {
-            if (isHitTable(table.getTableDbName(), ifValue) == !notIfValue) {
+            if (isHitTable(toTableName(table), ifValue) == !notIfValue) {
                 evaluateTableThenClause(table, statement, result, ifClause);
             }
         } else if (ifItem.equalsIgnoreCase("alias")) {
@@ -119,10 +119,10 @@ public class DfSchemaPolicyTableStatement {
         final boolean notThenValue = ifClause.isNotThenValue();
         final String notOr = notThenValue ? "not " : "";
         if (thenItem.equalsIgnoreCase("tableName")) { // e.g. tableName is prefix:CLS_
-            final String tableDbName = table.getTableDbName();
-            if (!isHitExp(tableDbName, thenValue) == !notThenValue) {
+            final String tableName = toTableName(table);
+            if (!isHitExp(tableName, thenValue) == !notThenValue) {
                 result.addViolation(policy,
-                        "The table name should " + notOr + "be " + thenValue + " but " + tableDbName + ": " + toTableDisp(table));
+                        "The table name should " + notOr + "be " + thenValue + " but " + tableName + ": " + toTableDisp(table));
             }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:History
             if (table.hasAlias()) {
@@ -194,7 +194,7 @@ public class DfSchemaPolicyTableStatement {
     }
 
     protected String toConstraintComparingValue(Table table, String thenValue) {
-        final String tableName = table.getResourceNameForSqlName(); // to remove schema prefix
+        final String tableName = toTableName(table);
         String comparingValue = thenValue;
         comparingValue = Srl.replace(comparingValue, "$$table$$", tableName);
         comparingValue = Srl.replace(comparingValue, "$$Table$$", tableName);
@@ -211,6 +211,10 @@ public class DfSchemaPolicyTableStatement {
 
     protected boolean isHitExp(String exp, String hint) {
         return _secretary.isHitExp(exp, hint);
+    }
+
+    protected String toTableName(Table table) {
+        return _secretary.toTableName(table);
     }
 
     protected String toTableDisp(Table table) {

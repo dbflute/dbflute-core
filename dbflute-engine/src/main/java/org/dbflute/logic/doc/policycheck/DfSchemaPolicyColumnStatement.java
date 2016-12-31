@@ -66,7 +66,7 @@ public class DfSchemaPolicyColumnStatement {
         final String ifValue = ifClause.getIfValue();
         final boolean notIfValue = ifClause.isNotIfValue();
         if (ifItem.equalsIgnoreCase("columnName")) { // if columnName is ...
-            if (isHitColumn(column.getName(), ifValue) == !notIfValue) {
+            if (isHitColumn(toColumnName(column), ifValue) == !notIfValue) {
                 evaluateColumnThenClause(column, statement, result, ifClause);
             }
         } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
@@ -115,7 +115,7 @@ public class DfSchemaPolicyColumnStatement {
         final boolean notThenValue = ifClause.isNotThenValue();
         final String notOr = notThenValue ? "not " : "";
         if (thenItem.equalsIgnoreCase("columnName")) { // e.g. columnName is suffix:_ID
-            final String columnName = column.getName();
+            final String columnName = toColumnName(column);
             if (!isHitExp(columnName, thenValue) == !notThenValue) {
                 result.addViolation(policy,
                         "The column name should " + notOr + "be " + thenValue + " but " + columnName + ": " + toColumnDisp(column));
@@ -166,6 +166,10 @@ public class DfSchemaPolicyColumnStatement {
 
     protected boolean isHitExp(String exp, String hint) {
         return _secretary.isHitExp(exp, hint);
+    }
+
+    protected String toColumnName(Column column) {
+        return _secretary.toColumnName(column);
     }
 
     protected String toColumnDisp(Column column) {

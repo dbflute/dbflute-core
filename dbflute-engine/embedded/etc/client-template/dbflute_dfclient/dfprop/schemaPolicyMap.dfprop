@@ -11,6 +11,9 @@
 #     ; tableTargetList = list:{}
 #     ; tableMap = map:{
 #         ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
+#         ; statementList = list:{
+#             ; if tableName is $$ALL$$ then fkName is prefix:FK_$$table$$
+#         }
 #     }
 #     ; columnMap = map:{
 #         ; themeList = list:{ upperCaseBasis }
@@ -29,6 +32,9 @@ map:{
     #; tableTargetList = list:{}
     #; tableMap = map:{
     #    ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
+    #    ; statementList = list:{
+    #        ; if tableName is $$ALL$$ then fkName is prefix:FK_$$table$$
+    #    }
     #}
     #; columnMap = map:{
     #    ; themeList = list:{ upperCaseBasis }
