@@ -17,6 +17,7 @@ package org.dbflute.logic.doc.policycheck;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
@@ -25,6 +26,7 @@ import org.dbflute.exception.DfSchemaPolicyCheckUnknownPropertyException;
 import org.dbflute.exception.DfSchemaPolicyCheckUnknownThemeException;
 import org.dbflute.exception.DfSchemaPolicyCheckViolationException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.doc.policycheck.DfSchemaPolicyResult.DfSchemaPolicyViolation;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
@@ -49,26 +51,45 @@ public class DfSchemaPolicyMiscSecretary {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, additional);
         }
         final String ifClause = ifClauseScope.getContent().trim();
-        if (!ifClause.contains(" is ")) {
+        final String ifDelimiter = " is ";
+        if (!ifClause.contains(ifDelimiter)) {
             final String additional = "The if-clause should contain 'is': " + ifClause;
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, additional);
         }
-        final String ifItem = Srl.substringFirstFront(ifClause, " is ").trim();
-        final String ifValue = Srl.substringFirstRear(ifClause, " is ").trim();
-        final String thenClause = ifClauseScope.substringInterspaceToNext();
-        return new DfSchemaPolicyIfClause(ifItem, ifValue, thenClause);
+        final String ifItem = Srl.substringFirstFront(ifClause, ifDelimiter).trim();
+        final String ifValue = Srl.substringFirstRear(ifClause, ifDelimiter).trim();
+        final String thenRear = ifClauseScope.substringInterspaceToNext();
+        final String thenClause;
+        final String supplement;
+        final String thenDelimiter = " => "; // e.g. if tableName is suffix:_ID then bad => similar to column name
+        if (thenRear.contains(thenDelimiter)) {
+            thenClause = Srl.substringLastFront(thenRear, thenDelimiter);
+            supplement = Srl.substringLastRear(thenRear, thenDelimiter);
+        } else {
+            thenClause = thenRear;
+            supplement = null;
+        }
+        return new DfSchemaPolicyIfClause(statement, ifItem, ifValue, thenClause, supplement);
     }
 
     public static class DfSchemaPolicyIfClause {
 
+        protected final String _statement;
         protected final String _ifItem;
         protected final String _ifValue;
         protected final String _thenClause;
+        protected final String _supplement;
 
-        public DfSchemaPolicyIfClause(String ifItem, String ifValue, String thenClause) {
-            this._ifItem = ifItem;
-            this._ifValue = ifValue;
-            this._thenClause = thenClause;
+        public DfSchemaPolicyIfClause(String statement, String ifItem, String ifValue, String thenClause, String supplement) {
+            _statement = statement;
+            _ifItem = ifItem;
+            _ifValue = ifValue;
+            _thenClause = thenClause;
+            _supplement = supplement;
+        }
+
+        public String getStatement() {
+            return _statement;
         }
 
         public String getIfItem() {
@@ -81,6 +102,10 @@ public class DfSchemaPolicyMiscSecretary {
 
         public String getThenClause() {
             return _thenClause;
+        }
+
+        public String getSupplement() {
+            return _supplement;
         }
     }
 
@@ -143,20 +168,22 @@ public class DfSchemaPolicyMiscSecretary {
     //                                                                             Display
     //                                                                             =======
     public String toTableDisp(Table table) {
-        return table.getAliasExpression() + table.getTableDbName();
+        return table.getAliasExpression() + table.getTableDispName();
     }
 
     public String toColumnDisp(Column column) {
-        final String notNull = column.isNotNull() ? "*" : "";
+        final String tableDispName = column.getTable().getTableDispName();
+        final String aliasExp = column.getAliasExpression();
         final String dbType = column.hasDbType() ? column.getDbType() : "(unknownType)";
         final String size = column.hasColumnSize() ? "(" + column.getColumnSize() + ")" : "";
-        return notNull + column.getTable().getTableDbName() + "." + column.getName() + " " + dbType + size;
+        final String notNull = column.isNotNull() ? "(NotNull)" : "(NullAllowed)";
+        return tableDispName + "." + aliasExp + column.getName() + " " + dbType + size + " " + notNull;
     }
 
     // ===================================================================================
     //                                                                 Violation Exception
     //                                                                 ===================
-    public void throwSchemaPolicyCheckViolationException(Map<String, Object> policyMap, List<String> vioList) {
+    public void throwSchemaPolicyCheckViolationException(Map<String, Object> policyMap, DfSchemaPolicyResult result) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The schema policy has been violated.");
         br.addItem("Advice");
@@ -166,11 +193,24 @@ public class DfSchemaPolicyMiscSecretary {
         br.addItem("Schema Policy");
         br.addElement(buildPolicyExp(policyMap));
         br.addItem("Violation");
-        for (String vio : vioList) {
-            br.addElement(vio);
+        final Map<String, List<DfSchemaPolicyViolation>> violationMap = result.getViolationMap();
+        int policyIndex = 0;
+        for (Entry<String, List<DfSchemaPolicyViolation>> entry : violationMap.entrySet()) {
+            if (policyIndex > 0) { // second or more
+                br.addElement(""); // empty line
+            }
+            br.addElement(entry.getKey());
+            final List<DfSchemaPolicyViolation> violationList = entry.getValue();
+            int violationIndex = 0;
+            for (DfSchemaPolicyViolation violation : violationList) {
+                final boolean lastLoop = violationIndex < violationList.size() - 1;
+                br.addElement((lastLoop ? " |-" : " +-") + violation.getMessage());
+                ++violationIndex;
+            }
+            ++policyIndex;
         }
         final String msg = br.buildExceptionMessage();
-        throw new DfSchemaPolicyCheckViolationException(msg, vioList);
+        throw new DfSchemaPolicyCheckViolationException(msg);
     }
 
     public String buildPolicyExp(Map<String, Object> policyMap) {

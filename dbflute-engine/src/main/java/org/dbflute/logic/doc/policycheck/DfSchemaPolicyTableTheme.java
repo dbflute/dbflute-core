@@ -18,6 +18,8 @@ package org.dbflute.logic.doc.policycheck;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
@@ -33,7 +35,7 @@ public class DfSchemaPolicyTableTheme {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static Map<String, BiConsumer<Table, List<String>>> _cachedThemeMap;
+    protected static Map<String, BiConsumer<Table, DfSchemaPolicyResult>> _cachedThemeMap;
 
     // ===================================================================================
     //                                                                           Attribute
@@ -43,37 +45,37 @@ public class DfSchemaPolicyTableTheme {
     // ===================================================================================
     //                                                                         Table Theme
     //                                                                         ===========
-    public void checkTableTheme(Table table, Map<String, Object> tableMap, List<String> vioList) {
-        processTableTheme(table, tableMap, vioList);
+    public void checkTableTheme(Table table, Map<String, Object> tableMap, DfSchemaPolicyResult result) {
+        processTableTheme(table, tableMap, result);
     }
 
-    protected void processTableTheme(Table table, Map<String, Object> tableMap, List<String> vioList) {
+    protected void processTableTheme(Table table, Map<String, Object> tableMap, DfSchemaPolicyResult result) {
         @SuppressWarnings("unchecked")
         final List<String> themeList = (List<String>) tableMap.get("themeList");
         if (themeList == null) {
             return;
         }
         for (String theme : themeList) {
-            evaluateTableTheme(table, vioList, theme);
+            evaluateTableTheme(table, result, theme);
         }
     }
 
-    protected void evaluateTableTheme(Table table, List<String> vioList, String theme) {
-        final Map<String, BiConsumer<Table, List<String>>> themeMap = getThemeMap();
-        final BiConsumer<Table, List<String>> themeProcessor = themeMap.get(theme);
+    protected void evaluateTableTheme(Table table, DfSchemaPolicyResult result, String theme) {
+        final Map<String, BiConsumer<Table, DfSchemaPolicyResult>> themeMap = getThemeMap();
+        final BiConsumer<Table, DfSchemaPolicyResult> themeProcessor = themeMap.get(theme);
         if (themeProcessor != null) {
-            themeProcessor.accept(table, vioList);
+            themeProcessor.accept(table, result);
         } else {
             throwSchemaPolicyCheckUnknownThemeException(theme, "Table");
         }
     }
 
-    protected Map<String, BiConsumer<Table, List<String>>> getThemeMap() {
+    protected Map<String, BiConsumer<Table, DfSchemaPolicyResult>> getThemeMap() {
         if (_cachedThemeMap != null) {
             return _cachedThemeMap;
         }
-        final Map<String, BiConsumer<Table, List<String>>> themeMap = StringKeyMap.createAsCaseInsensitiveOrdered();
-        defineTableTheme(themeMap);
+        final Map<String, BiConsumer<Table, DfSchemaPolicyResult>> themeMap = StringKeyMap.createAsCaseInsensitiveOrdered();
+        prepareTableTheme(themeMap);
         _cachedThemeMap = themeMap;
         return _cachedThemeMap;
     }
@@ -81,37 +83,40 @@ public class DfSchemaPolicyTableTheme {
     // ===================================================================================
     //                                                                         Theme Logic
     //                                                                         ===========
-    protected void defineTableTheme(Map<String, BiConsumer<Table, List<String>>> themeMap) {
+    protected void prepareTableTheme(Map<String, BiConsumer<Table, DfSchemaPolicyResult>> themeMap) {
         // e.g.
         // ; tableMap = map:{
         //     ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
         // }
-        themeMap.put("hasPK", (table, vioList) -> {
-            if (!table.hasPrimaryKey()) {
-                vioList.add("The table should have primary key: " + toTableDisp(table));
-            }
+        define(themeMap, "hasPK", table -> !table.hasPrimaryKey(), table -> {
+            return "The table should have primary key: " + toTableDisp(table);
         });
-        themeMap.put("upperCaseBasis", (table, vioList) -> {
-            if (Srl.isLowerCaseAny(buildCaseComparingTableName(table))) {
-                vioList.add("The table name should be on upper case basis: " + toTableDisp(table));
-            }
+        define(themeMap, "upperCaseBasis", table -> Srl.isLowerCaseAny(buildCaseComparingTableName(table)), table -> {
+            return "The table name should be on upper case basis: " + toTableDisp(table);
         });
-        themeMap.put("lowerCaseBasis", (table, vioList) -> {
-            if (Srl.isUpperCaseAny(buildCaseComparingTableName(table))) {
-                vioList.add("The table name should be on lower case basis: " + toTableDisp(table));
-            }
+        define(themeMap, "lowerCaseBasis", table -> Srl.isUpperCaseAny(buildCaseComparingTableName(table)), table -> {
+            return "The table name should be on lower case basis: " + toTableDisp(table);
         });
-        themeMap.put("identityIfPureIDPK", (table, vioList) -> {
+        define(themeMap, "identityIfPureIDPK", table -> {
             if (table.hasPrimaryKey() && table.hasSinglePrimaryKey()) {
                 final Column pk = table.getPrimaryKeyAsOne();
-                if (!pk.isForeignKey() && Srl.endsWith(pk.getName(), "ID") && !pk.isIdentity()) {
-                    vioList.add("The primary key should be identity: " + toTableDisp(table) + "." + pk.getName());
-                }
+                return !pk.isForeignKey() && Srl.endsWith(pk.getName(), "ID") && !pk.isIdentity();
+            } else {
+                return false;
             }
+        }, table -> {
+            return "The primary key should be identity: " + toTableDisp(table) + "." + table.getPrimaryKeyAsOne().getName();
         });
-        themeMap.put("hasCommonColumn", (table, vioList) -> {
-            if (!table.hasAllCommonColumn()) {
-                vioList.add("The table should have common columns: " + toTableDisp(table));
+        define(themeMap, "hasCommonColumn", table -> !table.hasAllCommonColumn(), table -> {
+            return "The table should have common columns: " + toTableDisp(table);
+        });
+    }
+
+    protected void define(Map<String, BiConsumer<Table, DfSchemaPolicyResult>> themeMap, String theme, Predicate<Table> determiner,
+            Function<Table, String> messenger) {
+        themeMap.put(theme, (table, result) -> {
+            if (determiner.test(table)) {
+                result.addViolation("table.theme: " + theme, messenger.apply(table));
             }
         });
     }

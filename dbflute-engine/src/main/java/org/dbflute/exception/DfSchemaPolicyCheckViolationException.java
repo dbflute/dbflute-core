@@ -15,9 +15,6 @@
  */
 package org.dbflute.exception;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author jflute
  */
@@ -25,14 +22,7 @@ public class DfSchemaPolicyCheckViolationException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    protected final List<String> _vioList;
-
-    public DfSchemaPolicyCheckViolationException(String msg, List<String> vioList) {
+    public DfSchemaPolicyCheckViolationException(String msg) {
         super(msg);
-        _vioList = Collections.unmodifiableList(vioList);
-    }
-
-    public List<String> getVioList() {
-        return _vioList;
     }
 }

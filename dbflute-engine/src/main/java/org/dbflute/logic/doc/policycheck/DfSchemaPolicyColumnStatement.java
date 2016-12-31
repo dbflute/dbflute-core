@@ -37,19 +37,19 @@ public class DfSchemaPolicyColumnStatement {
     // ===================================================================================
     //                                                                    Column Statement
     //                                                                    ================
-    public void checkColumnStatement(Table table, Map<String, Object> columnMap, List<String> vioList) {
+    public void checkColumnStatement(Table table, Map<String, Object> columnMap, DfSchemaPolicyResult result) {
         final List<Column> columnList = table.getColumnList();
         for (Column column : columnList) {
-            processColumnStatement(column, columnMap, vioList);
+            processColumnStatement(column, columnMap, result);
         }
     }
 
-    protected void processColumnStatement(Column column, Map<String, Object> columnMap, List<String> vioList) {
+    protected void processColumnStatement(Column column, Map<String, Object> columnMap, DfSchemaPolicyResult result) {
         @SuppressWarnings("unchecked")
         final List<String> statementList = (List<String>) columnMap.get("statementList");
         if (statementList != null) {
             for (String statement : statementList) {
-                evaluateColumnIfClause(column, statement, vioList, _secretary.extractIfClause(statement));
+                evaluateColumnIfClause(column, statement, result, _secretary.extractIfClause(statement));
             }
         }
     }
@@ -63,20 +63,20 @@ public class DfSchemaPolicyColumnStatement {
     // e.g.
     //  if columnName is suffix:_FLG then notNull
     //  if columnName is suffix:_FLG then dbType is integer
-    protected void evaluateColumnIfClause(Column column, String statement, List<String> vioList, DfSchemaPolicyIfClause ifClause) {
+    protected void evaluateColumnIfClause(Column column, String statement, DfSchemaPolicyResult result, DfSchemaPolicyIfClause ifClause) {
         final String ifItem = ifClause.getIfItem();
         final String ifValue = ifClause.getIfValue();
         if (ifItem.equalsIgnoreCase("columnName")) { // if columnName is ...
             if (isHitColumn(column.getName(), ifValue)) {
-                evaluateColumnThenClause(column, statement, vioList, ifClause);
+                evaluateColumnThenClause(column, statement, result, ifClause);
             }
         } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
             if (isHitColumn(column.getAlias(), ifValue)) {
-                evaluateColumnThenClause(column, statement, vioList, ifClause);
+                evaluateColumnThenClause(column, statement, result, ifClause);
             }
         } else if (ifItem.equalsIgnoreCase("dbType")) {// if dbType is ...
             if (column.hasDbType() && isHitExp(column.getDbType(), ifValue)) {
-                evaluateColumnThenClause(column, statement, vioList, ifClause);
+                evaluateColumnThenClause(column, statement, result, ifClause);
             }
         } else {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-item: " + ifItem);
@@ -86,56 +86,61 @@ public class DfSchemaPolicyColumnStatement {
     // -----------------------------------------------------
     //                                           Then Clause
     //                                           -----------
-    protected void evaluateColumnThenClause(Column column, String statement, List<String> vioList, DfSchemaPolicyIfClause ifClause) {
+    protected void evaluateColumnThenClause(Column column, String statement, DfSchemaPolicyResult result, DfSchemaPolicyIfClause ifClause) {
+        final String policy = toPolicy(ifClause);
         final String thenClause = ifClause.getThenClause();
         if (thenClause.equalsIgnoreCase("notNull")) {
             if (!column.isNotNull()) {
-                vioList.add("The column should be not-null: " + toColumnDisp(column));
+                result.addViolation(policy, "The column should be not-null: " + toColumnDisp(column));
             }
         } else if (thenClause.equalsIgnoreCase("bad")) {
-            vioList.add("The column is no good: " + toColumnDisp(column));
+            result.addViolation(policy, "The column is no good: " + toColumnDisp(column));
         } else if (thenClause.contains(" is ")) { // e.g. dbType is integer
-            evaluateColumnThenItemValue(column, statement, vioList, ifClause);
+            evaluateColumnThenItemValue(column, statement, result, ifClause);
         } else {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
         }
     }
 
-    protected void evaluateColumnThenItemValue(Column column, String statement, List<String> vioList, DfSchemaPolicyIfClause ifClause) {
+    protected void evaluateColumnThenItemValue(Column column, String statement, DfSchemaPolicyResult result,
+            DfSchemaPolicyIfClause ifClause) {
+        final String policy = toPolicy(ifClause);
         final String thenClause = ifClause.getThenClause();
         final String thenItem = Srl.substringFirstFront(thenClause, " is ").trim();
         final String thenValue = Srl.substringFirstRear(thenClause, " is ").trim();
         if (thenItem.equalsIgnoreCase("columnName")) { // e.g. columnName is suffix:_ID
             final String columnName = column.getName();
             if (!isHitExp(columnName, thenValue)) {
-                vioList.add("The column name should be " + thenValue + " but " + columnName + ": " + toColumnDisp(column));
+                result.addViolation(policy, "The column name should be " + thenValue + " but " + columnName + ": " + toColumnDisp(column));
             }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:ID
             if (column.hasAlias()) {
                 final String alias = column.getAlias();
                 if (!isHitExp(alias, thenValue)) {
-                    vioList.add("The column alias should be " + thenValue + " but " + alias + ": " + toColumnDisp(column));
+                    result.addViolation(policy, "The column alias should be " + thenValue + " but " + alias + ": " + toColumnDisp(column));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("dbType")) { // e.g. dbType is integer
             if (column.hasDbType()) {
                 final String dbType = column.getDbType();
                 if (!isHitExp(dbType, thenValue)) {
-                    vioList.add("The column db-type should be " + thenValue + " but " + dbType + ": " + toColumnDisp(column));
+                    result.addViolation(policy,
+                            "The column db-type should be " + thenValue + " but " + dbType + ": " + toColumnDisp(column));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("size")) { // e.g. size is 200
             if (column.hasColumnSize()) {
                 final String size = column.getColumnSize(); // String expression #for_now
                 if (!isHitExp(size, thenValue)) {
-                    vioList.add("The column size should be " + thenValue + " but " + size + ": " + toColumnDisp(column));
+                    result.addViolation(policy, "The column size should be " + thenValue + " but " + size + ": " + toColumnDisp(column));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("comment")) { // e.g. comment is contain:SEA
             if (column.hasAlias()) {
                 final String comment = column.getComment();
                 if (!isHitExp(comment, thenValue)) {
-                    vioList.add("The column comment should be " + thenValue + " but " + comment + ": " + toColumnDisp(column));
+                    result.addViolation(policy,
+                            "The column comment should be " + thenValue + " but " + comment + ": " + toColumnDisp(column));
                 }
             }
         } else {
@@ -156,6 +161,10 @@ public class DfSchemaPolicyColumnStatement {
 
     protected String toColumnDisp(Column column) {
         return _secretary.toColumnDisp(column);
+    }
+
+    protected String toPolicy(DfSchemaPolicyIfClause ifClause) {
+        return "table.statement: " + ifClause.getStatement();
     }
 
     // ===================================================================================

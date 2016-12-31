@@ -18,6 +18,8 @@ package org.dbflute.logic.doc.policycheck;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
@@ -33,7 +35,7 @@ public class DfSchemaPolicyColumnTheme {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static Map<String, BiConsumer<Column, List<String>>> _cachedThemeMap;
+    protected static Map<String, BiConsumer<Column, DfSchemaPolicyResult>> _cachedThemeMap;
 
     // ===================================================================================
     //                                                                           Attribute
@@ -43,40 +45,40 @@ public class DfSchemaPolicyColumnTheme {
     // ===================================================================================
     //                                                                        Column Theme
     //                                                                        ============
-    public void checkColumnTheme(Table table, Map<String, Object> columnMap, List<String> vioList) {
-        processColumnTheme(table, columnMap, vioList);
+    public void checkColumnTheme(Table table, Map<String, Object> columnMap, DfSchemaPolicyResult result) {
+        processColumnTheme(table, columnMap, result);
     }
 
-    protected void processColumnTheme(Table table, Map<String, Object> columnMap, List<String> vioList) {
+    protected void processColumnTheme(Table table, Map<String, Object> columnMap, DfSchemaPolicyResult result) {
         @SuppressWarnings("unchecked")
         final List<String> themeList = (List<String>) columnMap.get("themeList");
         if (themeList == null) {
             return;
         }
         for (String theme : themeList) {
-            evaluateColumnTheme(table, vioList, theme);
+            evaluateColumnTheme(table, result, theme);
         }
     }
 
-    protected void evaluateColumnTheme(Table table, List<String> vioList, String theme) {
-        final Map<String, BiConsumer<Column, List<String>>> themeMap = getThemeMap();
+    protected void evaluateColumnTheme(Table table, DfSchemaPolicyResult result, String theme) {
+        final Map<String, BiConsumer<Column, DfSchemaPolicyResult>> themeMap = getThemeMap();
         final List<Column> columnList = table.getColumnList();
         for (Column column : columnList) {
-            final BiConsumer<Column, List<String>> themeProcessor = themeMap.get(theme);
+            final BiConsumer<Column, DfSchemaPolicyResult> themeProcessor = themeMap.get(theme);
             if (themeProcessor != null) {
-                themeProcessor.accept(column, vioList);
+                themeProcessor.accept(column, result);
             } else {
                 throwSchemaPolicyCheckUnknownThemeException(theme, "Column");
             }
         }
     }
 
-    protected Map<String, BiConsumer<Column, List<String>>> getThemeMap() {
+    protected Map<String, BiConsumer<Column, DfSchemaPolicyResult>> getThemeMap() {
         if (_cachedThemeMap != null) {
             return _cachedThemeMap;
         }
-        final Map<String, BiConsumer<Column, List<String>>> themeMap = StringKeyMap.createAsCaseInsensitiveOrdered();
-        defineColumnTheme(themeMap);
+        final Map<String, BiConsumer<Column, DfSchemaPolicyResult>> themeMap = StringKeyMap.createAsCaseInsensitiveOrdered();
+        prepareColumnTheme(themeMap);
         _cachedThemeMap = themeMap;
         return _cachedThemeMap;
     }
@@ -84,19 +86,24 @@ public class DfSchemaPolicyColumnTheme {
     // ===================================================================================
     //                                                                         Theme Logic
     //                                                                         ===========
-    protected void defineColumnTheme(Map<String, BiConsumer<Column, List<String>>> themeMap) {
+    protected void prepareColumnTheme(Map<String, BiConsumer<Column, DfSchemaPolicyResult>> themeMap) {
         // e.g.
         // ; columnMap = map:{
         //     ; themeList = list:{ upperCaseBasis }
         // }
-        themeMap.put("upperCaseBasis", (column, vioList) -> {
-            if (Srl.isLowerCaseAny(buildCaseComparingColumnName(column))) {
-                vioList.add("The column name should be on upper case basis: " + toColumnDisp(column));
-            }
+        define(themeMap, "upperCaseBasis", column -> Srl.isLowerCaseAny(buildCaseComparingColumnName(column)), column -> {
+            return "The column name should be on upper case basis: " + toColumnDisp(column);
         });
-        themeMap.put("lowerCaseBasis", (column, vioList) -> {
-            if (Srl.isUpperCaseAny(buildCaseComparingColumnName(column))) {
-                vioList.add("The column name should be on lower case basis: " + toColumnDisp(column));
+        define(themeMap, "lowerCaseBasis", column -> Srl.isUpperCaseAny(buildCaseComparingColumnName(column)), column -> {
+            return "The column name should be on lower case basis: " + toColumnDisp(column);
+        });
+    }
+
+    protected void define(Map<String, BiConsumer<Column, DfSchemaPolicyResult>> themeMap, String theme, Predicate<Column> determiner,
+            Function<Column, String> messenger) {
+        themeMap.put(theme, (column, result) -> {
+            if (determiner.test(column)) {
+                result.addViolation("column.theme: " + theme, messenger.apply(column));
             }
         });
     }

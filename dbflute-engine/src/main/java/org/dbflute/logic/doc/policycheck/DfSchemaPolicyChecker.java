@@ -96,7 +96,7 @@ public class DfSchemaPolicyChecker {
         //         }
         //     }
         // }
-        final List<String> vioList = new ArrayList<String>(); // #hope needs to be structured, rule and message
+        final DfSchemaPolicyResult result = new DfSchemaPolicyResult();
         final boolean mainSchemaOnly = isMainSchemaOnly();
         for (Table table : _tableListSupplier.get()) {
             if (table.isTypeView()) { // out of target
@@ -108,10 +108,10 @@ public class DfSchemaPolicyChecker {
             if (mainSchemaOnly && table.isAdditionalSchema()) {
                 continue;
             }
-            doCheck(table, vioList);
+            doCheck(table, result);
         }
-        if (!vioList.isEmpty()) {
-            throwSchemaPolicyCheckViolationException(vioList);
+        if (!result.isEmpty()) {
+            throwSchemaPolicyCheckViolationException(result);
         } else {
             _log.info("No violation of schema policy, good!\n[Schema Policy]\n" + _secretary.buildPolicyExp(_policyMap));
         }
@@ -121,18 +121,18 @@ public class DfSchemaPolicyChecker {
         return ((String) _policyMap.getOrDefault("isMainSchemaOnly", "false")).equalsIgnoreCase("true");
     }
 
-    protected void doCheck(Table table, List<String> vioList) {
+    protected void doCheck(Table table, DfSchemaPolicyResult result) {
         for (Entry<String, Object> entry : _policyMap.entrySet()) {
             final String key = entry.getKey();
             final Object value = entry.getValue();
             if (key.equals("tableMap")) {
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> tableMap = (Map<String, Object>) value;
-                doCheckTableMap(table, tableMap, vioList);
+                doCheckTableMap(table, tableMap, result);
             } else if (key.equals("columnMap")) {
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> columnMap = (Map<String, Object>) value;
-                doCheckColumnMap(table, columnMap, vioList);
+                doCheckColumnMap(table, columnMap, result);
             } else {
                 if (!Srl.equalsPlain(key, "isMainSchemaOnly", "tableExceptList", "tableTargetList")) {
                     throwSchemaPolicyCheckUnknownPropertyException(key);
@@ -141,8 +141,8 @@ public class DfSchemaPolicyChecker {
         }
     }
 
-    protected void throwSchemaPolicyCheckViolationException(List<String> vioList) {
-        _secretary.throwSchemaPolicyCheckViolationException(_policyMap, vioList);
+    protected void throwSchemaPolicyCheckViolationException(DfSchemaPolicyResult result) {
+        _secretary.throwSchemaPolicyCheckViolationException(_policyMap, result);
     }
 
     protected void throwSchemaPolicyCheckUnknownPropertyException(String property) {
@@ -152,17 +152,17 @@ public class DfSchemaPolicyChecker {
     // ===================================================================================
     //                                                                         Check Table
     //                                                                         ===========
-    protected void doCheckTableMap(Table table, Map<String, Object> tableMap, List<String> vioList) {
-        _tableTheme.checkTableTheme(table, tableMap, vioList);
-        _tableStatement.checkTableStatement(table, tableMap, vioList);
+    protected void doCheckTableMap(Table table, Map<String, Object> tableMap, DfSchemaPolicyResult result) {
+        _tableTheme.checkTableTheme(table, tableMap, result);
+        _tableStatement.checkTableStatement(table, tableMap, result);
     }
 
     // ===================================================================================
     //                                                                        Check Column
     //                                                                        ============
-    protected void doCheckColumnMap(Table table, Map<String, Object> columnMap, List<String> vioList) {
-        _columnTheme.checkColumnTheme(table, columnMap, vioList);
-        _columnStatement.checkColumnStatement(table, columnMap, vioList);
+    protected void doCheckColumnMap(Table table, Map<String, Object> columnMap, DfSchemaPolicyResult result) {
+        _columnTheme.checkColumnTheme(table, columnMap, result);
+        _columnStatement.checkColumnStatement(table, columnMap, result);
     }
 
     // ===================================================================================
