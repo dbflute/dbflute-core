@@ -200,8 +200,8 @@ public class DfSchemaPolicyTableStatement {
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
-    protected boolean isHitTable(String columnName, String hint) {
-        return _secretary.isHitTable(columnName, hint);
+    protected boolean isHitTable(String tableName, String hint) {
+        return _secretary.isHitTable(tableName, hint);
     }
 
     protected boolean isHitExp(String exp, String hint) {

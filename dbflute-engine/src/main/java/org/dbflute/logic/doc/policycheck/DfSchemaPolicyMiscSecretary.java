@@ -112,8 +112,8 @@ public class DfSchemaPolicyMiscSecretary {
     // ===================================================================================
     //                                                                           Hit Logic
     //                                                                           =========
-    public boolean isHitTable(String columnName, String hint) {
-        return determineHitBy(columnName, hint);
+    public boolean isHitTable(String tableName, String hint) {
+        return determineHitBy(tableName, hint);
     }
 
     public boolean isHitColumn(String columnName, String hint) {
