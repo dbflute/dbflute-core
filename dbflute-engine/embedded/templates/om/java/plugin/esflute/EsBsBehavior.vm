@@ -62,7 +62,7 @@ public abstract class Bs${table.camelizedName}Bhv extends EsAbstractBehavior<${t
 #set ($tableMetaSettings = ${table.indexSettings.settings.index.dbflute.get($table.name)})
 #foreach ($column in $table.columnList)
 #if ($column.isNormalColumn)
-#set ($javaNative = ${column.type})
+#if (${column.type} == "keyword" || ${column.type} == "text")#set ($javaNative = "String")#else#set ($javaNative = ${column.type})#end
 #if ($tableMetaSettings.properties.get($column.name).array)
             result.set${column.capCamelName}(to${javaNative}Array(source.get("${column.name}")));
 #else

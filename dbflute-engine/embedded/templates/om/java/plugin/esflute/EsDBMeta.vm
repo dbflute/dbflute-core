@@ -68,7 +68,7 @@ public class ${table.camelizedName}Dbm extends AbstractDBMeta {
 #set ($tableMetaSettings = ${table.indexSettings.settings.index.dbflute.get($table.name)})
 #foreach ($col in $table.columnList)
 #if ($col.isNormalColumn)
-#set ($javaNative = ${col.type})
+#if (${col.type} == "keyword" || ${col.type} == "text")#set ($javaNative = "String")#else#set ($javaNative = ${col.type})#end
 #elseif ($col.isRefColumn)
 #set ($javaNative = ${col.camelizedName})
 #end
@@ -104,7 +104,7 @@ public class ${table.camelizedName}Dbm extends AbstractDBMeta {
     //                                                                         ===========
 #foreach ($col in $table.columnList)
 #if ($col.isNormalColumn)
-#set ($javaNative = ${col.type})
+#if (${col.type} == "keyword" || ${col.type} == "text")#set ($javaNative = "String")#else#set ($javaNative = ${col.type})#end
 #elseif ($col.isRefColumn)
 #set ($javaNative = ${col.camelizedName})
 #end

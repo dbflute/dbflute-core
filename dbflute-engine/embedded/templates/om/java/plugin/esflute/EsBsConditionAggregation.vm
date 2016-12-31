@@ -11,28 +11,28 @@ import ${request.package}.cbean.cq.bs.Bs${table.camelizedName}CQ;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.global.GlobalBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.HistogramBuilder;
-import org.elasticsearch.search.aggregations.bucket.missing.MissingBuilder;
-import org.elasticsearch.search.aggregations.bucket.range.RangeBuilder;
-import org.elasticsearch.search.aggregations.bucket.range.date.DateRangeBuilder;
-import org.elasticsearch.search.aggregations.bucket.range.ipv4.IPv4RangeBuilder;
+import org.elasticsearch.search.aggregations.bucket.global.GlobalAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.HistogramAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.missing.MissingAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.range.date.DateRangeAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.range.ip.IpRangeAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.sampler.SamplerAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.significant.SignificantTermsBuilder;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
-import org.elasticsearch.search.aggregations.metrics.avg.AvgBuilder;
-import org.elasticsearch.search.aggregations.metrics.cardinality.CardinalityBuilder;
-import org.elasticsearch.search.aggregations.metrics.max.MaxBuilder;
-import org.elasticsearch.search.aggregations.metrics.min.MinBuilder;
-import org.elasticsearch.search.aggregations.metrics.percentiles.PercentileRanksBuilder;
-import org.elasticsearch.search.aggregations.metrics.percentiles.PercentilesBuilder;
-import org.elasticsearch.search.aggregations.metrics.scripted.ScriptedMetricBuilder;
-import org.elasticsearch.search.aggregations.metrics.stats.StatsBuilder;
-import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStatsBuilder;
-import org.elasticsearch.search.aggregations.metrics.sum.SumBuilder;
-import org.elasticsearch.search.aggregations.metrics.tophits.TopHitsBuilder;
-import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountBuilder;
+import org.elasticsearch.search.aggregations.bucket.significant.SignificantTermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.avg.AvgAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.cardinality.CardinalityAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.percentiles.PercentileRanksAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.percentiles.PercentilesAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.scripted.ScriptedMetricAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.stats.StatsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStatsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.sum.SumAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.tophits.TopHitsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountAggregationBuilder;
 
 /**
  * @author ESFlute (using FreeGen)
@@ -60,8 +60,8 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         }
     }
 
-    public void global(String name, ConditionOptionCall<GlobalBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
-        GlobalBuilder builder = regGlobalA(name);
+    public void global(String name, ConditionOptionCall<GlobalAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+        GlobalAggregationBuilder builder = regGlobalA(name);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -84,15 +84,15 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         }
     }
 
-    public void scriptedMetric(String name, ConditionOptionCall<ScriptedMetricBuilder> opLambda) {
-        ScriptedMetricBuilder builder = regScriptedMetricA(name);
+    public void scriptedMetric(String name, ConditionOptionCall<ScriptedMetricAggregationBuilder> opLambda) {
+        ScriptedMetricAggregationBuilder builder = regScriptedMetricA(name);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
     }
 
-    public void topHits(String name, ConditionOptionCall<TopHitsBuilder> opLambda) {
-        TopHitsBuilder builder = regTopHitsA(name);
+    public void topHits(String name, ConditionOptionCall<TopHitsAggregationBuilder> opLambda) {
+        TopHitsAggregationBuilder builder = regTopHitsA(name);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -100,19 +100,18 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
 
 #foreach ($column in $table.columnList)
 #if ($column.isNormalColumn)
-#set ($javaNative = ${column.type})
-    // $javaNative ${column.name}
+#if (${column.type} == "keyword" || ${column.type} == "text")#set ($javaNative = "String")#else#set ($javaNative = ${column.type})#end
 #if ($javaNative != "String" && $javaNative != "Date" && $javaNative != "Timestamp" && $javaNative != "LocalDateTime")
     public void set${column.capCamelName}_Avg() {
         set${column.capCamelName}_Avg(null);
     }
 
-    public void set${column.capCamelName}_Avg(ConditionOptionCall<AvgBuilder> opLambda) {
+    public void set${column.capCamelName}_Avg(ConditionOptionCall<AvgAggregationBuilder> opLambda) {
         set${column.capCamelName}_Avg("${column.name}", opLambda);
     }
 
-    public void set${column.capCamelName}_Avg(String name, ConditionOptionCall<AvgBuilder> opLambda) {
-        AvgBuilder builder = regAvgA(name, "${column.name}");
+    public void set${column.capCamelName}_Avg(String name, ConditionOptionCall<AvgAggregationBuilder> opLambda) {
+        AvgAggregationBuilder builder = regAvgA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -122,12 +121,12 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_Max(null);
     }
 
-    public void set${column.capCamelName}_Max(ConditionOptionCall<MaxBuilder> opLambda) {
+    public void set${column.capCamelName}_Max(ConditionOptionCall<MaxAggregationBuilder> opLambda) {
         set${column.capCamelName}_Max("${column.name}", opLambda);
     }
 
-    public void set${column.capCamelName}_Max(String name, ConditionOptionCall<MaxBuilder> opLambda) {
-        MaxBuilder builder = regMaxA(name, "${column.name}");
+    public void set${column.capCamelName}_Max(String name, ConditionOptionCall<MaxAggregationBuilder> opLambda) {
+        MaxAggregationBuilder builder = regMaxA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -136,12 +135,12 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_Min(null);
     }
 
-    public void set${column.capCamelName}_Min(ConditionOptionCall<MinBuilder> opLambda) {
+    public void set${column.capCamelName}_Min(ConditionOptionCall<MinAggregationBuilder> opLambda) {
         set${column.capCamelName}_Min("${column.name}", opLambda);
     }
 
-    public void set${column.capCamelName}_Min(String name, ConditionOptionCall<MinBuilder> opLambda) {
-        MinBuilder builder = regMinA(name, "${column.name}");
+    public void set${column.capCamelName}_Min(String name, ConditionOptionCall<MinAggregationBuilder> opLambda) {
+        MinAggregationBuilder builder = regMinA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -151,12 +150,12 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_Sum(null);
     }
 
-    public void set${column.capCamelName}_Sum(ConditionOptionCall<SumBuilder> opLambda) {
+    public void set${column.capCamelName}_Sum(ConditionOptionCall<SumAggregationBuilder> opLambda) {
         set${column.capCamelName}_Sum("${column.name}", opLambda);
     }
 
-    public void set${column.capCamelName}_Sum(String name, ConditionOptionCall<SumBuilder> opLambda) {
-        SumBuilder builder = regSumA(name, "${column.name}");
+    public void set${column.capCamelName}_Sum(String name, ConditionOptionCall<SumAggregationBuilder> opLambda) {
+        SumAggregationBuilder builder = regSumA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -166,12 +165,12 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_ExtendedStats(null);
     }
 
-    public void set${column.capCamelName}_ExtendedStats(ConditionOptionCall<ExtendedStatsBuilder> opLambda) {
+    public void set${column.capCamelName}_ExtendedStats(ConditionOptionCall<ExtendedStatsAggregationBuilder> opLambda) {
         set${column.capCamelName}_ExtendedStats("${column.name}", opLambda);
     }
 
-    public void set${column.capCamelName}_ExtendedStats(String name, ConditionOptionCall<ExtendedStatsBuilder> opLambda) {
-        ExtendedStatsBuilder builder = regExtendedStatsA(name, "${column.name}");
+    public void set${column.capCamelName}_ExtendedStats(String name, ConditionOptionCall<ExtendedStatsAggregationBuilder> opLambda) {
+        ExtendedStatsAggregationBuilder builder = regExtendedStatsA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -181,12 +180,12 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_Stats(null);
     }
 
-    public void set${column.capCamelName}_Stats(ConditionOptionCall<StatsBuilder> opLambda) {
+    public void set${column.capCamelName}_Stats(ConditionOptionCall<StatsAggregationBuilder> opLambda) {
         set${column.capCamelName}_Stats("${column.name}", opLambda);
     }
 
-    public void set${column.capCamelName}_Stats(String name, ConditionOptionCall<StatsBuilder> opLambda) {
-        StatsBuilder builder = regStatsA(name, "${column.name}");
+    public void set${column.capCamelName}_Stats(String name, ConditionOptionCall<StatsAggregationBuilder> opLambda) {
+        StatsAggregationBuilder builder = regStatsA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -196,12 +195,12 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_Percentiles(null);
     }
 
-    public void set${column.capCamelName}_Percentiles(ConditionOptionCall<PercentilesBuilder> opLambda) {
+    public void set${column.capCamelName}_Percentiles(ConditionOptionCall<PercentilesAggregationBuilder> opLambda) {
         set${column.capCamelName}_Percentiles("${column.name}", opLambda);
     }
 
-    public void set${column.capCamelName}_Percentiles(String name, ConditionOptionCall<PercentilesBuilder> opLambda) {
-        PercentilesBuilder builder = regPercentilesA(name, "${column.name}");
+    public void set${column.capCamelName}_Percentiles(String name, ConditionOptionCall<PercentilesAggregationBuilder> opLambda) {
+        PercentilesAggregationBuilder builder = regPercentilesA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -211,12 +210,12 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_PercentileRanks(null);
     }
 
-    public void set${column.capCamelName}_PercentileRanks(ConditionOptionCall<PercentileRanksBuilder> opLambda) {
+    public void set${column.capCamelName}_PercentileRanks(ConditionOptionCall<PercentileRanksAggregationBuilder> opLambda) {
         set${column.capCamelName}_PercentileRanks("${column.name}", opLambda);
     }
 
-    public void set${column.capCamelName}_PercentileRanks(String name, ConditionOptionCall<PercentileRanksBuilder> opLambda) {
-        PercentileRanksBuilder builder = regPercentileRanksA(name, "${column.name}");
+    public void set${column.capCamelName}_PercentileRanks(String name, ConditionOptionCall<PercentileRanksAggregationBuilder> opLambda) {
+        PercentileRanksAggregationBuilder builder = regPercentileRanksA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -226,16 +225,16 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_Histogram(null);
     }
 
-    public void set${column.capCamelName}_Histogram(ConditionOptionCall<HistogramBuilder> opLambda) {
+    public void set${column.capCamelName}_Histogram(ConditionOptionCall<HistogramAggregationBuilder> opLambda) {
         set${column.capCamelName}_Histogram("${column.name}", opLambda, null);
     }
 
-    public void set${column.capCamelName}_Histogram(ConditionOptionCall<HistogramBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+    public void set${column.capCamelName}_Histogram(ConditionOptionCall<HistogramAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
         set${column.capCamelName}_Histogram("${column.name}", opLambda, aggsLambda);
     }
 
-    public void set${column.capCamelName}_Histogram(String name, ConditionOptionCall<HistogramBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
-        HistogramBuilder builder = regHistogramA(name, "${column.name}");
+    public void set${column.capCamelName}_Histogram(String name, ConditionOptionCall<HistogramAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+        HistogramAggregationBuilder builder = regHistogramA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -250,16 +249,16 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_Range(null);
     }
 
-    public void set${column.capCamelName}_Range(ConditionOptionCall<RangeBuilder> opLambda) {
+    public void set${column.capCamelName}_Range(ConditionOptionCall<RangeAggregationBuilder> opLambda) {
         set${column.capCamelName}_Range("${column.name}", opLambda, null);
     }
 
-    public void set${column.capCamelName}_Range(ConditionOptionCall<RangeBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+    public void set${column.capCamelName}_Range(ConditionOptionCall<RangeAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
         set${column.capCamelName}_Range("${column.name}", opLambda, aggsLambda);
     }
 
-    public void set${column.capCamelName}_Range(String name, ConditionOptionCall<RangeBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
-        RangeBuilder builder = regRangeA(name, "${column.name}");
+    public void set${column.capCamelName}_Range(String name, ConditionOptionCall<RangeAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+        RangeAggregationBuilder builder = regRangeA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -271,21 +270,21 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
     }
 #end
 
-#if ($javaNative == "String")
+#if ($javaNative == "String" && ($column.type == "keyword" || $column.fielddata))
     public void set${column.capCamelName}_Terms() {
         set${column.capCamelName}_Terms(null);
     }
 
-    public void set${column.capCamelName}_Terms(ConditionOptionCall<TermsBuilder> opLambda) {
+    public void set${column.capCamelName}_Terms(ConditionOptionCall<TermsAggregationBuilder> opLambda) {
         set${column.capCamelName}_Terms("${column.name}", opLambda, null);
     }
 
-    public void set${column.capCamelName}_Terms(ConditionOptionCall<TermsBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+    public void set${column.capCamelName}_Terms(ConditionOptionCall<TermsAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
         set${column.capCamelName}_Terms("${column.name}", opLambda, aggsLambda);
     }
 
-    public void set${column.capCamelName}_Terms(String name, ConditionOptionCall<TermsBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
-        TermsBuilder builder = regTermsA(name, "${column.name}");
+    public void set${column.capCamelName}_Terms(String name, ConditionOptionCall<TermsAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+        TermsAggregationBuilder builder = regTermsA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -300,16 +299,16 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_SignificantTerms(null);
     }
 
-    public void set${column.capCamelName}_SignificantTerms(ConditionOptionCall<SignificantTermsBuilder> opLambda) {
+    public void set${column.capCamelName}_SignificantTerms(ConditionOptionCall<SignificantTermsAggregationBuilder> opLambda) {
         set${column.capCamelName}_SignificantTerms("${column.name}", opLambda, null);
     }
 
-    public void set${column.capCamelName}_SignificantTerms(ConditionOptionCall<SignificantTermsBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+    public void set${column.capCamelName}_SignificantTerms(ConditionOptionCall<SignificantTermsAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
         set${column.capCamelName}_SignificantTerms("${column.name}", opLambda, aggsLambda);
     }
 
-    public void set${column.capCamelName}_SignificantTerms(String name, ConditionOptionCall<SignificantTermsBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
-        SignificantTermsBuilder builder = regSignificantTermsA(name, "${column.name}");
+    public void set${column.capCamelName}_SignificantTerms(String name, ConditionOptionCall<SignificantTermsAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+        SignificantTermsAggregationBuilder builder = regSignificantTermsA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -324,16 +323,16 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_IpRange(null);
     }
 
-    public void set${column.capCamelName}_IpRange(ConditionOptionCall<IPv4RangeBuilder> opLambda) {
+    public void set${column.capCamelName}_IpRange(ConditionOptionCall<IpRangeAggregationBuilder> opLambda) {
         set${column.capCamelName}_IpRange("${column.name}", opLambda, null);
     }
 
-    public void set${column.capCamelName}_IpRange(ConditionOptionCall<IPv4RangeBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+    public void set${column.capCamelName}_IpRange(ConditionOptionCall<IpRangeAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
         set${column.capCamelName}_IpRange("${column.name}", opLambda, aggsLambda);
     }
 
-    public void set${column.capCamelName}_IpRange(String name, ConditionOptionCall<IPv4RangeBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
-        IPv4RangeBuilder builder = regIpRangeA(name, "${column.name}");
+    public void set${column.capCamelName}_IpRange(String name, ConditionOptionCall<IpRangeAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+        IpRangeAggregationBuilder builder = regIpRangeA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -350,16 +349,16 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_DateRange(null);
     }
 
-    public void set${column.capCamelName}_DateRange(ConditionOptionCall<DateRangeBuilder> opLambda) {
+    public void set${column.capCamelName}_DateRange(ConditionOptionCall<DateRangeAggregationBuilder> opLambda) {
         set${column.capCamelName}_DateRange("${column.name}", opLambda, null);
     }
 
-    public void set${column.capCamelName}_DateRange(ConditionOptionCall<DateRangeBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+    public void set${column.capCamelName}_DateRange(ConditionOptionCall<DateRangeAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
         set${column.capCamelName}_DateRange("${column.name}", opLambda, aggsLambda);
     }
 
-    public void set${column.capCamelName}_DateRange(String name, ConditionOptionCall<DateRangeBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
-        DateRangeBuilder builder = regDateRangeA(name, "${column.name}");
+    public void set${column.capCamelName}_DateRange(String name, ConditionOptionCall<DateRangeAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+        DateRangeAggregationBuilder builder = regDateRangeA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -374,16 +373,16 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_DateHistogram(null);
     }
 
-    public void set${column.capCamelName}_DateHistogram(ConditionOptionCall<DateHistogramBuilder> opLambda) {
+    public void set${column.capCamelName}_DateHistogram(ConditionOptionCall<DateHistogramAggregationBuilder> opLambda) {
         set${column.capCamelName}_DateHistogram("${column.name}", opLambda, null);
     }
 
-    public void set${column.capCamelName}_DateHistogram(ConditionOptionCall<DateHistogramBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+    public void set${column.capCamelName}_DateHistogram(ConditionOptionCall<DateHistogramAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
         set${column.capCamelName}_DateHistogram("${column.name}", opLambda, aggsLambda);
     }
 
-    public void set${column.capCamelName}_DateHistogram(String name, ConditionOptionCall<DateHistogramBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
-        DateHistogramBuilder builder = regDateHistogramA(name, "${column.name}");
+    public void set${column.capCamelName}_DateHistogram(String name, ConditionOptionCall<DateHistogramAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+        DateHistogramAggregationBuilder builder = regDateHistogramA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -399,12 +398,12 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_Count(null);
     }
 
-    public void set${column.capCamelName}_Count(ConditionOptionCall<ValueCountBuilder> opLambda) {
+    public void set${column.capCamelName}_Count(ConditionOptionCall<ValueCountAggregationBuilder> opLambda) {
         set${column.capCamelName}_Count("${column.name}", opLambda);
     }
 
-    public void set${column.capCamelName}_Count(String name, ConditionOptionCall<ValueCountBuilder> opLambda) {
-        ValueCountBuilder builder = regCountA(name, "${column.name}");
+    public void set${column.capCamelName}_Count(String name, ConditionOptionCall<ValueCountAggregationBuilder> opLambda) {
+        ValueCountAggregationBuilder builder = regCountA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -414,12 +413,12 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_Cardinality(null);
     }
 
-    public void set${column.capCamelName}_Cardinality(ConditionOptionCall<CardinalityBuilder> opLambda) {
+    public void set${column.capCamelName}_Cardinality(ConditionOptionCall<CardinalityAggregationBuilder> opLambda) {
         set${column.capCamelName}_Cardinality("${column.name}", opLambda);
     }
 
-    public void set${column.capCamelName}_Cardinality(String name, ConditionOptionCall<CardinalityBuilder> opLambda) {
-        CardinalityBuilder builder = regCardinalityA(name, "${column.name}");
+    public void set${column.capCamelName}_Cardinality(String name, ConditionOptionCall<CardinalityAggregationBuilder> opLambda) {
+        CardinalityAggregationBuilder builder = regCardinalityA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -429,16 +428,16 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         set${column.capCamelName}_Missing(null);
     }
 
-    public void set${column.capCamelName}_Missing(ConditionOptionCall<MissingBuilder> opLambda) {
+    public void set${column.capCamelName}_Missing(ConditionOptionCall<MissingAggregationBuilder> opLambda) {
         set${column.capCamelName}_Missing("${column.name}", opLambda, null);
     }
 
-    public void set${column.capCamelName}_Missing(ConditionOptionCall<MissingBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+    public void set${column.capCamelName}_Missing(ConditionOptionCall<MissingAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
         set${column.capCamelName}_Missing("${column.name}", opLambda, aggsLambda);
     }
 
-    public void set${column.capCamelName}_Missing(String name, ConditionOptionCall<MissingBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
-        MissingBuilder builder = regMissingA(name, "${column.name}");
+    public void set${column.capCamelName}_Missing(String name, ConditionOptionCall<MissingAggregationBuilder> opLambda, OperatorCall<Bs${table.camelizedName}CA> aggsLambda) {
+        MissingAggregationBuilder builder = regMissingA(name, "${column.name}");
         if (opLambda != null) {
             opLambda.callback(builder);
         }

@@ -558,6 +558,18 @@ public abstract class EsAbstractConditionBean implements ConditionBean {
         // do nothing
     }
 
+    public void enableSpecifyColumnRequired() {
+        // do nothing
+    }
+
+    public void disableSpecifyColumnRequired() {
+        // do nothing
+    }
+
+    public void xcheckSpecifyColumnRequiredIfNeeds() {
+        // do nothing
+    }
+
     @Override
     public boolean hasSpecifiedLocalColumn() {
         return false;
