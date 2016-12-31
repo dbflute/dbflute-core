@@ -57,6 +57,7 @@
 	<property name="test.option.compatible10x.dir" value="${test.option.stage.base}/dbflute-test-option-compatible10x" />
 
 	<!-- SubProject Examples -->
+	<property name="example.on.parade.dir" value="${example.on.stage.base}/dbflute-example-on-parade" />
 	<property name="example.on.springboot.dir" value="${example.on.stage.base}/dbflute-example-on-springboot" />
 	<property name="example.on.play2java.dir" value="${example.on.stage.base}/dbflute-example-on-play2java" />
 	<property name="example.with.doma.dir" value="${example.on.stage.base}/dbflute-example-with-doma" />
@@ -320,6 +321,15 @@
 			description="==> reflect to test of option for compatible10x">
 		<delete dir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${test.option.compatible10x.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-example-on-parade" depends="prepare-reflection"
+			description="==> reflect to example on parade">
+		<delete dir="${example.on.parade.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${example.on.parade.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />
