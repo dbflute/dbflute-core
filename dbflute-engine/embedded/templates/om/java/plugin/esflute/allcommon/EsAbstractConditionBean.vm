@@ -558,6 +558,7 @@ public abstract class EsAbstractConditionBean implements ConditionBean {
         // do nothing
     }
 
+    // no annotation for compatible with 1.1.1
     public void enableSpecifyColumnRequired() {
         // do nothing
     }
