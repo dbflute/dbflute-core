@@ -13,6 +13,7 @@ ant -f build.xml reflect-to-test-dbms-postgresql
 ant -f build.xml reflect-to-test-dbms-derby
 ant -f build.xml reflect-to-test-dbms-sqlite
 ant -f build.xml reflect-to-test-option-compatible10x
+ant -f build.xml reflect-to-example-on-parade
 ant -f build.xml reflect-to-example-on-springboot
 ant -f build.xml reflect-to-example-on-play2java
 ant -f build.xml reflect-to-example-with-doma
@@ -52,8 +53,8 @@ mvn -e compile
 
 cd ../dbflute-test-dbms-postgresql/dbflute_maihamadb
 rm ./log/*.log
-# not replace-schema because of big data
-. manage.sh regenerate
+. nextschema-renewal.sh
+. manage.sh renewal
 cd ..
 mvn -e compile
 
