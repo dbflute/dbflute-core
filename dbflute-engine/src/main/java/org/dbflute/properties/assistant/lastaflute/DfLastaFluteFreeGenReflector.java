@@ -136,7 +136,7 @@ public final class DfLastaFluteFreeGenReflector {
                     } else if ("html".equals(freeGen)) {
                         setupHtmlPathGen(appName, path, lastafluteMap);
                     } else if ("doc".equals(freeGen)) {
-                        final String mailPluginInterface = (String) commonMap.get("mailPluginInterface");
+                        final String mailPluginInterface = (String) defMap.get("mailPluginInterface");
                         setupDocGen(appName, path, lastafluteMap, lastaDocOutputDirectory, freeGenList, mailPluginInterface);
                     } else if ("appcls".equals(freeGen)) {
                         setupAppClsGen(appName, path, lastafluteMap);
@@ -374,7 +374,8 @@ public final class DfLastaFluteFreeGenReflector {
         doSetupHtmlTemplatePathGen(appName, path, targetDir, "html", lastafluteMap);
     }
 
-    protected void doSetupHtmlTemplatePathGen(String appName, String path, String targetDir, String ext, Map<String, Object> lastafluteMap) {
+    protected void doSetupHtmlTemplatePathGen(String appName, String path, String targetDir, String ext,
+            Map<String, Object> lastafluteMap) {
         final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
         final String capAppName = initCap(appName);
         registerFreeGen(capAppName + initCap(ext) + "Path", pathMap);
