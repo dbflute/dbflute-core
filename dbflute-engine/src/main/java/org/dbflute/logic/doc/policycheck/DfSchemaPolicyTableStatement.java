@@ -23,7 +23,6 @@ import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Index;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.Unique;
-import org.dbflute.logic.doc.policycheck.DfSchemaPolicyMiscSecretary.DfSchemaPolicyIfClause;
 import org.dbflute.util.Srl;
 
 /**
@@ -67,25 +66,23 @@ public class DfSchemaPolicyTableStatement {
         // #hope if tableName is ... and pkDbType is ... then ... by jflute (2016/12/29)
         final String ifItem = ifClause.getIfItem();
         final String ifValue = ifClause.getIfValue();
+        final boolean notIfValue = ifClause.isNotIfValue();
         if (ifItem.equalsIgnoreCase("tableName")) {
-            if (isHitTable(table.getTableDbName(), ifValue)) {
+            if (isHitTable(table.getTableDbName(), ifValue) == !notIfValue) {
                 evaluateTableThenClause(table, statement, result, ifClause);
             }
         } else if (ifItem.equalsIgnoreCase("alias")) {
-            if (isHitTable(table.getAlias(), ifValue)) {
+            if (isHitTable(table.getAlias(), ifValue) == !notIfValue) {
                 evaluateTableThenClause(table, statement, result, ifClause);
             }
         } else if (ifItem.equalsIgnoreCase("pkDbType")) { // e.g. if pkDbType is char
             if (table.hasPrimaryKey()) {
                 final List<Column> pkList = table.getPrimaryKey();
                 for (Column pk : pkList) {
-                    if (isHitTable(pk.getDbType(), ifValue)) {
+                    if (isHitTable(pk.getDbType(), ifValue) == !notIfValue) {
                         evaluateTableThenClause(table, statement, result, ifClause);
                     }
                 }
-            }
-            if (isHitTable(table.getAlias(), ifValue)) {
-                evaluateTableThenClause(table, statement, result, ifClause);
             }
         } else {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-item: " + ifItem);
@@ -98,41 +95,49 @@ public class DfSchemaPolicyTableStatement {
     protected void evaluateTableThenClause(Table table, String statement, DfSchemaPolicyResult result, DfSchemaPolicyIfClause ifClause) {
         final String policy = toPolicy(ifClause);
         final String thenClause = ifClause.getThenClause();
-        if (thenClause.equalsIgnoreCase("bad")) {
-            result.addViolation(policy, "The table is no good: " + toTableDisp(table));
-        } else if (thenClause.contains("hasCommonColumn")) {
-            if (!table.hasAllCommonColumn()) {
-                result.addViolation(policy, "The table should have common columns: " + toTableDisp(table));
-            }
-        } else if (thenClause.contains(" is ")) { // e.g. dbType is integer
+        if (ifClause.getThenItem() != null) { // e.g. dbType is integer
             evaluateTableThenItemValue(table, statement, result, ifClause);
         } else {
-            throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
+            final boolean notThenClause = ifClause.isNotThenClause();
+            final String notOr = notThenClause ? "not " : "";
+            if (thenClause.equalsIgnoreCase("bad") == !notThenClause) { // "not bad" is non-sense
+                result.addViolation(policy, "The table is no good: " + toTableDisp(table));
+            } else if (thenClause.contains("hasCommonColumn")) {
+                if (!table.hasAllCommonColumn() == !notThenClause) {
+                    result.addViolation(policy, "The table should " + notOr + "have common columns: " + toTableDisp(table));
+                }
+            } else {
+                throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
+            }
         }
     }
 
     protected void evaluateTableThenItemValue(Table table, String statement, DfSchemaPolicyResult result, DfSchemaPolicyIfClause ifClause) {
         final String policy = toPolicy(ifClause);
-        final String thenClause = ifClause.getThenClause();
-        final String thenItem = Srl.substringFirstFront(thenClause, " is ").trim();
-        final String thenValue = Srl.substringFirstRear(thenClause, " is ").trim();
+        final String thenItem = ifClause.getThenItem();
+        final String thenValue = ifClause.getThenValue();
+        final boolean notThenValue = ifClause.isNotThenValue();
+        final String notOr = notThenValue ? "not " : "";
         if (thenItem.equalsIgnoreCase("tableName")) { // e.g. tableName is prefix:CLS_
             final String tableDbName = table.getTableDbName();
-            if (!isHitExp(tableDbName, thenValue)) {
-                result.addViolation(policy, "The table name should be " + thenValue + " but " + tableDbName + ": " + toTableDisp(table));
+            if (!isHitExp(tableDbName, thenValue) == !notThenValue) {
+                result.addViolation(policy,
+                        "The table name should " + notOr + "be " + thenValue + " but " + tableDbName + ": " + toTableDisp(table));
             }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:History
             if (table.hasAlias()) {
                 final String alias = table.getAlias();
-                if (!isHitExp(alias, thenValue)) {
-                    result.addViolation(policy, "The table alias should be " + thenValue + " but " + alias + ": " + toTableDisp(table));
+                if (!isHitExp(alias, thenValue) == !notThenValue) {
+                    result.addViolation(policy,
+                            "The table alias should " + notOr + "be " + thenValue + " but " + alias + ": " + toTableDisp(table));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("comment")) { // e.g. comment is contain:SEA
             if (table.hasAlias()) {
                 final String comment = table.getComment();
-                if (!isHitExp(comment, thenValue)) {
-                    result.addViolation(policy, "The table comment should be " + thenValue + " but " + comment + ": " + toTableDisp(table));
+                if (!isHitExp(comment, thenValue) == !notThenValue) {
+                    result.addViolation(policy,
+                            "The table comment should " + notOr + "be " + thenValue + " but " + comment + ": " + toTableDisp(table));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("pkDbType")) { // e.g. pkDbType is char
@@ -140,9 +145,9 @@ public class DfSchemaPolicyTableStatement {
                 final List<Column> pkList = table.getPrimaryKey();
                 for (Column pk : pkList) {
                     final String pkDbName = pk.getDbType();
-                    if (!isHitExp(pkDbName, thenValue)) {
-                        result.addViolation(policy,
-                                "The PK column DB type should be " + thenValue + " but " + pkDbName + ": " + toTableDisp(table));
+                    if (!isHitExp(pkDbName, thenValue) == !notThenValue) {
+                        result.addViolation(policy, "The PK column DB type should " + notOr + "be " + thenValue + " but " + pkDbName + ": "
+                                + toTableDisp(table));
                     }
                 }
             }
@@ -151,18 +156,18 @@ public class DfSchemaPolicyTableStatement {
                 final Column pk = table.getPrimaryKey().get(0); // same name if compound
                 final String pkName = pk.getPrimaryKeyName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
-                if (!isHitExp(pkName, comparingValue)) {
-                    result.addViolation(policy,
-                            "The PK constraint name should be " + comparingValue + " but " + pkName + ": " + toTableDisp(table));
+                if (!isHitExp(pkName, comparingValue) == !notThenValue) {
+                    result.addViolation(policy, "The PK constraint name should " + notOr + "be " + comparingValue + " but " + pkName + ": "
+                            + toTableDisp(table));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("fkName")) { // e.g. fkName is prefix:FK_
             for (ForeignKey fk : table.getForeignKeyList()) {
                 final String fkName = fk.getName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
-                if (!isHitExp(fkName, comparingValue)) {
-                    result.addViolation(policy,
-                            "The FK constraint name should be " + comparingValue + " but " + fkName + ": " + toTableDisp(table));
+                if (!isHitExp(fkName, comparingValue) == !notThenValue) {
+                    result.addViolation(policy, "The FK constraint name should " + notOr + "be " + comparingValue + " but " + fkName + ": "
+                            + toTableDisp(table));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("uniqueName")) { // e.g. uniqueName is prefix:UQ_ 
@@ -170,17 +175,17 @@ public class DfSchemaPolicyTableStatement {
                 final String uqName = uq.getName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
                 if (!isHitExp(uqName, comparingValue)) {
-                    result.addViolation(policy,
-                            "The unique constraint name should be " + comparingValue + " but " + uqName + ": " + toTableDisp(table));
+                    result.addViolation(policy, "The unique constraint name should " + notOr + "be " + comparingValue + " but " + uqName
+                            + ": " + toTableDisp(table));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("indexName")) { // e.g. indexName is prefix:IX_ 
             for (Index ix : table.getIndexList()) {
                 final String ixName = ix.getName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
-                if (!isHitExp(ixName, comparingValue)) {
+                if (!isHitExp(ixName, comparingValue) == !notThenValue) {
                     result.addViolation(policy,
-                            "The index name should be " + comparingValue + " but " + ixName + ": " + toTableDisp(table));
+                            "The index name should " + notOr + "be " + comparingValue + " but " + ixName + ": " + toTableDisp(table));
                 }
             }
         } else {

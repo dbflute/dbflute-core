@@ -20,8 +20,6 @@ import java.util.Map;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
-import org.dbflute.logic.doc.policycheck.DfSchemaPolicyMiscSecretary.DfSchemaPolicyIfClause;
-import org.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -66,17 +64,20 @@ public class DfSchemaPolicyColumnStatement {
     protected void evaluateColumnIfClause(Column column, String statement, DfSchemaPolicyResult result, DfSchemaPolicyIfClause ifClause) {
         final String ifItem = ifClause.getIfItem();
         final String ifValue = ifClause.getIfValue();
+        final boolean notIfValue = ifClause.isNotIfValue();
         if (ifItem.equalsIgnoreCase("columnName")) { // if columnName is ...
-            if (isHitColumn(column.getName(), ifValue)) {
+            if (isHitColumn(column.getName(), ifValue) == !notIfValue) {
                 evaluateColumnThenClause(column, statement, result, ifClause);
             }
         } else if (ifItem.equalsIgnoreCase("alias")) { // if alias is ...
-            if (isHitColumn(column.getAlias(), ifValue)) {
+            if (isHitColumn(column.getAlias(), ifValue) == !notIfValue) {
                 evaluateColumnThenClause(column, statement, result, ifClause);
             }
         } else if (ifItem.equalsIgnoreCase("dbType")) {// if dbType is ...
-            if (column.hasDbType() && isHitExp(column.getDbType(), ifValue)) {
-                evaluateColumnThenClause(column, statement, result, ifClause);
+            if (column.hasDbType()) { // just in case
+                if (isHitExp(column.getDbType(), ifValue) == !notIfValue) {
+                    evaluateColumnThenClause(column, statement, result, ifClause);
+                }
             }
         } else {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown if-item: " + ifItem);
@@ -89,58 +90,66 @@ public class DfSchemaPolicyColumnStatement {
     protected void evaluateColumnThenClause(Column column, String statement, DfSchemaPolicyResult result, DfSchemaPolicyIfClause ifClause) {
         final String policy = toPolicy(ifClause);
         final String thenClause = ifClause.getThenClause();
-        if (thenClause.equalsIgnoreCase("notNull")) {
-            if (!column.isNotNull()) {
-                result.addViolation(policy, "The column should be not-null: " + toColumnDisp(column));
-            }
-        } else if (thenClause.equalsIgnoreCase("bad")) {
-            result.addViolation(policy, "The column is no good: " + toColumnDisp(column));
-        } else if (thenClause.contains(" is ")) { // e.g. dbType is integer
+        if (ifClause.getThenItem() != null) { // e.g. dbType is integer
             evaluateColumnThenItemValue(column, statement, result, ifClause);
         } else {
-            throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
+            final boolean notThenClause = ifClause.isNotThenClause();
+            final String notOr = notThenClause ? "not " : "";
+            if (thenClause.equalsIgnoreCase("bad") == !notThenClause) {
+                result.addViolation(policy, "The column is no good: " + toColumnDisp(column));
+            } else if (thenClause.equalsIgnoreCase("notNull")) {
+                if (!column.isNotNull() == !notThenClause) {
+                    result.addViolation(policy, "The column should " + notOr + "be not-null: " + toColumnDisp(column));
+                }
+            } else {
+                throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-clause: " + thenClause);
+            }
         }
     }
 
     protected void evaluateColumnThenItemValue(Column column, String statement, DfSchemaPolicyResult result,
             DfSchemaPolicyIfClause ifClause) {
         final String policy = toPolicy(ifClause);
-        final String thenClause = ifClause.getThenClause();
-        final String thenItem = Srl.substringFirstFront(thenClause, " is ").trim();
-        final String thenValue = Srl.substringFirstRear(thenClause, " is ").trim();
+        final String thenItem = ifClause.getThenItem();
+        final String thenValue = ifClause.getThenValue();
+        final boolean notThenValue = ifClause.isNotThenValue();
+        final String notOr = notThenValue ? "not " : "";
         if (thenItem.equalsIgnoreCase("columnName")) { // e.g. columnName is suffix:_ID
             final String columnName = column.getName();
-            if (!isHitExp(columnName, thenValue)) {
-                result.addViolation(policy, "The column name should be " + thenValue + " but " + columnName + ": " + toColumnDisp(column));
+            if (!isHitExp(columnName, thenValue) == !notThenValue) {
+                result.addViolation(policy,
+                        "The column name should " + notOr + "be " + thenValue + " but " + columnName + ": " + toColumnDisp(column));
             }
         } else if (thenItem.equalsIgnoreCase("alias")) { // e.g. alias is suffix:ID
             if (column.hasAlias()) {
                 final String alias = column.getAlias();
-                if (!isHitExp(alias, thenValue)) {
-                    result.addViolation(policy, "The column alias should be " + thenValue + " but " + alias + ": " + toColumnDisp(column));
+                if (!isHitExp(alias, thenValue) == !notThenValue) {
+                    result.addViolation(policy,
+                            "The column alias should " + notOr + "be " + thenValue + " but " + alias + ": " + toColumnDisp(column));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("dbType")) { // e.g. dbType is integer
             if (column.hasDbType()) {
                 final String dbType = column.getDbType();
-                if (!isHitExp(dbType, thenValue)) {
+                if (!isHitExp(dbType, thenValue) == !notThenValue) {
                     result.addViolation(policy,
-                            "The column db-type should be " + thenValue + " but " + dbType + ": " + toColumnDisp(column));
+                            "The column db-type should " + notOr + "be " + thenValue + " but " + dbType + ": " + toColumnDisp(column));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("size")) { // e.g. size is 200
             if (column.hasColumnSize()) {
                 final String size = column.getColumnSize(); // String expression #for_now
-                if (!isHitExp(size, thenValue)) {
-                    result.addViolation(policy, "The column size should be " + thenValue + " but " + size + ": " + toColumnDisp(column));
+                if (!isHitExp(size, thenValue) == !notThenValue) {
+                    result.addViolation(policy,
+                            "The column size should " + notOr + "be " + thenValue + " but " + size + ": " + toColumnDisp(column));
                 }
             }
         } else if (thenItem.equalsIgnoreCase("comment")) { // e.g. comment is contain:SEA
             if (column.hasAlias()) {
                 final String comment = column.getComment();
-                if (!isHitExp(comment, thenValue)) {
+                if (!isHitExp(comment, thenValue) == !notThenValue) {
                     result.addViolation(policy,
-                            "The column comment should be " + thenValue + " but " + comment + ": " + toColumnDisp(column));
+                            "The column comment should " + notOr + "be " + thenValue + " but " + comment + ": " + toColumnDisp(column));
                 }
             }
         } else {

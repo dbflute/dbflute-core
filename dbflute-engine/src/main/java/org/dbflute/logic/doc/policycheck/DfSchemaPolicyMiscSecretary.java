@@ -51,62 +51,48 @@ public class DfSchemaPolicyMiscSecretary {
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, additional);
         }
         final String ifClause = ifClauseScope.getContent().trim();
-        final String ifDelimiter = " is ";
-        if (!ifClause.contains(ifDelimiter)) {
+        final String equalsDelimiter = " is ";
+        final String notPrefix = "not ";
+        if (!ifClause.contains(equalsDelimiter)) {
             final String additional = "The if-clause should contain 'is': " + ifClause;
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, additional);
         }
-        final String ifItem = Srl.substringFirstFront(ifClause, ifDelimiter).trim();
-        final String ifValue = Srl.substringFirstRear(ifClause, ifDelimiter).trim();
+        final String ifItem = Srl.substringFirstFront(ifClause, equalsDelimiter).trim();
+        final String ifValueCandidate = Srl.substringFirstRear(ifClause, equalsDelimiter).trim();
+        final boolean notIfValue = ifValueCandidate.startsWith(notPrefix);
+        final String ifValue = notIfValue ? Srl.substringFirstRear(ifValueCandidate, notPrefix).trim() : ifValueCandidate;
         final String thenRear = ifClauseScope.substringInterspaceToNext();
-        final String thenClause;
+        String thenClause; // may be filtered later
         final String supplement;
-        final String thenDelimiter = " => "; // e.g. if tableName is suffix:_ID then bad => similar to column name
-        if (thenRear.contains(thenDelimiter)) {
-            thenClause = Srl.substringLastFront(thenRear, thenDelimiter);
-            supplement = Srl.substringLastRear(thenRear, thenDelimiter);
+        final String supplementDelimiter = " => "; // e.g. if tableName is suffix:_ID then bad => similar to column name
+        if (thenRear.contains(supplementDelimiter)) {
+            thenClause = Srl.substringLastFront(thenRear, supplementDelimiter).trim();
+            supplement = Srl.substringLastRear(thenRear, supplementDelimiter).trim();
         } else {
             thenClause = thenRear;
             supplement = null;
         }
-        return new DfSchemaPolicyIfClause(statement, ifItem, ifValue, thenClause, supplement);
-    }
-
-    public static class DfSchemaPolicyIfClause {
-
-        protected final String _statement;
-        protected final String _ifItem;
-        protected final String _ifValue;
-        protected final String _thenClause;
-        protected final String _supplement;
-
-        public DfSchemaPolicyIfClause(String statement, String ifItem, String ifValue, String thenClause, String supplement) {
-            _statement = statement;
-            _ifItem = ifItem;
-            _ifValue = ifValue;
-            _thenClause = thenClause;
-            _supplement = supplement;
+        final boolean notThenClause;
+        final String thenItem;
+        final boolean notThenValue;
+        final String thenValue;
+        if (thenClause.contains(equalsDelimiter)) {
+            notThenClause = false;
+            thenItem = Srl.substringFirstFront(thenClause, equalsDelimiter).trim();
+            final String valueCandidate = Srl.substringFirstRear(thenClause, equalsDelimiter).trim();
+            notThenValue = valueCandidate.startsWith(notPrefix);
+            thenValue = notThenValue ? Srl.substringFirstRear(valueCandidate, notPrefix).trim() : valueCandidate;
+        } else {
+            notThenClause = thenClause.startsWith(notPrefix);
+            if (notThenClause) {
+                thenClause = Srl.substringFirstRear(thenClause, notPrefix);
+            }
+            thenItem = null;
+            notThenValue = false;
+            thenValue = null;
         }
-
-        public String getStatement() {
-            return _statement;
-        }
-
-        public String getIfItem() {
-            return _ifItem;
-        }
-
-        public String getIfValue() {
-            return _ifValue;
-        }
-
-        public String getThenClause() {
-            return _thenClause;
-        }
-
-        public String getSupplement() {
-            return _supplement;
-        }
+        return new DfSchemaPolicyIfClause(statement, ifItem, ifValue, notIfValue, thenClause, notThenClause, thenItem, thenValue,
+                notThenValue, supplement);
     }
 
     // ===================================================================================
