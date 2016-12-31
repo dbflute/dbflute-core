@@ -12,7 +12,8 @@ ant -f build.xml reflect-to-test-dbms-mysql
 ant -f build.xml reflect-to-test-dbms-postgresql
 ant -f build.xml reflect-to-test-dbms-oracle
 ant -f build.xml reflect-to-test-dbms-db2
-ant -f build.xml reflect-to-test-dbms-sqlserver
+# *for now waiting SQLServer on docker
+#ant -f build.xml reflect-to-test-dbms-sqlserver
 ant -f build.xml reflect-to-test-dbms-derby
 ant -f build.xml reflect-to-test-dbms-sqlite
 ant -f build.xml reflect-to-test-option-compatible10x
@@ -63,6 +64,7 @@ mvn -e compile
 
 cd ../dbflute-test-dbms-oracle/dbflute_maihamadb
 rm ./log/*.log
+. nextschema-renewal.sh
 . manage.sh renewal
 . diffworld-test.sh
 cd ../dbflute_resortlinedb
@@ -77,11 +79,12 @@ rm ./log/*.log
 cd ..
 mvn -e compile
 
-cd ../dbflute-test-dbms-sqlserver/dbflute_maihamadb
-rm ./log/*.log
-. manage.sh renewal
-cd ..
-mvn -e compile
+# *for now waiting SQLServer on docker
+#cd ../dbflute-test-dbms-sqlserver/dbflute_maihamadb
+#rm ./log/*.log
+#. manage.sh renewal
+#cd ..
+#mvn -e compile
 
 cd ../dbflute-test-dbms-derby/dbflute_maihamadb
 rm ./log/*.log
