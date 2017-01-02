@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,8 +126,8 @@ public abstract class AbstractSubQuery {
      * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause string of correlation sub-query. (NotNull)
      */
-    protected String buildCorrelationFromWhereClause(String selectClause, String localAliasName,
-            ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames, String correlatedFixedCondition) {
+    protected String buildCorrelationFromWhereClause(String selectClause, String localAliasName, ColumnRealName[] correlatedColumnRealNames,
+            ColumnSqlName[] relatedColumnSqlNames, String correlatedFixedCondition) {
         final SubQueryClause clause = createSubQueryClause(selectClause, localAliasName);
         return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealNames, relatedColumnSqlNames, correlatedFixedCondition);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,8 @@ public final class DfLastaFluteFreeGenReflector {
                 } else if ("template".equals(freeGen)) {
                     setupPmTemplateGen(_uncapServiceName, path, lastafluteMap);
                 } else if ("doc".equals(freeGen)) {
-                    setupDocGen(_uncapServiceName, path, lastaDocOutputDirectory);
+                    final String mailPluginInterface = (String) commonMap.get("mailPluginInterface");
+                    setupDocGen(_uncapServiceName, path, lastafluteMap, lastaDocOutputDirectory, freeGenList, mailPluginInterface);
                 } else {
                     String msg = "Unkonwn type for commonMap's freeGen: " + freeGen;
                     throw new DfIllegalPropertySettingException(msg);
@@ -135,7 +136,12 @@ public final class DfLastaFluteFreeGenReflector {
                     } else if ("html".equals(freeGen)) {
                         setupHtmlPathGen(appName, path, lastafluteMap);
                     } else if ("doc".equals(freeGen)) {
-                        setupDocGen(appName, path, lastaDocOutputDirectory);
+                        final String mailPluginInterface = (String) defMap.get("mailPluginInterface");
+                        setupDocGen(appName, path, lastafluteMap, lastaDocOutputDirectory, freeGenList, mailPluginInterface);
+                    } else if ("appcls".equals(freeGen)) {
+                        setupAppClsGen(appName, path, lastafluteMap);
+                    } else if ("webcls".equals(freeGen)) {
+                        setupWebClsGen(appName, path, lastafluteMap);
                     } else {
                         String msg = "Unkonwn type for appMap's freeGen: " + freeGen;
                         throw new DfIllegalPropertySettingException(msg);
@@ -200,9 +206,9 @@ public final class DfLastaFluteFreeGenReflector {
     protected void doSetupOutputConfigMap(String appName, Map<String, Map<String, Object>> elementMap, String theme) {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         elementMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaSystemConfig.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", _mylastaPackage + ".direction");
+        outputMap.put("templateFile", "LaSystemConfig.vm");
         outputMap.put("className", initCap(appName) + initCap(theme));
     }
 
@@ -261,9 +267,9 @@ public final class DfLastaFluteFreeGenReflector {
             Map<String, Object> lastafluteMap) {
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         elementMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaUserMessages.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", buildMessagesPackage(appName, lastafluteMap));
+        outputMap.put("templateFile", "LaUserMessages.vm");
         outputMap.put("className", initCap(appName) + initCap(theme) + "s");
     }
 
@@ -299,9 +305,9 @@ public final class DfLastaFluteFreeGenReflector {
         resourceMap.put("resourceType", DfFreeGenResourceType.MAIL_FLUTE.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaMailFlute.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", buildMailPostcardPackage(capAppName, lastafluteMap));
+        outputMap.put("templateFile", "LaMailFlute.vm");
         outputMap.put("className", initCap(appName) + "Postcard");
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
@@ -336,16 +342,16 @@ public final class DfLastaFluteFreeGenReflector {
         resourceMap.put("resourceType", DfFreeGenResourceType.PM_FILE.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaPmTemplate.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", buildPmTemplateBeanPackage(capAppName, lastafluteMap));
+        outputMap.put("templateFile", "LaPmTemplate.vm");
         outputMap.put("className", "unused");
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
         tableMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, "template", "targetDir"));
         tableMap.put("targetExt", filterOverridden("." + ext, lastafluteMap, appName, "template", "targetExt"));
-        tableMap.put("isConventionSuffix", "true");
-        tableMap.put("isLastaTemplate", "true");
+        tableMap.put("isConventionSuffix", getTrueLiteral());
+        tableMap.put("isLastaTemplate", getTrueLiteral());
     }
 
     protected String buildPmTemplateBeanPackage(String appName, Map<String, Object> lastafluteMap) {
@@ -368,7 +374,8 @@ public final class DfLastaFluteFreeGenReflector {
         doSetupHtmlTemplatePathGen(appName, path, targetDir, "html", lastafluteMap);
     }
 
-    protected void doSetupHtmlTemplatePathGen(String appName, String path, String targetDir, String ext, Map<String, Object> lastafluteMap) {
+    protected void doSetupHtmlTemplatePathGen(String appName, String path, String targetDir, String ext,
+            Map<String, Object> lastafluteMap) {
         final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
         final String capAppName = initCap(appName);
         registerFreeGen(capAppName + initCap(ext) + "Path", pathMap);
@@ -378,15 +385,17 @@ public final class DfLastaFluteFreeGenReflector {
         resourceMap.put("resourceType", DfFreeGenResourceType.FILE_PATH.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaHtmlPath.vm");
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", buildHtmlTemplatePackage(capAppName, lastafluteMap, ext));
+        outputMap.put("templateFile", "LaHtmlPath.vm");
         outputMap.put("className", initCap(appName) + "HtmlPath");
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
-        tableMap.put("targetDir", targetDir);
-        tableMap.put("targetExt", ext.equals("html") ? ".html" : ("." + ext + "|.html"));
-        tableMap.put("exceptPathList", DfCollectionUtil.newArrayList("contain:/view/common/"));
+        tableMap.put("targetDir", filterOverridden(targetDir, lastafluteMap, appName, ext, "targetDir"));
+        final String targetExt = ext.equals("html") ? ".html" : ("." + ext + "|.html");
+        tableMap.put("targetExt", filterOverridden(targetExt, lastafluteMap, appName, ext, "targetExt"));
+        final List<String> exceptPathList = DfCollectionUtil.newArrayList("contain:/view/common/");
+        tableMap.put("exceptPathList", filterOverridden(exceptPathList, lastafluteMap, appName, ext, "exceptPathList"));
     }
 
     protected String buildHtmlTemplatePackage(String appName, Map<String, Object> lastafluteMap, String ext) {
@@ -400,19 +409,21 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                            Document
     //                                                                            ========
     // last process recommended for generated classes by others
-    protected void setupDocGen(String appName, String path, String lastaDocOutputDirectory) {
+    protected void setupDocGen(String appName, String path, Map<String, Object> lastafluteMap, String lastaDocOutputDirectory,
+            List<String> freeGenList, String mailPluginInterface) {
         final Map<String, Map<String, Object>> docMap = new LinkedHashMap<String, Map<String, Object>>();
         final String theme = "lastaDoc";
-        registerFreeGen(initCap(appName) + buildTitleSuffix(theme), docMap);
+        final String capAppName = initCap(appName);
+        registerFreeGen(capAppName + buildTitleSuffix(theme), docMap);
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         docMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
         resourceMap.put("resourceType", DfFreeGenResourceType.LASTA_DOC.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         docMap.put("outputMap", outputMap);
-        outputMap.put("templateFile", "LaDocHtml.vm");
         outputMap.put("outputDirectory", lastaDocOutputDirectory);
         outputMap.put("package", ""); // flat documents e.g. ./output/doc/lastadoc-harbor.html
+        outputMap.put("templateFile", "LaDocHtml.vm");
         outputMap.put("className", "lastadoc-" + appName);
         outputMap.put("fileExt", "html");
         final Map<String, Object> tableMap = createTableMap();
@@ -420,6 +431,83 @@ public final class DfLastaFluteFreeGenReflector {
         tableMap.put("path", path);
         tableMap.put("targetDir", "$$baseDir$$/java");
         tableMap.put("appName", appName);
+
+        if (freeGenList.contains("mail")) {
+            tableMap.put("mailPackage", buildMailPostcardPackage(capAppName, lastafluteMap));
+            tableMap.put("mailTargetDir", filterOverridden("$$baseDir$$/resources/mail", lastafluteMap, appName, "mail", "targetDir"));
+            tableMap.put("mailTargetExt", filterOverridden(".dfmail", lastafluteMap, appName, "mail", "targetExt"));
+            final List<String> mailExceptPathList = DfCollectionUtil.newArrayList("contain:/mail/common/");
+            tableMap.put("mailExceptPathList", filterOverridden(mailExceptPathList, lastafluteMap, appName, "mail", "exceptPathList"));
+            if (mailPluginInterface != null) {
+                tableMap.put("mailPluginInterface", mailPluginInterface);
+            }
+        }
+
+        if (freeGenList.contains("template")) {
+            tableMap.put("templatePackage", buildPmTemplateBeanPackage(capAppName, lastafluteMap));
+            tableMap.put("templateTargetDir", filterOverridden("$$baseDir$$/resources", lastafluteMap, appName, "template", "targetDir"));
+            tableMap.put("templateTargetExt", filterOverridden("." + "dfpm", lastafluteMap, appName, "template", "targetExt"));
+            tableMap.put("templateIsConventionSuffix", getTrueLiteral());
+            tableMap.put("templateIsLastaTemplate", getTrueLiteral());
+        }
+
+        if (freeGenList.contains("appcls")) {
+            final String appClsResourceFile = path + "/src/main/resources/" + appName + "_appcls.dfprop";
+            tableMap.put("appclsResourceFile", filterOverridden(appClsResourceFile, lastafluteMap, appName, "appcls", "resourceFile"));
+            tableMap.put("appclsPackage", filterOverridden(_mylastaPackage + ".appcls", lastafluteMap, appName, "appcls", "package"));
+        }
+
+        if (freeGenList.contains("webcls")) {
+            final String webclsResourceFile = path + "/src/main/resources/" + appName + "_webcls.dfprop";
+            tableMap.put("webclsResourceFile", filterOverridden(webclsResourceFile, lastafluteMap, appName, "webcls", "resourceFile"));
+            tableMap.put("webclsPackage", filterOverridden(_mylastaPackage + ".webcls", lastafluteMap, appName, "webcls", "package"));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                              AppCls
+    //                                                                              ======
+    protected void setupAppClsGen(String appName, String path, Map<String, Object> lastafluteMap) {
+        final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
+        final String capAppName = initCap(appName);
+        registerFreeGen(capAppName + "AppCls", pathMap);
+        final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
+        pathMap.put("resourceMap", resourceMap);
+        resourceMap.put("baseDir", path + "/src/main");
+        final String resourceFile = "$$baseDir$$/resources/" + appName + "_appcls.dfprop";
+        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, "appcls", "resourceFile"));
+        resourceMap.put("resourceType", DfFreeGenResourceType.APP_CLS.name());
+        final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
+        pathMap.put("outputMap", outputMap);
+        outputMap.put("outputDirectory", "$$baseDir$$/java");
+        outputMap.put("package", filterOverridden(_mylastaPackage + ".appcls", lastafluteMap, appName, "appcls", "package"));
+        outputMap.put("templateFile", "LaAppCDef.vm");
+        outputMap.put("className", filterOverridden("AppCDef", lastafluteMap, appName, "appcls", "className"));
+        final Map<String, Object> tableMap = createTableMap();
+        pathMap.put("tableMap", tableMap);
+    }
+
+    // ===================================================================================
+    //                                                                              WebCls
+    //                                                                              ======
+    protected void setupWebClsGen(String appName, String path, Map<String, Object> lastafluteMap) {
+        final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
+        final String capAppName = initCap(appName);
+        registerFreeGen(capAppName + "WebCls", pathMap);
+        final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
+        pathMap.put("resourceMap", resourceMap);
+        resourceMap.put("baseDir", path + "/src/main");
+        final String resourceFile = "$$baseDir$$/resources/" + appName + "_webcls.dfprop";
+        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, "webcls", "resourceFile"));
+        resourceMap.put("resourceType", DfFreeGenResourceType.WEB_CLS.name());
+        final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
+        pathMap.put("outputMap", outputMap);
+        outputMap.put("outputDirectory", "$$baseDir$$/java");
+        outputMap.put("package", filterOverridden(_mylastaPackage + ".webcls", lastafluteMap, appName, "webcls", "package"));
+        outputMap.put("templateFile", "LaWebCDef.vm");
+        outputMap.put("className", filterOverridden("WebCDef", lastafluteMap, appName, "webcls", "className"));
+        final Map<String, Object> tableMap = createTableMap();
+        pathMap.put("tableMap", tableMap);
     }
 
     // ===================================================================================

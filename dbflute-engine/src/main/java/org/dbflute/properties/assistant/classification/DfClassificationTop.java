@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,7 @@ public class DfClassificationTop {
     protected boolean _deprecated;
     protected final Map<String, Map<String, Object>> _groupingMap = new LinkedHashMap<String, Map<String, Object>>();
     protected final Map<String, String> _deprecatedMap = new LinkedHashMap<String, String>();
+    protected final List<DfRefClsElement> _refClsElementList = new ArrayList<DfRefClsElement>(); // for webCls
 
     // ===================================================================================
     //                                                                              Accept
@@ -286,6 +287,10 @@ public class DfClassificationTop {
     //                                                                        Grouping Map
     //                                                                        ============
     protected List<DfClassificationGroup> _cachedGroupList;
+
+    public void acceptGroupList(List<DfClassificationGroup> _cachedGroupList) { // for e.g. appcls
+        this._cachedGroupList = _cachedGroupList;
+    }
 
     public List<DfClassificationGroup> getGroupList() {
         if (_cachedGroupList != null) {
@@ -674,5 +679,16 @@ public class DfClassificationTop {
 
     public void putDeprecatedAll(Map<String, String> deprecatedMap) {
         _deprecatedMap.putAll(deprecatedMap);
+    }
+
+    // -----------------------------------------------------
+    //                                     RefClsElementList
+    //                                     -----------------
+    public List<DfRefClsElement> getRefClsElementList() { // for webCls
+        return _refClsElementList;
+    }
+
+    public void addRefClsElement(DfRefClsElement classificationElement) {
+        _refClsElementList.add(classificationElement);
     }
 }

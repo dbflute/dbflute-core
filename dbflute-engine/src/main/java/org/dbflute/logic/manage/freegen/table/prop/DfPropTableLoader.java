@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,9 @@ import org.dbflute.helper.jprop.JavaPropertiesResult;
 import org.dbflute.helper.jprop.JavaPropertiesStreamProvider;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.DfCollectionUtil;
@@ -67,8 +67,8 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
     //     ; extendsPropFileList = list:{ ../../../bar.properties }
     //     ; isCheckImplicitOverride = false
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
+    public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getOptionMap();
         final Map<String, DfFreeGenRequest> requestMap = mapProp.getRequestMap();
         final JavaPropertiesReader reader = createReader(requestName, resource, tableMap, requestMap);
         final JavaPropertiesResult result;
@@ -82,7 +82,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         final String resourceFile = resource.getResourceFile();
         final String tableName = buildTableName(resourceFile);
         final List<Map<String, Object>> columnList = toMapList(result, tableMap);
-        return new DfFreeGenTable(tableMap, tableName, columnList);
+        return new DfFreeGenMetaData(tableMap, tableName, columnList);
     }
 
     protected void throwFreeGenPropReadFailureException(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
@@ -128,7 +128,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
             public InputStream provideStream() throws IOException {
                 return new FileInputStream(new File(resourceFile));
             }
-        });
+        }).encodeAsUTF8(); // as default
         final String extendsPropRequestKey = "extendsPropRequest";
         String extendsPropRequest = (String) tableMap.get(extendsPropRequestKey);
         final List<String> extendsPropFileList;
@@ -142,9 +142,9 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
                 if (!extendsRequest.isResourceTypeProp()) {
                     throwFreeGenPropExtendsRequestNotPropException(requestName, extendsPropRequest, extendsRequest);
                 }
-                final String extendsFile = extendsRequest.getResourceFile();
+                final String extendsFile = extendsRequest.getResource().getResourceFile();
                 extendsPropFileList.add(extendsFile);
-                final Map<String, Object> extendsTableMap = extendsRequest.getTableMap();
+                final Map<String, Object> extendsTableMap = extendsRequest.getOptionMap();
                 extendsPropRequest = (String) extendsTableMap.get(extendsPropRequestKey);
                 if (extendsPropRequest == null) {
                     break;
@@ -204,7 +204,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         br.addElement(requestName);
         br.addItem("Not PROP Extended Request");
         br.addElement(extendsPropRequest);
-        br.addElement(extendsRequest.getResourceType());
+        br.addElement(extendsRequest.getResource().getResourceType());
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }

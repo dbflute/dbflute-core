@@ -5,9 +5,9 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="1.1.1" />
+	<property name="version" value="1.1.2" />
 	<property name="build.version" value="${version}" />
-	<property name="runtime.version" value="1.1.1" />
+	<property name="runtime.version" value="1.1.2" />
 	<property name="runtime.build.version" value="${runtime.version}" />
 	<property name="example.latest.version" value="1.x" />
 
@@ -57,8 +57,10 @@
 	<property name="test.option.compatible10x.dir" value="${test.option.stage.base}/dbflute-test-option-compatible10x" />
 
 	<!-- SubProject Examples -->
+	<property name="example.on.parade.dir" value="${example.on.stage.base}/dbflute-example-on-parade" />
 	<property name="example.on.springboot.dir" value="${example.on.stage.base}/dbflute-example-on-springboot" />
 	<property name="example.on.play2java.dir" value="${example.on.stage.base}/dbflute-example-on-play2java" />
+	<property name="example.with.non.rdb" value="${example.on.stage.base}/dbflute-example-with-non-rdb" />
 	<property name="example.with.doma.dir" value="${example.on.stage.base}/dbflute-example-with-doma" />
 
 	<!-- ============================================================================= -->
@@ -325,6 +327,15 @@
 		<delete dir="${extraction.dir}" />
 	</target>
 
+	<target name="reflect-to-example-on-parade" depends="prepare-reflection"
+			description="==> reflect to example on parade">
+		<delete dir="${example.on.parade.dir}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${example.on.parade.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
 	<target name="reflect-to-example-on-springboot" depends="prepare-reflection"
 			description="==> reflect to example on SpringBoot">
 		<delete dir="${example.on.springboot.dir}/mydbflute/dbflute-${example.latest.version}" />
@@ -338,6 +349,15 @@
 			description="==> reflect to example on Play2 Java">
 		<delete dir="${example.on.play2java.dir}/mydbflute/dbflute-${example.latest.version}" />
 		<copy todir="${example.on.play2java.dir}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-example-with-non-rdb" depends="prepare-reflection"
+			description="==> reflect to example with non-RDB">
+		<delete dir="${example.with.non.rdb}/mydbflute/dbflute-${example.latest.version}" />
+		<copy todir="${example.with.non.rdb}/mydbflute/dbflute-${example.latest.version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
 		<delete dir="${extraction.dir}" />

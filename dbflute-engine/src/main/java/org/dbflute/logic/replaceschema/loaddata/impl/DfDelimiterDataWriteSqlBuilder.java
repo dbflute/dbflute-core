@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  */
 package org.dbflute.logic.replaceschema.loaddata.impl;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.dbflute.DfBuildProperties;
@@ -86,9 +88,23 @@ public class DfDelimiterDataWriteSqlBuilder {
         //        && (_defaultValueMap == null || _defaultValueMap.isEmpty())) { // and no default
         //    return;
         //}
+        adjustColumnValueBeforeConvert(columnValueMap);
         final DfColumnValueConverter converter = createColumnValueConverter();
-        converter.emptyToNullIfNoConvert(); // e.g. TSV might have empty string (treated as null as default)
+        converter.treatEmptyBeforeAsNull(); // for compatible with e.g. $$empty$$ = $$empty$$
         converter.convert(_tableDbName, columnValueMap, _columnMetaMap);
+    }
+
+    protected void adjustColumnValueBeforeConvert(Map<String, Object> columnValueMap) {
+        final Map<String, Object> overridingMap = new HashMap<String, Object>();
+        for (Entry<String, Object> entry : columnValueMap.entrySet()) {
+            Object value = entry.getValue();
+            if ("".equals(value)) {
+                // e.g. TSV might have empty string (treated as null as default)
+                // you can change null to empty by convertValueMap.dataprop
+                overridingMap.put(entry.getKey(), null);
+            }
+        }
+        columnValueMap.putAll(overridingMap);
     }
 
     protected DfColumnValueConverter createColumnValueConverter() {

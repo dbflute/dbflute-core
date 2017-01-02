@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2014 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -78,31 +78,31 @@ import ${table.relationalNullObjectProviderPackage}.*;
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
- * 
+ *
  * [column]
  *     ${table.columnNameCommaString}
- * 
+ *
  * [sequence]
  *     ${table.definedSequenceName}
- * 
+ *
  * [identity]
  *     ${table.identityColumnName}
- * 
+ *
  * [version-no]
  *     ${table.versionNoColumnName}
- * 
+ *
  * [foreign table]
  *     ${table.foreignTableNameCommaString}
- * 
+ *
  * [referrer table]
  *     ${table.referrerTableNameCommaString}
- * 
+ *
  * [foreign property]
  *     ${table.foreignPropertyNameCommaString}
- * 
+ *
  * [referrer property]
  *     ${table.referrerPropertyNameCommaString}
- * 
+ *
  * [get/set template]
  * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 #foreach ($col in $table.columns)
@@ -299,6 +299,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 #if ($col.hasClassification())
 #if (!$col.isTableClassification())
 #if ($col.hasClassificationName())
+#if ($col.isMakeClassificationGetterOfNameEnabled())
     /**
      * Get the value of the column '${col.uncapitalisedJavaName}' as classification name.
      * @return The string of classification name. (NullAllowed: when the column value is null)
@@ -309,7 +310,9 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
     }
 
 #end
+#end
 #if (${col.hasClassificationAlias()})
+#if ($col.isMakeClassificationGetterOfAliasEnabled())
     /**
      * Get the value of the column '${col.uncapitalisedJavaName}' as classification alias.
      * @return The string of classification alias. (NullAllowed: when the column value is null)
@@ -319,6 +322,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
         return cdef != null ? cdef.alias() : null;
     }
 
+#end
 #end
 #end
 #end
@@ -480,7 +484,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 ##
 ## it uses List and ArrayList to be able to specify detail import clause
 ##
-    protected <ELEMENT> List<ELEMENT> newReferrerList() {
+    protected <ELEMENT> List<ELEMENT> newReferrerList() { // overriding to import
         return new ArrayList<ELEMENT>();
     }
 #if (${table.canBeColumnNullObject()})
@@ -495,7 +499,7 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
 
     /** {@inheritDoc} */
     public void disableColumnNullObject() {
-        _columnNullObjectEnabled = true;
+        _columnNullObjectEnabled = false;
     }
 #end
 
@@ -662,7 +666,8 @@ public abstract class $myClassName extends AbstractEntity implements ${myEntityI
         if (_columnNullObjectEnabled && convertEmptyToNull(_${col.uncapitalisedJavaName}) == null)
         { _${col.uncapitalisedJavaName} = ${col.columnNullObjectProviderExp}; }
 #else
-        if (_${col.uncapitalisedJavaName} == null) { _${col.uncapitalisedJavaName} = ${col.columnNullObjectProviderExp}; }
+        if (_columnNullObjectEnabled && _${col.uncapitalisedJavaName} == null)
+        { _${col.uncapitalisedJavaName} = ${col.columnNullObjectProviderExp}; }
 #end
 #end
 #if ($col.isEntityConvertEmptyStringToNull())

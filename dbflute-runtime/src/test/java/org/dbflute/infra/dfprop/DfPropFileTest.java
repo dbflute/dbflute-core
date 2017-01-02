@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,14 @@
  */
 package org.dbflute.infra.dfprop;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import org.dbflute.exception.DfPropFileReadFailureException;
 import org.dbflute.unit.RuntimeTestCase;
 
 /**
@@ -567,8 +570,8 @@ public class DfPropFileTest extends RuntimeTestCase {
     }
 
     // ===================================================================================
-    //                                                                           Read List
-    //                                                                           =========
+    //                                                                         Read String
+    //                                                                         ===========
     public void test_readString_default() throws Exception {
         // ## Arrange ##
         DfPropFile propFile = new DfPropFile() {
@@ -606,8 +609,8 @@ public class DfPropFileTest extends RuntimeTestCase {
     }
 
     // ===================================================================================
-    //                                                                              Option
-    //                                                                              ======
+    //                                                                       File NotFound
+    //                                                                       =============
     public void test_actuallyReadMap_FileNotFound() throws Exception {
         // ## Arrange ##
         DfPropFile propFile = new DfPropFile();
@@ -688,6 +691,28 @@ public class DfPropFileTest extends RuntimeTestCase {
             // ## Assert ##
             fail();
         } catch (FileNotFoundException e) {
+            log(e.getMessage());
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Parse Failure
+    //                                                                       =============
+    public void test_readMap_FileNotFound() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile() {
+            @Override
+            protected InputStream createInputStream(String path) throws FileNotFoundException {
+                return new ByteArrayInputStream("sea".getBytes());
+            }
+        };
+
+        // ## Act ##
+        try {
+            propFile.readMap("/dummy/dummy.dfprop", null);
+            // ## Assert ##
+            fail();
+        } catch (DfPropFileReadFailureException e) {
             log(e.getMessage());
         }
     }

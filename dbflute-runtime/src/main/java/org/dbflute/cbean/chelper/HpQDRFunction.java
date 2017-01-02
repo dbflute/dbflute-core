@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,8 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * @param opLambda The callback for option of DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
      */
-    public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> derivedCBLambda, FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
+    public HpQDRParameter<CB, Integer> countDistinct(SubQuery<CB> derivedCBLambda,
+            FunctionFilterOptionCall<DerivedReferrerOption> opLambda) {
         assertDerivedReferrerOption(opLambda);
         final DerivedReferrerOption option = createDerivedReferrerOption();
         opLambda.callback(option);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import org.dbflute.helper.jdbc.DfRunnerInformation;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.logic.generate.gapile.DfGapileProcess;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
@@ -153,6 +154,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         fireVelocityProcess();
         setupBehaviorQueryPath();
         setupExtendedClassDescription();
+        reflectGapileClassIfNeeds();
 
         showTargetSqlFileInformation(outsideSqlPack);
         showSkippedFileInformation();
@@ -257,16 +259,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected void throwProcedureSetupFailureException(SQLException e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to set up procedures.");
-        br.addItem("SQL Exception");
-        br.addElement(DfJDBCException.extractMessage(e));
-        SQLException nextEx = e.getNextException();
-        if (nextEx != null) {
-            br.addElement(DfJDBCException.extractMessage(nextEx));
-        }
-        String msg = br.buildExceptionMessage();
-        throw new DfProcedureSetupFailureException(msg, e);
+        String msg = "Failed to set up procedures.";
+        throw new DfProcedureSetupFailureException(msg, DfJDBCException.voice(e));
     }
 
     // ===================================================================================
@@ -278,9 +272,20 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         setupper.setupBehaviorQueryPath(sqlFileList);
     }
 
+    // ===================================================================================
+    //                                                          Extended Class Description
+    //                                                          ==========================
     protected void setupExtendedClassDescription() {
         final DfPmbCommentSetupper reflector = new DfPmbCommentSetupper(_database.getPmbMetaDataList());
         reflector.setupExtendedClassDescription();
+    }
+
+    // ===================================================================================
+    //                                                                        Gapile Class
+    //                                                                        ============
+    protected void reflectGapileClassIfNeeds() {
+        final DfGapileProcess process = new DfGapileProcess();
+        process.reflectIfNeeds();
     }
 
     // ===================================================================================

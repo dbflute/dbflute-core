@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1006,6 +1006,41 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         final String property = getProperty("craftMetaDirPath", defaultDir, getSchemaSyncCheckMap());
         return Srl.replace(property, "$$DEFAULT$$", defaultDir);
     }
+
+    // #making multipleSchemaSyncCheckMap
+    //    // ===================================================================================
+    //    //                                                            Multiple SchemaSyncCheck
+    //    //                                                            ========================
+    //    // ; multipleSchemaSyncCheckMap = map:{
+    //    //     ; preview.EXAMPLEDB = map:{
+    //    //         ; url = jdbc:...
+    //    //         ; schema = EXAMPLEDB
+    //    //         ; user = exampuser
+    //    //         ; password = exampword
+    //    //     }
+    //    //     ; staging.EXAMPLEDB = map:{
+    //    //         ; url = jdbc:...
+    //    //         ; schema = EXAMPLEDB
+    //    //         ; user = exampuser
+    //    //         ; password = exampword
+    //    //     }
+    //    // }
+    //    protected Map<String, Map<String, String>> _multipleSchemaSyncCheckMap;
+    //
+    //    protected Map<String, Map<String, String>> getMultipleSchemaSyncCheckMap() {
+    //        if (_multipleSchemaSyncCheckMap != null) {
+    //            return _multipleSchemaSyncCheckMap;
+    //        }
+    //        final String key = "schemaSyncCheckMap";
+    //        @SuppressWarnings("unchecked")
+    //        final Map<String, Map<String, String>> map = (Map<String, Map<String, String>>) getDocumentMap().get(key);
+    //        if (map != null) {
+    //            _multipleSchemaSyncCheckMap = map;
+    //        } else {
+    //            _multipleSchemaSyncCheckMap = DfCollectionUtil.emptyMap();
+    //        }
+    //        return _multipleSchemaSyncCheckMap;
+    //    }
 
     // ===================================================================================
     //                                                              Table Display Order By

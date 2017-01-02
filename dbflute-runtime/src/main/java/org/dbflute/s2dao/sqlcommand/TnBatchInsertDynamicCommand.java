@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,8 @@ public class TnBatchInsertDynamicCommand extends TnInsertEntityDynamicCommand {
     // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
-    protected TnBatchInsertHandler createBatchInsertHandler(TnPropertyType[] boundPropTypes, String sql, InsertOption<ConditionBean> option) {
+    protected TnBatchInsertHandler createBatchInsertHandler(TnPropertyType[] boundPropTypes, String sql,
+            InsertOption<ConditionBean> option) {
         final TnBatchInsertHandler handler = newBatchInsertHandler(boundPropTypes, sql);
         handler.setInsertOption(option);
         return handler;

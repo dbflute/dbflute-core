@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -206,8 +206,8 @@ public abstract class ConditionKey implements Serializable {
      * @param cipher The cipher of column by function. (NullAllowed)
      * @param option The option of condition. (NullAllowed)
      */
-    public void addWhereClause(final QueryModeProvider provider, final List<QueryClause> conditionList,
-            final ColumnRealName columnRealName, final ConditionValue cvalue, // basic resources
+    public void addWhereClause(final QueryModeProvider provider, final List<QueryClause> conditionList, final ColumnRealName columnRealName,
+            final ConditionValue cvalue, // basic resources
             final ColumnFunctionCipher cipher, final ConditionOption option) { // optional resources
         cvalue.process(new CallbackProcessor<Void>() {
             public Void process() {
@@ -300,7 +300,8 @@ public abstract class ConditionKey implements Serializable {
         return new StringQueryClause(clause);
     }
 
-    protected String doBuildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher, ConditionOption option) {
+    protected String doBuildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
+            ConditionOption option) {
         final BindClauseResult result = resolveBindClause(columnRealName, location, cipher, option);
         return result.toBindClause();
     }

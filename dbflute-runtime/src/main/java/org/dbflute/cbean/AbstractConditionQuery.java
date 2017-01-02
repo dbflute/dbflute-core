@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1247,9 +1247,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final ColumnSqlNameProvider subQuerySqlNameProvider = dbName -> subQuery.toColumnSqlName(dbName);
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
-        final ExistsReferrer existsReferrer =
-                new ExistsReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
-                        subQueryIdentity, subQueryDBMeta, cipherManager);
+        final ExistsReferrer existsReferrer = new ExistsReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider,
+                subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager);
         final String correlatedFixedCondition = xbuildReferrerCorrelatedFixedCondition(subQuery, referrerPropertyName);
         final String existsOption = notExists ? "not" : null;
         final String clause = existsReferrer.buildExistsReferrer(columnDbName, relatedColumnDbName, correlatedFixedCondition, existsOption);
@@ -1327,9 +1326,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.asTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final boolean suppressLocalAliasName = isInScopeRelationSuppressLocalAliasName();
-        final InScopeRelation inScopeRelation =
-                new InScopeRelation(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause,
-                        subQueryIdentity, subQueryDBMeta, cipherManager, suppressLocalAliasName);
+        final InScopeRelation inScopeRelation = new InScopeRelation(subQueryPath, localRealNameProvider, subQuerySqlNameProvider,
+                subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, suppressLocalAliasName);
         final String correlatedFixedCondition = xbuildForeignCorrelatedFixedCondition(subQuery, relationPropertyName);
         final String inScopeOption = notInScope ? "not" : null;
         final String clause =
@@ -1362,8 +1360,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                            (Specify)DerivedReferrer
     //                                                            ========================
-    protected void registerSpecifyDerivedReferrer(String function, ConditionQuery subQuery, String columnDbName,
-            String relatedColumnDbName, String propertyName, String referrerPropertyName, String aliasName, DerivedReferrerOption option) {
+    protected void registerSpecifyDerivedReferrer(String function, ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
+            String propertyName, String referrerPropertyName, String aliasName, DerivedReferrerOption option) {
         final DerivedReferrerOption realOp = option != null ? option : newDefaultDerivedReferrerOption();
         doRegisterSpecifyDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName,
                 aliasName, realOp);
@@ -1456,10 +1454,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
         final String parameterPath = xgetLocation(parameterPropertyName);
-        final QueryDerivedReferrer derivedReferrer =
-                option.createQueryDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
-                        subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value,
-                        parameterPath);
+        final QueryDerivedReferrer derivedReferrer = option.createQueryDerivedReferrer(subQueryPath, localRealNameProvider,
+                subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager,
+                mainSubQueryIdentity, operand, value, parameterPath);
         xregisterParameterOption(option);
         final String correlatedFixedCondition = xbuildReferrerCorrelatedFixedCondition(subQuery, referrerPropertyName);
         final String clause =
@@ -2030,6 +2027,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String columnCapPropName = initCap(columnInfo.getPropertyName());
         final boolean rangeOf = Srl.equalsIgnoreCase(ckey, "RangeOf");
         final boolean fromTo = Srl.equalsIgnoreCase(ckey, "FromTo", "DateFromTo");
+        final boolean inScope = Srl.equalsIgnoreCase(ckey, "InScope");
         if (!noArg) {
             try {
                 value = columnInfo.convertToObjectNativeType(value); // convert type
@@ -2056,7 +2054,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             typeList.add(propertyType);
         } else {
             if (!noArg) {
-                typeList.add(value.getClass());
+                final Class<?> instanceType = value.getClass();
+                if (inScope && Collection.class.isAssignableFrom(instanceType)) { // double check just in case
+                    typeList.add(Collection.class); // inScope's argument is fixed type
+                } else {
+                    typeList.add(instanceType);
+                }
             }
         }
         if (option != null) {
@@ -2388,7 +2391,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (found != null) {
             return found;
         }
-        // non-cache here e.g. native method of classification or protected option method
+        // non-cache #for_now e.g. native method of classification or protected option method
+        // (but cache of Class.class can be available)
         return DfReflectionUtil.getWholeMethod(cqType, methodName, argTypes);
     }
 
@@ -2632,9 +2636,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (conditionValue == null || conditionValue.length() == 0) {
             return; // ignored according to condition-bean rule
         }
-        final String clause =
-                ((SqlClauseMySql) xgetSqlClause()).buildMatchCondition(textColumnList, conditionValue, modifier, asTableDbName(),
-                        xgetAliasName());
+        final String clause = ((SqlClauseMySql) xgetSqlClause()).buildMatchCondition(textColumnList, conditionValue, modifier,
+                asTableDbName(), xgetAliasName());
         registerWhereClause(clause);
     }
 

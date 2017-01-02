@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,15 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         return process.suppressSequenceIncrement().skipIfNonAssetionSql().rollbackTransaction().continueIfAssetionFailure();
     }
 
-    public static DfTakeFinallyProcess createAsAlterCheck(final String sqlRootDir, DataSource dataSource) {
+    public static DfTakeFinallyProcess createAsPrevious(final String sqlRootDir, DataSource dataSource) {
+        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
+        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null);
+        // previous may not match with current sequence definition
+        // and other settings are same as core
+        return process.suppressSequenceIncrement();
+    }
+
+    public static DfTakeFinallyProcess createAsAlterSchema(final String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
         final DfTakeFinallySqlFileProvider provider = new DfTakeFinallySqlFileProvider() {
             public List<File> provide() {
@@ -122,7 +130,9 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
             }
         };
         final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, provider);
-        return process.suppressSequenceIncrement().restrictIfNonAssetionSql().rollbackTransaction();
+        // this take-finally is only for assertion (so roll-back transaction)
+        // but increment sequences for development after AlterCheck
+        return process.restrictIfNonAssetionSql().rollbackTransaction();
     }
 
     protected DfTakeFinallyProcess suppressSequenceIncrement() {

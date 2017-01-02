@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -345,7 +345,8 @@ public class ManualOrderOption implements ColumnCalculator {
         return new HpMobConnectedBean(this);
     }
 
-    protected void throwManualOrderPreviousConditionNotFoundException(HpMobConnectionMode mode, ConditionKey conditionKey, Object orderValue) {
+    protected void throwManualOrderPreviousConditionNotFoundException(HpMobConnectionMode mode, ConditionKey conditionKey,
+            Object orderValue) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found previous condition of 'case when' for connecting next condition.");
         br.addItem("Advice");

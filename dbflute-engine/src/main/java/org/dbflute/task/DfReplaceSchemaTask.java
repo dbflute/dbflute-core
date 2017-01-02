@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -296,7 +296,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected void takeFinally(String sqlRootDir, boolean previous) {
-        final DfTakeFinallyProcess process = createTakeFinallyProcess(sqlRootDir);
+        final DfTakeFinallyProcess process = createTakeFinallyProcess(sqlRootDir, previous);
         _takeFinallyFinalInfo = process.execute();
         final SQLFailureException breakCause = _takeFinallyFinalInfo.getBreakCause();
         if (breakCause != null) { // high priority exception
@@ -308,8 +308,12 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         }
     }
 
-    protected DfTakeFinallyProcess createTakeFinallyProcess(String sqlRootDir) {
-        return DfTakeFinallyProcess.createAsCore(sqlRootDir, getDataSource());
+    protected DfTakeFinallyProcess createTakeFinallyProcess(String sqlRootDir, boolean previous) {
+        if (previous) {
+            return DfTakeFinallyProcess.createAsPrevious(sqlRootDir, getDataSource());
+        } else {
+            return DfTakeFinallyProcess.createAsCore(sqlRootDir, getDataSource());
+        }
     }
 
     protected void setupReplaceSchemaFinalInfo() {
@@ -333,7 +337,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     // ===================================================================================
-    //                                                           Wait before ReplaceSchema 
+    //                                                           Wait before ReplaceSchema
     //                                                           =========================
     protected boolean waitBeforeReps() {
         if (_areYouReadyAnswer != null && "y".equals(_areYouReadyAnswer)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -408,7 +408,7 @@ public class Table {
         return filterSchemaSqlPrefix(tableName);
     }
 
-    protected String getResourceNameForSqlName() {
+    public String getResourceNameForSqlName() { // public for e.g. SchemaPolicyCheck
         final String pureName = getName();
         return isSqlNameUpperCase() ? pureName.toUpperCase() : pureName;
     }
@@ -1322,13 +1322,13 @@ public class Table {
     protected boolean doExistsForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList,
             String fixedSuffix, boolean compareSuffix) {
         final boolean compareLocalColumn = true;
-        final ForeignKey fk =
-                doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, compareSuffix,
-                        compareLocalColumn);
+        final ForeignKey fk = doFindExistingForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix,
+                compareSuffix, compareLocalColumn);
         return fk != null;
     }
 
-    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList) { // no suffix
+    public ForeignKey findExistingForeignKey(String foreignTableName, List<String> localColumnNameList,
+            List<String> foreignColumnNameList) { // no suffix
         final String fixedSuffix = null;
         final boolean compareSuffix = false;
         final boolean compareLocalColumn = true;

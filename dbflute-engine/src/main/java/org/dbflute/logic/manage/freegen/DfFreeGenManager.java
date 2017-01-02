@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.apache.velocity.texen.util.FileUtil;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.friends.velocity.DfGenerator;
 import org.dbflute.properties.DfAllClassCopyrightProperties;
+import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -72,6 +73,36 @@ public class DfFreeGenManager {
     }
 
     // ===================================================================================
+    //                                                                          Basic Info
+    //                                                                          ==========
+    public boolean isTargetContainerSeasar() {
+        return getBasicProperties().isTargetContainerSeasar();
+    }
+
+    public boolean isTargetContainerSpring() {
+        return getBasicProperties().isTargetContainerSpring();
+    }
+
+    public boolean isTargetContainerGuice() {
+        return getBasicProperties().isTargetContainerGuice();
+    }
+
+    public boolean isTargetContainerCDI() {
+        return getBasicProperties().isTargetContainerCDI();
+    }
+
+    public boolean isTargetContainerLastaDi() {
+        return getBasicProperties().isTargetContainerLastaDi();
+    }
+
+    // ===================================================================================
+    //                                                                           Copyright
+    //                                                                           =========
+    public String getAllClassCopyright() {
+        return getAllClassCopyrightProperties().getAllClassCopyright();
+    }
+
+    // ===================================================================================
     //                                                                      Resolve Helper
     //                                                                      ==============
     public String htmlEscape(String text) { // made from lasta-doc
@@ -108,15 +139,12 @@ public class DfFreeGenManager {
     }
 
     // ===================================================================================
-    //                                                                    Copyright Helper
-    //                                                                    ================
-    public String getAllClassCopyright() {
-        return getAllClassCopyrightProperties().getAllClassCopyright();
-    }
-
-    // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
     protected DfDocumentProperties getDocumentProperties() {
         return getProperties().getDocumentProperties();
     }

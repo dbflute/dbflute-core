@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -427,6 +427,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isNonSpecifiedColumnAccessAllowed", isCompatibleBeforeJava8());
     }
 
+    public boolean isSpecifyColumnRequired() { // closet
+        return isProperty("isSpecifyColumnRequired", false);
+    }
+
     public boolean isMakeConditionQueryEqualEmptyString() { // closet
         return isProperty("isMakeConditionQueryEqualEmptyString", false);
     }
@@ -615,16 +619,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isPagingCountLeastJoin", true); // default true @since 0.9.9.0A
     }
 
-    // ===================================================================================
-    //                                                                          Inner Join
-    //                                                                          ==========
     public boolean isInnerJoinAutoDetect() { // closet since 1.1
         return isProperty("isInnerJoinAutoDetect", true); // default true @since 1.0.3
     }
 
-    // ===================================================================================
-    //                                                                   That's Bad Timing
-    //                                                                   =================
     public boolean isThatsBadTimingDetect() { // closet
         final boolean defaultValue = !isCompatibleBeforeJava8();
         return isProperty("isThatsBadTimingDetect", defaultValue);
@@ -1223,7 +1221,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                   ReadOnly Generate
     //                                                                   =================
-    public boolean isReadOnlySchema() { // for compile speed, safety
+    public boolean isReadOnlySchema() { // closet, for compile speed, safety
         return isProperty("isReadOnlySchema", false);
     }
 
@@ -1484,14 +1482,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                                          Value Type
-    //                                                                          ==========
-    // S2Dao.NET does not implement ValueType attribute,
-    // so this property is INVALID now. At the future,
-    // DBFlute may implement ValueType Framework. 
-    public boolean isUseAnsiStringTypeToNotUnicode() { // closet, CSharp only
-        return isProperty("isUseAnsiStringTypeToNotUnicode", false);
-    }
+    //                                                                      Flat Expansion
+    //                                                                      ==============
+    // unsupported completely @since 1.0.5K
+    //public boolean isMakeFlatExpansion() { // closet, closed function permanently
+    //    return isProperty("isMakeFlatExpansion", false);
+    //}
 
     // ===================================================================================
     //                                                                   Alternate Control
@@ -1515,8 +1511,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                                       Stop Generate
-    //                                                                       =============
+    //                                                                    Internal Options
+    //                                                                    ================
+    // -----------------------------------------------------
+    //                                         Stop Generate
+    //                                         -------------
     public boolean isStopGenerateExtendedBhv() { // closet
         return isProperty("isStopGenerateExtendedBhv", false);
     }
@@ -1529,36 +1528,28 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isStopGenerateExtendedEntity", false);
     }
 
-    // ===================================================================================
-    //                                                              Delete Old Table Class
-    //                                                              ======================
+    // -----------------------------------------------------
+    //                                Delete Old Table Class
+    //                                ----------------------
     public boolean isDeleteOldTableClass() { // closet
         // The default value is true since 0.8.8.1.
         return isProperty("isDeleteOldTableClass", true);
     }
 
-    // ===================================================================================
-    //                                                          Skip Generate If Same File
-    //                                                          ==========================
+    // -----------------------------------------------------
+    //                            Skip Generate If Same File
+    //                            --------------------------
     public boolean isSkipGenerateIfSameFile() { // closet
         // The default value is true since 0.7.8.
         return isProperty("isSkipGenerateIfSameFile", true);
     }
 
-    // ===================================================================================
-    //                                              ToLower in Generator Underscore Method
-    //                                              ======================================
+    // -----------------------------------------------------
+    //                ToLower in Generator Underscore Method
+    //                --------------------------------------
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() { // closet
         return isProperty("isAvailableToLowerInGeneratorUnderscoreMethod", true);
     }
-
-    // ===================================================================================
-    //                                                                      Flat Expansion
-    //                                                                      ==============
-    // unsupported completely @since 1.0.5K
-    //public boolean isMakeFlatExpansion() { // closet, closed function permanently
-    //    return isProperty("isMakeFlatExpansion", false);
-    //}
 
     // ===================================================================================
     //                                                                               S2Dao
@@ -1566,6 +1557,20 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isMakeDaoInterface() { // closet, basically CSharp only
         final DfLanguageFramework framework = getLanguageDependency().getLanguageFramework();
         return booleanProp("torque.isMakeDaoInterface", framework.isMakeDaoInterface());
+    }
+
+    // S2Dao.NET does not implement ValueType attribute,
+    // so this property is INVALID now. At the future,
+    // DBFlute may implement ValueType Framework. 
+    public boolean isUseAnsiStringTypeToNotUnicode() { // closet, CSharp only
+        return isProperty("isUseAnsiStringTypeToNotUnicode", false);
+    }
+
+    // ===================================================================================
+    //                                                                          LastaFlute
+    //                                                                          ==========
+    public boolean isLastaMigrationAlsoGenearteDiXml() {
+        return isProperty("isLastaMigrationAlsoGenearteDiXml", false);
     }
 
     // ===================================================================================
@@ -1676,15 +1681,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                                     Lasta Migration
-    //                                                                     ===============
-    public boolean isLastaMigrationAlsoGenearteDiXml() {
-        return isProperty("isLastaMigrationAlsoGenearteDiXml", false);
-    }
-
-    // ===================================================================================
-    //                                                                            Language
-    //                                                                            ========
+    //                                                                          Properties
+    //                                                                          ==========
     protected DfLanguageDependency getLanguageDependency() {
         return getBasicProperties().getLanguageDependency();
     }

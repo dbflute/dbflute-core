@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ public class DfJDBCException extends SQLException {
     private static final long serialVersionUID = 1L;
 
     public static final int NULL_ERROR_CODE = Integer.MIN_VALUE;
+    private static final String LF = "\n";
 
     public DfJDBCException(String msg) {
         super(msg, null, NULL_ERROR_CODE);
@@ -33,6 +34,39 @@ public class DfJDBCException extends SQLException {
     public DfJDBCException(String msg, SQLException e) {
         super(msg, e.getSQLState(), e.getErrorCode());
         setNextException(e);
+    }
+
+    public static DfJDBCException voice(SQLException e) { // to be wrapped by runtime exception
+        return new DfJDBCException(buildSQLExceptionInfo("JDBC said...", e), e);
+    }
+
+    protected static String buildSQLExceptionInfo(String msg, SQLException e) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(msg);
+        setupSQLExceptionExp(sb, e);
+        return sb.toString();
+    }
+
+    protected static void setupSQLExceptionExp(StringBuilder sb, SQLException e) {
+        sb.append(LF).append("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+        sb.append(LF).append("[SQLException]");
+        sb.append(LF).append(e.getClass().getName());
+        sb.append(LF).append(extractMessage(e));
+        final SQLException nextEx = e.getNextException();
+        if (nextEx != null && !e.equals(nextEx)) {
+            sb.append(LF);
+            sb.append(LF).append("[NextException]");
+            sb.append(LF).append(nextEx.getClass().getName());
+            sb.append(LF).append(extractMessage(nextEx));
+            final SQLException nextNextEx = nextEx.getNextException();
+            if (nextNextEx != null && !nextEx.equals(nextNextEx)) {
+                sb.append(LF);
+                sb.append(LF).append("[NextNextException]");
+                sb.append(LF).append(nextNextEx.getClass().getName());
+                sb.append(LF).append(extractMessage(nextNextEx));
+            }
+        }
+        sb.append(LF).append("- - - - - - - - - -/");
     }
 
     public static String extractMessage(SQLException e) {

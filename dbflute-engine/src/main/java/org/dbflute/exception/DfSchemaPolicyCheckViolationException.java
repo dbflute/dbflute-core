@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package org.dbflute.exception;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author jflute
  */
@@ -25,14 +22,7 @@ public class DfSchemaPolicyCheckViolationException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    protected final List<String> _vioList;
-
-    public DfSchemaPolicyCheckViolationException(String msg, List<String> vioList) {
+    public DfSchemaPolicyCheckViolationException(String msg) {
         super(msg);
-        _vioList = Collections.unmodifiableList(vioList);
-    }
-
-    public List<String> getVioList() {
-        return _vioList;
     }
 }

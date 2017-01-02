@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -236,8 +236,8 @@ public class DfBeanDescImpl implements DfBeanDesc {
                 final String propertyName = initBeansProp(methodName.substring(PREFIX_CLOSET_GETTER.length()));
                 setupReadMethod(method, propertyName);
             } else if (methodName.startsWith(PREFIX_DETERMINER)) {
-                if (method.getParameterTypes().length != 0 || !method.getReturnType().equals(Boolean.TYPE)
-                        && !method.getReturnType().equals(Boolean.class)) {
+                if (method.getParameterTypes().length != 0
+                        || !method.getReturnType().equals(Boolean.TYPE) && !method.getReturnType().equals(Boolean.class)) {
                     continue;
                 }
                 final String propertyName = initBeansProp(methodName.substring(PREFIX_DETERMINER.length()));

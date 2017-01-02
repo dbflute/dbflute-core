@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2014 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import java.util.*;
+import static ${glPackageBaseCommon}.${glCDef}.XInternalCDefUtil.emptyStrings;
 
 /**
  * The definition of classification.
@@ -49,6 +50,10 @@ public interface ${glCDef} {
      * @return The map of sub-items. (NotNull, EmptyAllowed, ReadOnly)
      */
     Map<String, Object> subItemMap();
+
+    class XInternalCDefUtil {
+        public static String[] emptyStrings() { return EMPTY_SISTERS; }
+    }
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
 
@@ -64,7 +69,7 @@ public interface ${glCDef} {
         ,
 #end
         /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
-        ${classificationElement.name}($database.buildClassificationCodeAliasSisterCodeVariables($classificationElement))
+        ${classificationElement.name}($classificationElement.buildClassificationCodeAliasSisterCodeVariables())
 #set ($count = $count + 1)
 #end
         ;

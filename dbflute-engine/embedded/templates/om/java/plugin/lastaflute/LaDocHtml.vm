@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2014 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -41,20 +41,21 @@ h1 {
     letter-spacing: 0.2em;
 }
 h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    padding: 3px 0;
+    background-color: #9e4873;
+    color: #F9FCEB;
+    text-indent: 2em;
+    letter-spacing: 0.2em;
+}
+h3 {
     margin: 2em 0 0.5em 0;
     font-size: 1.8em;
     border-left: 0.5em solid #882255;
     background-color: #CFA7BB;
     text-indent: 0.3em;
     line-height: 1.5em;
-}
-h3 {
-    padding: 0 0 0 10px;
-    margin: 1em 10% 0 0;
-    border-top: double 3px #882255;
-    border-bottom: solid 1px #333333;
-    font-size: 1.5em;
-    color: #333333;
 }
 h4 {
     padding: 0 0 0 10px;
@@ -70,37 +71,37 @@ h4 {
     text-align: right;
 }
 .sisterlink {
-	margin-top: 0.6em;
-	font-size: 120%;
+    margin-top: 0.6em;
+    font-size: 120%;
 }
 .sistersublink {
-	margin-top: 0.6em;
-	font-size: 85%;
+    margin-top: 0.6em;
+    font-size: 85%;
 }
 .sisterneighborlink {
-	margin-top: 0.6em;
-	font-size: 100%;
+    margin-top: 0.6em;
+    font-size: 100%;
 }
-.actiontitle {
+.doctitle {
     font-size: 1.2em;
     color: #889977;
 }
-.actionsubtitle {
+.docsubtitle {
     font-size: 1.0em;
     color: #889977;
 }
-.actionmainvalue {
+.docmainvalue {
     font-size: 1.3em;
     color: #221188;
 }
-.actionsubvalue {
+.docsubvalue {
     font-size: 1.1em;
     color: #221188;
 }
-p.actionsubitem {
+p.docsubitem {
     padding: 0.2em 0 0 1.5em;
 }
-.actionannotations {
+.docannotations {
     color: #666666;
 }
 
@@ -139,13 +140,13 @@ td {
     font-size: 0.9em;
     color: #666666;
 }
-.rownumcell {
-    text-align: center;
+.rowcell {
+    white-space: nowrap;
+}
+.rowcellnum {
+    text-align: right;
     font-size: 0.4em;
     color: #444;
-}
-.aliascell {
-    white-space: nowrap;
 }
 
 /* inner table */
@@ -189,8 +190,29 @@ to ${app.appName}
 #end
 </p>
 #end
+
+<p class="sisterneighborlink">
+    #if ($table.tableMap.actionDocMetaList)
+    <a href="#lastadoc_action">to action($table.tableMap.actionDocMetaList.size())</a>
+    #else
+    <a href="#lastadoc_action">to action($table.columnList.size())</a>
+    #end
+    #if ($table.tableMap.mailList.size() > 0)
+    | <a href="#lastadoc_mail">to mail($table.tableMap.mailList.size())</a>
+    #end
+    #if ($table.tableMap.templateList.size() > 0)
+    | <a href="#lastadoc_template">to template($table.tableMap.templateList.size())</a>
+    #end
+    #if ($table.tableMap.appclsMap.classificationTopList.size() > 0)
+    | <a href="#lastadoc_appcls">to appcls($table.tableMap.appclsMap.classificationTopList.size())</a>
+    #end
+    #if ($table.tableMap.webclsMap.classificationTopList.size() > 0)
+    | <a href="#lastadoc_webcls">to webcls($table.tableMap.webclsMap.classificationTopList.size())</a>
+    #end
+</p>
 </div>
 
+<h2 id="lastadoc_action">action</h2>
 #if ($table.tableMap.actionDocMetaList)
 <table>
     <thead>
@@ -206,16 +228,16 @@ to ${app.appName}
     <tbody id="table-list-body">
 #foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
     <tr>
-        <td class="rownumcell">${foreach.count}</td>
-        <td class="aliascell"><a href="#$manager.htmlEscape($actionDocMeta.url)">$manager.htmlEscape($actionDocMeta.url)</a></td>
-        <td class="aliascell">$!manager.htmlEscape($actionDocMeta.description)</td>
-        <td class="aliascell"><span title="$manager.htmlEscape($actionDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.simpleTypeName)</span>#${actionDocMeta.methodName}()</td>
-        <td class="aliascell">
+        <td class="rowcellnum">${foreach.count}</td>
+        <td class="rowcell"><a href="#$manager.htmlEscape($actionDocMeta.url)">$manager.htmlEscape($actionDocMeta.url)</a></td>
+        <td class="rowcell">$!manager.htmlEscape($actionDocMeta.description)</td>
+        <td class="rowcell"><span title="$manager.htmlEscape($actionDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.simpleTypeName)</span>#${actionDocMeta.methodName}()</td>
+        <td class="rowcell">
 #if ($actionDocMeta.formTypeDocMeta)
             <span title="$manager.htmlEscape($actionDocMeta.formTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.formTypeDocMeta.simpleTypeName)</span>
 #end
         </td>
-        <td class="aliascell">
+        <td class="rowcell">
 #if ($actionDocMeta.returnTypeDocMeta)
             <span title="$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.simpleTypeName)</span>
 #end
@@ -226,17 +248,17 @@ to ${app.appName}
 </table>
 
 #foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
-<h2 id="$manager.htmlEscape($actionDocMeta.url)">
+<h3 id="$manager.htmlEscape($actionDocMeta.url)">
 $manager.htmlEscape($actionDocMeta.url)
-</h2>
+</h3>
 <p>
-<span class="actiontitle">Execute Method:</span> <span class="actionmainvalue">$manager.htmlEscape($actionDocMeta.typeName)#${actionDocMeta.methodName}()</span>
+<span class="doctitle">Execute Method:</span> <span class="docmainvalue">$manager.htmlEscape($actionDocMeta.typeName)#${actionDocMeta.methodName}()</span>
 </p>
 #if ($actionDocMeta.annotationList)
-<p class="actionsubitem">
-<span class="actionsubtitle">annotations:</span>
+<p class="docsubitem">
+<span class="docsubtitle">annotations:</span>
 #foreach($annotation in $actionDocMeta.annotationList)
-<span class="actionannotations actionsubvalue">&#64;${annotation}</span>
+<span class="docannotations docsubvalue">&#64;${annotation}</span>
 #end
 </p>
 #end
@@ -247,15 +269,15 @@ $manager.htmlEscape($actionDocMeta.url)
 <p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($actionDocMeta.methodComment)</p>
 #end
 #if ($actionDocMeta.formTypeDocMeta)
-<span class="actiontitle">Form or Body:</span> <span class="actionsubvalue"><span title="$manager.htmlEscape($actionDocMeta.formTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.formTypeDocMeta.simpleTypeName)</span></span>
+<span class="doctitle">Form or Body:</span> <span class="docsubvalue"><span title="$manager.htmlEscape($actionDocMeta.formTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.formTypeDocMeta.simpleTypeName)</span></span>
 <p class="tablecomment" title="$!manager.htmlEscape($actionDocMeta.formTypeDocMeta.comment)">$!manager.htmlEscape($actionDocMeta.formTypeDocMeta.description)</p>
 $generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.formTypeDocMeta)
 #end
 #if ($actionDocMeta.returnTypeDocMeta)
-<span class="actiontitle">Return as:</span> <span class="actionsubvalue"><span title="$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.simpleTypeName)</span></span>
+<span class="doctitle">Return as:</span> <span class="docsubvalue"><span title="$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.simpleTypeName)</span></span>
 <p class="tablecomment" title="$!manager.htmlEscape($actionDocMeta.returnTypeDocMeta.comment)">$!manager.htmlEscape($actionDocMeta.returnTypeDocMeta.description)</p>
 #if ($actionDocMeta.returnTypeDocMeta.simpleTypeName == 'HtmlResponse' && $actionDocMeta.returnTypeDocMeta.value)
-<p class="actionsubitem"><span class="actionsubtitle">implementations:</span> <span class="actionsubvalue">${actionDocMeta.returnTypeDocMeta.value}</span></p>
+<p class="docsubitem"><span class="docsubtitle">implementations:</span> <span class="docsubvalue">${actionDocMeta.returnTypeDocMeta.value}</span></p>
 #end
 $generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.returnTypeDocMeta)
 #end
@@ -265,5 +287,10 @@ $generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typ
 ${column.url} :: ${column.className}<br>
 #end
 #end
+
+$generator.parse("om/java/plugin/lastaflute/LaMailFluteDocHtml.vm", null, "mailList", $table.tableMap.mailList)
+$generator.parse("om/java/plugin/lastaflute/LaPmTemplateDocHtml.vm", null, "templateList", $table.tableMap.templateList)
+$generator.parse("om/java/plugin/lastaflute/LaAppCDefDocHtml.vm", null, "appclsMap", $table.tableMap.appclsMap)
+$generator.parse("om/java/plugin/lastaflute/LaWebCDefDocHtml.vm", null, "webclsMap", $table.tableMap.webclsMap)
 </body>
 </html>

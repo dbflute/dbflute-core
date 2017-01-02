@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -236,11 +236,96 @@ public class DfClassificationElement {
     }
 
     // ===================================================================================
+    //                                                                        Code Builder
+    //                                                                        ============
+    public String buildClassificationCodeAliasVariables() {
+        return doBuildClassificationCodeAliasVariables();
+    }
+
+    public String buildClassificationCodeAliasSisterCodeVariables() {
+        final StringBuilder sb = new StringBuilder();
+        final String codeAliasVariables = buildClassificationCodeAliasVariables();
+        sb.append(codeAliasVariables);
+        final String[] sisters = getSisters();
+        sb.append(", ");
+        if (sisters != null && sisters.length > 0) {
+            sb.append("new String[] {");
+            if (sisters != null && sisters.length > 0) {
+                int index = 0;
+                for (String sister : sisters) {
+                    if (index > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append("\"").append(sister).append("\"");
+                    ++index;
+                }
+            }
+            sb.append("}");
+        } else {
+            sb.append("emptyStrings()"); // changed from EMPTY_SISTERS since 1.1.2
+        }
+        return sb.toString();
+    }
+
+    protected String doBuildClassificationCodeAliasVariables() {
+        final StringBuilder sb = new StringBuilder();
+        final String code = getCode();
+        final String alias = getAlias();
+        sb.append("\"").append(code).append("\"");
+        if (alias != null && alias.trim().length() > 0) {
+            sb.append(", \"").append(alias).append("\"");
+        } else {
+            sb.append(", null");
+        }
+        return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                     Comment Builder
+    //                                                                     ===============
+    public String buildClassificationApplicationCommentForJavaDoc() {
+        final String comment = buildClassificationApplicationComment();
+        return getDocumentProperties().resolveTextForJavaDoc(comment, "    "); // basically indent is unused
+    }
+
+    public String buildClassificationApplicationCommentForSchemaHtml() {
+        final String comment = buildClassificationApplicationComment();
+        return getDocumentProperties().resolveTextForSchemaHtml(comment);
+    }
+
+    protected String buildClassificationApplicationComment() {
+        final StringBuilder sb = new StringBuilder();
+        if (hasAlias()) {
+            sb.append(getAlias());
+        }
+        if (hasCommentDisp()) {
+            if (sb.length() > 0) {
+                sb.append(": ");
+            }
+            final String comment = getCommentDisp();
+            final String filtered = Srl.replace(comment, "\n", comment); // just in case (basically one line)
+            sb.append(filtered);
+        }
+        return sb.toString();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return DfBuildProperties.getInstance().getDocumentProperties();
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public String toString() {
-        return _classificationName + ":{" + _table + ", " + _code + ", " + _name + ", " + _alias + ", " + _comment + "}";
+        final String clsType = _table != null ? "table(" + _table + ")" : "implicit";
+        final StringBuilder sb = new StringBuilder();
+        sb.append(_classificationName);
+        sb.append(":{").append(clsType);
+        sb.append(", code=").append(_code).append(", name=").append(_name);
+        sb.append(", alias=").append(_alias).append(", comment=").append(_comment);
+        sb.append("}");
+        return sb.toString();
     }
 
     // ===================================================================================

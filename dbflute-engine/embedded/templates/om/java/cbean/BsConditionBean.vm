@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2014 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -64,6 +64,9 @@ public class ${myClassName} extends AbstractConditionBean {
         }
         if (${glDBFluteConfig}.getInstance().isNonSpecifiedColumnAccessAllowed()) {
             enableNonSpecifiedColumnAccess();
+        }
+        if (${glDBFluteConfig}.getInstance().isSpecifyColumnRequired()) {
+            enableSpecifyColumnRequired();
         }
         if (${glDBFluteConfig}.getInstance().isQueryUpdateCountPreCheck()) {
             enableQueryUpdateCountPreCheck();
@@ -395,6 +398,9 @@ public class ${myClassName} extends AbstractConditionBean {
      * @deprecated ${fk.deprecated}
 #end
      */
+#if ($fk.isDeprecatedRelation())
+    @SuppressWarnings("deprecation")
+#end
     public ${setupSelectReturnType} setupSelect_${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
         assertSetupSelectPurpose("${tmpPropertyName}");
 #if ($fk.hasLocalColumnExceptPrimaryKey())
@@ -447,6 +453,9 @@ public class ${myClassName} extends AbstractConditionBean {
      * @deprecated ${referrer.deprecated}
 #end
      */
+#if ($referrer.isDeprecatedRelation())
+    @SuppressWarnings("deprecation")
+#end
     public ${setupSelectReturnType} setupSelect_${tmpPropertyNameInitCap}() {
         assertSetupSelectPurpose("${tmpPropertyName}");
         doSetupSelect(() -> query().query${tmpPropertyNameInitCap}());
@@ -566,6 +575,9 @@ public class ${myClassName} extends AbstractConditionBean {
          * @deprecated ${fk.deprecated}
 #end
          */
+#if ($fk.isDeprecatedRelation())
+    @SuppressWarnings("deprecation")
+#end
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionFinalArgs}) {
             assertRelation("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
@@ -590,6 +602,9 @@ public class ${myClassName} extends AbstractConditionBean {
          * @deprecated ${referrer.deprecated}
 #end
          */
+#if ($referrer.isDeprecatedRelation())
+    @SuppressWarnings("deprecation")
+#end
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}() {
             assertRelation("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {

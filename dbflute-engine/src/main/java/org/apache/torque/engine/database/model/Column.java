@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -362,7 +362,7 @@ public class Column {
         return quoteColumnNameIfNeedsDirectUse(getResourceNameForSqlName());
     }
 
-    protected String getResourceNameForSqlName() {
+    public String getResourceNameForSqlName() { // public for e.g. SchemaPolicyCheck
         return isSqlNameUpperCase() ? getName().toUpperCase() : getName();
     }
 
@@ -2450,11 +2450,19 @@ public class Column {
         return getClassificationProperties().hasClassificationName(getTable().getTableDbName(), getName());
     }
 
+    public boolean isMakeClassificationGetterOfNameEnabled() { // for checking column name conflict
+        return hasClassificationName() && getTable().getColumn(getName() + "_NAME") == null;
+    }
+
     public boolean hasClassificationAlias() {
         if (hasSql2EntityRelatedTableClassificationAlias()) {
             return true;
         }
         return getClassificationProperties().hasClassificationAlias(getTable().getTableDbName(), getName());
+    }
+
+    public boolean isMakeClassificationGetterOfAliasEnabled() { // for checking column name conflict
+        return hasClassificationAlias() && getTable().getColumn(getName() + "_ALIAS") == null;
     }
 
     public String getClassificationName() {

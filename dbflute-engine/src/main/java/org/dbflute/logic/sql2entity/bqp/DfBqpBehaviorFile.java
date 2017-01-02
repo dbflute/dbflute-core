@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,8 +128,7 @@ public class DfBqpBehaviorFile {
                 lineString = br.readLine();
                 if (lineString == null) {
                     if (targetArea) {
-                        String msg = "The end mark of behavior query path was not found:";
-                        msg = msg + " bsbhvFile=" + _bsbhvFile;
+                        String msg = "The end mark of behavior query path was not found: bsbhvFile=" + _bsbhvFile;
                         throw new IllegalStateException(msg);
                     }
                     break;
@@ -190,10 +189,12 @@ public class DfBqpBehaviorFile {
             String msg = "BufferedReader.readLine() threw the exception: current line=" + lineString;
             throw new IllegalStateException(msg, e);
         } finally {
-            try {
-                br.close();
-            } catch (IOException ignored) {
-                _log.warn(ignored.getMessage());
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                    _log.warn(ignored.getMessage());
+                }
             }
         }
 

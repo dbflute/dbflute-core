@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.dbflute.exception.MapListStringDuplicateEntryException;
 import org.dbflute.exception.MapListStringParseFailureException;
@@ -108,8 +107,11 @@ public class MapListString {
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
-    /** Does it check duplicate entry of map? */
+    /** Does it check duplicate entry of map for generation? */
     protected boolean _checkDuplicateEntry;
+
+    /** Does it print as one-liner for building? */
+    protected boolean _printOneLiner;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -140,31 +142,48 @@ public class MapListString {
         final StringBuilder sb = new StringBuilder();
         @SuppressWarnings("unchecked")
         final Map<String, Object> casted = (Map<String, Object>) map;
-        doBuildMapString(sb, casted, "", "    ");
+        final boolean printOneLiner = isPrintOneLiner();
+        doBuildMapString(sb, casted, printOneLiner, "", printOneLiner ? "" : "    ");
         return sb.toString();
     }
 
-    protected void doBuildMapString(StringBuilder sb, Map<String, Object> map, String preIndent, String curIndent) {
+    protected void doBuildMapString(StringBuilder sb, Map<String, Object> map, boolean printOneLiner, String preIndent, String curIndent) {
         sb.append(_mapMark).append(_startBrace);
-        final Set<Entry<String, Object>> entrySet = map.entrySet();
-        for (Entry<String, ? extends Object> entry : entrySet) {
-            final String key = entry.getKey();
-            final Object value = entry.getValue();
-            sb.append(ln()).append(curIndent).append(_delimiter);
-            sb.append(" ").append(escapeControlMark(key)).append(" ").append(_equal).append(" ");
-            if (value instanceof Map<?, ?>) {
-                @SuppressWarnings("unchecked")
-                final Map<String, Object> valueMap = (Map<String, Object>) value;
-                doBuildMapString(sb, valueMap, curIndent, calculateNextIndent(preIndent, curIndent));
-            } else if (value instanceof List<?>) {
-                @SuppressWarnings("unchecked")
-                final List<Object> valueList = (List<Object>) value;
-                doBuildListString(sb, valueList, curIndent, calculateNextIndent(preIndent, curIndent));
+        if (!map.isEmpty()) {
+            int index = 0;
+            for (Entry<String, ? extends Object> entry : map.entrySet()) {
+                final String key = entry.getKey();
+                final Object value = entry.getValue();
+                if (printOneLiner) {
+                    if (index > 0) {
+                        sb.append(" ").append(_delimiter);
+                    }
+                } else {
+                    sb.append(ln()).append(curIndent).append(_delimiter);
+                }
+                sb.append(" ").append(escapeControlMark(key)).append(" ").append(_equal).append(" ");
+                if (value instanceof Map<?, ?>) {
+                    @SuppressWarnings("unchecked")
+                    final Map<String, Object> valueMap = (Map<String, Object>) value;
+                    final String nextIndent = printOneLiner ? "" : calculateNextIndent(preIndent, curIndent);
+                    doBuildMapString(sb, valueMap, printOneLiner, curIndent, nextIndent);
+                } else if (value instanceof List<?>) {
+                    @SuppressWarnings("unchecked")
+                    final List<Object> valueList = (List<Object>) value;
+                    final String nextIndent = printOneLiner ? "" : calculateNextIndent(preIndent, curIndent);
+                    doBuildListString(sb, valueList, printOneLiner, curIndent, nextIndent);
+                } else {
+                    sb.append(escapeControlMark(value));
+                }
+                ++index;
+            }
+            if (printOneLiner) {
+                sb.append(" ");
             } else {
-                sb.append(escapeControlMark(value));
+                sb.append(ln()).append(preIndent);
             }
         }
-        sb.append(ln()).append(preIndent).append(_endBrace);
+        sb.append(_endBrace);
     }
 
     /**
@@ -176,37 +195,57 @@ public class MapListString {
         final StringBuilder sb = new StringBuilder();
         @SuppressWarnings("unchecked")
         final List<Object> casted = (List<Object>) list;
-        doBuildListString(sb, casted, "", "    ");
+        final boolean printOneLiner = isPrintOneLiner();
+        doBuildListString(sb, casted, printOneLiner, "", printOneLiner ? "" : "    ");
         return sb.toString();
     }
 
-    protected void doBuildListString(StringBuilder sb, List<? extends Object> list, String preIndent, String curIndent) {
+    protected void doBuildListString(StringBuilder sb, List<? extends Object> list, boolean printOneLiner, String preIndent,
+            String curIndent) {
         sb.append(_listMark).append(_startBrace);
-        for (Object value : list) {
-            sb.append(ln()).append(curIndent).append(_delimiter);
-            sb.append(" ");
-            if (value instanceof Map<?, ?>) {
-                @SuppressWarnings("unchecked")
-                final Map<String, Object> valueMap = (Map<String, Object>) value;
-                doBuildMapString(sb, valueMap, curIndent, calculateNextIndent(preIndent, curIndent));
-            } else if (value instanceof List<?>) {
-                @SuppressWarnings("unchecked")
-                final List<Object> valueList = (List<Object>) value;
-                doBuildListString(sb, valueList, curIndent, calculateNextIndent(preIndent, curIndent));
+        if (!list.isEmpty()) {
+            int index = 0;
+            for (Object value : list) {
+                if (printOneLiner) {
+                    if (index > 0) {
+                        sb.append(" ").append(_delimiter);
+                    }
+                } else {
+                    sb.append(ln()).append(curIndent).append(_delimiter);
+                }
+                sb.append(" ");
+                if (value instanceof Map<?, ?>) {
+                    @SuppressWarnings("unchecked")
+                    final Map<String, Object> valueMap = (Map<String, Object>) value;
+                    final String nextIndent = printOneLiner ? "" : calculateNextIndent(preIndent, curIndent);
+                    doBuildMapString(sb, valueMap, printOneLiner, curIndent, nextIndent);
+                } else if (value instanceof List<?>) {
+                    @SuppressWarnings("unchecked")
+                    final List<Object> valueList = (List<Object>) value;
+                    final String nextIndent = printOneLiner ? "" : calculateNextIndent(preIndent, curIndent);
+                    doBuildListString(sb, valueList, printOneLiner, curIndent, nextIndent);
+                } else {
+                    sb.append(escapeControlMark(value));
+                }
+                ++index;
+            }
+            if (printOneLiner) {
+                sb.append(" ");
             } else {
-                sb.append(escapeControlMark(value));
+                sb.append(ln()).append(preIndent);
             }
         }
-        sb.append(ln()).append(preIndent).append(_endBrace);
+        sb.append(_endBrace);
     }
 
     protected String calculateNextIndent(String preIndent, String curIndent) {
         final StringBuilder sb = new StringBuilder();
+        sb.append(curIndent);
         final int indentLength = curIndent.length() - preIndent.length();
         for (int i = 0; i < indentLength; i++) {
             sb.append(" ");
         }
-        return curIndent + sb.toString();
+        return sb.toString();
     }
 
     // ===================================================================================
@@ -1043,7 +1082,8 @@ public class MapListString {
         throw new MapListStringParseFailureException(msg);
     }
 
-    protected void assertMapStringEndBraceIndex(String remainderString, int endBraceIndex, String mapString, Map<String, Object> currentMap) {
+    protected void assertMapStringEndBraceIndex(String remainderString, int endBraceIndex, String mapString,
+            Map<String, Object> currentMap) {
         if (remainderString == null) {
             final String notice = "The remainderString should not be null:";
             throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
@@ -1188,7 +1228,7 @@ public class MapListString {
     //                                                Option
     //                                                ------
     /**
-     * Check duplicate entry of map. (throws exception if found)
+     * Check duplicate entry of map for generation. (throws exception if found)
      * @return this;
      */
     public MapListString checkDuplicateEntry() {
@@ -1198,5 +1238,18 @@ public class MapListString {
 
     public boolean isCheckDuplicateEntry() {
         return _checkDuplicateEntry;
+    }
+
+    /**
+     * Print as one liner for building.
+     * @return this;
+     */
+    public MapListString printOneLiner() {
+        _printOneLiner = true;
+        return this;
+    }
+
+    public boolean isPrintOneLiner() {
+        return _printOneLiner;
     }
 }

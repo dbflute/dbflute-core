@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.dbflute.exception.DfJDBCException;
 import org.dbflute.exception.DfPropertySettingTableNotFoundException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
@@ -134,7 +135,8 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
                 callSequenceLoop(st, sequenceName, actualValue);
             }
         } catch (SQLException e) {
-            throwIncrementSequenceToDataMaxFailureException(tableName, sequenceName, tableInfo, pkInfo, tableSqlName, actualValue, e);
+            throwIncrementSequenceToDataMaxFailureException(tableName, sequenceName, tableInfo, pkInfo, tableSqlName, actualValue,
+                    DfJDBCException.voice(e));
         } finally {
             if (st != null) {
                 try {
@@ -262,7 +264,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     protected abstract Integer selectNextVal(Statement statement, String sequenceName) throws SQLException;
 
     protected void throwIncrementSequenceToDataMaxFailureException(String tableName, String sequenceName, DfTableMeta tableInfo,
-            DfPrimaryKeyMeta pkInfo, String tableSqlName, Integer actualValue, SQLException e) {
+            DfPrimaryKeyMeta pkInfo, String tableSqlName, Integer actualValue, DfJDBCException e) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "Failed to handle serial type sequence!" + ln();

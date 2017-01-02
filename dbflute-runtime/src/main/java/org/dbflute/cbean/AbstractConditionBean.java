@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.dbflute.cbean.chelper.HpSpQyCall;
 import org.dbflute.cbean.chelper.HpSpQyDelegatingCall;
 import org.dbflute.cbean.chelper.HpSpQyHas;
 import org.dbflute.cbean.chelper.HpSpQyQy;
+import org.dbflute.cbean.chelper.HpSpecifyColumnRequiredChecker;
 import org.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.dbflute.cbean.coption.CursorSelectOption;
 import org.dbflute.cbean.coption.DerivedReferrerOption;
@@ -170,6 +171,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /** Does it allow access to non-specified column? {Internal} */
     protected boolean _nonSpecifiedColumnAccessAllowed; // the default is on the DBFlute generator (false @since 1.1)
+
+    /** Is SpecifyColumn required? (both local and relation) {Internal} */
+    protected boolean _specifyColumnRequired;
 
     /** Does it allow selecting undefined classification code? {Internal} */
     protected boolean _undefinedClassificationSelectAllowed;
@@ -340,7 +344,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return new HpColQyOperand<CB>(handler);
     }
 
-    protected <CB extends ConditionBean> HpColQyOperand.HpExtendedColQyOperandMySql<CB> xcreateColQyOperandMySql(HpColQyHandler<CB> handler) {
+    protected <CB extends ConditionBean> HpColQyOperand.HpExtendedColQyOperandMySql<CB> xcreateColQyOperandMySql(
+            HpColQyHandler<CB> handler) {
         return new HpColQyOperand.HpExtendedColQyOperandMySql<CB>(handler);
     }
 
@@ -1227,6 +1232,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                      Entity Mapping
     //                                                                      ==============
+    // -----------------------------------------------------
+    //                                Relation Mapping Cache
+    //                                ----------------------
     /**
      * Disable (entity instance) cache of relation mapping. <br>
      * Basically you don't need this. This is for accidents.
@@ -1243,6 +1251,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return _canRelationMappingCache;
     }
 
+    // -----------------------------------------------------
+    //                           Non-Specified Column Access
+    //                           ---------------------------
     /** {@inheritDoc} */
     public void enableNonSpecifiedColumnAccess() {
         _nonSpecifiedColumnAccessAllowed = true;
@@ -1256,6 +1267,28 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** {@inheritDoc} */
     public boolean isNonSpecifiedColumnAccessAllowed() {
         return _nonSpecifiedColumnAccessAllowed;
+    }
+
+    // -----------------------------------------------------
+    //                                SpecifyColumn Required
+    //                                ----------------------
+    /** {@inheritDoc} */
+    public void enableSpecifyColumnRequired() {
+        _specifyColumnRequired = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableSpecifyColumnRequired() {
+        _specifyColumnRequired = false;
+    }
+
+    /** {@inheritDoc} */
+    public void xcheckSpecifyColumnRequiredIfNeeds() {
+        if (_specifyColumnRequired) {
+            new HpSpecifyColumnRequiredChecker().checkSpecifyColumnRequiredIfNeeds(this, nonSpecifiedAliasSet -> {
+                createCBExThrower().throwRequiredSpecifyColumnNotFoundException(this, nonSpecifiedAliasSet);
+            });
+        }
     }
 
     // ===================================================================================
@@ -1655,8 +1688,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return new HpSDRFunctionFactory() {
             public <REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> HpSDRFunction<REFERRER_CB, LOCAL_CQ> create(
                     ConditionBean baseCB, LOCAL_CQ localCQ //
-                    , HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper //
-                    , DBMetaProvider dbmetaProvider) {
+            , HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper //
+            , DBMetaProvider dbmetaProvider) {
                 final DerivedReferrerOptionFactory optionFactory = createSpecifyDerivedReferrerOptionFactory();
                 return newSDFFunction(baseCB, localCQ, querySetupper, dbmetaProvider, optionFactory);
             }

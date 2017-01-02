@@ -31,7 +31,7 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
 #set ($tableMetaSettings = ${table.indexSettings.settings.index.dbflute.get($table.name)})
 #foreach ($column in $table.columnList)
 #if ($column.isNormalColumn)
-#set ($javaNative = ${column.type})
+#if (${column.type} == "keyword" || ${column.type} == "text")#set ($javaNative = "String")#else#set ($javaNative = ${column.type})#end
 #elseif ($column.isRefColumn)
 #set ($javaNative = ${column.camelizedName})
 #end
@@ -112,7 +112,7 @@ public class Bs${table.camelizedName} extends EsAbstractEntity {
 
 #end
 #if ($column.isNormalColumn)
-#set ($javaNative = ${column.type})
+#if (${column.type} == "keyword" || ${column.type} == "text")#set ($javaNative = "String")#else#set ($javaNative = ${column.type})#end
 #elseif ($column.isRefColumn)
 #set ($javaNative = ${column.camelizedName})
 #end

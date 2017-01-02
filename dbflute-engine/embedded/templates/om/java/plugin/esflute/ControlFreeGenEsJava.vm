@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2014 the original author or authors.
+## Copyright 2014-2016 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -34,12 +34,10 @@ $manager.makeDirectory($path)
 $request.info("parse('${path}')")
 $generator.parse("om/java/plugin/esflute/allcommon/EsAbstractConditionQuery.vm", $path, "", "")
 
-#if ($esVersion.isLessThan("2.0.0"))
-  #set ($path = "${request.generateDirPath}allcommon/EsAbstractConditionFilter.java")
-  $manager.makeDirectory($path)
-  $request.info("parse('${path}')")
-  $generator.parse("om/java/plugin/esflute/allcommon/EsAbstractConditionFilter.vm", $path, "", "")
-#end
+#set ($path = "${request.generateDirPath}allcommon/EsAbstractConditionAggregation.java")
+$manager.makeDirectory($path)
+$request.info("parse('${path}')")
+$generator.parse("om/java/plugin/esflute/allcommon/EsAbstractConditionAggregation.vm", $path, "", "")
 
 #set ($path = "${request.generateDirPath}allcommon/EsAbstractEntity.java")
 $manager.makeDirectory($path)
@@ -113,18 +111,16 @@ $generator.parse("om/java/plugin/esflute/allcommon/EsSqlClause.vm", $path, "", "
     $generator.parse("om/java/plugin/esflute/EsExConditionQuery.vm", $path, "", "")
   #end
 
-  #if ($esVersion.isLessThan("2.0.0"))
-    #set ($path = "${request.generateDirPath}cbean/cf/bs/Bs${table.camelizedName}CF.java")
-    $manager.makeDirectory($path)
-    $request.info("parse('${path}')")
-    $generator.parse("om/java/plugin/esflute/EsBsConditionFilter.vm", $path, "", "")
+  #set ($path = "${request.generateDirPath}cbean/ca/bs/Bs${table.camelizedName}CA.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  $generator.parse("om/java/plugin/esflute/EsBsConditionAggregation.vm", $path, "", "")
 
-    #set ($path = "${request.generateDirPath}cbean/cf/${table.camelizedName}CF.java")
-    $manager.makeDirectory($path)
-    $request.info("parse('${path}')")
-    #if (!$files.file(${generator.outputPath},$path).exists())
-      $generator.parse("om/java/plugin/esflute/EsExConditionFilter.vm", $path, "", "")
-    #end
+  #set ($path = "${request.generateDirPath}cbean/ca/${table.camelizedName}CA.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("om/java/plugin/esflute/EsExConditionAggregation.vm", $path, "", "")
   #end
 
   #set ($path = "${request.generateDirPath}bsbhv/Bs${table.camelizedName}Bhv.java")

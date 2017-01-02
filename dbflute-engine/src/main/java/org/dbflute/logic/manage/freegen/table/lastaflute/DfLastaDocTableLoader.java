@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,14 @@ import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
+import org.dbflute.logic.manage.freegen.table.appcls.DfAppClsTableLoader;
+import org.dbflute.logic.manage.freegen.table.appcls.DfWebClsTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonFreeAgent;
+import org.dbflute.logic.manage.freegen.table.mailflute.DfMailFluteTableLoader;
+import org.dbflute.logic.manage.freegen.table.pmfile.DfPmFileTableLoader;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
@@ -80,8 +84,8 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     // ; tableMap = map:{
     //     ; targetDir = $$baseDir$$/java
     // }
-    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
+    public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        final Map<String, Object> tableMap = mapProp.getOptionMap();
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
         final File rootDir = new File(targetDir);
         if (!rootDir.exists()) {
@@ -108,8 +112,20 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
             tableMap.putAll(decodeJsonMap(lastaDocFile));
         }
         tableMap.put("appList", findAppList(mapProp));
+        if (mapProp.getOptionMap().get("mailPackage") != null) {
+            tableMap.put("mailList", new DfMailFluteTableLoader(true).loadTable(requestName, resource, mapProp).getTableList());
+        }
+        if (mapProp.getOptionMap().get("templatePackage") != null) {
+            tableMap.put("templateList", new DfPmFileTableLoader(true).loadTable(requestName, resource, mapProp).getTableList());
+        }
+        if (mapProp.getOptionMap().get("appclsPackage") != null) {
+            tableMap.put("appclsMap", new DfAppClsTableLoader(true).loadTable(requestName, resource, mapProp).getOptionMap());
+        }
+        if (mapProp.getOptionMap().get("webclsPackage") != null) {
+            tableMap.put("webclsMap", new DfWebClsTableLoader(true).loadTable(requestName, resource, mapProp).getOptionMap());
+        }
         prepareSchemaHtmlLink(tableMap);
-        return new DfFreeGenTable(tableMap, "unused", columnList);
+        return new DfFreeGenMetaData(tableMap, "unused", columnList);
     }
 
     protected List<Map<String, Object>> prepareColumnList(DfLastaInfo lastaInfo) {
@@ -139,7 +155,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     }
 
     protected List<Map<String, String>> findAppList(DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getTableMap();
+        final Map<String, Object> tableMap = mapProp.getOptionMap();
         List<Map<String, String>> appList;
         try {
             final String outputDirectory = getLastaFluteProperties().getLastaDocOutputDirectory();

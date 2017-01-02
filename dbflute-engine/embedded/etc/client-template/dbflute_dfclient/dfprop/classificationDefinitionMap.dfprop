@@ -7,7 +7,7 @@
 # map: {
 #     [classification-name] = list:{
 #         ; map:{
-#             ; topComment=[comment]; codeType=[String(default) or Number or Boolean]}
+#             ; topComment=[comment]; codeType=[String(default) or Number or Boolean]
 #             ; undefinedHandlingType=[EXCEPTION or LOGGING(default) or ALLOWED]
 #             ; isUseDocumentOnly=[true or false(default)]
 #             ; isSuppressAutoDeploy=[true or false(default)]

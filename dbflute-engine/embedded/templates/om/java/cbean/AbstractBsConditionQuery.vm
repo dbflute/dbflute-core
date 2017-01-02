@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2014 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -245,7 +245,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    ${col.propertySettingModifier} void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
         doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
@@ -499,6 +499,50 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
     public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object vl);
 #end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${fk.foreignLambdaSubQueryCBName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up InScopeRelation (sub-query). <br />
+     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param ${relatedLambdaName} The callback for sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
+     */
+    public void inScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}", false);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${fk.foreignLambdaSubQueryCBName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up NotInScopeRelation (sub-query). <br />
+     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param ${relatedLambdaName} The callback for sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
+     */
+    public void notInScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}", true);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+#end
 #end
 #if (${col.isJavaNativeNumberObject()})
     /**
@@ -679,7 +723,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope. (NullAllowed: if null (or empty), no condition)
      */
-    public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+    ${col.propertySettingModifier} void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
         doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
@@ -870,6 +914,50 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
     public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object vl);
 #end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${fk.foreignLambdaSubQueryCBName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up InScopeRelation (sub-query). <br />
+     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param ${relatedLambdaName} The callback for sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
+     */
+    public void inScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${fk.firstForeignColumnName}", pp, "${fk.foreignPropertyName}", false);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($relatedLambdaName = "${fk.foreignLambdaSubQueryCBName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up NotInScopeRelation (sub-query). <br />
+     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
+     * ${fk.foreignDispForJavaDoc}
+     * @param ${relatedLambdaName} The callback for sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
+     */
+    public void notInScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> ${relatedLambdaName}) {
+        assertObjectNotNull("${relatedLambdaName}", ${relatedLambdaName});
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeRelation(this);
+        try { lock(); ${relatedLambdaName}.query(cb); } finally { unlock(); }
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query());
+        registerInScopeRelation(cb.query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", pp, "${fk.foreignPropertyName}", true);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq);
+#end
 #end
 #if (${col.isJavaNativeDateObject()})
     /**
@@ -943,8 +1031,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, op <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> op.<span style="color: #CC4747">compareAsDate()</span>);</pre>
-     * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
-     * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
+     * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (basically NotNull: if op.allowOneSide(), null allowed)
+     * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (basically NotNull: if op.allowOneSide(), null allowed)
      * @param opLambda The callback for option of from-to. (NotNull)
      */
     public void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, ConditionOptionCall<FromToOption> opLambda) {
@@ -957,8 +1045,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * And NullIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, new <span style="color: #CC4747">FromToOption</span>().compareAsDate());</pre>
-     * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
-     * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
+     * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (basically NotNull: if op.allowOneSide(), null allowed)
+     * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (basically NotNull: if op.allowOneSide(), null allowed)
      * @param fromToOption The option of from-to. (NotNull)
      */
     ${table.directConditionOptionMethodModifier} void set${tmpJavaName}_FromTo(${col.fromToJavaNativeDate} fromDatetime, ${col.fromToJavaNativeDate} toDatetime, FromToOption fromToOption) {
@@ -982,8 +1070,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
      *  column &gt;= '2007/04/10 00:00:00' and column <span style="color: #CC4747">&lt; '2007/04/17 00:00:00'</span>
      * </pre>
-     * @param fromDate The from-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
-     * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
+     * @param fromDate The from-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (basically NotNull: if op.allowOneSide(), null allowed)
+     * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (basically NotNull: if op.allowOneSide(), null allowed)
      */
     public void set${tmpJavaName}_DateFromTo(${col.fromToJavaNativeDate} fromDate, ${col.fromToJavaNativeDate} toDate) {
         set${tmpJavaName}_FromTo(fromDate, toDate, xcDFTOP());
@@ -1160,7 +1248,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      * });
      * </pre> 
-     * </pre>
      * @return The object to set up a function. (NotNull)
      */
     public HpSLCFunction<${myConditionBeanClassName}> scalar_GreaterThan() {
@@ -1176,7 +1263,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      *     <span style="color: #553000">purchaseCB</span>.query().setPaymentCompleteFlg_Equal_True();
      * });
      * </pre> 
-     * </pre>
      * @return The object to set up a function. (NotNull)
      */
     public HpSLCFunction<${myConditionBeanClassName}> scalar_LessThan() {

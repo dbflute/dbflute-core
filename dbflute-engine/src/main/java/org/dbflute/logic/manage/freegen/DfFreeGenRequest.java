@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.dbflute.logic.manage.freegen;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class DfFreeGenRequest {
     protected final String _requestName;
     protected final DfFreeGenResource _resource;
     protected final DfFreeGenOutput _output;
-    protected DfFreeGenTable _table;
+    protected DfFreeGenMetaData _metaData;
     protected DfPackagePathHandler _packagePathHandler;
 
     // ===================================================================================
@@ -96,19 +97,25 @@ public class DfFreeGenRequest {
         return getPackageAsPath(_output.getPackage());
     }
 
-    public String buildGenerateDirHierarchyPath(Map<String, Object> tableMap) { // contains rear slash '/'
-        return getPackageAsPath(buildHierarchyPackage(tableMap));
+    public String buildGenerateDirHierarchyPath(Map<String, Object> map) { // contains rear slash '/'
+        return getPackageAsPath(buildHierarchyPackage(map));
     }
 
-    public String getGenerateFilePath() {
-        return getGenerateDirPath() + _output.getClassName() + "." + _output.getFileExt();
+    public String buildHierarchyPackage(Map<String, Object> map) { // public for compatible
+        final String additionalPkg = (String) map.get("additionalPackage");
+        final String added = Srl.is_NotNull_and_NotEmpty(additionalPkg) ? "." + additionalPkg : "";
+        return _output.getPackage() + added;
     }
 
     protected String getPackageAsPath(String pkg) {
         return _packagePathHandler.getPackageAsPath(pkg);
     }
 
-    public String getTemplatePath() {
+    public String getGenerateFilePath() { // for only-one table
+        return getGenerateDirPath() + _output.getClassName() + "." + _output.getFileExt();
+    }
+
+    public String getTemplatePath() { // for only-one table or multiple table (not for one-to-free)
         return _output.getTemplateFile();
     }
 
@@ -124,7 +131,7 @@ public class DfFreeGenRequest {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _requestName + ", " + _resource + ", " + _output + ", " + _table + "}";
+        return "{" + _requestName + ", " + _resource + ", " + _output + ", " + _metaData + "}";
     }
 
     // ===================================================================================
@@ -137,87 +144,105 @@ public class DfFreeGenRequest {
     // -----------------------------------------------------
     //                                              Resource
     //                                              --------
-    public DfFreeGenResource getResource() {
+    public DfFreeGenResource getResource() { // not null (basically unneeded to be called from template)
         return _resource;
     }
 
-    public DfFreeGenResourceType getResourceType() {
+    public DfFreeGenResourceType getResourceType() { // not null
         return _resource.getResourceType();
     }
 
-    public String getResourceFile() {
+    public String getResourceFile() { // not null
         return _resource.getResourceFile();
     }
 
-    public String getResourceFilePureName() {
+    public String getResourceFilePureName() { // not null
         return _resource.getResourceFilePureName();
     }
 
     // -----------------------------------------------------
     //                                                Output
     //                                                ------
-    public DfFreeGenOutput getOutput() {
+    public DfFreeGenOutput getOutput() { // not null (basically unneeded to be called from template)
         return _output;
     }
 
-    public String getTemplateFile() {
-        return _output.getTemplateFile();
-    }
-
-    public String getOutputDirectory() {
+    public String getOutputDirectory() { // not null
         return _output.getOutputDirectory();
     }
 
-    public String getPackage() {
+    public String getPackage() { // not null
         return _output.getPackage();
     }
 
-    public String buildHierarchyPackage(Map<String, Object> tableMap) {
-        final String additionalPkg = (String) tableMap.get("additionalPackage");
-        final String added = Srl.is_NotNull_and_NotEmpty(additionalPkg) ? "." + additionalPkg : "";
-        return _output.getPackage() + added;
+    public String getTemplateFile() { // for one-to-one, one-to-many classes, null allowed when one-to-free classes
+        return _output.getTemplateFile();
     }
 
-    public String getClassName() {
+    public String getClassName() { // for one-to-one class, null allowed when one-to-many or one-to-free class
         return _output.getClassName();
     }
 
-    public String getFileExt() {
+    public String getFileExt() { // not null
         return _output.getFileExt();
     }
 
     // -----------------------------------------------------
-    //                                                 Table
-    //                                                 -----
-    public DfFreeGenTable getTable() { // fixed info of table
-        return _table;
+    //                                            Option Map
+    //                                            ----------
+    public Map<String, Object> getOptionMap() { // not null
+        return _metaData.getOptionMap();
     }
 
-    public Map<String, Object> getTableMap() { // flexible table configuration
-        return _table.getTableMap();
+    @Deprecated
+    public Map<String, Object> getTableMap() { // for compatible
+        return _metaData.getOptionMap();
     }
 
-    public boolean isOnlyOneTable() { // only-one or multiple table?
-        return _table.isOnlyOneTable();
+    // -----------------------------------------------------
+    //                                             Meta Data
+    //                                             ---------
+    public DfFreeGenMetaData getMetaData() { // not null (basically unneeded to be called from template)
+        return _metaData;
     }
 
-    public String getTableName() { // when only-one table
-        return _table.getTableName();
+    public boolean isOnlyOneTable() { // only-one table? (or multiple?)
+        return _metaData.isOnlyOneTable();
     }
 
-    public List<Map<String, Object>> getColumnList() { // when only-one table
-        return _table.getColumnList();
+    public Map<String, Object> getTable() { // for only-one table
+        final Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("tableName", _metaData.getTableName());
+        map.put("columnList", _metaData.getColumnList());
+        map.put("isOnlyOneTable", _metaData.isOnlyOneTable()); // for compatible
+        map.put("tableMap", _metaData.getOptionMap()); // for compatible
+        map.put("schemaMap", _metaData.getSchemaMap()); // for compatible
+        map.put("tableList", _metaData.getTableList()); // for compatible
+        return map;
     }
 
-    public List<Map<String, Object>> getTableList() { // when multiple table
-        return _table.getTableList();
+    public List<Map<String, Object>> getTableList() { // for multiple table
+        return _metaData.getTableList();
+    }
+
+    // -----------------------------------------------------
+    //                                        for compatible
+    //                                        --------------
+    @Deprecated
+    public String getTableName() { // for only-one table
+        return _metaData.getTableName();
+    }
+
+    @Deprecated
+    public List<Map<String, Object>> getColumnList() { // for compatible, for only-one table
+        return _metaData.getColumnList();
     }
 
     // -----------------------------------------------------
     //                                                Setter
     //                                                ------
-    public void setTable(DfFreeGenTable table) {
-        _table = table;
+    public void setMetaData(DfFreeGenMetaData metaData) {
+        _metaData = metaData;
     }
 
     public void setPackagePathHandler(DfPackagePathHandler packagePathHandler) {

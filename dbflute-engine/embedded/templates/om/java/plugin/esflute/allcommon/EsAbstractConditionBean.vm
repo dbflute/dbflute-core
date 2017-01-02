@@ -23,7 +23,6 @@ import org.dbflute.dbmeta.accessory.DerivedTypeHandler;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.twowaysql.style.BoundDateDisplayStyle;
-import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.unit.TimeValue;
 
@@ -37,12 +36,12 @@ public abstract class EsAbstractConditionBean implements ConditionBean {
     //                                                                           =========
     protected final SqlClause _sqlClause = new EsSqlClause(asTableDbName());
     protected int _safetyMaxResultSize;
-    private SearchRequestParams _searchRequestParams = new SearchRequestParams();
+    protected SearchRequestParams _searchRequestParams = new SearchRequestParams();
+    protected String _preference;
 
     // ===================================================================================
     //                                                                             Builder
     //                                                                             =======
-    public abstract CountRequestBuilder build(CountRequestBuilder builder);
     public abstract SearchRequestBuilder build(SearchRequestBuilder builder);
 
     // ===================================================================================
@@ -559,6 +558,19 @@ public abstract class EsAbstractConditionBean implements ConditionBean {
         // do nothing
     }
 
+    // no annotation for compatible with 1.1.1
+    public void enableSpecifyColumnRequired() {
+        // do nothing
+    }
+
+    public void disableSpecifyColumnRequired() {
+        // do nothing
+    }
+
+    public void xcheckSpecifyColumnRequiredIfNeeds() {
+        // do nothing
+    }
+
     @Override
     public boolean hasSpecifiedLocalColumn() {
         return false;
@@ -582,6 +594,14 @@ public abstract class EsAbstractConditionBean implements ConditionBean {
     //                                                                   =================
     public SearchRequestParams request() {
         return _searchRequestParams;
+    }
+
+    public void setPreference(final String preference) {
+        _preference = preference;
+    }
+
+    public String getPreference() {
+        return _preference;
     }
 
     // ===================================================================================

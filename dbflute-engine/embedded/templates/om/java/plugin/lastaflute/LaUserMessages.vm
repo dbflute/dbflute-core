@@ -1,9 +1,24 @@
+##
+## Copyright 2014-2017 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
 ${manager.allClassCopyright}package ${request.package};
 
 #if ($request.tableMap.superClassPackage)
 import ${request.tableMap.superClassPackage}.${request.tableMap.superClassSimpleName};
 #else
-import org.lastaflute.web.ruts.message.ActionMessages;
+import org.lastaflute.core.message.UserMessages;
 #end
 #set ($hasMessage = false)
 #foreach ($column in $table.columnList)
@@ -14,7 +29,7 @@ import org.lastaflute.web.ruts.message.ActionMessages;
 #end
 #end
 #if ($hasMessage)
-import org.lastaflute.web.ruts.message.ActionMessage;
+import org.lastaflute.core.message.UserMessage;
 #end
 
 /**
@@ -24,7 +39,7 @@ import org.lastaflute.web.ruts.message.ActionMessage;
 #if ($request.tableMap.superClassPackage)
 public class ${request.className} extends ${request.tableMap.superClassSimpleName} {
 #else
-public class ${request.className} extends ActionMessages {
+public class ${request.className} extends UserMessages {
 #end
 
     /** The serial version UID for object serialization. (Default) */
@@ -62,7 +77,7 @@ public class ${request.className} extends ActionMessages {
 #end
     public ${request.className} add${column.capCamelName}(String property, ${column.variableArgDef}) {
         assertPropertyNotNull(property);
-        add(property, new ActionMessage(${column.defName}, ${column.variableArgSet}));
+        add(property, new UserMessage(${column.defName}, ${column.variableArgSet}));
         return this;
     }
 #else
@@ -82,7 +97,7 @@ public class ${request.className} extends ActionMessages {
 #end
     public ${request.className} add${column.capCamelName}(String property) {
         assertPropertyNotNull(property);
-        add(property, new ActionMessage(${column.defName}));
+        add(property, new UserMessage(${column.defName}));
         return this;
     }
 #end

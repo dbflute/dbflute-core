@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
@@ -18,6 +18,8 @@ package org.dbflute.logic.manage.freegen;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.dbflute.logic.manage.freegen.table.appcls.DfAppClsTableLoader;
+import org.dbflute.logic.manage.freegen.table.appcls.DfWebClsTableLoader;
 import org.dbflute.logic.manage.freegen.table.elasticsearch.DfElasticsearchTableLoader;
 import org.dbflute.logic.manage.freegen.table.filepath.DfFilePathTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonKeyTableLoader;
@@ -34,7 +36,7 @@ import org.dbflute.logic.manage.freegen.table.xls.DfXlsTableLoader;
  */
 public enum DfFreeGenResourceType {
 
-    PROP, XLS, FILE_PATH, JSON_KEY, JSON_SCHEMA, SOLR, ELASTICSEARCH, MAIL_FLUTE, PM_FILE, LASTA_DOC;
+    PROP, XLS, FILE_PATH, JSON_KEY, JSON_SCHEMA, SOLR, ELASTICSEARCH, MAIL_FLUTE, PM_FILE, LASTA_DOC, APP_CLS, WEB_CLS;
 
     public static final Map<DfFreeGenResourceType, DfFreeGenTableLoader> tableLoaderMap;
     static {
@@ -46,8 +48,10 @@ public enum DfFreeGenResourceType {
         tableLoaderMap.put(DfFreeGenResourceType.JSON_SCHEMA, new DfJsonSchemaTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.SOLR, new DfSolrXmlTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.ELASTICSEARCH, new DfElasticsearchTableLoader());
-        tableLoaderMap.put(DfFreeGenResourceType.MAIL_FLUTE, new DfMailFluteTableLoader());
-        tableLoaderMap.put(DfFreeGenResourceType.PM_FILE, new DfPmFileTableLoader());
+        tableLoaderMap.put(DfFreeGenResourceType.MAIL_FLUTE, new DfMailFluteTableLoader(false));
+        tableLoaderMap.put(DfFreeGenResourceType.PM_FILE, new DfPmFileTableLoader(false));
         tableLoaderMap.put(DfFreeGenResourceType.LASTA_DOC, new DfLastaDocTableLoader());
+        tableLoaderMap.put(DfFreeGenResourceType.APP_CLS, new DfAppClsTableLoader(false));
+        tableLoaderMap.put(DfFreeGenResourceType.WEB_CLS, new DfWebClsTableLoader(false));
     }
 }

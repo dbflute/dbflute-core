@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,7 +165,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                     throwClassificationMapValueIllegalListTypeException(objValue);
                 }
                 final List<?> plainList = (List<?>) objValue;
-                final List<Map<String, Object>> elementMapList = new ArrayList<Map<String, Object>>();
                 final List<DfClassificationElement> elementList = new ArrayList<DfClassificationElement>();
                 boolean tableClassification = false;
                 for (Object element : plainList) {
@@ -190,7 +189,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                     if (isElementMapClassificationTop(elementMap)) { // top definition
                         processClassificationTopFromLiteralIfNeeds(classificationTop, elementMap);
                     } else {
-                        literalArranger.arrange(classificationName, elementMap, elementMapList);
+                        literalArranger.arrange(classificationName, elementMap);
                         final DfClassificationElement classificationElement = new DfClassificationElement();
                         classificationElement.setClassificationName(classificationName);
                         classificationElement.acceptBasicItemMap(elementMap);
@@ -891,14 +890,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                                                                         SubItem Map
     //                                                                         ===========
     public boolean hasClassificationSubItemMap(String classificationName) {
-        final List<DfClassificationElement> elementList = getClassificationElementList(classificationName);
-        for (DfClassificationElement element : elementList) {
-            final Map<String, Object> subItemMap = element.getSubItemMap();
-            if (subItemMap != null && !subItemMap.isEmpty()) {
-                return true;
-            }
-        }
-        return false;
+        return getClassificationTop(classificationName).hasSubItem();
     }
 
     public List<String> getClassificationSubItemList(Map<String, Object> classificationMap) {
@@ -998,51 +990,19 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     }
 
     public String buildClassificationApplicationCommentForJavaDoc(DfClassificationElement classificationElement) {
-        final String comment = buildClassificationApplicationComment(classificationElement);
-        return getDocumentProperties().resolveTextForJavaDoc(comment, "    "); // basically indent is unused
+        return classificationElement.buildClassificationApplicationCommentForJavaDoc();
     }
 
     public String buildClassificationApplicationCommentForSchemaHtml(DfClassificationElement classificationElement) {
-        final String comment = buildClassificationApplicationComment(classificationElement);
-        return getDocumentProperties().resolveTextForSchemaHtml(comment);
+        return classificationElement.buildClassificationApplicationCommentForSchemaHtml();
     }
 
     public String buildClassificationCodeAliasVariables(DfClassificationElement classificationElement) {
-        final StringBuilder sb = new StringBuilder();
-        final String code = classificationElement.getCode();
-        final String alias = classificationElement.getAlias();
-        sb.append("\"").append(code).append("\"");
-        if (alias != null && alias.trim().length() > 0) {
-            sb.append(", \"").append(alias).append("\"");
-        } else {
-            sb.append(", null");
-        }
-        return sb.toString();
+        return classificationElement.buildClassificationCodeAliasVariables();
     }
 
     public String buildClassificationCodeAliasSisterCodeVariables(DfClassificationElement classificationElement) {
-        final StringBuilder sb = new StringBuilder();
-        final String codeAliasVariables = buildClassificationCodeAliasVariables(classificationElement);
-        sb.append(codeAliasVariables);
-        final String[] sisters = classificationElement.getSisters();
-        sb.append(", ");
-        if (sisters != null && sisters.length > 0) {
-            sb.append("new String[] {");
-            if (sisters != null && sisters.length > 0) {
-                int index = 0;
-                for (String sister : sisters) {
-                    if (index > 0) {
-                        sb.append(", ");
-                    }
-                    sb.append("\"").append(sister).append("\"");
-                    ++index;
-                }
-            }
-            sb.append("}");
-        } else {
-            sb.append("EMPTY_SISTERS");
-        }
-        return sb.toString();
+        return classificationElement.buildClassificationCodeAliasSisterCodeVariables();
     }
 
     public String buildClassificationCodeNameAliasVariables(DfClassificationElement classificationElement) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,9 +153,9 @@ import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.core.DfDatabaseNameMapping;
 import org.dbflute.logic.generate.deletefile.DfOldClassHandler;
-import org.dbflute.logic.generate.exmange.DfCopyrightResolver;
-import org.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
-import org.dbflute.logic.generate.exmange.DfSpringComponentResolver;
+import org.dbflute.logic.generate.exdirect.DfCopyrightResolver;
+import org.dbflute.logic.generate.exdirect.DfSerialVersionUIDResolver;
+import org.dbflute.logic.generate.exdirect.DfSpringComponentResolver;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.logic.generate.packagepath.DfPackagePathHandler;
@@ -169,6 +169,7 @@ import org.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDatabaseProperties;
+import org.dbflute.properties.DfDependencyInjectionProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.DfTableDeterminer;
 import org.dbflute.properties.assistant.DfTableFinder;
@@ -2006,6 +2007,10 @@ public class Database {
         return getLittleAdjustmentProperties().isThatsBadTimingDetect();
     }
 
+    public boolean isSpecifyColumnRequired() {
+        return getLittleAdjustmentProperties().isSpecifyColumnRequired();
+    }
+
     public boolean isNullOrEmptyQueryAllowed() {
         return getLittleAdjustmentProperties().isNullOrEmptyQueryAllowed();
     }
@@ -2568,23 +2573,29 @@ public class Database {
     // = = = = = = = = = =/
 
     public String getDBFluteInitializerComponentName() {
-        return filterComponentNameWithProjectPrefix("introduction");
+        return filterRuntimeComponentPrefix("introduction");
     }
 
     public String getInvokerAssistantComponentName() {
-        return filterComponentNameWithProjectPrefix("invokerAssistant");
+        return filterRuntimeComponentPrefix("invokerAssistant");
     }
 
     public String getCommonColumnAutoSetupperComponentName() {
-        return filterComponentNameWithProjectPrefix("commonColumnAutoSetupper");
+        return filterRuntimeComponentPrefix("commonColumnAutoSetupper");
     }
 
     public String getBehaviorSelectorComponentName() {
-        return filterComponentNameWithProjectPrefix("behaviorSelector");
+        return filterRuntimeComponentPrefix("behaviorSelector");
     }
 
     public String getBehaviorCommandInvokerComponentName() {
-        return filterComponentNameWithProjectPrefix("behaviorCommandInvoker");
+        return filterRuntimeComponentPrefix("behaviorCommandInvoker");
+    }
+
+    protected String filterRuntimeComponentPrefix(String componentName) {
+        final DfDependencyInjectionProperties prop = getProperties().getDependencyInjectionProperties();
+        final String filtered = prop.filterRuntimeComponentPrefix(componentName);
+        return filterComponentNameWithProjectPrefix(filtered);
     }
 
     // -----------------------------------------------------
@@ -2595,7 +2606,7 @@ public class Database {
      * @param componentName The name of component. (NotNull)
      * @return A filtered component name with project prefix. (NotNull)
      */
-    public String filterComponentNameWithProjectPrefix(String componentName) {
+    public String filterComponentNameWithProjectPrefix(String componentName) { // called from Table
         final String prefix = getBasicProperties().getProjectPrefix();
         if (prefix == null || prefix.trim().length() == 0) {
             return componentName;

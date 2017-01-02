@@ -20,7 +20,7 @@
 # o sourceFileEncoding: (NotRequired - Default 'UTF-8')
 # o sourceCodeLineSeparator: (NotRequired - Default no setting)
 # o applicationBehaviorMap: (NotRequired - Default map:{})
-# o outputPackageAdjustmentMap: (NotRequired - Default map:{})
+# o generationGapileMap: (NotRequired - Default map:{})
 # o dbfluteSystemFinalTimeZone: (NotRequired - Default null)
 #
 # *The line that starts with '#' means comment-out.
@@ -200,19 +200,13 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o outputPackageAdjustmentMap: (NotRequired - Default map:{})
-    #  The adjustments for output package.
-    #  Elements of this map are as below:
-    #   o flatDirectoryPackage: (Required - Default '')
-    #    This is only for CSharp.
-    #    e.g. Aaa.Bbb.DBFlute --> Directory: source/Aaa.Bbb.DBFlute/AllCommon
-    #   o omitDirectoryPackage: (NotRequired - Default '')
-    #    This is only for CSharp.
-    #    e.g. Aaa --> Directory: source/Bbb/DBFlute/AllCommon
+    # o generationGapileMap: (NotRequired - Default map:{})
+    #  The settings for Generation Gapile.
+    #  You can compile separating base classes from extended classes
+    #  to avoid compile cost of developers.
     #
-    #; outputPackageAdjustmentMap = map:{
-    #    ; flatDirectoryPackage = Aaa.Bbb.DBFlute
-    #    ; omitDirectoryPackage = Aaa
+    #; generationGapileMap = map:{
+    #    ; gapileDirectory = ../../maihama-dfgenerated/src/main/java
     #}
     # - - - - - - - - - -/
 

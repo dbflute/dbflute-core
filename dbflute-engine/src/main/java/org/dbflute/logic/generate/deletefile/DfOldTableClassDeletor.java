@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public class DfOldTableClassDeletor {
     //                                                                          Definition
     //                                                                          ==========
     /** The logger instance for this class. (NotNull) */
-    private static final Logger _log = LoggerFactory.getLogger(DfOldClassHandler.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfOldTableClassDeletor.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -47,7 +48,13 @@ public class DfOldTableClassDeletor {
     protected String _classPrefix;
     protected String _classSuffix;
     protected String _classExtension;
-    protected Set<String> notDeleteClassNameSet;
+    protected Set<String> _notDeleteClassNameSet;
+
+    // -----------------------------------------------------
+    //                                         Gapile Option
+    //                                         -------------
+    protected String _mainOutputDirectory; // null allowed
+    protected String _gapileDirectory; // null allowed
 
     // ===================================================================================
     //                                                                         Constructor
@@ -67,7 +74,7 @@ public class DfOldTableClassDeletor {
             for (File file : files) {
                 final String name = file.getName();
                 final String nameWithoutExt = name.substring(0, name.lastIndexOf(_classExtension));
-                if (notDeleteClassNameSet.contains(nameWithoutExt)) {
+                if (_notDeleteClassNameSet.contains(nameWithoutExt)) {
                     continue;
                 }
                 deletedClassNameList.add(nameWithoutExt);
@@ -86,16 +93,29 @@ public class DfOldTableClassDeletor {
      * @param packagePath The path of package. (NotNull)
      * @param classPrefix The prefix of classes. (NotNull)
      * @param classSuffix The suffix of classes. (NullAllowed)
-     * @return The list of package files. (NotNull)
+     * @return The read-only list of package files. (NotNull)
      */
     protected List<File> findPackageFileList(String packagePath, final String classPrefix, final String classSuffix) {
         final String packageAsPath = _packagePathHandler.getPackageAsPath(packagePath);
-        final String dirPath = _outputDirectory + "/" + packageAsPath;
-        final File dir = new File(dirPath);
-        if (!dir.exists() || !dir.isDirectory()) {
-            return new ArrayList<File>();
+        final File dir = new File(_outputDirectory + "/" + packageAsPath);
+        final FilenameFilter filter = createTargetFileFilter(classPrefix, classSuffix);
+        final File[] targetFiles = dir.exists() ? dir.listFiles(filter) : null;
+        if (targetFiles != null && targetFiles.length > 0) {
+            return Arrays.asList(targetFiles);
+        } else {
+            if (isUseGapileDirectory()) {
+                final File gapileDir = new File(_gapileDirectory + "/" + packageAsPath);
+                final File[] gapileFiles = gapileDir.exists() ? gapileDir.listFiles(filter) : null;
+                if (gapileFiles != null && gapileFiles.length > 0) {
+                    return Arrays.asList(gapileFiles);
+                }
+            }
+            return Collections.emptyList();
         }
-        final FilenameFilter filter = new FilenameFilter() {
+    }
+
+    protected FilenameFilter createTargetFileFilter(String classPrefix, String classSuffix) {
+        return new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 if (!name.endsWith(_classExtension)) {
                     return false;
@@ -113,11 +133,11 @@ public class DfOldTableClassDeletor {
                 return true;
             }
         };
-        final File[] listFiles = dir.listFiles(filter);
-        if (listFiles == null || listFiles.length == 0) {
-            return new ArrayList<File>();
-        }
-        return Arrays.asList(listFiles);
+    }
+
+    protected boolean isUseGapileDirectory() {
+        return _mainOutputDirectory != null && _gapileDirectory != null // has gapileDirectory
+                && _outputDirectory.equals(_mainOutputDirectory); // main directory
     }
 
     // ===================================================================================
@@ -127,39 +147,27 @@ public class DfOldTableClassDeletor {
         _packagePathList.add(packagePath);
     }
 
-    protected String getClassPrefix() {
-        return _classPrefix;
-    }
-
     public void setClassPrefix(String classPrefix) {
         _classPrefix = classPrefix;
-    }
-
-    public String getClassSuffix() {
-        return _classSuffix;
     }
 
     public void setClassSuffix(String classSuffix) {
         _classSuffix = classSuffix;
     }
 
-    public String getClassExtension() {
-        return _classExtension;
-    }
-
-    public void setClassExtension(String classExtension) {
-        if (classExtension != null && !classExtension.startsWith(".")) {
-            this._classExtension = "." + classExtension;
-        } else {
-            this._classExtension = classExtension;
-        }
-    }
-
-    public Set<String> getNotDeleteClassNameSet() {
-        return notDeleteClassNameSet;
+    public void setClassExtension(String ext) {
+        _classExtension = (ext != null && !ext.startsWith(".") ? "." : "") + ext;
     }
 
     public void setNotDeleteClassNameSet(Set<String> notDeleteClassNameSet) {
-        this.notDeleteClassNameSet = notDeleteClassNameSet;
+        _notDeleteClassNameSet = notDeleteClassNameSet;
+    }
+
+    public void setMainOutputDirectory(String mainOutputDirectory) {
+        _mainOutputDirectory = mainOutputDirectory;
+    }
+
+    public void setGapileDirectory(String gapileDirectory) {
+        _gapileDirectory = gapileDirectory;
     }
 }

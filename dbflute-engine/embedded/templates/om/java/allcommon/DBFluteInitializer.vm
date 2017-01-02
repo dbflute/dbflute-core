@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2014 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+#if ($database.hasDBFluteSystemFinalTimeZone())
+import java.util.TimeZone;
+#end
 #if ($database.isTargetContainerSeasar())
 import org.dbflute.bhv.core.context.ConditionBeanContext;
 #end
@@ -26,9 +29,6 @@ import org.dbflute.system.DBFluteSystem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-#if ($database.hasDBFluteSystemFinalTimeZone())
-import java.util.TimeZone;
-#end
 
 /**
  * @author ${database.classAuthor}

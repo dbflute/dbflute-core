@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,8 +64,6 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.dbflute.system.DBFluteSystem;
@@ -76,6 +74,8 @@ import org.dbflute.util.DfTypeUtil.ParseDateOutOfCalendarException;
 import org.dbflute.util.DfTypeUtil.ParseTimestampException;
 import org.dbflute.util.DfTypeUtil.ParseTimestampNumberFormatException;
 import org.dbflute.util.DfTypeUtil.ParseTimestampOutOfCalendarException;
+
+import junit.framework.TestCase;
 
 /**
  * @author jflute
@@ -175,6 +175,16 @@ public class DfTypeUtilZonedTest extends TestCase { // because PlainTestCase use
 
         assertEquals("789999", DfTypeUtil.toString(toLocalDateTime("2014/10/28 12:34:56.789999"), "SSSSSS"));
         assertEquals("12:34:56.789999999", DfTypeUtil.toString(toLocalTime("12:34:56.789999999"), "HH:mm:ss.SSSSSSSSS"));
+    }
+
+    // -----------------------------------------------------
+    //                                                 Array
+    //                                                 -----
+    public void test_string_array() {
+        String[] strings = DfTypeUtil.emptyStrings();
+        assertNotNull(strings);
+        assertEquals(0, strings.length);
+        assertSame(DfTypeUtil.emptyStrings(), strings);
     }
 
     // ===================================================================================

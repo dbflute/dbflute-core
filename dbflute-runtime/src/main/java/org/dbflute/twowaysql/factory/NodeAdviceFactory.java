@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,8 @@ public interface NodeAdviceFactory {
      * @param commentType The type of comment corresponding the value. (NotNull)
      * @return The new-created set-upper of the value and type. (NotNull)
      */
-    BoundValueTracer createBoundValueTracer(List<String> nameList, String expression, String specifiedSql, ParameterCommentType commentType);
+    BoundValueTracer createBoundValueTracer(List<String> nameList, String expression, String specifiedSql,
+            ParameterCommentType commentType);
 
     /**
      * @param mightBeLikeDirection It might be the direction of like-search, e.g. likePrefix (NotNull)

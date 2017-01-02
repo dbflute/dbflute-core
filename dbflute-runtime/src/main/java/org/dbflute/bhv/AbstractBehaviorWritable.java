@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,8 +61,8 @@ import org.dbflute.optional.OptionalThing;
  * @param <CB> The type of condition-bean handled by this behavior.
  * @author jflute
  */
-public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends ConditionBean> extends
-        AbstractBehaviorReadable<ENTITY, CB> implements BehaviorWritable {
+public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends ConditionBean> extends AbstractBehaviorReadable<ENTITY, CB>
+        implements BehaviorWritable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -863,7 +863,8 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected OptionalThing<UpdateOption<? extends ConditionBean>> createOptionalUpdateOption(UpdateOption<? extends ConditionBean> option) {
+    protected OptionalThing<UpdateOption<? extends ConditionBean>> createOptionalUpdateOption(
+            UpdateOption<? extends ConditionBean> option) {
         return OptionalThing.ofNullable(option, () -> {
             throw new IllegalStateException("Not found the update option.");
         });
@@ -907,7 +908,8 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         }
     }
 
-    protected OptionalThing<DeleteOption<? extends ConditionBean>> createOptionalDeleteOption(DeleteOption<? extends ConditionBean> option) {
+    protected OptionalThing<DeleteOption<? extends ConditionBean>> createOptionalDeleteOption(
+            DeleteOption<? extends ConditionBean> option) {
         return OptionalThing.ofNullable(option, () -> {
             throw new IllegalStateException("Not found the delete option.");
         });
@@ -1039,7 +1041,8 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
     // -----------------------------------------------------
     //                                          Query Update
     //                                          ------------
-    protected int delegateQueryInsert(Entity entity, ConditionBean inCB, ConditionBean resCB, InsertOption<? extends ConditionBean> option) {
+    protected int delegateQueryInsert(Entity entity, ConditionBean inCB, ConditionBean resCB,
+            InsertOption<? extends ConditionBean> option) {
         final OptionalThing<InsertOption<? extends ConditionBean>> optOption = createOptionalInsertOption(option);
         adjustEntityBeforeQueryInsert(entity, inCB, resCB, optOption);
         final QueryInsertCBCommand command = createQueryInsertCBCommand(entity, inCB, resCB, option);
@@ -1673,7 +1676,8 @@ public abstract class AbstractBehaviorWritable<ENTITY extends Entity, CB extends
         return cmd;
     }
 
-    protected QueryUpdateCBCommand createQueryUpdateCBCommand(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
+    protected QueryUpdateCBCommand createQueryUpdateCBCommand(Entity entity, ConditionBean cb,
+            UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createQueryUpdateCBCommand");
         final QueryUpdateCBCommand cmd = new QueryUpdateCBCommand();
         cmd.setTableDbName(asTableDbName());

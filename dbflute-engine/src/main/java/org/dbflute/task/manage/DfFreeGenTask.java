@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.apache.velocity.context.Context;
 import org.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.dbflute.helper.function.IndependentProcessor;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
+import org.dbflute.logic.manage.freegen.DfFreeGenInitializer;
 import org.dbflute.logic.manage.freegen.DfFreeGenManager;
 import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
 import org.dbflute.properties.DfFreeGenProperties;
@@ -94,13 +95,15 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     }
 
     protected void prepareFreeGenRequestList() {
-        final List<DfFreeGenRequest> requestList = getFreeGenProperties().getFreeGenRequestList();
-        for (DfFreeGenRequest request : requestList) {
-            if (_genTarget != null && !_genTarget.equalsIgnoreCase(request.getRequestName())) {
-                continue;
-            }
-            _freeGenRequestList.add(request);
-        }
+        final DfFreeGenInitializer initializer = new DfFreeGenInitializer();
+        final List<DfFreeGenRequest> requestList = initializer.initialize(requestName -> {
+            return isTargetRequest(requestName);
+        });
+        _freeGenRequestList.addAll(requestList);
+    }
+
+    protected boolean isTargetRequest(String requestName) {
+        return _genTarget == null || _genTarget.equalsIgnoreCase(requestName);
     }
 
     // ===================================================================================
@@ -124,7 +127,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
 
     protected boolean hasESFluteRequest() {
         for (DfFreeGenRequest request : _freeGenRequestList) {
-            final Object es = request.getTableMap().get("isESFlute");
+            final Object es = request.getOptionMap().get("isESFlute");
             if (es != null && (boolean) es) {
                 return true;
             }
@@ -135,7 +138,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     protected void removeESFluteDoneRequest() {
         final List<DfFreeGenRequest> doneList = new ArrayList<DfFreeGenRequest>();
         for (DfFreeGenRequest request : _freeGenRequestList) {
-            final Object la = request.getTableMap().get("isESFlute");
+            final Object la = request.getOptionMap().get("isESFlute");
             if (la != null && (boolean) la) {
                 doneList.add(request);
             }
@@ -167,7 +170,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
 
     protected boolean hasLastaFluteRequest() {
         for (DfFreeGenRequest request : _freeGenRequestList) {
-            final Object la = request.getTableMap().get("isLastaFlute");
+            final Object la = request.getOptionMap().get("isLastaFlute");
             if (la != null && (boolean) la) {
                 return true;
             }
@@ -178,7 +181,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     protected void removeLastaFluteDoneRequest() {
         final List<DfFreeGenRequest> doneList = new ArrayList<DfFreeGenRequest>();
         for (DfFreeGenRequest request : _freeGenRequestList) {
-            final Object la = request.getTableMap().get("isLastaFlute");
+            final Object la = request.getOptionMap().get("isLastaFlute");
             if (la != null && (boolean) la) {
                 doneList.add(request);
             }
@@ -245,7 +248,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
             sb.append(ln()).append("[").append(request.getRequestName()).append("]");
             sb.append(ln()).append(" resource : ").append(request.getResource());
             sb.append(ln()).append(" output   : ").append(request.getOutput());
-            final String tableMapExp = Srl.cut(request.getTableMap().toString(), 3000, "...");
+            final String tableMapExp = Srl.cut(request.getOptionMap().toString(), 3000, "...");
             sb.append(ln()).append(" tableMap : ").append(tableMapExp); // possible too big
         }
         _log.info(sb.toString());
@@ -254,7 +257,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
 
     protected VelocityContext createVelocityContext() {
         final DfVelocityContextFactory factory = createVelocityContextFactory();
-        final DfFreeGenManager manager = getFreeGenProperties().getFreeGenManager();
+        final DfFreeGenManager manager = DfFreeGenInitializer.getManager();
         return factory.createAsFreeGen(manager, _freeGenRequestList);
     }
 

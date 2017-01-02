@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -427,7 +427,8 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                      Log SqlCommand
     //                                                                      ==============
-    protected <RESULT> void logSqlExecution(BehaviorCommand<RESULT> behaviorCommand, SqlExecution execution, long beforeCmd, long afterCmd) {
+    protected <RESULT> void logSqlExecution(BehaviorCommand<RESULT> behaviorCommand, SqlExecution execution, long beforeCmd,
+            long afterCmd) {
         final String view = DfTraceViewUtil.convertToPerformanceView(afterCmd - beforeCmd);
         log("SqlExecution Initialization Cost: [" + view + "]");
     }

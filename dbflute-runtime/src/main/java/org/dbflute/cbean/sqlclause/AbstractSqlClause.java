@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1277,8 +1277,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return HpFixedConditionQueryResolver.OPTIMIZED_MARK.equals(fixedCondition);
     }
 
-    protected int doBuildJoinOnClauseAdditional(StringBuilder sb, LeftOuterJoinInfo joinInfo,
-            Map<ColumnRealName, ColumnRealName> joinOnMap, int currentConditionCount) {
+    protected int doBuildJoinOnClauseAdditional(StringBuilder sb, LeftOuterJoinInfo joinInfo, Map<ColumnRealName, ColumnRealName> joinOnMap,
+            int currentConditionCount) {
         final List<QueryClause> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
         for (QueryClause additionalOnClause : additionalOnClauseList) {
             sb.append(ln()).append("    ");
@@ -3401,7 +3401,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         sb.append(")");
     }
 
-    protected void buildQueryUpdateDirectClause(Map<String, Object> columnParameterMap, String whereClause, DBMeta dbmeta, StringBuilder sb) {
+    protected void buildQueryUpdateDirectClause(Map<String, Object> columnParameterMap, String whereClause, DBMeta dbmeta,
+            StringBuilder sb) {
         if (hasUnionQuery()) {
             throwQueryUpdateUnavailableFunctionException("union", dbmeta);
         }

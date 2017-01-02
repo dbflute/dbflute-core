@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.dbflute.util.DfCollectionUtil;
  * @author jflute
  * @since 1.1.0 (2014/10/29 Monday)
  */
-public class EntityModifiedProperties implements Serializable {
+public class EntityModifiedProperties implements Serializable, Cloneable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -123,9 +123,13 @@ public class EntityModifiedProperties implements Serializable {
 
     protected Set<String> getPropertyNameSet() {
         if (_propertyNameSet == null) {
-            _propertyNameSet = new LinkedHashSet<String>();
+            _propertyNameSet = newPropertyNameSet();
         }
         return _propertyNameSet;
+    }
+
+    protected LinkedHashSet<String> newPropertyNameSet() {
+        return new LinkedHashSet<String>();
     }
 
     // ===================================================================================
@@ -134,5 +138,20 @@ public class EntityModifiedProperties implements Serializable {
     @Override
     public String toString() {
         return "modifiedProp:" + _propertyNameSet;
+    }
+
+    @Override
+    public EntityModifiedProperties clone() { // deep copy
+        try {
+            final EntityModifiedProperties cloned = (EntityModifiedProperties) super.clone();
+            if (_propertyNameSet != null) {
+                final Set<String> copied = newPropertyNameSet();
+                copied.addAll(_propertyNameSet);
+                cloned._propertyNameSet = copied;
+            }
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("Failed to clone the properties: " + toString(), e);
+        }
     }
 }

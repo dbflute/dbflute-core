@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ public final class DfTypeUtil {
     public static final String DEFAULT_TIME_PATTERN = COLONED_TIME_PATTERN;
 
     protected static final String NULL = "null";
-    protected static final String[] EMPTY_STRINGS = new String[0];
+    protected static final String[] EMPTY_STRINGS = new String[] {};
     protected static final long GMT_AD_ORIGIN_MILLISECOND;
     static {
         final Calendar cal = Calendar.getInstance();
@@ -429,6 +429,13 @@ public final class DfTypeUtil {
         } else {
             return 3;
         }
+    }
+
+    // -----------------------------------------------------
+    //                                                 Array
+    //                                                 -----
+    public static String[] emptyStrings() {
+        return EMPTY_STRINGS;
     }
 
     // ===================================================================================

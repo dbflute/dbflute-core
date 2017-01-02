@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import org.dbflute.util.DfCollectionUtil;
 /**
  * @author jflute
  */
-public class DfFreeGenTable {
+public class DfFreeGenMetaData {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, Object> _tableMap; // not null
+    protected final Map<String, Object> _optionMap; // not null
     protected final String _tableName; // only-one table, but may be unused
     protected final List<Map<String, Object>> _columnList; // only-one table
     protected final Map<String, Map<String, Object>> _schemaMap; // multiple table
@@ -36,19 +36,19 @@ public class DfFreeGenTable {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+    // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
     // only-one table : tableMap, tableName, columnList 
     // multiple table : tableMap, schemaMap
     // _/_/_/_/_/_/_/_/_/_/
-    public DfFreeGenTable(Map<String, Object> tableMap, String tableName, List<Map<String, Object>> columnList) {
-        _tableMap = tableMap;
+    public DfFreeGenMetaData(Map<String, Object> optionMap, String tableName, List<Map<String, Object>> columnList) {
+        _optionMap = optionMap;
         _tableName = tableName;
         _columnList = columnList;
         _schemaMap = DfCollectionUtil.emptyMap();
     }
 
-    public DfFreeGenTable(Map<String, Object> tableMap, Map<String, Map<String, Object>> schemaMap) {
-        _tableMap = tableMap;
+    public DfFreeGenMetaData(Map<String, Object> optionMap, Map<String, Map<String, Object>> schemaMap) {
+        _optionMap = optionMap;
         _tableName = null;
         _columnList = DfCollectionUtil.emptyList();
         _schemaMap = schemaMap;
@@ -69,33 +69,38 @@ public class DfFreeGenTable {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Map<String, Object> getTableMap() {
-        return _tableMap;
+    public Map<String, Object> getOptionMap() { // not null
+        return _optionMap;
+    }
+
+    @Deprecated
+    public Map<String, Object> getTableMap() { // for compatible
+        return _optionMap;
     }
 
     // -----------------------------------------------------
-    //                                        Only-One Table
-    //                                        --------------
-    public boolean isOnlyOneTable() {
+    //                                         OnlyOne Table
+    //                                         -------------
+    public boolean isOnlyOneTable() { // only-one table? (or multiple?)
         return _tableName != null;
     }
 
-    public String getTableName() { // can be used when only-one table
-        return _tableName;
+    public String getTableName() { // for only-one table, null allowed
+        return _tableName; // derived name from resource file
     }
 
-    public List<Map<String, Object>> getColumnList() { // can be used when only-one table
+    public List<Map<String, Object>> getColumnList() { // for only-one table
         return _columnList;
     }
 
     // -----------------------------------------------------
     //                                        Multiple Table
     //                                        --------------
-    public Map<String, Map<String, Object>> getSchemaMap() { // can be used when multiple table
+    public Map<String, Map<String, Object>> getSchemaMap() { // for multiple table
         return _schemaMap;
     }
 
-    public List<Map<String, Object>> getTableList() { // can be used when multiple table
+    public List<Map<String, Object>> getTableList() { // for multiple table
         return DfCollectionUtil.newArrayList(_schemaMap.values());
     }
 }

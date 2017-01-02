@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
-import org.dbflute.logic.manage.freegen.DfFreeGenTable;
+import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenLazyReflector;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenMethodConverter;
 import org.dbflute.util.DfCollectionUtil;
@@ -95,8 +95,8 @@ public class DfJsonSchemaLoadingAgent {
     //     , MEMBER_STATUS_CODE : { type: "varchar", comment: "code" }
     //     , MEMBER_STATUS_NAME : { type: "varchar" }
     // }
-    public DfFreeGenTable loadTable() {
-        final Map<String, Object> tableMap = _mapProp.getTableMap();
+    public DfFreeGenMetaData loadTable() {
+        final Map<String, Object> tableMap = _mapProp.getOptionMap();
         prepareReflectorList();
         final Map<String, Map<String, Object>> schemaMap = DfCollectionUtil.newLinkedHashMap();
         final Map<String, Object> rootMap = decodeJsonMap();
@@ -114,7 +114,7 @@ public class DfJsonSchemaLoadingAgent {
         }
         reflectLazyProcess();
         prepareFinalDetermination(schemaMap);
-        return new DfFreeGenTable(tableMap, schemaMap);
+        return new DfFreeGenMetaData(tableMap, schemaMap);
     }
 
     protected void prepareFinalDetermination(final Map<String, Map<String, Object>> schemaMap) {
@@ -287,7 +287,7 @@ public class DfJsonSchemaLoadingAgent {
         br.addItem("JSON File");
         br.addElement(_resource.getResourceFile());
         br.addItem("tableMap");
-        br.addElement(_mapProp.getTableMap());
+        br.addElement(_mapProp.getOptionMap());
         final String msg = br.buildExceptionMessage();
         throw new DfIllegalPropertySettingException(msg);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,7 @@
  */
 package org.apache.torque.task;
 
+import org.dbflute.logic.generate.gapile.DfGapileProcess;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
@@ -139,6 +140,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
         setupControlTemplate();
         fireVelocityProcess();
         setupBehaviorQueryPath();
+        reflectGapileClassIfNeeds();
         showSkippedFileInformation();
         refreshResources();
     }
@@ -173,5 +175,13 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
         final DfOutsideSqlPack outsideSqlPack = collectOutsideSqlChecked();
         final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper();
         setupper.setupBehaviorQueryPath(outsideSqlPack);
+    }
+
+    // ===================================================================================
+    //                                                                        Gapile Class
+    //                                                                        ============
+    protected void reflectGapileClassIfNeeds() {
+        final DfGapileProcess process = new DfGapileProcess();
+        process.reflectIfNeeds();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,8 @@ public class TnBatchUpdateDynamicCommand extends TnUpdateEntityDynamicCommand {
     // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
-    protected TnBatchUpdateHandler createBatchUpdateHandler(TnPropertyType[] boundPropTypes, String sql, UpdateOption<ConditionBean> option) {
+    protected TnBatchUpdateHandler createBatchUpdateHandler(TnPropertyType[] boundPropTypes, String sql,
+            UpdateOption<ConditionBean> option) {
         final TnBatchUpdateHandler handler = newBatchUpdateHandler(boundPropTypes, sql);
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.dbflute.helper.thread;
 
+import org.dbflute.optional.OptionalThing;
+
 /**
  * @author jflute
  * @since 1.0.5A (2013/10/17 Thursday)
@@ -27,16 +29,19 @@ public class CountDownRaceRunner {
     protected final long _threadId;
     protected final CountDownRaceLatch _ourLatch;
     protected final int _entryNumber;
+    protected final Object _parameter;
     protected final Object _lockObj;
     protected final int _countOfEntry; // to check
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public CountDownRaceRunner(long threadId, CountDownRaceLatch ourLatch, int entryNumber, Object lockObj, int countOfEntry) {
+    public CountDownRaceRunner(long threadId, CountDownRaceLatch ourLatch, int entryNumber, Object parameter, Object lockObj,
+            int countOfEntry) {
         _threadId = threadId;
         _ourLatch = ourLatch;
         _entryNumber = entryNumber;
+        _parameter = parameter;
         _lockObj = lockObj;
         _countOfEntry = countOfEntry;
     }
@@ -114,11 +119,21 @@ public class CountDownRaceRunner {
     }
 
     /**
-     * Get the entry number of the car (current thread).
+     * Get the entry number of the runner (current thread).
      * @return The assigned number. e.g. 1, 2, 3... (NotNull)
      */
     public int getEntryNumber() {
         return _entryNumber;
+    }
+
+    /**
+     * Get the parameter for the runner (current thread).
+     * @return The optional value as parameter. (NotNull, EmptyAllowed)
+     */
+    public OptionalThing<Object> getParameter() {
+        return OptionalThing.ofNullable(_parameter, () -> {
+            throw new IllegalStateException("Not found the parameter for the runner: " + _entryNumber);
+        });
     }
 
     /**

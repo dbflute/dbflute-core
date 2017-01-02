@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2014 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -128,6 +128,20 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keep${subQueryPropertyNameInitCap}Parameter(Object vl)
     { throwIICBOE("(Query)DerivedReferrer"); return null; }
 #end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
+    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
+    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
+#end
 #end
 #if (${col.isJavaNativeNumberObject()})
 #foreach ($referrer in $col.existsReferrerReferrers)
@@ -173,6 +187,20 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     { throwIICBOE("(Query)DerivedReferrer"); return null; }
     public String keep${subQueryPropertyNameInitCap}Parameter(Object vl)
     { throwIICBOE("(Query)DerivedReferrer"); return null; }
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
+    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
+#end
+#if (${col.isInScopeRelationAllowedForeignKey()})
+#set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq)
+    { return _myCQ.keep${subQueryPropertyNameInitCap}(sq); }
 #end
 #end
 #end

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import org.dbflute.optional.OptionalScalar;
  * @author jflute
  * @since 1.1.0 (2014/10/29 Monday)
  */
-public class EntityDerivedMap implements Serializable {
+public class EntityDerivedMap implements Serializable, Cloneable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -133,9 +133,13 @@ public class EntityDerivedMap implements Serializable {
     //                                                                         ===========
     protected Map<String, Object> getDerivedMap() {
         if (_derivedMap == null) {
-            _derivedMap = new HashMap<String, Object>(4);
+            _derivedMap = newDerivedMap();
         }
         return _derivedMap;
+    }
+
+    protected HashMap<String, Object> newDerivedMap() {
+        return new HashMap<String, Object>();
     }
 
     // ===================================================================================
@@ -202,7 +206,8 @@ public class EntityDerivedMap implements Serializable {
         throw new SpecifyDerivedReferrerUnknownAliasNameException(msg);
     }
 
-    protected void throwUnmatchDerivedPropertyTypeException(Entity entity, String aliasName, Class<?> propertyType, ClassCastException cause) {
+    protected void throwUnmatchDerivedPropertyTypeException(Entity entity, String aliasName, Class<?> propertyType,
+            ClassCastException cause) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Illegal property type for the derived property.");
         br.addItem("Advice");
@@ -305,5 +310,20 @@ public class EntityDerivedMap implements Serializable {
     @Override
     public String toString() {
         return "derivedMap:" + _derivedMap;
+    }
+
+    @Override
+    public EntityDerivedMap clone() { // almost deep copy (value is shallow copy, not always immutable)
+        try {
+            final EntityDerivedMap cloned = (EntityDerivedMap) super.clone();
+            if (_derivedMap != null) {
+                final Map<String, Object> copied = newDerivedMap();
+                copied.putAll(_derivedMap);
+                cloned._derivedMap = copied;
+            }
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("Failed to clone the derived map: " + toString(), e);
+        }
     }
 }

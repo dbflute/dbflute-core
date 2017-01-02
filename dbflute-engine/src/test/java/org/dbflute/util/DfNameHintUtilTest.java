@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.dbflute.util;
 import java.util.Arrays;
 import java.util.List;
 
-import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.unit.EngineTestCase;
 
 /**
@@ -26,9 +25,9 @@ import org.dbflute.unit.EngineTestCase;
  */
 public class DfNameHintUtilTest extends EngineTestCase {
 
-    public DfNameHintUtilTest() {
-    }
-
+    // ===================================================================================
+    //                                                                    isTargetByHint()
+    //                                                                    ================
     public void test_isTargetByHint() {
         {
             List<String> targetList = Arrays.asList(new String[] { "prefix:MY_" });
@@ -56,11 +55,21 @@ public class DfNameHintUtilTest extends EngineTestCase {
         }
     }
 
-    public void test_isHitByTheHint() {
+    // ===================================================================================
+    //                                                                    isHitByTheHint()
+    //                                                                    ================
+    public void test_isHitByTheHint_basic() {
         assertTrue(DfNameHintUtil.isHitByTheHint("XXX_YN", DfNameHintUtil.SUFFIX_MARK + "_YN"));
         assertTrue(DfNameHintUtil.isHitByTheHint("L_XXX", DfNameHintUtil.PREFIX_MARK + "L_"));
         assertTrue(DfNameHintUtil.isHitByTheHint("XXX", "XXX"));
         assertFalse(DfNameHintUtil.isHitByTheHint("XXX_YN", DfNameHintUtil.PREFIX_MARK + "_YN"));
         assertFalse(DfNameHintUtil.isHitByTheHint("L_XXX", DfNameHintUtil.SUFFIX_MARK + "L_"));
+    }
+
+    public void test_isHitByTheHint_pattern() {
+        assertTrue(DfNameHintUtil.isHitByTheHint("1234", DfNameHintUtil.PATTERN_MARK + "\\d{4}"));
+        assertFalse(DfNameHintUtil.isHitByTheHint("123d", DfNameHintUtil.PATTERN_MARK + "\\d{4}"));
+        assertFalse(DfNameHintUtil.isHitByTheHint("a234", DfNameHintUtil.PATTERN_MARK + "\\d{4}"));
+        assertFalse(DfNameHintUtil.isHitByTheHint("123", DfNameHintUtil.PATTERN_MARK + "\\d{4}"));
     }
 }

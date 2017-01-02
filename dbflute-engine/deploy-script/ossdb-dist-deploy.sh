@@ -1,3 +1,9 @@
+#!/bin/bash
+
+if [ `uname` = "Darwin" ]; then
+  export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+fi
+
 cd ..
 ant -f build.xml dist
 ant -f build.xml reflect-to-test-active-dockside
@@ -7,8 +13,10 @@ ant -f build.xml reflect-to-test-dbms-postgresql
 ant -f build.xml reflect-to-test-dbms-derby
 ant -f build.xml reflect-to-test-dbms-sqlite
 ant -f build.xml reflect-to-test-option-compatible10x
+ant -f build.xml reflect-to-example-on-parade
 ant -f build.xml reflect-to-example-on-springboot
 ant -f build.xml reflect-to-example-on-play2java
+ant -f build.xml reflect-to-example-with-non-rdb
 ant -f build.xml reflect-to-example-with-doma
 ant -f build.xml reflect-to-howto
 
@@ -46,8 +54,8 @@ mvn -e compile
 
 cd ../dbflute-test-dbms-postgresql/dbflute_maihamadb
 rm ./log/*.log
-# not replace-schema because of big data
-. manage.sh regenerate
+. nextschema-renewal.sh
+. manage.sh renewal
 cd ..
 mvn -e compile
 
@@ -75,6 +83,12 @@ rm ./log/*.log
 cd ..
 mvn -e compile
 
+cd ../dbflute-example-on-parade/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal,freegen
+cd ..
+mvn -e compile
+
 cd ../dbflute-example-on-springboot/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
@@ -84,6 +98,12 @@ mvn -e compile
 cd ../dbflute-example-on-play2java/dbflute_maihamadb
 rm ./log/*.log
 . manage.sh renewal
+cd ..
+mvn -e compile
+
+cd ../dbflute-example-with-non-rdb/dbflute_maihamadb
+rm ./log/*.log
+. manage.sh renewal,freegen
 cd ..
 mvn -e compile
 

@@ -62,7 +62,7 @@ public abstract class Bs${table.camelizedName}Bhv extends EsAbstractBehavior<${t
 #set ($tableMetaSettings = ${table.indexSettings.settings.index.dbflute.get($table.name)})
 #foreach ($column in $table.columnList)
 #if ($column.isNormalColumn)
-#set ($javaNative = ${column.type})
+#if (${column.type} == "keyword" || ${column.type} == "text")#set ($javaNative = "String")#else#set ($javaNative = ${column.type})#end
 #if ($tableMetaSettings.properties.get($column.name).array)
             result.set${column.capCamelName}(to${javaNative}Array(source.get("${column.name}")));
 #else
@@ -172,9 +172,7 @@ public abstract class Bs${table.camelizedName}Bhv extends EsAbstractBehavior<${t
     }
 
     public void insert(${table.camelizedName} entity, RequestOptionCall<IndexRequestBuilder> opLambda) {
-        if (entity instanceof EsAbstractEntity) {
-            entity.asDocMeta().indexOption(opLambda);
-        }
+        entity.asDocMeta().indexOption(opLambda);
         doInsert(entity, null);
     }
 
@@ -183,9 +181,7 @@ public abstract class Bs${table.camelizedName}Bhv extends EsAbstractBehavior<${t
     }
 
     public void update(${table.camelizedName} entity, RequestOptionCall<IndexRequestBuilder> opLambda) {
-        if (entity instanceof EsAbstractEntity) {
-            entity.asDocMeta().indexOption(opLambda);
-        }
+        entity.asDocMeta().indexOption(opLambda);
         doUpdate(entity, null);
     }
 
@@ -194,9 +190,7 @@ public abstract class Bs${table.camelizedName}Bhv extends EsAbstractBehavior<${t
     }
 
     public void insertOrUpdate(${table.camelizedName} entity, RequestOptionCall<IndexRequestBuilder> opLambda) {
-        if (entity instanceof EsAbstractEntity) {
-            entity.asDocMeta().indexOption(opLambda);
-        }
+        entity.asDocMeta().indexOption(opLambda);
         doInsertOrUpdate(entity, null, null);
     }
 
@@ -205,9 +199,7 @@ public abstract class Bs${table.camelizedName}Bhv extends EsAbstractBehavior<${t
     }
 
     public void delete(${table.camelizedName} entity, RequestOptionCall<DeleteRequestBuilder> opLambda) {
-        if (entity instanceof EsAbstractEntity) {
-            entity.asDocMeta().deleteOption(opLambda);
-        }
+        entity.asDocMeta().deleteOption(opLambda);
         doDelete(entity, null);
     }
 

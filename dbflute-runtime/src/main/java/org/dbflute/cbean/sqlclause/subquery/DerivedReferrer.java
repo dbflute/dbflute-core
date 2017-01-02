@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,18 +126,16 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         final ColumnRealName derivedColumnRealName = getDerivedColumnRealName();
         final String subQueryClause;
         if (_subQuerySqlClause.hasUnionQuery()) {
-            subQueryClause =
-                    buildUnionSubQueryClause(function, correlatedColumnRealName, relatedColumnSqlName, option, tableAliasName,
-                            derivedColumnRealName, derivedColumnSqlName, correlatedFixedCondition);
+            subQueryClause = buildUnionSubQueryClause(function, correlatedColumnRealName, relatedColumnSqlName, option, tableAliasName,
+                    derivedColumnRealName, derivedColumnSqlName, correlatedFixedCondition);
         } else {
             final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option, false);
             final String fromWhereClause;
             if (option.isSuppressCorrelation()) { // e.g. myselfDerived
                 fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, correlatedFixedCondition);
             } else { // basically here
-                fromWhereClause =
-                        buildCorrelationFromWhereClause(selectClause, tableAliasName, correlatedColumnRealName, relatedColumnSqlName,
-                                correlatedFixedCondition);
+                fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName, correlatedColumnRealName,
+                        relatedColumnSqlName, correlatedFixedCondition);
             }
             subQueryClause = selectClause + " " + fromWhereClause;
         }
@@ -150,9 +148,8 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     protected String buildUnionSubQueryClause(String function, ColumnRealName correlatedColumnRealName, ColumnSqlName relatedColumnSqlName,
             DerivedReferrerOption option, String tableAliasName, ColumnRealName derivedColumnRealName, ColumnSqlName derivedColumnSqlName,
             String correlatedFixedCondition) {
-        final String mainSql =
-                buildUnionMainPartClause(relatedColumnSqlName, tableAliasName, derivedColumnRealName, derivedColumnSqlName,
-                        correlatedFixedCondition);
+        final String mainSql = buildUnionMainPartClause(relatedColumnSqlName, tableAliasName, derivedColumnRealName, derivedColumnSqlName,
+                correlatedFixedCondition);
         final String mainAlias = buildSubQueryMainAliasName();
         final String whereJoinCondition;
         if (option.isSuppressCorrelation()) { // e.g. myselfDerived
@@ -264,8 +261,8 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
      * @param option The option of DerivedReferrer. (NotNull)
      * @return The clause of sub-query. (NotNull)
      */
-    protected String buildSubQueryClause(String function, ColumnRealName[] correlatedColumnRealNames,
-            ColumnSqlName[] relatedColumnSqlNames, String correlatedFixedCondition, DerivedReferrerOption option) {
+    protected String buildSubQueryClause(String function, ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames,
+            String correlatedFixedCondition, DerivedReferrerOption option) {
         final String tableAliasName = getSubQueryLocalAliasName();
         final ColumnSqlName derivedColumnSqlName = getDerivedColumnSqlName();
         if (derivedColumnSqlName == null) {
@@ -274,18 +271,16 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         final ColumnRealName derivedColumnRealName = getDerivedColumnRealName();
         final String subQueryClause;
         if (_subQuerySqlClause.hasUnionQuery()) {
-            subQueryClause =
-                    buildUnionSubQueryClause(function, correlatedColumnRealNames, relatedColumnSqlNames, option, tableAliasName,
-                            derivedColumnRealName, derivedColumnSqlName, correlatedFixedCondition);
+            subQueryClause = buildUnionSubQueryClause(function, correlatedColumnRealNames, relatedColumnSqlNames, option, tableAliasName,
+                    derivedColumnRealName, derivedColumnSqlName, correlatedFixedCondition);
         } else {
             final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option, false);
             final String fromWhereClause;
             if (option.isSuppressCorrelation()) { // e.g. myselfDerived
                 fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, correlatedFixedCondition);
             } else { // basically here
-                fromWhereClause =
-                        buildCorrelationFromWhereClause(selectClause, tableAliasName, correlatedColumnRealNames, relatedColumnSqlNames,
-                                correlatedFixedCondition);
+                fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName, correlatedColumnRealNames,
+                        relatedColumnSqlNames, correlatedFixedCondition);
             }
             subQueryClause = selectClause + " " + fromWhereClause;
         }
@@ -298,9 +293,8 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     protected String buildUnionSubQueryClause(String function, ColumnRealName[] correlatedColumnRealNames,
             ColumnSqlName[] relatedColumnSqlNames, DerivedReferrerOption option, String tableAliasName,
             ColumnRealName derivedColumnRealName, ColumnSqlName derivedColumnSqlName, String correlatedFixedCondition) {
-        final String mainSql =
-                buildUnionMainPartClause(correlatedColumnRealNames, relatedColumnSqlNames, tableAliasName, derivedColumnRealName,
-                        derivedColumnSqlName, correlatedFixedCondition);
+        final String mainSql = buildUnionMainPartClause(correlatedColumnRealNames, relatedColumnSqlNames, tableAliasName,
+                derivedColumnRealName, derivedColumnSqlName, correlatedFixedCondition);
         final String mainAlias = buildSubQueryMainAliasName();
         final String whereJoinCondition;
         if (option.isSuppressCorrelation()) { // e.g. myselfDerived
@@ -328,7 +322,8 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     }
 
     protected String buildUnionMainPartClause(ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames,
-            String tableAliasName, ColumnRealName derivedColumnRealName, ColumnSqlName derivedColumnSqlName, String correlatedFixedCondition) {
+            String tableAliasName, ColumnRealName derivedColumnRealName, ColumnSqlName derivedColumnSqlName,
+            String correlatedFixedCondition) {
         // similar to simple primary key so refer it
         final StringBuilder keySb = new StringBuilder();
         final ColumnSqlName derivedRealSqlName = derivedColumnRealName.getColumnSqlName();

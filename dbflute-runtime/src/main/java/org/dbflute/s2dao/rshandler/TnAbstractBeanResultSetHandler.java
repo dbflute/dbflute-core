@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,8 +102,8 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      * @return The created row. (NotNull)
      * @throws SQLException When it fails to handle the SQL.
      */
-    protected Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap,
-            Map<String, TnPropertyMapping> propertyCache, ConditionBean cb) throws SQLException {
+    protected Object createRow(ResultSet rs, Map<String, Map<String, Integer>> selectIndexMap, Map<String, TnPropertyMapping> propertyCache,
+            ConditionBean cb) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
