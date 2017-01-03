@@ -80,7 +80,7 @@ public class DfSPolicyStatement {
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();
-            sb.append("ifClause:{");
+            sb.append("{");
             final StringBuilder partSb = new StringBuilder();
             for (DfSPolicyIfPart ifPart : _ifPartList) {
                 if (partSb.length() > 0) {
@@ -176,9 +176,9 @@ public class DfSPolicyStatement {
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();
-            sb.append("thenClause:{");
+            sb.append("{");
             if (_thenTheme != null) {
-                sb.append(_notThenTheme ? "not " : "").append(_thenTheme);
+                sb.append("then ").append(_notThenTheme ? "not " : "").append(_thenTheme);
             } else {
                 final StringBuilder partSb = new StringBuilder();
                 for (DfSPolicyThenPart thenPart : _thenPartList) {

@@ -200,7 +200,7 @@ public class DfSPolicyChecker {
     protected List<DfSPolicyStatement> extractStatementList(Map<String, Object> map) {
         @SuppressWarnings("unchecked")
         final List<String> nativeStatementList = (List<String>) map.get("statementList");
-        List<DfSPolicyStatement> statementList = new ArrayList<DfSPolicyStatement>();
+        final List<DfSPolicyStatement> statementList = new ArrayList<DfSPolicyStatement>();
         if (nativeStatementList != null) {
             for (String nativeStatement : nativeStatementList) {
                 statementList.add(_secretary.parseStatement(nativeStatement));
@@ -228,9 +228,10 @@ public class DfSPolicyChecker {
         sb.append(ln()).append("   statementList:");
         final List<DfSPolicyStatement> tableStatementList = policyPart.getStatementList();
         for (DfSPolicyStatement statement : tableStatementList) {
-            sb.append(ln()).append("     ").append(statement);
-            sb.append(ln()).append("       ").append(statement.getIfClause());
-            sb.append(ln()).append("       ").append(statement.getThenClause());
+            sb.append(ln()).append("     statement:");
+            sb.append(ln()).append("       native: ").append(statement.getNativeExp());
+            sb.append(ln()).append("       parsed: ");
+            sb.append(statement.getIfClause()).append(", ").append(statement.getThenClause());
         }
     }
 
