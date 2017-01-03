@@ -9,6 +9,12 @@
 # map:{
 #     ; tableExceptList = list:{}
 #     ; tableTargetList = list:{}
+#     ; columnExceptMap = map:{}
+#     ; isMainSchemaOnly = false
+#     
+#     ; wholeMap = map:{
+#         ; themeList = list:{ uniqueTableAlias ; sameColumnAliasIfSameColumnName }
+#     }
 #     ; tableMap = map:{
 #         ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
 #         ; statementList = list:{
@@ -30,6 +36,12 @@
 map:{
     #; tableExceptList = list:{}
     #; tableTargetList = list:{}
+    #; columnExceptMap = map:{}
+    #; isMainSchemaOnly = false
+    #
+    #; wholeMap = map:{
+    #    ; themeList = list:{ uniqueTableAlias ; sameColumnAliasIfSameColumnName }
+    #}
     #; tableMap = map:{
     #    ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
     #    ; statementList = list:{

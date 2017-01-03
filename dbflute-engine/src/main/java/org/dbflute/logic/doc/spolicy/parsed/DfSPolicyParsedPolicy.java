@@ -23,10 +23,13 @@ import java.util.List;
  */
 public class DfSPolicyParsedPolicy {
 
+    protected final DfSPolicyParsedPolicyPart _wholePolicyPart;
     protected final DfSPolicyParsedPolicyPart _tablePolicyPart;
     protected final DfSPolicyParsedPolicyPart _columnPolicyPart;
 
-    public DfSPolicyParsedPolicy(DfSPolicyParsedPolicyPart tablePolicyPart, DfSPolicyParsedPolicyPart columnPolicyPart) {
+    public DfSPolicyParsedPolicy(DfSPolicyParsedPolicyPart wholePolicyPart, DfSPolicyParsedPolicyPart tablePolicyPart,
+            DfSPolicyParsedPolicyPart columnPolicyPart) {
+        _wholePolicyPart = wholePolicyPart;
         _tablePolicyPart = tablePolicyPart;
         _columnPolicyPart = columnPolicyPart;
     }
@@ -34,30 +37,34 @@ public class DfSPolicyParsedPolicy {
     public static class DfSPolicyParsedPolicyPart {
 
         protected final List<String> _themeList;
-        protected final List<DfSPolicyStatement> _statementClauseList;
+        protected final List<DfSPolicyStatement> _statementList;
 
-        public DfSPolicyParsedPolicyPart(List<String> themeList, List<DfSPolicyStatement> statementClauseList) {
-            this._themeList = themeList;
-            this._statementClauseList = statementClauseList;
+        public DfSPolicyParsedPolicyPart(List<String> themeList, List<DfSPolicyStatement> statementList) {
+            _themeList = themeList;
+            _statementList = statementList;
         }
 
         @Override
         public String toString() {
-            return "policyPart:{" + _themeList + ", " + _statementClauseList + "}";
+            return "policyPart:{" + _themeList + ", " + _statementList + "}";
         }
 
         public List<String> getThemeList() {
             return _themeList;
         }
 
-        public List<DfSPolicyStatement> getStatementClauseList() {
-            return _statementClauseList;
+        public List<DfSPolicyStatement> getStatementList() {
+            return _statementList;
         }
     }
 
     @Override
     public String toString() {
-        return "parsedPolicy:{" + _tablePolicyPart + ", " + _columnPolicyPart + "}";
+        return "parsedPolicy:{" + _wholePolicyPart + ", " + _tablePolicyPart + ", " + _columnPolicyPart + "}";
+    }
+
+    public DfSPolicyParsedPolicyPart getWholePolicyPart() {
+        return _wholePolicyPart;
     }
 
     public DfSPolicyParsedPolicyPart getTablePolicyPart() {

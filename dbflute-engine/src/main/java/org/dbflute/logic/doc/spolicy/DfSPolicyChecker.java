@@ -53,10 +53,11 @@ public class DfSPolicyChecker {
     //                                                                           =========
     protected final Supplier<List<Table>> _tableListSupplier;
     protected final Map<String, Object> _policyMap;
-    protected final DfSPolicyTableThemeChecker _tableThemeChecker = new DfSPolicyTableThemeChecker();
-    protected final DfSPolicyTableStatementChecker _tableStatementChecker = new DfSPolicyTableStatementChecker();
-    protected final DfSPolicyColumnThemeChecker _columnThemeChecker = new DfSPolicyColumnThemeChecker();
-    protected final DfSPolicyColumnStatementChecker _columnStatementChecker = new DfSPolicyColumnStatementChecker();
+    protected final DfSPolicyWholeThemeChecker _wholeThemeChecker;
+    protected final DfSPolicyTableThemeChecker _tableThemeChecker;
+    protected final DfSPolicyTableStatementChecker _tableStatementChecker;
+    protected final DfSPolicyColumnThemeChecker _columnThemeChecker;
+    protected final DfSPolicyColumnStatementChecker _columnStatementChecker;
     protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
 
     // ===================================================================================
@@ -65,6 +66,11 @@ public class DfSPolicyChecker {
     public DfSPolicyChecker(Supplier<List<Table>> tableListSupplier, Map<String, Object> policyMap) {
         _tableListSupplier = tableListSupplier;
         _policyMap = policyMap;
+        _wholeThemeChecker = new DfSPolicyWholeThemeChecker(this);
+        _tableThemeChecker = new DfSPolicyTableThemeChecker(this);
+        _tableStatementChecker = new DfSPolicyTableStatementChecker();
+        _columnThemeChecker = new DfSPolicyColumnThemeChecker();
+        _columnStatementChecker = new DfSPolicyColumnStatementChecker();
     }
 
     // ===================================================================================
@@ -83,7 +89,11 @@ public class DfSPolicyChecker {
         // map:{
         //     ; tableExceptList = list:{}
         //     ; tableTargetList = list:{}
+        //     ; columnExceptMap = map:{}
         //     ; isMainSchemaOnly = false
+        //     ; wholeMap = map:{
+        //         ; themeList = list:{ uniqueTableAlias ; sameColumnAliasIfSameColumnName }
+        //     }
         //     ; tableMap = map:{
         //         ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
         //     }
@@ -95,31 +105,17 @@ public class DfSPolicyChecker {
         //             ; if columnName is suffix:_FLG then dbType is INTEGER 
         //         }
         //     }
-        //     ; additionalSchemaPolicyMap = list:{
-        //         ; tableExceptList = list:{}
-        //         ; tableTargetList = list:{}
-        //         ; tableMap = map:{
-        //             ; inheritsMainSchema = false
-        //         }
-        //         ; columnMap = map:{
-        //         }
-        //     }
         // }
         final DfSPolicyParsedPolicy policy = parsePolicy();
         showParsedPolicy(policy);
         final DfSPolicyResult result = new DfSPolicyResult();
-        final boolean mainSchemaOnly = isMainSchemaOnly();
-        for (Table table : _tableListSupplier.get()) {
-            if (table.isTypeView()) { // out of target
-                continue;
-            }
+        final List<Table> tableList = _tableListSupplier.get();
+        doCheckWhole(policy, result, tableList);
+        for (Table table : tableList) {
             if (!isTargetTable(table)) {
                 continue;
             }
-            if (mainSchemaOnly && table.isAdditionalSchema()) {
-                continue;
-            }
-            doCheck(policy, result, table);
+            doCheckTableColumn(policy, result, table);
         }
         if (!result.isEmpty()) {
             _secretary.throwSchemaPolicyCheckViolationException(_policyMap, result);
@@ -129,10 +125,17 @@ public class DfSPolicyChecker {
         }
     }
 
-    protected void doCheck(DfSPolicyParsedPolicy policy, DfSPolicyResult result, Table table) {
+    protected void doCheckWhole(DfSPolicyParsedPolicy policy, DfSPolicyResult result, List<Table> tableList) {
+        if (!tableList.isEmpty()) { // just in case
+            final List<String> themeList = policy.getWholePolicyPart().getThemeList();
+            _wholeThemeChecker.checkTableTheme(themeList, result, tableList.get(0).getDatabase());
+        }
+    }
+
+    protected void doCheckTableColumn(DfSPolicyParsedPolicy policy, DfSPolicyResult result, Table table) {
         final DfSPolicyParsedPolicyPart tablePolicyPart = policy.getTablePolicyPart();
         _tableThemeChecker.checkTableTheme(tablePolicyPart.getThemeList(), result, table);
-        _tableStatementChecker.checkTableStatement(tablePolicyPart.getStatementClauseList(), result, table);
+        _tableStatementChecker.checkTableStatement(tablePolicyPart.getStatementList(), result, table);
 
         final List<Column> columnList = table.getColumnList();
         final DfSPolicyParsedPolicyPart columnPolicyPart = policy.getColumnPolicyPart();
@@ -141,7 +144,7 @@ public class DfSPolicyChecker {
                 continue;
             }
             _columnThemeChecker.checkColumnTheme(columnPolicyPart.getThemeList(), result, column);
-            _columnStatementChecker.checkColumnStatement(columnPolicyPart.getStatementClauseList(), result, column);
+            _columnStatementChecker.checkColumnStatement(columnPolicyPart.getStatementList(), result, column);
         }
     }
 
@@ -150,28 +153,35 @@ public class DfSPolicyChecker {
     //                                                                        ============
     protected DfSPolicyParsedPolicy parsePolicy() {
         _log.info("...Parcing schema policy map: " + _policyMap.keySet());
+        DfSPolicyParsedPolicyPart wholePolicyPart = null;
         DfSPolicyParsedPolicyPart tablePolicyPart = null;
         DfSPolicyParsedPolicyPart columnPolicyPart = null;
         for (Entry<String, Object> entry : _policyMap.entrySet()) {
             final String key = entry.getKey();
             final Object value = entry.getValue();
-            if (key.equals("tableMap")) {
+            if (key.equals("wholeMap")) {
+                @SuppressWarnings("unchecked")
+                final Map<String, Object> wholeMap = (Map<String, Object>) value;
+                final List<String> themeList = extractThemeList(wholeMap);
+                wholePolicyPart = new DfSPolicyParsedPolicyPart(themeList, Collections.emptyList());
+            } else if (key.equals("tableMap")) {
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> tableMap = (Map<String, Object>) value;
-                @SuppressWarnings("unchecked")
-                final List<String> themeList = (List<String>) tableMap.getOrDefault("themeList", Collections.emptyList());
+                final List<String> themeList = extractThemeList(tableMap);
                 tablePolicyPart = new DfSPolicyParsedPolicyPart(themeList, extractStatementList(tableMap));
             } else if (key.equals("columnMap")) {
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> columnMap = (Map<String, Object>) value;
-                @SuppressWarnings("unchecked")
-                final List<String> themeList = (List<String>) columnMap.getOrDefault("themeList", Collections.emptyList());
+                final List<String> themeList = extractThemeList(columnMap);
                 columnPolicyPart = new DfSPolicyParsedPolicyPart(themeList, extractStatementList(columnMap));
             } else {
-                if (!Srl.equalsPlain(key, "isMainSchemaOnly", "tableExceptList", "tableTargetList", "columnExceptMap")) {
+                if (!Srl.equalsPlain(key, "tableExceptList", "tableTargetList", "columnExceptMap", "isMainSchemaOnly")) {
                     _secretary.throwSchemaPolicyCheckUnknownPropertyException(key);
                 }
             }
+        }
+        if (wholePolicyPart == null) {
+            wholePolicyPart = new DfSPolicyParsedPolicyPart(Collections.emptyList(), Collections.emptyList());
         }
         if (tablePolicyPart == null) {
             tablePolicyPart = new DfSPolicyParsedPolicyPart(Collections.emptyList(), Collections.emptyList());
@@ -179,7 +189,12 @@ public class DfSPolicyChecker {
         if (columnPolicyPart == null) {
             columnPolicyPart = new DfSPolicyParsedPolicyPart(Collections.emptyList(), Collections.emptyList());
         }
-        return new DfSPolicyParsedPolicy(tablePolicyPart, columnPolicyPart);
+        return new DfSPolicyParsedPolicy(wholePolicyPart, tablePolicyPart, columnPolicyPart);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected List<String> extractThemeList(Map<String, Object> map) {
+        return (List<String>) map.getOrDefault("themeList", Collections.emptyList());
     }
 
     protected List<DfSPolicyStatement> extractStatementList(Map<String, Object> map) {
@@ -205,7 +220,7 @@ public class DfSPolicyChecker {
         sb.append(ln()).append(" table:");
         sb.append(ln()).append("   themeList: ").append(tablePolicyPart.getThemeList());
         sb.append(ln()).append("   statementList:");
-        final List<DfSPolicyStatement> tableStatementList = tablePolicyPart.getStatementClauseList();
+        final List<DfSPolicyStatement> tableStatementList = tablePolicyPart.getStatementList();
         for (DfSPolicyStatement statement : tableStatementList) {
             sb.append(ln()).append("     ").append(statement);
         }
@@ -213,7 +228,7 @@ public class DfSPolicyChecker {
         sb.append(ln()).append(" column:");
         sb.append(ln()).append("   themeList: ").append(columnPolicyPart.getThemeList());
         sb.append(ln()).append("   statementList:");
-        final List<DfSPolicyStatement> columnStatementList = columnPolicyPart.getStatementClauseList();
+        final List<DfSPolicyStatement> columnStatementList = columnPolicyPart.getStatementList();
         for (DfSPolicyStatement statement : columnStatementList) {
             sb.append(ln()).append("     ").append(statement);
             sb.append(ln()).append("       ").append(statement.getIfClause());
@@ -225,7 +240,13 @@ public class DfSPolicyChecker {
     // ===================================================================================
     //                                                                       Except/Target
     //                                                                       =============
-    protected boolean isTargetTable(Table table) {
+    public boolean isTargetTable(Table table) { // may be called by nested checker
+        if (table.isTypeView()) {
+            return false; // fixedly
+        }
+        if (isMainSchemaOnly() && table.isAdditionalSchema()) {
+            return false;
+        }
         return DfNameHintUtil.isTargetByHint(table.getTableDbName(), getTableTargetList(), getTableExceptList());
     }
 
