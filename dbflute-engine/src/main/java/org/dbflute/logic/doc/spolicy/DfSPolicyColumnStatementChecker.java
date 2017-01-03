@@ -35,7 +35,15 @@ public class DfSPolicyColumnStatementChecker {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final DfSPolicyChecker _spolicyChecker;
     protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfSPolicyColumnStatementChecker(DfSPolicyChecker spolicyChecker) {
+        _spolicyChecker = spolicyChecker;
+    }
 
     // ===================================================================================
     //                                                                    Column Statement

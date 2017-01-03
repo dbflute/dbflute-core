@@ -68,9 +68,9 @@ public class DfSPolicyChecker {
         _policyMap = policyMap;
         _wholeThemeChecker = new DfSPolicyWholeThemeChecker(this);
         _tableThemeChecker = new DfSPolicyTableThemeChecker(this);
-        _tableStatementChecker = new DfSPolicyTableStatementChecker();
-        _columnThemeChecker = new DfSPolicyColumnThemeChecker();
-        _columnStatementChecker = new DfSPolicyColumnStatementChecker();
+        _tableStatementChecker = new DfSPolicyTableStatementChecker(this);
+        _columnThemeChecker = new DfSPolicyColumnThemeChecker(this);
+        _columnStatementChecker = new DfSPolicyColumnStatementChecker(this);
     }
 
     // ===================================================================================

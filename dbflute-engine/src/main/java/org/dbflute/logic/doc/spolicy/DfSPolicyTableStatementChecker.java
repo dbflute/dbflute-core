@@ -40,7 +40,15 @@ public class DfSPolicyTableStatementChecker {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final DfSPolicyChecker _spolicyChecker;
     protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfSPolicyTableStatementChecker(DfSPolicyChecker spolicyChecker) {
+        _spolicyChecker = spolicyChecker;
+    }
 
     // ===================================================================================
     //                                                                    Table Statement

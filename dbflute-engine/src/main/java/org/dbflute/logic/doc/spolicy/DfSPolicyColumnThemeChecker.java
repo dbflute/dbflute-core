@@ -41,7 +41,15 @@ public class DfSPolicyColumnThemeChecker {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final DfSPolicyChecker _spolicyChecker;
     protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfSPolicyColumnThemeChecker(DfSPolicyChecker spolicyChecker) {
+        _spolicyChecker = spolicyChecker;
+    }
 
     // ===================================================================================
     //                                                                        Column Theme

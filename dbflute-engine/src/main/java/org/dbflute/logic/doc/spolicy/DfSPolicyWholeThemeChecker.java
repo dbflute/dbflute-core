@@ -246,14 +246,13 @@ public class DfSPolicyWholeThemeChecker {
     //                                                                        Assist Logic
     //                                                                        ============
     protected List<Table> toTableList(Database database) {
-        List<Table> tableList = database.getTableList();
         final List<Table> filteredTableList = new ArrayList<Table>();
-        for (Table table : tableList) {
+        for (Table table : database.getTableList()) {
             if (_spolicyChecker.isTargetTable(table)) {
                 filteredTableList.add(table);
             }
         }
-        return tableList;
+        return filteredTableList;
     }
 
     protected boolean eitherEmpty(Object myValue, Object yourValue) {
