@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.doc.policycheck;
+package org.dbflute.logic.doc.spolicy;
 
 import java.util.List;
 import java.util.Map;
@@ -24,45 +24,38 @@ import java.util.function.Predicate;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  * @since 1.1.2 (2016/12/29 Thursday at higashi-ginza)
  */
-public class DfSchemaPolicyTableTheme {
+public class DfSPolicyTableThemeChecker {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static Map<String, BiConsumer<Table, DfSchemaPolicyResult>> _cachedThemeMap;
+    protected static Map<String, BiConsumer<Table, DfSPolicyResult>> _cachedThemeMap;
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSchemaPolicyMiscSecretary _secretary = new DfSchemaPolicyMiscSecretary();
+    protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
 
     // ===================================================================================
     //                                                                         Table Theme
     //                                                                         ===========
-    public void checkTableTheme(Table table, Map<String, Object> tableMap, DfSchemaPolicyResult result) {
-        processTableTheme(table, tableMap, result);
-    }
-
-    protected void processTableTheme(Table table, Map<String, Object> tableMap, DfSchemaPolicyResult result) {
-        @SuppressWarnings("unchecked")
-        final List<String> themeList = (List<String>) tableMap.get("themeList");
-        if (themeList == null) {
-            return;
-        }
+    public void checkTableTheme(List<String> themeList, DfSPolicyResult result, Table table) {
         for (String theme : themeList) {
-            evaluateTableTheme(table, result, theme);
+            evaluateTableTheme(theme, result, table);
         }
     }
 
-    protected void evaluateTableTheme(Table table, DfSchemaPolicyResult result, String theme) {
-        final Map<String, BiConsumer<Table, DfSchemaPolicyResult>> themeMap = getThemeMap();
-        final BiConsumer<Table, DfSchemaPolicyResult> themeProcessor = themeMap.get(theme);
+    protected void evaluateTableTheme(String theme, DfSPolicyResult result, Table table) {
+        final Map<String, BiConsumer<Table, DfSPolicyResult>> themeMap = getThemeMap();
+        final BiConsumer<Table, DfSPolicyResult> themeProcessor = themeMap.get(theme);
         if (themeProcessor != null) {
             themeProcessor.accept(table, result);
         } else {
@@ -70,11 +63,11 @@ public class DfSchemaPolicyTableTheme {
         }
     }
 
-    protected Map<String, BiConsumer<Table, DfSchemaPolicyResult>> getThemeMap() {
+    protected Map<String, BiConsumer<Table, DfSPolicyResult>> getThemeMap() {
         if (_cachedThemeMap != null) {
             return _cachedThemeMap;
         }
-        final Map<String, BiConsumer<Table, DfSchemaPolicyResult>> themeMap = StringKeyMap.createAsCaseInsensitiveOrdered();
+        final Map<String, BiConsumer<Table, DfSPolicyResult>> themeMap = StringKeyMap.createAsCaseInsensitiveOrdered();
         prepareTableTheme(themeMap);
         _cachedThemeMap = themeMap;
         return _cachedThemeMap;
@@ -83,7 +76,7 @@ public class DfSchemaPolicyTableTheme {
     // ===================================================================================
     //                                                                         Theme Logic
     //                                                                         ===========
-    protected void prepareTableTheme(Map<String, BiConsumer<Table, DfSchemaPolicyResult>> themeMap) {
+    protected void prepareTableTheme(Map<String, BiConsumer<Table, DfSPolicyResult>> themeMap) {
         // e.g.
         // ; tableMap = map:{
         //     ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
@@ -112,11 +105,11 @@ public class DfSchemaPolicyTableTheme {
         });
     }
 
-    protected void define(Map<String, BiConsumer<Table, DfSchemaPolicyResult>> themeMap, String theme, Predicate<Table> determiner,
+    protected void define(Map<String, BiConsumer<Table, DfSPolicyResult>> themeMap, String theme, Predicate<Table> determiner,
             Function<Table, String> messenger) {
         themeMap.put(theme, (table, result) -> {
             if (determiner.test(table)) {
-                result.addViolation("table.theme: " + theme, messenger.apply(table));
+                result.violate("table.theme: " + theme, messenger.apply(table));
             }
         });
     }

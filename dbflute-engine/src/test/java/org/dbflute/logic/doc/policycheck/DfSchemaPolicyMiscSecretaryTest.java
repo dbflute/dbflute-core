@@ -15,6 +15,7 @@
  */
 package org.dbflute.logic.doc.policycheck;
 
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
 import org.dbflute.unit.EngineTestCase;
 
 /**
@@ -25,7 +26,7 @@ public class DfSchemaPolicyMiscSecretaryTest extends EngineTestCase {
 
     public void test_isHitTable_basic() {
         // ## Arrange ##
-        DfSchemaPolicyMiscSecretary secretary = new DfSchemaPolicyMiscSecretary();
+        DfSPolicyMiscSecretary secretary = new DfSPolicyMiscSecretary();
 
         // ## Act ##
         // ## Assert ##
