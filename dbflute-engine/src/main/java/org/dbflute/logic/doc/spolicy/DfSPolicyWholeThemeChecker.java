@@ -148,7 +148,7 @@ public class DfSPolicyWholeThemeChecker {
                 if (eitherEmpty(myValue, yourValue)) { // except non-defined value
                     continue;
                 }
-                if (myValue.equals(yourValue)) { // different in spite of same column name
+                if (isEqual(myValue, yourValue)) {
                     return toTableDisp(myTable) + "=" + myValue + ", " + toTableDisp(yourTable) + "=" + yourValue;
                 }
             }
@@ -189,7 +189,7 @@ public class DfSPolicyWholeThemeChecker {
                         if (ignoreEmpty && eitherEmpty(myValue, yourValue)) {
                             continue;
                         }
-                        if (!myValue.equals(yourValue)) { // different in spite of same column name
+                        if (!isEqual(myValue, yourValue)) { // different in spite of same column name
                             return toColumnExp(myColumn) + "=" + myValue + ", " + toColumnExp(yourColumn) + "=" + yourValue;
                         }
                     }
@@ -231,7 +231,7 @@ public class DfSPolicyWholeThemeChecker {
                             if (ignoreEmpty && eitherEmpty(myValue, yourValue)) {
                                 continue;
                             }
-                            if (!myValue.equals(yourValue)) { // different in spite of same column alias
+                            if (!isEqual(myValue, yourValue)) { // different in spite of same column alias
                                 return toColumnExp(myColumn) + "=" + myValue + ", " + toColumnExp(yourColumn) + "=" + yourValue;
                             }
                         }
@@ -263,6 +263,10 @@ public class DfSPolicyWholeThemeChecker {
             return true;
         }
         return false;
+    }
+
+    protected boolean isEqual(Object myValue, Object yourValue) { // considering null
+        return (myValue == null && yourValue == null) || (myValue != null && myValue.equals(yourValue));
     }
 
     protected String toTableDisp(Table table) {
