@@ -212,29 +212,26 @@ public class DfSPolicyChecker {
     protected void showParsedPolicy(DfSPolicyParsedPolicy policy) {
         final StringBuilder sb = new StringBuilder();
         sb.append(ln()).append("[Schema Policy]");
-        final DfSPolicyParsedPolicyPart tablePolicyPart = policy.getTablePolicyPart();
         sb.append(ln()).append(" tableExceptList: ").append(getTableExceptList());
         sb.append(ln()).append(" tableTargetList: ").append(getTableTargetList());
         sb.append(ln()).append(" columnExceptMap: ").append(getColumnExceptMap());
         sb.append(ln()).append(" isMainSchemaOnly: ").append(isMainSchemaOnly());
-        sb.append(ln()).append(" table:");
-        sb.append(ln()).append("   themeList: ").append(tablePolicyPart.getThemeList());
+        buildElementMap(sb, "wholeMap", policy.getWholePolicyPart());
+        buildElementMap(sb, "tableMap", policy.getTablePolicyPart());
+        buildElementMap(sb, "columnMap", policy.getColumnPolicyPart());
+        _log.info(sb.toString());
+    }
+
+    protected void buildElementMap(StringBuilder sb, String title, DfSPolicyParsedPolicyPart policyPart) {
+        sb.append(ln()).append(" ").append(title).append(":");
+        sb.append(ln()).append("   themeList: ").append(policyPart.getThemeList());
         sb.append(ln()).append("   statementList:");
-        final List<DfSPolicyStatement> tableStatementList = tablePolicyPart.getStatementList();
+        final List<DfSPolicyStatement> tableStatementList = policyPart.getStatementList();
         for (DfSPolicyStatement statement : tableStatementList) {
-            sb.append(ln()).append("     ").append(statement);
-        }
-        final DfSPolicyParsedPolicyPart columnPolicyPart = policy.getColumnPolicyPart();
-        sb.append(ln()).append(" column:");
-        sb.append(ln()).append("   themeList: ").append(columnPolicyPart.getThemeList());
-        sb.append(ln()).append("   statementList:");
-        final List<DfSPolicyStatement> columnStatementList = columnPolicyPart.getStatementList();
-        for (DfSPolicyStatement statement : columnStatementList) {
             sb.append(ln()).append("     ").append(statement);
             sb.append(ln()).append("       ").append(statement.getIfClause());
             sb.append(ln()).append("       ").append(statement.getThenClause());
         }
-        _log.info(sb.toString());
     }
 
     // ===================================================================================
