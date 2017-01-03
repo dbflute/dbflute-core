@@ -116,7 +116,7 @@ public class DfSPolicyStatement {
 
         @Override
         public String toString() {
-            return "then:{" + _ifItem + " is " + (_notIfValue ? "not " : "") + _ifValue + "}";
+            return "if:{" + _ifItem + " is " + (_notIfValue ? "not " : "") + _ifValue + "}";
         }
 
         public String getIfItem() {
