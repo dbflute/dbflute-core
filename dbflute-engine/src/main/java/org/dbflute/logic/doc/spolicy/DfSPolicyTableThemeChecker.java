@@ -111,6 +111,12 @@ public class DfSPolicyTableThemeChecker {
         define(themeMap, "hasCommonColumn", table -> !table.hasAllCommonColumn(), table -> {
             return "The table should have common columns: " + toTableDisp(table);
         });
+        define(themeMap, "hasAlias", table -> !table.hasAlias(), table -> {
+            return "The table should have table alias: " + toTableDisp(table);
+        });
+        define(themeMap, "hasComment", table -> !table.hasComment(), table -> {
+            return "The table should have table comment: " + toTableDisp(table);
+        });
     }
 
     protected void define(Map<String, BiConsumer<Table, DfSPolicyResult>> themeMap, String theme, Predicate<Table> determiner,

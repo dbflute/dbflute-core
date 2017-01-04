@@ -94,6 +94,12 @@ public class DfSPolicyColumnThemeChecker {
         define(themeMap, "lowerCaseBasis", column -> Srl.isUpperCaseAny(toComparingColumnName(column)), column -> {
             return "The column name should be on lower case basis: " + toColumnDisp(column);
         });
+        define(themeMap, "hasAlias", column -> !column.hasAlias(), column -> {
+            return "The column should have column alias: " + toColumnDisp(column);
+        });
+        define(themeMap, "hasComment", column -> !column.hasComment(), column -> {
+            return "The column should have column comment: " + toColumnDisp(column);
+        });
     }
 
     protected void define(Map<String, BiConsumer<Column, DfSPolicyResult>> themeMap, String theme, Predicate<Column> determiner,
