@@ -413,7 +413,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected DfSchemaPolicyProperties getSchemaPolicyCheckProperties() {
-        return getProperties().getSchemaPolicyCheckProperties();
+        return getProperties().getSchemaPolicyProperties();
     }
 
     // ===================================================================================

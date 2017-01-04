@@ -31,6 +31,7 @@ import org.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.dbflute.exception.DfTakeFinallyFailureException;
 import org.dbflute.exception.SQLFailureException;
 import org.dbflute.friends.velocity.DfVelocityContextFactory;
+import org.dbflute.logic.doc.spolicy.reps.DfSPolicyInRepsChecker;
 import org.dbflute.logic.replaceschema.finalinfo.DfAbstractSchemaTaskFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
 import org.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
@@ -153,22 +154,19 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         arrangeBeforeReps();
         if (isAlterProcess()) {
             processAlterCheck();
-        } else {
+        } else { // normally here
             processMain();
         }
     }
 
-    // -----------------------------------------------------
-    //                          Arrange before ReplaceSchema
-    //                          ----------------------------
     protected void arrangeBeforeReps() {
         final DfArrangeBeforeRepsProcess process = new DfArrangeBeforeRepsProcess();
         process.arrangeBeforeReps();
     }
 
-    // -----------------------------------------------------
-    //                                            AlterCheck
-    //                                            ----------
+    // ===================================================================================
+    //                                                                          AlterCheck
+    //                                                                          ==========
     protected boolean isAlterProcess() {
         return isAlterCheck() || isSavePrevious();
     }
@@ -223,25 +221,23 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         fireVelocityProcess();
     }
 
-    // -----------------------------------------------------
-    //                                          Main Process
-    //                                          ------------
+    // ===================================================================================
+    //                                                                        Core Process
+    //                                                                        ============
     protected void processMain() {
         executeCoreProcess(getPlaySqlDir(), false);
     }
 
-    // ===================================================================================
-    //                                                                        Core Process
-    //                                                                        ============
-    protected void executeCoreProcess(String sqlRootDir, boolean previous) {
+    protected void executeCoreProcess(String sqlRootDir, boolean previous) { // for main
         doExecuteCoreProcess(sqlRootDir, previous, false);
     }
 
-    protected void executeCoreProcess(String sqlRootDir, boolean previous, boolean schemaOnly) {
+    protected void executeCoreProcess(String sqlRootDir, boolean previous, boolean schemaOnly) { // for alter check
         doExecuteCoreProcess(sqlRootDir, previous, schemaOnly);
     }
 
     protected void doExecuteCoreProcess(String sqlRootDir, boolean previous, boolean schemaOnly) {
+        // ReplaceSchema flow here
         try {
             createSchema(sqlRootDir, previous);
             if (!schemaOnly) { // normally load data
@@ -256,12 +252,20 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         handleSchemaContinuedFailure();
     }
 
+    // -----------------------------------------------------
+    //                                         Create Schema
+    //                                         -------------
     protected void createSchema(String sqlRootDir, boolean previous) {
         final DfCreateSchemaProcess process = createCreateSchemaProcess(sqlRootDir);
         _createSchemaFinalInfo = process.execute();
         final SQLFailureException breakCause = _createSchemaFinalInfo.getBreakCause();
         if (breakCause != null) { // high priority exception
             throw breakCause;
+        }
+        if (!_createSchemaFinalInfo.isFailure()) { // because it may have low priority failure
+            if (!previous) { // because previous is immutable
+                checkSchemaPolicyInRepsIfNeeds();
+            }
         }
     }
 
@@ -282,6 +286,13 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         };
     }
 
+    protected void checkSchemaPolicyInRepsIfNeeds() {
+        new DfSPolicyInRepsChecker(getDataSource()).checkSchemaPolicyInRepsIfNeeds();
+    }
+
+    // -----------------------------------------------------
+    //                                             Load Data
+    //                                             ---------
     protected void loadData(String sqlRootDir, boolean previous) {
         final DfLoadDataProcess process = createLoadDataProcess(sqlRootDir, previous);
         _loadDataFinalInfo = process.execute();
@@ -295,6 +306,9 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         return DfLoadDataProcess.createAsCore(sqlRootDir, getDataSource(), previous);
     }
 
+    // -----------------------------------------------------
+    //                                          Take Finally
+    //                                          ------------
     protected void takeFinally(String sqlRootDir, boolean previous) {
         final DfTakeFinallyProcess process = createTakeFinallyProcess(sqlRootDir, previous);
         _takeFinallyFinalInfo = process.execute();

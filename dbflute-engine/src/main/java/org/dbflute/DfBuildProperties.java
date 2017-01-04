@@ -303,10 +303,10 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                                   Schema Policy Check
-    //                                   -------------------
-    public DfSchemaPolicyProperties getSchemaPolicyCheckProperties() {
-        return getHandler().getSchemaPolicyCheckProperties(getProperties());
+    //                                         Schema Policy
+    //                                         -------------
+    public DfSchemaPolicyProperties getSchemaPolicyProperties() {
+        return getHandler().getSchemaPolicyProperties(getProperties());
     }
 
     // -----------------------------------------------------

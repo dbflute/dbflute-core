@@ -39,7 +39,7 @@ public final class DfSchemaPolicyProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                      Definition Map
     //                                                                      ==============
-    // *see SchemaPolicyChecker
+    // *see policy checker
     protected Map<String, Object> _schemaPolicyMap;
 
     protected Map<String, Object> getSchemaPolicyMap() {
@@ -49,6 +49,10 @@ public final class DfSchemaPolicyProperties extends DfAbstractHelperProperties {
             _schemaPolicyMap.putAll(map);
         }
         return _schemaPolicyMap;
+    }
+
+    public boolean hasPolicy() {
+        return !getSchemaPolicyMap().isEmpty();
     }
 
     public DfSPolicyChecker createChecker(Supplier<List<Table>> tableListSupplier) {
