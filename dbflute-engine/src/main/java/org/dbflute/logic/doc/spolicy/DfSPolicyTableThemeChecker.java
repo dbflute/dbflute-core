@@ -92,10 +92,10 @@ public class DfSPolicyTableThemeChecker {
         define(themeMap, "hasPK", table -> !table.hasPrimaryKey(), table -> {
             return "The table should have primary key: " + toTableDisp(table);
         });
-        define(themeMap, "upperCaseBasis", table -> Srl.isLowerCaseAny(buildCaseComparingTableName(table)), table -> {
+        define(themeMap, "upperCaseBasis", table -> Srl.isLowerCaseAny(toComparingTableName(table)), table -> {
             return "The table name should be on upper case basis: " + toTableDisp(table);
         });
-        define(themeMap, "lowerCaseBasis", table -> Srl.isUpperCaseAny(buildCaseComparingTableName(table)), table -> {
+        define(themeMap, "lowerCaseBasis", table -> Srl.isUpperCaseAny(toComparingTableName(table)), table -> {
             return "The table name should be on lower case basis: " + toTableDisp(table);
         });
         define(themeMap, "identityIfPureIDPK", table -> {
@@ -125,8 +125,8 @@ public class DfSPolicyTableThemeChecker {
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
-    protected String buildCaseComparingTableName(Table table) {
-        return _secretary.buildCaseComparingTableName(table);
+    protected String toComparingTableName(Table table) {
+        return _secretary.toComparingTableName(table);
     }
 
     protected String toTableDisp(Table table) {

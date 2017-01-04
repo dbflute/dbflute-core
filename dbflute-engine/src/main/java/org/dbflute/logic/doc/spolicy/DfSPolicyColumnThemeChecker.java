@@ -88,10 +88,10 @@ public class DfSPolicyColumnThemeChecker {
         // ; columnMap = map:{
         //     ; themeList = list:{ upperCaseBasis }
         // }
-        define(themeMap, "upperCaseBasis", column -> Srl.isLowerCaseAny(buildCaseComparingColumnName(column)), column -> {
+        define(themeMap, "upperCaseBasis", column -> Srl.isLowerCaseAny(toComparingColumnName(column)), column -> {
             return "The column name should be on upper case basis: " + toColumnDisp(column);
         });
-        define(themeMap, "lowerCaseBasis", column -> Srl.isUpperCaseAny(buildCaseComparingColumnName(column)), column -> {
+        define(themeMap, "lowerCaseBasis", column -> Srl.isUpperCaseAny(toComparingColumnName(column)), column -> {
             return "The column name should be on lower case basis: " + toColumnDisp(column);
         });
     }
@@ -108,8 +108,8 @@ public class DfSPolicyColumnThemeChecker {
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
-    protected String buildCaseComparingColumnName(Column column) {
-        return _secretary.buildCaseComparingColumnName(column);
+    protected String toComparingColumnName(Column column) {
+        return _secretary.toComparingColumnName(column);
     }
 
     protected String toColumnDisp(Column column) {

@@ -182,14 +182,6 @@ public class DfSPolicyMiscSecretary {
     // ===================================================================================
     //                                                                           Hit Logic
     //                                                                           =========
-    public boolean isHitTable(String tableName, String hint) {
-        return determineHitBy(tableName, hint);
-    }
-
-    public boolean isHitColumn(String columnName, String hint) {
-        return determineHitBy(columnName, hint);
-    }
-
     public boolean isHitExp(String exp, String hint) {
         return determineHitBy(exp, hint);
     }
@@ -222,24 +214,20 @@ public class DfSPolicyMiscSecretary {
     }
 
     // ===================================================================================
-    //                                                                              Naming
-    //                                                                              ======
-    public String buildCaseComparingTableName(Table table) {
-        return toTableName(table);
-    }
-
-    public String buildCaseComparingColumnName(Column column) {
-        return toColumnName(column);
-    }
-
-    public String toTableName(Table table) {
+    //                                                            Conversion for Comparing
+    //                                                            ========================
+    public String toComparingTableName(Table table) {
         // use SQL name because DB name may be controlled
         // (and use resource name to be without schema prefix)
         return table.getResourceNameForSqlName();
     }
 
-    public String toColumnName(Column column) {
+    public String toComparingColumnName(Column column) {
         return column.getResourceNameForSqlName(); // same reason as table name
+    }
+
+    public String toComparingDbTypeWithSize(Column column) {
+        return column.getDbType() + "(" + column.getColumnSize() + ")";
     }
 
     // ===================================================================================
