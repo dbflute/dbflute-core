@@ -112,7 +112,7 @@ public class DfSPolicyWholeThemeChecker {
         define(themeMap, "sameColumnNameIfSameColumnAlias", database -> {
             return analyzeSameColumnNameIfSameColumnAlias(database);
         }, violation -> {
-            return "The column alias should be same if column name is same: " + violation;
+            return "The column name should be same if column alias is same: " + violation;
         });
     }
 
@@ -204,7 +204,7 @@ public class DfSPolicyWholeThemeChecker {
     //                                  --------------------
     protected String analyzeSameColumnNameIfSameColumnAlias(Database database) {
         final boolean ignoreEmpty = true; // alias existence should be checked by other process
-        return determineSameWhatIfSameColumnAlias(database, column -> column.getAlias(), ignoreEmpty);
+        return determineSameWhatIfSameColumnAlias(database, column -> column.getName(), ignoreEmpty);
     }
 
     protected String determineSameWhatIfSameColumnAlias(Database database, Function<Column, Object> valueProvider, boolean ignoreEmpty) {
