@@ -180,6 +180,7 @@ public class DfSPolicyColumnStatementChecker {
 
     protected String doEvaluateColumnThenItemValue(DfSPolicyStatement statement, DfSPolicyThenPart thenPart, Column column,
             Function<String, String> violationCall) {
+        // *can arrange more but don't be hard for now
         final String thenItem = thenPart.getThenItem();
         final String thenValue = thenPart.getThenValue();
         final boolean notThenValue = thenPart.isNotThenValue();
@@ -187,6 +188,45 @@ public class DfSPolicyColumnStatementChecker {
             final String tableName = toComparingTableName(column);
             if (!isHitExp(tableName, thenValue) == !notThenValue) {
                 return violationCall.apply(tableName);
+            }
+        } else if (thenItem.equalsIgnoreCase("column")) { // e.g. column is notNull
+            if ("notNull".equalsIgnoreCase(thenValue)) {
+                final boolean determination = column.isNotNull();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
+                }
+            } else if ("identity".equalsIgnoreCase(thenValue)) {
+                final boolean determination = column.isAutoIncrement();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
+                }
+            } else if ("pk".equalsIgnoreCase(thenValue)) {
+                final boolean determination = column.isPrimaryKey();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
+                }
+            } else if ("fk".equalsIgnoreCase(thenValue)) {
+                final boolean determination = column.isForeignKey();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
+                }
+            } else if ("unique".equalsIgnoreCase(thenValue)) {
+                final boolean determination = column.isUnique();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
+                }
+            } else if ("index".equalsIgnoreCase(thenValue)) {
+                final boolean determination = column.hasIndex();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
+                }
+            } else if ("classification".equalsIgnoreCase(thenValue)) {
+                final boolean determination = column.hasClassification();
+                if (!determination == !notThenValue) {
+                    return violationCall.apply(String.valueOf(determination));
+                }
+            } else {
+                throwSchemaPolicyCheckIllegalIfThenStatementException(statement, "Unknown then-value: " + thenValue);
             }
         } else if (thenItem.equalsIgnoreCase("columnName")) { // e.g. columnName is suffix:_ID
             final String columnName = toComparingColumnName(column);
