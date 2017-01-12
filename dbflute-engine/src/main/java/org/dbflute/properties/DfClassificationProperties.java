@@ -46,6 +46,7 @@ import org.dbflute.properties.assistant.classification.DfClassificationLiteralAr
 import org.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer;
 import org.dbflute.properties.assistant.classification.DfClassificationSqlResourceCloser;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -212,7 +213,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
             reflectClassificationResourceToDefinition(); // *Classification Resource Point!
             filterUseDocumentOnly();
-            checkClassificationConstraints();
+            checkClassificationConstraintsIfNeeds();
             prepareSuppressedDBAccessClassTableSet();
         } finally {
             new DfClassificationSqlResourceCloser().closeConnection(conn);
@@ -220,7 +221,12 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return _classificationTopMap;
     }
 
-    protected void checkClassificationConstraints() {
+    protected void checkClassificationConstraintsIfNeeds() {
+        if (DfDBFluteTaskStatus.getInstance().isReplaceSchema()) {
+            // SchemaPolicyCheck may use classification in ReplaceSchema by dfprop option,
+            // but no data for table classification yet so no check here #for_now by jflute (2017/01/12)
+            return;
+        }
         for (DfClassificationTop classificationTop : _classificationTopMap.values()) {
             // only check one that is not compile-safe
             // (e.g. groupingMap gives us compile error if no-existence element)
