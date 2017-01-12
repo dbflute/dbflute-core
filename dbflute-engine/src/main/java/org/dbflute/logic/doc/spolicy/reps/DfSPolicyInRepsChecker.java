@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.torque.engine.database.model.AppData;
+import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
@@ -26,6 +27,7 @@ import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.dbflute.properties.DfBasicProperties;
+import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
 import org.dbflute.properties.DfSchemaPolicyProperties;
@@ -75,7 +77,9 @@ public class DfSPolicyInRepsChecker {
         try {
             final DfSchemaXmlReader reader = createSchemaXmlReader(schemaXml);
             final AppData appData = reader.read();
-            final List<Table> tableList = appData.getDatabase().getTableList();
+            final Database database = appData.getDatabase();
+            initializeClassificationDeployment(database); // for "then classification"
+            final List<Table> tableList = database.getTableList();
             final DfSPolicyChecker checker = policyProp.createChecker(() -> tableList);
             checker.checkPolicyIfNeeds();
         } finally {
@@ -90,6 +94,11 @@ public class DfSPolicyInRepsChecker {
     protected DfSchemaXmlReader createSchemaXmlReader(String schemaXml) {
         final String databaseType = getBasicProperties().getDatabaseTypeFacadeProp().getTargetDatabase();
         return DfSchemaXmlReader.createAsPlain(schemaXml, databaseType, /*readingFilter*/null); // filter unneeded
+    }
+
+    protected void initializeClassificationDeployment(final Database database) {
+        final DfClassificationProperties clsProp = getClassificationProperties();
+        clsProp.initializeClassificationDeployment(database);
     }
 
     protected void deleteTemporarySchemaXmlIfExists(String schemaXml) {
@@ -108,6 +117,10 @@ public class DfSPolicyInRepsChecker {
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+
+    protected DfClassificationProperties getClassificationProperties() {
+        return getProperties().getClassificationProperties();
     }
 
     protected DfDocumentProperties getDocumentProperties() {

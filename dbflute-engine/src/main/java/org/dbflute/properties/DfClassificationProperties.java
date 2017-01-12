@@ -1088,6 +1088,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
      * @param database The database object. (NotNull)
      */
     public void initializeClassificationDeployment(Database database) { // this should be called when the task start
+        // only overridden if called with same database
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
         final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();
         if (allColumnClassificationMap != null) {
