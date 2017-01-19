@@ -55,13 +55,13 @@ public class DfSPolicyWholeThemeChecker {
     // ===================================================================================
     //                                                                         Whole Theme
     //                                                                         ===========
-    public void checkTableTheme(List<String> themeList, DfSPolicyResult result, Database database) {
+    public void checkWholeTheme(List<String> themeList, DfSPolicyResult result, Database database) {
         for (String theme : themeList) {
-            evaluateTableTheme(theme, result, database);
+            evaluateWholeTheme(theme, result, database);
         }
     }
 
-    protected void evaluateTableTheme(String theme, DfSPolicyResult result, Database database) {
+    protected void evaluateWholeTheme(String theme, DfSPolicyResult result, Database database) {
         final Map<String, BiConsumer<Database, DfSPolicyResult>> themeMap = getThemeMap();
         final BiConsumer<Database, DfSPolicyResult> themeProcessor = themeMap.get(theme);
         if (themeProcessor != null) {

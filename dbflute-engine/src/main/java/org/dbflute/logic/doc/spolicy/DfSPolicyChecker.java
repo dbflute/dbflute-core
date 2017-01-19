@@ -128,7 +128,7 @@ public class DfSPolicyChecker {
     protected void doCheckWhole(DfSPolicyParsedPolicy policy, DfSPolicyResult result, List<Table> tableList) {
         if (!tableList.isEmpty()) { // just in case
             final List<String> themeList = policy.getWholePolicyPart().getThemeList();
-            _wholeThemeChecker.checkTableTheme(themeList, result, tableList.get(0).getDatabase());
+            _wholeThemeChecker.checkWholeTheme(themeList, result, tableList.get(0).getDatabase());
         }
     }
 

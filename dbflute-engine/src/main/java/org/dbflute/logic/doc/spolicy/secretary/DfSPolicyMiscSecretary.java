@@ -269,8 +269,8 @@ public class DfSPolicyMiscSecretary {
             final List<DfSPolicyViolation> violationList = entry.getValue();
             int violationIndex = 0;
             for (DfSPolicyViolation violation : violationList) {
-                final boolean lastLoop = violationIndex < violationList.size() - 1;
-                br.addElement((lastLoop ? " |-" : " +-") + violation.getMessage());
+                final boolean beforeLastLoop = violationIndex < violationList.size() - 1;
+                br.addElement((beforeLastLoop ? " |-" : " +-") + violation.getMessage());
                 ++violationIndex;
             }
             ++policyIndex;
