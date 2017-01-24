@@ -1875,6 +1875,9 @@ public class Column {
     }
 
     public boolean isPropertySettingModifierClosed() {
+        if (isJavaNativeBooleanObject()) { // native setter allowed if Boolean because of safety
+            return false;
+        }
         return isForceClassificationSetting();
     }
 

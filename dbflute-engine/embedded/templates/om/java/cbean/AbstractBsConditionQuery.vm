@@ -577,7 +577,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      * @param determination The determination, true or false. (basically NotNull: error as default, or no condition as option)
      */
-    public void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
+    ${col.propertySettingModifier} void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
         set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
     }
 #end
