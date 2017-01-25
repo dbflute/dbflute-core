@@ -82,7 +82,7 @@ public class ${myClassName} extends AbstractDBMeta {
 #if ($col.isCheckSelectedClassification())
             ccls(et, col, vl);
 #end
-#if ($col.isForceClassificationSetting())
+#if ($col.isPropertySettingModifierClosed())
             ${glCDef}.${col.classificationName} cls = (${glCDef}.${col.classificationName})gcls(et, col, vl);
             if (cls != null) {
                 ((${myExtendedObjectClassName})et).set${col.javaName}As${col.classificationName}(cls);

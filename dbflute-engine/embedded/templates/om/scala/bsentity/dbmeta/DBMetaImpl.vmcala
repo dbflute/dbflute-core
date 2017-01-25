@@ -78,7 +78,7 @@ object ${myClassName} extends AbstractDBMeta {
 #if ($col.isCheckSelectedClassification())
             dgccls(col, vl);
 #end
-#if ($col.isForceClassificationSetting())
+#if ($col.isPropertySettingModifierClosed())
             val cls = dggcls(col, vl).asInstanceOf[${glCDef}.${col.classificationName}];
             if (cls != null) {
                 et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}As${col.classificationName}(cls);

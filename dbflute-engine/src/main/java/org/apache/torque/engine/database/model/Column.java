@@ -1862,19 +1862,19 @@ public class Column {
     //    return javaNative;
     //}
 
-    public String getPropertySettingModifier() {
+    public String getPropertySettingModifier() { // for native setter
         final DfLanguageGrammar grammar = getLanguageDependency().getLanguageGrammar();
         final String publicModifier = grammar.getPublicModifier();
         final String protectedModifier = grammar.getProtectedModifier();
         return isPropertySettingModifierClosed() ? protectedModifier : publicModifier;
     }
 
-    public String getPropertySettingModifierAsPrefix() {
+    public String getPropertySettingModifierAsPrefix() { // for native setter
         final String modifier = getPropertySettingModifier(); // Scala might return empty for public
         return !modifier.isEmpty() ? modifier + " " : ""; // add rear space if exists
     }
 
-    public boolean isPropertySettingModifierClosed() {
+    public boolean isPropertySettingModifierClosed() { // for native setter
         if (isJavaNativeBooleanObject()) { // native setter allowed if Boolean because of safety
             return false;
         }
