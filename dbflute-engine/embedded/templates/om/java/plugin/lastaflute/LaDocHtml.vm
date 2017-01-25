@@ -217,12 +217,18 @@ to ${app.appName}
 <table>
     <thead>
     <tr>
-        <th>No.</th>
-        <th>URL</th>
-        <th>description</th>
-        <th>class#method</th>
-        <th>Form or Body</th>
-        <th>return</th>
+        <th rowspan="2">No.</th>
+        <th rowspan="2">URL</th>
+        <th rowspan="2">description</th>
+        <th rowspan="2">class#method</th>
+        <th rowspan="2">Form or Body</th>
+        <th rowspan="2">return</th>
+        <th colspan="3">count</th>
+    </tr>
+    <tr>
+        <th>class filed</th>
+        <th>class line</th>
+        <th>method line</th>
     </tr>
     </thead>
     <tbody id="table-list-body">
@@ -242,7 +248,14 @@ to ${app.appName}
             <span title="$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.simpleTypeName)</span>
 #end
         </td>
+        <td class="rowcellnum">$!actionDocMeta.fieldTypeDocMetaList.size()</td>
+#if ($actionDocMeta.fileLineCount != 0)
+        <td class="rowcellnum">${actionDocMeta.fileLineCount}</td>
+#end
+#if ($actionDocMeta.methodLineCount != 0)
+        <td class="rowcellnum">${actionDocMeta.methodLineCount}</td>
     </tr>
+#end
 #end
     </tbody>
 </table>
@@ -267,6 +280,10 @@ $manager.htmlEscape($actionDocMeta.url)
 #end
 #if ($actionDocMeta.methodComment)
 <p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($actionDocMeta.methodComment)</p>
+#end
+#if (!$actionDocMeta.parameterTypeDocMetaList.isEmpty())
+<span class="doctitle">URL Parameter:</span>
+$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta)
 #end
 #if ($actionDocMeta.formTypeDocMeta)
 <span class="doctitle">Form or Body:</span> <span class="docsubvalue"><span title="$manager.htmlEscape($actionDocMeta.formTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.formTypeDocMeta.simpleTypeName)</span></span>
