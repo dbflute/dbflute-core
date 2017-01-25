@@ -23,7 +23,9 @@ import org.dbflute.jdbc.ClassificationCodeType;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.optional.OptionalThing;
+#if (!$tableMap.classificationTopList.isEmpty())
 import static org.dbflute.util.DfTypeUtil.emptyStrings;
+#end
 #if ($tableMap.hasRefCls)
 import ${tableMap.allcommonPackage}.*;
 #end
@@ -343,11 +345,14 @@ public interface ${glCDef} extends Classification {
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
+## because empty class is generated when no classification
+#if (!$tableMap.classificationNameList.isEmpty())
 
         @SuppressWarnings("unchecked")
         private List<Classification> toClsList(List<?> clsList) {
             return (List<Classification>)clsList;
         }
+#end
 
         public ClassificationCodeType codeType() {
 #foreach ($classificationTop in $tableMap.classificationTopList)
