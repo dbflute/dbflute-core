@@ -74,12 +74,12 @@ object ${myClassName} extends AbstractDBMeta {
     class ${setupperClassName} extends PropertyGateway {
         def read(et: Entity): Object = { return et.asInstanceOf[${myExtendedObjectClassName}].get${col.javaName}(); }
         def write(et: Entity, vl: Object): Unit = {
-            val col: ColumnInfo = column${col.javaBeansRulePropertyNameInitCap}();
+## this is old style, check on entity is standard after java8
 #if ($col.isCheckSelectedClassification())
-            dgccls(col, vl);
+            dgccls(column${col.javaBeansRulePropertyNameInitCap}(), vl);
 #end
 #if ($col.isPropertySettingModifierClosed())
-            val cls = dggcls(col, vl).asInstanceOf[${glCDef}.${col.classificationName}];
+            val cls = dggcls(column${col.javaBeansRulePropertyNameInitCap}(), vl).asInstanceOf[${glCDef}.${col.classificationName}];
             if (cls != null) {
                 et.asInstanceOf[${myExtendedObjectClassName}].set${col.javaName}As${col.classificationName}(cls);
             } else {
