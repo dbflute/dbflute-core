@@ -250,10 +250,10 @@ to ${app.appName}
         </td>
         <td class="rowcellnum">$!actionDocMeta.fieldTypeDocMetaList.size()</td>
 #if ($actionDocMeta.fileLineCount != 0)
-        <td class="rowcellnum">${actionDocMeta.fileLineCount}</td>
+        <td class="rowcellnum">$!{actionDocMeta.fileLineCount}</td>
 #end
 #if ($actionDocMeta.methodLineCount != 0)
-        <td class="rowcellnum">${actionDocMeta.methodLineCount}</td>
+        <td class="rowcellnum">$!{actionDocMeta.methodLineCount}</td>
     </tr>
 #end
 #end
