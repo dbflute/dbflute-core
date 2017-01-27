@@ -226,7 +226,7 @@ to ${app.appName}
         <th colspan="3">count</th>
     </tr>
     <tr>
-        <th>class filed</th>
+        <th>fields</th>
         <th>class line</th>
         <th>method line</th>
     </tr>
