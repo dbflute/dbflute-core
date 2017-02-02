@@ -1849,6 +1849,7 @@ public final class DfTypeUtil {
         if (includeMillis) {
             if (secEndIndex >= 0) {
                 String millis = startsSec.substring(secEndIndex + timeMilliDlm.length());
+                millis = handleUTCMarkIfExists(millis, pureStr); // may be e.g. 12:34:56.789Z
                 if (millis.length() > 3) { // keep or truncate details
                     millis = keepMillisMore ? millis : millis.substring(0, 3);
                 } else { // add zero prefix
@@ -1861,6 +1862,16 @@ public final class DfTypeUtil {
             }
         }
         return value;
+    }
+
+    protected static String handleUTCMarkIfExists(String millis, String pureValue) {
+        // quit automatic filter for safety, only improve error message
+        //return millis.endsWith("Z") ? millis.substring(0, millis.length() - 1) : millis;
+        if (millis.endsWith("Z")) {
+            String msg = "Cannot parse millisecond part with UTC suffix 'Z' (e.g. ...12:34:56.789Z): " + pureValue;
+            throw new ParseDateUTCSuffixException(msg);
+        }
+        return millis;
     }
 
     protected static Integer formatDateElementAsNumber(String str, String title, String pureValue) {
@@ -1892,6 +1903,10 @@ public final class DfTypeUtil {
     public static class ParseDateException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
+        public ParseDateException(String msg) {
+            super(msg);
+        }
+
         public ParseDateException(String msg, Exception e) {
             super(msg, e);
         }
@@ -1910,6 +1925,14 @@ public final class DfTypeUtil {
 
         public ParseDateOutOfCalendarException(String msg, Exception e) {
             super(msg, e);
+        }
+    }
+
+    public static class ParseDateUTCSuffixException extends ParseDateException {
+        private static final long serialVersionUID = 1L;
+
+        public ParseDateUTCSuffixException(String msg) {
+            super(msg);
         }
     }
 
