@@ -151,8 +151,10 @@ public class DfLoadingControlProp {
         br.addItem("Existing Column");
         br.addElement(columnMetaMap.keySet());
         br.addItem("Non-existing Column");
+        int number = 1; // numbering for mistake of CSV/TSV
         for (String columnName : unneededList) {
-            br.addElement(columnName);
+            br.addElement(number + ": " + columnName);
+            ++number;
         }
         final String msg = br.buildExceptionMessage();
         throw new DfLoadDataRegistrationFailureException(msg);
