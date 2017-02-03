@@ -131,21 +131,26 @@ public class DfLoadingControlProp {
             }
         }
         if (!unneededList.isEmpty()) {
-            throwLoadingControlNoExistenceColumnFoundException(dataDirectory, dataFile, tableName, unneededList);
+            throwLoadingControlNoExistenceColumnFoundException(dataDirectory, dataFile, tableName, columnMetaMap, unneededList);
         }
     }
 
     protected void throwLoadingControlNoExistenceColumnFoundException(String dataDirectory, File dataFile, String tableName,
-            List<String> unneededList) {
+            Map<String, DfColumnMeta> columnMetaMap, List<String> unneededList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Found the no-exist column in your data file.");
+        br.addNotice("Found the non-existing column in your data file.");
+        br.addItem("Advice");
+        br.addElement("Confirm the column names in your data file");
+        br.addElement("and existing columns in database.");
         br.addItem("Data Directory");
         br.addElement(dataDirectory);
         br.addItem("Data File");
         br.addElement(dataFile);
         br.addItem("Table Name");
         br.addElement(tableName);
-        br.addItem("Found Column");
+        br.addItem("Existing Column");
+        br.addElement(columnMetaMap.keySet());
+        br.addItem("Non-existing Column");
         for (String columnName : unneededList) {
             br.addElement(columnName);
         }
@@ -157,7 +162,8 @@ public class DfLoadingControlProp {
     //                                                                     Date Adjustment
     //                                                                     ===============
     public void resolveRelativeDate(String dataDirectory, String tableName, Map<String, Object> columnValueMap,
-            Map<String, DfColumnMeta> columnMetaMap, Set<String> sysdateColumnSet, DfColumnBindTypeProvider bindTypeProvider, int rowNumber) { // was born at LUXA
+            Map<String, DfColumnMeta> columnMetaMap, Set<String> sysdateColumnSet, DfColumnBindTypeProvider bindTypeProvider,
+            int rowNumber) { // was born at LUXA
         if (!hasDateAdjustment(dataDirectory, tableName)) {
             return;
         }
