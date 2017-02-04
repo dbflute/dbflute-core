@@ -19,6 +19,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -131,11 +132,11 @@ public class DfLoadingControlProp {
             }
         }
         if (!unneededList.isEmpty()) {
-            throwLoadingControlNoExistenceColumnFoundException(dataDirectory, dataFile, tableName, columnMetaMap, unneededList);
+            throwLoadingControlNonExistingColumnFoundException(dataDirectory, dataFile, tableName, columnMetaMap, unneededList);
         }
     }
 
-    protected void throwLoadingControlNoExistenceColumnFoundException(String dataDirectory, File dataFile, String tableName,
+    protected void throwLoadingControlNonExistingColumnFoundException(String dataDirectory, File dataFile, String tableName,
             Map<String, DfColumnMeta> columnMetaMap, List<String> unneededList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the non-existing column in your data file.");
@@ -149,15 +150,19 @@ public class DfLoadingControlProp {
         br.addItem("Table Name");
         br.addElement(tableName);
         br.addItem("Existing Column");
-        br.addElement(columnMetaMap.keySet());
+        buildNonExistingColumnNumberingColumnElement(br, columnMetaMap.keySet());
         br.addItem("Non-existing Column");
-        int number = 1; // numbering for mistake of CSV/TSV
-        for (String columnName : unneededList) {
-            br.addElement(number + ": " + columnName);
-            ++number;
-        }
+        buildNonExistingColumnNumberingColumnElement(br, unneededList);
         final String msg = br.buildExceptionMessage();
         throw new DfLoadDataRegistrationFailureException(msg);
+    }
+
+    protected void buildNonExistingColumnNumberingColumnElement(ExceptionMessageBuilder br, Collection<String> columnList) {
+        int number = 1; // numbering for mistake of CSV/TSV
+        for (String column : columnList) {
+            br.addElement(number + ": " + column);
+            ++number;
+        }
     }
 
     // ===================================================================================
