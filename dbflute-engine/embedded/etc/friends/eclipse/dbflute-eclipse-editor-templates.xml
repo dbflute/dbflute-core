@@ -24,6 +24,8 @@ private AsyncManager asyncManager;</template>
 private ${app}Config config;</template>
 <template autoinsert="true" context="java-members" deleted="false" description="LastaFlute: DI for CookieManager" enabled="true" name="_ladcookie">${:import(javax.annotation.Resource,org.lastaflute.web.servlet.cookie.CookieManager)}@Resource
 private CookieManager cookieManager;</template>
+<template autoinsert="true" context="java-members" deleted="false" description="LastaFlute: DI for JobManager" enabled="true" name="_ladjob">${:import(javax.annotation.Resource,org.lastaflute.job.JobManager)}@Resource
+private JobManager jobManager;</template>
 <template autoinsert="true" context="java-members" deleted="false" description="LastaFlute: DI for JsonManager" enabled="true" name="_ladjson">${:import(javax.annotation.Resource,org.lastaflute.core.json.JsonManager)}@Resource
 private JsonManager jsonManager;</template>
 <template autoinsert="true" context="java-members" deleted="false" description="LastaFlute: DI for MessageManager" enabled="true" name="_ladmessage">${:import(javax.annotation.Resource,org.lastaflute.core.message.MessageManager)}@Resource
