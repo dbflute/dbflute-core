@@ -529,7 +529,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getProperty("projectPrefix", "");
     }
 
-    public String getAllcommonPrefix() {
+    public String getAllcommonPrefix() { // closet
         return getProperty("allcommonPrefix", "");
     }
 
