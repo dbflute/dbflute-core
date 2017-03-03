@@ -21,6 +21,19 @@ package org.dbflute.logic.generate.language.pkgstyle;
 public class DfLanguageClassPackagePhp implements DfLanguageClassPackage {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final DfLanguageClassPackageJava classPackageJava = new DfLanguageClassPackageJava();
+
+    // ===================================================================================
+    //                                                                         Basic Class
+    //                                                                         ===========
+    @Override
+    public String buildCDefPureClassName(String projectPrefix, String allcommonPrefix) {
+        return classPackageJava.buildCDefPureClassName(projectPrefix, allcommonPrefix);
+    }
+
+    // ===================================================================================
     //                                                                               Basic
     //                                                                               =====
     public String getBaseCommonPackage() {

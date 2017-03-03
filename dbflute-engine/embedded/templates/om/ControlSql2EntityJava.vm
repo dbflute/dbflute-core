@@ -44,6 +44,7 @@ $database.initializeClassificationDeployment()
 ##                                                                              Prefix
 ##                                                                              ======
 #set ($glProjectPrefix = ${database.projectPrefix})
+#set ($glAllcommonPrefix = ${database.allcommonPrefix})
 #set ($glBasePrefix = ${database.basePrefix})
 #set ($glBaseSuffixForEntity = ${database.baseSuffixForEntity})
 
@@ -61,17 +62,17 @@ $database.initializeClassificationDeployment()
 ##                                                                          Class Name
 ##                                                                          ==========
 ## [Allcommon]
-#set ($glAccessContext = "${glProjectPrefix}AccessContext")
-#set ($glCDef = "${glProjectPrefix}CDef")
-#set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
-#set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
-#set ($glDBFluteInitializer = "${glProjectPrefix}DBFluteInitializer")
-#set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
-#set ($glImplementedBehaviorSelector = "${glProjectPrefix}ImplementedBehaviorSelector")
-#set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}ImplementedCommonColumnAutoSetupper")
-#set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
-#set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
-#set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
+#set ($glAccessContext = "${glProjectPrefix}${glAllcommonPrefix}AccessContext")
+#set ($glCDef = "${glProjectPrefix}${glAllcommonPrefix}CDef")
+#set ($glDBCurrent = "${glProjectPrefix}${glAllcommonPrefix}DBCurrent")
+#set ($glDBFluteConfig = "${glProjectPrefix}${glAllcommonPrefix}DBFluteConfig")
+#set ($glDBFluteInitializer = "${glProjectPrefix}${glAllcommonPrefix}DBFluteInitializer")
+#set ($glEntityDefinedCommonColumn = "${glProjectPrefix}${glAllcommonPrefix}EntityDefinedCommonColumn")
+#set ($glImplementedBehaviorSelector = "${glProjectPrefix}${glAllcommonPrefix}ImplementedBehaviorSelector")
+#set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}${glAllcommonPrefix}ImplementedCommonColumnAutoSetupper")
+#set ($glImplementedInvokerAssistant = "${glProjectPrefix}${glAllcommonPrefix}ImplementedInvokerAssistant")
+#set ($glImplementedSqlClauseCreator = "${glProjectPrefix}${glAllcommonPrefix}ImplementedSqlClauseCreator")
+#set ($glDBMetaInstanceHandler = "${glProjectPrefix}${glAllcommonPrefix}DBMetaInstanceHandler")
 
 ## ===================================================================================
 ##                                                                            Variable

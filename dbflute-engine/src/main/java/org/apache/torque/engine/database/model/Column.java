@@ -2476,25 +2476,24 @@ public class Column {
         return getClassificationProperties().getClassificationName(getTable().getTableDbName(), getName());
     }
 
-    public String getClassificationCDefName() {
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
-        return projectPrefix + "CDef";
-    }
-
     public String getClassificationDefinitionType() {
         final String classificationName = getClassificationName();
-        return hasClassification() ? getClassificationCDefName() + "." + classificationName : "";
+        return hasClassification() ? buildClassificationCDefPureName() + "." + classificationName : "";
     }
 
     public String getClassificationMetaSettingExpression() { // for DBMeta
         if (!hasClassification()) {
             return "null";
         }
-        return getClassificationCDefName() + ".DefMeta." + getClassificationName();
+        return buildClassificationCDefPureName() + ".DefMeta." + getClassificationName();
     }
 
     public String getClassificationMethodSuffix() {
         return hasClassification() ? "As" + getClassificationName() : "";
+    }
+
+    protected String buildClassificationCDefPureName() {
+        return getBasicProperties().getCDefPureName();
     }
 
     // -----------------------------------------------------

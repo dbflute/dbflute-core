@@ -690,14 +690,13 @@ public class DfPmbMetaData {
     }
 
     protected String buildPropertyOptionClassificationElementValueExp(String propertyName, String classificationName, String element) {
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String valueType;
         if (isPropertyTypeList(propertyName)) {
             valueType = getPropertyTypeOfListElement(propertyName);
         } else {
             valueType = getPropertyType(propertyName);
         }
-        final String cdefBase = projectPrefix + "CDef." + classificationName + "." + element;
+        final String cdefBase = getBasicProperties().getCDefPureName() + "." + classificationName + "." + element;
         final DfLanguageGrammar grammar = getLanguageGrammar();
         final boolean toNumber = isPropertyJavaNativeNumberObjectIncludingListElement(propertyName);
         final boolean toBoolean = isPropertyJavaNativeBooleanObjectIncludingListElement(propertyName);
@@ -974,12 +973,13 @@ public class DfPmbMetaData {
         final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
         return metaInfo != null && _columnHandler.isConceptTypeFixedLengthString(metaInfo.getDbTypeName());
     }
-    
+
     public boolean needsObjectBindingBigDecimalHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
         final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
         return metaInfo != null && _columnHandler.isConceptTypeObjectBindingBigDecimal(metaInfo.getDbTypeName());
     }
+
     public boolean needsPostgreSQLByteaHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);
         final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
@@ -991,7 +991,6 @@ public class DfPmbMetaData {
         final DfProcedureColumnMeta metaInfo = getProcedureColumnInfo(propertyName);
         return metaInfo != null && _columnHandler.isPostgreSQLOid(metaInfo.getDbTypeName());
     }
-
 
     public boolean needsOracleArrayHandling(String propertyName) {
         assertArgumentPmbMetaDataPropertyName(propertyName);

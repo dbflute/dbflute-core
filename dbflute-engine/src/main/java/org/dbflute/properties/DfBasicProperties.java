@@ -529,8 +529,19 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getProperty("projectPrefix", "");
     }
 
+    public String getAllcommonPrefix() {
+        return getProperty("allcommonPrefix", "");
+    }
+
     public String getBasePrefix() { // non property
         return "Bs"; // for generation gap
+    }
+
+    public String getCDefPureName() {
+        final String projectPrefix = getProjectPrefix();
+        final String allcommonPrefix = getAllcommonPrefix();
+        final DfLanguageClassPackage classPackage = getLanguageDependency().getLanguageClassPackage();
+        return classPackage.buildCDefPureClassName(projectPrefix, allcommonPrefix);
     }
 
     // ===================================================================================

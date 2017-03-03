@@ -1438,6 +1438,10 @@ public class Database {
         return getBasicProperties().getProjectPrefix();
     }
 
+    public String getAllcommonPrefix() {
+        return getBasicProperties().getAllcommonPrefix();
+    }
+
     public String getBasePrefix() {
         return getBasicProperties().getBasePrefix();
     }

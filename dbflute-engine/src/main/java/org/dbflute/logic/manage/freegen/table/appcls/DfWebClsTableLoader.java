@@ -201,7 +201,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
     }
 
     protected String buildClassificationType(String refClsName) {
-        return getBasicProperties().getProjectPrefix() + "CDef." + refClsName;
+        return getBasicProperties().getCDefPureName() + "." + refClsName;
     }
 
     protected DfClassificationTop findDBCls(String classificationName, String refClsName, Map<String, DfClassificationTop> dbClsMap,

@@ -49,6 +49,7 @@ $database.checkProperties()
 ##                                                Prefix
 ##                                                ------
 #set ($glProjectPrefix = ${database.projectPrefix})
+#set ($glAllcommonPrefix = ${database.allcommonPrefix})
 #set ($glBasePrefix = ${database.basePrefix})
 
 ## -----------------------------------------------------
@@ -79,7 +80,7 @@ $database.checkProperties()
 #set ($glBehaviorSelector = "${glProjectPrefix}BehaviorSelector")
 #set ($glCacheBehaviorSelector = "${glProjectPrefix}CacheBehaviorSelector")
 #set ($glInternalMapContext = "${glProjectPrefix}InternalMapContext")
-#set ($glCDef = "${glProjectPrefix}CDef")
+#set ($glCDef = "${glProjectPrefix}${glAllcommonPrefix}CDef")
 #set ($glDBDef = "${glProjectPrefix}DBDef")
 #set ($glQLog = "${glProjectPrefix}QLog")
 #set ($glXLog = "${glProjectPrefix}XLog")

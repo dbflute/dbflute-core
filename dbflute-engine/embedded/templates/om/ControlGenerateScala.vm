@@ -50,6 +50,7 @@ $database.checkProperties()
 ##                                                                              Prefix
 ##                                                                              ======
 #set ($glProjectPrefix = ${database.projectPrefix})
+#set ($glAllcommonPrefix = ${database.allcommonPrefix})
 #set ($glBasePrefix = ${database.basePrefix})
 #set ($glBaseSuffixForEntity = ${database.baseSuffixForEntity})
 
@@ -72,7 +73,7 @@ $database.checkProperties()
 ##                                               -------
 ## [AllCommon]
 #set ($glAccessContext = "${glProjectPrefix}AccessContext")
-#set ($glCDef = "${glProjectPrefix}CDef")
+#set ($glCDef = "${glProjectPrefix}${glAllcommonPrefix}CDef")
 #set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
 #set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
 #set ($glDBFluteInitializer = "${glProjectPrefix}DBFluteInitializer")

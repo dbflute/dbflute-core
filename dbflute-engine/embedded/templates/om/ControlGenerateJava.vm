@@ -50,6 +50,7 @@ $database.checkProperties()
 ##                                                                              Prefix
 ##                                                                              ======
 #set ($glProjectPrefix = ${database.projectPrefix})
+#set ($glAllcommonPrefix = ${database.allcommonPrefix})
 #set ($glBasePrefix = ${database.basePrefix})
 #set ($glBaseSuffixForEntity = ${database.baseSuffixForEntity})
 
@@ -62,8 +63,8 @@ $database.checkProperties()
 #set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
 #set ($glJ2eeDiconResourceName = "${database.j2eeDiconResourceName}")
 #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
-#set ($glDBFluteBeansJavaConfig = "${glProjectPrefix}DBFluteBeansJavaConfig")
-#set ($glDBFluteModule = "${glProjectPrefix}DBFluteModule")
+#set ($glDBFluteBeansJavaConfig = "${glProjectPrefix}${glAllcommonPrefix}DBFluteBeansJavaConfig")
+#set ($glDBFluteModule = "${glProjectPrefix}${glAllcommonPrefix}DBFluteModule")
 #set ($glDBFluteDiXmlNamespace = "${database.DBFluteDiXmlNamespace}")
 #set ($glDBFluteDiXmlFileName = "${database.DBFluteDiXmlFileName}")
 #set ($glRdbDiXmlResourceName = "${database.RdbDiXmlResourceName}")
@@ -75,17 +76,17 @@ $database.checkProperties()
 ##                                               Regular
 ##                                               -------
 ## [AllCommon]
-#set ($glAccessContext = "${glProjectPrefix}AccessContext")
-#set ($glCDef = "${glProjectPrefix}CDef")
-#set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
-#set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
-#set ($glDBFluteInitializer = "${glProjectPrefix}DBFluteInitializer")
-#set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
-#set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
-#set ($glImplementedBehaviorSelector = "${glProjectPrefix}ImplementedBehaviorSelector")
-#set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}ImplementedCommonColumnAutoSetupper")
-#set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
-#set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
+#set ($glAccessContext = "${glProjectPrefix}${glAllcommonPrefix}AccessContext")
+#set ($glCDef = "${glProjectPrefix}${glAllcommonPrefix}CDef")
+#set ($glDBCurrent = "${glProjectPrefix}${glAllcommonPrefix}DBCurrent")
+#set ($glDBFluteConfig = "${glProjectPrefix}${glAllcommonPrefix}DBFluteConfig")
+#set ($glDBFluteInitializer = "${glProjectPrefix}${glAllcommonPrefix}DBFluteInitializer")
+#set ($glDBMetaInstanceHandler = "${glProjectPrefix}${glAllcommonPrefix}DBMetaInstanceHandler")
+#set ($glEntityDefinedCommonColumn = "${glProjectPrefix}${glAllcommonPrefix}EntityDefinedCommonColumn")
+#set ($glImplementedBehaviorSelector = "${glProjectPrefix}${glAllcommonPrefix}ImplementedBehaviorSelector")
+#set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}${glAllcommonPrefix}ImplementedCommonColumnAutoSetupper")
+#set ($glImplementedInvokerAssistant = "${glProjectPrefix}${glAllcommonPrefix}ImplementedInvokerAssistant")
+#set ($glImplementedSqlClauseCreator = "${glProjectPrefix}${glAllcommonPrefix}ImplementedSqlClauseCreator")
 
 ## ===================================================================================
 ##                                                                            Variable

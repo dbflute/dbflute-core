@@ -718,11 +718,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         } else {
             if (runtime) { // e.g. BehaviorCommandInvoker
                 return className;
-            } else {
+            } else { // allcommon
                 final DfBasicProperties prop = getBasicProperties();
                 final String commonPackage = prop.getBaseCommonPackage();
                 final String projectPrefix = prop.getProjectPrefix();
-                return commonPackage + "." + projectPrefix + className;
+                final String allcommonPrefix = prop.getAllcommonPrefix();
+                return commonPackage + "." + projectPrefix + allcommonPrefix + className;
             }
         }
     }

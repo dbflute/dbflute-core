@@ -77,7 +77,8 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     // }
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> optionMap = mapProp.getOptionMap();
-        final String resourceFile = this.docProcess ? (String) mapProp.getOptionMap().get("appclsResourceFile") : resource.getResourceFile();
+        final String resourceFile =
+                this.docProcess ? (String) mapProp.getOptionMap().get("appclsResourceFile") : resource.getResourceFile();
         final Map<String, Object> appClsMap;
         try {
             appClsMap = new MapListFile().readMap(new FileInputStream(resourceFile));
@@ -200,7 +201,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     }
 
     protected String buildClassificationType(String refClsName) {
-        return getBasicProperties().getProjectPrefix() + "CDef." + refClsName;
+        return getBasicProperties().getCDefPureName() + "." + refClsName;
     }
 
     protected DfClassificationTop findDBCls(String classificationName, String refClsName, Map<String, DfClassificationTop> dbClsMap,
