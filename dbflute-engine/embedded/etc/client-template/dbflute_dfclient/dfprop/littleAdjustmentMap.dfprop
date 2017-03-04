@@ -12,6 +12,7 @@
 # o isTableDispNameUpperCase: (NotRequired - Default false)
 # o isTableSqlNameUpperCase: (NotRequired - Default false)
 # o isColumnSqlNameUpperCase: (NotRequired - Default false)
+# o isSpecifyColumnRequired: (NotRequired - Default false)
 # o extendedDBFluteInitializerClass: (NotRequired - Default null)
 # o shortCharHandlingMode: (NotRequired - Default NONE)
 # o quoteTableNameList: (NotRequired - Default list:{})
@@ -101,6 +102,14 @@ map:{
     #     are forcedly treated as upper case. (except outside-SQL)
     #
     #; isColumnSqlNameUpperCase = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isSpecifyColumnRequired: (NotRequired - Default false)
+    #   [true]
+    #     SpecifyColumn of ConditionBean is required. (exception if no specified columns)
+    #
+    #; isSpecifyColumnRequired = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

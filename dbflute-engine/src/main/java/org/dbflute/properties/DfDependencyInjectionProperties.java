@@ -261,8 +261,7 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         return isProperty("isDBFluteBeansJavaConfigLazy", true); // default: lazy
     }
 
-    protected String getDBFluteBeansRuntimeComponentPrefix() { // Java Only
-        // #for_now only for XML style now, needs adjustment of JavaConfig class's component name
+    protected String getDBFluteBeansRuntimeComponentPrefix() { // closet, Java Only
         return getProperty("dbfluteBeansRuntimeComponentPrefix", null);
     }
 

@@ -2599,19 +2599,21 @@ public class Database {
     protected String filterRuntimeComponentPrefix(String componentName) {
         final DfDependencyInjectionProperties prop = getProperties().getDependencyInjectionProperties();
         final String filtered = prop.filterRuntimeComponentPrefix(componentName);
-        return filterComponentNameWithProjectPrefix(filtered);
+        return filterComponentNameWithProjectPrefix(filterComponentNameWithAllcommonPrefix(filtered));
     }
 
     // -----------------------------------------------------
     //                                     Filtering Utility
     //                                     -----------------
-    /**
-     * Filter a component name with a project prefix.
-     * @param componentName The name of component. (NotNull)
-     * @return A filtered component name with project prefix. (NotNull)
-     */
     public String filterComponentNameWithProjectPrefix(String componentName) { // called from Table
-        final String prefix = getBasicProperties().getProjectPrefix();
+        return doFilterComponentNameWithPrefix(componentName, getBasicProperties().getProjectPrefix());
+    }
+
+    protected String filterComponentNameWithAllcommonPrefix(String componentName) {
+        return doFilterComponentNameWithPrefix(componentName, getBasicProperties().getAllcommonPrefix());
+    }
+
+    protected String doFilterComponentNameWithPrefix(String componentName, String prefix) {
         if (prefix == null || prefix.trim().length() == 0) {
             return componentName;
         }
