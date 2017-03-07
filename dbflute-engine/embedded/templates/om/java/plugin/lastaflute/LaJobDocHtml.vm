@@ -25,6 +25,7 @@
         <th rowspan="2">job unique</th>
         <th rowspan="2">title</th>
         <th rowspan="2">description</th>
+        <th rowspan="2">concurrent</th>
         <th rowspan="2">notice log</th>
         <th rowspan="2">triggered job</th>
         <th colspan="4">count</th>
@@ -46,6 +47,7 @@
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobUnique)</td>
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobTitle)</td>
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobDescription)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.concurrentExec)</td>
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.noticeLogLevel)</td>
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.triggeredJobKeyList)</td>
         <td class="rowcellnum">$!{jobDocMeta.params.size()}</td>
@@ -72,6 +74,7 @@ $manager.htmlEscape($jobDocMeta.jobKey)
         <th rowspan="2">job unique</th>
         <th rowspan="2">title</th>
         <th rowspan="2">description</th>
+        <th rowspan="2">concurrent</th>
         <th rowspan="2">notice log</th>
         <th rowspan="2">triggered job</th>
         <th colspan="4">count</th>
@@ -92,6 +95,7 @@ $manager.htmlEscape($jobDocMeta.jobKey)
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobUnique)</td>
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobTitle)</td>
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobDescription)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.concurrentExec)</td>
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.noticeLogLevel)</td>
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.triggeredJobKeyList)</td>
         <td class="rowcellnum">$!{jobDocMeta.params.size()}</td>
