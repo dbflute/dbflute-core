@@ -32,7 +32,7 @@
     <tr>
         <th>job params</th>
         <th>fields</th>
-        <th>file lines</th>
+        <th>class lines</th>
         <th>method lines</th>
     </tr>
     </thead>
@@ -79,7 +79,7 @@ $manager.htmlEscape($jobDocMeta.jobKey)
     <tr>
         <th>job params</th>
         <th>fields</th>
-        <th>file lines</th>
+        <th>class lines</th>
         <th>method lines</th>
     </tr>
     </thead>

@@ -28,7 +28,7 @@
     </tr>
     <tr>
         <th>fields</th>
-        <th>file lines</th>
+        <th>class lines</th>
         <th>method lines</th>
     </tr>
     </thead>
