@@ -55,6 +55,7 @@ public class DfAbstractReplaceSchemaProcess {
             runInfo.setRollbackOnly(false);
         }
         runInfo.setSuppressLoggingSql(isSuppressLoggingReplaceSql());
+        runInfo.setDelimiter(getSqlDelimiter()); // use delimiter from ReplaceSchema properties
         return runInfo;
     }
 
@@ -72,6 +73,10 @@ public class DfAbstractReplaceSchemaProcess {
 
     protected boolean isSuppressLoggingReplaceSql() {
         return getReplaceSchemaProperties().isSuppressLoggingReplaceSql();
+    }
+
+    protected String getSqlDelimiter() {
+        return getReplaceSchemaProperties().getSqlDelimiter();
     }
 
     protected String resolveTerminator4Tool() {

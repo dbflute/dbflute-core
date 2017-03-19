@@ -27,7 +27,7 @@ public class DfRunnerInformation {
     protected String _url;
     protected String _user;
     protected String _password;
-    protected String _delimiter = ";";
+    protected String _delimiter = ";"; // as default (be set if ReplaceSchema)
     protected boolean _breakCauseThrow;
     protected boolean _errorContinue;
     protected boolean _autoCommit;
