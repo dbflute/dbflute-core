@@ -258,7 +258,7 @@ public class UnifiedSchema {
         return _schema;
     }
 
-    protected String getSqlPrefixSchema() {
+    public String getSqlPrefixSchema() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         if (prop.isAvailableAddingSchemaToTableSqlName()) {
             if (prop.isAvailableAddingCatalogToTableSqlName()) {

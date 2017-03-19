@@ -317,6 +317,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty("isSuppressSchemaHtmlProcedure", false, getDocumentMap());
     }
 
+    public boolean isShowSchemaHtmlProcedureRegardlessOfGeneration() { // closet, for e.g. Alto DBFlute
+        return isProperty("isShowSchemaHtmlProcedureRegardlessOfGeneration", false, getDocumentMap());
+    }
+
     // -----------------------------------------------------
     //                                           Style Sheet
     //                                           -----------
