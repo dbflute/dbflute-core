@@ -30,7 +30,6 @@ import org.springframework.context.annotation.Lazy;
 #end
 import org.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.dbflute.bhv.core.InvokerAssistant;
-import ${database.DBFluteInitializerClass};
 #if (!$database.needsDBFluteBeansHybritScanConfig())
 import ${glPackageExtendedBhv}.*;
 #end
