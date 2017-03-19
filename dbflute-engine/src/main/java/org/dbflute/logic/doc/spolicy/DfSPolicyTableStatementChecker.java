@@ -173,7 +173,7 @@ public class DfSPolicyTableStatementChecker {
                 final String pkName = pk.getPrimaryKeyName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
                 if (!isHitExp(pkName, comparingValue) == !notThenValue) {
-                    return violationCall.apply(comparingValue);
+                    return violationCall.apply(pkName);
                 }
             }
         } else if (thenItem.equalsIgnoreCase("fkName")) { // e.g. fkName is prefix:FK_
@@ -181,7 +181,7 @@ public class DfSPolicyTableStatementChecker {
                 final String fkName = fk.getName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
                 if (!isHitExp(fkName, comparingValue) == !notThenValue) {
-                    return violationCall.apply(comparingValue);
+                    return violationCall.apply(fkName);
                 }
             }
         } else if (thenItem.equalsIgnoreCase("uniqueName")) { // e.g. uniqueName is prefix:UQ_ 
@@ -189,7 +189,7 @@ public class DfSPolicyTableStatementChecker {
                 final String uqName = uq.getName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
                 if (!isHitExp(uqName, comparingValue)) {
-                    return violationCall.apply(comparingValue);
+                    return violationCall.apply(uqName);
                 }
             }
         } else if (thenItem.equalsIgnoreCase("indexName")) { // e.g. indexName is prefix:IX_ 
@@ -197,7 +197,7 @@ public class DfSPolicyTableStatementChecker {
                 final String ixName = ix.getName();
                 final String comparingValue = toConstraintComparingValue(table, thenValue);
                 if (!isHitExp(ixName, comparingValue) == !notThenValue) {
-                    return violationCall.apply(comparingValue);
+                    return violationCall.apply(ixName);
                 }
             }
         } else if (thenItem.equalsIgnoreCase("pk_columnName")) {
