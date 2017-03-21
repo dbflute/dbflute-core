@@ -65,16 +65,22 @@ public abstract class Bs${table.camelizedName}Bhv extends EsAbstractBehavior<${t
 #if (${column.type} == "keyword" || ${column.type} == "text")#set ($javaNative = "String")#else#set ($javaNative = ${column.type})#end
 #if ($tableMetaSettings.properties.get($column.name).array)
             result.set${column.capCamelName}(to${javaNative}Array(source.get("${column.name}")));
+#elseif ($javaNative == "LocalDateTime" || $javaNative == "Date")
+            result.set${column.capCamelName}(to$javaNative(source.get("${column.name}")));
 #else
             result.set${column.capCamelName}(DfTypeUtil.to$javaNative(source.get("${column.name}")));
 #end
 #end
 #end
-            return result;
+            return updateEntity(source, result);
         } catch (InstantiationException | IllegalAccessException e) {
             final String msg = "Cannot create a new instance: " + entityType.getName();
             throw new IllegalBehaviorStateException(msg, e);
         }
+    }
+
+    protected <RESULT extends ${table.camelizedName}> RESULT updateEntity(Map<String, Object> source, RESULT result) {
+        return result;
     }
 
     // ===================================================================================
