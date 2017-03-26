@@ -35,6 +35,8 @@ import org.dbflute.helper.StringKeyMap;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
+import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
+import org.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataWriterImpl.FirstLineInfo;
 import org.dbflute.logic.replaceschema.loaddata.impl.DfRelativeDateResolver;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
 import org.dbflute.system.DBFluteSystem;
@@ -112,9 +114,64 @@ public class DfLoadingControlProp {
     }
 
     // ===================================================================================
-    //                                                                 ColumnDef Existence
-    //                                                                 ===================
-    public boolean isCheckColumnDefExistence(String dataDirectory) {
+    //                                                         Different ColumnValue Count
+    //                                                         ===========================
+    protected boolean isContinueDifferentColumnValueCount(String dataDirectory) { // basically delimiter file only
+        final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final String prop = (String) loadingControlMap.get("isContinueDifferentColumnValueCount");
+        if (isSpecifiedValidProperty(prop) && prop.trim().equalsIgnoreCase("true")) {
+            return true; // continue (warning only)
+        }
+        return false; // default is error
+    }
+
+    public void handleDifferentColumnValueCount(DfDelimiterDataResultInfo resultInfo, String dataDirectory, String fileName,
+            String tableDbName, FirstLineInfo firstLineInfo, List<String> valueList) {
+        if (isContinueDifferentColumnValueCount(dataDirectory)) {
+            String msg = "The count of values wasn't correct:";
+            msg = msg + " column=" + firstLineInfo.getColumnNameList().size() + " value=" + valueList.size();
+            msg = msg + " -> " + valueList;
+            resultInfo.registerColumnCountDiff(fileName, msg);
+        } else {
+            throwLoadingControlDifferentColumnValueCountException(fileName, tableDbName, firstLineInfo, valueList);
+        }
+    }
+
+    protected void throwLoadingControlDifferentColumnValueCountException(String fileName, String tableDbName, FirstLineInfo firstLineInfo,
+            List<String> valueList) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Different column and value count in your data file.");
+        br.addItem("Advice");
+        br.addElement("Confirm the count of header columns and row values.");
+        br.addElement("For example:");
+        br.addElement("  (o):");
+        br.addElement("    SEA_ID (delimiter) SEA_NAME (delimiter) SEA_DATE");
+        br.addElement("    1 (delimiter) mystic (delimiter) 2017/03/26 16:34:00");
+        br.addElement("    2 (delimiter) bigband (delimiter) 2017/03/26 16:34:00");
+        br.addElement("  (x):");
+        br.addElement("    SEA_ID (delimiter) SEA_NAME (delimiter) SEA_DATE");
+        br.addElement("    1 (delimiter) mystic // *Bad");
+        br.addElement("    2 (delimiter) bigband (delimiter) 2017/03/26 16:34:00");
+        br.addItem("Data File");
+        br.addElement(fileName); // contains path
+        br.addItem("Table Name");
+        br.addElement(tableDbName);
+        br.addItem("Header Columns");
+        final String displayDelimiter = " | ";
+        final List<String> columnNameList = firstLineInfo.getColumnNameList();
+        br.addElement(Srl.connectByDelimiter(columnNameList, displayDelimiter));
+        br.addElement("count: " + columnNameList.size());
+        br.addItem("Row Values");
+        br.addElement(Srl.connectByDelimiter(valueList, displayDelimiter));
+        br.addElement("count: " + valueList.size());
+        final String msg = br.buildExceptionMessage();
+        throw new DfLoadDataRegistrationFailureException(msg);
+    }
+
+    // ===================================================================================
+    //                                                             Column Definition Check
+    //                                                             =======================
+    public boolean isCheckColumnDef(String dataDirectory) {
         final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
         final String prop = (String) loadingControlMap.get("isSuppressColumnDefCheck");
         if (isSpecifiedValidProperty(prop) && prop.trim().equalsIgnoreCase("true")) {
@@ -123,8 +180,7 @@ public class DfLoadingControlProp {
         return true; // default is checked
     }
 
-    public void checkColumnDefExistence(String dataDirectory, File dataFile, String tableName, List<String> columnDefNameList,
-            Map<String, DfColumnMeta> columnMetaMap) {
+    public void checkColumnDef(File dataFile, String tableName, List<String> columnDefNameList, Map<String, DfColumnMeta> columnMetaMap) {
         final List<String> unneededList = new ArrayList<String>();
         for (String columnName : columnDefNameList) {
             if (!columnMetaMap.containsKey(columnName)) {
@@ -132,19 +188,26 @@ public class DfLoadingControlProp {
             }
         }
         if (!unneededList.isEmpty()) {
-            throwLoadingControlNonExistingColumnFoundException(dataDirectory, dataFile, tableName, columnMetaMap, unneededList);
+            throwLoadingControlNonExistingColumnException(dataFile, tableName, columnMetaMap, unneededList);
         }
     }
 
-    protected void throwLoadingControlNonExistingColumnFoundException(String dataDirectory, File dataFile, String tableName,
-            Map<String, DfColumnMeta> columnMetaMap, List<String> unneededList) {
+    protected void throwLoadingControlNonExistingColumnException(File dataFile, String tableName, Map<String, DfColumnMeta> columnMetaMap,
+            List<String> unneededList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Found the non-existing column in your data file.");
+        br.addNotice("Non-existing column in database, defined your data file.");
         br.addItem("Advice");
         br.addElement("Confirm the column names in your data file");
         br.addElement("and existing columns in database.");
-        br.addItem("Data Directory");
-        br.addElement(dataDirectory);
+        br.addElement("For example:");
+        br.addElement("  (o):");
+        br.addElement("    SEA_ID | SEA_NAME | SEA_COUNT | SEA_DATE // Good");
+        br.addElement("    1      | mystic   | 904       | 2001/09/04");
+        br.addElement("    ...");
+        br.addElement("  (x):");
+        br.addElement("    SEA_ID | SEA_NAME | SEA_COUNT | C_DATE   // *Bad");
+        br.addElement("    1      | mystic   | 904       | 2001/09/04");
+        br.addElement("    ...");
         br.addItem("Data File");
         br.addElement(dataFile);
         br.addItem("Table Name");

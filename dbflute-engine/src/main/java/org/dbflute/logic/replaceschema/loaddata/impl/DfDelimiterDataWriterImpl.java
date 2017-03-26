@@ -161,7 +161,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // check definition differences
                 // - - - - - - - - - -/
                 if (isDifferentColumnValueCount(firstLineInfo, valueList)) {
-                    handleDifferentColumnValueCount(resultInfo, valueList, firstLineInfo);
+                    handleDifferentColumnValueCount(resultInfo, dataDirectory, tableDbName, firstLineInfo, valueList);
 
                     // clear temporary variables
                     valueList.clear();
@@ -287,14 +287,6 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         return tableDbName;
     }
 
-    protected void handleDifferentColumnValueCount(DfDelimiterDataResultInfo resultInfo, List<String> valueList,
-            FirstLineInfo firstLineInfo) {
-        String msg = "The count of values wasn't correct:";
-        msg = msg + " column=" + firstLineInfo.getColumnNameList().size() + " value=" + valueList.size();
-        msg = msg + " -> " + valueList;
-        resultInfo.registerColumnCountDiff(_fileName, msg);
-    }
-
     protected DfDelimiterDataWriteSqlBuilder createSqlBuilder(DfDelimiterDataResultInfo resultInfo, String tableDbName,
             final Map<String, DfColumnMeta> columnMetaMap, List<String> columnNameList, List<String> valueList) {
         final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
@@ -385,8 +377,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         if (columnNameList.isEmpty()) {
             throwDelimiterDataColumnDefNotFoundException(_fileName, tableDbName);
         }
-        if (isCheckColumnDefExistence(dataDirectory)) { // should be before default process
-            checkColumnDefExistence(dataDirectory, dataFile, tableDbName, columnNameList, columnMetaMap);
+        if (isCheckColumnDef(dataDirectory)) {
+            checkColumnDef(dataFile, tableDbName, columnNameList, columnMetaMap);
         }
         final StringSet columnSet = StringSet.createAsFlexible();
         columnSet.addAll(columnNameList);
@@ -574,11 +566,16 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         }
     }
 
+    // ===================================================================================
+    //                                                         Different ColumnValue Count
+    //                                                         ===========================
     protected boolean isDifferentColumnValueCount(FirstLineInfo firstLineInfo, List<String> valueList) {
-        if (valueList.size() < firstLineInfo.getColumnNameList().size()) {
-            return true;
-        }
-        return false;
+        return valueList.size() < firstLineInfo.getColumnNameList().size();
+    }
+
+    protected void handleDifferentColumnValueCount(DfDelimiterDataResultInfo resultInfo, String dataDirectory, String tableDbName,
+            FirstLineInfo firstLineInfo, List<String> valueList) {
+        _loadingControlProp.handleDifferentColumnValueCount(resultInfo, dataDirectory, _fileName, tableDbName, firstLineInfo, valueList);
     }
 
     // ===================================================================================

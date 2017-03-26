@@ -299,7 +299,8 @@ public abstract class DfAbsractDataWriter {
         }
         for (StringProcessor tryProcessor : _stringProcessorList) {
             // processing and searching target processor
-            if (tryProcessor.process(dataDirectory, dataFile, tableName, columnName, value, conn, ps, bindCount, columnInfoMap, rowNumber)) {
+            if (tryProcessor.process(dataDirectory, dataFile, tableName, columnName, value, conn, ps, bindCount, columnInfoMap,
+                    rowNumber)) {
                 cacheMap.put(columnName, tryProcessor); // use cache next times
                 break;
             }
@@ -532,8 +533,8 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                                Number
     //                                                ------
-    protected boolean processNumber(String tableName, String columnName, String value, Connection conn, PreparedStatement ps,
-            int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
+    protected boolean processNumber(String tableName, String columnName, String value, Connection conn, PreparedStatement ps, int bindCount,
+            Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
         if (value == null || value.trim().length() == 0) { // cannot be number
             return false;
         }
@@ -971,7 +972,8 @@ public abstract class DfAbsractDataWriter {
         // ReplaceSchema uses an own original mapping way
         // (not uses Generate mapping)
         // it's simple mapping (for string processor)
-        if (jdbcDefValue == Types.CHAR || jdbcDefValue == Types.VARCHAR || jdbcDefValue == Types.LONGVARCHAR || jdbcDefValue == Types.CLOB) {
+        if (jdbcDefValue == Types.CHAR || jdbcDefValue == Types.VARCHAR || jdbcDefValue == Types.LONGVARCHAR
+                || jdbcDefValue == Types.CLOB) {
             bindType = String.class;
         } else if (jdbcDefValue == Types.TINYINT || jdbcDefValue == Types.SMALLINT || jdbcDefValue == Types.INTEGER) {
             bindType = Integer.class;
@@ -1133,16 +1135,16 @@ public abstract class DfAbsractDataWriter {
         return _loadingControlProp.isMergedSuppressBatchUpdate(dataDirectory, _suppressBatchUpdate);
     }
 
-    protected boolean isCheckColumnDefExistence(String dataDirectory) {
+    protected boolean isCheckColumnDef(String dataDirectory) {
         if (isSuppressCheckColumnDef()) { // basically for SavePrevious
             return false;
         }
-        return _loadingControlProp.isCheckColumnDefExistence(dataDirectory);
+        return _loadingControlProp.isCheckColumnDef(dataDirectory);
     }
 
-    protected void checkColumnDefExistence(String dataDirectory, File dataFile, String tableName, List<String> columnDefNameList,
+    protected void checkColumnDef(File dataFile, String tableName, List<String> columnDefNameList,
             Map<String, DfColumnMeta> columnMetaMap) {
-        _loadingControlProp.checkColumnDefExistence(dataDirectory, dataFile, tableName, columnDefNameList, columnMetaMap);
+        _loadingControlProp.checkColumnDef(dataFile, tableName, columnDefNameList, columnMetaMap);
     }
 
     protected void resolveRelativeDate(String dataDirectory, String tableName, Map<String, Object> columnValueMap,

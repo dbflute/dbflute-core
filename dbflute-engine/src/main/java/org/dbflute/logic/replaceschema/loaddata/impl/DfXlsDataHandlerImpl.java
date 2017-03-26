@@ -302,7 +302,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     protected void checkHeaderColumnIfNeeds(DfXlsDataResource resource, File file, DfDataTable dataTable,
             Map<String, DfColumnMeta> columnMetaMap) {
         final String dataDirectory = resource.getDataDirectory();
-        if (!isCheckColumnDefExistence(dataDirectory)) {
+        if (!isCheckColumnDef(dataDirectory)) {
             return;
         }
         final List<String> columnDefNameList = new ArrayList<String>();
@@ -313,8 +313,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
         // use columnMetaMap to check (not use DataTable's meta data here)
         // at old age, columnMetaMap is not required but required now
-        final String tableDbName = dataTable.getTableDbName();
-        checkColumnDefExistence(dataDirectory, file, tableDbName, columnDefNameList, columnMetaMap);
+        checkColumnDef(file, dataTable.getTableDbName(), columnDefNameList, columnMetaMap);
     }
 
     protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
@@ -555,7 +554,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         final Map<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectory);
         final Map<String, List<String>> emptyStringTableColumnMap = getEmptyStringTableColumnMap(dataDirectory);
         final boolean rtrimCellValue = isRTrimCellValue(dataDirectory);
-        return new DfTableXlsReader(file, tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap, _skipSheetPattern, rtrimCellValue);
+        return new DfTableXlsReader(file, tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap, _skipSheetPattern,
+                rtrimCellValue);
     }
 
     protected List<File> getXlsList(DfXlsDataResource resource) {
