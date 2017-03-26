@@ -64,7 +64,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _fileName;
+    protected String _fileName; // contains path
     protected String _encoding;
     protected String _delimiter;
     protected Map<String, Map<String, String>> _convertValueMap;
@@ -253,6 +253,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 commitTransaction(conn);
             }
             noticeLoadedRowSize(tableDbName, rowNumber);
+            resultInfo.registerLoadedMeta(dataDirectory, _fileName, rowNumber);
             checkImplicitClassification(dataFile, tableDbName, columnNameList);
         } catch (FileNotFoundException e) {
             throw e;

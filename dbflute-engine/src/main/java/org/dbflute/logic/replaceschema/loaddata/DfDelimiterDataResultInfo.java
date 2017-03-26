@@ -30,6 +30,29 @@ public class DfDelimiterDataResultInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** map:{ data-directory = map:{ file-name = loaded-meta } } */
+    protected final Map<String, Map<String, DfDelimiterDataLoadedMeta>> _loadedMetaMap =
+            new LinkedHashMap<String, Map<String, DfDelimiterDataLoadedMeta>>();
+
+    public static class DfDelimiterDataLoadedMeta {
+
+        protected final String _fileName; // contains path
+        protected final int _successRowCount;
+
+        public DfDelimiterDataLoadedMeta(String fileName, int successRowCount) {
+            _fileName = fileName;
+            _successRowCount = successRowCount;
+        }
+
+        public String getFileName() {
+            return _fileName;
+        }
+
+        public Integer getSuccessRowCount() {
+            return _successRowCount;
+        }
+    }
+
     /**
      * as INFO, map:{ tableName = set:{ not-found-column } } <br>
      * may be empty because already checked by loading control
@@ -42,6 +65,15 @@ public class DfDelimiterDataResultInfo {
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
+    public void registerLoadedMeta(String dataDirectory, String fileName, int successRowCount) {
+        Map<String, DfDelimiterDataLoadedMeta> firstMap = _loadedMetaMap.get(dataDirectory);
+        if (firstMap == null) {
+            firstMap = new LinkedHashMap<String, DfDelimiterDataLoadedMeta>();
+            _loadedMetaMap.put(dataDirectory, firstMap);
+        }
+        firstMap.put(fileName, new DfDelimiterDataLoadedMeta(fileName, successRowCount));
+    }
+
     public void registerColumnCountDiff(String fileName, String message) {
         List<String> messageList = _columnCountDiffMap.get(fileName);
         if (messageList == null) {
@@ -58,6 +90,10 @@ public class DfDelimiterDataResultInfo {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public Map<String, Map<String, DfDelimiterDataLoadedMeta>> getLoadedMetaMap() {
+        return Collections.unmodifiableMap(_loadedMetaMap);
+    }
+
     public Map<String, Set<String>> getNotFoundColumnMap() {
         return _notFoundColumnMap; // cannot be read-only, put by outer processes
     }

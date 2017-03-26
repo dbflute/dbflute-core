@@ -67,7 +67,6 @@ import org.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfTableNameProp;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
-import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -149,11 +148,11 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     //                                               DataSet
     //                                               -------
     protected void doWriteDataSet(DfXlsDataResource resource, File file, DfDataSet dataSet, StringBuilder msgSb) {
-        msgSb.append(ln()).append(ln()).append("[" + file.getName() + "]");
+        msgSb.append(ln()).append(ln()).append("[").append(file.getName()).append("]");
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable dataTable = dataSet.getTable(i);
             final int loadedCount = doWriteDataTable(resource, file, dataTable);
-            msgSb.append(ln()).append("  " + dataTable.getTableDbName() + " (" + loadedCount + ")");
+            msgSb.append(ln()).append("  ").append(dataTable.getTableDbName()).append(" (").append(loadedCount).append(")");
         }
     }
 
@@ -884,10 +883,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 } catch (IOException ignored) {}
             }
         }
-    }
-
-    protected String ln() {
-        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

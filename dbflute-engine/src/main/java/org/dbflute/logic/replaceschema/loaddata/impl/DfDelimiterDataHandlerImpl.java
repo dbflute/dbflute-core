@@ -15,13 +15,17 @@
  */
 package org.dbflute.logic.replaceschema.loaddata.impl;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -32,10 +36,13 @@ import org.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
 import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResource;
 import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
+import org.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo.DfDelimiterDataLoadedMeta;
 import org.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfDefaultValueProp;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
 import org.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptor;
+import org.dbflute.system.DBFluteSystem;
+import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +98,8 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                     continue;
                 }
 
-                final File encodingNameDirectory = new File(basePath + "/" + encoding);
+                final String dataDirectory = basePath + "/" + encoding;
+                final File encodingNameDirectory = new File(dataDirectory);
                 final String[] fileNameList = encodingNameDirectory.list(filter);
 
                 final Comparator<String> fileNameAscComparator = new Comparator<String>() {
@@ -107,7 +115,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                 final Map<String, Map<String, String>> convertValueMap = getConvertValueMap(resource, encoding);
                 final Map<String, String> defaultValueMap = getDefaultValueMap(resource, encoding);
                 for (String fileName : sortedFileNameSet) {
-                    final String fileNamePath = basePath + "/" + encoding + "/" + fileName;
+                    final String fileNamePath = dataDirectory + "/" + fileName;
                     final DfDelimiterDataWriterImpl writer = new DfDelimiterDataWriterImpl(_dataSource, _unifiedSchema);
                     writer.setLoggingInsertSql(isLoggingInsertSql());
                     writer.setFileName(fileNamePath);
@@ -129,6 +137,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                     final boolean warned = resultInfo.containsColumnCountDiff(fileNamePath);
                     loadedDataInfo.addLoadedFile(loadType, fileType, encoding, fileName, warned);
                 }
+                outputResultMark(resource, resultInfo, dataDirectory);
             }
         } catch (IOException e) {
             String msg = "Failed to register delimiter data: " + resource;
@@ -168,6 +177,60 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     protected void prepareImplicitClassificationLazyCheck(DfLoadedDataInfo info, DfDelimiterDataWriterImpl writer) {
         final List<DfLoadedClassificationLazyChecker> checkerList = writer.getImplicitClassificationLazyCheckerList();
         info.acceptImplicitClassificationLazyCheck(checkerList);
+    }
+
+    // ===================================================================================
+    //                                                                         Result Mark
+    //                                                                         ===========
+    protected void outputResultMark(DfDelimiterDataResource resource, DfDelimiterDataResultInfo resultInfo, String dataDirectory) {
+        final String fileType = resource.getFileType();
+        final StringBuilder sb = new StringBuilder();
+        final String title = Srl.initCap(fileType); // e.g. Tsv like Xls
+        sb.append(ln()).append("* * * * * * * * * *");
+        sb.append(ln()).append("*                 *");
+        sb.append(ln()).append("* " + title + " Data Result *");
+        sb.append(ln()).append("*                 *");
+        sb.append(ln()).append("* * * * * * * * * *");
+        sb.append(ln()).append("data-directory: ").append(dataDirectory);
+        sb.append(ln());
+        final Map<String, Map<String, DfDelimiterDataLoadedMeta>> loadedMetaMap = resultInfo.getLoadedMetaMap();
+        final Map<String, DfDelimiterDataLoadedMeta> elementMap = loadedMetaMap.get(dataDirectory);
+        if (elementMap == null) { // e.g. no delimiter file
+            return;
+        }
+        for (Entry<String, DfDelimiterDataLoadedMeta> entry : elementMap.entrySet()) {
+            final DfDelimiterDataLoadedMeta loadedMeta = entry.getValue();
+            final String delimiterFilePureName = Srl.substringLastRear(loadedMeta.getFileName(), "/");
+            final Integer successRowCount = loadedMeta.getSuccessRowCount();
+            sb.append(ln()).append(delimiterFilePureName).append(" (").append(successRowCount).append(")");
+        }
+        final String outputFilePureName = fileType.toLowerCase() + "-data-result.dfmark";
+        final File dataPropFile = new File(dataDirectory + "/" + outputFilePureName);
+        if (dataPropFile.exists()) {
+            dataPropFile.delete();
+        }
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataPropFile), "UTF-8"));
+            bw.write(sb.toString());
+            bw.flush();
+        } catch (IOException e) {
+            String msg = "Failed to write " + outputFilePureName + ": " + dataPropFile;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ignored) {}
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DBFluteSystem.ln();
     }
 
     // ===================================================================================
