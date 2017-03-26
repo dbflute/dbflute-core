@@ -16,6 +16,7 @@
 package org.dbflute.logic.replaceschema.loaddata;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,29 +30,39 @@ public class DfDelimiterDataResultInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /**
+     * as INFO, map:{ tableName = set:{ not-found-column } } <br>
+     * may be empty because already checked by loading control
+     */
     protected final Map<String, Set<String>> _notFoundColumnMap = new LinkedHashMap<String, Set<String>>();
-    protected final Map<String, List<String>> _warinngFileMap = new LinkedHashMap<String, List<String>>();
+
+    /** as WARN, map:{ tsv-file-path = list:{ message-of-diff } } */
+    protected final Map<String, List<String>> _columnCountDiffMap = new LinkedHashMap<String, List<String>>();
 
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
-    public void registerWarningFile(String fileName, String message) {
-        List<String> messageList = _warinngFileMap.get(fileName);
+    public void registerColumnCountDiff(String fileName, String message) {
+        List<String> messageList = _columnCountDiffMap.get(fileName);
         if (messageList == null) {
             messageList = new ArrayList<String>();
-            _warinngFileMap.put(fileName, messageList);
+            _columnCountDiffMap.put(fileName, messageList);
         }
         messageList.add(message);
+    }
+
+    public boolean containsColumnCountDiff(String delimiterFilePath) {
+        return _columnCountDiffMap.containsKey(delimiterFilePath);
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public Map<String, Set<String>> getNotFoundColumnMap() {
-        return _notFoundColumnMap;
+        return _notFoundColumnMap; // cannot be read-only, put by outer processes
     }
 
-    public Map<String, List<String>> getWarningFileMap() {
-        return _warinngFileMap;
+    public Map<String, List<String>> getColumnCountDiffMap() {
+        return Collections.unmodifiableMap(_columnCountDiffMap);
     }
 }

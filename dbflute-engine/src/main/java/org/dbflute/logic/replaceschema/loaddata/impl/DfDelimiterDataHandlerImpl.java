@@ -126,7 +126,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
 
                     final String loadType = resource.getLoadType();
                     final String fileType = resource.getFileType();
-                    final boolean warned = resultInfo.getWarningFileMap().containsKey(fileNamePath);
+                    final boolean warned = resultInfo.containsColumnCountDiff(fileNamePath);
                     loadedDataInfo.addLoadedFile(loadType, fileType, encoding, fileName, warned);
                 }
             }

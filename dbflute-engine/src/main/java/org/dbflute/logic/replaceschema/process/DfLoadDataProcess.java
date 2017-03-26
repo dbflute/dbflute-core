@@ -189,14 +189,14 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         resource.setBasePath(directoryPath);
         resource.setFileType(fileType);
         resource.setDelimiter(delimiter);
-        final DfDelimiterDataHandler handler = getDelimiterDataHandlerImpl();
+        final DfDelimiterDataHandler handler = createDelimiterDataHandlerImpl();
         final DfDelimiterDataResultInfo resultInfo = handler.writeSeveralData(resource, _loadedDataInfo);
         showDelimiterResult(fileType, resultInfo);
     }
 
-    protected DfDelimiterDataHandlerImpl getDelimiterDataHandlerImpl() {
+    protected DfDelimiterDataHandlerImpl createDelimiterDataHandlerImpl() {
         if (_delimiterDataHandlerImpl != null) {
-            return _delimiterDataHandlerImpl;
+            return _delimiterDataHandlerImpl; // cached
         }
         final DfDelimiterDataHandlerImpl handler = new DfDelimiterDataHandlerImpl();
         handler.setLoggingInsertSql(isLoggingInsertSql());
@@ -212,13 +212,15 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         return _delimiterDataHandlerImpl;
     }
 
+    // -----------------------------------------------------
+    //                                      Delimiter Result
+    //                                      ----------------
     protected void showDelimiterResult(String typeName, DfDelimiterDataResultInfo resultInfo) {
         final Map<String, Set<String>> notFoundColumnMap = resultInfo.getNotFoundColumnMap();
         if (!notFoundColumnMap.isEmpty()) {
             final StringBuilder sb = new StringBuilder();
             sb.append("*Found non-persistent columns in ").append(typeName).append(":");
-            Set<Entry<String, Set<String>>> entrySet = notFoundColumnMap.entrySet();
-            for (Entry<String, Set<String>> entry : entrySet) {
+            for (Entry<String, Set<String>> entry : notFoundColumnMap.entrySet()) {
                 final String tableName = entry.getKey();
                 final Set<String> columnNameSet = entry.getValue();
                 sb.append(ln()).append("[").append(tableName).append("]");
@@ -226,13 +228,13 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
                     sb.append(ln()).append("    ").append(columnName);
                 }
             }
-            _log.info(sb.toString());
+            _log.info(sb.toString()); // INFO because other check function exists
         }
-        final Map<String, List<String>> warningFileMap = resultInfo.getWarningFileMap();
-        if (!warningFileMap.isEmpty()) {
+        final Map<String, List<String>> columnCountDiffMap = resultInfo.getColumnCountDiffMap();
+        if (!columnCountDiffMap.isEmpty()) {
             final StringBuilder sb = new StringBuilder();
-            sb.append("*Found warned files in ").append(typeName).append(":");
-            for (Entry<String, List<String>> entry : warningFileMap.entrySet()) {
+            sb.append("*Found column-count diff in ").append(typeName).append(":");
+            for (Entry<String, List<String>> entry : columnCountDiffMap.entrySet()) {
                 final String key = entry.getKey();
                 final List<String> messageList = entry.getValue();
                 sb.append(ln()).append("[").append(key).append("]");
@@ -315,11 +317,11 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         final DfXlsDataResource resource = new DfXlsDataResource();
         resource.setEnvType(envType);
         resource.setDataDirectory(dataDirectory);
-        final DfXlsDataHandler handler = getXlsDataHandlerImpl();
+        final DfXlsDataHandler handler = createXlsDataHandlerImpl();
         handler.writeSeveralData(resource, _loadedDataInfo);
     }
 
-    protected DfXlsDataHandlerImpl getXlsDataHandlerImpl() {
+    protected DfXlsDataHandlerImpl createXlsDataHandlerImpl() {
         if (_xlsDataHandlerImpl != null) {
             return _xlsDataHandlerImpl;
         }
