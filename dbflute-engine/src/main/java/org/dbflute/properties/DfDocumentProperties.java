@@ -842,13 +842,20 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (limitExp == null) {
             return null; // if null, default limit
         }
+        final Integer limit;
         try {
-            return Integer.valueOf(limitExp);
+            limit = Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
             String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_oldDocumentMap;
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }
+        if (limit < 0) {
+            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_oldDocumentMap;
+            msg = msg + " should be zero or plus number but minus: value=" + limit;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+        return limit;
     }
 
     public boolean isLoadDataReverseSuppressLargeDataHandling() {
