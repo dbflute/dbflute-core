@@ -830,9 +830,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
         if (classificationTop.isSuppressNameCamelizing()) {
             // basically plain but only remove characters that cannot be method name
-            return Srl.replace(Srl.replace(name, "-", ""), " ", "");
+            return Srl.replace(name, "-", "");
         } else { // normally here
-            return Srl.camelize(name, " ", "_", "-"); // for method name
+            return Srl.camelize(name, "_", "-"); // for method name
         }
     }
 
