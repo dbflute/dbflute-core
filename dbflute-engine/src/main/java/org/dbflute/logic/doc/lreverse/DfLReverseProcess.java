@@ -377,7 +377,7 @@ public class DfLReverseProcess {
             _log.info(sectionTitle);
             sectionInfoList.add("");
             sectionInfoList.add(sectionTitle);
-            _outputHandler.outputData(tableInfoMap, limit, xlsFile, sectionInfoList);
+            _outputHandler.outputData(tableInfoMap, limit, xlsFile, resource, sectionInfoList);
         }
     }
 
