@@ -64,6 +64,7 @@ public class DfClassificationTop {
     public static final String KEY_USE_DOCUMENT_ONLY = "isUseDocumentOnly";
     public static final String KEY_SUPPRESS_AUTO_DEPLOY = "isSuppressAutoDeploy";
     public static final String KEY_SUPPRESS_DBACCESS_CLASS = "isSuppressDBAccessClass";
+    public static final String KEY_SUPPRESS_NAME_CAMELIZING = "isSuppressNameCamelizing";
     public static final String KEY_DEPRECATED = "isDeprecated";
 
     // mapping settings
@@ -87,6 +88,7 @@ public class DfClassificationTop {
     protected boolean _useDocumentOnly;
     protected boolean _suppressAutoDeploy; // no automatic classification deployment
     protected boolean _suppressDBAccessClass; // no DB-access class (e.g. behavior) for table classification
+    protected boolean _suppressNameCamelizing; // use plain name, to avoid Japanese and English headache 
     protected boolean _deprecated;
     protected final Map<String, Map<String, Object>> _groupingMap = new LinkedHashMap<String, Map<String, Object>>();
     protected final Map<String, String> _deprecatedMap = new LinkedHashMap<String, String>();
@@ -652,6 +654,14 @@ public class DfClassificationTop {
 
     public void setSuppressDBAccessClass(boolean suppressDBAccessClass) {
         _suppressDBAccessClass = suppressDBAccessClass;
+    }
+    
+    public boolean isSuppressNameCamelizing() {
+        return _suppressNameCamelizing;
+    }
+    
+    public void setSuppressNameCamelizing(boolean suppressNameCamelizing) {
+        _suppressNameCamelizing = suppressNameCamelizing;
     }
 
     public boolean isDeprecated() {

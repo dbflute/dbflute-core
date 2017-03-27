@@ -607,6 +607,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isSuppressTableClassificationDBAccessClass", false);
     }
 
+    public boolean isSuppressTableClassificationNameCamelizing() { // closet
+        return isProperty("isSuppressTableClassificationNameCamelizing", false);
+    }
+
     // ===================================================================================
     //                                                                       Paging Select
     //                                                                       =============

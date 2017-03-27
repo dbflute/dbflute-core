@@ -339,6 +339,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         classificationTop.setUseDocumentOnly(isElementMapUseDocumentOnly(elementMap));
         classificationTop.setSuppressAutoDeploy(isElementMapSuppressAutoDeploy(elementMap));
         classificationTop.setSuppressDBAccessClass(isElementMapSuppressDBAccessClass(elementMap));
+        classificationTop.setSuppressNameCamelizing(isElementMapSuppressNameCamelizing(elementMap));
         classificationTop.setDeprecated(isElementMapDeprecated(elementMap));
         classificationTop.putGroupingAll(getElementMapGroupingMap(elementMap));
         classificationTop.putDeprecatedAll(getElementMapDeprecatedMap(elementMap));
@@ -505,6 +506,14 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final String key = DfClassificationTop.KEY_SUPPRESS_DBACCESS_CLASS;
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         final boolean defaultValue = prop.isSuppressTableClassificationDBAccessClass();
+        return isProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean isElementMapSuppressNameCamelizing(Map<?, ?> elementMap) {
+        final String key = DfClassificationTop.KEY_SUPPRESS_NAME_CAMELIZING;
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final boolean defaultValue = prop.isSuppressTableClassificationNameCamelizing();
         return isProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
     }
 
@@ -698,7 +707,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
                 final Map<String, Object> selectedMap = newLinkedHashMap();
                 selectedMap.put(DfClassificationElement.KEY_CODE, code);
-                selectedMap.put(DfClassificationElement.KEY_NAME, filterTableClassificationName(name));
+                selectedMap.put(DfClassificationElement.KEY_NAME, filterTableClassificationName(classificationTop, name));
                 selectedMap.put(DfClassificationElement.KEY_ALIAS, filterTableClassificationLiteralOutput(alias));
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) { // because of not required
                     selectedMap.put(DfClassificationElement.KEY_COMMENT, comment);
@@ -811,7 +820,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         _nameFromToMap.put("\uff0d", "_");
     }
 
-    protected String filterTableClassificationName(String name) {
+    protected String filterTableClassificationName(DfClassificationTop classificationTop, String name) {
         if (Srl.is_Null_or_TrimmedEmpty(name)) {
             return name;
         }
@@ -819,7 +828,12 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (Character.isDigit(name.charAt(0))) {
             name = "N" + name;
         }
-        return Srl.camelize(name, " ", "_", "-"); // for method name
+        if (classificationTop.isSuppressNameCamelizing()) {
+            // basically plain but only remove characters that cannot be method name
+            return Srl.replace(Srl.replace(name, "-", ""), " ", "");
+        } else { // normally here
+            return Srl.camelize(name, " ", "_", "-"); // for method name
+        }
     }
 
     protected final Map<String, String> _literalOutputFromToMap = newLinkedHashMap();
