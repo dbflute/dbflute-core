@@ -23,9 +23,7 @@ import org.dbflute.jdbc.ClassificationCodeType;
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.optional.OptionalThing;
-#if (!$tableMap.classificationTopList.isEmpty())
 import static org.dbflute.util.DfTypeUtil.emptyStrings;
-#end
 #if ($tableMap.hasRefCls)
 import ${tableMap.allcommonPackage}.*;
 #end
@@ -389,6 +387,11 @@ public interface ${glCDef} extends Classification {
             if (${classificationName}.name().equalsIgnoreCase(classificationName)) { return ${glCDef}.DefMeta.${classificationName}; }
 #end
             throw new IllegalStateException("Unknown classification: " + classificationName);
+        }
+
+        @SuppressWarnings("unused")
+        private String[] xinternalEmptyString() {
+            return emptyStrings(); // to suppress 'unused' warning of import statement
         }
     }
 }

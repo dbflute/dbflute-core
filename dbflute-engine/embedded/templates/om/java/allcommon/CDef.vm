@@ -357,5 +357,10 @@ public interface ${glCDef} extends Classification {
 #end
             throw new IllegalStateException("Unknown classification: " + classificationName);
         }
+
+        @SuppressWarnings("unused")
+        private String[] xinternalEmptyString() {
+            return emptyStrings(); // to suppress 'unused' warning of import statement
+        }
     }
 }
