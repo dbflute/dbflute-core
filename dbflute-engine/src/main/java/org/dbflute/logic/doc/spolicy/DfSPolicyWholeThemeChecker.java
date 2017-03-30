@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
@@ -43,13 +44,15 @@ public class DfSPolicyWholeThemeChecker {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfSPolicyChecker _spolicyChecker;
+    protected final Predicate<Column> _columnTargetPredicator;
     protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSPolicyWholeThemeChecker(DfSPolicyChecker spolicyChecker) {
+    public DfSPolicyWholeThemeChecker(DfSPolicyChecker spolicyChecker, Predicate<Column> columnTargetPredicator) {
         _spolicyChecker = spolicyChecker;
+        _columnTargetPredicator = columnTargetPredicator;
     }
 
     // ===================================================================================
@@ -177,6 +180,9 @@ public class DfSPolicyWholeThemeChecker {
         for (Table myTable : myTableList) {
             final List<Column> myColumnList = myTable.getColumnList();
             for (Column myColumn : myColumnList) {
+                if (!isTargetColumn(myColumn)) {
+                    continue;
+                }
                 for (Table yourTable : myTableList) {
                     if (myTable.equals(yourTable)) {
                         continue;
@@ -184,6 +190,9 @@ public class DfSPolicyWholeThemeChecker {
                     final String myColumnName = myColumn.getName();
                     final Column yourColumn = yourTable.getColumn(myColumnName);
                     if (yourColumn != null) {
+                        if (!isTargetColumn(yourColumn)) {
+                            continue;
+                        }
                         final Object myValue = valueProvider.apply(myColumn);
                         final Object yourValue = valueProvider.apply(yourColumn);
                         if (ignoreEmpty && eitherEmpty(myValue, yourValue)) {
@@ -212,6 +221,9 @@ public class DfSPolicyWholeThemeChecker {
         for (Table myTable : myTableList) {
             final List<Column> myColumnList = myTable.getColumnList();
             for (Column myColumn : myColumnList) {
+                if (!isTargetColumn(myColumn)) {
+                    continue;
+                }
                 if (!myColumn.hasAlias()) {
                     continue;
                 }
@@ -222,6 +234,9 @@ public class DfSPolicyWholeThemeChecker {
                     final String myColumnAlias = myColumn.getAlias();
                     final List<Column> yourColumnList = yourTable.getColumnList();
                     for (Column yourColumn : yourColumnList) {
+                        if (!isTargetColumn(yourColumn)) {
+                            continue;
+                        }
                         if (!yourColumn.hasAlias()) {
                             continue;
                         }
@@ -253,6 +268,10 @@ public class DfSPolicyWholeThemeChecker {
             }
         }
         return filteredTableList;
+    }
+
+    protected boolean isTargetColumn(Column column) {
+        return _columnTargetPredicator.test(column);
     }
 
     protected boolean eitherEmpty(Object myValue, Object yourValue) {

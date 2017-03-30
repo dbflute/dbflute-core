@@ -66,7 +66,7 @@ public class DfSPolicyChecker {
     public DfSPolicyChecker(Supplier<List<Table>> tableListSupplier, Map<String, Object> policyMap) {
         _tableListSupplier = tableListSupplier;
         _policyMap = policyMap;
-        _wholeThemeChecker = new DfSPolicyWholeThemeChecker(this);
+        _wholeThemeChecker = new DfSPolicyWholeThemeChecker(this, column -> isTargetColumn(column));
         _tableThemeChecker = new DfSPolicyTableThemeChecker(this);
         _tableStatementChecker = new DfSPolicyTableStatementChecker(this);
         _columnThemeChecker = new DfSPolicyColumnThemeChecker(this);
