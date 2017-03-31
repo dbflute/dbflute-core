@@ -262,7 +262,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         } catch (SQLException e) {
             DfJDBCException wrapped = DfJDBCException.voice(e);
             String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, wrapped);
-            throw new DfDelimiterDataRegistrationFailureException(msg, wrapped);
+            throw new DfDelimiterDataRegistrationFailureException(msg, wrapped.getNextException());
         } catch (RuntimeException e) {
             String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, null);
             throw new DfDelimiterDataRegistrationFailureException(msg, e);
