@@ -811,8 +811,10 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         _nameFromToMap.put("\uff08", "_");
         _nameFromToMap.put("\uff09", "_");
 
-        // full-width space
-        _nameFromToMap.put("\u3000", "_");
+        // pinpoint full-width
+        _nameFromToMap.put("\u3000", "_"); // full-width space
+        _nameFromToMap.put("\u3001", "_"); // Japanese touten
+        _nameFromToMap.put("\u3002", "_"); // Japanese kuten
 
         // non-compilable hyphens
         _nameFromToMap.put("\u2010", "_");
