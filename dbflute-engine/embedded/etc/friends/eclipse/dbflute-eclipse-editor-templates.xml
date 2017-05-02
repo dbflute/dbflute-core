@@ -242,6 +242,9 @@ public String toString() {
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for resource" enabled="true" name="resourceLambda">resource -&gt; {
     ${cursor}
 }</template>
+<template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for runner" enabled="true" name="runnerLambda">runner -&gt; {
+    ${cursor}
+}</template>
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ScalarCondition" enabled="true" name="scalarCBLambda">${table}CB -&gt; {
     ${table}CB.specify().column${Column}
 }</template>
