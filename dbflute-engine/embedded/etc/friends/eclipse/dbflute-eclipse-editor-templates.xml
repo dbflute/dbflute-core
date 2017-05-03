@@ -175,6 +175,9 @@ public String toString() {
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQueryAndPart" enabled="true" name="andCBLambda">andCB -&gt; {
     andCB.query().set${Column}
 }</template>
+<template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for JSON Body" enabled="true" name="bodyLambda">body -&gt; {
+    body.${property}
+}</template>
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Exception cause" enabled="true" name="causeLambda">cause -&gt; {
     ${cursor}
 }</template>
@@ -197,6 +200,9 @@ public String toString() {
 }</template>
 <template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for general Error Response" enabled="true" name="errorResponseLambda">() -&gt; {
     return asHtml(path_${newName});
+}</template>
+<template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Form" enabled="true" name="formLambda">form -&gt; {
+    form.${property}
 }</template>
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ReferrerLoader" enabled="true" name="loaderLambda">${base}Loader -&gt; {
     ${base}Loader.load${Referrer}
