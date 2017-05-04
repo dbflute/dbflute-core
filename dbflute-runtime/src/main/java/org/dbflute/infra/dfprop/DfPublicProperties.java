@@ -177,4 +177,12 @@ public class DfPublicProperties {
         _specifiedUrl = url;
         return this;
     }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "publicProp:{" + _publicProp + "}";
+    }
 }
