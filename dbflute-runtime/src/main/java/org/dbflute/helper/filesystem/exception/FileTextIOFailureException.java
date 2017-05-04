@@ -18,7 +18,7 @@ package org.dbflute.helper.filesystem.exception;
 /**
  * @author jflute
  */
-public class FileTextIONotFoundException extends FileTextIOFailureException {
+public class FileTextIOFailureException extends RuntimeException {
 
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
@@ -27,7 +27,7 @@ public class FileTextIONotFoundException extends FileTextIOFailureException {
      * Constructor.
      * @param msg The message for the exception. (NotNull)
      */
-    public FileTextIONotFoundException(String msg) {
+    public FileTextIOFailureException(String msg) {
         super(msg);
     }
 
@@ -36,7 +36,7 @@ public class FileTextIONotFoundException extends FileTextIOFailureException {
      * @param msg Exception message. (NotNull)
      * @param cause The wrapped exception. (NotNull)
      */
-    public FileTextIONotFoundException(String msg, Throwable cause) {
+    public FileTextIOFailureException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }
