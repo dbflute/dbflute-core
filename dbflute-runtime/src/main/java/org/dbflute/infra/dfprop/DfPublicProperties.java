@@ -48,6 +48,7 @@ public class DfPublicProperties {
     public static final String DBFLUTE_LATEST_RELEASE_VERSION = "dbflute.latest.release.version";
     public static final String DBFLUTE_LATEST_SNAPSHOT_VERSION = "dbflute.latest.snapshot.version";
     public static final String DBFLUTE_ENGINE_DOWNLOAD_URL = "dbflute.engine.download.url";
+    public static final String INTRO_LATEST_VERSION = "intro.latest.version";
     public static final String INTRO_DOWNLOAD_URL = "intro.download.url";
 
     // ===================================================================================
@@ -87,6 +88,9 @@ public class DfPublicProperties {
     // ===================================================================================
     //                                                                            Property
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                          DBFlute Core
+    //                                          ------------
     public String getDBFluteLatestReleaseVersion() {
         return getProperty(DBFLUTE_LATEST_RELEASE_VERSION);
     }
@@ -107,6 +111,13 @@ public class DfPublicProperties {
 
     protected String buildDBFluteDownloadUrl(String downloadUrl, String downloadVersion) {
         return replace(downloadUrl, VERSION_VARIABLE, downloadVersion);
+    }
+
+    // -----------------------------------------------------
+    //                                         DBFlute Intro
+    //                                         -------------
+    public String getIntroLatestVersion() {
+        return getProperty(INTRO_LATEST_VERSION);
     }
 
     public String getIntroDownloadUrl() {
