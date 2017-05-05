@@ -100,8 +100,7 @@ public class DfPublicProperties {
     }
 
     public String getDBFluteDownloadUrl(String downloadVersion) {
-        final String key = DBFLUTE_ENGINE_DOWNLOAD_URL;
-        return buildDownloadUrl(downloadVersion, key);
+        return buildDownloadUrl(DBFLUTE_ENGINE_DOWNLOAD_URL, downloadVersion);
     }
 
     // -----------------------------------------------------
@@ -112,14 +111,14 @@ public class DfPublicProperties {
     }
 
     public String getIntroDownloadUrl(String downloadVersion) {
-        final String key = INTRO_DOWNLOAD_URL;
-        return buildDownloadUrl(downloadVersion, key);
+        // defined download URL may not contain version but just in case (for future)
+        return buildDownloadUrl(INTRO_DOWNLOAD_URL, downloadVersion);
     }
 
-    protected String buildDownloadUrl(String downloadVersion, String key) {
-        final String downloadUrl = getProperty(key);
+    protected String buildDownloadUrl(String urlKey, String downloadVersion) {
+        final String downloadUrl = getProperty(urlKey);
         if (downloadUrl == null) {
-            String msg = "Not found the property: key=" + key + ", map=" + _publicProp;
+            String msg = "Not found the download URL property: key=" + urlKey + ", map=" + _publicProp;
             throw new IllegalStateException(msg);
         }
         return replace(downloadUrl, VERSION_VARIABLE, downloadVersion);
