@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import org.dbflute.helper.filesystem.exception.FileTextIOFailureException;
 import org.dbflute.helper.filesystem.exception.FileTextIONotFoundException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.util.Srl;
@@ -363,7 +364,7 @@ public class FileTextIO {
             return adjustInOutTextIfNeeds(text);
         } catch (UnsupportedEncodingException e) {
             String msg = "Unknown encoding: " + _encoding;
-            throw new IllegalStateException(msg, e);
+            throw new FileTextIOFailureException(msg, e);
         }
     }
 
@@ -415,22 +416,22 @@ public class FileTextIO {
 
     protected void handleOutputStreamWriteFailureException(OutputStream ous, IOException e) {
         String msg = "Failed to write the text to the output stream: " + ous;
-        throw new IllegalStateException(msg, e);
+        throw new FileTextIOFailureException(msg, e);
     }
 
     protected void handleTextFileWriteFailureException(String textPath, IOException e) {
         String msg = "Failed to write the text file: " + textPath;
-        throw new IllegalStateException(msg, e);
+        throw new FileTextIOFailureException(msg, e);
     }
 
     protected String handleInputStreamReadFailureException(InputStream ins, IOException e) {
         String msg = "Failed to read the input stream: " + ins;
-        throw new IllegalStateException(msg, e);
+        throw new FileTextIOFailureException(msg, e);
     }
 
     protected String handleTextFileReadFailureException(String textPath, IOException e) {
         String msg = "Failed to read the text file: " + textPath;
-        throw new IllegalStateException(msg, e);
+        throw new FileTextIOFailureException(msg, e);
     }
 
     // ===================================================================================

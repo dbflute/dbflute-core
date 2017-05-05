@@ -21,7 +21,7 @@ import java.util.Properties;
 import java.util.function.Supplier;
 
 import org.apache.torque.engine.database.model.Table;
-import org.dbflute.logic.doc.policycheck.DfSchemaPolicyChecker;
+import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
 
 /**
  * @author jflute
@@ -39,7 +39,7 @@ public final class DfSchemaPolicyProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                      Definition Map
     //                                                                      ==============
-    // *see SchemaPolicyChecker
+    // *see policy checker
     protected Map<String, Object> _schemaPolicyMap;
 
     protected Map<String, Object> getSchemaPolicyMap() {
@@ -51,7 +51,11 @@ public final class DfSchemaPolicyProperties extends DfAbstractHelperProperties {
         return _schemaPolicyMap;
     }
 
-    public DfSchemaPolicyChecker createChecker(Supplier<List<Table>> tableListSupplier) {
-        return new DfSchemaPolicyChecker(tableListSupplier, getSchemaPolicyMap());
+    public boolean hasPolicy() {
+        return !getSchemaPolicyMap().isEmpty();
+    }
+
+    public DfSPolicyChecker createChecker(Supplier<List<Table>> tableListSupplier) {
+        return new DfSPolicyChecker(tableListSupplier, getSchemaPolicyMap());
     }
 }

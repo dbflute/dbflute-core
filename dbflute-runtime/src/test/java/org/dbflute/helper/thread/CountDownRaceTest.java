@@ -17,6 +17,8 @@ package org.dbflute.helper.thread;
 
 import java.util.Arrays;
 
+import org.dbflute.exception.EntityAlreadyDeletedException;
+import org.dbflute.helper.thread.exception.CountDownRaceExecutionException;
 import org.dbflute.unit.RuntimeTestCase;
 
 /**
@@ -63,5 +65,97 @@ public class CountDownRaceTest extends RuntimeTestCase {
         assertMarked("entry:sea");
         assertMarked("entry:land");
         assertMarked("entry:piari");
+    }
+
+    // -----------------------------------------------------
+    //                                             Exception
+    //                                             ---------
+    public void test_exception_causeList() {
+        // ## Arrange ##
+        CountDownRace race = new CountDownRace(Arrays.asList("sea", "land", "piari", "bonvo"));
+
+        // ## Act ##
+        // ## Assert ##
+        assertException(CountDownRaceExecutionException.class, () -> {
+            race.readyGo(runner -> {
+                String parameter = (String) runner.getParameter().get();
+                log(parameter);
+                int entryNumber = runner.getEntryNumber();
+                if (entryNumber == 1) {
+                    throw new IllegalStateException("parameter=" + parameter);
+                } else if (entryNumber == 2) {
+                    try {
+                        throw new MockNestedException("nested");
+                    } catch (RuntimeException e) {
+                        throw new IllegalStateException("parameter=" + parameter, e);
+                    }
+                } else if (entryNumber == 4) {
+                    throw new Error("parameter=" + parameter);
+                }
+            });
+        }).handle(cause -> {
+            String msg = cause.getMessage();
+            log(msg);
+            assertContains(msg, MockNestedException.class.getSimpleName());
+            assertContainsAll(msg, "sea", "land", "bonvo");
+            assertNull(cause.getCause());
+        });
+    }
+
+    public void test_exception_firstCause() {
+        // ## Arrange ##
+        CountDownRace race = new CountDownRace(Arrays.asList("sea", "land", "piari", "bonvo"));
+
+        // ## Act ##
+        // ## Assert ##
+        assertException(CountDownRaceExecutionException.class, () -> {
+            race.readyGo(new CountDownRaceExecution() {
+                @Override
+                public void execute(CountDownRaceRunner runner) {
+                    String parameter = (String) runner.getParameter().get();
+                    log(parameter);
+                    int entryNumber = runner.getEntryNumber();
+                    if (entryNumber == 1) {
+                        throw new IllegalStateException("parameter=" + parameter);
+                    } else if (entryNumber == 2) {
+                        sleep(1000);
+                        try {
+                            throw new MockNestedException("nested");
+                        } catch (RuntimeException e) {
+                            throw new IllegalStateException("parameter=" + parameter, e);
+                        }
+                    } else if (entryNumber == 4) {
+                        sleep(1000);
+                        throw new Error("parameter=" + parameter);
+                    }
+                }
+
+                @Override
+                public boolean isThrowImmediatelyByFirstCause() {
+                    return true;
+                }
+            });
+        }).handle(cause -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append(cause.getMessage());
+            String msg = sb.toString();
+            log(msg);
+            assertNotContains(msg, EntityAlreadyDeletedException.class.getSimpleName());
+            assertNotContains(msg, "sea");
+            assertNotContains(msg, "land");
+            assertNotContains(msg, "piari");
+            assertNotContains(msg, "bonvo");
+            assertNotNull(cause.getCause());
+            assertContains(cause.getCause().getMessage(), "sea");
+        });
+    }
+
+    protected static class MockNestedException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        public MockNestedException(String msg) {
+            super(msg);
+        }
     }
 }

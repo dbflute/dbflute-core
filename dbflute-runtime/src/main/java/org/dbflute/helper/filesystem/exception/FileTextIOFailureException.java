@@ -12,17 +12,31 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
- */package org.dbflute.helper.thread.exception;
+ */
+package org.dbflute.helper.filesystem.exception;
 
 /**
  * @author jflute
- * @since 1.0.5A (2013/10/17 Thursday)
  */
-public class ThreadFireFailureException extends RuntimeException {
+public class FileTextIOFailureException extends RuntimeException {
 
+    /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
 
-    public ThreadFireFailureException(String msg, Throwable e) {
-        super(msg, e);
+    /**
+     * Constructor.
+     * @param msg The message for the exception. (NotNull)
+     */
+    public FileTextIOFailureException(String msg) {
+        super(msg);
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause The wrapped exception. (NotNull)
+     */
+    public FileTextIOFailureException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

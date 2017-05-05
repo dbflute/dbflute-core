@@ -53,6 +53,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                          Definition
     //                                                                          ==========
     private static final Logger _log = LoggerFactory.getLogger(DfReplaceSchemaProperties.class);
+    protected static final String SCHEMA_POLICY_CHECK_SCHEMA_XML = "./schema/project-spolicy-schema.xml";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -375,8 +376,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
-    //                                                                             Logging
-    //                                                                             =======
+    //                                                                       SQL Execution
+    //                                                                       =============
     public boolean isLoggingInsertSql() {
         return isProperty("isLoggingInsertSql", true, getReplaceSchemaMap());
     }
@@ -389,14 +390,20 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return !isLoggingReplaceSql();
     }
 
-    // ===================================================================================
-    //                                                                            Continue
-    //                                                                            ========
     public boolean isErrorSqlContinue() {
         // default is false (at an old time, true)
         // though DBFlute task returns failure when this property is true,
         // load data may have big cost so change the default value
         return isProperty("isErrorSqlContinue", false, getReplaceSchemaMap());
+    }
+
+    public String getSqlDelimiter() { // closet, for e.g. SQLServer's "go"
+        final String sqlDelimiter = (String) getReplaceSchemaMap().get("sqlDelimiter");
+        if (sqlDelimiter != null && sqlDelimiter.trim().length() > 0) {
+            return sqlDelimiter;
+        } else {
+            return ";";
+        }
     }
 
     // ===================================================================================
@@ -1136,6 +1143,17 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                             =======
     public boolean isReplaceSchemaLimited() {
         return isProperty("isReplaceSchemaLimited", false, getReplaceSchemaMap());
+    }
+
+    // ===================================================================================
+    //                                                                       Schema Policy
+    //                                                                       =============
+    public boolean isCheckSchemaPolicyInReps() {
+        return isProperty("isCheckSchemaPolicyInReps", false, getReplaceSchemaMap());
+    }
+
+    public String getSchemaPolicyInRepsSchemaXml() {
+        return SCHEMA_POLICY_CHECK_SCHEMA_XML;
     }
 
     // ===================================================================================

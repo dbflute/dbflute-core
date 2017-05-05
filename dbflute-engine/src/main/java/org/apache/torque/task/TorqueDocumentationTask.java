@@ -134,7 +134,7 @@ import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.doc.lreverse.DfLReverseProcess;
-import org.dbflute.logic.doc.policycheck.DfSchemaPolicyChecker;
+import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
 import org.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
 import org.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.dbflute.properties.DfDocumentProperties;
@@ -267,7 +267,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             throw new IllegalStateException("SchemaPolicyCheck should be before making SchemaHTML because of schema data.");
         }
         final DfSchemaPolicyProperties prop = getSchemaPolicyCheckProperties();
-        final DfSchemaPolicyChecker checker = prop.createChecker(() -> _schemaData.getDatabase().getTableList());
+        final DfSPolicyChecker checker = prop.createChecker(() -> _schemaData.getDatabase().getTableList());
         checker.checkPolicyIfNeeds();
     }
 
@@ -413,7 +413,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected DfSchemaPolicyProperties getSchemaPolicyCheckProperties() {
-        return getProperties().getSchemaPolicyCheckProperties();
+        return getProperties().getSchemaPolicyProperties();
     }
 
     // ===================================================================================

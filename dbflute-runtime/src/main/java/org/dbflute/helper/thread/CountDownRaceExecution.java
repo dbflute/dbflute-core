@@ -19,12 +19,24 @@ package org.dbflute.helper.thread;
  * @author jflute
  * @since 1.0.5A (2013/10/17 Thursday)
  */
-@FunctionalInterface
 public interface CountDownRaceExecution {
+
+    default void readyCaller() {
+    }
+
+    default void hookBeforeCountdown() {
+    }
 
     /**
      * Execute the application code as thread-fire.
      * @param runner The resource for the thread-fire. (NotNull)
      */
     void execute(CountDownRaceRunner runner);
+
+    default void hookBeforeGoalFinally() {
+    }
+
+    default boolean isThrowImmediatelyByFirstCause() {
+        return false;
+    }
 }

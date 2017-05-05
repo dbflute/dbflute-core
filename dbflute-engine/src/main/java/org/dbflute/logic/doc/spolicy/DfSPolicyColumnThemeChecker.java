@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.doc.policycheck;
+package org.dbflute.logic.doc.spolicy;
 
 import java.util.List;
 import java.util.Map;
@@ -22,62 +22,59 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.torque.engine.database.model.Column;
-import org.apache.torque.engine.database.model.Table;
 import org.dbflute.helper.StringKeyMap;
+import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
 import org.dbflute.util.Srl;
 
 /**
  * @author jflute
  * @since 1.1.2 (2016/12/29 Thursday at higashi-ginza)
  */
-public class DfSchemaPolicyColumnTheme {
+public class DfSPolicyColumnThemeChecker {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static Map<String, BiConsumer<Column, DfSchemaPolicyResult>> _cachedThemeMap;
+    protected static Map<String, BiConsumer<Column, DfSPolicyResult>> _cachedThemeMap;
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfSchemaPolicyMiscSecretary _secretary = new DfSchemaPolicyMiscSecretary();
+    protected final DfSPolicyChecker _spolicyChecker;
+    protected final DfSPolicyMiscSecretary _secretary = new DfSPolicyMiscSecretary();
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfSPolicyColumnThemeChecker(DfSPolicyChecker spolicyChecker) {
+        _spolicyChecker = spolicyChecker;
+    }
 
     // ===================================================================================
     //                                                                        Column Theme
     //                                                                        ============
-    public void checkColumnTheme(Table table, Map<String, Object> columnMap, DfSchemaPolicyResult result) {
-        processColumnTheme(table, columnMap, result);
-    }
-
-    protected void processColumnTheme(Table table, Map<String, Object> columnMap, DfSchemaPolicyResult result) {
-        @SuppressWarnings("unchecked")
-        final List<String> themeList = (List<String>) columnMap.get("themeList");
-        if (themeList == null) {
-            return;
-        }
+    public void checkColumnTheme(List<String> themeList, DfSPolicyResult result, Column column) {
         for (String theme : themeList) {
-            evaluateColumnTheme(table, result, theme);
+            evaluateColumnTheme(theme, result, column);
         }
     }
 
-    protected void evaluateColumnTheme(Table table, DfSchemaPolicyResult result, String theme) {
-        final Map<String, BiConsumer<Column, DfSchemaPolicyResult>> themeMap = getThemeMap();
-        final List<Column> columnList = table.getColumnList();
-        for (Column column : columnList) {
-            final BiConsumer<Column, DfSchemaPolicyResult> themeProcessor = themeMap.get(theme);
-            if (themeProcessor != null) {
-                themeProcessor.accept(column, result);
-            } else {
-                throwSchemaPolicyCheckUnknownThemeException(theme, "Column");
-            }
+    protected void evaluateColumnTheme(String theme, DfSPolicyResult result, Column column) {
+        final Map<String, BiConsumer<Column, DfSPolicyResult>> themeMap = getThemeMap();
+        final BiConsumer<Column, DfSPolicyResult> themeProcessor = themeMap.get(theme);
+        if (themeProcessor != null) {
+            themeProcessor.accept(column, result);
+        } else {
+            throwSchemaPolicyCheckUnknownThemeException(theme, "Column");
         }
     }
 
-    protected Map<String, BiConsumer<Column, DfSchemaPolicyResult>> getThemeMap() {
+    protected Map<String, BiConsumer<Column, DfSPolicyResult>> getThemeMap() {
         if (_cachedThemeMap != null) {
             return _cachedThemeMap;
         }
-        final Map<String, BiConsumer<Column, DfSchemaPolicyResult>> themeMap = StringKeyMap.createAsCaseInsensitiveOrdered();
+        final Map<String, BiConsumer<Column, DfSPolicyResult>> themeMap = StringKeyMap.createAsCaseInsensitiveOrdered();
         prepareColumnTheme(themeMap);
         _cachedThemeMap = themeMap;
         return _cachedThemeMap;
@@ -86,24 +83,30 @@ public class DfSchemaPolicyColumnTheme {
     // ===================================================================================
     //                                                                         Theme Logic
     //                                                                         ===========
-    protected void prepareColumnTheme(Map<String, BiConsumer<Column, DfSchemaPolicyResult>> themeMap) {
+    protected void prepareColumnTheme(Map<String, BiConsumer<Column, DfSPolicyResult>> themeMap) {
         // e.g.
         // ; columnMap = map:{
         //     ; themeList = list:{ upperCaseBasis }
         // }
-        define(themeMap, "upperCaseBasis", column -> Srl.isLowerCaseAny(buildCaseComparingColumnName(column)), column -> {
+        define(themeMap, "upperCaseBasis", column -> Srl.isLowerCaseAny(toComparingColumnName(column)), column -> {
             return "The column name should be on upper case basis: " + toColumnDisp(column);
         });
-        define(themeMap, "lowerCaseBasis", column -> Srl.isUpperCaseAny(buildCaseComparingColumnName(column)), column -> {
+        define(themeMap, "lowerCaseBasis", column -> Srl.isUpperCaseAny(toComparingColumnName(column)), column -> {
             return "The column name should be on lower case basis: " + toColumnDisp(column);
+        });
+        define(themeMap, "hasAlias", column -> !column.hasAlias(), column -> {
+            return "The column should have column alias: " + toColumnDisp(column);
+        });
+        define(themeMap, "hasComment", column -> !column.hasComment(), column -> {
+            return "The column should have column comment: " + toColumnDisp(column);
         });
     }
 
-    protected void define(Map<String, BiConsumer<Column, DfSchemaPolicyResult>> themeMap, String theme, Predicate<Column> determiner,
+    protected void define(Map<String, BiConsumer<Column, DfSPolicyResult>> themeMap, String theme, Predicate<Column> determiner,
             Function<Column, String> messenger) {
         themeMap.put(theme, (column, result) -> {
             if (determiner.test(column)) {
-                result.addViolation("column.theme: " + theme, messenger.apply(column));
+                result.violate("column.theme: " + theme, messenger.apply(column));
             }
         });
     }
@@ -111,8 +114,8 @@ public class DfSchemaPolicyColumnTheme {
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
-    protected String buildCaseComparingColumnName(Column column) {
-        return _secretary.buildCaseComparingColumnName(column);
+    protected String toComparingColumnName(Column column) {
+        return _secretary.toComparingColumnName(column);
     }
 
     protected String toColumnDisp(Column column) {

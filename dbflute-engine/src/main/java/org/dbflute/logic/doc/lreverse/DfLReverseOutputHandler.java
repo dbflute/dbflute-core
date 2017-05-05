@@ -85,15 +85,17 @@ public class DfLReverseOutputHandler {
      * @param tableInfoMap The map of table to extract. (NotNull)
      * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
      * @param xlsFile The file of XLS. (NotNull)
+     * @param resource The resource information of output data. (NotNull)
      * @param sectionInfoList The list of section info. (NotNull)
      */
-    public void outputData(Map<String, Table> tableInfoMap, int limit, File xlsFile, List<String> sectionInfoList) {
+    public void outputData(Map<String, Table> tableInfoMap, int limit, File xlsFile, DfLReverseOutputResource resource,
+            List<String> sectionInfoList) {
         filterUnsupportedTable(tableInfoMap);
         final DfLReverseDataExtractor extractor = new DfLReverseDataExtractor(_dataSource);
         extractor.setExtractingLimit(limit);
         extractor.setLargeBorder(_xlsLimit);
         final Map<String, DfLReverseDataResult> loadDataMap = extractor.extractData(tableInfoMap);
-        transferToXls(tableInfoMap, loadDataMap, limit, xlsFile, sectionInfoList);
+        transferToXls(tableInfoMap, loadDataMap, limit, xlsFile, resource, sectionInfoList);
     }
 
     protected void filterUnsupportedTable(Map<String, Table> tableInfoMap) {
@@ -114,22 +116,23 @@ public class DfLReverseOutputHandler {
      * @param loadDataMap The map of load data. (NotNull)
      * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
      * @param xlsFile The file of XLS. (NotNull)
+     * @param resource The resource information of output data. (NotNull)
      * @param sectionInfoList The list of section info. (NotNull)
      */
     protected void transferToXls(Map<String, Table> tableMap, Map<String, DfLReverseDataResult> loadDataMap, int limit, File xlsFile,
-            List<String> sectionInfoList) {
+            DfLReverseOutputResource resource, List<String> sectionInfoList) {
         final DfDataSet dataSet = new DfDataSet();
-        int index = 0;
+        int sheetNumber = 0;
         for (Entry<String, Table> entry : tableMap.entrySet()) {
-            ++index;
+            ++sheetNumber;
             final String tableDbName = entry.getKey();
             final Table table = entry.getValue();
             final DfLReverseDataResult dataResult = loadDataMap.get(tableDbName);
             if (dataResult.isLargeData()) {
-                outputDelimiterData(table, dataResult, limit, sectionInfoList);
+                outputDelimiterData(table, dataResult, limit, resource, sheetNumber, sectionInfoList);
             } else {
                 final List<Map<String, String>> extractedList = dataResult.getResultList();
-                setupXlsDataTable(dataSet, table, extractedList, index, sectionInfoList);
+                setupXlsDataTable(dataSet, table, extractedList, sheetNumber, sectionInfoList);
             }
         }
         if (dataSet.getTableSize() > 0) {
@@ -140,7 +143,7 @@ public class DfLReverseOutputHandler {
     // ===================================================================================
     //                                                                            Xls Data
     //                                                                            ========
-    protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList, int index,
+    protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList, int sheetNumber,
             List<String> sectionInfoList) {
         final List<Map<String, String>> recordList;
         {
@@ -153,7 +156,7 @@ public class DfLReverseOutputHandler {
                 recordList = extractedList;
             }
         }
-        final DfDataTable dataTable = new DfDataTable(resolveSheetName(table, index));
+        final DfDataTable dataTable = new DfDataTable(resolveSheetName(table, sheetNumber));
         final List<Column> columnList = table.getColumnList();
         for (Column column : columnList) {
             if (isExceptCommonColumn(column)) {
@@ -175,7 +178,7 @@ public class DfLReverseOutputHandler {
         dataSet.addTable(dataTable);
     }
 
-    protected String resolveSheetName(Table table, int index) {
+    protected String resolveSheetName(Table table, int sheetNumber) {
         String sheetName = deriveSheetName(table);
         if (sheetName.length() > 30) { // restriction of excel
             final String middleParts = sheetName.substring(0, 25);
@@ -195,7 +198,7 @@ public class DfLReverseOutputHandler {
                 continue;
             }
             if (!resolved) {
-                final String indexExp = (index < 10 ? "0" + index : String.valueOf(index));
+                final String indexExp = (sheetNumber < 10 ? "0" + sheetNumber : String.valueOf(sheetNumber));
                 sheetName = "$" + middleParts + "_" + indexExp;
             }
             _tableNameMap.put(sheetName, table);
@@ -248,7 +251,7 @@ public class DfLReverseOutputHandler {
     //                                                                      Delimiter Data
     //                                                                      ==============
     protected void outputDelimiterData(final Table table, DfLReverseDataResult templateDataResult, final int limit,
-            final List<String> sectionInfoList) {
+            DfLReverseOutputResource resource, int sheetNumber, List<String> sectionInfoList) {
         if (_delimiterDataDir == null) {
             return;
         }
@@ -262,7 +265,7 @@ public class DfLReverseOutputHandler {
         }
         final FileToken fileToken = new FileToken();
         // file name uses DB name (no display name) just in case
-        final String delimiterFilePath = delimiterDir.getPath() + "/" + table.getTableDbName() + "." + ext;
+        final String delimiterFilePath = buildDelimiterFilePath(table, resource, sheetNumber, delimiterDir, ext);
         final List<String> columnNameList = new ArrayList<String>();
         for (Column column : table.getColumnList()) {
             if (!_containsCommonColumn && column.isCommonColumn()) {
@@ -301,9 +304,21 @@ public class DfLReverseOutputHandler {
         });
     }
 
+    protected String buildDelimiterFilePath(Table table, DfLReverseOutputResource resource, int sheetNumber, File delimiterDir,
+            String ext) {
+        final String dirPath = delimiterDir.getPath();
+        final String fileName = buildDelimiterFilePrefix(resource, sheetNumber) + table.getTableDispName() + "." + ext;
+        return dirPath + "/" + fileName;
+    }
+
+    protected String buildDelimiterFilePrefix(DfLReverseOutputResource resource, int sheetNumber) {
+        final int sectionNo = resource.getSectionNo();
+        final String sectionPrefix = sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo);
+        return "cyclic_" + sectionPrefix + "_" + sheetNumber + "-";
+    }
+
     protected void handleDelimiterDataFailureException(Table table, String delimiterFilePath, Exception cause) {
-        String tableDispName = table.getTableDispName();
-        String msg = "Failed to output delimiter data: table=" + tableDispName + " file=" + delimiterFilePath;
+        String msg = "Failed to output delimiter data: table=" + table.getTableDispName() + " file=" + delimiterFilePath;
         throw new IllegalStateException(msg, cause);
     }
 

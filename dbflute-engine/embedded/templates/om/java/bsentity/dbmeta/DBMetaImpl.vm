@@ -78,12 +78,12 @@ public class ${myClassName} extends AbstractDBMeta {
 ## for classification type, needs check and change called methods...
 ## - - - - - - - - - -/
         setupEpg(_epgMap, ${reader}, ${writerLambda}{
-            ColumnInfo col = column${col.javaBeansRulePropertyNameInitCap}();
+## this is old style, check on entity is standard after java8
 #if ($col.isCheckSelectedClassification())
-            ccls(et, col, vl);
+            ccls(et, column${col.javaBeansRulePropertyNameInitCap}(), vl);
 #end
-#if ($col.isForceClassificationSetting())
-            ${glCDef}.${col.classificationName} cls = (${glCDef}.${col.classificationName})gcls(et, col, vl);
+#if ($col.isPropertySettingModifierClosed())
+            ${glCDef}.${col.classificationName} cls = (${glCDef}.${col.classificationName})gcls(et, column${col.javaBeansRulePropertyNameInitCap}(), vl);
             if (cls != null) {
                 ((${myExtendedObjectClassName})et).set${col.javaName}As${col.classificationName}(cls);
             } else {

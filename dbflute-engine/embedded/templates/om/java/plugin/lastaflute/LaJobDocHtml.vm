@@ -1,0 +1,130 @@
+##
+## Copyright 2014-2017 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#if ($table.tableMap.jobDocMetaList && $table.tableMap.jobDocMetaList.size() > 0)
+<h2 id="lastadoc_job">job</h2>
+<table>
+    <thead>
+    <tr>
+        <th rowspan="2">No.</th>
+        <th rowspan="2">cron exp</th>
+        <th rowspan="2">class</th>
+        <th rowspan="2">job key</th>
+        <th rowspan="2">job unique</th>
+        <th rowspan="2">title</th>
+        <th rowspan="2">description</th>
+        <th rowspan="2">concurrent</th>
+        <th rowspan="2">notice log</th>
+        <th rowspan="2">triggered job</th>
+        <th colspan="4">count</th>
+    </tr>
+    <tr>
+        <th>job params</th>
+        <th>fields</th>
+        <th>class lines</th>
+        <th>method lines</th>
+    </tr>
+    </thead>
+    <tbody id="table-list-body">
+#foreach ($jobDocMeta in $table.tableMap.jobDocMetaList)
+    <tr>
+        <td class="rowcellnum">${foreach.count}</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.cronExp)</td>
+        <td class="rowcell"><span title="$!manager.htmlEscape($jobDocMeta.typeName)">$!manager.htmlEscape($jobDocMeta.simpleTypeName)</span></td>
+        <td class="rowcell"><a href="#$!manager.htmlEscape($jobDocMeta.jobKey)">$!manager.htmlEscape($jobDocMeta.jobKey)</a></td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobUnique)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobTitle)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobDescription)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.concurrentExec)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.noticeLogLevel)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.triggeredJobKeyList)</td>
+        <td class="rowcellnum">$!{jobDocMeta.params.size()}</td>
+        <td class="rowcellnum">$!{jobDocMeta.fieldTypeDocMetaList.size()}</td>
+        <td class="rowcellnum">$!{jobDocMeta.fileLineCount}</td>
+        <td class="rowcellnum">$!{jobDocMeta.methodLineCount}</td>
+    </tr>
+#end
+    </tbody>
+</table>
+
+#foreach ($jobDocMeta in $table.tableMap.jobDocMetaList)
+<h3 id="$manager.htmlEscape($jobDocMeta.jobKey)">
+$manager.htmlEscape($jobDocMeta.jobKey)
+</h3>
+
+<table>
+    <thead>
+    <tr>
+        <th rowspan="2">No.</th>
+        <th rowspan="2">cron exp</th>
+        <th rowspan="2">class</th>
+        <th rowspan="2">job key</th>
+        <th rowspan="2">job unique</th>
+        <th rowspan="2">title</th>
+        <th rowspan="2">description</th>
+        <th rowspan="2">concurrent</th>
+        <th rowspan="2">notice log</th>
+        <th rowspan="2">triggered job</th>
+        <th colspan="4">count</th>
+    </tr>
+    <tr>
+        <th>job params</th>
+        <th>fields</th>
+        <th>class lines</th>
+        <th>method lines</th>
+    </tr>
+    </thead>
+    <tbody id="table-list-body">
+    <tr>
+        <td class="rowcellnum">${foreach.count}</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.cronExp)</td>
+        <td class="rowcell"><span title="$!manager.htmlEscape($jobDocMeta.typeName)">$!manager.htmlEscape($jobDocMeta.simpleTypeName)</span></td>
+        <td class="rowcell"><a href="#$!manager.htmlEscape($jobDocMeta.jobKey)">$!manager.htmlEscape($jobDocMeta.jobKey)</a></td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobUnique)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobTitle)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.jobDescription)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.concurrentExec)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.noticeLogLevel)</td>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.triggeredJobKeyList)</td>
+        <td class="rowcellnum">$!{jobDocMeta.params.size()}</td>
+        <td class="rowcellnum">$!{jobDocMeta.fieldTypeDocMetaList.size()}</td>
+        <td class="rowcellnum">$!{jobDocMeta.fileLineCount}</td>
+        <td class="rowcellnum">$!{jobDocMeta.methodLineCount}</td>
+    </tr>
+    </tbody>
+</table>
+
+<table>
+    <tbody id="table-list-body">
+    <tr>
+        <th>class name</th>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.typeName)</td>
+    </tr>
+    <tr>
+        <th>class comment</th>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.typeComment)</td>
+    </tr>
+    <tr>
+        <th>method comment</th>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.methodComment)</td>
+    </tr>
+    <tr>
+        <th>job parameters</th>
+        <td class="rowcell">$!manager.htmlEscape($jobDocMeta.params.toString())</td>
+    </tr>
+    </tbody>
+</table>
+#end
+#end

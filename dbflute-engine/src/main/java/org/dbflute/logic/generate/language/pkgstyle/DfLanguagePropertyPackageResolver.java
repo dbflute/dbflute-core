@@ -64,8 +64,7 @@ public abstract class DfLanguagePropertyPackageResolver {
         if (typeName.contains(VAR_CDEF)) {
             final DfBasicProperties prop = getBasicProperties();
             final String pkg = prop.getBaseCommonPackage();
-            final String prefix = prop.getProjectPrefix();
-            typeName = DfStringUtil.replace(typeName, VAR_CDEF, pkg + "." + prefix + "CDef");
+            typeName = DfStringUtil.replace(typeName, VAR_CDEF, pkg + "." + prop.getCDefPureName());
         }
         if (typeName.contains(VAR_DOMAIN + ".")) { // as domain entity
             final String pkg = getBasicProperties().getExtendedEntityPackage();

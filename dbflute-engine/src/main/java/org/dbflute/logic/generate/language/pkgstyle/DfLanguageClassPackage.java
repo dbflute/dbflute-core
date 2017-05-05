@@ -21,8 +21,13 @@ package org.dbflute.logic.generate.language.pkgstyle;
 public interface DfLanguageClassPackage {
 
     // ===================================================================================
-    //                                                                               Basic
-    //                                                                               =====
+    //                                                                         Basic Class
+    //                                                                         ===========
+    String buildCDefPureClassName(String projectPrefix, String allcommonPrefix);
+
+    // ===================================================================================
+    //                                                                       Basic Package
+    //                                                                       =============
     String getBaseCommonPackage();
 
     String getBaseBehaviorPackage();

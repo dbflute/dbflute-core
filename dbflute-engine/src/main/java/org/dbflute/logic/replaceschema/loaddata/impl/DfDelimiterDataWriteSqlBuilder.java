@@ -133,28 +133,20 @@ public class DfDelimiterDataWriteSqlBuilder {
         for (String columnName : _columnNameList) {
             columnCount++;
             if (!_columnMetaMap.isEmpty() && !_columnMetaMap.containsKey(columnName)) {
-                if (hasDefaultValue(columnName)) {
-                    continue;
-                }
-                Set<String> notFoundColumnSet = _notFoundColumnMap.get(_tableDbName);
-                if (notFoundColumnSet == null) {
-                    notFoundColumnSet = new LinkedHashSet<String>();
-                    _notFoundColumnMap.put(_tableDbName, notFoundColumnSet);
-                }
-                notFoundColumnSet.add(columnName);
+                // changed logic at setupColumnNameList() in writer like this:
+                // "added columns for default value are existing in DB"
+                //  by jflute (2017/03/26)
+                //if (hasDefaultValue(columnName)) {
+                //    continue;
+                //}
+                handleNotFoundColumn(columnName);
                 continue;
             }
             final String value;
             try {
-                if (columnCount < _valueList.size()) {
-                    value = _valueList.get(columnCount);
-                } else {
-                    value = null;
-                }
+                value = columnCount < _valueList.size() ? _valueList.get(columnCount) : null;
             } catch (RuntimeException e) {
-                String msg = "valueList.get(columnCount) threw the exception:";
-                msg = msg + " tableName=" + _tableDbName + " columnNameList=" + _columnNameList;
-                msg = msg + " valueList=" + _valueList + " columnCount=" + columnCount;
+                String msg = buildDelimiterDataRegistrationFailureMessage(columnCount);
                 throw new DfDelimiterDataRegistrationFailureException(msg, e);
             }
             if (!_columnMetaMap.isEmpty() && _columnMetaMap.containsKey(columnName)) {
@@ -167,11 +159,20 @@ public class DfDelimiterDataWriteSqlBuilder {
         return _basicColumnValueMap;
     }
 
-    // ===================================================================================
-    //                                                                       Default Value
-    //                                                                       =============
-    private boolean hasDefaultValue(String columnName) {
-        return _defaultValueMap.containsKey(columnName);
+    private void handleNotFoundColumn(String columnName) {
+        Set<String> notFoundColumnSet = _notFoundColumnMap.get(_tableDbName);
+        if (notFoundColumnSet == null) {
+            notFoundColumnSet = new LinkedHashSet<String>();
+            _notFoundColumnMap.put(_tableDbName, notFoundColumnSet);
+        }
+        notFoundColumnSet.add(columnName);
+    }
+
+    protected String buildDelimiterDataRegistrationFailureMessage(int columnCount) {
+        String msg = "valueList.get(columnCount) threw the exception:";
+        msg = msg + " tableName=" + _tableDbName + " columnNameList=" + _columnNameList;
+        msg = msg + " valueList=" + _valueList + " columnCount=" + columnCount;
+        return msg;
     }
 
     // ===================================================================================
@@ -182,7 +183,7 @@ public class DfDelimiterDataWriteSqlBuilder {
     }
 
     public void setColumnMetaMap(Map<String, DfColumnMeta> columnMetaMap) {
-        this._columnMetaMap = columnMetaMap;
+        _columnMetaMap = columnMetaMap;
     }
 
     public List<String> getColumnNameList() {
@@ -190,7 +191,7 @@ public class DfDelimiterDataWriteSqlBuilder {
     }
 
     public void setColumnNameList(List<String> columnNameList) {
-        this._columnNameList = columnNameList;
+        _columnNameList = columnNameList;
     }
 
     public Map<String, Set<String>> getNotFoundColumnMap() {
@@ -198,7 +199,7 @@ public class DfDelimiterDataWriteSqlBuilder {
     }
 
     public void setNotFoundColumnMap(Map<String, Set<String>> notFoundColumnMap) {
-        this._notFoundColumnMap = notFoundColumnMap;
+        _notFoundColumnMap = notFoundColumnMap;
     }
 
     public String getTableDbName() {
@@ -206,7 +207,7 @@ public class DfDelimiterDataWriteSqlBuilder {
     }
 
     public void setTableDbName(String tableDbName) {
-        this._tableDbName = tableDbName;
+        _tableDbName = tableDbName;
     }
 
     public List<String> getValueList() {
@@ -214,7 +215,7 @@ public class DfDelimiterDataWriteSqlBuilder {
     }
 
     public void setValueList(List<String> valueList) {
-        this._valueList = valueList;
+        _valueList = valueList;
     }
 
     public Map<String, Map<String, String>> getConvertValueMap() {
@@ -222,7 +223,7 @@ public class DfDelimiterDataWriteSqlBuilder {
     }
 
     public void setConvertValueMap(Map<String, Map<String, String>> convertValueMap) {
-        this._convertValueMap = convertValueMap;
+        _convertValueMap = convertValueMap;
     }
 
     public Map<String, String> getDefaultValueMap() {
@@ -230,7 +231,7 @@ public class DfDelimiterDataWriteSqlBuilder {
     }
 
     public void setDefaultValueMap(Map<String, String> defaultValueMap) {
-        this._defaultValueMap = defaultValueMap;
+        _defaultValueMap = defaultValueMap;
     }
 
     public DfColumnBindTypeProvider getBindTypeProvider() {
@@ -238,7 +239,7 @@ public class DfDelimiterDataWriteSqlBuilder {
     }
 
     public void setBindTypeProvider(DfColumnBindTypeProvider bindTypeProvider) {
-        this._bindTypeProvider = bindTypeProvider;
+        _bindTypeProvider = bindTypeProvider;
     }
 
     public DfDefaultValueProp getDefaultValueProp() {
@@ -246,7 +247,7 @@ public class DfDelimiterDataWriteSqlBuilder {
     }
 
     public void setDefaultValueProp(DfDefaultValueProp defaultValueProp) {
-        this._defaultValueProp = defaultValueProp;
+        _defaultValueProp = defaultValueProp;
     }
 
     public Set<String> getSysdateColumnSet() {

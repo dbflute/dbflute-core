@@ -18,7 +18,7 @@ package org.dbflute.helper.filesystem.exception;
 /**
  * @author jflute
  */
-public class FileTextIONotFoundException extends RuntimeException {
+public class FileTextIONotFoundException extends FileTextIOFailureException {
 
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;

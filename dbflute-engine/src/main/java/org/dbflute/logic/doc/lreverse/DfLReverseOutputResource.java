@@ -31,8 +31,8 @@ public class DfLReverseOutputResource {
 
     protected final File _xlsFile;
     protected final List<Table> _tableList;
-    protected final Integer _sectionNo;
-    protected final String _mainName;
+    protected final Integer _sectionNo; // e.g. 01, 02
+    protected final String _mainName; // in current section e.g. MEMBER
 
     public DfLReverseOutputResource(File xlsFile, List<Table> tableList, Integer sectionNo, String mainName) {
         _xlsFile = xlsFile;

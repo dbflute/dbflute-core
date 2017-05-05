@@ -16,6 +16,7 @@
 # o isTableNameCamelCase: (NotRequired - Default false)
 # o isColumnNameCamelCase: (NotRequired - Default false)
 # o projectPrefix: (NotRequired - Default '')
+# o allcommonPrefix: (NotRequired - Default '')
 # o classAuthor: (NotRequired - Default 'DBFlute(AutoGenerator)')
 # o sourceFileEncoding: (NotRequired - Default 'UTF-8')
 # o sourceCodeLineSeparator: (NotRequired - Default no setting)
@@ -150,9 +151,18 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o projectPrefix: (NotRequired - Default '')
     #  If the value is 'Ld', all class names are 'LdXxx'.
-    #  Basically you don't need this if you don't want the common prefix of class name.
+    #  It may be needed if multiple DB structure, to identify allcommon and same-name entities.
     #
     #; projectPrefix = Ld
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o allcommonPrefix: (NotRequired - Default '')
+    #  If the value is 'Ma', only allcommon class names are 'MaXxx' e.g. MaCDef.
+    #  It may be needed if multiple DB structure, to identify allcommon.
+    #  (Use this instead of projectPrefix)
+    #
+    #; allcommonPrefix = Ma
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

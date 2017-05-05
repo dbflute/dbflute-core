@@ -391,15 +391,15 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
-    //                                   Schema Policy Check
-    //                                   -------------------
-    protected DfSchemaPolicyProperties _schemaPolicyCheckProperties;
+    //                                         Schema Policy
+    //                                         -------------
+    protected DfSchemaPolicyProperties _schemaPolicyProperties;
 
-    public DfSchemaPolicyProperties getSchemaPolicyCheckProperties(Properties prop) {
-        if (_schemaPolicyCheckProperties == null) {
-            _schemaPolicyCheckProperties = new DfSchemaPolicyProperties(prop);
+    public DfSchemaPolicyProperties getSchemaPolicyProperties(Properties prop) {
+        if (_schemaPolicyProperties == null) {
+            _schemaPolicyProperties = new DfSchemaPolicyProperties(prop);
         }
-        return _schemaPolicyCheckProperties;
+        return _schemaPolicyProperties;
     }
 
     // -----------------------------------------------------

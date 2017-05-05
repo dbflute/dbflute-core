@@ -69,6 +69,7 @@ import org.apache.log4j.Logger;
 import org.dbflute.util.DfTypeUtil.ParseDateException;
 import org.dbflute.util.DfTypeUtil.ParseDateNumberFormatException;
 import org.dbflute.util.DfTypeUtil.ParseDateOutOfCalendarException;
+import org.dbflute.util.DfTypeUtil.ParseDateUTCSuffixException;
 import org.dbflute.util.DfTypeUtil.ParseTimestampException;
 import org.dbflute.util.DfTypeUtil.ParseTimestampNumberFormatException;
 import org.dbflute.util.DfTypeUtil.ParseTimestampOutOfCalendarException;
@@ -233,6 +234,9 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals(LocalDate.of(0001, 10, 04), toLocalDate("0001-10-04 01:23:45.123"));
         assertEquals(LocalDate.of(2014, 10, 28), toLocalDate("2014/10/28 12:34:56.789"));
         assertEquals(LocalDate.of(2009, 12, 13), toLocalDate("2009-12-13T01:23:45.123"));
+        assertEquals(LocalDate.of(2009, 12, 13), toLocalDate("2009-12-13T01:23:45.123456"));
+        assertEquals(LocalDate.of(2009, 12, 13), toLocalDate("2009-12-13T01:23:45.123Z"));
+        assertEquals(LocalDate.of(2009, 12, 13), toLocalDate("2009-12-13T01:23:45.123+09:00"));
     }
 
     public void test_toLocalDate_fromStringDate_pattern() {
@@ -350,6 +354,16 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals(LocalDateTime.of(0001, 10, 04, 14, 23, 45, 678900000), toLocalDateTime("0001-10-04 14:23:45.6789"));
         assertEquals(LocalDateTime.of(0001, 10, 04, 14, 23, 45, 123456789), toLocalDateTime("0001-10-04 14:23:45.123456789"));
         assertEquals(LocalDateTime.of(0001, 10, 04, 14, 23, 45, 789000000), toLocalDateTime("0001-10-04T14:23:45.789"));
+        try {
+            assertEquals(LocalDateTime.of(0001, 10, 04, 14, 23, 45, 789000000), toLocalDateTime("0001-10-04T14:23:45.789Z"));
+        } catch (ParseDateUTCSuffixException e) {
+            log(e.getMessage());
+        }
+        try {
+            toLocalDateTime("0001-10-04T14:23:45.789+09:00");
+        } catch (ParseDateException e) {
+            log(e.getMessage());
+        }
         try {
             toLocalDateTime("0001-10-04 14:23:45.123456789123");
             fail();

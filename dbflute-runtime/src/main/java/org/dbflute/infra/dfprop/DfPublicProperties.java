@@ -48,6 +48,7 @@ public class DfPublicProperties {
     public static final String DBFLUTE_LATEST_RELEASE_VERSION = "dbflute.latest.release.version";
     public static final String DBFLUTE_LATEST_SNAPSHOT_VERSION = "dbflute.latest.snapshot.version";
     public static final String DBFLUTE_ENGINE_DOWNLOAD_URL = "dbflute.engine.download.url";
+    public static final String INTRO_LATEST_VERSION = "intro.latest.version";
     public static final String INTRO_DOWNLOAD_URL = "intro.download.url";
 
     // ===================================================================================
@@ -87,6 +88,9 @@ public class DfPublicProperties {
     // ===================================================================================
     //                                                                            Property
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                          DBFlute Core
+    //                                          ------------
     public String getDBFluteLatestReleaseVersion() {
         return getProperty(DBFLUTE_LATEST_RELEASE_VERSION);
     }
@@ -96,21 +100,28 @@ public class DfPublicProperties {
     }
 
     public String getDBFluteDownloadUrl(String downloadVersion) {
-        final String key = DBFLUTE_ENGINE_DOWNLOAD_URL;
-        final String downloadUrl = getProperty(key);
+        return buildDownloadUrl(DBFLUTE_ENGINE_DOWNLOAD_URL, downloadVersion);
+    }
+
+    // -----------------------------------------------------
+    //                                         DBFlute Intro
+    //                                         -------------
+    public String getIntroLatestVersion() {
+        return getProperty(INTRO_LATEST_VERSION);
+    }
+
+    public String getIntroDownloadUrl(String downloadVersion) {
+        // defined download URL may not contain version but just in case (for future)
+        return buildDownloadUrl(INTRO_DOWNLOAD_URL, downloadVersion);
+    }
+
+    protected String buildDownloadUrl(String urlKey, String downloadVersion) {
+        final String downloadUrl = getProperty(urlKey);
         if (downloadUrl == null) {
-            String msg = "Not found the property: key=" + key + ", map=" + _publicProp;
+            String msg = "Not found the download URL property: key=" + urlKey + ", map=" + _publicProp;
             throw new IllegalStateException(msg);
         }
-        return buildDBFluteDownloadUrl(downloadUrl, downloadVersion);
-    }
-
-    protected String buildDBFluteDownloadUrl(String downloadUrl, String downloadVersion) {
         return replace(downloadUrl, VERSION_VARIABLE, downloadVersion);
-    }
-
-    public String getIntroDownloadUrl() {
-        return getProperty(INTRO_DOWNLOAD_URL);
     }
 
     // ===================================================================================
@@ -165,5 +176,13 @@ public class DfPublicProperties {
     public DfPublicProperties specifyUrl(String url) {
         _specifiedUrl = url;
         return this;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "publicProp:{" + _publicProp + "}";
     }
 }

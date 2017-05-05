@@ -24,8 +24,20 @@ import org.dbflute.util.Srl;
 public class DfLanguageClassPackageJava implements DfLanguageClassPackage {
 
     // ===================================================================================
-    //                                                                               Basic
-    //                                                                               =====
+    //                                                                         Basic Class
+    //                                                                         ===========
+    @Override
+    public String buildCDefPureClassName(String projectPrefix, String allcommonPrefix) {
+        return nullToEmpty(projectPrefix) + nullToEmpty(allcommonPrefix) + "CDef";
+    }
+
+    protected String nullToEmpty(String str) {
+        return str != null ? str : "";
+    }
+
+    // ===================================================================================
+    //                                                                       Basic Package
+    //                                                                       =============
     public String getBaseCommonPackage() {
         return "allcommon";
     }

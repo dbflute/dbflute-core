@@ -1,7 +1,9 @@
 ${manager.allClassCopyright}package ${request.package}.allcommon;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -257,7 +259,7 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
     }
 
     protected IndexRequestBuilder createInsertRequest(final EsAbstractEntity esEntity) {
-        final IndexRequestBuilder builder = client.prepareIndex(asEsIndex(), asEsIndexType()).setSource(esEntity.toSource());
+        final IndexRequestBuilder builder = client.prepareIndex(asEsIndex(), asEsIndexType()).setSource(toSource(esEntity));
         final String id = esEntity.asDocMeta().id();
         if (id != null) {
             builder.setId(id);
@@ -284,7 +286,7 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
 
     protected IndexRequestBuilder createUpdateRequest(final EsAbstractEntity esEntity) {
         final IndexRequestBuilder builder =
-                client.prepareIndex(asEsIndex(), asEsIndexType(), esEntity.asDocMeta().id()).setSource(esEntity.toSource());
+                client.prepareIndex(asEsIndex(), asEsIndexType(), esEntity.asDocMeta().id()).setSource(toSource(esEntity));
         final RequestOptionCall<IndexRequestBuilder> indexOption = esEntity.asDocMeta().indexOption();
         if (indexOption != null) {
             indexOption.callback(builder);
@@ -294,6 +296,10 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
             builder.setVersion(version);
         }
         return builder;
+    }
+
+    protected Map<String, Object> toSource(final EsAbstractEntity esEntity) {
+        return esEntity.toSource();
     }
 
     @Override
@@ -480,7 +486,7 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
-    public static String[] toStringArray(final Object value) {
+    protected String[] toStringArray(final Object value) {
         if (value instanceof String[]) {
             return (String[]) value;
         } else if (value instanceof List) {
@@ -491,6 +497,14 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
             return null;
         }
         return new String[] { str };
+    }
+
+    protected LocalDateTime toLocalDateTime(Object value) {
+        return DfTypeUtil.toLocalDateTime(value);
+    }
+
+    protected Date toDate(Object value) {
+        return DfTypeUtil.toDate(value);
     }
 
     public static class BulkList<E, B> implements List<E> {

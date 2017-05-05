@@ -343,11 +343,14 @@ public interface ${glCDef} extends Classification {
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
+## because empty class is generated when no classification
+#if (!$tableMap.classificationNameList.isEmpty())
 
         @SuppressWarnings("unchecked")
         private List<Classification> toClsList(List<?> clsList) {
             return (List<Classification>)clsList;
         }
+#end
 
         public ClassificationCodeType codeType() {
 #foreach ($classificationTop in $tableMap.classificationTopList)
@@ -377,13 +380,18 @@ public interface ${glCDef} extends Classification {
             });
         }
 
-        public static ${glCDef}.DefMeta meta(String classificationName) { // old style so use byName(name)
+        public static ${glCDef}.DefMeta meta(String classificationName) { // old style so use find(name)
             if (classificationName == null) { throw new IllegalArgumentException("The argument 'classificationName' should not be null."); }
 #foreach ($classificationName in $tableMap.classificationNameList)
 #set ($classificationName = $classificationTop.classificationName)
             if (${classificationName}.name().equalsIgnoreCase(classificationName)) { return ${glCDef}.DefMeta.${classificationName}; }
 #end
             throw new IllegalStateException("Unknown classification: " + classificationName);
+        }
+
+        @SuppressWarnings("unused")
+        private String[] xinternalEmptyString() {
+            return emptyStrings(); // to suppress 'unused' warning of import statement
         }
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.dbflute.logic.doc.policycheck;
 
+import org.dbflute.logic.doc.spolicy.secretary.DfSPolicyMiscSecretary;
 import org.dbflute.unit.EngineTestCase;
 
 /**
@@ -23,17 +24,17 @@ import org.dbflute.unit.EngineTestCase;
  */
 public class DfSchemaPolicyMiscSecretaryTest extends EngineTestCase {
 
-    public void test_isHitTable_basic() {
+    public void test_isHitExp_basic() {
         // ## Arrange ##
-        DfSchemaPolicyMiscSecretary secretary = new DfSchemaPolicyMiscSecretary();
+        DfSPolicyMiscSecretary secretary = new DfSPolicyMiscSecretary();
 
         // ## Act ##
         // ## Assert ##
-        assertTrue(secretary.isHitTable("SEA_MEMBER", "prefix:SEA_"));
-        assertFalse(secretary.isHitTable("SEA_MEMBER", "prefix:LAND_"));
-        assertTrue(secretary.isHitTable("SEA_MEMBER", "prefix:SEA_ and suffix:_MEMBER"));
-        assertTrue(secretary.isHitTable("SEA_MEMBER", "prefix:SEA_ or prefix:LAND_"));
-        assertTrue(secretary.isHitTable("LAND_MEMBER", "prefix:SEA_ or prefix:LAND_"));
-        assertFalse(secretary.isHitTable("PIARI_MEMBER", "prefix:SEA_ or prefix:LAND_"));
+        assertTrue(secretary.isHitExp("SEA_MEMBER", "prefix:SEA_"));
+        assertFalse(secretary.isHitExp("SEA_MEMBER", "prefix:LAND_"));
+        assertTrue(secretary.isHitExp("SEA_MEMBER", "prefix:SEA_ and suffix:_MEMBER"));
+        assertTrue(secretary.isHitExp("SEA_MEMBER", "prefix:SEA_ or prefix:LAND_"));
+        assertTrue(secretary.isHitExp("LAND_MEMBER", "prefix:SEA_ or prefix:LAND_"));
+        assertFalse(secretary.isHitExp("PIARI_MEMBER", "prefix:SEA_ or prefix:LAND_"));
     }
 }

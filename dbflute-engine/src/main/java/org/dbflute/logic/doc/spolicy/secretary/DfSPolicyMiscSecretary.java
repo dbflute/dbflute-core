@@ -13,8 +13,10 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.doc.policycheck;
+package org.dbflute.logic.doc.spolicy.secretary;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,7 +28,13 @@ import org.dbflute.exception.DfSchemaPolicyCheckUnknownPropertyException;
 import org.dbflute.exception.DfSchemaPolicyCheckUnknownThemeException;
 import org.dbflute.exception.DfSchemaPolicyCheckViolationException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.logic.doc.policycheck.DfSchemaPolicyResult.DfSchemaPolicyViolation;
+import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement;
+import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfClause;
+import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyIfPart;
+import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenClause;
+import org.dbflute.logic.doc.spolicy.parsed.DfSPolicyStatement.DfSPolicyThenPart;
+import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult;
+import org.dbflute.logic.doc.spolicy.result.DfSPolicyResult.DfSPolicyViolation;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.Srl;
 import org.dbflute.util.Srl.ScopeInfo;
@@ -35,77 +43,145 @@ import org.dbflute.util.Srl.ScopeInfo;
  * @author jflute
  * @since 1.1.2 (2016/12/29 Thursday at higashi-ginza)
  */
-public class DfSchemaPolicyMiscSecretary {
+public class DfSPolicyMiscSecretary {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String EQUALS_DELIMITER = " is ";
+    protected static final String NOT_PREFIX = "not ";
+    protected static final String SUPPLEMENT_DELIMITER = " => ";
 
     // ===================================================================================
     //                                                                           Statement
     //                                                                           =========
-    public DfSchemaPolicyIfClause extractIfClause(String statement) {
+    public DfSPolicyStatement parseStatement(String statement) {
         if (!statement.startsWith("if ")) {
             String msg = "The element of statementList should start with 'if' for SchemaPolicyCheck: " + statement;
             throw new IllegalStateException(msg);
         }
-        final ScopeInfo ifClauseScope = Srl.extractScopeFirst(statement, "if ", " then ");
-        if (ifClauseScope == null) {
+        final ScopeInfo ifScope = Srl.extractScopeFirst(statement, "if ", " then ");
+        if (ifScope == null) {
             final String additional = "The statement should start with 'if' and contain 'then'.";
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, additional);
         }
-        final String ifClause = ifClauseScope.getContent().trim();
-        final String equalsDelimiter = " is ";
-        final String notPrefix = "not ";
-        if (!ifClause.contains(equalsDelimiter)) {
-            final String additional = "The if-clause should contain 'is': " + ifClause;
+        final DfSPolicyIfClause ifClause = analyzeIfClause(statement, ifScope);
+        final DfSPolicyThenClause thenClause = analyzeThenClause(statement, ifScope);
+        return new DfSPolicyStatement(statement, ifClause, thenClause);
+    }
+
+    // -----------------------------------------------------
+    //                                             If Clause
+    //                                             ---------
+    protected DfSPolicyIfClause analyzeIfClause(String statement, ScopeInfo ifScope) {
+        final String ifWhole = ifScope.getContent().trim();
+        if (!ifWhole.contains(EQUALS_DELIMITER)) {
+            final String additional = "The if-clause should contain 'is': " + ifWhole;
             throwSchemaPolicyCheckIllegalIfThenStatementException(statement, additional);
         }
-        final String ifItem = Srl.substringFirstFront(ifClause, equalsDelimiter).trim();
-        final String ifValueCandidate = Srl.substringFirstRear(ifClause, equalsDelimiter).trim();
-        final boolean notIfValue = ifValueCandidate.startsWith(notPrefix);
-        final String ifValue = notIfValue ? Srl.substringFirstRear(ifValueCandidate, notPrefix).trim() : ifValueCandidate;
-        final String thenRear = ifClauseScope.substringInterspaceToNext();
-        String thenClause; // may be filtered later
-        final String supplement;
-        final String supplementDelimiter = " => "; // e.g. if tableName is suffix:_ID then bad => similar to column name
-        if (thenRear.contains(supplementDelimiter)) {
-            thenClause = Srl.substringLastFront(thenRear, supplementDelimiter).trim();
-            supplement = Srl.substringLastRear(thenRear, supplementDelimiter).trim();
+        // e.g. if tableName is sea and alias is land and piari and tableName is bonvo then ...
+        boolean connectedByOr = false;
+        List<String> ifPartStrList = splitClauseByConnector(ifWhole, " and ");
+        if (ifPartStrList.size() == 1) {
+            ifPartStrList = splitClauseByConnector(ifWhole, " or ");
+            if (ifPartStrList.size() >= 2) {
+                connectedByOr = true;
+            }
+        }
+        final List<DfSPolicyIfPart> ifPartList = new ArrayList<DfSPolicyIfPart>();
+        for (String ifPartStr : ifPartStrList) {
+            final String ifItem = Srl.substringFirstFront(ifPartStr, EQUALS_DELIMITER).trim();
+            final String ifValueCandidate = Srl.substringFirstRear(ifPartStr, EQUALS_DELIMITER).trim();
+            final boolean notIfValue = ifValueCandidate.startsWith(NOT_PREFIX);
+            final String ifValue = notIfValue ? Srl.substringFirstRear(ifValueCandidate, NOT_PREFIX).trim() : ifValueCandidate;
+            final DfSPolicyIfPart part = new DfSPolicyIfPart(ifItem, ifValue, notIfValue);
+            ifPartList.add(part);
+        }
+        return new DfSPolicyIfClause(Collections.unmodifiableList(ifPartList), connectedByOr);
+    }
+
+    // -----------------------------------------------------
+    //                                           Then Clause
+    //                                           -----------
+    protected DfSPolicyThenClause analyzeThenClause(String statement, ScopeInfo ifScope) {
+        final String thenRear = ifScope.substringInterspaceToNext();
+        final String thenWhole;
+        final String supplement; // e.g. if tableName is suffix:_ID then bad => similar to column name
+        if (thenRear.contains(SUPPLEMENT_DELIMITER)) {
+            thenWhole = Srl.substringLastFront(thenRear, SUPPLEMENT_DELIMITER).trim();
+            supplement = Srl.substringLastRear(thenRear, SUPPLEMENT_DELIMITER).trim();
         } else {
-            thenClause = thenRear;
+            thenWhole = thenRear;
             supplement = null;
         }
-        final boolean notThenClause;
-        final String thenItem;
-        final boolean notThenValue;
-        final String thenValue;
-        if (thenClause.contains(equalsDelimiter)) {
-            notThenClause = false;
-            thenItem = Srl.substringFirstFront(thenClause, equalsDelimiter).trim();
-            final String valueCandidate = Srl.substringFirstRear(thenClause, equalsDelimiter).trim();
-            notThenValue = valueCandidate.startsWith(notPrefix);
-            thenValue = notThenValue ? Srl.substringFirstRear(valueCandidate, notPrefix).trim() : valueCandidate;
-        } else {
-            notThenClause = thenClause.startsWith(notPrefix);
-            if (notThenClause) {
-                thenClause = Srl.substringFirstRear(thenClause, notPrefix);
+        final String thenTheme;
+        final boolean notThenTheme;
+        final List<DfSPolicyThenPart> thenPartList;
+        final boolean connectedByOr;
+        if (!thenWhole.contains(EQUALS_DELIMITER)) { // then [theme]
+            final boolean startsWithNot = thenWhole.startsWith(NOT_PREFIX);
+            if (startsWithNot) {
+                thenTheme = Srl.substringFirstRear(thenWhole, NOT_PREFIX);
+            } else {
+                thenTheme = thenWhole;
             }
-            thenItem = null;
-            notThenValue = false;
-            thenValue = null;
+            notThenTheme = startsWithNot;
+            thenPartList = Collections.emptyList();
+            connectedByOr = false;
+        } else { // then ... is ... 
+            thenTheme = null;
+            notThenTheme = false;
+            boolean byOr = false;
+            List<String> thenPartStrList = splitClauseByConnector(thenWhole, " and ");
+            if (thenPartStrList.size() == 1) {
+                thenPartStrList = splitClauseByConnector(thenWhole, " or ");
+                if (thenPartStrList.size() >= 2) {
+                    byOr = true;
+                }
+            }
+            final List<DfSPolicyThenPart> makingPartList = new ArrayList<DfSPolicyThenPart>();
+            for (String thenPartStr : thenPartStrList) {
+                final String thenItem = Srl.substringFirstFront(thenPartStr, EQUALS_DELIMITER).trim();
+                final String thenValueCandidate = Srl.substringFirstRear(thenPartStr, EQUALS_DELIMITER).trim();
+                final boolean notThenValue = thenValueCandidate.startsWith(NOT_PREFIX);
+                final String thenValue = notThenValue ? Srl.substringFirstRear(thenValueCandidate, NOT_PREFIX).trim() : thenValueCandidate;
+                makingPartList.add(new DfSPolicyThenPart(thenItem, thenValue, notThenValue));
+            }
+            thenPartList = Collections.unmodifiableList(makingPartList);
+            connectedByOr = byOr;
         }
-        return new DfSchemaPolicyIfClause(statement, ifItem, ifValue, notIfValue, thenClause, notThenClause, thenItem, thenValue,
-                notThenValue, supplement);
+        return new DfSPolicyThenClause(thenTheme, notThenTheme, thenPartList, connectedByOr, supplement);
+    }
+
+    protected List<String> splitClauseByConnector(String clause, String connector) {
+        // e.g. tableName is sea and alias is land and piari and tableName is bonvo
+        // e.g. tableName is sea and alias is land or piari and tableName is bonvo
+        // e.g. tableName is sea or alias is land or piari or tableName is bonvo
+        // e.g. tableName is sea or alias is land and piari or tableName is bonvo
+        final List<String> partElementList = Srl.splitListTrimmed(clause, connector);
+        final List<String> partElementSummaryList = new ArrayList<String>();
+        final StringBuilder connectedSb = new StringBuilder();
+        for (String partElement : partElementList) {
+            if (partElement.contains(EQUALS_DELIMITER)) { // e.g. tableName is sea
+                if (connectedSb.length() > 0) { // e.g. alias is land
+                    partElementSummaryList.add(connectedSb.toString()); // add previous part
+                    connectedSb.setLength(0);
+                }
+            }
+            if (connectedSb.length() > 0) {
+                connectedSb.append(connector);
+            }
+            connectedSb.append(partElement);
+        }
+        if (connectedSb.length() > 0) { // e.g. tableName is bonvo
+            partElementSummaryList.add(connectedSb.toString()); // add last part
+        }
+        return partElementSummaryList;
     }
 
     // ===================================================================================
     //                                                                           Hit Logic
     //                                                                           =========
-    public boolean isHitTable(String tableName, String hint) {
-        return determineHitBy(tableName, hint);
-    }
-
-    public boolean isHitColumn(String columnName, String hint) {
-        return determineHitBy(columnName, hint);
-    }
-
     public boolean isHitExp(String exp, String hint) {
         return determineHitBy(exp, hint);
     }
@@ -138,24 +214,20 @@ public class DfSchemaPolicyMiscSecretary {
     }
 
     // ===================================================================================
-    //                                                                              Naming
-    //                                                                              ======
-    public String buildCaseComparingTableName(Table table) {
-        return toTableName(table);
-    }
-
-    public String buildCaseComparingColumnName(Column column) {
-        return toColumnName(column);
-    }
-
-    public String toTableName(Table table) {
+    //                                                            Conversion for Comparing
+    //                                                            ========================
+    public String toComparingTableName(Table table) {
         // use SQL name because DB name may be controlled
         // (and use resource name to be without schema prefix)
         return table.getResourceNameForSqlName();
     }
 
-    public String toColumnName(Column column) {
+    public String toComparingColumnName(Column column) {
         return column.getResourceNameForSqlName(); // same reason as table name
+    }
+
+    public String toComparingDbTypeWithSize(Column column) {
+        return column.getDbType() + "(" + column.getColumnSize() + ")";
     }
 
     // ===================================================================================
@@ -177,7 +249,7 @@ public class DfSchemaPolicyMiscSecretary {
     // ===================================================================================
     //                                                                 Violation Exception
     //                                                                 ===================
-    public void throwSchemaPolicyCheckViolationException(Map<String, Object> policyMap, DfSchemaPolicyResult result) {
+    public void throwSchemaPolicyCheckViolationException(Map<String, Object> policyMap, DfSPolicyResult result) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The schema policy has been violated.");
         br.addItem("Advice");
@@ -187,18 +259,18 @@ public class DfSchemaPolicyMiscSecretary {
         br.addItem("Schema Policy");
         br.addElement(buildPolicyExp(policyMap));
         br.addItem("Violation");
-        final Map<String, List<DfSchemaPolicyViolation>> violationMap = result.getViolationMap();
+        final Map<String, List<DfSPolicyViolation>> violationMap = result.getViolationMap();
         int policyIndex = 0;
-        for (Entry<String, List<DfSchemaPolicyViolation>> entry : violationMap.entrySet()) {
+        for (Entry<String, List<DfSPolicyViolation>> entry : violationMap.entrySet()) {
             if (policyIndex > 0) { // second or more
                 br.addElement(""); // empty line
             }
             br.addElement(entry.getKey());
-            final List<DfSchemaPolicyViolation> violationList = entry.getValue();
+            final List<DfSPolicyViolation> violationList = entry.getValue();
             int violationIndex = 0;
-            for (DfSchemaPolicyViolation violation : violationList) {
-                final boolean lastLoop = violationIndex < violationList.size() - 1;
-                br.addElement((lastLoop ? " |-" : " +-") + violation.getMessage());
+            for (DfSPolicyViolation violation : violationList) {
+                final boolean beforeLastLoop = violationIndex < violationList.size() - 1;
+                br.addElement((beforeLastLoop ? " |-" : " +-") + violation.getMessage());
                 ++violationIndex;
             }
             ++policyIndex;
@@ -247,9 +319,9 @@ public class DfSchemaPolicyMiscSecretary {
         br.addNotice("Unknown theme for SchemaPolicyCheck.");
         br.addItem("Advice");
         br.addElement("Make sure your schemaPolicyMap.dfprop.");
-        br.addElement("You can use following themes:");
-        br.addElement(" Table  : hasPK, upperCaseBasis, lowerCaseBasis, identityIfPureIDPK");
-        br.addElement(" Column : upperCaseBasis, lowerCaseBasis");
+        br.addElement("For example, you can use following themes:");
+        br.addElement(" Table  : hasPK, upperCaseBasis, lowerCaseBasis, identityIfPureIDPK, ...");
+        br.addElement(" Column : upperCaseBasis, lowerCaseBasis, ...");
         br.addItem("Target");
         br.addElement(targetType);
         br.addItem("Unknown Theme");
@@ -269,7 +341,7 @@ public class DfSchemaPolicyMiscSecretary {
         throw new DfSchemaPolicyCheckUnknownPropertyException(msg);
     }
 
-    public void throwSchemaPolicyCheckIllegalIfThenStatementException(String statement, String additional) {
+    public void throwSchemaPolicyCheckIllegalIfThenStatementException(String nativeStatement, String additional) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Illegal if-then statement for SchemaPolicyCheck.");
         br.addItem("Advice");
@@ -289,7 +361,7 @@ public class DfSchemaPolicyMiscSecretary {
         br.addElement("");
         br.addElement(additional);
         br.addItem("Statement");
-        br.addElement(statement);
+        br.addElement(nativeStatement);
         final String msg = br.buildExceptionMessage();
         throw new DfSchemaPolicyCheckIllegalIfThenStatementException(msg);
     }

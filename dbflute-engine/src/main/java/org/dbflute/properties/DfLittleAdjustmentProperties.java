@@ -405,6 +405,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //public boolean isMakeConditionBeanCBDrivenLoadReferrer() {
     //    return isProperty("isMakeConditionBeanCBDrivenLoadReferrer", false);
     //}
+    public boolean isSpecifyColumnRequired() { // @since 1.1.2
+        return isProperty("isSpecifyColumnRequired", false);
+    }
 
     public boolean isNullOrEmptyQueryAllowed() { // closet
         final boolean defaultValue = isProperty("isInvalidQueryChecked", !isCompatibleBeforeJava8());
@@ -425,10 +428,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isNonSpecifiedColumnAccessAllowed() { // closet
         return isProperty("isNonSpecifiedColumnAccessAllowed", isCompatibleBeforeJava8());
-    }
-
-    public boolean isSpecifyColumnRequired() { // closet
-        return isProperty("isSpecifyColumnRequired", false);
     }
 
     public boolean isMakeConditionQueryEqualEmptyString() { // closet
@@ -608,6 +607,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isSuppressTableClassificationDBAccessClass", false);
     }
 
+    public boolean isSuppressTableClassificationNameCamelizing() { // closet
+        return isProperty("isSuppressTableClassificationNameCamelizing", false);
+    }
+
     // ===================================================================================
     //                                                                       Paging Select
     //                                                                       =============
@@ -718,11 +721,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         } else {
             if (runtime) { // e.g. BehaviorCommandInvoker
                 return className;
-            } else {
+            } else { // allcommon
                 final DfBasicProperties prop = getBasicProperties();
                 final String commonPackage = prop.getBaseCommonPackage();
                 final String projectPrefix = prop.getProjectPrefix();
-                return commonPackage + "." + projectPrefix + className;
+                final String allcommonPrefix = prop.getAllcommonPrefix();
+                return commonPackage + "." + projectPrefix + allcommonPrefix + className;
             }
         }
     }

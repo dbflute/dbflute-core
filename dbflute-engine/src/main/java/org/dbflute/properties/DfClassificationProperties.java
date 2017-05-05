@@ -46,6 +46,7 @@ import org.dbflute.properties.assistant.classification.DfClassificationLiteralAr
 import org.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer;
 import org.dbflute.properties.assistant.classification.DfClassificationSqlResourceCloser;
 import org.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -212,7 +213,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
             reflectClassificationResourceToDefinition(); // *Classification Resource Point!
             filterUseDocumentOnly();
-            checkClassificationConstraints();
+            checkClassificationConstraintsIfNeeds();
             prepareSuppressedDBAccessClassTableSet();
         } finally {
             new DfClassificationSqlResourceCloser().closeConnection(conn);
@@ -220,7 +221,12 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return _classificationTopMap;
     }
 
-    protected void checkClassificationConstraints() {
+    protected void checkClassificationConstraintsIfNeeds() {
+        if (DfDBFluteTaskStatus.getInstance().isReplaceSchema()) {
+            // SchemaPolicyCheck may use classification in ReplaceSchema by dfprop option,
+            // but no data for table classification yet so no check here #for_now by jflute (2017/01/12)
+            return;
+        }
         for (DfClassificationTop classificationTop : _classificationTopMap.values()) {
             // only check one that is not compile-safe
             // (e.g. groupingMap gives us compile error if no-existence element)
@@ -333,6 +339,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         classificationTop.setUseDocumentOnly(isElementMapUseDocumentOnly(elementMap));
         classificationTop.setSuppressAutoDeploy(isElementMapSuppressAutoDeploy(elementMap));
         classificationTop.setSuppressDBAccessClass(isElementMapSuppressDBAccessClass(elementMap));
+        classificationTop.setSuppressNameCamelizing(isElementMapSuppressNameCamelizing(elementMap));
         classificationTop.setDeprecated(isElementMapDeprecated(elementMap));
         classificationTop.putGroupingAll(getElementMapGroupingMap(elementMap));
         classificationTop.putDeprecatedAll(getElementMapDeprecatedMap(elementMap));
@@ -499,6 +506,14 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final String key = DfClassificationTop.KEY_SUPPRESS_DBACCESS_CLASS;
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         final boolean defaultValue = prop.isSuppressTableClassificationDBAccessClass();
+        return isProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean isElementMapSuppressNameCamelizing(Map<?, ?> elementMap) {
+        final String key = DfClassificationTop.KEY_SUPPRESS_NAME_CAMELIZING;
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final boolean defaultValue = prop.isSuppressTableClassificationNameCamelizing();
         return isProperty(key, defaultValue, (Map<String, ? extends Object>) elementMap);
     }
 
@@ -692,7 +707,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
                 final Map<String, Object> selectedMap = newLinkedHashMap();
                 selectedMap.put(DfClassificationElement.KEY_CODE, code);
-                selectedMap.put(DfClassificationElement.KEY_NAME, filterTableClassificationName(name));
+                selectedMap.put(DfClassificationElement.KEY_NAME, filterTableClassificationName(classificationTop, name));
                 selectedMap.put(DfClassificationElement.KEY_ALIAS, filterTableClassificationLiteralOutput(alias));
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) { // because of not required
                     selectedMap.put(DfClassificationElement.KEY_COMMENT, comment);
@@ -796,8 +811,10 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         _nameFromToMap.put("\uff08", "_");
         _nameFromToMap.put("\uff09", "_");
 
-        // full-width space
-        _nameFromToMap.put("\u3000", "_");
+        // pinpoint full-width
+        _nameFromToMap.put("\u3000", "_"); // full-width space
+        _nameFromToMap.put("\u3001", "_"); // Japanese touten
+        _nameFromToMap.put("\u3002", "_"); // Japanese kuten
 
         // non-compilable hyphens
         _nameFromToMap.put("\u2010", "_");
@@ -805,7 +822,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         _nameFromToMap.put("\uff0d", "_");
     }
 
-    protected String filterTableClassificationName(String name) {
+    protected String filterTableClassificationName(DfClassificationTop classificationTop, String name) {
         if (Srl.is_Null_or_TrimmedEmpty(name)) {
             return name;
         }
@@ -813,7 +830,12 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (Character.isDigit(name.charAt(0))) {
             name = "N" + name;
         }
-        return Srl.camelize(name, " ", "_", "-"); // for method name
+        if (classificationTop.isSuppressNameCamelizing()) {
+            // basically plain but only remove characters that cannot be method name
+            return Srl.replace(name, "-", "");
+        } else { // normally here
+            return Srl.camelize(name, "_", "-"); // for method name
+        }
     }
 
     protected final Map<String, String> _literalOutputFromToMap = newLinkedHashMap();
@@ -1088,6 +1110,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
      * @param database The database object. (NotNull)
      */
     public void initializeClassificationDeployment(Database database) { // this should be called when the task start
+        // only overridden if called with same database
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
         final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();
         if (allColumnClassificationMap != null) {

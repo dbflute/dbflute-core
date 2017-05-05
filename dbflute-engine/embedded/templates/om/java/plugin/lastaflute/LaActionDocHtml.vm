@@ -1,0 +1,103 @@
+##
+## Copyright 2014-2017 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+<h2 id="lastadoc_action">action</h2>
+#if ($table.tableMap.actionDocMetaList)
+<table>
+    <thead>
+    <tr>
+        <th rowspan="2">No.</th>
+        <th rowspan="2">URL</th>
+        <th rowspan="2">description</th>
+        <th rowspan="2">class#method</th>
+        <th rowspan="2">Form or Body</th>
+        <th rowspan="2">return</th>
+        <th colspan="3">count</th>
+    </tr>
+    <tr>
+        <th>fields</th>
+        <th>class lines</th>
+        <th>method lines</th>
+    </tr>
+    </thead>
+    <tbody id="table-list-body">
+#foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
+    <tr>
+        <td class="rowcellnum">${foreach.count}</td>
+        <td class="rowcell"><a href="#$manager.htmlEscape($actionDocMeta.url)">$manager.htmlEscape($actionDocMeta.url)</a></td>
+        <td class="rowcell">$!manager.htmlEscape($actionDocMeta.description)</td>
+        <td class="rowcell"><span title="$manager.htmlEscape($actionDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.simpleTypeName)</span>#${actionDocMeta.methodName}()</td>
+        <td class="rowcell">
+#if ($actionDocMeta.formTypeDocMeta)
+            <span title="$manager.htmlEscape($actionDocMeta.formTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.formTypeDocMeta.simpleTypeName)</span>
+#end
+        </td>
+        <td class="rowcell">
+#if ($actionDocMeta.returnTypeDocMeta)
+            <span title="$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.simpleTypeName)</span>
+#end
+        </td>
+        <td class="rowcellnum">$!{actionDocMeta.fieldTypeDocMetaList.size()}</td>
+        <td class="rowcellnum">$!{actionDocMeta.fileLineCount}</td>
+        <td class="rowcellnum">$!{actionDocMeta.methodLineCount}</td>
+    </tr>
+#end
+    </tbody>
+</table>
+
+#foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
+<h3 id="$manager.htmlEscape($actionDocMeta.url)">
+$manager.htmlEscape($actionDocMeta.url)
+</h3>
+<p>
+<span class="doctitle">Execute Method:</span> <span class="docmainvalue">$manager.htmlEscape($actionDocMeta.typeName)#${actionDocMeta.methodName}()</span>
+</p>
+#if ($actionDocMeta.annotationList)
+<p class="docsubitem">
+<span class="docsubtitle">annotations:</span>
+#foreach($annotation in $actionDocMeta.annotationList)
+<span class="docannotations docsubvalue">&#64;${annotation}</span>
+#end
+</p>
+#end
+#if ($actionDocMeta.typeComment)
+<p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($actionDocMeta.typeComment)</p>
+#end
+#if ($actionDocMeta.methodComment)
+<p class="tablecomment" style="white-space:pre-wrap;">$manager.htmlEscape($actionDocMeta.methodComment)</p>
+#end
+#if (!$actionDocMeta.parameterTypeDocMetaList.isEmpty())
+<span class="doctitle">URL Parameter:</span>
+$generator.parse("om/java/plugin/lastaflute/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta)
+#end
+#if ($actionDocMeta.formTypeDocMeta)
+<span class="doctitle">Form or Body:</span> <span class="docsubvalue"><span title="$manager.htmlEscape($actionDocMeta.formTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.formTypeDocMeta.simpleTypeName)</span></span>
+<p class="tablecomment" title="$!manager.htmlEscape($actionDocMeta.formTypeDocMeta.comment)">$!manager.htmlEscape($actionDocMeta.formTypeDocMeta.description)</p>
+$generator.parse("om/java/plugin/lastaflute/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.formTypeDocMeta)
+#end
+#if ($actionDocMeta.returnTypeDocMeta)
+<span class="doctitle">Return as:</span> <span class="docsubvalue"><span title="$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.simpleTypeName)</span></span>
+<p class="tablecomment" title="$!manager.htmlEscape($actionDocMeta.returnTypeDocMeta.comment)">$!manager.htmlEscape($actionDocMeta.returnTypeDocMeta.description)</p>
+#if ($actionDocMeta.returnTypeDocMeta.simpleTypeName == 'HtmlResponse' && $actionDocMeta.returnTypeDocMeta.value)
+<p class="docsubitem"><span class="docsubtitle">implementations:</span> <span class="docsubvalue">${actionDocMeta.returnTypeDocMeta.value}</span></p>
+#end
+$generator.parse("om/java/plugin/lastaflute/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.returnTypeDocMeta)
+#end
+#end
+#else
+#foreach ($column in $table.columnList)
+${column.url} :: ${column.className}<br>
+#end
+#end

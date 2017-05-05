@@ -67,7 +67,6 @@ import org.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfTableNameProp;
 import org.dbflute.properties.propreader.DfOutsideMapPropReader;
-import org.dbflute.system.DBFluteSystem;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -149,11 +148,11 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     //                                               DataSet
     //                                               -------
     protected void doWriteDataSet(DfXlsDataResource resource, File file, DfDataSet dataSet, StringBuilder msgSb) {
-        msgSb.append(ln()).append(ln()).append("[" + file.getName() + "]");
+        msgSb.append(ln()).append(ln()).append("[").append(file.getName()).append("]");
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable dataTable = dataSet.getTable(i);
             final int loadedCount = doWriteDataTable(resource, file, dataTable);
-            msgSb.append(ln()).append("  " + dataTable.getTableDbName() + " (" + loadedCount + ")");
+            msgSb.append(ln()).append("  ").append(dataTable.getTableDbName()).append(" (").append(loadedCount).append(")");
         }
     }
 
@@ -302,7 +301,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     protected void checkHeaderColumnIfNeeds(DfXlsDataResource resource, File file, DfDataTable dataTable,
             Map<String, DfColumnMeta> columnMetaMap) {
         final String dataDirectory = resource.getDataDirectory();
-        if (!isCheckColumnDefExistence(dataDirectory)) {
+        if (!isCheckColumnDef(dataDirectory)) {
             return;
         }
         final List<String> columnDefNameList = new ArrayList<String>();
@@ -313,8 +312,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
         // use columnMetaMap to check (not use DataTable's meta data here)
         // at old age, columnMetaMap is not required but required now
-        final String tableDbName = dataTable.getTableDbName();
-        checkColumnDefExistence(dataDirectory, file, tableDbName, columnDefNameList, columnMetaMap);
+        checkColumnDef(file, dataTable.getTableDbName(), columnDefNameList, columnMetaMap);
     }
 
     protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
@@ -555,7 +553,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         final Map<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectory);
         final Map<String, List<String>> emptyStringTableColumnMap = getEmptyStringTableColumnMap(dataDirectory);
         final boolean rtrimCellValue = isRTrimCellValue(dataDirectory);
-        return new DfTableXlsReader(file, tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap, _skipSheetPattern, rtrimCellValue);
+        return new DfTableXlsReader(file, tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap, _skipSheetPattern,
+                rtrimCellValue);
     }
 
     protected List<File> getXlsList(DfXlsDataResource resource) {
@@ -884,10 +883,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 } catch (IOException ignored) {}
             }
         }
-    }
-
-    protected String ln() {
-        return DBFluteSystem.ln();
     }
 
     // ===================================================================================

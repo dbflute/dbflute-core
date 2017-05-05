@@ -16,6 +16,7 @@
 package org.dbflute.logic.replaceschema.loaddata;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,29 +30,75 @@ public class DfDelimiterDataResultInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** map:{ data-directory = map:{ file-name = loaded-meta } } */
+    protected final Map<String, Map<String, DfDelimiterDataLoadedMeta>> _loadedMetaMap =
+            new LinkedHashMap<String, Map<String, DfDelimiterDataLoadedMeta>>();
+
+    public static class DfDelimiterDataLoadedMeta {
+
+        protected final String _fileName; // contains path
+        protected final int _successRowCount;
+
+        public DfDelimiterDataLoadedMeta(String fileName, int successRowCount) {
+            _fileName = fileName;
+            _successRowCount = successRowCount;
+        }
+
+        public String getFileName() {
+            return _fileName;
+        }
+
+        public Integer getSuccessRowCount() {
+            return _successRowCount;
+        }
+    }
+
+    /**
+     * as INFO, map:{ tableName = set:{ not-found-column } } <br>
+     * may be empty because already checked by loading control
+     */
     protected final Map<String, Set<String>> _notFoundColumnMap = new LinkedHashMap<String, Set<String>>();
-    protected final Map<String, List<String>> _warinngFileMap = new LinkedHashMap<String, List<String>>();
+
+    /** as WARN, map:{ tsv-file-path = list:{ message-of-diff } } */
+    protected final Map<String, List<String>> _columnCountDiffMap = new LinkedHashMap<String, List<String>>();
 
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
-    public void registerWarningFile(String fileName, String message) {
-        List<String> messageList = _warinngFileMap.get(fileName);
+    public void registerLoadedMeta(String dataDirectory, String fileName, int successRowCount) {
+        Map<String, DfDelimiterDataLoadedMeta> firstMap = _loadedMetaMap.get(dataDirectory);
+        if (firstMap == null) {
+            firstMap = new LinkedHashMap<String, DfDelimiterDataLoadedMeta>();
+            _loadedMetaMap.put(dataDirectory, firstMap);
+        }
+        firstMap.put(fileName, new DfDelimiterDataLoadedMeta(fileName, successRowCount));
+    }
+
+    public void registerColumnCountDiff(String fileName, String message) {
+        List<String> messageList = _columnCountDiffMap.get(fileName);
         if (messageList == null) {
             messageList = new ArrayList<String>();
-            _warinngFileMap.put(fileName, messageList);
+            _columnCountDiffMap.put(fileName, messageList);
         }
         messageList.add(message);
+    }
+
+    public boolean containsColumnCountDiff(String delimiterFilePath) {
+        return _columnCountDiffMap.containsKey(delimiterFilePath);
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Map<String, Set<String>> getNotFoundColumnMap() {
-        return _notFoundColumnMap;
+    public Map<String, Map<String, DfDelimiterDataLoadedMeta>> getLoadedMetaMap() {
+        return Collections.unmodifiableMap(_loadedMetaMap);
     }
 
-    public Map<String, List<String>> getWarningFileMap() {
-        return _warinngFileMap;
+    public Map<String, Set<String>> getNotFoundColumnMap() {
+        return _notFoundColumnMap; // cannot be read-only, put by outer processes
+    }
+
+    public Map<String, List<String>> getColumnCountDiffMap() {
+        return Collections.unmodifiableMap(_columnCountDiffMap);
     }
 }

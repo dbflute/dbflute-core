@@ -9,6 +9,12 @@
 # map:{
 #     ; tableExceptList = list:{}
 #     ; tableTargetList = list:{}
+#     ; columnExceptMap = map:{}
+#     ; isMainSchemaOnly = false
+#     
+#     ; wholeMap = map:{
+#         ; themeList = list:{ uniqueTableAlias ; sameColumnAliasIfSameColumnName }
+#     }
 #     ; tableMap = map:{
 #         ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
 #         ; statementList = list:{
@@ -21,6 +27,7 @@
 #             ; if columnName is suffix:_FLAG then bad
 #             ; if columnName is suffix:_FLG then notNull
 #             ; if columnName is suffix:_FLG then dbType is INTEGER 
+#             ; if columnName is suffix:_FLG then classification 
 #         }
 #     }
 # }
@@ -30,6 +37,12 @@
 map:{
     #; tableExceptList = list:{}
     #; tableTargetList = list:{}
+    #; columnExceptMap = map:{}
+    #; isMainSchemaOnly = false
+    #
+    #; wholeMap = map:{
+    #    ; themeList = list:{ uniqueTableAlias ; sameColumnAliasIfSameColumnName }
+    #}
     #; tableMap = map:{
     #    ; themeList = list:{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
     #    ; statementList = list:{
@@ -42,6 +55,7 @@ map:{
     #        ; if columnName is suffix:_FLAG then bad
     #        ; if columnName is suffix:_FLG then notNull
     #        ; if columnName is suffix:_FLG then dbType is INTEGER
+    #        ; if columnName is suffix:_FLG then classification
     #    }
     #}
 }

@@ -39,6 +39,7 @@ $database.initializeClassificationDeployment()
 
 ## [Prefix-and-Suffix]
 #set ($glProjectPrefix = ${database.ProjectPrefix})
+#set ($glAllcommonPrefix = ${database.allcommonPrefix})
 #set ($glBasePrefix = ${database.BasePrefix})
 #set ($glBaseSuffixForEntity = ${database.BaseSuffixForEntity})
 
@@ -85,7 +86,7 @@ $database.initializeClassificationDeployment()
 #set ($glLatestSqlProvider = "${glProjectPrefix}LatestSqlProvider")
 
 ## [ClassificationDefinition]
-#set ($glCDef = "${glProjectPrefix}CDef")
+#set ($glCDef = "${glProjectPrefix}${glAllcommonPrefix}CDef")
 #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
 
 ## [Allcommon-Util]

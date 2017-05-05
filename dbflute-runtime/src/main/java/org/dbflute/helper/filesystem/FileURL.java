@@ -57,14 +57,14 @@ public class FileURL {
     }
 
     protected void doDownloadFileAndClose(URL url, String toFilePath) {
-        InputStream in;
+        InputStream ins;
         try {
-            in = url.openStream();
+            ins = url.openStream();
         } catch (IOException e) {
             String msg = "Failed to open stream: url=" + url;
             throw new IllegalStateException(msg, e);
         }
-        doDownloadFileAndClose(in, toFilePath);
+        doDownloadFileAndClose(ins, toFilePath);
     }
 
     protected void doDownloadFileAndClose(InputStream ins, String toFilePath) {
@@ -74,10 +74,7 @@ public class FileURL {
         } finally {
             try {
                 ins.close();
-            } catch (IOException e) {
-                String msg = "Failed to close the input stream: ins=" + ins;
-                throw new IllegalStateException(msg, e);
-            }
+            } catch (IOException ignored) {}
         }
         final File outputFile = new File(toFilePath);
         FileOutputStream ous = null;
@@ -122,7 +119,7 @@ public class FileURL {
 
     protected void copy(InputStream ins, OutputStream ous) {
         try {
-            final byte[] bytes = new byte[256];
+            final byte[] bytes = new byte[getReadBufferSize()];
             int length = ins.read(bytes);
             while (length != -1 && length != 0) {
                 ous.write(bytes, 0, length);
@@ -132,5 +129,9 @@ public class FileURL {
             String msg = "Failed to copy : ins=" + ins + ", ous=" + ous;
             throw new IllegalStateException(msg, e);
         }
+    }
+
+    protected int getReadBufferSize() {
+        return 8192; // same as Files.BUFFER_SIZE
     }
 }

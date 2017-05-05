@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.dbflute.logic.doc.policycheck;
+package org.dbflute.logic.doc.spolicy.result;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -24,16 +24,16 @@ import java.util.Map;
  * @author jflute
  * @since 1.1.2 (2016/12/31 Saturday)
  */
-public class DfSchemaPolicyResult {
+public class DfSPolicyResult {
 
-    protected final Map<String, List<DfSchemaPolicyViolation>> _violationMap = new LinkedHashMap<String, List<DfSchemaPolicyViolation>>();
+    protected final Map<String, List<DfSPolicyViolation>> _violationMap = new LinkedHashMap<String, List<DfSPolicyViolation>>();
 
-    public static class DfSchemaPolicyViolation {
+    public static class DfSPolicyViolation {
 
         protected final String _policy;
         protected final String _message;
 
-        public DfSchemaPolicyViolation(String policy, String message) {
+        public DfSPolicyViolation(String policy, String message) {
             _policy = policy;
             _message = message;
         }
@@ -51,16 +51,16 @@ public class DfSchemaPolicyResult {
         return _violationMap.isEmpty();
     }
 
-    public void addViolation(String policy, String message) {
-        List<DfSchemaPolicyViolation> violationList = _violationMap.get(policy);
+    public void violate(String policy, String message) {
+        List<DfSPolicyViolation> violationList = _violationMap.get(policy);
         if (violationList == null) {
-            violationList = new ArrayList<DfSchemaPolicyViolation>();
+            violationList = new ArrayList<DfSPolicyViolation>();
             _violationMap.put(policy, violationList);
         }
-        violationList.add(new DfSchemaPolicyViolation(policy, message));
+        violationList.add(new DfSPolicyViolation(policy, message));
     }
 
-    public Map<String, List<DfSchemaPolicyViolation>> getViolationMap() {
+    public Map<String, List<DfSPolicyViolation>> getViolationMap() {
         return _violationMap;
     }
 }

@@ -152,6 +152,7 @@ import org.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.core.DfDatabaseNameMapping;
+import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlProcedure;
 import org.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.dbflute.logic.generate.exdirect.DfCopyrightResolver;
 import org.dbflute.logic.generate.exdirect.DfSerialVersionUIDResolver;
@@ -159,7 +160,6 @@ import org.dbflute.logic.generate.exdirect.DfSpringComponentResolver;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.dbflute.logic.generate.packagepath.DfPackagePathHandler;
-import org.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
 import org.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
@@ -170,6 +170,7 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
 import org.dbflute.properties.DfDatabaseProperties;
 import org.dbflute.properties.DfDependencyInjectionProperties;
+import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.properties.assistant.DfTableDeterminer;
 import org.dbflute.properties.assistant.DfTableFinder;
@@ -181,7 +182,6 @@ import org.dbflute.properties.initializer.DfAdditionalForeignKeyInitializer;
 import org.dbflute.properties.initializer.DfAdditionalPrimaryKeyInitializer;
 import org.dbflute.properties.initializer.DfAdditionalUniqueKeyInitializer;
 import org.dbflute.properties.initializer.DfIncludeQueryInitializer;
-import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1438,6 +1438,10 @@ public class Database {
         return getBasicProperties().getProjectPrefix();
     }
 
+    public String getAllcommonPrefix() {
+        return getBasicProperties().getAllcommonPrefix();
+    }
+
     public String getBasePrefix() {
         return getBasicProperties().getBasePrefix();
     }
@@ -2342,10 +2346,15 @@ public class Database {
     }
 
     public boolean isSchemaHtmlProcedureValid() {
-        if (getProperties().getDocumentProperties().isSuppressSchemaHtmlProcedure()) {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        if (prop.isSuppressSchemaHtmlProcedure()) {
             return false;
         }
-        return isGenerateProcedureParameterBean();
+        if (prop.isShowSchemaHtmlProcedureRegardlessOfGeneration()) {
+            return true;
+        } else {
+            return isGenerateProcedureParameterBean();
+        }
     }
 
     public boolean isSchemaHtmlStyleSheetEmbedded() {
@@ -2595,19 +2604,21 @@ public class Database {
     protected String filterRuntimeComponentPrefix(String componentName) {
         final DfDependencyInjectionProperties prop = getProperties().getDependencyInjectionProperties();
         final String filtered = prop.filterRuntimeComponentPrefix(componentName);
-        return filterComponentNameWithProjectPrefix(filtered);
+        return filterComponentNameWithProjectPrefix(filterComponentNameWithAllcommonPrefix(filtered));
     }
 
     // -----------------------------------------------------
     //                                     Filtering Utility
     //                                     -----------------
-    /**
-     * Filter a component name with a project prefix.
-     * @param componentName The name of component. (NotNull)
-     * @return A filtered component name with project prefix. (NotNull)
-     */
     public String filterComponentNameWithProjectPrefix(String componentName) { // called from Table
-        final String prefix = getBasicProperties().getProjectPrefix();
+        return doFilterComponentNameWithPrefix(componentName, getBasicProperties().getProjectPrefix());
+    }
+
+    protected String filterComponentNameWithAllcommonPrefix(String componentName) {
+        return doFilterComponentNameWithPrefix(componentName, getBasicProperties().getAllcommonPrefix());
+    }
+
+    protected String doFilterComponentNameWithPrefix(String componentName, String prefix) {
         if (prefix == null || prefix.trim().length() == 0) {
             return componentName;
         }
@@ -2820,56 +2831,18 @@ public class Database {
     // ===================================================================================
     //                                                                  Procedure Document
     //                                                                  ==================
-    protected List<DfProcedureMeta> _procedureMetaInfoList;
-    protected Map<String, List<DfProcedureMeta>> _schemaProcedureMap;
+    protected final DfSchemaHtmlProcedure _schemaHtmlProcedure = new DfSchemaHtmlProcedure(); // contains cache
 
     public boolean hasSeveralProcedureSchema() throws SQLException {
         return getAvailableSchemaProcedureMap().size() >= 2;
     }
 
     public List<DfProcedureMeta> getAvailableProcedureList() throws SQLException {
-        if (_procedureMetaInfoList != null) {
-            return _procedureMetaInfoList;
-        }
-        _log.info(" ");
-        _log.info("...Setting up procedures for documents");
-        final DfProcedureExtractor handler = new DfProcedureExtractor();
-        final DfSchemaSource dataSource = getDataSource();
-        handler.includeProcedureSynonym(dataSource);
-        handler.includeProcedureToDBLink(dataSource);
-        _procedureMetaInfoList = handler.getAvailableProcedureList(dataSource); // ordered by schema
-        return _procedureMetaInfoList;
+        return _schemaHtmlProcedure.getAvailableProcedureList(() -> getDataSource());
     }
 
     public Map<String, List<DfProcedureMeta>> getAvailableSchemaProcedureMap() throws SQLException {
-        if (_schemaProcedureMap != null) {
-            return _schemaProcedureMap;
-        }
-        final List<DfProcedureMeta> procedureList = getAvailableProcedureList();
-        final Map<String, List<DfProcedureMeta>> schemaProcedureListMap = DfCollectionUtil.newLinkedHashMap();
-        final String mainName = "(main schema)";
-        for (DfProcedureMeta meta : procedureList) {
-            final UnifiedSchema procedureSchema = meta.getProcedureSchema();
-            final String schemaName;
-            if (procedureSchema != null) {
-                final String drivenSchema = procedureSchema.getDrivenSchema();
-                if (drivenSchema != null) {
-                    schemaName = drivenSchema;
-                } else {
-                    schemaName = procedureSchema.isMainSchema() ? mainName : procedureSchema.getSqlPrefixSchema();
-                }
-            } else {
-                schemaName = "(no schema)";
-            }
-            List<DfProcedureMeta> metaList = schemaProcedureListMap.get(schemaName);
-            if (metaList == null) {
-                metaList = DfCollectionUtil.newArrayList();
-                schemaProcedureListMap.put(schemaName, metaList);
-            }
-            metaList.add(meta);
-        }
-        _schemaProcedureMap = schemaProcedureListMap;
-        return _schemaProcedureMap;
+        return _schemaHtmlProcedure.getAvailableSchemaProcedureMap(() -> getDataSource());
     }
 
     // ===================================================================================

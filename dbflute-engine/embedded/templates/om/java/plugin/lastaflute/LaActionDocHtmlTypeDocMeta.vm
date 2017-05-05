@@ -13,7 +13,11 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-#if ($typeDocMeta.nestTypeDocMetaList.size() > 0)
+#set($typeDocMetaList = $typeDocMeta.nestTypeDocMetaList)
+#if (!$typeDocMeta.parameterTypeDocMetaList.isEmpty())
+    #set($typeDocMetaList = $typeDocMeta.parameterTypeDocMetaList)
+#end
+#if (!$typeDocMetaList.isEmpty())
 <table>
     <thead>
     <tr>
@@ -24,9 +28,9 @@
         <th>annotations</th>
     </tr>
     </thead>
-#foreach ($nestTypeDocMeta in $typeDocMeta.nestTypeDocMetaList)
+#foreach ($nestTypeDocMeta in $typeDocMetaList)
 #set($rowspan = 1)
-#if ($nestTypeDocMeta.nestTypeDocMetaList.size() > 0)
+#if (!$nestTypeDocMeta.nestTypeDocMetaList.isEmpty())
 #set($rowspan = 2)
 #end
     <tr>
@@ -46,11 +50,11 @@
 #end
         </td>
     </tr>
-#if ($nestTypeDocMeta.nestTypeDocMetaList.size() > 0)
+#if (!$nestTypeDocMeta.nestTypeDocMetaList.isEmpty())
     <tr>
         <td colspan="4">
             <div class="nestedbean">
-$generator.parse("om/java/plugin/lastaflute/LaDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $nestTypeDocMeta)
+$generator.parse("om/java/plugin/lastaflute/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $nestTypeDocMeta)
             </div>
         </td>
     </tr>

@@ -23,8 +23,21 @@ import org.dbflute.hook.AccessContext;
 public class DfLanguageClassPackageCSharp implements DfLanguageClassPackage {
 
     // ===================================================================================
-    //                                                                               Basic
-    //                                                                               =====
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final DfLanguageClassPackageJava classPackageJava = new DfLanguageClassPackageJava();
+
+    // ===================================================================================
+    //                                                                         Basic Class
+    //                                                                         ===========
+    @Override
+    public String buildCDefPureClassName(String projectPrefix, String allcommonPrefix) {
+        return classPackageJava.buildCDefPureClassName(projectPrefix, allcommonPrefix);
+    }
+
+    // ===================================================================================
+    //                                                                       Basic Package
+    //                                                                       =============
     public String getBaseCommonPackage() {
         return "AllCommon";
     }

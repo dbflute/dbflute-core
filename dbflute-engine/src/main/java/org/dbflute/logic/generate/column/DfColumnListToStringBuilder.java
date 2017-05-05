@@ -36,10 +36,7 @@ public class DfColumnListToStringBuilder {
         for (Column column : columnList) {
             final String javaNative;
             if (column.isForceClassificationSetting()) {
-                final DfBasicProperties prop = getBasicProperties();
-                final String projectPrefix = prop.getProjectPrefix();
-                final String classificationName = column.getClassificationName();
-                javaNative = projectPrefix + "CDef." + classificationName;
+                javaNative = getBasicProperties().getCDefPureName() + "." + column.getClassificationName();
             } else {
                 javaNative = column.getJavaNative();
             }

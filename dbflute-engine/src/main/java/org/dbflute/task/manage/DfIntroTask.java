@@ -16,12 +16,19 @@
 package org.dbflute.task.manage;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.dbflute.infra.dfprop.DfPublicProperties;
 import org.dbflute.properties.DfInfraProperties;
 import org.dbflute.task.DfDBFluteTaskStatus;
 import org.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.dbflute.task.bs.DfAbstractTask;
+import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,13 +71,19 @@ public class DfIntroTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
+        final DfPublicProperties dfprop = preparePublicProperties();
         final String locationPath = findLocationPath();
         final File jarFile = new File(locationPath);
         if (jarFile.exists()) { // basically no way because of script control
-            _log.info("*Intro file already exists: " + locationPath);
-            return;
+            if (determineExistingIntroLatestVersion(jarFile, dfprop)) {
+                _log.info("*The jar file of DBFlute Intro already exists: " + locationPath);
+                return;
+            } else {
+                _log.info("*The existing DBFlute Intro is old version so override it: " + locationPath);
+                jarFile.delete();
+            }
         }
-        final String downloadUrl = findDownloadUrl();
+        final String downloadUrl = findDownloadUrl(dfprop);
         _log.info("...Downloading DBFlute Intro to " + locationPath);
         _log.info("    from " + downloadUrl);
         download(downloadUrl, locationPath);
@@ -78,23 +91,93 @@ public class DfIntroTask extends DfAbstractTask {
     }
 
     protected String findLocationPath() {
-        final DfInfraProperties prop = getInfraProperties();
-        final String specified = prop.getDBFluteIntroLocationPath();
+        final String specified = getInfraProperties().getDBFluteIntroLocationPath();
         return specified != null ? specified : DEFAULT_LOCATION_PATH;
     }
 
-    protected String findDownloadUrl() {
+    protected boolean determineExistingIntroLatestVersion(File jarFile, DfPublicProperties dfprop) {
+        final String existingJarVersion;
+        try {
+            existingJarVersion = extractIntroJarVersion(jarFile);
+        } catch (RuntimeException e) { // unknown, continue because of sub process
+            _log.info("*Failed to extract the existing intro version from jar file: " + jarFile);
+            return false;
+        }
+        if (existingJarVersion == null) { // unknown
+            return false;
+        }
+        // over version treated as latest just in case (might forget to update public.properties)
+        return existingJarVersion.compareTo(getIntroLatestVersion(dfprop)) >= 0;
+    }
+
+    protected String findDownloadUrl(DfPublicProperties dfprop) {
         final DfInfraProperties prop = getInfraProperties();
         final String specified = prop.getDBFluteIntroDownloadUrl();
         if (specified != null) {
             return specified;
         }
-        final DfPublicProperties dfprop = preparePublicProperties();
-        final String downloadUrl = dfprop.getIntroDownloadUrl();
+        // defined download URL may not contain version but just in case (for future)
+        return getIntroDownloadUrl(dfprop, dfprop.getIntroLatestVersion());
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected String getIntroLatestVersion(DfPublicProperties dfprop) {
+        final String latestVersion = dfprop.getIntroLatestVersion();
+        if (latestVersion == null) {
+            String msg = "Not found the latest version for DBFlute Intro in public properties: " + dfprop;
+            throw new IllegalStateException(msg);
+        }
+        return latestVersion;
+    }
+
+    protected String getIntroDownloadUrl(DfPublicProperties dfprop, final String latestVersion) {
+        final String downloadUrl = dfprop.getIntroDownloadUrl(latestVersion);
         if (downloadUrl == null) {
-            String msg = "Not found the download URL for DBFlute Intro in publicMap.";
+            String msg = "Not found the download URL for DBFlute Intro in public properties: " + dfprop;
             throw new IllegalStateException(msg);
         }
         return downloadUrl;
+    }
+
+    protected String extractIntroJarVersion(File jarFile) { // null allowed: when not found
+        ZipInputStream ins = null;
+        try {
+            ins = new ZipInputStream(new FileInputStream(jarFile));
+            final String manifestText = readManifestText(ins);
+            final List<String> lineList = Srl.splitListTrimmed(manifestText, "\n");
+            final String versionKey = "Implementation-Version:";
+            String introVersion = null;
+            for (String line : lineList) {
+                if (line.startsWith(versionKey)) {
+                    introVersion = Srl.substringFirstRear(line, versionKey).trim();
+                }
+            }
+            return introVersion;
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to read intro version: jarFile=" + jarFile, e);
+        } finally {
+            if (ins != null) {
+                try {
+                    ins.close();
+                } catch (IOException ignored) {}
+            }
+        }
+    }
+
+    protected String readManifestText(ZipInputStream ins) throws IOException, UnsupportedEncodingException {
+        ZipEntry entry = null;
+        while ((entry = ins.getNextEntry()) != null) {
+            if (entry.getName().endsWith("MANIFEST.MF")) {
+                break;
+            }
+            ins.closeEntry();
+        }
+        final byte[] buf = new byte[4096]; // enough to get intro version
+        ins.read(buf);
+        final String manifestText = new String(buf, "UTF-8");
+        ins.closeEntry();
+        return manifestText;
     }
 }

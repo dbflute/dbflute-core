@@ -27,7 +27,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.dbflute.helper.thread.exception.ThreadFireFailureException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.helper.thread.exception.CountDownRaceExecutionException;
+import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +67,7 @@ public class CountDownRace {
     }
 
     public CountDownRace(List<Object> parameterList) { // assigned by parameters (the size is runner count)
-        if (parameterList == null || parameterList.isEmpty()) {
+        if (parameterList == null) {
             String msg = "The argument 'parameterList' should not be null or empty: " + parameterList;
             throw new IllegalArgumentException(msg);
         }
@@ -90,15 +92,17 @@ public class CountDownRace {
     // ===================================================================================
     //                                                                         Thread Fire
     //                                                                         ===========
-    public void readyGo(CountDownRaceExecution oneArgLambda) {
-        if (oneArgLambda == null) {
-            String msg = "The argument 'execution' should be not null.";
-            throw new IllegalArgumentException(msg);
+    public void readyGo(CountDownRaceExecution runnerLambda) {
+        if (runnerLambda == null) {
+            throw new IllegalArgumentException("The argument 'runnerLambda' should be not null.");
         }
-        doReadyGo(oneArgLambda);
+        doReadyGo(runnerLambda);
     }
 
     protected void doReadyGo(CountDownRaceExecution execution) {
+        if (_runnerRequestMap.isEmpty()) { // e.g. empty parameter list
+            return;
+        }
         final int runnerCount = _runnerRequestMap.size();
         final CountDownLatch ready = new CountDownLatch(runnerCount);
         final CountDownLatch start = new CountDownLatch(1);
@@ -128,31 +132,102 @@ public class CountDownRace {
             throw new IllegalStateException(msg, e);
         }
 
-        handleFuture(futureList);
+        handleFuture(futureList, execution);
     }
 
-    protected void handleFuture(List<Future<Void>> futureList) {
+    protected void handleFuture(List<Future<Void>> futureList, CountDownRaceExecution execution) {
+        final boolean throwImmediatelyByFirstCause = execution.isThrowImmediatelyByFirstCause();
+        final List<Throwable> runnerCauseList = new ArrayList<Throwable>();
         for (Future<Void> future : futureList) {
             try {
                 future.get();
             } catch (InterruptedException e) {
-                String msg = "future.get() was interrupted!";
-                throw new IllegalStateException(msg, e);
+                throw new IllegalStateException("future.get() was interrupted: " + future, e);
             } catch (ExecutionException e) {
-                String msg = "Failed to fire the thread: " + future;
-                throw new ThreadFireFailureException(msg, e.getCause());
+                if (throwImmediatelyByFirstCause) {
+                    throw new CountDownRaceExecutionException(buildRunnerGoalFailureNotice(), e.getCause());
+                } else {
+                    runnerCauseList.add(e.getCause());
+                }
             }
+        }
+        if (!runnerCauseList.isEmpty()) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice(buildRunnerGoalFailureNotice());
+            br.addItem("Advice");
+            br.addElement("Confirm all causes thrown by runners.");
+            br.addItem("Runner Cause");
+            int index = 0;
+            for (Throwable cause : runnerCauseList) {
+                if (index > 0) {
+                    br.addElement("");
+                }
+                buildRunnerExStackTrace(br, cause, 0);
+                ++index;
+            }
+            final String msg = br.buildExceptionMessage();
+            throw new CountDownRaceExecutionException(msg, runnerCauseList);
+        }
+    }
+
+    protected String buildRunnerGoalFailureNotice() {
+        return "Failed to reach the goal of countdown race for runners.";
+    }
+
+    protected void buildRunnerExStackTrace(ExceptionMessageBuilder br, Throwable cause, int nestLevel) {
+        final StringBuilder headerSb = new StringBuilder();
+        if (nestLevel > 0) {
+            headerSb.append("Caused by: ");
+        }
+        final String causeNameBase = cause.getClass().getName() + ":";
+        final String causeMessage = cause.getMessage();
+        if (causeMessage != null && Srl.contains(causeMessage, "\n")) {
+            headerSb.append(causeNameBase);
+            br.addElement(headerSb.toString());
+            br.addElement(causeMessage);
+        } else {
+            headerSb.append(causeNameBase + " " + causeMessage);
+            br.addElement(headerSb.toString());
+        }
+        final StackTraceElement[] stackTrace = cause.getStackTrace();
+        if (stackTrace == null) { // just in case
+            return;
+        }
+        final int limit = nestLevel == 0 ? 10 : 3;
+        int index = 0;
+        for (StackTraceElement element : stackTrace) {
+            if (index > limit) { // not all because it's not error
+                br.addElement("  ...");
+                break;
+            }
+            final String className = element.getClassName();
+            final String fileName = element.getFileName(); // might be null
+            final int lineNumber = element.getLineNumber();
+            final String methodName = element.getMethodName();
+            final StringBuilder lineSb = new StringBuilder();
+            lineSb.append("  at ").append(className).append(".").append(methodName).append("(").append(fileName);
+            if (lineNumber >= 0) {
+                lineSb.append(":").append(lineNumber);
+            }
+            lineSb.append(")");
+            br.addElement(lineSb.toString());
+            ++index;
+        }
+        final Throwable nested = cause.getCause();
+        if (nested != null && nested != cause) {
+            buildRunnerExStackTrace(br, nested, nestLevel + 1);
         }
     }
 
     // ===================================================================================
     //                                                                            Callable
     //                                                                            ========
-    protected Callable<Void> createCallable(final CountDownRaceExecution execution, final CountDownLatch ready, final CountDownLatch start,
-            final CountDownLatch goal, final CountDownRaceLatch ourLatch, final int entryNumber, final Object parameter,
-            final Object lockObj) {
+    protected Callable<Void> createCallable(CountDownRaceExecution execution, CountDownLatch ready, CountDownLatch start,
+            CountDownLatch goal, CountDownRaceLatch ourLatch, int entryNumber, Object parameter, final Object lockObj) {
+        execution.readyCaller();
         return new Callable<Void>() {
             public Void call() { // each thread here
+                execution.hookBeforeCountdown();
                 final long threadId = Thread.currentThread().getId();
                 try {
                     ready.countDown();
@@ -172,6 +247,7 @@ public class CountDownRace {
                         throw cause;
                     }
                 } finally {
+                    execution.hookBeforeGoalFinally();
                     goal.countDown();
                     ourLatch.reset(); // to release waiting threads
                 }
