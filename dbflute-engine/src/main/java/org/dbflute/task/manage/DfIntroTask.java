@@ -106,13 +106,8 @@ public class DfIntroTask extends DfAbstractTask {
         if (existingJarVersion == null) { // unknown
             return false;
         }
-        final String latestVersion = dfprop.getIntroLatestVersion();
-        if (latestVersion == null) {
-            String msg = "Not found the latest version for DBFlute Intro in public properties: " + dfprop;
-            throw new IllegalStateException(msg);
-        }
         // over version treated as latest just in case (might forget to update public.properties)
-        return existingJarVersion.compareTo(latestVersion) >= 0;
+        return existingJarVersion.compareTo(getIntroLatestVersion(dfprop)) >= 0;
     }
 
     protected String findDownloadUrl(DfPublicProperties dfprop) {
@@ -121,7 +116,24 @@ public class DfIntroTask extends DfAbstractTask {
         if (specified != null) {
             return specified;
         }
-        final String downloadUrl = dfprop.getIntroDownloadUrl();
+        // defined download URL may not contain version but just in case (for future)
+        return getIntroDownloadUrl(dfprop, dfprop.getIntroLatestVersion());
+    }
+
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    protected String getIntroLatestVersion(DfPublicProperties dfprop) {
+        final String latestVersion = dfprop.getIntroLatestVersion();
+        if (latestVersion == null) {
+            String msg = "Not found the latest version for DBFlute Intro in public properties: " + dfprop;
+            throw new IllegalStateException(msg);
+        }
+        return latestVersion;
+    }
+
+    protected String getIntroDownloadUrl(DfPublicProperties dfprop, final String latestVersion) {
+        final String downloadUrl = dfprop.getIntroDownloadUrl(latestVersion);
         if (downloadUrl == null) {
             String msg = "Not found the download URL for DBFlute Intro in public properties: " + dfprop;
             throw new IllegalStateException(msg);
@@ -129,9 +141,6 @@ public class DfIntroTask extends DfAbstractTask {
         return downloadUrl;
     }
 
-    // ===================================================================================
-    //                                                                        Assist Logic
-    //                                                                        ============
     protected String extractIntroJarVersion(File jarFile) { // null allowed: when not found
         ZipInputStream ins = null;
         try {
