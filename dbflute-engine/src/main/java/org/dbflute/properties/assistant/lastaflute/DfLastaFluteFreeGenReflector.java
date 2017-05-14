@@ -15,6 +15,7 @@
  */
 package org.dbflute.properties.assistant.lastaflute;
 
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,10 @@ import org.slf4j.LoggerFactory;
  */
 public final class DfLastaFluteFreeGenReflector {
 
-    private static final Logger logger = LoggerFactory.getLogger(DfLastaFluteFreeGenReflector.class);
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Logger _log = LoggerFactory.getLogger(DfLastaFluteFreeGenReflector.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -62,7 +66,7 @@ public final class DfLastaFluteFreeGenReflector {
     //                                                                     Prepare FreeGen
     //                                                                     ===============
     public void reflectFrom(Map<String, Object> lastafluteMap, String lastaDocOutputDirectory) {
-        logger.info("Before LastaFlute refecting, existing freeGen settigs: " + _freeGenMap.keySet());
+        _log.info("Before LastaFlute refecting, existing freeGen settigs: " + _freeGenMap.keySet());
         boolean hasCommonEnv = false;
         boolean hasCommonConfig = false;
         boolean hasCommonLabel = false;
@@ -74,7 +78,7 @@ public final class DfLastaFluteFreeGenReflector {
             @SuppressWarnings("unchecked")
             final List<String> freeGenList = (List<String>) commonMap.get("freeGenList");
             for (String freeGen : freeGenList) {
-                logger.info("...Reflecting common freeGen settigs: " + freeGen + ", " + path);
+                _log.info("...Reflecting common freeGen settigs: " + freeGen + ", " + path);
                 if ("env".equals(freeGen)) {
                     setupEnvGen(_uncapServiceName, path, false, false);
                     hasCommonEnv = true;
@@ -96,6 +100,8 @@ public final class DfLastaFluteFreeGenReflector {
                 } else if ("doc".equals(freeGen)) {
                     final String mailPluginInterface = (String) commonMap.get("mailPluginInterface");
                     setupDocGen(_uncapServiceName, path, lastafluteMap, lastaDocOutputDirectory, freeGenList, mailPluginInterface);
+                } else if ("namedcls".equals(freeGen)) {
+                    setupNamedClsGen(_uncapServiceName, path, lastafluteMap);
                 } else {
                     String msg = "Unkonwn type for commonMap's freeGen: " + freeGen;
                     throw new DfIllegalPropertySettingException(msg);
@@ -114,7 +120,7 @@ public final class DfLastaFluteFreeGenReflector {
                 @SuppressWarnings("unchecked")
                 final List<String> freeGenList = (List<String>) defMap.get("freeGenList");
                 for (String freeGen : freeGenList) {
-                    logger.info("...Reflecting application freeGen settigs: " + appName + "." + freeGen);
+                    _log.info("...Reflecting application freeGen settigs: " + appName + "." + freeGen);
                     if ("env".equals(freeGen)) {
                         setupEnvGen(appName, path, hasCommonEnv, hasCommonConfig);
                         hasAppEnv = true;
@@ -142,6 +148,8 @@ public final class DfLastaFluteFreeGenReflector {
                         setupAppClsGen(appName, path, lastafluteMap);
                     } else if ("webcls".equals(freeGen)) {
                         setupWebClsGen(appName, path, lastafluteMap);
+                    } else if ("namedcls".equals(freeGen)) {
+                        setupNamedClsGen(appName, path, lastafluteMap);
                     } else {
                         String msg = "Unkonwn type for appMap's freeGen: " + freeGen;
                         throw new DfIllegalPropertySettingException(msg);
@@ -158,7 +166,7 @@ public final class DfLastaFluteFreeGenReflector {
         for (Entry<String, Object> entry : _freeGenMap.entrySet()) {
             sb.append("\n ").append(entry.getKey()).append(": ").append(entry.getValue());
         }
-        logger.info(sb.toString());
+        _log.info(sb.toString());
     }
 
     // ===================================================================================
@@ -467,10 +475,10 @@ public final class DfLastaFluteFreeGenReflector {
     // ===================================================================================
     //                                                                              AppCls
     //                                                                              ======
+    // cannot use in common, application project only: use named classification instead if you need
     protected void setupAppClsGen(String appName, String path, Map<String, Object> lastafluteMap) {
         final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
-        final String capAppName = initCap(appName);
-        registerFreeGen(capAppName + "AppCls", pathMap);
+        registerFreeGen(initCap(appName) + "AppCls", pathMap);
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         pathMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", path + "/src/main");
@@ -485,12 +493,15 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("className", filterOverridden("AppCDef", lastafluteMap, appName, "appcls", "className"));
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
+        tableMap.put("clsDomain", "app");
+        tableMap.put("clsTitle", "application"); // same as old javadoc
     }
 
     // ===================================================================================
     //                                                                              WebCls
     //                                                                              ======
-    protected void setupWebClsGen(String appName, String path, Map<String, Object> lastafluteMap) {
+    // cannot use in common, application project only: use named classification instead if you need
+    protected void setupWebClsGen(String appName, String path, Map<String, Object> lastafluteMap) { // cannot use in common
         final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
         final String capAppName = initCap(appName);
         registerFreeGen(capAppName + "WebCls", pathMap);
@@ -508,6 +519,60 @@ public final class DfLastaFluteFreeGenReflector {
         outputMap.put("className", filterOverridden("WebCDef", lastafluteMap, appName, "webcls", "className"));
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
+        tableMap.put("clsDomain", "web");
+        tableMap.put("clsTitle", "web");
+    }
+
+    // ===================================================================================
+    //                                                                            NamedCls
+    //                                                                            ========
+    // can be used in both common and application freely
+    protected void setupNamedClsGen(String appName, String path, Map<String, Object> lastafluteMap) {
+        final String baseDir = path + "/src/main";
+        final String middlePath = "resources/namedcls";
+        final String namedclsPath = baseDir + "/" + middlePath;
+        final File namedclsDir = new File(namedclsPath);
+        if (!namedclsDir.exists()) {
+            _log.info("*No namedcls directory so skip it: namedclsPath=" + namedclsPath);
+            return;
+        }
+        final String filePrefix = appName + "_";
+        final String fileSuffix = "_cls.dfprop";
+        final File[] dfpropFiles = namedclsDir.listFiles(file -> {
+            return file.isFile() && file.getName().startsWith(filePrefix) && file.getName().endsWith(fileSuffix);
+        });
+        if (dfpropFiles == null || dfpropFiles.length == 0) {
+            _log.info("*No namedcls dfprop file in the directory so skip it: " + namedclsPath);
+            return;
+        }
+        for (File dfpropFile : dfpropFiles) {
+            final String dfpropName = dfpropFile.getName();
+            final String clsDomain = Srl.extractScopeFirst(dfpropName, filePrefix, fileSuffix).getContent();
+            doSetupNamedClsGen(appName, clsDomain, lastafluteMap, baseDir, middlePath, dfpropName);
+        }
+    }
+
+    protected void doSetupNamedClsGen(String appName, String clsDomain, Map<String, Object> lastafluteMap, String baseDir,
+            String middlePath, String dfpropName) {
+        final String clsCode = clsDomain + "_cls"; // e.g. vinci_cls
+        final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
+        registerFreeGen(initCap(appName) + initCap(clsDomain) + "Cls", pathMap);
+        final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
+        pathMap.put("resourceMap", resourceMap);
+        resourceMap.put("baseDir", baseDir);
+        final String resourceFile = "$$baseDir$$/" + middlePath + "/" + dfpropName;
+        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, clsCode, "resourceFile"));
+        resourceMap.put("resourceType", DfFreeGenResourceType.APP_CLS.name());
+        final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
+        pathMap.put("outputMap", outputMap);
+        outputMap.put("outputDirectory", "$$baseDir$$/java");
+        outputMap.put("package", filterOverridden(_mylastaPackage + ".namedcls", lastafluteMap, appName, clsCode, "package"));
+        outputMap.put("templateFile", "LaAppCDef.vm"); // borrow application classification's template
+        outputMap.put("className", filterOverridden(initCap(clsDomain) + "CDef", lastafluteMap, appName, clsCode, "className"));
+        final Map<String, Object> tableMap = createTableMap();
+        pathMap.put("tableMap", tableMap);
+        tableMap.put("clsDomain", clsDomain);
+        tableMap.put("clsTitle", clsDomain); // same as domain
     }
 
     // ===================================================================================

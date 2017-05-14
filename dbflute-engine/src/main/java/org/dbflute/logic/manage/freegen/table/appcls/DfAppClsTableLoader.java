@@ -77,8 +77,9 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     // }
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> optionMap = mapProp.getOptionMap();
+        final String clsTheme = (String) optionMap.getOrDefault("clsTheme", "appcls");
         final String resourceFile =
-                this.docProcess ? (String) mapProp.getOptionMap().get("appclsResourceFile") : resource.getResourceFile();
+                this.docProcess ? (String) mapProp.getOptionMap().get(clsTheme + "ResourceFile") : resource.getResourceFile();
         final Map<String, Object> appClsMap;
         try {
             appClsMap = new MapListFile().readMap(new FileInputStream(resourceFile));
@@ -130,7 +131,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         }).collect(Collectors.toList()));
         optionMap.put("hasRefCls", hasRefCls);
         optionMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
-        return new DfFreeGenMetaData(optionMap, "appcls", Collections.emptyList());
+        return new DfFreeGenMetaData(optionMap, clsTheme, Collections.emptyList());
     }
 
     protected boolean isElementMapClassificationTop(Map<String, Object> elementMap) {
