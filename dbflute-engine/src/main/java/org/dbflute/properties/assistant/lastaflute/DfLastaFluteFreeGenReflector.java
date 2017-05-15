@@ -16,6 +16,7 @@
 package org.dbflute.properties.assistant.lastaflute;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -470,6 +471,46 @@ public final class DfLastaFluteFreeGenReflector {
             tableMap.put("webclsResourceFile", filterOverridden(webclsResourceFile, lastafluteMap, appName, "webcls", "resourceFile"));
             tableMap.put("webclsPackage", filterOverridden(_mylastaPackage + ".webcls", lastafluteMap, appName, "webcls", "package"));
         }
+
+        if (freeGenList.contains("namedcls")) {
+            doSetupDocNamedClsGen(appName, path, lastafluteMap, tableMap);
+        }
+    }
+
+    protected void doSetupDocNamedClsGen(String appName, String path, Map<String, Object> lastafluteMap, Map<String, Object> tableMap) {
+        final List<Map<String, Object>> namedclsList = new ArrayList<Map<String, Object>>();
+        tableMap.put("namedclsList", namedclsList);
+        final String baseDir = path + "/src/main";
+        final String middlePath = "resources/namedcls";
+        final String namedclsPath = baseDir + "/" + middlePath;
+        final File namedclsDir = new File(namedclsPath);
+        if (!namedclsDir.exists()) {
+            return;
+        }
+        final String filePrefix = appName + "_";
+        final String fileSuffix = "_cls.dfprop";
+        final File[] dfpropFiles = namedclsDir.listFiles(file -> {
+            return file.isFile() && file.getName().startsWith(filePrefix) && file.getName().endsWith(fileSuffix);
+        });
+        if (dfpropFiles == null || dfpropFiles.length == 0) {
+            return;
+        }
+        for (File dfpropFile : dfpropFiles) {
+            final Map<String, Object> namedclsMap = new LinkedHashMap<String, Object>();
+            final String dfpropName = dfpropFile.getName();
+            final String clsDomain = Srl.extractScopeFirst(dfpropName, filePrefix, fileSuffix).getContent();
+            final String clsTheme = clsDomain + "_cls"; // e.g. vinci_cls
+            namedclsMap.put("clsDomain", clsDomain);
+            namedclsMap.put("clsTheme", clsTheme);
+
+            final String clsResourceFile = namedclsPath + "/" + dfpropName;
+            namedclsMap.put(clsTheme + "ResourceFile", filterOverridden(clsResourceFile, lastafluteMap, appName, clsTheme, "resourceFile"));
+
+            final String clsPackage = _mylastaPackage + ".namedcls";
+            namedclsMap.put(clsTheme + "Package", filterOverridden(clsPackage, lastafluteMap, appName, clsTheme, "package"));
+
+            namedclsList.add(namedclsMap);
+        }
     }
 
     // ===================================================================================
@@ -554,21 +595,21 @@ public final class DfLastaFluteFreeGenReflector {
 
     protected void doSetupNamedClsGen(String appName, String clsDomain, Map<String, Object> lastafluteMap, String baseDir,
             String middlePath, String dfpropName) {
-        final String clsCode = clsDomain + "_cls"; // e.g. vinci_cls
+        final String clsTheme = clsDomain + "_cls"; // e.g. vinci_cls
         final Map<String, Map<String, Object>> pathMap = new LinkedHashMap<String, Map<String, Object>>();
         registerFreeGen(initCap(appName) + initCap(clsDomain) + "Cls", pathMap);
         final Map<String, Object> resourceMap = new LinkedHashMap<String, Object>();
         pathMap.put("resourceMap", resourceMap);
         resourceMap.put("baseDir", baseDir);
         final String resourceFile = "$$baseDir$$/" + middlePath + "/" + dfpropName;
-        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, clsCode, "resourceFile"));
+        resourceMap.put("resourceFile", filterOverridden(resourceFile, lastafluteMap, appName, clsTheme, "resourceFile"));
         resourceMap.put("resourceType", DfFreeGenResourceType.APP_CLS.name());
         final Map<String, Object> outputMap = new LinkedHashMap<String, Object>();
         pathMap.put("outputMap", outputMap);
         outputMap.put("outputDirectory", "$$baseDir$$/java");
-        outputMap.put("package", filterOverridden(_mylastaPackage + ".namedcls", lastafluteMap, appName, clsCode, "package"));
+        outputMap.put("package", filterOverridden(_mylastaPackage + ".namedcls", lastafluteMap, appName, clsTheme, "package"));
         outputMap.put("templateFile", "LaAppCDef.vm"); // borrow application classification's template
-        outputMap.put("className", filterOverridden(initCap(clsDomain) + "CDef", lastafluteMap, appName, clsCode, "className"));
+        outputMap.put("className", filterOverridden(initCap(clsDomain) + "CDef", lastafluteMap, appName, clsTheme, "className"));
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
         tableMap.put("clsDomain", clsDomain);

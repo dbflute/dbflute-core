@@ -14,7 +14,7 @@
 ## governing permissions and limitations under the License.
 ##
 #if ($appclsMap.classificationTopList.size() > 0)
-<h2 id="lastadoc_appcls">appcls</h2>
+<h2 id="lastadoc_${appclsMap.clsTheme}">${appclsMap.clsTheme}</h2>
 <table>
     <thead>
     <tr>

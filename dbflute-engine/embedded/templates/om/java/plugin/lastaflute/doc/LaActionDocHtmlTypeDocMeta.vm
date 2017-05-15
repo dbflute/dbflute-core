@@ -54,7 +54,7 @@
     <tr>
         <td colspan="4">
             <div class="nestedbean">
-$generator.parse("om/java/plugin/lastaflute/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $nestTypeDocMeta)
+$generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $nestTypeDocMeta)
             </div>
         </td>
     </tr>

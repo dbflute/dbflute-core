@@ -78,8 +78,15 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> optionMap = mapProp.getOptionMap();
         final String clsTheme = (String) optionMap.getOrDefault("clsTheme", "appcls");
-        final String resourceFile =
-                this.docProcess ? (String) mapProp.getOptionMap().get(clsTheme + "ResourceFile") : resource.getResourceFile();
+        final String resourceFile;
+        if (docProcess) {
+            resourceFile = (String) optionMap.get(clsTheme + "ResourceFile");
+            if (resourceFile == null) { // no way
+                throw new IllegalStateException("Not found the resource file for clsTheme: " + clsTheme + ", " + optionMap.keySet());
+            }
+        } else {
+            resourceFile = resource.getResourceFile();
+        }
         final Map<String, Object> appClsMap;
         try {
             appClsMap = new MapListFile().readMap(new FileInputStream(resourceFile));
@@ -125,6 +132,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                 hasRefCls = true;
             }
         }
+        optionMap.put("clsTheme", clsTheme);
         optionMap.put("classificationTopList", topList);
         optionMap.put("classificationNameList", topList.stream().map(top -> {
             return top.getClassificationName();
