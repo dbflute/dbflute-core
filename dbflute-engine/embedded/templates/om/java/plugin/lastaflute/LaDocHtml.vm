@@ -196,29 +196,29 @@ to ${app.appName}
 #end
 
 <p class="sisterneighborlink">
-    #if ($table.tableMap.actionDocMetaList)
+#if ($table.tableMap.actionDocMetaList)
     <a href="#lastadoc_action">to action($table.tableMap.actionDocMetaList.size())</a>
-    #else
+#else
     <a href="#lastadoc_action">to action($table.columnList.size())</a>
-    #end
-    #if ($table.tableMap.jobDocMetaList && $table.tableMap.jobDocMetaList.size() > 0)
+#end
+#if ($table.tableMap.jobDocMetaList && $table.tableMap.jobDocMetaList.size() > 0)
     | <a href="#lastadoc_job">to job($table.tableMap.jobDocMetaList.size())</a>
-    #end
-    #if ($table.tableMap.mailList.size() > 0)
+#end
+#if ($table.tableMap.mailList.size() > 0)
     | <a href="#lastadoc_mail">to mail($table.tableMap.mailList.size())</a>
-    #end
-    #if ($table.tableMap.templateList.size() > 0)
+#end
+#if ($table.tableMap.templateList.size() > 0)
     | <a href="#lastadoc_template">to template($table.tableMap.templateList.size())</a>
-    #end
-    #if ($table.tableMap.appclsMap.classificationTopList.size() > 0)
+#end
+#if ($table.tableMap.appclsMap.classificationTopList.size() > 0)
     | <a href="#lastadoc_appcls">to appcls($table.tableMap.appclsMap.classificationTopList.size())</a>
-    #end
-    #if ($table.tableMap.webclsMap.classificationTopList.size() > 0)
+#end
+#if ($table.tableMap.webclsMap.classificationTopList.size() > 0)
     | <a href="#lastadoc_webcls">to webcls($table.tableMap.webclsMap.classificationTopList.size())</a>
-    #end
-    #if ($table.tableMap.namedclsList.size() > 0)
+#end
+#if ($table.tableMap.namedclsList.size() > 0)
     | <a href="#lastadoc_namedcls">to namedcls</a>
-    #end
+#end
 </p>
 </div>
 
