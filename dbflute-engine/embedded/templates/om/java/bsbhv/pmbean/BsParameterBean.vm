@@ -538,6 +538,24 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassificationSetter($pmbClassName, $propertyName))
+#set ($classificationTop = $database.getPmbMetaDataPropertyOptionClassificationTop($pmbClassName, $propertyName))
+
+    /**
+     * [set as ${classificationTop.classificationName}] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br>
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topCommentForJavaDoc}
+#end
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, null value is set to the property)
+     */
+    public void set${database.initCap($propertyName)}As${classificationTop.classificationName}(${glCDef}.${classificationTop.classificationName} cdef) {
+#if ($database.isPmbMetaDataPropertyJavaNativeNumberObject($pmbClassName, $propertyName))
+        ${variableName} = cdef != null ? toNumber(cdef.code(), ${propertyType}.class) : null;
+#elseif ($database.isPmbMetaDataPropertyJavaNativeBooleanObject($pmbClassName, $propertyName))
+        ${variableName} = cdef != null ? toBoolean(cdef.code()) : null;
+#else
+        ${variableName} = cdef != null ? cdef.code() : null;
+#end
+    }
 #foreach ($classificationElement in $database.getPmbMetaDataPropertyOptionClassificationTop($pmbClassName, $propertyName).classificationElementList)
 
     /**
