@@ -186,13 +186,13 @@ public class DfSPolicyMiscSecretary {
         return determineHitBy(exp, hint);
     }
 
-    protected boolean determineHitBy(String name, String hint) {
+    protected boolean determineHitBy(String name, String hint) { // hint is e.g. prefix:MEMBER
         if (name == null) {
             return false;
         }
-        if ("$$ALL$$".equalsIgnoreCase(hint)) {
+        if ("$$ALL$$".equalsIgnoreCase(hint)) { // e.g. tableName is $$ALL$$
             return true;
-        } else if (hint.contains(" and ")) {
+        } else if (hint.contains(" and ")) { // e.g. tableName is prefix:MEMBER and suffix:_HISTORY
             final List<String> elementHintList = Srl.splitListTrimmed(hint, " and ");
             for (String elementHint : elementHintList) {
                 if (!DfNameHintUtil.isHitByTheHint(name, elementHint)) {
@@ -200,7 +200,7 @@ public class DfSPolicyMiscSecretary {
                 }
             }
             return true;
-        } else if (hint.contains(" or ")) {
+        } else if (hint.contains(" or ")) { // e.g. tableName is prefix:MEMBER or suffix:_HISTORY
             final List<String> elementHintList = Srl.splitListTrimmed(hint, " or ");
             for (String elementHint : elementHintList) {
                 if (DfNameHintUtil.isHitByTheHint(name, elementHint)) {
