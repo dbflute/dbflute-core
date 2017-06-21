@@ -93,7 +93,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                        Service Name
     //                                                                        ============
-    protected String findServiceName(final Map<String, Object> lastafluteMap) {
+    protected String findServiceName(Map<String, Object> lastafluteMap) {
         return (String) lastafluteMap.get("serviceName");
     }
 

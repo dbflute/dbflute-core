@@ -346,7 +346,10 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         if (propertyValue == null) {
             return "null";
         }
-        final String escaped = Srl.replace(Srl.replace(propertyValue, "\\", "\\\\"), "\"", "\\\"");
+        String escaped = Srl.replace(propertyValue, "\\", "\\\\");
+        escaped = Srl.replace(escaped, "\"", "\\\"");
+        escaped = Srl.replace(escaped, "\n", "\\n");
+        escaped = Srl.replace(escaped, "\t", "\\t");
         return Srl.quoteAnything(escaped, "\"");
     }
 
