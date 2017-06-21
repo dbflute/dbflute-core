@@ -119,8 +119,8 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     protected DfLastaFluteFreeGenReflector createFreeGenReflector(Map<String, Object> lastafluteMap, Map<String, Object> freeGenMap,
             String serviceName, String domainPackage) {
         final DfLastaFluteFreeGenReflector reflector = newFreeGenReflector(freeGenMap, serviceName, domainPackage);
-        if (isProperty("isUseGeneratedDefaultConfig", false, lastafluteMap)) {
-            reflector.useGeneratedDefaultConfig();
+        if (isProperty("isUseDefaultConfigAtGeneration", false, lastafluteMap)) {
+            reflector.useDefaultConfigAtGeneration();
         }
         return reflector;
     }

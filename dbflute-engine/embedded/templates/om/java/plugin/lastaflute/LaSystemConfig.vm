@@ -202,7 +202,7 @@ public interface ${request.className}${pluginDef} {
 #end
 #end
 #end
-#if ($request.tableMap.isUseGeneratedDefaultConfig)
+#if ($request.tableMap.isUseDefaultConfigAtGeneration)
 
         @Override
         protected java.util.Map<String, String> prepareGeneratedDefaultMap() {

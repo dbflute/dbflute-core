@@ -54,7 +54,7 @@ public final class DfLastaFluteFreeGenReflector {
     // -----------------------------------------------------
     //                                         Global Option
     //                                         -------------
-    protected boolean _useGeneratedDefaultConfig;
+    protected boolean _useDefaultConfigAtGeneration;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -68,8 +68,8 @@ public final class DfLastaFluteFreeGenReflector {
         _mylastaPackage = domainPackage + ".mylasta";
     }
 
-    public DfLastaFluteFreeGenReflector useGeneratedDefaultConfig() {
-        _useGeneratedDefaultConfig = true;
+    public DfLastaFluteFreeGenReflector useDefaultConfigAtGeneration() {
+        _useDefaultConfigAtGeneration = true;
         return this;
     }
 
@@ -248,7 +248,7 @@ public final class DfLastaFluteFreeGenReflector {
     }
 
     protected void doSetupConfigTableMapBasic(Map<String, Object> tableMap) {
-        tableMap.put("isUseGeneratedDefaultConfig", _useGeneratedDefaultConfig); // direct use so not literal
+        tableMap.put("isUseDefaultConfigAtGeneration", _useDefaultConfigAtGeneration); // direct use so not literal
     }
 
     // ===================================================================================
