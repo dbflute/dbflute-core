@@ -112,7 +112,17 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
             throw new DfIllegalPropertySettingException("The property 'domainPackage' is required: " + lastafluteMap.keySet());
         }
         final String lastaDocDir = getLastaDocOutputDirectory();
-        newFreeGenReflector(freeGenMap, serviceName, domainPackage).reflectFrom(lastafluteMap, lastaDocDir);
+        final DfLastaFluteFreeGenReflector reflector = createFreeGenReflector(lastafluteMap, freeGenMap, serviceName, domainPackage);
+        reflector.reflectFrom(lastafluteMap, lastaDocDir);
+    }
+
+    protected DfLastaFluteFreeGenReflector createFreeGenReflector(Map<String, Object> lastafluteMap, Map<String, Object> freeGenMap,
+            String serviceName, String domainPackage) {
+        final DfLastaFluteFreeGenReflector reflector = newFreeGenReflector(freeGenMap, serviceName, domainPackage);
+        if (isProperty("isUseGeneratedDefaultConfig", false, lastafluteMap)) {
+            reflector.useGeneratedDefaultConfig();
+        }
+        return reflector;
     }
 
     protected DfLastaFluteFreeGenReflector newFreeGenReflector(Map<String, Object> freeGenMap, String serviceName, String domainPackage) {

@@ -51,6 +51,11 @@ public final class DfLastaFluteFreeGenReflector {
     protected final String _appPackage;
     protected final String _mylastaPackage;
 
+    // -----------------------------------------------------
+    //                                         Global Option
+    //                                         -------------
+    protected boolean _useGeneratedDefaultConfig;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -61,6 +66,11 @@ public final class DfLastaFluteFreeGenReflector {
         _domainPackage = domainPackage;
         _appPackage = domainPackage + ".app";
         _mylastaPackage = domainPackage + ".mylasta";
+    }
+
+    public DfLastaFluteFreeGenReflector useGeneratedDefaultConfig() {
+        _useGeneratedDefaultConfig = true;
+        return this;
     }
 
     // ===================================================================================
@@ -222,17 +232,23 @@ public final class DfLastaFluteFreeGenReflector {
     }
 
     protected void doSetupConfigTableMapRoot(Map<String, Object> tableMap) {
+        doSetupConfigTableMapBasic(tableMap);
         tableMap.put("superClassPackage", "org.lastaflute.core.direction");
         tableMap.put("superClassSimpleName", "ObjectiveConfig");
     }
 
     protected void doSetupConfigTableMapInheritance(Map<String, Object> tableMap, String appName, String theme) {
+        doSetupConfigTableMapBasic(tableMap);
         tableMap.put("extendsPropRequest", initCap(appName) + buildTitleSuffix(theme));
         tableMap.put("isCheckImplicitOverride", getTrueLiteral());
         tableMap.put("interfacePackage", _mylastaPackage + ".direction");
         tableMap.put("interfaceSimpleName", initCap(appName) + initCap(theme));
         tableMap.put("superClassPackage", _mylastaPackage + ".direction");
         tableMap.put("superClassSimpleName", initCap(appName) + initCap(theme) + ".SimpleImpl");
+    }
+
+    protected void doSetupConfigTableMapBasic(Map<String, Object> tableMap) {
+        tableMap.put("isUseGeneratedDefaultConfig", _useGeneratedDefaultConfig); // direct use so not literal
     }
 
     // ===================================================================================
@@ -638,7 +654,7 @@ public final class DfLastaFluteFreeGenReflector {
 
     protected Map<String, Object> createTableMap() {
         final Map<String, Object> map = new LinkedHashMap<String, Object>();
-        map.put("isLastaFlute", true);
+        map.put("isLastaFlute", true); // direct use so not literal
         return map;
     }
 
@@ -664,6 +680,8 @@ public final class DfLastaFluteFreeGenReflector {
     }
 
     protected String getTrueLiteral() {
+        // for DfPropTableLoader@isProperty(), so not use this if direct use by jflute (2017/06/21)
+        // can fix it? later I will think...
         return "true";
     }
 

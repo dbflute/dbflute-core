@@ -248,6 +248,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
             columnMap.put("propertyValue", propertyValue != null ? propertyValue : "");
             final String valueHtmlEncoded = prop.resolveTextForSimpleLineHtml(propertyValue);
             columnMap.put("propertyValueHtmlEncoded", valueHtmlEncoded != null ? valueHtmlEncoded : "");
+            columnMap.put("propertyValueStringLiteral", preparePropertyValueStringLiteral(propertyValue));
             columnMap.put("hasPropertyValue", Srl.is_NotNull_and_NotTrimmedEmpty(propertyValue));
 
             final String defName = convertToDefName(propertyKey);
@@ -339,6 +340,14 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
 
     protected boolean isGroupingTarget(String propertyKey, String keyHint) {
         return DfNameHintUtil.isHitByTheHint(propertyKey, keyHint);
+    }
+
+    protected String preparePropertyValueStringLiteral(String propertyValue) {
+        if (propertyValue == null) {
+            return "null";
+        }
+        final String escaped = Srl.replace(Srl.replace(propertyValue, "\\", "\\\\"), "\"", "\\\"");
+        return Srl.quoteAnything(escaped, "\"");
     }
 
     // -----------------------------------------------------
