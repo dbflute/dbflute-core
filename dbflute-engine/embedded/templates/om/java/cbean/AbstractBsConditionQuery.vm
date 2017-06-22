@@ -199,7 +199,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * GreaterThan(&gt;). And NullOrEmptyIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (basically NotNull: error as default, or no condition as option)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan. (basically NotNull, NotEmpty: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_GreaterThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_GT, fRES(${tmpUncapitalisedJavaName}));
@@ -210,7 +210,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * LessThan(&lt;). And NullOrEmptyIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (basically NotNull: error as default, or no condition as option)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan. (basically NotNull, NotEmpty: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_LT, fRES(${tmpUncapitalisedJavaName}));
@@ -221,7 +221,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * GreaterEqual(&gt;=). And NullOrEmptyIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (basically NotNull: error as default, or no condition as option)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual. (basically NotNull, NotEmpty: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_GreaterEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_GE, fRES(${tmpUncapitalisedJavaName}));
@@ -232,7 +232,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * LessEqual(&lt;=). And NullOrEmptyIgnored, OnlyOnceRegistered. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (basically NotNull: error as default, or no condition as option)
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual. (basically NotNull, NotEmpty: error as default, or no condition as option)
      */
     public void set${tmpJavaName}_LessEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_LE, fRES(${tmpUncapitalisedJavaName}));
