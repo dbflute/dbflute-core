@@ -50,6 +50,7 @@ import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.dbflute.DfBuildProperties;
+import org.dbflute.exception.DfJDBCException;
 import org.dbflute.exception.DfSchemaEmptyException;
 import org.dbflute.exception.DfTableDuplicateException;
 import org.dbflute.helper.StringKeyMap;
@@ -319,7 +320,7 @@ public class DfSchemaXmlSerializer {
             throw new IllegalStateException(msg, e);
         } catch (SQLException e) {
             String msg = "SQL exception when serializing SchemaXml: " + filePath;
-            throw new IllegalStateException(msg, e);
+            throw new IllegalStateException(msg, DfJDBCException.voice(e));
         } finally {
             if (writer != null) {
                 try {
