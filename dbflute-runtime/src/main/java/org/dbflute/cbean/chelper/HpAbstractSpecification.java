@@ -116,9 +116,11 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     }
 
     protected void checkSpecifiedThemeColumnStatus(String columnName) {
-        if (_alreadySpecifiedEveryColumn) {
-            throwSpecifyColumnAlreadySpecifiedEveryColumnException(columnName);
-        }
+        // not check to avoid automatic specify-column exception after everyColumn() by jflute (2017/07/19)
+        // (and it's hard to judge automatic specify-column so simple comment-out, not important check)
+        //if (_alreadySpecifiedEveryColumn) {
+        //    throwSpecifyColumnAlreadySpecifiedEveryColumnException(columnName);
+        //}
         if (_alreadySpecifiedExceptColumn) {
             throwSpecifyColumnAlreadySpecifiedExceptColumnException(columnName);
         }
