@@ -97,6 +97,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         }
         Map<String, DfClassificationTop> dbClsMap = null; // lazy load because it might be unused
         boolean hasRefCls = false;
+        final DfClassificationProperties clsProp = getClassificationProperties();
         final DfClassificationLiteralArranger literalArranger = new DfClassificationLiteralArranger();
         final List<DfClassificationTop> topList = new ArrayList<DfClassificationTop>();
         for (Entry<String, Object> entry : appClsMap.entrySet()) {
@@ -110,11 +111,15 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
             for (Map<String, Object> elementMap : elementMapList) {
                 if (isElementMapClassificationTop(elementMap)) {
                     classificationTop.acceptClassificationTopBasicItemMap(elementMap);
+
+                    // pickup from DfClassificationProperties@processClassificationTopFromLiteralIfNeedss()
+                    classificationTop.putGroupingAll(clsProp.getElementMapGroupingMap(elementMap));
+                    classificationTop.putDeprecatedAll(clsProp.getElementMapDeprecatedMap(elementMap));
                 } else {
                     if (isElementMapRefCls(elementMap)) {
                         assertRefClsOnlyOne(classificationName, refClsElement, elementMap, resource);
                         if (dbClsMap == null) {
-                            dbClsMap = getClassificationProperties().getClassificationTopMap();
+                            dbClsMap = clsProp.getClassificationTopMap();
                         }
                         refClsElement = createRefClsElement(classificationName, elementMap, dbClsMap, resource);
                         handleRefCls(classificationTop, refClsElement);

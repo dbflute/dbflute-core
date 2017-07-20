@@ -527,7 +527,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // -----------------------------------------------------
     //                                      Mapping Settings
     //                                      ----------------
-    protected Map<String, Map<String, Object>> getElementMapGroupingMap(Map<?, ?> elementMap) {
+    public Map<String, Map<String, Object>> getElementMapGroupingMap(Map<?, ?> elementMap) {
         final Object obj = elementMap.get(DfClassificationTop.KEY_GROUPING_MAP);
         if (obj == null) {
             return DfCollectionUtil.emptyMap();
@@ -537,7 +537,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return groupingMap;
     }
 
-    protected Map<String, String> getElementMapDeprecatedMap(Map<?, ?> elementMap) {
+    public Map<String, String> getElementMapDeprecatedMap(Map<?, ?> elementMap) {
         final Object obj = elementMap.get(DfClassificationTop.KEY_DEPRECATED_MAP);
         if (obj == null) {
             return DfCollectionUtil.emptyMap();
