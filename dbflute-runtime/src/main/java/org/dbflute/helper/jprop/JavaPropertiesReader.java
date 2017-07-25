@@ -285,7 +285,7 @@ public class JavaPropertiesReader {
         final Entry<String, JavaPropertiesStreamProvider> firstEntry = providerMap.entrySet().iterator().next();
         final String firstKey = firstEntry.getKey();
         final JavaPropertiesStreamProvider firstProvider = firstEntry.getValue();
-        final JavaPropertiesReader extendsReader = newJavaPropertiesReader(firstKey, firstProvider);
+        final JavaPropertiesReader extendsReader = newExtendsReader(firstKey, firstProvider);
         providerMap.remove(firstKey);
         for (Entry<String, JavaPropertiesStreamProvider> entry : providerMap.entrySet()) { // next extends
             extendsReader.extendsProperties(entry.getKey(), entry.getValue());
@@ -293,11 +293,19 @@ public class JavaPropertiesReader {
         if (_checkImplicitOverride) {
             extendsReader.checkImplicitOverride();
         }
+        if (_streamEncoding != null) {
+            extendsReader.encodeAs(_streamEncoding);
+        }
         return extendsReader;
     }
 
-    protected JavaPropertiesReader newJavaPropertiesReader(String firstKey, JavaPropertiesStreamProvider firstProvider) {
-        return new JavaPropertiesReader(firstKey, firstProvider);
+    protected JavaPropertiesReader newExtendsReader(String title, JavaPropertiesStreamProvider streamProvider) {
+        return newJavaPropertiesReader(title, streamProvider);
+    }
+
+    // general factory (LastaFlute may override this as patch, so keep it)
+    protected JavaPropertiesReader newJavaPropertiesReader(String title, JavaPropertiesStreamProvider streamProvider) {
+        return new JavaPropertiesReader(title, streamProvider); // for e.g. extends
     }
 
     // ===================================================================================
