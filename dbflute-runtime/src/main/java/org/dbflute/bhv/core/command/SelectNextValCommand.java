@@ -183,7 +183,7 @@ public class SelectNextValCommand<RESULT> extends AbstractAllBehaviorCommand<RES
 
     protected void assertSequenceReturnsNotNull(String nextValSql, DBMeta dbmeta) {
         if (nextValSql == null) {
-            String msg = "If it uses sequence, SQL for next value should exist:";
+            String msg = "SQL for sequence was null, confirm your DBMS settings (Is sequence supported in the DBMS?):";
             msg = msg + " table=" + dbmeta.getTableDbName() + " sequence=" + dbmeta.getSequenceName();
             throw new SequenceSelectIllegalStateException(msg);
         }
