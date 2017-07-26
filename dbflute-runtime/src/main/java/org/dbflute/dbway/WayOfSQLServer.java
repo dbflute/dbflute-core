@@ -37,7 +37,7 @@ public class WayOfSQLServer implements DBWay, Serializable {
     //                                                                        Sequence Way
     //                                                                        ============
     public String buildSequenceNextValSql(String sequenceName) {
-        return null;
+        return "select next value for " + sequenceName; // supported since SQLServer2012
     }
 
     // ===================================================================================
