@@ -14,7 +14,7 @@ Apache Velocity   : Apache License 2.0 (also modified codes included)
 Apache Commons    : Apache License 2.0
 Apache POI        : Apache License 2.0
 MySQL Connector/J : GNU General Public License with MySQL FOSS License Exception
-PostgreSQL        : BSD License
+PostgreSQL        : BSD 2-clause "Simplified" License
 H2 Database       : MPL 1.1
 Apache Log4j      : Apache License 2.0 (compile-time only, not included in module)
 Apache Xerces     : Apache License 2.0 (compile-time only, not included in module)
