@@ -508,7 +508,7 @@ public class Column {
         _columnSize = columnSize;
     }
 
-    public void setupColumnSize(int columnSize, int decimalDigits) {
+    public void setupColumnSize(int columnSize, int decimalDigits) { // for Sql2Entity
         if (DfColumnExtractor.isColumnSizeValid(columnSize)) {
             if (DfColumnExtractor.isDecimalDigitsValid(decimalDigits)) {
                 setColumnSize(columnSize + ", " + decimalDigits);

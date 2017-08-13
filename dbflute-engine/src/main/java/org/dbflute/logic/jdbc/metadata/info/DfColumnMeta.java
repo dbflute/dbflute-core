@@ -36,6 +36,7 @@ public class DfColumnMeta {
     protected String _dbTypeName;
     protected int _columnSize;
     protected int _decimalDigits;
+    protected Integer _datePrecision;
     protected boolean _required;
     protected String _columnComment;
     protected String _defaultValue;
@@ -97,13 +98,37 @@ public class DfColumnMeta {
         }
     }
 
+    public void acceptDatePrecision(Map<String, Integer> columnDatePrecisionMap) {
+        if (columnDatePrecisionMap == null) {
+            return;
+        }
+        Integer datePrecision = columnDatePrecisionMap.get(_columnName);
+        if (datePrecision == null) {
+            return;
+        }
+        _datePrecision = datePrecision;
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _tableName + "." + _columnName + ", " + _dbTypeName + "(" + _columnSize + "," + _decimalDigits + "), " + _jdbcDefValue
-                + ", " + _required + ", " + _columnComment + ", " + _defaultValue + "}";
+        final StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append(_tableName).append(".").append(_columnName);
+        sb.append(", ").append(_dbTypeName);
+        sb.append("(");
+        if (_datePrecision != null) {
+            sb.append(_datePrecision);
+        } else { // mainly here
+            sb.append(_columnSize).append(", ").append(_decimalDigits);
+        }
+        sb.append("), ");
+        sb.append(_jdbcDefValue).append(", ").append(_required);
+        sb.append(", ").append(_columnComment).append(", ").append(_defaultValue);
+        sb.append("}");
+        return sb.toString();
     }
 
     // ===================================================================================
@@ -139,6 +164,14 @@ public class DfColumnMeta {
 
     public void setDecimalDigits(int decimalDigits) {
         this._decimalDigits = decimalDigits;
+    }
+
+    public Integer getDatePrecision() {
+        return _datePrecision;
+    }
+
+    public void setDatePrecision(Integer datePrecision) {
+        _datePrecision = datePrecision;
     }
 
     public String getDefaultValue() {
