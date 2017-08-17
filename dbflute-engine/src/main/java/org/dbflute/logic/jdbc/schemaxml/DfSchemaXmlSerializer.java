@@ -597,7 +597,7 @@ public class DfSchemaXmlSerializer {
 
     protected void processDatePrecision(DfColumnMeta columnMeta, Element columnElement) {
         Integer datePrecision = columnMeta.getDatePrecision();
-        if (datePrecision != null) {
+        if (datePrecision != null && datePrecision > 0) { // avoid zero for compatible
             columnElement.setAttribute("datePrecision", String.valueOf(datePrecision));
         }
     }

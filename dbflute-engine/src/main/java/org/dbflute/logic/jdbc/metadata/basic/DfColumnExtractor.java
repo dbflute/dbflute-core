@@ -290,6 +290,11 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
                 return getBasicProperties().getLanguageDependency();
             }
 
+            @Override
+            public boolean isDbmsMySQL() {
+                return isDatabaseMySQL();
+            }
+
             public boolean isDbmsPostgreSQL() {
                 return isDatabasePostgreSQL();
             }
@@ -343,6 +348,10 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                         Pinpoint Type
     //                                         -------------
+    public boolean isMySQLDatetime(final String dbTypeName) {
+        return getJdbcTypeMapper().isMySQLDatetime(dbTypeName);
+    }
+
     public boolean isPostgreSQLBpChar(final String dbTypeName) {
         return getJdbcTypeMapper().isPostgreSQLBpChar(dbTypeName);
     }

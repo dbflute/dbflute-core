@@ -145,9 +145,11 @@ public class DfJdbcTypeMapperTest extends EngineTestCase {
     }
 
     protected static class TestResource implements DfMapperResource {
+
         protected boolean _targetLanguageJava;
-        protected boolean _databaseOracle;
+        protected boolean _databaseMySQL;
         protected boolean _databasePostgreSQL;
+        protected boolean _databaseOracle;
         protected boolean _databaseSQLServer;
 
         public TestResource java() {
@@ -155,13 +157,18 @@ public class DfJdbcTypeMapperTest extends EngineTestCase {
             return this;
         }
 
-        public TestResource oracle() {
-            _databaseOracle = true;
+        public TestResource mySQL() {
+            _databaseMySQL = true;
             return this;
         }
 
         public TestResource postgreSQL() {
             _databasePostgreSQL = true;
+            return this;
+        }
+
+        public TestResource oracle() {
+            _databaseOracle = true;
             return this;
         }
 
@@ -174,12 +181,17 @@ public class DfJdbcTypeMapperTest extends EngineTestCase {
             return new DfLanguageDependencyJava();
         }
 
-        public boolean isDbmsOracle() {
-            return _databaseOracle;
+        @Override
+        public boolean isDbmsMySQL() {
+            return _databaseMySQL;
         }
 
         public boolean isDbmsPostgreSQL() {
             return _databasePostgreSQL;
+        }
+
+        public boolean isDbmsOracle() {
+            return _databaseOracle;
         }
 
         public boolean isDbmsSQLServer() {

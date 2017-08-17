@@ -185,6 +185,7 @@ public class Column {
     protected String _synonym;
     protected String _dbType;
     protected String _columnSize;
+    protected Integer _datePrecision;
     protected boolean _notNull;
     protected boolean _autoIncrement;
     protected String _defaultValue;
@@ -249,6 +250,7 @@ public class Column {
         _jdbcType = attrib.getValue("type");
         _dbType = attrib.getValue("dbType");
         _columnSize = attrib.getValue("size");
+        _datePrecision = DfTypeUtil.toInteger(attrib.getValue("datePrecision")); // null allowed (option)
 
         // It is not necessary to use this value on XML
         // because it uses the JavaNative value.
@@ -481,6 +483,10 @@ public class Column {
         return hasDbType() && _columnHandler.isConceptTypeStringClob(_dbType);
     }
 
+    public boolean isDbTypeMySQLDatetime() { // as pinpoint
+        return hasDbType() && _columnHandler.isMySQLDatetime(_dbType);
+    }
+
     public boolean isDbTypePostgreSQLBytea() { // as pinpoint
         return hasDbType() && _columnHandler.isPostgreSQLBytea(_dbType);
     }
@@ -557,15 +563,27 @@ public class Column {
         return String.valueOf(columnSize);
     }
 
-    // -----------------------------------------------------
-    //                                        Decimal Digits
-    //                                        --------------
     public String getColumnDecimalDigitsSettingExpression() {
         final Integer decimalDigits = getDecimalDigits();
         if (decimalDigits == null) {
             return "null";
         }
         return String.valueOf(decimalDigits);
+    }
+
+    // -----------------------------------------------------
+    //                                        Date Precision
+    //                                        --------------
+    public Integer getDatePrecision() {
+        return _datePrecision;
+    }
+
+    public boolean hasDatePrecision() {
+        return _datePrecision != null && _datePrecision > 0;
+    }
+
+    public boolean needsMillisFilterOnCB() {
+        return !hasDatePrecision();
     }
 
     // -----------------------------------------------------
