@@ -70,6 +70,7 @@ public class JavaPropertiesReader {
     protected boolean _checkImplicitOverride;
     protected String _streamEncoding; // used if set
     protected boolean _useNonNumberVariable;
+    protected Set<String> _variableExceptSet; // used if set
 
     // -----------------------------------------------------
     //                                            Reflection
@@ -116,6 +117,14 @@ public class JavaPropertiesReader {
 
     public JavaPropertiesReader useNonNumberVariable() {
         _useNonNumberVariable = true;
+        return this;
+    }
+
+    public JavaPropertiesReader useVariableExcept(Set<String> variableExceptSet) {
+        if (variableExceptSet == null) {
+            throw new IllegalArgumentException("The argument 'variableExceptSet' should not be null.");
+        }
+        _variableExceptSet = variableExceptSet;
         return this;
     }
 
@@ -183,19 +192,22 @@ public class JavaPropertiesReader {
     }
 
     protected List<ScopeInfo> extractVariableScopeList(String value) {
-        return Srl.extractScopeList(value, "{", "}"); // e.g. {0} is for {1}.
+        return Srl.extractScopeList(value, "{", "}"); // e.g. {0}, {1}
     }
 
     protected boolean isUnsupportedVariableContent(String content) {
-        if (content.contains(" ")) {
+        if (content.contains(" ")) { // e.g. {sea land}
             return true;
         }
-        if (!_useNonNumberVariable) {
+        if (!_useNonNumberVariable) { // number only
             try {
-                Integer.valueOf(content);
-            } catch (NumberFormatException ignored) { // e.g. {A} is for {B}
+                Integer.valueOf(content); // e.g. {0}, {1}
+            } catch (NumberFormatException ignored) { // e.g. {sea}, {land}
                 return true;
             }
+        }
+        if (_variableExceptSet != null && _variableExceptSet.contains(content)) { // e.g. {item} in LastaFlute
+            return true;
         }
         return false;
     }
