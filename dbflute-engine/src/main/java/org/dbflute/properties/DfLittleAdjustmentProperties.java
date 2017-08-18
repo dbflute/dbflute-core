@@ -430,6 +430,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isNonSpecifiedColumnAccessAllowed", isCompatibleBeforeJava8());
     }
 
+    public boolean isDatetimePrecisionTruncationOfCondition() { // closet
+        return isProperty("isDatetimePrecisionTruncationOfCondition", false);
+    }
+
     public boolean isMakeConditionQueryEqualEmptyString() { // closet
         return isProperty("isMakeConditionQueryEqualEmptyString", false);
     }

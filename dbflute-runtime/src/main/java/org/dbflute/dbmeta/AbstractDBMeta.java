@@ -277,7 +277,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     protected ColumnInfo cci(String columnDbName, String columnSqlName, String columnSynonym, String columnAlias // column name
             , Class<?> objectNativeType, String propertyName, Class<?> propertyAccessType // property info
             , boolean primary, boolean autoIncrement, boolean notNull // column basic check
-            , String columnDbType, Integer columnSize, Integer decimalDigits, String defaultValue // column type
+            , String columnDbType, Integer columnSize, Integer decimalDigits, Integer datetimePrecision, String defaultValue // column type
             , boolean commonColumn, OptimisticLockType optimisticLockType, String columnComment // column others
             , String foreignListExp, String referrerListExp // relation property
             , ClassificationMeta classificationMeta, boolean canBeNullObject // various info
@@ -294,8 +294,9 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
         final PropertyMethodFinder propertyMethodFinder = createColumnPropertyMethodFinder();
         return new ColumnInfo(this, columnDbName, columnSqlName, columnSynonym, columnAlias, objectNativeType, propertyName, realPt,
-                primary, autoIncrement, notNull, columnDbType, columnSize, decimalDigits, defaultValue, commonColumn, optimisticLockType,
-                columnComment, foreignPropList, referrerPropList, classificationMeta, canBeNullObject, propertyMethodFinder);
+                primary, autoIncrement, notNull, columnDbType, columnSize, decimalDigits, datetimePrecision, defaultValue, commonColumn,
+                optimisticLockType, columnComment, foreignPropList, referrerPropList, classificationMeta, canBeNullObject,
+                propertyMethodFinder);
     }
 
     protected Class<?> chooseColumnPropertyAccessType(Class<?> objectNativeType, String propertyName, Class<?> propertyAccessType) {

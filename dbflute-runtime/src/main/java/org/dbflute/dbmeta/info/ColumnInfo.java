@@ -92,6 +92,7 @@ public class ColumnInfo {
     protected final String _columnDbType;
     protected final Integer _columnSize;
     protected final Integer _decimalDigits;
+    protected final Integer _datetimePrecision;
     protected final String _defaultValue;
     protected final boolean _commonColumn;
     protected final OptimisticLockType _optimisticLockType;
@@ -113,7 +114,7 @@ public class ColumnInfo {
             , String columnDbName, String columnSqlName, String columnSynonym, String columnAlias // column name
             , Class<?> objectNativeType, String propertyName, Class<?> propertyAccessType // property info
             , boolean primary, boolean autoIncrement, boolean notNull // column basic check
-            , String columnDbType, Integer columnSize, Integer decimalDigits, String defaultValue // column type
+            , String columnDbType, Integer columnSize, Integer decimalDigits, Integer datetimePrecision, String defaultValue // column type
             , boolean commonColumn, OptimisticLockType optimisticLockType, String columnComment // column others
             , List<String> foreignPropList, List<String> referrerPropList // relation property
             , ClassificationMeta classificationMeta, boolean canBeNullObject, PropertyMethodFinder propertyMethodFinder // various info
@@ -139,6 +140,7 @@ public class ColumnInfo {
         _columnSize = columnSize;
         _columnDbType = columnDbType;
         _decimalDigits = decimalDigits;
+        _datetimePrecision = datetimePrecision;
         _defaultValue = defaultValue;
         _commonColumn = commonColumn;
         _optimisticLockType = optimisticLockType != null ? optimisticLockType : OptimisticLockType.NONE;
@@ -393,11 +395,19 @@ public class ColumnInfo {
         sb.append(":{");
         sb.append(_columnDbType);
         if (_columnSize != null) {
-            sb.append("(").append(_columnSize);
+            sb.append("(");
+            sb.append(_columnSize);
             if (_decimalDigits != null) {
                 sb.append(", ").append(_decimalDigits);
             }
+            if (_datetimePrecision != null) {
+                sb.append(", ").append(_datetimePrecision);
+            }
             sb.append(")");
+        } else {
+            if (_datetimePrecision != null) {
+                sb.append("(").append(_datetimePrecision).append(")");
+            }
         }
         sb.append(", ").append(_objectNativeType.getName());
         sb.append("}");
@@ -477,7 +487,7 @@ public class ColumnInfo {
     }
 
     /**
-     * Is the object native type Date? (assignable from)
+     * Is the object native type Date (or Java8 Date, DateTime, ...)? (assignable from)
      * @return The determination, true or false.
      */
     public boolean isObjectNativeTypeDate() {
@@ -604,6 +614,14 @@ public class ColumnInfo {
      */
     public Integer getDecimalDigits() {
         return _decimalDigits;
+    }
+
+    /**
+     * Get the date-time precision of the column.
+     * @return The date-time precision of the column. (NullAllowed: If the type does not have precision, it returns null.)
+     */
+    public Integer getDatetimePrecision() {
+        return _datetimePrecision;
     }
 
     /**
