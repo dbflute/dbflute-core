@@ -34,14 +34,14 @@ import org.slf4j.LoggerFactory;
  * @author jflute
  * @since 1.1.4 (2017/08/12 Saturday at ikspiari)
  */
-public class DfDatePrecisionExtractorMySQL implements DfDatePrecisionExtractor {
+public class DfDatetimePrecisionExtractorMySQL implements DfDatetimePrecisionExtractor {
 
-    private static final Logger _log = LoggerFactory.getLogger(DfDatePrecisionExtractorMySQL.class);
+    private static final Logger _log = LoggerFactory.getLogger(DfDatetimePrecisionExtractorMySQL.class);
 
     protected DataSource _dataSource;
     protected UnifiedSchema _unifiedSchema;
 
-    public Map<String, Map<String, Integer>> extractDatePrecisionMap(Set<String> tableSet) {
+    public Map<String, Map<String, Integer>> extractDatetimePrecisionMap(Set<String> tableSet) {
         try {
             final Map<String, Map<String, Integer>> precisionMap = StringKeyMap.createAsFlexibleOrdered();
             final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
@@ -71,7 +71,7 @@ public class DfDatePrecisionExtractorMySQL implements DfDatePrecisionExtractor {
             }
             return precisionMap;
         } catch (RuntimeException continued) {
-            _log.info("Failed to select date precision, so you cannot use date precision option.", continued);
+            _log.info("Failed to select date-time precision, so you cannot use date precision option.", continued);
             return Collections.emptyMap();
         }
     }

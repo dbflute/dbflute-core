@@ -22,7 +22,7 @@ import java.util.Set;
  * @author jflute
  * @since 1.1.4 (2017/08/12 Saturday at ikspiari)
  */
-public interface DfDatePrecisionExtractor {
+public interface DfDatetimePrecisionExtractor {
 
-    Map<String, Map<String, Integer>> extractDatePrecisionMap(Set<String> tableSet);
+    Map<String, Map<String, Integer>> extractDatetimePrecisionMap(Set<String> tableSet);
 }
