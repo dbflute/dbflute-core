@@ -18,8 +18,8 @@ package org.dbflute.logic.jdbc.metadata.supplement.factory;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.dbflute.logic.jdbc.metadata.supplement.DfDatePrecisionExtractor;
-import org.dbflute.logic.jdbc.metadata.supplement.DfDatePrecisionExtractorMySQL;
+import org.dbflute.logic.jdbc.metadata.supplement.DfDatetimePrecisionExtractor;
+import org.dbflute.logic.jdbc.metadata.supplement.DfDatetimePrecisionExtractorMySQL;
 import org.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 
 /**
@@ -43,7 +43,8 @@ public class DfDatePrecisionExtractorFactory {
      * @param unifiedSchema The unified schema to extract. (NullAllowed)
      * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      */
-    public DfDatePrecisionExtractorFactory(DataSource dataSource, UnifiedSchema unifiedSchema, DfDatabaseTypeFacadeProp databaseTypeFacadeProp) {
+    public DfDatePrecisionExtractorFactory(DataSource dataSource, UnifiedSchema unifiedSchema,
+            DfDatabaseTypeFacadeProp databaseTypeFacadeProp) {
         _dataSource = dataSource;
         _unifiedSchema = unifiedSchema;
         _databaseTypeFacadeProp = databaseTypeFacadeProp;
@@ -53,11 +54,11 @@ public class DfDatePrecisionExtractorFactory {
     //                                                                              Create
     //                                                                              ======
     /**
-     * @return The extractor of date precision. (NullAllowed)
+     * @return The extractor of date-time precision. (NullAllowed)
      */
-    public DfDatePrecisionExtractor createDatePrecisionExtractor() {
+    public DfDatetimePrecisionExtractor createDatetimePrecisionExtractor() {
         if (_databaseTypeFacadeProp.isDatabaseMySQL()) {
-            final DfDatePrecisionExtractorMySQL extractor = new DfDatePrecisionExtractorMySQL();
+            final DfDatetimePrecisionExtractorMySQL extractor = new DfDatetimePrecisionExtractorMySQL();
             extractor.setDataSource(_dataSource);
             extractor.setUnifiedSchema(_unifiedSchema);
             return extractor;

@@ -185,7 +185,7 @@ public class Column {
     protected String _synonym;
     protected String _dbType;
     protected String _columnSize;
-    protected Integer _datePrecision;
+    protected Integer _datetimePrecision;
     protected boolean _notNull;
     protected boolean _autoIncrement;
     protected String _defaultValue;
@@ -250,7 +250,7 @@ public class Column {
         _jdbcType = attrib.getValue("type");
         _dbType = attrib.getValue("dbType");
         _columnSize = attrib.getValue("size");
-        _datePrecision = DfTypeUtil.toInteger(attrib.getValue("datePrecision")); // null allowed (option)
+        _datetimePrecision = DfTypeUtil.toInteger(attrib.getValue("datetimePrecision")); // null allowed (option)
 
         // It is not necessary to use this value on XML
         // because it uses the JavaNative value.
@@ -557,33 +557,28 @@ public class Column {
 
     public String getColumnSizeSettingExpression() {
         final Integer columnSize = getIntegerColumnSize();
-        if (columnSize == null) {
-            return "null";
-        }
-        return String.valueOf(columnSize);
+        return columnSize != null ? String.valueOf(columnSize) : "null";
     }
 
-    public String getColumnDecimalDigitsSettingExpression() {
+    public String getDecimalDigitsSettingExpression() {
         final Integer decimalDigits = getDecimalDigits();
-        if (decimalDigits == null) {
-            return "null";
-        }
-        return String.valueOf(decimalDigits);
+        return decimalDigits != null ? String.valueOf(decimalDigits) : "null";
+    }
+
+    public String getColumnDecimalDigitsSettingExpression() { // old style, for compatible
+        return getDecimalDigitsSettingExpression();
     }
 
     // -----------------------------------------------------
     //                                        Date Precision
     //                                        --------------
-    public Integer getDatePrecision() {
-        return _datePrecision;
+    public Integer getDatetimePrecision() {
+        return _datetimePrecision;
     }
 
-    public boolean hasDatePrecision() {
-        return _datePrecision != null && _datePrecision > 0;
-    }
-
-    public boolean needsMillisFilterOnCB() {
-        return !hasDatePrecision();
+    public String getDatetimePrecisionSettingExpression() {
+        final Integer datetimePrecision = getDatetimePrecision();
+        return datetimePrecision != null ? String.valueOf(datetimePrecision) : "null";
     }
 
     // -----------------------------------------------------

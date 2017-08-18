@@ -36,7 +36,7 @@ public class DfColumnMeta {
     protected String _dbTypeName;
     protected int _columnSize;
     protected int _decimalDigits;
-    protected Integer _datePrecision;
+    protected Integer _datetimePrecision;
     protected boolean _required;
     protected String _columnComment;
     protected String _defaultValue;
@@ -98,15 +98,15 @@ public class DfColumnMeta {
         }
     }
 
-    public void acceptDatePrecision(Map<String, Integer> columnDatePrecisionMap) {
-        if (columnDatePrecisionMap == null) {
+    public void acceptDatetimePrecision(Map<String, Integer> columnDatetimePrecisionMap) {
+        if (columnDatetimePrecisionMap == null) {
             return;
         }
-        Integer datePrecision = columnDatePrecisionMap.get(_columnName);
-        if (datePrecision == null) {
+        Integer datetimePrecision = columnDatetimePrecisionMap.get(_columnName);
+        if (datetimePrecision == null) {
             return;
         }
-        _datePrecision = datePrecision;
+        _datetimePrecision = datetimePrecision;
     }
 
     // ===================================================================================
@@ -119,8 +119,8 @@ public class DfColumnMeta {
         sb.append(_tableName).append(".").append(_columnName);
         sb.append(", ").append(_dbTypeName);
         sb.append("(");
-        if (_datePrecision != null) {
-            sb.append(_datePrecision);
+        if (_datetimePrecision != null) {
+            sb.append(_datetimePrecision);
         } else { // mainly here
             sb.append(_columnSize).append(", ").append(_decimalDigits);
         }
@@ -166,12 +166,12 @@ public class DfColumnMeta {
         this._decimalDigits = decimalDigits;
     }
 
-    public Integer getDatePrecision() {
-        return _datePrecision;
+    public Integer getDatetimePrecision() {
+        return _datetimePrecision;
     }
 
-    public void setDatePrecision(Integer datePrecision) {
-        _datePrecision = datePrecision;
+    public void setDatetimePrecision(Integer datetimePrecision) {
+        _datetimePrecision = datetimePrecision;
     }
 
     public String getDefaultValue() {

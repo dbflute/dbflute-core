@@ -92,7 +92,7 @@ import org.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
 import org.dbflute.logic.jdbc.metadata.sequence.factory.DfSequenceExtractorFactory;
-import org.dbflute.logic.jdbc.metadata.supplement.DfDatePrecisionExtractor;
+import org.dbflute.logic.jdbc.metadata.supplement.DfDatetimePrecisionExtractor;
 import org.dbflute.logic.jdbc.metadata.supplement.factory.DfDatePrecisionExtractorFactory;
 import org.dbflute.logic.jdbc.metadata.synonym.DfSynonymExtractor;
 import org.dbflute.logic.jdbc.metadata.synonym.factory.DfSynonymExtractorFactory;
@@ -182,7 +182,7 @@ public class DfSchemaXmlSerializer {
     //                                      Direct Meta Data
     //                                      ----------------
     protected Map<UnifiedSchema, Map<String, Map<String, UserColComments>>> _columnCommentAllMap;
-    protected Map<UnifiedSchema, Map<String, Map<String, Integer>>> _datePrecisionAllMap;
+    protected Map<UnifiedSchema, Map<String, Map<String, Integer>>> _datetimePrecisionAllMap;
     protected Map<String, String> _identityMap;
     protected Map<String, DfSynonymMeta> _supplementarySynonymInfoMap;
 
@@ -523,7 +523,7 @@ public class DfSchemaXmlSerializer {
             processColumnDbType(columnMeta, columnElement);
             processColumnJavaType(columnMeta, columnElement);
             processColumnSize(columnMeta, columnElement);
-            processDatePrecision(columnMeta, columnElement);
+            processDatetimePrecision(columnMeta, columnElement);
             processRequired(columnMeta, columnElement);
             processPrimaryKey(columnMeta, pkInfo, columnElement);
             processColumnComment(columnMeta, columnElement);
@@ -595,10 +595,10 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected void processDatePrecision(DfColumnMeta columnMeta, Element columnElement) {
-        Integer datePrecision = columnMeta.getDatePrecision();
-        if (datePrecision != null && datePrecision > 0) { // avoid zero for compatible
-            columnElement.setAttribute("datePrecision", String.valueOf(datePrecision));
+    protected void processDatetimePrecision(DfColumnMeta columnMeta, Element columnElement) {
+        final Integer datetimePrecision = columnMeta.getDatetimePrecision();
+        if (datetimePrecision != null && datetimePrecision > 0) { // avoid zero for compatible
+            columnElement.setAttribute("datetimePrecision", String.valueOf(datetimePrecision));
         }
     }
 
@@ -1083,25 +1083,25 @@ public class DfSchemaXmlSerializer {
     }
 
     protected void doHelpTableDatePrecision(List<DfTableMeta> tableList, UnifiedSchema unifiedSchema) {
-        final DfDatePrecisionExtractor datePrecisionExtractor = createDatePrecisionExtractor(unifiedSchema);
-        if (datePrecisionExtractor != null) {
+        final DfDatetimePrecisionExtractor datetimePrecisionExtractor = createDatetimePrecisionExtractor(unifiedSchema);
+        if (datetimePrecisionExtractor != null) {
             final Set<String> tableSet = new HashSet<String>();
             for (DfTableMeta table : tableList) {
                 tableSet.add(table.getTableName());
             }
             try {
-                if (_datePrecisionAllMap == null) {
-                    _datePrecisionAllMap = new LinkedHashMap<UnifiedSchema, Map<String, Map<String, Integer>>>();
+                if (_datetimePrecisionAllMap == null) {
+                    _datetimePrecisionAllMap = new LinkedHashMap<UnifiedSchema, Map<String, Map<String, Integer>>>();
                 }
-                final Map<String, Map<String, Integer>> datePrecisionMap = _datePrecisionAllMap.get(unifiedSchema);
-                final Map<String, Map<String, Integer>> extractedMap = datePrecisionExtractor.extractDatePrecisionMap(tableSet);
-                if (datePrecisionMap == null) {
-                    _datePrecisionAllMap.put(unifiedSchema, extractedMap);
+                final Map<String, Map<String, Integer>> datetimePrecisionMap = _datetimePrecisionAllMap.get(unifiedSchema);
+                final Map<String, Map<String, Integer>> extractedMap = datetimePrecisionExtractor.extractDatetimePrecisionMap(tableSet);
+                if (datetimePrecisionMap == null) {
+                    _datetimePrecisionAllMap.put(unifiedSchema, extractedMap);
                 } else { // basically no way, schema is unique but just in case
-                    datePrecisionMap.putAll(extractedMap); // merge
+                    datetimePrecisionMap.putAll(extractedMap); // merge
                 }
             } catch (RuntimeException continued) {
-                _log.info("Failed to extract date precisions: extractor=" + datePrecisionExtractor, continued);
+                _log.info("Failed to extract date-time precisions: extractor=" + datetimePrecisionExtractor, continued);
             }
         }
     }
@@ -1157,7 +1157,7 @@ public class DfSchemaXmlSerializer {
         List<DfColumnMeta> columnList = _columnExtractor.getColumnList(dbMeta, tableMeta);
         columnList = helpColumnAdjustment(dbMeta, tableMeta, columnList);
         helpColumnComments(tableMeta, columnList);
-        helpColumnDatePrecision(tableMeta, columnList);
+        helpColumnDatetimePrecision(tableMeta, columnList);
         tableMeta.setLazyColumnMetaList(columnList);
         return columnList;
     }
@@ -1231,15 +1231,15 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected void helpColumnDatePrecision(DfTableMeta tableMeta, List<DfColumnMeta> columnList) {
-        if (_datePrecisionAllMap != null) {
+    protected void helpColumnDatetimePrecision(DfTableMeta tableMeta, List<DfColumnMeta> columnList) {
+        if (_datetimePrecisionAllMap != null) {
             final String tableName = tableMeta.getTableName();
-            final Map<String, Map<String, Integer>> tableMap = _datePrecisionAllMap.get(tableMeta.getUnifiedSchema());
+            final Map<String, Map<String, Integer>> tableMap = _datetimePrecisionAllMap.get(tableMeta.getUnifiedSchema());
             if (tableMap != null) { // just in case
-                final Map<String, Integer> datePrecisionMap = tableMap.get(tableName);
-                if (datePrecisionMap != null) { // just in case
+                final Map<String, Integer> datetimePrecisionMap = tableMap.get(tableName);
+                if (datetimePrecisionMap != null) { // just in case
                     for (DfColumnMeta column : columnList) {
-                        column.acceptDatePrecision(datePrecisionMap);
+                        column.acceptDatetimePrecision(datetimePrecisionMap);
                     }
                 }
             }
@@ -1490,9 +1490,9 @@ public class DfSchemaXmlSerializer {
         return new DfDbCommentExtractorFactory(_dataSource, unifiedSchema, getDatabaseTypeFacadeProp());
     }
 
-    protected DfDatePrecisionExtractor createDatePrecisionExtractor(UnifiedSchema unifiedSchema) {
+    protected DfDatetimePrecisionExtractor createDatetimePrecisionExtractor(UnifiedSchema unifiedSchema) {
         final DfDatePrecisionExtractorFactory factory = createDatePrecisionExtractorFactory(unifiedSchema);
-        return factory.createDatePrecisionExtractor();
+        return factory.createDatetimePrecisionExtractor();
     }
 
     protected DfDatePrecisionExtractorFactory createDatePrecisionExtractorFactory(UnifiedSchema unifiedSchema) {
