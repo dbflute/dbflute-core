@@ -1687,7 +1687,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected Object filterConditionValueIfNeeds(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
             ConditionOption option, ColumnInfo columnInfo) {
-        if (isDatetimePrecisionTruncationOfConditionEnabled(columnDbName)) {
+        if (value != null && isDatetimePrecisionTruncationOfConditionEnabled(columnDbName)) { // null check, just in case
             if (columnInfo.isObjectNativeTypeDate()) { // contains Java8 Dates
                 final Integer datetimePrecision = columnInfo.getDatetimePrecision();
                 if (datetimePrecision == null || datetimePrecision == 0) { // non-millisecond date-time
