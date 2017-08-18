@@ -303,6 +303,7 @@ public final class DfLastaFluteFreeGenReflector {
         tableMap.put("extendsPropRequest", initCap(appName) + buildTitleSuffix(theme));
         tableMap.put("isCheckImplicitOverride", getTrueLiteral());
         tableMap.put("isUseNonNumberVariable", getTrueLiteral());
+        tableMap.put("variableExceptList", DfCollectionUtil.newArrayList("item")); // e.g. {item}
         tableMap.put("superClassPackage", buildMessagesPackage(appName, lastafluteMap));
         tableMap.put("superClassSimpleName", initCap(appName) + initCap(theme) + "s");
     }

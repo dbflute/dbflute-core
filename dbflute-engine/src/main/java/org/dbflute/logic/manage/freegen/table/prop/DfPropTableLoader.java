@@ -172,6 +172,11 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         if (isProperty("isUseNonNumberVariable", tableMap)) {
             reader.useNonNumberVariable();
         }
+        @SuppressWarnings("unchecked")
+        final List<String> variableExceptList = (List<String>) tableMap.get("variableExceptList");
+        if (variableExceptList != null) {
+            reader.useVariableExcept(DfCollectionUtil.newHashSet(variableExceptList));
+        }
         return reader;
     }
 
