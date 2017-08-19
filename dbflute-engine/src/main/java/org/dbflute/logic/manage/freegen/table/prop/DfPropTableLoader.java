@@ -177,6 +177,9 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         if (variableExceptList != null) {
             reader.useVariableExcept(DfCollectionUtil.newHashSet(variableExceptList));
         }
+        if (isProperty("isSuppressVariableOrder", tableMap)) {
+            reader.suppressVariableOrder();
+        }
         return reader;
     }
 

@@ -22,8 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.dbflute.DfBuildProperties;
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.logic.manage.freegen.DfFreeGenResourceType;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
@@ -303,7 +305,10 @@ public final class DfLastaFluteFreeGenReflector {
         tableMap.put("extendsPropRequest", initCap(appName) + buildTitleSuffix(theme));
         tableMap.put("isCheckImplicitOverride", getTrueLiteral());
         tableMap.put("isUseNonNumberVariable", getTrueLiteral());
-        tableMap.put("variableExceptList", DfCollectionUtil.newArrayList("item")); // e.g. {item}
+        tableMap.put("variableExceptList", DfCollectionUtil.newArrayList("item")); // e.g. {item} (is subject)
+        if (getLittleAdjustmentProperties().isCompatibleUserMessagesVariableNotOrdered()) { // emergency option
+            tableMap.put("isSuppressVariableOrder", getTrueLiteral());
+        }
         tableMap.put("superClassPackage", buildMessagesPackage(appName, lastafluteMap));
         tableMap.put("superClassSimpleName", initCap(appName) + initCap(theme) + "s");
     }
@@ -671,6 +676,17 @@ public final class DfLastaFluteFreeGenReflector {
         }
         final String fullKey = appName + ".freeGen." + title + "." + key;
         return (VALUE) overrideMap.getOrDefault(fullKey, overriddenValue);
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    public DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    public DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================
