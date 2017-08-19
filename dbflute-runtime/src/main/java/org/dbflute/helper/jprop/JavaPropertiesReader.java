@@ -208,12 +208,9 @@ public class JavaPropertiesReader {
         if (content.contains(" ")) { // e.g. {sea land}
             return true;
         }
-        if (!_useNonNumberVariable) { // number only
-            try {
-                Integer.valueOf(content); // e.g. {0}, {1}
-            } catch (NumberFormatException ignored) { // e.g. {sea}, {land}
-                return true;
-            }
+        if (!_useNonNumberVariable && !Srl.isNumberHarfAll(content)) { // number only but non-number
+            // e.g. {sea}, {land}
+            return true;
         }
         if (_variableExceptSet != null && _variableExceptSet.contains(content)) { // e.g. {item} in LastaFlute
             return true;
@@ -234,14 +231,14 @@ public class JavaPropertiesReader {
         if (!_suppressOrderNumberVariable) {
             // should be ordered for MessageFormat by jflute (2017/08/19)
             Collections.sort(variableNumberList, Comparator.naturalOrder()); // e.g. {1}-{0} to {0}-{1}
-            orderNumberOnly(variableStringList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{sea}-{1}-{land}-{2}
+            orderNumberVariableOnly(variableStringList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{sea}-{1}-{land}-{2}
         }
     }
 
-    protected void orderNumberOnly(List<String> variableStringList) {
-        final Map<Integer, String> namedMap = new HashMap<Integer, String>();
+    protected void orderNumberVariableOnly(List<String> variableStringList) {
+        final Map<Integer, String> namedMap = new LinkedHashMap<Integer, String>();
         for (int i = 0; i < variableStringList.size(); i++) {
-            String element = variableStringList.get(i);
+            final String element = variableStringList.get(i);
             if (!Srl.isNumberHarfAll(element)) {
                 namedMap.put(i, element);
             }
@@ -603,14 +600,23 @@ public class JavaPropertiesReader {
     //                                                                     Variable Helper
     //                                                                     ===============
     protected Integer valueOfVariableNumber(String key, String content) {
-        try {
-            return Integer.valueOf(content);
-        } catch (NumberFormatException e) {
+        if (Srl.isNumberHarfAll(content)) {
+            try {
+                return Integer.valueOf(content);
+            } catch (NumberFormatException e) { // no way, but just in case
+                if (_useNonNumberVariable) {
+                    return null;
+                }
+                String msg = "The NON-number variable was found: provider=" + _streamProvider + " key=" + key;
+                throw new IllegalStateException(msg, e);
+            }
+        } else { // non-number
             if (_useNonNumberVariable) {
                 return null;
+            } else {
+                String msg = "The NON-number variable was found: provider=" + _streamProvider + " key=" + key;
+                throw new IllegalStateException(msg);
             }
-            String msg = "The NON-number variable was found: provider=" + _streamProvider + " key=" + key;
-            throw new IllegalStateException(msg, e);
         }
     }
 
