@@ -878,6 +878,7 @@ public abstract class RuntimeTestCase extends TestCase {
     protected String xgetCaseDisp() {
         return getClass().getSimpleName() + "." + getName() + "()";
     }
+
     /**
      * Sleep the current thread.
      * @param millis The millisecond to sleep.

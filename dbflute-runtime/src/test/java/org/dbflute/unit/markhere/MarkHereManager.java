@@ -19,9 +19,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import junit.framework.AssertionFailedError;
-
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author jflute

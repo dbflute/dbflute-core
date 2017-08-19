@@ -435,7 +435,12 @@ public class FileTokenTest extends RuntimeTestCase {
                     writer.writeRow(valueList);
                 }
             }
-        }, op -> op.delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally().suppressValueCountCheck().headerInfo(columnNameList));
+        }, op -> op.delimitateByComma()
+                .encodeAsUTF8()
+                .separateByLf()
+                .quoteMinimally()
+                .suppressValueCountCheck()
+                .headerInfo(columnNameList));
 
         // ## Assert ##
         String actual = ous.toString();
