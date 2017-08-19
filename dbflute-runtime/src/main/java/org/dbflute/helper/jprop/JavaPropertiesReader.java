@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -224,8 +225,7 @@ public class JavaPropertiesReader {
         }
         // should be ordered for MessageFormat by jflute (2017/08/19)
         final VariableOrderAgent orderAgent = createVariableOrderAgent();
-        orderAgent.orderIndexedOnly(variableScopeList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{sea}-{1}-{land}-{2}
-        orderAgent.orderNamedOnly(variableScopeList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{land}-{1}-{sea}-{2}
+        orderAgent.orderScopeList(variableScopeList);
     }
 
     protected VariableOrderAgent createVariableOrderAgent() {
@@ -234,23 +234,31 @@ public class JavaPropertiesReader {
 
     public static class VariableOrderAgent { // can be used other libraries
 
-        public void orderIndexedOnly(List<ScopeInfo> variableStringList) {
+        public void orderScopeList(List<ScopeInfo> variableScopeList) {
+            Collections.sort(variableScopeList, (o1, o2) -> { // ...after all, split indexed and named
+                return Srl.isNumberHarfAll(o1.getContent()) ? -1 : 0;
+            });
+            orderIndexedOnly(variableScopeList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{sea}-{1}-{land}-{2}
+            orderNamedOnly(variableScopeList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{land}-{1}-{sea}-{2}
+        }
+
+        protected void orderIndexedOnly(List<ScopeInfo> variableScopeList) {
             final Map<Integer, ScopeInfo> namedMap = new LinkedHashMap<Integer, ScopeInfo>();
-            for (int i = 0; i < variableStringList.size(); i++) {
-                final ScopeInfo element = variableStringList.get(i);
+            for (int i = 0; i < variableScopeList.size(); i++) {
+                final ScopeInfo element = variableScopeList.get(i);
                 if (!Srl.isNumberHarfAll(element.getContent())) {
                     namedMap.put(i, element);
                 }
             }
-            final List<ScopeInfo> sortedList = variableStringList.stream()
+            final List<ScopeInfo> sortedList = variableScopeList.stream()
                     .filter(el -> Srl.isNumberHarfAll(el.getContent()))
                     .sorted(Comparator.comparing(el -> filterNumber(el.getContent()), Comparator.naturalOrder()))
                     .collect(Collectors.toList());
             namedMap.forEach((key, value) -> {
                 sortedList.add(key, value);
             });
-            variableStringList.clear();
-            variableStringList.addAll(sortedList);
+            variableScopeList.clear();
+            variableScopeList.addAll(sortedList);
         }
 
         protected String filterNumber(String el) {
@@ -262,15 +270,15 @@ public class JavaPropertiesReader {
             }
         }
 
-        public void orderNamedOnly(List<ScopeInfo> variableStringList) {
+        protected void orderNamedOnly(List<ScopeInfo> variableScopeList) {
             final Map<Integer, ScopeInfo> indexedMap = new LinkedHashMap<Integer, ScopeInfo>();
-            for (int i = 0; i < variableStringList.size(); i++) {
-                final ScopeInfo element = variableStringList.get(i);
+            for (int i = 0; i < variableScopeList.size(); i++) {
+                final ScopeInfo element = variableScopeList.get(i);
                 if (Srl.isNumberHarfAll(element.getContent())) {
                     indexedMap.put(i, element);
                 }
             }
-            final List<ScopeInfo> sortedList = variableStringList.stream().filter(el -> {
+            final List<ScopeInfo> sortedList = variableScopeList.stream().filter(el -> {
                 return !Srl.isNumberHarfAll(el.getContent());
             }).sorted((o1, o2) -> {
                 final String v1 = o1.getContent();
@@ -285,8 +293,8 @@ public class JavaPropertiesReader {
             indexedMap.forEach((key, value) -> {
                 sortedList.add(key, value);
             });
-            variableStringList.clear();
-            variableStringList.addAll(sortedList);
+            variableScopeList.clear();
+            variableScopeList.addAll(sortedList);
         }
 
         protected boolean isSpecialNamedOrder(String v1, String v2) {

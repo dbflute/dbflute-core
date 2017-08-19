@@ -128,9 +128,9 @@ public class JavaPropertiesReaderTest extends RuntimeTestCase {
         List<Integer> variableNumberList = property.getVariableNumberList();
         log(property, variableNumberList);
         assertEquals(Arrays.asList(0, 1, 2), variableNumberList);
-        assertEquals(Arrays.asList("0", "mic", "1", "mystic", "2"), property.getVariableStringList());
-        assertEquals("String arg0, String mic, String arg1, String mystic, String arg2", property.getVariableArgDef());
-        assertEquals("arg0, mic, arg1, mystic, arg2", property.getVariableArgSet());
+        assertEquals(Arrays.asList("0", "1", "2", "mic", "mystic"), property.getVariableStringList());
+        assertEquals("String arg0, String arg1, String arg2, String mic, String mystic", property.getVariableArgDef());
+        assertEquals("arg0, arg1, arg2, mic, mystic", property.getVariableArgSet());
     }
 
     public void test_variable_ordered_compatible() {
@@ -173,10 +173,10 @@ public class JavaPropertiesReaderTest extends RuntimeTestCase {
         List<Integer> variableNumberList = property.getVariableNumberList();
         log(property, variableNumberList);
         assertEquals(Arrays.asList(1, 4), variableNumberList);
-        assertEquals(Arrays.asList("mou", "mystic", "1", "oneman", "4"), property.getVariableStringList());
-        assertEquals(Arrays.asList("mou", "mystic", "arg1", "oneman", "arg4"), property.getVariableArgNameList());
-        assertEquals("String mou, String mystic, String arg1, String oneman, String arg4", property.getVariableArgDef());
-        assertEquals("mou, mystic, arg1, oneman, arg4", property.getVariableArgSet());
+        assertEquals(Arrays.asList("1", "4", "mou", "mystic", "oneman"), property.getVariableStringList());
+        assertEquals(Arrays.asList("arg1", "arg4", "mou", "mystic", "oneman"), property.getVariableArgNameList());
+        assertEquals("String arg1, String arg4, String mou, String mystic, String oneman", property.getVariableArgDef());
+        assertEquals("arg1, arg4, mou, mystic, oneman", property.getVariableArgSet());
     }
 
     protected ByteArrayInputStream stream(String propDef) throws UnsupportedEncodingException {
