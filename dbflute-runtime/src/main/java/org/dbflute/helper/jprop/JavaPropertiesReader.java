@@ -254,7 +254,12 @@ public class JavaPropertiesReader {
         }
 
         protected String filterNumber(String el) {
-            return Srl.ltrim(el, "0"); // zero suppressed e.g. "007" to "7"
+            final String ltrimmed = Srl.ltrim(el, "0"); // zero suppressed e.g. "007" to "7"
+            if (ltrimmed.isEmpty() && el.contains("0")) { // e.g. "000"
+                return "0";
+            } else {
+                return ltrimmed;
+            }
         }
 
         public void orderNamedOnly(List<ScopeInfo> variableStringList) {
