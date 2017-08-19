@@ -114,7 +114,7 @@ public class JavaPropertiesReaderTest extends RuntimeTestCase {
     public void test_variable_ordered_basic() {
         // ## Arrange ##
         JavaPropertiesReader reader = new JavaPropertiesReader("maihama", () -> {
-            return stream("land.sea = land{2}sea{mystic}piari{0}bonvo{goof}dstore{1}");
+            return stream("land.sea = land{2}sea{mystic}piari{0}bonvo{mic}dstore{1}");
         }).useNonNumberVariable();
 
         // ## Act ##
@@ -128,16 +128,16 @@ public class JavaPropertiesReaderTest extends RuntimeTestCase {
         List<Integer> variableNumberList = property.getVariableNumberList();
         log(property, variableNumberList);
         assertEquals(Arrays.asList(0, 1, 2), variableNumberList);
-        assertEquals(Arrays.asList("0", "mystic", "1", "goof", "2"), property.getVariableStringList());
-        assertEquals("String arg0, String mystic, String arg1, String goof, String arg2", property.getVariableArgDef());
-        assertEquals("arg0, mystic, arg1, goof, arg2", property.getVariableArgSet());
+        assertEquals(Arrays.asList("0", "mic", "1", "mystic", "2"), property.getVariableStringList());
+        assertEquals("String arg0, String mic, String arg1, String mystic, String arg2", property.getVariableArgDef());
+        assertEquals("arg0, mic, arg1, mystic, arg2", property.getVariableArgSet());
     }
 
     public void test_variable_ordered_compatible() {
         // ## Arrange ##
         JavaPropertiesReader reader = new JavaPropertiesReader("abc", () -> {
             return new ByteArrayInputStream("land.sea = land{2}sea{mystic}piari{0}bonvo{goof}dstore{1}".getBytes("UTF-8"));
-        }).useNonNumberVariable().suppressOrderNumberVariable();
+        }).useNonNumberVariable().suppressOrderVariable();
 
         // ## Act ##
         JavaPropertiesResult result = reader.read();
@@ -159,7 +159,7 @@ public class JavaPropertiesReaderTest extends RuntimeTestCase {
     public void test_variable_ordered_various() {
         // ## Arrange ##
         JavaPropertiesReader reader = new JavaPropertiesReader("maihama", () -> {
-            return stream("land.sea = land{oneman}sea{mystic}piari{4}bonvo{goof}{1}");
+            return stream("land.sea = land{oneman}sea{mystic}piari{4}bonvo{mou}{1}");
         }).useNonNumberVariable();
 
         // ## Act ##
@@ -173,10 +173,10 @@ public class JavaPropertiesReaderTest extends RuntimeTestCase {
         List<Integer> variableNumberList = property.getVariableNumberList();
         log(property, variableNumberList);
         assertEquals(Arrays.asList(1, 4), variableNumberList);
-        assertEquals(Arrays.asList("oneman", "mystic", "1", "goof", "4"), property.getVariableStringList());
-        assertEquals(Arrays.asList("oneman", "mystic", "arg1", "goof", "arg4"), property.getVariableArgNameList());
-        assertEquals("String oneman, String mystic, String arg1, String goof, String arg4", property.getVariableArgDef());
-        assertEquals("oneman, mystic, arg1, goof, arg4", property.getVariableArgSet());
+        assertEquals(Arrays.asList("mou", "mystic", "1", "oneman", "4"), property.getVariableStringList());
+        assertEquals(Arrays.asList("mou", "mystic", "arg1", "oneman", "arg4"), property.getVariableArgNameList());
+        assertEquals("String mou, String mystic, String arg1, String oneman, String arg4", property.getVariableArgDef());
+        assertEquals("mou, mystic, arg1, oneman, arg4", property.getVariableArgSet());
     }
 
     protected ByteArrayInputStream stream(String propDef) throws UnsupportedEncodingException {

@@ -74,7 +74,7 @@ public class JavaPropertiesReader {
     protected String _streamEncoding; // used if set
     protected boolean _useNonNumberVariable;
     protected Set<String> _variableExceptSet; // used if set
-    protected boolean _suppressOrderNumberVariable; // for compatible
+    protected boolean _suppressOrderVariable; // for compatible
 
     // -----------------------------------------------------
     //                                            Reflection
@@ -132,8 +132,8 @@ public class JavaPropertiesReader {
         return this;
     }
 
-    public JavaPropertiesReader suppressOrderNumberVariable() { // for compatible
-        _suppressOrderNumberVariable = true;
+    public JavaPropertiesReader suppressOrderVariable() { // for compatible
+        _suppressOrderVariable = true;
         return this;
     }
 
@@ -228,30 +228,76 @@ public class JavaPropertiesReader {
             }
             variableStringList.add(content); // contains all elements
         }
-        if (!_suppressOrderNumberVariable) {
+        if (!_suppressOrderVariable) {
             // should be ordered for MessageFormat by jflute (2017/08/19)
             Collections.sort(variableNumberList, Comparator.naturalOrder()); // e.g. {1}-{0} to {0}-{1}
-            orderNumberVariableOnly(variableStringList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{sea}-{1}-{land}-{2}
+            final VariableOrderAgent orderAgent = createVariableOrderAgent();
+            orderAgent.orderIndexedOnly(variableStringList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{sea}-{1}-{land}-{2}
+            orderAgent.orderNamedOnly(variableStringList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{land}-{1}-{sea}-{2}
         }
     }
 
-    protected void orderNumberVariableOnly(List<String> variableStringList) {
-        final Map<Integer, String> namedMap = new LinkedHashMap<Integer, String>();
-        for (int i = 0; i < variableStringList.size(); i++) {
-            final String element = variableStringList.get(i);
-            if (!Srl.isNumberHarfAll(element)) {
-                namedMap.put(i, element);
+    protected VariableOrderAgent createVariableOrderAgent() {
+        return new VariableOrderAgent();
+    }
+
+    public static class VariableOrderAgent { // can be used other libraries
+
+        public void orderIndexedOnly(List<String> variableStringList) {
+            final Map<Integer, String> namedMap = new LinkedHashMap<Integer, String>();
+            for (int i = 0; i < variableStringList.size(); i++) {
+                final String element = variableStringList.get(i);
+                if (!Srl.isNumberHarfAll(element)) {
+                    namedMap.put(i, element);
+                }
             }
+            final List<String> sortedList = variableStringList.stream()
+                    .filter(el -> Srl.isNumberHarfAll(el))
+                    .sorted(Comparator.comparing(el -> filterNumber(el), Comparator.naturalOrder()))
+                    .collect(Collectors.toList());
+            namedMap.forEach((key, value) -> {
+                sortedList.add(key, value);
+            });
+            variableStringList.clear();
+            variableStringList.addAll(sortedList);
         }
-        final List<String> sortedList = variableStringList.stream()
-                .filter(el -> Srl.isNumberHarfAll(el))
-                .sorted(Comparator.comparing(el -> Srl.ltrim(el, "0")/*for "007"*/, Comparator.naturalOrder()))
-                .collect(Collectors.toList());
-        namedMap.forEach((key, value) -> {
-            sortedList.add(key, value);
-        });
-        variableStringList.clear();
-        variableStringList.addAll(sortedList);
+
+        protected String filterNumber(String el) {
+            return Srl.ltrim(el, "0"); // zero suppressed e.g. "007" to "7"
+        }
+
+        public void orderNamedOnly(List<String> variableStringList) {
+            final Map<Integer, String> indexedMap = new LinkedHashMap<Integer, String>();
+            for (int i = 0; i < variableStringList.size(); i++) {
+                final String element = variableStringList.get(i);
+                if (Srl.isNumberHarfAll(element)) {
+                    indexedMap.put(i, element);
+                }
+            }
+            final List<String> sortedList = variableStringList.stream().filter(el -> {
+                return !Srl.isNumberHarfAll(el);
+            }).sorted((o1, o2) -> {
+                if (isSpecialNamedOrder(o1, o2)) {
+                    return -1;
+                } else if (isSpecialNamedOrder(o2, o1)) {
+                    return 1;
+                }
+                return o1.compareTo(o2);
+            }).collect(Collectors.toList());
+            indexedMap.forEach((key, value) -> {
+                sortedList.add(key, value);
+            });
+            variableStringList.clear();
+            variableStringList.addAll(sortedList);
+        }
+
+        protected boolean isSpecialNamedOrder(String o1, String o2) {
+            return o1.equals("min") && o2.equals("max") // used by e.g. Hibernate Validator
+                    || o1.equals("minimum") && o2.equals("maximum") //
+                    || o1.equals("start") && o2.equals("end") //
+                    || o1.equals("before") && o2.equals("after") //
+            ;
+        }
     }
 
     protected List<String> prepareVariableArgNameList(List<String> variableStringList) {
