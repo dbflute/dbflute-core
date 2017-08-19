@@ -1608,6 +1608,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleNestSelectSetupperAlwaysGenerate", false);
     }
 
+    public boolean isCompatibleFreeGenPropVariableNotOrdered() { // closet
+        return isProperty("isCompatibleFreeGenPropVariableNotOrdered", false);
+    }
+    
     public boolean isCompatibleUserMessagesVariableNotOrdered() { // closet
         return isProperty("isCompatibleUserMessagesVariableNotOrdered", false);
     }

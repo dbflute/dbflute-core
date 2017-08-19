@@ -37,6 +37,7 @@ import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfPropertyUtil;
@@ -177,7 +178,8 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         if (variableExceptList != null) {
             reader.useVariableExcept(DfCollectionUtil.newHashSet(variableExceptList));
         }
-        if (isProperty("isSuppressVariableOrder", tableMap)) {
+        if (isProperty("isSuppressVariableOrder", tableMap)
+                || getLittleAdjustmentProperties().isCompatibleFreeGenPropVariableNotOrdered()) {
             reader.suppressVariableOrder();
         }
         return reader;
@@ -403,5 +405,9 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
 
     protected DfDocumentProperties getDocumentProperties() {
         return getProperties().getDocumentProperties();
+    }
+
+    public DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 }
