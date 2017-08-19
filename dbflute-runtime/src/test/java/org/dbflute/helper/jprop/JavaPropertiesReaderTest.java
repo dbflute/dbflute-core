@@ -137,7 +137,7 @@ public class JavaPropertiesReaderTest extends RuntimeTestCase {
         // ## Arrange ##
         JavaPropertiesReader reader = new JavaPropertiesReader("abc", () -> {
             return new ByteArrayInputStream("land.sea = land{2}sea{mystic}piari{0}bonvo{goof}dstore{1}".getBytes("UTF-8"));
-        }).useNonNumberVariable().suppressOrderVariable();
+        }).useNonNumberVariable().suppressVariableOrder();
 
         // ## Act ##
         JavaPropertiesResult result = reader.read();

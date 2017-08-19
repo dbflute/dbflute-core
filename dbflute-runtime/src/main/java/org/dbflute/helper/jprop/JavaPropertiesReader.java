@@ -74,7 +74,7 @@ public class JavaPropertiesReader {
     protected String _streamEncoding; // used if set
     protected boolean _useNonNumberVariable;
     protected Set<String> _variableExceptSet; // used if set
-    protected boolean _suppressOrderVariable; // for compatible
+    protected boolean _suppressVariableOrder; // for compatible
 
     // -----------------------------------------------------
     //                                            Reflection
@@ -132,8 +132,8 @@ public class JavaPropertiesReader {
         return this;
     }
 
-    public JavaPropertiesReader suppressOrderVariable() { // for compatible
-        _suppressOrderVariable = true;
+    public JavaPropertiesReader suppressVariableOrder() { // for compatible
+        _suppressVariableOrder = true;
         return this;
     }
 
@@ -228,7 +228,7 @@ public class JavaPropertiesReader {
             }
             variableStringList.add(content); // contains all elements
         }
-        if (!_suppressOrderVariable) {
+        if (!_suppressVariableOrder) {
             // should be ordered for MessageFormat by jflute (2017/08/19)
             Collections.sort(variableNumberList, Comparator.naturalOrder()); // e.g. {1}-{0} to {0}-{1}
             final VariableOrderAgent orderAgent = createVariableOrderAgent();
