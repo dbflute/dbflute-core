@@ -14,7 +14,6 @@ import ${request.package}.cbean.ca.bs.Bs${table.camelizedName}CA;
 import org.dbflute.cbean.ConditionQuery;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 
 /**
  * @author ESFlute (using FreeGen)
