@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -180,7 +179,7 @@ public class JavaPropertiesReader {
         return prepareResult(prop, propertyList, duplicateKeyList);
     }
 
-    protected List<ScopeInfo> analyzeVariableScopeList(final String value) {
+    protected List<ScopeInfo> analyzeVariableScopeList(String value) {
         final List<ScopeInfo> variableScopeList = newArrayList();
         {
             final List<ScopeInfo> scopeList;
@@ -197,6 +196,7 @@ public class JavaPropertiesReader {
                 variableScopeList.add(scopeInfo);
             }
         }
+        orderVariableScopeList(variableScopeList);
         return variableScopeList;
     }
 
@@ -218,23 +218,14 @@ public class JavaPropertiesReader {
         return false;
     }
 
-    protected void reflectToVariableList(String key, List<ScopeInfo> variableScopeList, List<Integer> variableNumberList,
-            List<String> variableStringList) {
-        for (ScopeInfo scopeInfo : variableScopeList) {
-            final String content = scopeInfo.getContent();
-            final Integer variableNumber = valueOfVariableNumber(key, content);
-            if (variableNumber != null) { // for non-number option
-                variableNumberList.add(variableNumber);
-            }
-            variableStringList.add(content); // contains all elements
+    protected void orderVariableScopeList(List<ScopeInfo> variableScopeList) {
+        if (_suppressVariableOrder) { // for compatible
+            return;
         }
-        if (!_suppressVariableOrder) {
-            // should be ordered for MessageFormat by jflute (2017/08/19)
-            Collections.sort(variableNumberList, Comparator.naturalOrder()); // e.g. {1}-{0} to {0}-{1}
-            final VariableOrderAgent orderAgent = createVariableOrderAgent();
-            orderAgent.orderIndexedOnly(variableStringList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{sea}-{1}-{land}-{2}
-            orderAgent.orderNamedOnly(variableStringList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{land}-{1}-{sea}-{2}
-        }
+        // should be ordered for MessageFormat by jflute (2017/08/19)
+        final VariableOrderAgent orderAgent = createVariableOrderAgent();
+        orderAgent.orderIndexedOnly(variableScopeList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{sea}-{1}-{land}-{2}
+        orderAgent.orderNamedOnly(variableScopeList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{land}-{1}-{sea}-{2}
     }
 
     protected VariableOrderAgent createVariableOrderAgent() {
@@ -243,17 +234,17 @@ public class JavaPropertiesReader {
 
     public static class VariableOrderAgent { // can be used other libraries
 
-        public void orderIndexedOnly(List<String> variableStringList) {
-            final Map<Integer, String> namedMap = new LinkedHashMap<Integer, String>();
+        public void orderIndexedOnly(List<ScopeInfo> variableStringList) {
+            final Map<Integer, ScopeInfo> namedMap = new LinkedHashMap<Integer, ScopeInfo>();
             for (int i = 0; i < variableStringList.size(); i++) {
-                final String element = variableStringList.get(i);
-                if (!Srl.isNumberHarfAll(element)) {
+                final ScopeInfo element = variableStringList.get(i);
+                if (!Srl.isNumberHarfAll(element.getContent())) {
                     namedMap.put(i, element);
                 }
             }
-            final List<String> sortedList = variableStringList.stream()
-                    .filter(el -> Srl.isNumberHarfAll(el))
-                    .sorted(Comparator.comparing(el -> filterNumber(el), Comparator.naturalOrder()))
+            final List<ScopeInfo> sortedList = variableStringList.stream()
+                    .filter(el -> Srl.isNumberHarfAll(el.getContent()))
+                    .sorted(Comparator.comparing(el -> filterNumber(el.getContent()), Comparator.naturalOrder()))
                     .collect(Collectors.toList());
             namedMap.forEach((key, value) -> {
                 sortedList.add(key, value);
@@ -266,23 +257,25 @@ public class JavaPropertiesReader {
             return Srl.ltrim(el, "0"); // zero suppressed e.g. "007" to "7"
         }
 
-        public void orderNamedOnly(List<String> variableStringList) {
-            final Map<Integer, String> indexedMap = new LinkedHashMap<Integer, String>();
+        public void orderNamedOnly(List<ScopeInfo> variableStringList) {
+            final Map<Integer, ScopeInfo> indexedMap = new LinkedHashMap<Integer, ScopeInfo>();
             for (int i = 0; i < variableStringList.size(); i++) {
-                final String element = variableStringList.get(i);
-                if (Srl.isNumberHarfAll(element)) {
+                final ScopeInfo element = variableStringList.get(i);
+                if (Srl.isNumberHarfAll(element.getContent())) {
                     indexedMap.put(i, element);
                 }
             }
-            final List<String> sortedList = variableStringList.stream().filter(el -> {
-                return !Srl.isNumberHarfAll(el);
+            final List<ScopeInfo> sortedList = variableStringList.stream().filter(el -> {
+                return !Srl.isNumberHarfAll(el.getContent());
             }).sorted((o1, o2) -> {
-                if (isSpecialNamedOrder(o1, o2)) {
+                final String v1 = o1.getContent();
+                final String v2 = o2.getContent();
+                if (isSpecialNamedOrder(v1, v2)) {
                     return -1;
-                } else if (isSpecialNamedOrder(o2, o1)) {
+                } else if (isSpecialNamedOrder(v2, v1)) {
                     return 1;
                 }
-                return o1.compareTo(o2);
+                return v1.compareTo(v2);
             }).collect(Collectors.toList());
             indexedMap.forEach((key, value) -> {
                 sortedList.add(key, value);
@@ -291,12 +284,24 @@ public class JavaPropertiesReader {
             variableStringList.addAll(sortedList);
         }
 
-        protected boolean isSpecialNamedOrder(String o1, String o2) {
-            return o1.equals("min") && o2.equals("max") // used by e.g. Hibernate Validator
-                    || o1.equals("minimum") && o2.equals("maximum") //
-                    || o1.equals("start") && o2.equals("end") //
-                    || o1.equals("before") && o2.equals("after") //
+        protected boolean isSpecialNamedOrder(String v1, String v2) {
+            return v1.equals("min") && v2.equals("max") // used by e.g. Hibernate Validator
+                    || v1.equals("minimum") && v2.equals("maximum") //
+                    || v1.equals("start") && v2.equals("end") //
+                    || v1.equals("before") && v2.equals("after") //
             ;
+        }
+    }
+
+    protected void reflectToVariableList(String key, List<ScopeInfo> variableScopeList, List<Integer> variableNumberList,
+            List<String> variableStringList) {
+        for (ScopeInfo scopeInfo : variableScopeList) {
+            final String content = scopeInfo.getContent();
+            final Integer variableNumber = valueOfVariableNumber(key, content);
+            if (variableNumber != null) { // for non-number option
+                variableNumberList.add(variableNumber);
+            }
+            variableStringList.add(content); // contains all elements
         }
     }
 
