@@ -22,6 +22,8 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.dbflute.helper.jprop.exception.JavaPropertiesImplicitOverrideException;
 import org.dbflute.helper.jprop.exception.JavaPropertiesLonelyOverrideException;
@@ -71,6 +74,7 @@ public class JavaPropertiesReader {
     protected String _streamEncoding; // used if set
     protected boolean _useNonNumberVariable;
     protected Set<String> _variableExceptSet; // used if set
+    protected boolean _suppressOrderNumberVariable; // for compatible
 
     // -----------------------------------------------------
     //                                            Reflection
@@ -125,6 +129,11 @@ public class JavaPropertiesReader {
             throw new IllegalArgumentException("The argument 'variableExceptSet' should not be null.");
         }
         _variableExceptSet = variableExceptSet;
+        return this;
+    }
+
+    public JavaPropertiesReader suppressOrderNumberVariable() { // for compatible
+        _suppressOrderNumberVariable = true;
         return this;
     }
 
@@ -217,11 +226,35 @@ public class JavaPropertiesReader {
         for (ScopeInfo scopeInfo : variableScopeList) {
             final String content = scopeInfo.getContent();
             final Integer variableNumber = valueOfVariableNumber(key, content);
-            if (variableNumber != null) { // for non number option
+            if (variableNumber != null) { // for non-number option
                 variableNumberList.add(variableNumber);
             }
-            variableStringList.add(content);
+            variableStringList.add(content); // contains all elements
         }
+        if (!_suppressOrderNumberVariable) {
+            // should be ordered for MessageFormat by jflute (2017/08/19)
+            Collections.sort(variableNumberList, Comparator.naturalOrder()); // e.g. {1}-{0} to {0}-{1}
+            orderNumberOnly(variableStringList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{sea}-{1}-{land}-{2}
+        }
+    }
+
+    protected void orderNumberOnly(List<String> variableStringList) {
+        final Map<Integer, String> namedMap = new HashMap<Integer, String>();
+        for (int i = 0; i < variableStringList.size(); i++) {
+            String element = variableStringList.get(i);
+            if (!Srl.isNumberHarfAll(element)) {
+                namedMap.put(i, element);
+            }
+        }
+        final List<String> sortedList = variableStringList.stream()
+                .filter(el -> Srl.isNumberHarfAll(el))
+                .sorted(Comparator.comparing(el -> Srl.ltrim(el, "0")/*for "007"*/, Comparator.naturalOrder()))
+                .collect(Collectors.toList());
+        namedMap.forEach((key, value) -> {
+            sortedList.add(key, value);
+        });
+        variableStringList.clear();
+        variableStringList.addAll(sortedList);
     }
 
     protected List<String> prepareVariableArgNameList(List<String> variableStringList) {
@@ -576,7 +609,7 @@ public class JavaPropertiesReader {
             if (_useNonNumberVariable) {
                 return null;
             }
-            String msg = "The NOT-number variable was found: provider=" + _streamProvider + " key=" + key;
+            String msg = "The NON-number variable was found: provider=" + _streamProvider + " key=" + key;
             throw new IllegalStateException(msg, e);
         }
     }

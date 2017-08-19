@@ -39,9 +39,9 @@ public class JavaPropertiesProperty {
     protected String _camelizedName;
     protected String _capCamelName;
     protected String _uncapCamelName;
-    protected List<Integer> _variableNumberList;
-    protected List<String> _variableStringList;
-    protected List<String> _variableArgNameList;
+    protected List<Integer> _variableNumberList; // only number variables
+    protected List<String> _variableStringList; // all variables
+    protected List<String> _variableArgNameList; // all variables
     protected String _variableArgDef;
     protected String _variableArgSet;
     protected String _comment;
