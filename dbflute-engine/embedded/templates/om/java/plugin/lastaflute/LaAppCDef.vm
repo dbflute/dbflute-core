@@ -30,7 +30,7 @@ import ${tableMap.allcommonPackage}.*;
 
 #set ($glCDef = "${request.className}")
 /**
- * The definition of application classification.
+ * The definition of ${tableMap.clsTitle} classification.
  * @author FreeGen
  */
 public interface ${glCDef} extends Classification {

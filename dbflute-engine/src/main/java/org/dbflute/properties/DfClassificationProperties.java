@@ -42,6 +42,7 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
 import org.dbflute.properties.assistant.classification.DfClassificationAllInOneSqlExecutor;
 import org.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.dbflute.properties.assistant.classification.DfClassificationJavaNameFilter;
 import org.dbflute.properties.assistant.classification.DfClassificationLiteralArranger;
 import org.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer;
 import org.dbflute.properties.assistant.classification.DfClassificationSqlResourceCloser;
@@ -526,7 +527,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // -----------------------------------------------------
     //                                      Mapping Settings
     //                                      ----------------
-    protected Map<String, Map<String, Object>> getElementMapGroupingMap(Map<?, ?> elementMap) {
+    public Map<String, Map<String, Object>> getElementMapGroupingMap(Map<?, ?> elementMap) {
         final Object obj = elementMap.get(DfClassificationTop.KEY_GROUPING_MAP);
         if (obj == null) {
             return DfCollectionUtil.emptyMap();
@@ -536,7 +537,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return groupingMap;
     }
 
-    protected Map<String, String> getElementMapDeprecatedMap(Map<?, ?> elementMap) {
+    public Map<String, String> getElementMapDeprecatedMap(Map<?, ?> elementMap) {
         final Object obj = elementMap.get(DfClassificationTop.KEY_DEPRECATED_MAP);
         if (obj == null) {
             return DfCollectionUtil.emptyMap();
@@ -786,40 +787,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     protected final Map<String, String> _nameFromToMap = newLinkedHashMap();
     {
-        // basic unexpected marks
-        _nameFromToMap.put(" ", "_");
-        _nameFromToMap.put("!", "_");
-        _nameFromToMap.put("\"", "");
-        _nameFromToMap.put("#", "_");
-        _nameFromToMap.put("%", "_PERCENT_");
-        _nameFromToMap.put("&", "_AND_");
-        _nameFromToMap.put("'", "");
-        _nameFromToMap.put("(", "_");
-        _nameFromToMap.put(")", "_");
-        _nameFromToMap.put(",", "_");
-        _nameFromToMap.put(".", "_");
-        _nameFromToMap.put("/", "_");
-        _nameFromToMap.put("<", "_");
-        _nameFromToMap.put(">", "_");
-        _nameFromToMap.put("?", "_");
-        _nameFromToMap.put("\n", "_");
-        _nameFromToMap.put("\t", "_");
-
-        // basic full-width marks
-        _nameFromToMap.put("\uff05", "_PERCENT_");
-        _nameFromToMap.put("\uff06", "_AND_");
-        _nameFromToMap.put("\uff08", "_");
-        _nameFromToMap.put("\uff09", "_");
-
-        // pinpoint full-width
-        _nameFromToMap.put("\u3000", "_"); // full-width space
-        _nameFromToMap.put("\u3001", "_"); // Japanese touten
-        _nameFromToMap.put("\u3002", "_"); // Japanese kuten
-
-        // non-compilable hyphens
-        _nameFromToMap.put("\u2010", "_");
-        _nameFromToMap.put("\u2212", "_");
-        _nameFromToMap.put("\uff0d", "_");
+        // move preparing process to filter class to be pull-request-able
+        new DfClassificationJavaNameFilter().prepareNameFromTo(_nameFromToMap);
     }
 
     protected String filterTableClassificationName(DfClassificationTop classificationTop, String name) {

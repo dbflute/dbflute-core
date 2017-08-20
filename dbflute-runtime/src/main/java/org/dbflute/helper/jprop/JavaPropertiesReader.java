@@ -22,6 +22,8 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.dbflute.helper.jprop.exception.JavaPropertiesImplicitOverrideException;
 import org.dbflute.helper.jprop.exception.JavaPropertiesLonelyOverrideException;
@@ -70,6 +73,8 @@ public class JavaPropertiesReader {
     protected boolean _checkImplicitOverride;
     protected String _streamEncoding; // used if set
     protected boolean _useNonNumberVariable;
+    protected Set<String> _variableExceptSet; // used if set
+    protected boolean _suppressVariableOrder; // for compatible
 
     // -----------------------------------------------------
     //                                            Reflection
@@ -119,6 +124,19 @@ public class JavaPropertiesReader {
         return this;
     }
 
+    public JavaPropertiesReader useVariableExcept(Set<String> variableExceptSet) {
+        if (variableExceptSet == null) {
+            throw new IllegalArgumentException("The argument 'variableExceptSet' should not be null.");
+        }
+        _variableExceptSet = variableExceptSet;
+        return this;
+    }
+
+    public JavaPropertiesReader suppressVariableOrder() { // for compatible
+        _suppressVariableOrder = true;
+        return this;
+    }
+
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
@@ -162,7 +180,7 @@ public class JavaPropertiesReader {
         return prepareResult(prop, propertyList, duplicateKeyList);
     }
 
-    protected List<ScopeInfo> analyzeVariableScopeList(final String value) {
+    protected List<ScopeInfo> analyzeVariableScopeList(String value) {
         final List<ScopeInfo> variableScopeList = newArrayList();
         {
             final List<ScopeInfo> scopeList;
@@ -179,25 +197,113 @@ public class JavaPropertiesReader {
                 variableScopeList.add(scopeInfo);
             }
         }
+        orderVariableScopeList(variableScopeList);
         return variableScopeList;
     }
 
     protected List<ScopeInfo> extractVariableScopeList(String value) {
-        return Srl.extractScopeList(value, "{", "}"); // e.g. {0} is for {1}.
+        return Srl.extractScopeList(value, "{", "}"); // e.g. {0}, {1}
     }
 
     protected boolean isUnsupportedVariableContent(String content) {
-        if (content.contains(" ")) {
+        if (content.contains(" ")) { // e.g. {sea land}
             return true;
         }
-        if (!_useNonNumberVariable) {
-            try {
-                Integer.valueOf(content);
-            } catch (NumberFormatException ignored) { // e.g. {A} is for {B}
-                return true;
-            }
+        if (!_useNonNumberVariable && !Srl.isNumberHarfAll(content)) { // number only but non-number
+            // e.g. {sea}, {land}
+            return true;
+        }
+        if (_variableExceptSet != null && _variableExceptSet.contains(content)) { // e.g. {item} in LastaFlute
+            return true;
         }
         return false;
+    }
+
+    protected void orderVariableScopeList(List<ScopeInfo> variableScopeList) {
+        if (_suppressVariableOrder) { // for compatible
+            return;
+        }
+        // should be ordered for MessageFormat by jflute (2017/08/19)
+        final VariableOrderAgent orderAgent = createVariableOrderAgent();
+        orderAgent.orderScopeList(variableScopeList);
+    }
+
+    protected VariableOrderAgent createVariableOrderAgent() {
+        return new VariableOrderAgent();
+    }
+
+    public static class VariableOrderAgent { // can be used other libraries
+
+        public void orderScopeList(List<ScopeInfo> variableScopeList) {
+            Collections.sort(variableScopeList, (o1, o2) -> { // ...after all, split indexed and named
+                return Srl.isNumberHarfAll(o1.getContent()) ? -1 : 0;
+            });
+            orderIndexedOnly(variableScopeList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{sea}-{1}-{land}-{2}
+            orderNamedOnly(variableScopeList); // e.g. {2}-{sea}-{0}-{land}-{1} to {0}-{land}-{1}-{sea}-{2}
+        }
+
+        protected void orderIndexedOnly(List<ScopeInfo> variableScopeList) {
+            final Map<Integer, ScopeInfo> namedMap = new LinkedHashMap<Integer, ScopeInfo>();
+            for (int i = 0; i < variableScopeList.size(); i++) {
+                final ScopeInfo element = variableScopeList.get(i);
+                if (!Srl.isNumberHarfAll(element.getContent())) {
+                    namedMap.put(i, element);
+                }
+            }
+            final List<ScopeInfo> sortedList = variableScopeList.stream()
+                    .filter(el -> Srl.isNumberHarfAll(el.getContent()))
+                    .sorted(Comparator.comparing(el -> filterNumber(el.getContent()), Comparator.naturalOrder()))
+                    .collect(Collectors.toList());
+            namedMap.forEach((key, value) -> {
+                sortedList.add(key, value);
+            });
+            variableScopeList.clear();
+            variableScopeList.addAll(sortedList);
+        }
+
+        protected String filterNumber(String el) {
+            final String ltrimmed = Srl.ltrim(el, "0"); // zero suppressed e.g. "007" to "7"
+            if (ltrimmed.isEmpty() && el.contains("0")) { // e.g. "000"
+                return "0";
+            } else {
+                return ltrimmed;
+            }
+        }
+
+        protected void orderNamedOnly(List<ScopeInfo> variableScopeList) {
+            final Map<Integer, ScopeInfo> indexedMap = new LinkedHashMap<Integer, ScopeInfo>();
+            for (int i = 0; i < variableScopeList.size(); i++) {
+                final ScopeInfo element = variableScopeList.get(i);
+                if (Srl.isNumberHarfAll(element.getContent())) {
+                    indexedMap.put(i, element);
+                }
+            }
+            final List<ScopeInfo> sortedList = variableScopeList.stream().filter(el -> {
+                return !Srl.isNumberHarfAll(el.getContent());
+            }).sorted((o1, o2) -> {
+                final String v1 = o1.getContent();
+                final String v2 = o2.getContent();
+                if (isSpecialNamedOrder(v1, v2)) {
+                    return -1;
+                } else if (isSpecialNamedOrder(v2, v1)) {
+                    return 1;
+                }
+                return v1.compareTo(v2);
+            }).collect(Collectors.toList());
+            indexedMap.forEach((key, value) -> {
+                sortedList.add(key, value);
+            });
+            variableScopeList.clear();
+            variableScopeList.addAll(sortedList);
+        }
+
+        protected boolean isSpecialNamedOrder(String v1, String v2) {
+            return v1.equals("min") && v2.equals("max") // used by e.g. Hibernate Validator
+                    || v1.equals("minimum") && v2.equals("maximum") //
+                    || v1.equals("start") && v2.equals("end") //
+                    || v1.equals("before") && v2.equals("after") //
+            ;
+        }
     }
 
     protected void reflectToVariableList(String key, List<ScopeInfo> variableScopeList, List<Integer> variableNumberList,
@@ -205,10 +311,10 @@ public class JavaPropertiesReader {
         for (ScopeInfo scopeInfo : variableScopeList) {
             final String content = scopeInfo.getContent();
             final Integer variableNumber = valueOfVariableNumber(key, content);
-            if (variableNumber != null) { // for non number option
+            if (variableNumber != null) { // for non-number option
                 variableNumberList.add(variableNumber);
             }
-            variableStringList.add(content);
+            variableStringList.add(content); // contains all elements
         }
     }
 
@@ -285,7 +391,7 @@ public class JavaPropertiesReader {
         final Entry<String, JavaPropertiesStreamProvider> firstEntry = providerMap.entrySet().iterator().next();
         final String firstKey = firstEntry.getKey();
         final JavaPropertiesStreamProvider firstProvider = firstEntry.getValue();
-        final JavaPropertiesReader extendsReader = newJavaPropertiesReader(firstKey, firstProvider);
+        final JavaPropertiesReader extendsReader = newExtendsReader(firstKey, firstProvider);
         providerMap.remove(firstKey);
         for (Entry<String, JavaPropertiesStreamProvider> entry : providerMap.entrySet()) { // next extends
             extendsReader.extendsProperties(entry.getKey(), entry.getValue());
@@ -293,11 +399,19 @@ public class JavaPropertiesReader {
         if (_checkImplicitOverride) {
             extendsReader.checkImplicitOverride();
         }
+        if (_streamEncoding != null) {
+            extendsReader.encodeAs(_streamEncoding);
+        }
         return extendsReader;
     }
 
-    protected JavaPropertiesReader newJavaPropertiesReader(String firstKey, JavaPropertiesStreamProvider firstProvider) {
-        return new JavaPropertiesReader(firstKey, firstProvider);
+    protected JavaPropertiesReader newExtendsReader(String title, JavaPropertiesStreamProvider streamProvider) {
+        return newJavaPropertiesReader(title, streamProvider);
+    }
+
+    // general factory (LastaFlute may override this as patch, so keep it)
+    protected JavaPropertiesReader newJavaPropertiesReader(String title, JavaPropertiesStreamProvider streamProvider) {
+        return new JavaPropertiesReader(title, streamProvider); // for e.g. extends
     }
 
     // ===================================================================================
@@ -550,14 +664,23 @@ public class JavaPropertiesReader {
     //                                                                     Variable Helper
     //                                                                     ===============
     protected Integer valueOfVariableNumber(String key, String content) {
-        try {
-            return Integer.valueOf(content);
-        } catch (NumberFormatException e) {
+        if (Srl.isNumberHarfAll(content)) {
+            try {
+                return Integer.valueOf(content);
+            } catch (NumberFormatException e) { // no way, but just in case
+                if (_useNonNumberVariable) {
+                    return null;
+                }
+                String msg = "The NON-number variable was found: provider=" + _streamProvider + " key=" + key;
+                throw new IllegalStateException(msg, e);
+            }
+        } else { // non-number
             if (_useNonNumberVariable) {
                 return null;
+            } else {
+                String msg = "The NON-number variable was found: provider=" + _streamProvider + " key=" + key;
+                throw new IllegalStateException(msg);
             }
-            String msg = "The NOT-number variable was found: provider=" + _streamProvider + " key=" + key;
-            throw new IllegalStateException(msg, e);
         }
     }
 

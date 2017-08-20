@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2016 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-#if ($appclsMap.classificationTopList.size() > 0)
-<h2 id="lastadoc_appcls">appcls</h2>
+#if ($webclsMap.classificationTopList.size() > 0)
+<h2 id="lastadoc_webcls">webcls</h2>
 <table>
     <thead>
     <tr>
@@ -25,7 +25,7 @@
     </tr>
     </thead>
     <tbody id="table-list-body">
-#foreach ($classificationTop in $appclsMap.classificationTopList)
+#foreach ($classificationTop in $webclsMap.classificationTopList)
     <tr>
 #if ($classificationTop.isDeprecated())
         <td><del>${classificationTop.classificationName}</del></td>

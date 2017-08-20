@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import ${request.package}.allcommon.EsAbstractBehavior;
-import ${request.package}.allcommon.EsAbstractEntity;
 import ${request.package}.allcommon.EsAbstractEntity.RequestOptionCall;
 import ${request.package}.bsentity.dbmeta.${table.camelizedName}Dbm;
 import ${request.package}.cbean.${table.camelizedName}CB;

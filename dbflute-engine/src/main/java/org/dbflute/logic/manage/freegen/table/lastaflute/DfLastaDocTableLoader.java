@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +86,8 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
     //     ; targetDir = $$baseDir$$/java
     // }
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> tableMap = mapProp.getOptionMap();
-        final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
+        final Map<String, Object> optionMap = mapProp.getOptionMap();
+        final String targetDir = resource.resolveBaseDir((String) optionMap.get("targetDir"));
         final File rootDir = new File(targetDir);
         if (!rootDir.exists()) {
             throw new IllegalStateException("Not found the targetDir: " + targetDir);
@@ -106,26 +107,39 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
             }
         });
         final List<Map<String, Object>> columnList = prepareColumnList(lastaInfo);
-        executeTestDocument(tableMap);
-        final Path lastaDocFile = acceptLastaDocFile(tableMap);
+        executeTestDocument(optionMap);
+        final Path lastaDocFile = acceptLastaDocFile(optionMap);
         if (Files.exists(lastaDocFile)) {
-            tableMap.putAll(decodeJsonMap(lastaDocFile));
+            optionMap.putAll(decodeJsonMap(lastaDocFile));
         }
-        tableMap.put("appList", findAppList(mapProp));
-        if (mapProp.getOptionMap().get("mailPackage") != null) {
-            tableMap.put("mailList", new DfMailFluteTableLoader(true).loadTable(requestName, resource, mapProp).getTableList());
+        optionMap.put("appList", findAppList(mapProp));
+        if (optionMap.get("mailPackage") != null) {
+            optionMap.put("mailList", new DfMailFluteTableLoader(true).loadTable(requestName, resource, mapProp).getTableList());
         }
-        if (mapProp.getOptionMap().get("templatePackage") != null) {
-            tableMap.put("templateList", new DfPmFileTableLoader(true).loadTable(requestName, resource, mapProp).getTableList());
+        if (optionMap.get("templatePackage") != null) {
+            optionMap.put("templateList", new DfPmFileTableLoader(true).loadTable(requestName, resource, mapProp).getTableList());
         }
-        if (mapProp.getOptionMap().get("appclsPackage") != null) {
-            tableMap.put("appclsMap", new DfAppClsTableLoader(true).loadTable(requestName, resource, mapProp).getOptionMap());
+        if (optionMap.get("appclsPackage") != null) {
+            optionMap.put("appclsMap", new DfAppClsTableLoader(true).loadTable(requestName, resource, mapProp).getOptionMap());
         }
-        if (mapProp.getOptionMap().get("webclsPackage") != null) {
-            tableMap.put("webclsMap", new DfWebClsTableLoader(true).loadTable(requestName, resource, mapProp).getOptionMap());
+        if (optionMap.get("webclsPackage") != null) {
+            optionMap.put("webclsMap", new DfWebClsTableLoader(true).loadTable(requestName, resource, mapProp).getOptionMap());
         }
-        prepareSchemaHtmlLink(tableMap);
-        return new DfFreeGenMetaData(tableMap, "unused", columnList);
+        if (optionMap.get("namedclsList") != null) {
+            @SuppressWarnings("unchecked")
+            final List<Map<String, Object>> namedclsList = (List<Map<String, Object>>) optionMap.get("namedclsList");
+            if (!namedclsList.isEmpty()) {
+                final List<Map<String, Object>> loadedList = new ArrayList<Map<String, Object>>();
+                for (Map<String, Object> namedclsMap : namedclsList) {
+                    final DfFreeGenMapProp nestedMapProp =
+                            new DfFreeGenMapProp(namedclsMap, Collections.emptyMap(), mapProp.getRequestMap());
+                    loadedList.add(new DfAppClsTableLoader(true).loadTable(requestName, resource, nestedMapProp).getOptionMap());
+                }
+                optionMap.put("namedclsList", loadedList); // override, convert to loaded list
+            }
+        }
+        prepareSchemaHtmlLink(optionMap);
+        return new DfFreeGenMetaData(optionMap, "unused", columnList);
     }
 
     protected List<Map<String, Object>> prepareColumnList(DfLastaInfo lastaInfo) {

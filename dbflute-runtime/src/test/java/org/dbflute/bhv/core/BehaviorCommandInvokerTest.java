@@ -95,7 +95,8 @@ public class BehaviorCommandInvokerTest extends RuntimeTestCase {
             }
 
             @Override
-            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before,
+                    long after) {
                 markList.add("logReturn");
                 log("before=" + before + ", after=" + after);
                 assertTrue(before > 0);
@@ -170,7 +171,8 @@ public class BehaviorCommandInvokerTest extends RuntimeTestCase {
             }
 
             @Override
-            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before,
+                    long after) {
                 throw new IllegalStateException("logReturn() should not be called!");
             }
 
@@ -245,7 +247,8 @@ public class BehaviorCommandInvokerTest extends RuntimeTestCase {
             }
 
             @Override
-            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before,
+                    long after) {
                 throw new IllegalStateException("logReturn() should not be called!");
             }
         };
@@ -314,7 +317,8 @@ public class BehaviorCommandInvokerTest extends RuntimeTestCase {
             }
 
             @Override
-            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before,
+                    long after) {
                 throw new IllegalStateException("logReturn should not be called!");
             }
         };

@@ -84,6 +84,7 @@ Java class or method name.
   dbType CDATA #IMPLIED
   javaType CDATA #IMPLIED
   size CDATA #IMPLIED
+  datetimePrecision CDATA #IMPLIED
   required (true|false) "false"
   primaryKey (true|false) "false"
   pkName CDATA #IMPLIED

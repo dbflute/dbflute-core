@@ -185,6 +185,7 @@ public class Column {
     protected String _synonym;
     protected String _dbType;
     protected String _columnSize;
+    protected Integer _datetimePrecision;
     protected boolean _notNull;
     protected boolean _autoIncrement;
     protected String _defaultValue;
@@ -249,6 +250,7 @@ public class Column {
         _jdbcType = attrib.getValue("type");
         _dbType = attrib.getValue("dbType");
         _columnSize = attrib.getValue("size");
+        _datetimePrecision = DfTypeUtil.toInteger(attrib.getValue("datetimePrecision")); // null allowed (option)
 
         // It is not necessary to use this value on XML
         // because it uses the JavaNative value.
@@ -481,6 +483,10 @@ public class Column {
         return hasDbType() && _columnHandler.isConceptTypeStringClob(_dbType);
     }
 
+    public boolean isDbTypeMySQLDatetime() { // as pinpoint
+        return hasDbType() && _columnHandler.isMySQLDatetime(_dbType);
+    }
+
     public boolean isDbTypePostgreSQLBytea() { // as pinpoint
         return hasDbType() && _columnHandler.isPostgreSQLBytea(_dbType);
     }
@@ -508,7 +514,7 @@ public class Column {
         _columnSize = columnSize;
     }
 
-    public void setupColumnSize(int columnSize, int decimalDigits) {
+    public void setupColumnSize(int columnSize, int decimalDigits) { // for Sql2Entity
         if (DfColumnExtractor.isColumnSizeValid(columnSize)) {
             if (DfColumnExtractor.isDecimalDigitsValid(decimalDigits)) {
                 setColumnSize(columnSize + ", " + decimalDigits);
@@ -551,21 +557,28 @@ public class Column {
 
     public String getColumnSizeSettingExpression() {
         final Integer columnSize = getIntegerColumnSize();
-        if (columnSize == null) {
-            return "null";
-        }
-        return String.valueOf(columnSize);
+        return columnSize != null ? String.valueOf(columnSize) : "null";
+    }
+
+    public String getDecimalDigitsSettingExpression() {
+        final Integer decimalDigits = getDecimalDigits();
+        return decimalDigits != null ? String.valueOf(decimalDigits) : "null";
+    }
+
+    public String getColumnDecimalDigitsSettingExpression() { // old style, for compatible
+        return getDecimalDigitsSettingExpression();
     }
 
     // -----------------------------------------------------
-    //                                        Decimal Digits
+    //                                        Date Precision
     //                                        --------------
-    public String getColumnDecimalDigitsSettingExpression() {
-        final Integer decimalDigits = getDecimalDigits();
-        if (decimalDigits == null) {
-            return "null";
-        }
-        return String.valueOf(decimalDigits);
+    public Integer getDatetimePrecision() {
+        return _datetimePrecision;
+    }
+
+    public String getDatetimePrecisionSettingExpression() {
+        final Integer datetimePrecision = getDatetimePrecision();
+        return datetimePrecision != null ? String.valueOf(datetimePrecision) : "null";
     }
 
     // -----------------------------------------------------

@@ -178,7 +178,7 @@ public class DfClassificationTop {
             }
         }
         return (firstSet.contains("true") && secondSet.contains("false") // first true
-        || firstSet.contains("false") && secondSet.contains("true")); // first false
+                || firstSet.contains("false") && secondSet.contains("true")); // first false
     }
 
     public boolean hasSisterCode() {
@@ -655,11 +655,11 @@ public class DfClassificationTop {
     public void setSuppressDBAccessClass(boolean suppressDBAccessClass) {
         _suppressDBAccessClass = suppressDBAccessClass;
     }
-    
+
     public boolean isSuppressNameCamelizing() {
         return _suppressNameCamelizing;
     }
-    
+
     public void setSuppressNameCamelizing(boolean suppressNameCamelizing) {
         _suppressNameCamelizing = suppressNameCamelizing;
     }

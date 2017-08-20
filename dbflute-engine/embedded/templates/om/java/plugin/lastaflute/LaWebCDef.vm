@@ -30,7 +30,7 @@ import ${tableMap.allcommonPackage}.*;
 
 #set ($glCDef = "${request.className}")
 /**
- * The definition of web classification.
+ * The definition of ${tableMap.clsDomain} classification.
  * @author FreeGen
  */
 public interface ${glCDef} extends Classification {

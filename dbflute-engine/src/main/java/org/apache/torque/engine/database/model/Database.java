@@ -2035,6 +2035,10 @@ public class Database {
         return getLittleAdjustmentProperties().isNonSpecifiedColumnAccessAllowed();
     }
 
+    public boolean isDatetimePrecisionTruncationOfCondition() {
+        return getLittleAdjustmentProperties().isDatetimePrecisionTruncationOfCondition();
+    }
+
     public boolean isAvailableDatabaseNativeJDBC() {
         return getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC();
     }

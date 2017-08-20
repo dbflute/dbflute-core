@@ -80,12 +80,12 @@ $manager.htmlEscape($actionDocMeta.url)
 #end
 #if (!$actionDocMeta.parameterTypeDocMetaList.isEmpty())
 <span class="doctitle">URL Parameter:</span>
-$generator.parse("om/java/plugin/lastaflute/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta)
+$generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta)
 #end
 #if ($actionDocMeta.formTypeDocMeta)
 <span class="doctitle">Form or Body:</span> <span class="docsubvalue"><span title="$manager.htmlEscape($actionDocMeta.formTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.formTypeDocMeta.simpleTypeName)</span></span>
 <p class="tablecomment" title="$!manager.htmlEscape($actionDocMeta.formTypeDocMeta.comment)">$!manager.htmlEscape($actionDocMeta.formTypeDocMeta.description)</p>
-$generator.parse("om/java/plugin/lastaflute/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.formTypeDocMeta)
+$generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.formTypeDocMeta)
 #end
 #if ($actionDocMeta.returnTypeDocMeta)
 <span class="doctitle">Return as:</span> <span class="docsubvalue"><span title="$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.returnTypeDocMeta.simpleTypeName)</span></span>
@@ -93,7 +93,7 @@ $generator.parse("om/java/plugin/lastaflute/LaActionDocHtmlTypeDocMeta.vm", null
 #if ($actionDocMeta.returnTypeDocMeta.simpleTypeName == 'HtmlResponse' && $actionDocMeta.returnTypeDocMeta.value)
 <p class="docsubitem"><span class="docsubtitle">implementations:</span> <span class="docsubvalue">${actionDocMeta.returnTypeDocMeta.value}</span></p>
 #end
-$generator.parse("om/java/plugin/lastaflute/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.returnTypeDocMeta)
+$generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtmlTypeDocMeta.vm", null, "typeDocMeta", $actionDocMeta.returnTypeDocMeta)
 #end
 #end
 #else

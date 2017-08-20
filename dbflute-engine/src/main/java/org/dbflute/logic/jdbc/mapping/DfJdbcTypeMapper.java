@@ -50,6 +50,8 @@ public class DfJdbcTypeMapper {
     public static interface DfMapperResource {
         DfLanguageDependency getLang();
 
+        boolean isDbmsMySQL();
+
         boolean isDbmsPostgreSQL();
 
         boolean isDbmsOracle();
@@ -270,6 +272,10 @@ public class DfJdbcTypeMapper {
     // -----------------------------------------------------
     //                                         Pinpoint Type
     //                                         -------------
+    public boolean isMySQLDatetime(final String dbTypeName) {
+        return _resource.isDbmsMySQL() && matchIgnoreCase(dbTypeName, "datetime");
+    }
+
     public boolean isPostgreSQLBpChar(final String dbTypeName) {
         return _resource.isDbmsPostgreSQL() && matchIgnoreCase(dbTypeName, "bpchar");
     }

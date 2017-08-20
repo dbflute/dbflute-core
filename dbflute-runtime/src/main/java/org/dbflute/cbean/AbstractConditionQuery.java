@@ -19,7 +19,10 @@ import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -1670,15 +1673,41 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             ConditionOption option) {
         final DBMeta dbmeta = xgetLocalDBMeta();
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
+        final QueryModeProvider queryModeProvider = xcreateQueryModeProvider();
+        final Object filtered = filterConditionValueIfNeeds(key, value, cvalue, columnDbName, option, columnInfo);
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
-        // if Java, it is necessary to use uncapPropName
-        final String location = xgetLocation(uncapPropName);
-        key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, location, option);
+        final String location = xgetLocation(uncapPropName); // if Java, it is necessary to use uncapPropName
+        key.setupConditionValue(queryModeProvider, cvalue, filtered, location, option);
         final ColumnRealName columnRealName = toColumnRealName(columnDbName);
         final ColumnFunctionCipher cipher = xgetSqlClause().findColumnFunctionCipher(columnInfo);
         final String usedAliasName = xgetAliasName();
         xgetSqlClause().registerWhereClause(columnRealName, key, cvalue, cipher, option, usedAliasName);
+    }
+
+    protected Object filterConditionValueIfNeeds(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
+            ConditionOption option, ColumnInfo columnInfo) {
+        if (value != null && isDatetimePrecisionTruncationOfConditionEnabled(columnDbName)) { // null check, just in case
+            if (columnInfo.isObjectNativeTypeDate()) { // contains Java8 Dates
+                final Integer datetimePrecision = columnInfo.getDatetimePrecision();
+                if (datetimePrecision == null || datetimePrecision == 0) { // non-millisecond date-time
+                    if (value instanceof LocalDateTime) {
+                        return ((LocalDateTime) value).truncatedTo(ChronoUnit.SECONDS); // means clear millisecond
+                    } else if (value instanceof LocalTime) {
+                        return ((LocalTime) value).truncatedTo(ChronoUnit.SECONDS); // means clear millisecond
+                    } else if (value instanceof Date && !(value instanceof java.sql.Date)) {
+                        final Calendar cal = DfTypeUtil.toCalendar(value);
+                        DfTypeUtil.clearCalendarMillisecond(cal);
+                        return DfTypeUtil.toDate(cal);
+                    }
+                }
+            }
+        }
+        return value;
+    }
+
+    protected boolean isDatetimePrecisionTruncationOfConditionEnabled(String columnDbName) { // may be overridden by option
+        return xgetSqlClause().isDatetimePrecisionTruncationOfConditionEnabled();
     }
 
     protected void registerWhereClause(String whereClause) {

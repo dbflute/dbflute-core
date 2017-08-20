@@ -1442,7 +1442,7 @@ public interface SqlClause {
     void disableColumnNullObject(); // called by condition-bean
 
     /**
-     * Is the handling of column null object enabled?
+     * Is the handling of column null object allowed?
      * @return The determination, true or false.
      */
     boolean isColumnNullObjectAllowed(); // called by result set handler
@@ -1471,6 +1471,26 @@ public interface SqlClause {
      * @return The set of column info. (NotNull, EmptyAllowed)
      */
     Set<ColumnInfo> getRelationSpecifiedNullObjectColumnSet(String relationNoSuffix); // called by relation row creator
+
+    // [DBFlute-1.1.4]
+    // ===================================================================================
+    //                                                                 Date-time Precision
+    //                                                                 ===================
+    /**
+     * Enable the truncation of date-time precision for condition value. (default is disabled, means checked)
+     */
+    void enableDatetimePrecisionTruncationOfCondition();
+
+    /**
+     * Disable the truncation of date-time precision for condition value. (back to default)
+     */
+    void disableDatetimePrecisionTruncationOfCondition();
+
+    /**
+     * Is the truncation of date-time precision for condition value enabled?
+     * @return The determination, true or false.
+     */
+    boolean isDatetimePrecisionTruncationOfConditionEnabled();
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================

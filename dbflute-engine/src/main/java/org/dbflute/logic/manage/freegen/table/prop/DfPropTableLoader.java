@@ -37,6 +37,7 @@ import org.dbflute.logic.manage.freegen.DfFreeGenRequest;
 import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfLittleAdjustmentProperties;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
 import org.dbflute.util.DfPropertyUtil;
@@ -172,6 +173,15 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         if (isProperty("isUseNonNumberVariable", tableMap)) {
             reader.useNonNumberVariable();
         }
+        @SuppressWarnings("unchecked")
+        final List<String> variableExceptList = (List<String>) tableMap.get("variableExceptList");
+        if (variableExceptList != null) {
+            reader.useVariableExcept(DfCollectionUtil.newHashSet(variableExceptList));
+        }
+        if (isProperty("isSuppressVariableOrder", tableMap)
+                || getLittleAdjustmentProperties().isCompatibleFreeGenPropVariableNotOrdered()) {
+            reader.suppressVariableOrder();
+        }
         return reader;
     }
 
@@ -248,6 +258,7 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
             columnMap.put("propertyValue", propertyValue != null ? propertyValue : "");
             final String valueHtmlEncoded = prop.resolveTextForSimpleLineHtml(propertyValue);
             columnMap.put("propertyValueHtmlEncoded", valueHtmlEncoded != null ? valueHtmlEncoded : "");
+            columnMap.put("propertyValueStringLiteral", preparePropertyValueStringLiteral(propertyValue));
             columnMap.put("hasPropertyValue", Srl.is_NotNull_and_NotTrimmedEmpty(propertyValue));
 
             final String defName = convertToDefName(propertyKey);
@@ -341,6 +352,17 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
         return DfNameHintUtil.isHitByTheHint(propertyKey, keyHint);
     }
 
+    protected String preparePropertyValueStringLiteral(String propertyValue) {
+        if (propertyValue == null) {
+            return "null";
+        }
+        String escaped = Srl.replace(propertyValue, "\\", "\\\\");
+        escaped = Srl.replace(escaped, "\"", "\\\"");
+        escaped = Srl.replace(escaped, "\n", "\\n");
+        escaped = Srl.replace(escaped, "\t", "\\t");
+        return Srl.quoteAnything(escaped, "\"");
+    }
+
     // -----------------------------------------------------
     //                                         Property Type
     //                                         -------------
@@ -383,5 +405,9 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
 
     protected DfDocumentProperties getDocumentProperties() {
         return getProperties().getDocumentProperties();
+    }
+
+    public DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 }

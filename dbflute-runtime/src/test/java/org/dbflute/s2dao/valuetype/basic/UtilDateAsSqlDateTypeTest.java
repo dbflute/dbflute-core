@@ -17,9 +17,9 @@ package org.dbflute.s2dao.valuetype.basic;
 
 import java.util.Date;
 
-import junit.framework.TestCase;
-
 import org.dbflute.util.DfTypeUtil;
+
+import junit.framework.TestCase;
 
 /**
  * @author jflute

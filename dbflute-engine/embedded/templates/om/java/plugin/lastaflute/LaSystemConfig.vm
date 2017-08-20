@@ -202,5 +202,16 @@ public interface ${request.className}${pluginDef} {
 #end
 #end
 #end
+#if ($request.tableMap.isUseDefaultConfigAtGeneration)
+
+        @Override
+        protected java.util.Map<String, String> prepareGeneratedDefaultMap() {
+            java.util.Map<String, String> defaultMap = super.prepareGeneratedDefaultMap();
+#foreach ($column in $table.columnList)
+            defaultMap.put(${request.className}.${column.defName}, ${column.propertyValueStringLiteral});
+#end
+            return defaultMap;
+        }
+#end
     }
 }

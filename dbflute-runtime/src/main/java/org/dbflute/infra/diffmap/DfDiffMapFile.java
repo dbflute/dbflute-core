@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.util.Map;
 
 import org.dbflute.exception.DfPropFileReadFailureException;
+import org.dbflute.exception.DfPropFileWriteFailureException;
 import org.dbflute.helper.mapstring.MapListFile;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 
@@ -73,7 +74,7 @@ public class DfDiffMapFile {
         br.addItem("DBFlute Property");
         br.addElement(ous);
         final String msg = br.buildExceptionMessage();
-        throw new DfPropFileReadFailureException(msg, e);
+        throw new DfPropFileWriteFailureException(msg, e);
     }
 
     // ===================================================================================

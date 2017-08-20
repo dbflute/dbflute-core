@@ -375,6 +375,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The map of specified column null object. map:{ alias-name = set:{ column-info } } (NullAllowed: lazy-loaded) */
     protected Map<String, Set<ColumnInfo>> _columnNullObjectSpecifiedMap;
 
+    // -----------------------------------------------------
+    //                                   Date-time Precision
+    //                                   -------------------
+    /** Does it truncate date-time precision of condition value? */
+    protected boolean _datetimePrecisionTruncationOfCondition;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -3737,6 +3743,25 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             specifiedMap.put(tableAliasName, columnSet);
         }
         columnSet.add(columnInfo);
+    }
+
+    // [DBFlute-1.1.4]
+    // ===================================================================================
+    //                                                                 Date-time Precision
+    //                                                                 ===================
+    /** {@inheritDoc} */
+    public void enableDatetimePrecisionTruncationOfCondition() {
+        _datetimePrecisionTruncationOfCondition = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableDatetimePrecisionTruncationOfCondition() {
+        _datetimePrecisionTruncationOfCondition = false;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isDatetimePrecisionTruncationOfConditionEnabled() {
+        return _datetimePrecisionTruncationOfCondition;
     }
 
     // ===================================================================================

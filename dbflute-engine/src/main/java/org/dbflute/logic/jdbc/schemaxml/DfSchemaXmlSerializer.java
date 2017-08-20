@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.dbflute.DfBuildProperties;
+import org.dbflute.exception.DfJDBCException;
 import org.dbflute.exception.DfSchemaEmptyException;
 import org.dbflute.exception.DfTableDuplicateException;
 import org.dbflute.helper.StringKeyMap;
@@ -90,6 +92,8 @@ import org.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
 import org.dbflute.logic.jdbc.metadata.sequence.factory.DfSequenceExtractorFactory;
+import org.dbflute.logic.jdbc.metadata.supplement.DfDatetimePrecisionExtractor;
+import org.dbflute.logic.jdbc.metadata.supplement.factory.DfDatePrecisionExtractorFactory;
 import org.dbflute.logic.jdbc.metadata.synonym.DfSynonymExtractor;
 import org.dbflute.logic.jdbc.metadata.synonym.factory.DfSynonymExtractorFactory;
 import org.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
@@ -175,13 +179,10 @@ public class DfSchemaXmlSerializer {
     protected final DfAutoIncrementExtractor _autoIncrementExtractor = new DfAutoIncrementExtractor();
 
     // -----------------------------------------------------
-    //                                        Column Comment
-    //                                        --------------
-    protected Map<String, Map<String, UserColComments>> _columnCommentAllMap; // as temporary cache!
-
-    // -----------------------------------------------------
     //                                      Direct Meta Data
     //                                      ----------------
+    protected Map<UnifiedSchema, Map<String, Map<String, UserColComments>>> _columnCommentAllMap;
+    protected Map<UnifiedSchema, Map<String, Map<String, Integer>>> _datetimePrecisionAllMap;
     protected Map<String, String> _identityMap;
     protected Map<String, DfSynonymMeta> _supplementarySynonymInfoMap;
 
@@ -319,7 +320,7 @@ public class DfSchemaXmlSerializer {
             throw new IllegalStateException(msg, e);
         } catch (SQLException e) {
             String msg = "SQL exception when serializing SchemaXml: " + filePath;
-            throw new IllegalStateException(msg, e);
+            throw new IllegalStateException(msg, DfJDBCException.voice(e));
         } finally {
             if (writer != null) {
                 try {
@@ -514,19 +515,20 @@ public class DfSchemaXmlSerializer {
         final DfPrimaryKeyMeta pkInfo = getPrimaryColumnMetaInfo(metaData, tableMeta);
         final List<DfColumnMeta> columns = getColumns(metaData, tableMeta);
         for (int j = 0; j < columns.size(); j++) {
-            final DfColumnMeta columnInfo = columns.get(j);
+            final DfColumnMeta columnMeta = columns.get(j);
             final Element columnElement = _doc.createElement("column");
 
-            processColumnName(columnInfo, columnElement);
-            processColumnType(columnInfo, columnElement);
-            processColumnDbType(columnInfo, columnElement);
-            processColumnJavaType(columnInfo, columnElement);
-            processColumnSize(columnInfo, columnElement);
-            processRequired(columnInfo, columnElement);
-            processPrimaryKey(columnInfo, pkInfo, columnElement);
-            processColumnComment(columnInfo, columnElement);
-            processDefaultValue(columnInfo, columnElement);
-            processAutoIncrement(tableMeta, columnInfo, pkInfo, conn, columnElement);
+            processColumnName(columnMeta, columnElement);
+            processColumnType(columnMeta, columnElement);
+            processColumnDbType(columnMeta, columnElement);
+            processColumnJavaType(columnMeta, columnElement);
+            processColumnSize(columnMeta, columnElement);
+            processDatetimePrecision(columnMeta, columnElement);
+            processRequired(columnMeta, columnElement);
+            processPrimaryKey(columnMeta, pkInfo, columnElement);
+            processColumnComment(columnMeta, columnElement);
+            processDefaultValue(columnMeta, columnElement);
+            processAutoIncrement(tableMeta, columnMeta, pkInfo, conn, columnElement);
 
             tableElement.appendChild(columnElement);
         }
@@ -586,10 +588,17 @@ public class DfSchemaXmlSerializer {
         final int decimalDigits = columnMeta.getDecimalDigits();
         if (DfColumnExtractor.isColumnSizeValid(columnSize)) {
             if (DfColumnExtractor.isDecimalDigitsValid(decimalDigits)) {
-                columnElement.setAttribute("size", columnSize + ", " + decimalDigits);
+                columnElement.setAttribute("size", columnSize + ", " + decimalDigits); // e.g. "10, 3"
             } else {
-                columnElement.setAttribute("size", String.valueOf(columnSize));
+                columnElement.setAttribute("size", String.valueOf(columnSize)); // e.g. "10"
             }
+        }
+    }
+
+    protected void processDatetimePrecision(DfColumnMeta columnMeta, Element columnElement) {
+        final Integer datetimePrecision = columnMeta.getDatetimePrecision();
+        if (datetimePrecision != null && datetimePrecision > 0) { // avoid zero for compatible
+            columnElement.setAttribute("datetimePrecision", String.valueOf(datetimePrecision));
         }
     }
 
@@ -965,7 +974,7 @@ public class DfSchemaXmlSerializer {
     public List<DfTableMeta> getTableList(DatabaseMetaData dbMeta) throws SQLException {
         final UnifiedSchema mainSchema = _dataSource.getSchema();
         final List<DfTableMeta> tableList = _tableExtractor.getTableList(dbMeta, mainSchema);
-        helpTableComments(tableList, mainSchema);
+        helpTableBasicSupplement(tableList, mainSchema);
         resolveAdditionalSchema(dbMeta, tableList);
         assertDuplicateTable(tableList);
         // table names from meta data are used so basically it does not need it
@@ -1029,40 +1038,73 @@ public class DfSchemaXmlSerializer {
         final List<UnifiedSchema> schemaList = getDatabaseProperties().getAdditionalSchemaList();
         for (UnifiedSchema additionalSchema : schemaList) {
             final List<DfTableMeta> additionalTableList = _tableExtractor.getTableList(dbMeta, additionalSchema);
-            helpTableComments(additionalTableList, additionalSchema);
+            helpTableBasicSupplement(additionalTableList, additionalSchema);
             tableList.addAll(additionalTableList);
         }
     }
 
-    protected void helpTableComments(List<DfTableMeta> tableList, UnifiedSchema unifiedSchema) {
-        final DfDbCommentExtractor extractor = createDbCommentExtractor(unifiedSchema);
-        if (extractor != null) {
+    protected void helpTableBasicSupplement(List<DfTableMeta> tableList, UnifiedSchema unifiedSchema) {
+        doHelpTableComment(tableList, unifiedSchema);
+        doHelpTableDatePrecision(tableList, unifiedSchema);
+    }
+
+    protected void doHelpTableComment(List<DfTableMeta> tableList, UnifiedSchema unifiedSchema) {
+        final DfDbCommentExtractor dbCommentExtractor = createDbCommentExtractor(unifiedSchema);
+        if (dbCommentExtractor != null) {
             final Set<String> tableSet = new HashSet<String>();
             for (DfTableMeta table : tableList) {
                 tableSet.add(table.getTableName());
             }
             try {
-                final Map<String, UserTabComments> tableCommentMap = extractor.extractTableComment(tableSet);
+                final Map<String, UserTabComments> tableCommentMap = dbCommentExtractor.extractTableComment(tableSet);
                 for (DfTableMeta table : tableList) {
                     table.acceptTableComment(tableCommentMap);
 
                     // *Synonym Processing is after loading synonyms.
                 }
             } catch (RuntimeException ignored) {
-                _log.info("Failed to extract table comments: extractor=" + extractor, ignored);
+                _log.info("Failed to extract table comments: extractor=" + dbCommentExtractor, ignored);
             }
             try {
                 if (_columnCommentAllMap == null) {
-                    _columnCommentAllMap = extractor.extractColumnComment(tableSet);
-                } else {
-                    _columnCommentAllMap.putAll(extractor.extractColumnComment(tableSet)); // Merge
+                    _columnCommentAllMap = new LinkedHashMap<UnifiedSchema, Map<String, Map<String, UserColComments>>>();
                 }
-            } catch (RuntimeException ignored) {
-                _log.info("Failed to extract column comments: extractor=" + extractor, ignored);
+                final Map<String, Map<String, UserColComments>> columnCommentMap = _columnCommentAllMap.get(unifiedSchema);
+                final Map<String, Map<String, UserColComments>> extractedMap = dbCommentExtractor.extractColumnComment(tableSet);
+                if (columnCommentMap == null) {
+                    _columnCommentAllMap.put(unifiedSchema, extractedMap);
+                } else { // basically no way, schema is unique but just in case
+                    columnCommentMap.putAll(extractedMap); // merge
+                }
+            } catch (RuntimeException continued) {
+                _log.info("Failed to extract column comments: extractor=" + dbCommentExtractor, continued);
             }
         }
     }
 
+    protected void doHelpTableDatePrecision(List<DfTableMeta> tableList, UnifiedSchema unifiedSchema) {
+        final DfDatetimePrecisionExtractor datetimePrecisionExtractor = createDatetimePrecisionExtractor(unifiedSchema);
+        if (datetimePrecisionExtractor != null) {
+            final Set<String> tableSet = new HashSet<String>();
+            for (DfTableMeta table : tableList) {
+                tableSet.add(table.getTableName());
+            }
+            try {
+                if (_datetimePrecisionAllMap == null) {
+                    _datetimePrecisionAllMap = new LinkedHashMap<UnifiedSchema, Map<String, Map<String, Integer>>>();
+                }
+                final Map<String, Map<String, Integer>> datetimePrecisionMap = _datetimePrecisionAllMap.get(unifiedSchema);
+                final Map<String, Map<String, Integer>> extractedMap = datetimePrecisionExtractor.extractDatetimePrecisionMap(tableSet);
+                if (datetimePrecisionMap == null) {
+                    _datetimePrecisionAllMap.put(unifiedSchema, extractedMap);
+                } else { // basically no way, schema is unique but just in case
+                    datetimePrecisionMap.putAll(extractedMap); // merge
+                }
+            } catch (RuntimeException continued) {
+                _log.info("Failed to extract date-time precisions: extractor=" + datetimePrecisionExtractor, continued);
+            }
+        }
+    }
     // /= = = = = = = = = = = = = = = = = = = = = = = =
     // These should be executed after loading synonyms
     // = = = = = = = = = =/
@@ -1115,6 +1157,7 @@ public class DfSchemaXmlSerializer {
         List<DfColumnMeta> columnList = _columnExtractor.getColumnList(dbMeta, tableMeta);
         columnList = helpColumnAdjustment(dbMeta, tableMeta, columnList);
         helpColumnComments(tableMeta, columnList);
+        helpColumnDatetimePrecision(tableMeta, columnList);
         tableMeta.setLazyColumnMetaList(columnList);
         return columnList;
     }
@@ -1161,9 +1204,14 @@ public class DfSchemaXmlSerializer {
     protected void helpColumnComments(DfTableMeta tableMeta, List<DfColumnMeta> columnList) {
         if (_columnCommentAllMap != null) {
             final String tableName = tableMeta.getTableName();
-            final Map<String, UserColComments> columnCommentMap = _columnCommentAllMap.get(tableName);
-            for (DfColumnMeta column : columnList) {
-                column.acceptColumnComment(columnCommentMap);
+            final Map<String, Map<String, UserColComments>> tableMap = _columnCommentAllMap.get(tableMeta.getUnifiedSchema());
+            if (tableMap != null) { // just in case
+                final Map<String, UserColComments> columnCommentMap = tableMap.get(tableName);
+                if (columnCommentMap != null) { // just in case
+                    for (DfColumnMeta column : columnList) {
+                        column.acceptColumnComment(columnCommentMap);
+                    }
+                }
             }
         }
         helpSynonymColumnComments(tableMeta, columnList);
@@ -1177,6 +1225,21 @@ public class DfSchemaXmlSerializer {
                     final UserColComments userColComments = synonym.getColumnCommentMap().get(column.getColumnName());
                     if (userColComments != null && userColComments.hasComments()) {
                         column.setColumnComment(userColComments.getComments());
+                    }
+                }
+            }
+        }
+    }
+
+    protected void helpColumnDatetimePrecision(DfTableMeta tableMeta, List<DfColumnMeta> columnList) {
+        if (_datetimePrecisionAllMap != null) {
+            final String tableName = tableMeta.getTableName();
+            final Map<String, Map<String, Integer>> tableMap = _datetimePrecisionAllMap.get(tableMeta.getUnifiedSchema());
+            if (tableMap != null) { // just in case
+                final Map<String, Integer> datetimePrecisionMap = tableMap.get(tableName);
+                if (datetimePrecisionMap != null) { // just in case
+                    for (DfColumnMeta column : columnList) {
+                        column.acceptDatetimePrecision(datetimePrecisionMap);
                     }
                 }
             }
@@ -1425,6 +1488,15 @@ public class DfSchemaXmlSerializer {
 
     protected DfDbCommentExtractorFactory createDbCommentExtractorFactory(UnifiedSchema unifiedSchema) {
         return new DfDbCommentExtractorFactory(_dataSource, unifiedSchema, getDatabaseTypeFacadeProp());
+    }
+
+    protected DfDatetimePrecisionExtractor createDatetimePrecisionExtractor(UnifiedSchema unifiedSchema) {
+        final DfDatePrecisionExtractorFactory factory = createDatePrecisionExtractorFactory(unifiedSchema);
+        return factory.createDatetimePrecisionExtractor();
+    }
+
+    protected DfDatePrecisionExtractorFactory createDatePrecisionExtractorFactory(UnifiedSchema unifiedSchema) {
+        return new DfDatePrecisionExtractorFactory(_dataSource, unifiedSchema, getDatabaseTypeFacadeProp());
     }
 
     protected DfIdentityExtractor createIdentityExtractor() {

@@ -93,7 +93,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                        Service Name
     //                                                                        ============
-    protected String findServiceName(final Map<String, Object> lastafluteMap) {
+    protected String findServiceName(Map<String, Object> lastafluteMap) {
         return (String) lastafluteMap.get("serviceName");
     }
 
@@ -112,7 +112,17 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
             throw new DfIllegalPropertySettingException("The property 'domainPackage' is required: " + lastafluteMap.keySet());
         }
         final String lastaDocDir = getLastaDocOutputDirectory();
-        newFreeGenReflector(freeGenMap, serviceName, domainPackage).reflectFrom(lastafluteMap, lastaDocDir);
+        final DfLastaFluteFreeGenReflector reflector = createFreeGenReflector(lastafluteMap, freeGenMap, serviceName, domainPackage);
+        reflector.reflectFrom(lastafluteMap, lastaDocDir);
+    }
+
+    protected DfLastaFluteFreeGenReflector createFreeGenReflector(Map<String, Object> lastafluteMap, Map<String, Object> freeGenMap,
+            String serviceName, String domainPackage) {
+        final DfLastaFluteFreeGenReflector reflector = newFreeGenReflector(freeGenMap, serviceName, domainPackage);
+        if (isProperty("isUseDefaultConfigAtGeneration", false, lastafluteMap)) {
+            reflector.useDefaultConfigAtGeneration();
+        }
+        return reflector;
     }
 
     protected DfLastaFluteFreeGenReflector newFreeGenReflector(Map<String, Object> freeGenMap, String serviceName, String domainPackage) {

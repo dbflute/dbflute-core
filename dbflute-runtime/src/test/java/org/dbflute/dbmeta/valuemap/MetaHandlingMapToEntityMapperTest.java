@@ -67,7 +67,7 @@ public class MetaHandlingMapToEntityMapperTest extends RuntimeTestCase {
         public String code() {
             return null;
         }
-        
+
         public Set<String> sisterSet() {
             return DfCollectionUtil.emptySet();
         }
