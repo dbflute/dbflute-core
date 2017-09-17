@@ -68,7 +68,7 @@ $manager.htmlEscape($actionDocMeta.url)
 <p class="docsubitem">
 <span class="docsubtitle">annotations:</span>
 #foreach($annotation in $actionDocMeta.annotationList)
-<span class="docannotations docsubvalue">&#64;${annotation}</span>
+<span class="docannotations docsubvalue">&#64;$!manager.htmlEscape(${annotation})</span>
 #end
 </p>
 #end
