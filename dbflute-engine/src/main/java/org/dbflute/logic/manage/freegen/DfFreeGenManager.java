@@ -15,6 +15,9 @@
  */
 package org.dbflute.logic.manage.freegen;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.apache.velocity.texen.util.FileUtil;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.friends.velocity.DfGenerator;
@@ -106,7 +109,16 @@ public class DfFreeGenManager {
     //                                                                      Resolve Helper
     //                                                                      ==============
     public String htmlEscape(String text) { // made from lasta-doc
-        return resolveTextForSchemaHtml(text);
+        return resolveTextForSchemaHtml(text); // borrow it
+    }
+
+    public String htmlEscapeAsId(String text) { // made from lasta-doc
+        final Map<String, String> fromToMap = new LinkedHashMap<String, String>();
+        fromToMap.put("/", "."); // e.g. sea/land => sea.land
+        fromToMap.put("{", "_b_"); // e.g. sea/{land} => sea._b_land_e_ (begin/end)
+        fromToMap.put("}", "_e_");
+        fromToMap.put("$", "_d_"); // e.g. get$index => get_d_index  (dollar)
+        return Srl.replaceBy(htmlEscape(text), fromToMap);
     }
 
     public String resolveTextForSchemaHtml(String text) { // public for compatible

@@ -36,7 +36,7 @@
 #foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
     <tr>
         <td class="rowcellnum">${foreach.count}</td>
-        <td class="rowcell"><a href="#$manager.htmlEscape($actionDocMeta.url)">$manager.htmlEscape($actionDocMeta.url)</a></td>
+        <td class="rowcell"><a href="#$manager.htmlEscapeAsId($actionDocMeta.url)::$manager.htmlEscapeAsId($actionDocMeta.methodName)">$manager.htmlEscape($actionDocMeta.url)</a></td>
         <td class="rowcell">$!manager.htmlEscape($actionDocMeta.description)</td>
         <td class="rowcell"><span title="$manager.htmlEscape($actionDocMeta.typeName)">$manager.htmlEscape($actionDocMeta.simpleTypeName)</span>#${actionDocMeta.methodName}()</td>
         <td class="rowcell">
@@ -58,7 +58,7 @@
 </table>
 
 #foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
-<h3 id="$manager.htmlEscape($actionDocMeta.url)">
+<h3 id="$manager.htmlEscapeAsId($actionDocMeta.url)::$manager.htmlEscapeAsId($actionDocMeta.methodName)">
 $manager.htmlEscape($actionDocMeta.url)
 </h3>
 <p>
