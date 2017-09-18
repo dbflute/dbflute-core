@@ -15,7 +15,7 @@
 ##
 #set ($manager = $selector.propertiesHtmlManager)
 <!DOCTYPE html>
-<html>
+<html lang="en"> <!-- main language (to avoid HTML validator) -->
 <head>
 	<meta charset="UTF-8" />
 #if ($manager.hasTitle())
