@@ -25,7 +25,7 @@
         <th>parameter count</th>
     </tr>
     </thead>
-    <tbody id="table-list-body">
+    <tbody id="mail-list-body">
 #foreach ($mail in $mailList)
     <tr>
         <td class="rowcellnum">${foreach.count}</td>

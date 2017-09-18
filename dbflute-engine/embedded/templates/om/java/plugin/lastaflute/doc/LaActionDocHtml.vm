@@ -32,7 +32,7 @@
         <th>method lines</th>
     </tr>
     </thead>
-    <tbody id="table-list-body">
+    <tbody id="action-list-body">
 #foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
     <tr>
         <td class="rowcellnum">${foreach.count}</td>
