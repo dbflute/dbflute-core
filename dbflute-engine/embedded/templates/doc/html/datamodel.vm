@@ -554,7 +554,17 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 #set ($diagramPath = "${selector.getSchemaDiagramPath($schemaHtmlKey)}")
 <h3>${schemaHtmlKey}</h3>
 <p>
-	<a href="${diagramPath}"><img src="${diagramPath}" alt="ER Diagram" width="${selector.getSchemaDiagramWidth($schemaHtmlKey)}" height="${selector.getSchemaDiagramHeight($schemaHtmlKey)}"/></a>
+	<a href="${diagramPath}">
+		<img src="${diagramPath}"
+			alt="ER Diagram"
+#if ($selector.hasSchemaDiagramWidth($schemaHtmlKey))
+			width="${selector.getSchemaDiagramWidth($schemaHtmlKey)}"
+#end
+#if ($selector.hasSchemaDiagramHeight($schemaHtmlKey))
+			height="${selector.getSchemaDiagramHeight($schemaHtmlKey)}"
+#end
+		/>
+	</a>
 </p>
 #end
 #end

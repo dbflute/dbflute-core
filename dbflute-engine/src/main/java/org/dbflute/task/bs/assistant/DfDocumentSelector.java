@@ -299,8 +299,16 @@ public class DfDocumentSelector {
         return getDocumentProperties().getSchemaDiagramPath(key);
     }
 
+    public boolean hasSchemaDiagramWidth(String key) {
+        return getDocumentProperties().hasSchemaDiagramWidth(key);
+    }
+
     public String getSchemaDiagramWidth(String key) {
         return getDocumentProperties().getSchemaDiagramWidth(key);
+    }
+
+    public boolean hasSchemaDiagramHeight(String key) {
+        return getDocumentProperties().hasSchemaDiagramHeight(key);
     }
 
     public String getSchemaDiagramHeight(String key) {
