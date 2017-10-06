@@ -18,6 +18,9 @@ package org.dbflute.logic.manage.freegen;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
 import org.apache.velocity.texen.util.FileUtil;
 import org.dbflute.DfBuildProperties;
 import org.dbflute.friends.velocity.DfGenerator;
@@ -148,6 +151,13 @@ public class DfFreeGenManager {
 
     public String decamelize(String camelName) {
         return Srl.decamelize(camelName);
+    }
+
+    // ===================================================================================
+    //                                                                       Script Helper
+    //                                                                       =============
+    public ScriptEngine createJavaScriptEngine() { // e.g. remote-api generate
+        return new ScriptEngineManager().getEngineByName("JavaScript");
     }
 
     // ===================================================================================

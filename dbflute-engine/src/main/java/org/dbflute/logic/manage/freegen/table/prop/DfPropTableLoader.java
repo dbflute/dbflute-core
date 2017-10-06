@@ -81,9 +81,9 @@ public class DfPropTableLoader implements DfFreeGenTableLoader {
             return null; // unreachable
         }
         final String resourceFile = resource.getResourceFile();
-        final String tableName = buildTableName(resourceFile);
+        final String tableName = buildTableName(resourceFile); // #for_now used?
         final List<Map<String, Object>> columnList = toMapList(result, tableMap);
-        return new DfFreeGenMetaData(tableMap, tableName, columnList);
+        return DfFreeGenMetaData.asOnlyOne(tableMap, tableName, columnList);
     }
 
     protected void throwFreeGenPropReadFailureException(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,

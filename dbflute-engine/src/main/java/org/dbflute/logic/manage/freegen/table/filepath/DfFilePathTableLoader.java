@@ -23,8 +23,8 @@ import java.util.Map;
 import org.dbflute.helper.filesystem.FileHierarchyTracer;
 import org.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
-import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
+import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfNameHintUtil;
@@ -91,7 +91,7 @@ public class DfFilePathTableLoader implements DfFreeGenTableLoader {
             }
             columnList.add(columnMap);
         }
-        return new DfFreeGenMetaData(tableMap, "unused", columnList);
+        return DfFreeGenMetaData.asOnlyOne(tableMap, "unused", columnList);
     }
 
     protected String[] extractTargetExt(Map<String, Object> tableMap) {

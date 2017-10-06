@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
-import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
+import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.util.Srl;
 
@@ -63,7 +63,7 @@ public class DfJsonKeyTableLoader implements DfFreeGenTableLoader {
 
         final String tableName = buildTableName(resourceFile);
         final List<Map<String, Object>> columnList = setupColumnList(requestName, resource, keyList);
-        return new DfFreeGenMetaData(tableMap, tableName, columnList);
+        return DfFreeGenMetaData.asOnlyOne(tableMap, tableName, columnList);
     }
 
     protected String buildTableName(final String resourceFile) {

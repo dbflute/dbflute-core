@@ -30,8 +30,8 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.helper.io.xls.DfXlsFactory;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
-import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
+import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenLazyReflector;
 import org.dbflute.logic.manage.freegen.reflector.DfFreeGenMethodConverter;
@@ -136,7 +136,7 @@ public class DfXlsTableLoader implements DfFreeGenTableLoader {
             }
         }
         final String tableName = sheetName; // basically unused, also for compatible
-        return new DfFreeGenMetaData(tableMap, tableName, columnList);
+        return DfFreeGenMetaData.asOnlyOne(tableMap, tableName, columnList);
     }
 
     protected boolean processColumnValue(final String requestName, final Map<String, String> columnMap, final Row row,

@@ -22,6 +22,7 @@ import org.dbflute.logic.manage.freegen.table.appcls.DfAppClsTableLoader;
 import org.dbflute.logic.manage.freegen.table.appcls.DfWebClsTableLoader;
 import org.dbflute.logic.manage.freegen.table.elasticsearch.DfElasticsearchTableLoader;
 import org.dbflute.logic.manage.freegen.table.filepath.DfFilePathTableLoader;
+import org.dbflute.logic.manage.freegen.table.json.DfJsonGeneralTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonKeyTableLoader;
 import org.dbflute.logic.manage.freegen.table.json.DfJsonSchemaTableLoader;
 import org.dbflute.logic.manage.freegen.table.lastaflute.DfLastaDocTableLoader;
@@ -29,6 +30,7 @@ import org.dbflute.logic.manage.freegen.table.mailflute.DfMailFluteTableLoader;
 import org.dbflute.logic.manage.freegen.table.pmfile.DfPmFileTableLoader;
 import org.dbflute.logic.manage.freegen.table.prop.DfPropTableLoader;
 import org.dbflute.logic.manage.freegen.table.solr.DfSolrXmlTableLoader;
+import org.dbflute.logic.manage.freegen.table.swagger.DfSwaggerTableLoader;
 import org.dbflute.logic.manage.freegen.table.xls.DfXlsTableLoader;
 
 /**
@@ -36,7 +38,10 @@ import org.dbflute.logic.manage.freegen.table.xls.DfXlsTableLoader;
  */
 public enum DfFreeGenResourceType {
 
-    PROP, XLS, FILE_PATH, JSON_KEY, JSON_SCHEMA, SOLR, ELASTICSEARCH, MAIL_FLUTE, PM_FILE, LASTA_DOC, APP_CLS, WEB_CLS;
+    PROP, XLS, FILE_PATH, JSON_GENERAL, JSON_KEY, JSON_SCHEMA // general
+    , SOLR, ELASTICSEARCH, SWAGGER // product
+    , MAIL_FLUTE, PM_FILE, LASTA_DOC, APP_CLS, WEB_CLS // lastaflute
+    ;
 
     public static final Map<DfFreeGenResourceType, DfFreeGenTableLoader> tableLoaderMap;
     static {
@@ -44,10 +49,12 @@ public enum DfFreeGenResourceType {
         tableLoaderMap.put(DfFreeGenResourceType.PROP, new DfPropTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.XLS, new DfXlsTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.FILE_PATH, new DfFilePathTableLoader());
+        tableLoaderMap.put(DfFreeGenResourceType.JSON_GENERAL, new DfJsonGeneralTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.JSON_KEY, new DfJsonKeyTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.JSON_SCHEMA, new DfJsonSchemaTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.SOLR, new DfSolrXmlTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.ELASTICSEARCH, new DfElasticsearchTableLoader());
+        tableLoaderMap.put(DfFreeGenResourceType.SWAGGER, new DfSwaggerTableLoader());
         tableLoaderMap.put(DfFreeGenResourceType.MAIL_FLUTE, new DfMailFluteTableLoader(false));
         tableLoaderMap.put(DfFreeGenResourceType.PM_FILE, new DfPmFileTableLoader(false));
         tableLoaderMap.put(DfFreeGenResourceType.LASTA_DOC, new DfLastaDocTableLoader());

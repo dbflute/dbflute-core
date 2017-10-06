@@ -114,7 +114,7 @@ public class DfJsonSchemaLoadingAgent {
         }
         reflectLazyProcess();
         prepareFinalDetermination(schemaMap);
-        return new DfFreeGenMetaData(tableMap, schemaMap);
+        return DfFreeGenMetaData.asMultiple(tableMap, schemaMap);
     }
 
     protected void prepareFinalDetermination(final Map<String, Map<String, Object>> schemaMap) {

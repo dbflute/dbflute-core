@@ -30,8 +30,8 @@ import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.helper.mapstring.MapListFile;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
-import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
+import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfClassificationProperties;
@@ -78,7 +78,8 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
     // }
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> optionMap = mapProp.getOptionMap();
-        final String resourceFile = this.docProcess ? (String) mapProp.getOptionMap().get("webclsResourceFile") : resource.getResourceFile();
+        final String resourceFile =
+                this.docProcess ? (String) mapProp.getOptionMap().get("webclsResourceFile") : resource.getResourceFile();
         final Map<String, Object> webclsMap;
         try {
             webclsMap = new MapListFile().readMap(new FileInputStream(resourceFile));
@@ -130,7 +131,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
         }).collect(Collectors.toList()));
         optionMap.put("hasRefCls", hasRefCls);
         optionMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
-        return new DfFreeGenMetaData(optionMap, "webcls", Collections.emptyList());
+        return DfFreeGenMetaData.asOnlyOne(optionMap, "webcls", Collections.emptyList());
     }
 
     protected boolean isElementMapClassificationTop(Map<String, Object> elementMap) {

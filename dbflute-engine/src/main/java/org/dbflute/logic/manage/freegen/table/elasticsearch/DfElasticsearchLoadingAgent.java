@@ -149,7 +149,7 @@ public class DfElasticsearchLoadingAgent {
         }
         reflectLazyProcess();
         prepareFinalDetermination(schemaMap);
-        return new DfFreeGenMetaData(tableMap, schemaMap);
+        return DfFreeGenMetaData.asMultiple(tableMap, schemaMap);
     }
 
     protected DfESFluteProperties getESFluteProperties() {

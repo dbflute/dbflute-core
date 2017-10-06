@@ -35,8 +35,8 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
 import org.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
-import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
+import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectAssist;
 import org.dbflute.logic.sql2entity.analyzer.DfParameterAutoDetectBindNode;
@@ -119,13 +119,12 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
         final String targetExt = extractTargetExt(tableMap);
         final String targetKeyword = extractTargetKeyword(tableMap);
         final List<String> exceptPathList = extractExceptPathList(tableMap);
-
         final Map<String, Map<String, Object>> schemaMap = doLoad(targetDir, targetExt, targetKeyword, exceptPathList, tableMap);
-        return new DfFreeGenMetaData(tableMap, schemaMap);
+        return DfFreeGenMetaData.asMultiple(tableMap, schemaMap);
     }
 
-    protected Map<String, Map<String, Object>> doLoad(String targetDir, String targetExt, String targetKeyword,
-            List<String> exceptPathList, Map<String, Object> tableMap) {
+    protected Map<String, Map<String, Object>> doLoad(String targetDir, String targetExt, String targetKeyword, List<String> exceptPathList,
+            Map<String, Object> tableMap) {
         final List<File> fileList = DfCollectionUtil.newArrayList();
         final File baseDir = new File(targetDir);
         collectFile(fileList, targetExt, targetKeyword, exceptPathList, baseDir);

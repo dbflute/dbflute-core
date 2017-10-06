@@ -37,21 +37,41 @@ public class DfFreeGenMetaData {
     //                                                                         Constructor
     //                                                                         ===========
     // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-    // only-one table : tableMap, tableName, columnList 
-    // multiple table : tableMap, schemaMap
+    // only-one table : optionMap, tableName, columnList 
+    // multiple table : optionMap, schemaMap
+    // flexible table : optionMap
     // _/_/_/_/_/_/_/_/_/_/
-    public DfFreeGenMetaData(Map<String, Object> optionMap, String tableName, List<Map<String, Object>> columnList) {
+    protected DfFreeGenMetaData(Map<String, Object> optionMap, String tableName, List<Map<String, Object>> columnList) { // only-one
         _optionMap = optionMap;
         _tableName = tableName;
         _columnList = columnList;
         _schemaMap = DfCollectionUtil.emptyMap();
     }
 
-    public DfFreeGenMetaData(Map<String, Object> optionMap, Map<String, Map<String, Object>> schemaMap) {
+    public static DfFreeGenMetaData asOnlyOne(Map<String, Object> optionMap, String tableName, List<Map<String, Object>> columnList) {
+        return new DfFreeGenMetaData(optionMap, tableName, columnList);
+    }
+
+    protected DfFreeGenMetaData(Map<String, Object> optionMap, Map<String, Map<String, Object>> schemaMap) { // multiple
         _optionMap = optionMap;
         _tableName = null;
         _columnList = DfCollectionUtil.emptyList();
         _schemaMap = schemaMap;
+    }
+
+    public static DfFreeGenMetaData asMultiple(Map<String, Object> optionMap, Map<String, Map<String, Object>> schemaMap) {
+        return new DfFreeGenMetaData(optionMap, schemaMap);
+    }
+
+    protected DfFreeGenMetaData(Map<String, Object> optionMap) { // flexible
+        _optionMap = optionMap;
+        _tableName = "unused";
+        _columnList = DfCollectionUtil.emptyList();
+        _schemaMap = DfCollectionUtil.emptyMap();
+    }
+
+    public static DfFreeGenMetaData asFlexible(Map<String, Object> optionMap) {
+        return new DfFreeGenMetaData(optionMap);
     }
 
     // ===================================================================================
