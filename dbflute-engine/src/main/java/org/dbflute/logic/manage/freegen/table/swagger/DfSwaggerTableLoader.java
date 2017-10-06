@@ -37,10 +37,8 @@ public class DfSwaggerTableLoader implements DfFreeGenTableLoader {
     //     ; resourceFile = ../../.../swagger.json
     // }
     // ; outputMap = map:{
-    //     ; templateFile = unused
     //     ; outputDirectory = ../src/main/java
     //     ; package = org.dbflute...
-    //     ; className = unused
     // }
     // ; optionMap = map:{
     //     ; ...
