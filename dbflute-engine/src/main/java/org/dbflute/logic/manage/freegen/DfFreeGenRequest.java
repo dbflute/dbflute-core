@@ -66,6 +66,10 @@ public class DfFreeGenRequest {
         return DfFreeGenResourceType.FILE_PATH.equals(_resource.getResourceType());
     }
 
+    public boolean isResourceTypeJsonGeneral() {
+        return DfFreeGenResourceType.JSON_GENERAL.equals(_resource.getResourceType());
+    }
+
     public boolean isResourceTypeJsonKey() {
         return DfFreeGenResourceType.JSON_KEY.equals(_resource.getResourceType());
     }
@@ -80,6 +84,10 @@ public class DfFreeGenRequest {
 
     public boolean isResourceTypeElasticsearch() {
         return DfFreeGenResourceType.ELASTICSEARCH.equals(_resource.getResourceType());
+    }
+
+    public boolean isResourceTypeSwagger() {
+        return DfFreeGenResourceType.SWAGGER.equals(_resource.getResourceType());
     }
 
     public boolean isResourceTypeMailFlute() {
