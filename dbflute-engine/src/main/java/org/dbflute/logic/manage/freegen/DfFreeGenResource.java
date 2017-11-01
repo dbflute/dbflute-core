@@ -61,6 +61,10 @@ public class DfFreeGenResource {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public String getBaseDir() {
+        return _baseDir;
+    }
+
     public DfFreeGenResourceType getResourceType() {
         return _resourceType;
     }
@@ -79,9 +83,5 @@ public class DfFreeGenResource {
 
     public String getEncoding() {
         return _encoding;
-    }
-
-    public String getBaseDir() {
-        return _baseDir;
     }
 }
