@@ -152,7 +152,8 @@ public class DfFreeGenRequest {
     // -----------------------------------------------------
     //                                              Resource
     //                                              --------
-    public DfFreeGenResource getResource() { // not null (basically unneeded to be called from template)
+    public DfFreeGenResource getResource() { // not null
+        // basically unneeded to be called from template but it may be used for resolveBaseDir()
         return _resource;
     }
 
