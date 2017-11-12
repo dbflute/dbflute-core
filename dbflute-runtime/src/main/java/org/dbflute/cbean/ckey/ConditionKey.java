@@ -42,6 +42,7 @@ import org.dbflute.exception.IllegalConditionBeanOperationException;
 /**
  * The abstract class of condition-key.
  * @author jflute
+ * @author h-funaki modified resolveCompoundColumn() to be able to treat coalesce option.
  */
 public abstract class ConditionKey implements Serializable {
 
