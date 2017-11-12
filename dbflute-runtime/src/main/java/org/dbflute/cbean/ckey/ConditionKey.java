@@ -449,10 +449,19 @@ public abstract class ConditionKey implements Serializable {
         }
         final List<SpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
         final List<ColumnRealName> realNameList = new ArrayList<ColumnRealName>();
-        realNameList.add(baseRealName); // already cipher
-        for (SpecifiedColumn specifiedColumn : compoundColumnList) {
-            realNameList.add(doResolveCompoundColumn(option, specifiedColumn));
+        if (option.treatsCompoundColumnNullAsEmpty()) {
+            realNameList.add(toColumnRealName("coalesce(" + baseRealName + ",\'\')"));
+            for (SpecifiedColumn specifiedColumn : compoundColumnList) {
+                realNameList.add(toColumnRealName("coalesce(" + doResolveCompoundColumn(option, specifiedColumn) + ",\'\')"));
+            }
+        } else {
+            realNameList.add(baseRealName); // already cipher
+            for (SpecifiedColumn specifiedColumn : compoundColumnList) {
+                ColumnRealName resolvedColumnRealName = doResolveCompoundColumn(option, specifiedColumn);
+                realNameList.add(resolvedColumnRealName);      
+            }  
         }
+        
         final OnQueryStringConnector stringConnector = option.getStringConnector();
         final String connected = stringConnector.connect(realNameList.toArray());
         return ColumnRealName.create(null, new ColumnSqlName(connected));

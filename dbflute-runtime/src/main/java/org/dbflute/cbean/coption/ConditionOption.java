@@ -26,6 +26,7 @@ import org.dbflute.dbway.OnQueryStringConnector;
 /**
  * The interface of condition-option.
  * @author jflute
+ * @author h-funaki added treatsCompoundColumnNullAsEmpty()
  */
 public interface ConditionOption {
 
@@ -46,6 +47,14 @@ public interface ConditionOption {
      * @return The list of specified column. (NotNull, EmptyAllowed)
      */
     List<SpecifiedColumn> getCompoundColumnList();
+    
+    /**
+     * Does the option treat null as empty when compounding columns?
+     * @return The determination, true or false.
+     */
+    default boolean treatsCompoundColumnNullAsEmpty() {
+        return false;
+    };
 
     /**
      * Does the option have string connector basically for compound columns?
