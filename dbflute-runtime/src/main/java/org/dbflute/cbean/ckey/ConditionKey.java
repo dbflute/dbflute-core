@@ -450,22 +450,20 @@ public abstract class ConditionKey implements Serializable {
         }
         final List<SpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
         final List<ColumnRealName> realNameList = new ArrayList<ColumnRealName>();
-        if (option.isNullCompoundedAsEmpty()) {
-            realNameList.add(toColumnRealName("coalesce(" + baseRealName + ",\'\')"));            
-        } else {
-            realNameList.add(baseRealName); // already cipher            
-        }
+        realNameList.add(resolveCompoundColumnOption(option, baseRealName));        
         for (SpecifiedColumn specifiedColumn : compoundColumnList) {
-            if (option.isNullCompoundedAsEmpty()) {
-                realNameList.add(toColumnRealName("coalesce(" + doResolveCompoundColumn(option, specifiedColumn) + ",\'\')"));
-            } else {
-                realNameList.add(doResolveCompoundColumn(option, specifiedColumn));
-            }
+            realNameList.add(resolveCompoundColumnOption(option, doResolveCompoundColumn(option, specifiedColumn)));
         }
-        
         final OnQueryStringConnector stringConnector = option.getStringConnector();
         final String connected = stringConnector.connect(realNameList.toArray());
         return ColumnRealName.create(null, new ColumnSqlName(connected));
+    }
+    
+    protected ColumnRealName resolveCompoundColumnOption(ConditionOption option, ColumnRealName columnRealName) {
+        if (option.isNullCompoundedAsEmpty()) {
+            return toColumnRealName("coalesce(" + columnRealName + ",\'\')");
+        }
+        return columnRealName;
     }
 
     protected ColumnRealName doResolveCompoundColumn(ConditionOption option, SpecifiedColumn specifiedColumn) {
