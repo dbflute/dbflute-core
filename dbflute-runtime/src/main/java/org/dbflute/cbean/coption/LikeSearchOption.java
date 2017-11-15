@@ -56,7 +56,7 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     protected List<String> _originalWildCardList;
     protected List<SpecifiedColumn> _compoundColumnList;
     protected List<Integer> _compoundColumnSizeList;
-    protected boolean _treatCompoundColumnNullAsEmpty;
+    protected boolean _isNullcompoundedAsEmpty;
     protected OnQueryStringConnector _stringConnector;
     protected GearedCipherManager _cipherManager;;
 
@@ -330,13 +330,13 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
         return _compoundColumnList;
     }
 
-    public void setCompoundColumnNullAsEmpty() {
-      _treatCompoundColumnNullAsEmpty = true;
+    public void compoundsNullAsEmpty() {
+        _isNullcompoundedAsEmpty = true;
     }
     
     @Override
-    public boolean treatsCompoundColumnNullAsEmpty() {
-      return _treatCompoundColumnNullAsEmpty;
+    public boolean isNullCompoundedAsEmpty() {
+      return _isNullcompoundedAsEmpty;
     }
 
     public void clearCompoundColumn() {

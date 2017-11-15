@@ -52,7 +52,7 @@ public interface ConditionOption {
      * Does the option treat null as empty when compounding columns?
      * @return The determination, true or false.
      */
-    default boolean treatsCompoundColumnNullAsEmpty() {
+    default boolean isNullCompoundedAsEmpty() {
         return false;
     };
 
