@@ -36,6 +36,7 @@ import org.dbflute.util.DfTypeUtil;
  *  new LikeSearchOption().likeSuffix()  : SuffixSearch
  * </pre>
  * @author jflute
+ * @author h-funaki added setCompoundColumnNullAsEmpty()
  */
 public class LikeSearchOption extends SimpleStringOption implements FilteringBindOption {
 
@@ -55,6 +56,7 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     protected List<String> _originalWildCardList;
     protected List<SpecifiedColumn> _compoundColumnList;
     protected List<Integer> _compoundColumnSizeList;
+    protected boolean _nullCompoundedAsEmpty;
     protected OnQueryStringConnector _stringConnector;
     protected GearedCipherManager _cipherManager;;
 
@@ -282,6 +284,10 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
      *  LikeSearchOption option = new LikeSearchOption().likeContain()
      *      .<span style="color: #CC4747">addCompoundColumn</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnMemberAccount());
      *  cb.query().setMemberName_LikeSearch("S", option);
+     * 
+     * If any selected value is null, the compounded value is also null as default (even others are not null).
+     * If some of compounded columns are allowed to be null, 
+     * setCompoundColumnNullAsEmpty() is recommended as LikeSearchOption.
      * </pre>
      * @param compoundColumn The compound column specified by Dream Cruise. (NotNull)
      * @return this. (NotNull)
@@ -322,6 +328,15 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     @Override
     public List<SpecifiedColumn> getCompoundColumnList() {
         return _compoundColumnList;
+    }
+
+    public void compoundsNullAsEmpty() {
+        _nullCompoundedAsEmpty = true;
+    }
+    
+    @Override
+    public boolean isNullCompoundedAsEmpty() {
+      return _nullCompoundedAsEmpty;
     }
 
     public void clearCompoundColumn() {
