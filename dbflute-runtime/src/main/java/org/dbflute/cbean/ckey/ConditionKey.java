@@ -450,23 +450,23 @@ public abstract class ConditionKey implements Serializable {
         }
         final List<SpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
         final List<ColumnRealName> realNameList = new ArrayList<ColumnRealName>();
-        realNameList.add(resolveCompoundColumnOption(option, baseRealName));        
+        realNameList.add(doResolveCompoundColumnOption(option, baseRealName)); // already cipher    
         for (SpecifiedColumn specifiedColumn : compoundColumnList) {
-            realNameList.add(resolveCompoundColumnOption(option, doResolveCompoundColumn(option, specifiedColumn)));
+            realNameList.add(doResolveCompoundColumnOption(option, doResolveCompoundColumnCipher(option, specifiedColumn)));
         }
         final OnQueryStringConnector stringConnector = option.getStringConnector();
         final String connected = stringConnector.connect(realNameList.toArray());
         return ColumnRealName.create(null, new ColumnSqlName(connected));
     }
     
-    protected ColumnRealName resolveCompoundColumnOption(ConditionOption option, ColumnRealName columnRealName) {
+    protected ColumnRealName doResolveCompoundColumnOption(ConditionOption option, ColumnRealName columnRealName) {
         if (option.isNullCompoundedAsEmpty()) {
             return toColumnRealName("coalesce(" + columnRealName + ",\'\')");
         }
         return columnRealName;
     }
 
-    protected ColumnRealName doResolveCompoundColumn(ConditionOption option, SpecifiedColumn specifiedColumn) {
+    protected ColumnRealName doResolveCompoundColumnCipher(ConditionOption option, SpecifiedColumn specifiedColumn) {
         final GearedCipherManager cipherManager = option.getGearedCipherManager();
         final ColumnRealName specifiedName = specifiedColumn.toColumnRealName();
         if (cipherManager != null && !specifiedColumn.isDerived()) {
