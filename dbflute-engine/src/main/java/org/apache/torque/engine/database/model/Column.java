@@ -690,6 +690,12 @@ public class Column {
         return comment != null ? comment : "";
     }
 
+    public String getCommentForSchemaHtmlPre() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.resolvePreTextForSchemaHtml(getComment());
+        return comment != null ? comment : "";
+    }
+
     public boolean isCommentForJavaDocValid() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         return hasComment() && prop.isEntityJavaDocDbCommentValid();
