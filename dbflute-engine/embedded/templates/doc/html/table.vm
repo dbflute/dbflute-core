@@ -29,6 +29,7 @@ ${table.aliasExpression}${table.tableDispName}
 #set ($hasDefaultValue = $table.hasDefaultValueExceptAutoIncrement())
 #set ($hasColumnComment = $table.hasColumnComment())
 #set ($canBeColumnNullObject = $table.canBeColumnNullObject())
+<input type="hidden" value="${table.tableDbName}">
 <table class="tablecontent">
 	<thead>
 	<tr>

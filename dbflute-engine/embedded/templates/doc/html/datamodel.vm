@@ -979,15 +979,35 @@ searcher.init();
  * @author deco
  */
 function Decomment() {
-	this.embeddedPickup = {}; // setup from dbflute if decomment pickup exists
-	this.pickupStore = {}; // store of comment info
+	// setup from dbflute if decomment pickup exists
+	this.embeddedPickup = {};
+	// store of comment info
+	// object structure
 	// {
 	//   tableName: {
-	//     columnName: {
-	//       propetyName: propertyValue
-	//     }, { ... }
+	//     propertyName: propertyValue,
+	//     columns: {
+	//       columnName: {
+	//         propetyName: propertyValue
+	//       }, { ... }
+	//     }
 	//   }, { ... }
 	// }
+	this.pickupStore = {
+	#foreach ($table in $database.tableDisplaySortedList)
+	## decomment uses display name so fix later
+		#if ($velocityCount > 1), #end'${table.tableDbName}': {
+			'databaseComment': '${table.commentForSchemaHtml}'
+			, 'columns': {
+	#foreach ($col in $table.columns)
+				#if ($velocityCount > 1), #end'${col.name}': {
+					'databaseComment': '${col.commentForSchemaHtml}'
+				}
+	#end
+			}
+		}
+	#end
+	}
 }
 Decomment.prototype = {
 
@@ -1095,14 +1115,28 @@ Decomment.prototype = {
 		if (this.pickupStore[tableName] === undefined) {
 			this.pickupStore[tableName] = {};
 		}
+		if (this.pickupStore[tableName]['columns'] === undefined) {
+			this.pickupStore[tableName]['columns'] = {};
+		}
+		if (this.pickupStore[tableName]['columns'][columnName] === undefined) {
+			this.pickupStore[tableName]['columns'][columnName] = {};
+		}
 
+		var columnMap = this.getColumnMapInfoFromStore(tableName, columnName)
+		var databaseComment = columnMap['databaseComment'];
 		var properties = column['properties'];
+
+		// properties to store
 		var isConflict = properties.length > 1;
+		var isDatabaseCommentConflict = false;
 		var decomments = [];
 		var previousPieces = [];
 		var authors = [];
 		var commentVersion = 0;
 		Array.prototype.forEach.call(properties, function (property) {
+			if (property['databaseComment'] != null && databaseComment != null && !isDatabaseCommentConflict) {
+				isDatabaseCommentConflict = databaseComment.replace('<br>', '\n') != property['databaseComment'];
+			}
 			decomments.push(property["decomment"]);
 			if (property['pieceCode'] != null) {
 				previousPieces.push(property['pieceCode']);
@@ -1116,13 +1150,12 @@ Decomment.prototype = {
 			return self.indexOf(x) === i;
 		});
 
-		this.pickupStore[tableName][columnName] = {
-			'isConflict': isConflict,
-			'decomments': decomments,
-			'previousPieces': previousPieces,
-			'authors': authors,
-			'commentVersion': commentVersion
-		}
+		columnMap['isConflict'] = isConflict || isDatabaseCommentConflict;
+		columnMap['isDatabaseCommentConflict'] = isDatabaseCommentConflict;
+		columnMap['decomments'] = decomments;
+		columnMap['previousPieces'] = previousPieces;
+		columnMap['authors'] = authors;
+		columnMap['commentVersion'] = commentVersion;
 	},
 
 	/**
@@ -1134,7 +1167,10 @@ Decomment.prototype = {
 	storeNewComment: function (table, column, newComment) {
 		var tableName = table['tableName'];
 		var columnName = column['columnName'];
-		this.pickupStore[tableName][columnName]['previousWholeComment'] = newComment;
+		var columnMap = this.getColumnMapInfoFromStore(tableName, columnName);
+		if (columnMap !== null) {
+			columnMap['previousWholeComment'] = newComment;
+		}
 	},
 
 	/**
@@ -1146,8 +1182,13 @@ Decomment.prototype = {
 	buildColumnCommentFromServer: function (table, column) {
 		var tableName = table['tableName'];
 		var columnName = column['columnName'];
-		var columnMap = this.pickupStore[tableName][columnName];
-		return columnMap['decomments'].join('\n\n=======\n\n');
+		var columnMap = this.getColumnMapInfoFromStore(tableName, columnName);
+		var result = "";
+		if (columnMap['isDatabaseCommentConflict']) {
+			result = columnMap['databaseComment'].replace('<br>', '\n') + '\n(from database comment)\n\n======\n\n';
+		}
+		result += columnMap['decomments'].join('\n\n=======\n\n');
+		return result;
 	},
 
 	/**
@@ -1159,7 +1200,7 @@ Decomment.prototype = {
 	buildAuthorsFromServer: function (table, column) {
 		var tableName = table['tableName'];
 		var columnName = column['columnName'];
-		var columnMap = this.pickupStore[tableName][columnName];
+		var columnMap = this.getColumnMapInfoFromStore(tableName, columnName);
 		return columnMap['authors'];
 	},
 
@@ -1196,11 +1237,10 @@ Decomment.prototype = {
 	 * @returns {Boolean} comment is conflict
 	 */
 	isCommentConflict: function(tableName, columnName) {
-		var table = this.pickupStore[tableName];
-		if (table === undefined || table[columnName] === undefined) {
+		var columnMap = this.getColumnMapInfoFromStore(tableName, columnName);
+		if (columnMap === null) {
 			return false;
 		}
-		var columnMap = table[columnName];
 		return columnMap['isConflict'] || false;
 	},
 
@@ -1273,11 +1313,7 @@ Decomment.prototype = {
 	 */
 	getTableName: function (table) {
 		var previousElement = table.previousElementSibling;
-		if (previousElement.className) {
-			return previousElement.previousElementSibling.innerText
-		} else {
-			return previousElement.innerText
-		}
+		return previousElement.value;
 	},
 
 	/**
@@ -1301,8 +1337,9 @@ Decomment.prototype = {
 	 * @returns {Boolean} is changed
 	 */
 	isCommentChanged: function (tableName, columnName, decomment) {
-		if (this.pickupStore[tableName] !== undefined && this.pickupStore[tableName][columnName] !== undefined) {
-			var previousComment = this.pickupStore[tableName][columnName]['previousWholeComment'];
+		var columnMap = this.getColumnMapInfoFromStore(tableName, columnName);
+		if (columnMap !== null) {
+			var previousComment = columnMap['previousWholeComment'];
 			return previousComment.trim() !== decomment.trim();
 		}
 		return decomment.trim().length != 0;
@@ -1317,10 +1354,13 @@ Decomment.prototype = {
 	 * @return {Object} Request body
 	 */
 	buildColumnCommentRequestParams: function (tableName, columnName, decomment, previousCommentElement) {
-		if (this.pickupStore[tableName] !== undefined && this.pickupStore[tableName][columnName] !== undefined) {
-			var authors = this.pickupStore[tableName][columnName]['authors'];
-			var previousPieces = this.pickupStore[tableName][columnName]['previousPieces'];
-			var commentVersion = this.pickupStore[tableName][columnName]['commentVersion'];
+		var columnMap = this.getColumnMapInfoFromStore(tableName, columnName);
+		if (columnMap !== null) {
+			var authors = columnMap['authors'];
+			var previousPieces = columnMap['previousPieces'];
+			var commentVersion = columnMap['commentVersion'];
+			var databaseComment = columnMap['databaseComment'];
+			databaseComment = databaseComment.replace('<br>', '\n');
 		}
 
 		decomment = this.escapeInputText(decomment);
@@ -1331,7 +1371,7 @@ Decomment.prototype = {
 			'columnName': columnName,
 			'targetType': 'COLUMN',
 			'decomment': decomment,
-			'databaseComment': '', // TODO deco add database comment from json created by DBFlute
+			'databaseComment': databaseComment,
 			'commentVersion': commentVersion || 0,
 			'authors': authors || [],
 			'previousPieces': previousPieces || []
@@ -1398,8 +1438,30 @@ Decomment.prototype = {
 			}
 		};
 		http.send(JSON.stringify(params, null, "  "));
+	},
+
+	/**
+	 * Get column object from pickup store.
+	 * @param {string} tableName - Table name
+	 * @param {string} columnName - Column name
+	 * @return {Object} Column object
+	 */
+	getColumnMapInfoFromStore: function (tableName, columnName) {
+		var tableMap = this.pickupStore[tableName];
+		if (tableMap === undefined) {
+			return null;
+		}
+		var columns = tableMap['columns'];
+		if (columns === undefined) {
+			return null;
+		}
+		var columnMap = columns[columnName];
+		if (columnMap === undefined) {
+			return null;
+		}
+		return columnMap;
 	}
-}
+};
 
 new Decomment().init();
 </script>
