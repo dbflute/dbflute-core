@@ -994,19 +994,19 @@ function Decomment() {
 	//   }, { ... }
 	// }
 	this.pickupStore = {
-	#foreach ($table in $database.tableDisplaySortedList)
-	## decomment uses display name so fix later
+#foreach ($table in $database.tableDisplaySortedList)
+## decomment uses display name so fix later
 		#if ($velocityCount > 1), #end'${table.tableDbName}': {
 			'databaseComment': '${table.commentForSchemaHtml}'
 			, 'columns': {
-	#foreach ($col in $table.columns)
+#foreach ($col in $table.columns)
 				#if ($velocityCount > 1), #end'${col.name}': {
 					'databaseComment': '${col.commentForSchemaHtml}'
 				}
-	#end
+#end
 			}
 		}
-	#end
+#end
 	}
 }
 Decomment.prototype = {
