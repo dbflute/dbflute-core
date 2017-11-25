@@ -1340,7 +1340,9 @@ Decomment.prototype = {
 		var columnMap = this.getColumnMapInfoFromStore(tableName, columnName);
 		if (columnMap !== null) {
 			var previousComment = columnMap['previousWholeComment'];
-			return previousComment.trim() !== decomment.trim();
+			if (previousComment) {
+				return previousComment.trim() !== decomment.trim();
+			}
 		}
 		return decomment.trim().length != 0;
 	},
