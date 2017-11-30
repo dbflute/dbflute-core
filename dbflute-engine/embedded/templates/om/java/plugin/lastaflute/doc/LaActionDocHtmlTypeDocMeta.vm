@@ -43,7 +43,7 @@
         </td>
         <td class="fieldannotations">
 #foreach ($annotation in $nestTypeDocMeta.annotationList)
-            &#64;${annotation}
+            &#64;$!manager.htmlEscape(${annotation})
 #if (!$foreach.isLast())
 ,
 #end

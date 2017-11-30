@@ -521,15 +521,27 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String getSchemaDiagramPath(String key) {
-        return doGetSchemaDiagramAttr(key, "path", null); // null means required
+        final String path = doGetSchemaDiagramAttr(key, "path", null);
+        if (path == null) {
+            throw new DfIllegalPropertySettingException("Not found the path of schema diagram: " + key);
+        }
+        return path;
+    }
+
+    public boolean hasSchemaDiagramWidth(String key) {
+        return getSchemaDiagramWidth(key) != null;
     }
 
     public String getSchemaDiagramWidth(String key) {
-        return doGetSchemaDiagramAttr(key, "width", "100%");
+        return doGetSchemaDiagramAttr(key, "width", null);
+    }
+
+    public boolean hasSchemaDiagramHeight(String key) {
+        return getSchemaDiagramHeight(key) != null;
     }
 
     public String getSchemaDiagramHeight(String key) {
-        return doGetSchemaDiagramAttr(key, "height", "100%");
+        return doGetSchemaDiagramAttr(key, "height", null);
     }
 
     protected String doGetSchemaDiagramAttr(String key, String attrName, String defaultValue) {
@@ -538,13 +550,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             throw new IllegalStateException("Unknown key of schema diagram: " + key);
         }
         final String attrValue = (String) elementMap.get(attrName);
-        if (attrValue == null) {
-            if (defaultValue != null) {
-                return defaultValue;
-            }
-            throw new DfIllegalPropertySettingException("Not found " + attrName + " of schema diagram: " + key);
-        }
-        return attrValue;
+        return attrValue != null ? attrValue : defaultValue;
     }
 
     // ===================================================================================

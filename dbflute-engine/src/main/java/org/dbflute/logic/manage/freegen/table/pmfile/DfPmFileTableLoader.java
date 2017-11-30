@@ -118,7 +118,7 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
         final String targetKeyword = extractTargetKeyword(tableMap);
         final List<String> exceptPathList = extractExceptPathList(tableMap);
         final Map<String, Map<String, Object>> schemaMap = doLoad(targetDir, targetExt, targetKeyword, exceptPathList, tableMap);
-        return new DfFreeGenMetaData(tableMap, schemaMap);
+        return DfFreeGenMetaData.asMultiple(tableMap, schemaMap);
     }
 
     protected Map<String, Map<String, Object>> doLoad(String targetDir, String targetExt, String targetKeyword,

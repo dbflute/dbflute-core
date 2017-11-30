@@ -27,8 +27,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.logic.manage.freegen.DfFreeGenMapProp;
-import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenMetaData;
+import org.dbflute.logic.manage.freegen.DfFreeGenResource;
 import org.dbflute.logic.manage.freegen.DfFreeGenTableLoader;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -81,8 +81,8 @@ public class DfSolrXmlTableLoader implements DfFreeGenTableLoader {
             final InputSource is = new InputSource(br);
             final DfSolrXmlParserHandler parserHandler = new DfSolrXmlParserHandler(tableMap, mappingMap);
             saxParser.parse(is, parserHandler);
-            final String tableName = requestName; // basically unsed, also for compatible
-            return new DfFreeGenMetaData(tableMap, tableName, parserHandler.getColumnList());
+            final String tableName = requestName; // basically unused, also for compatible
+            return DfFreeGenMetaData.asOnlyOne(tableMap, tableName, parserHandler.getColumnList());
         } catch (IOException e) {
             String msg = "Failed to read the properties:";
             msg = msg + " requestName=" + requestName + " resourceFile=" + resourceFile;

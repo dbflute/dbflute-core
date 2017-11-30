@@ -37,7 +37,7 @@
         <th>method lines</th>
     </tr>
     </thead>
-    <tbody id="table-list-body">
+    <tbody id="job-list-body">
 #foreach ($jobDocMeta in $table.tableMap.jobDocMetaList)
     <tr>
         <td class="rowcellnum">${foreach.count}</td>
@@ -86,7 +86,7 @@ $manager.htmlEscape($jobDocMeta.jobKey)
         <th>method lines</th>
     </tr>
     </thead>
-    <tbody id="table-list-body">
+    <tbody>
     <tr>
         <td class="rowcellnum">${foreach.count}</td>
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.cronExp)</td>
@@ -107,7 +107,7 @@ $manager.htmlEscape($jobDocMeta.jobKey)
 </table>
 
 <table>
-    <tbody id="table-list-body">
+    <tbody>
     <tr>
         <th>class name</th>
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.typeName)</td>

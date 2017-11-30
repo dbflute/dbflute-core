@@ -236,6 +236,9 @@ public String toString() {
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for OrScopeQuery" enabled="true" name="orCBLambda">orCB -&gt; {
     orCB.query().set${Column}
 }</template>
+<template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Param" enabled="true" name="paramLambda">param -&gt; {
+    param.${property}
+}</template>
 <template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Mail Postcard" enabled="true" name="postcardLambda">postcard -&gt; {
     postcard.setFrom(${fromAddress}, ${personal});
     postcard.addTo(${toAddress});
@@ -245,10 +248,25 @@ public String toString() {
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Referrer" enabled="true" name="refCBLambda">${referrer}CB -&gt; {
     ${referrer}CB.query().addOrderBy_${Column}
 }</template>
+<template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Request" enabled="true" name="requestLambda">request -&gt; {
+    request.${property}
+}</template>
+<template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Response" enabled="true" name="responseLambda">response -&gt; {
+    response.${property}
+}</template>
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for resource" enabled="true" name="resourceLambda">resource -&gt; {
     ${cursor}
 }</template>
-<template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for runner" enabled="true" name="runnerLambda">runner -&gt; {
+<template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Result" enabled="true" name="resultLambda">result -&gt; {
+    result.${property}
+}</template>
+<template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Rule" enabled="true" name="ruleLambda">rule -&gt; {
+    rule.${property}
+}</template>
+<template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for Runner" enabled="true" name="runnerLambda">runner -&gt; {
+    ${cursor}
+}</template>
+<template autoinsert="true" context="java" deleted="false" description="LastaFlute: Trick for Runtime" enabled="true" name="runtimeLambda">runtime -&gt; {
     ${cursor}
 }</template>
 <template autoinsert="true" context="java" deleted="false" description="DBFlute: Trick for ScalarCondition" enabled="true" name="scalarCBLambda">${table}CB -&gt; {

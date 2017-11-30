@@ -24,7 +24,7 @@
         <th>Definition</th>
     </tr>
     </thead>
-    <tbody id="table-list-body">
+    <tbody id="webcls-list-body">
 #foreach ($classificationTop in $webclsMap.classificationTopList)
     <tr>
 #if ($classificationTop.isDeprecated())

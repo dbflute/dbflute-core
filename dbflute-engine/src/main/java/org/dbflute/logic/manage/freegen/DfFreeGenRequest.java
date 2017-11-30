@@ -66,6 +66,10 @@ public class DfFreeGenRequest {
         return DfFreeGenResourceType.FILE_PATH.equals(_resource.getResourceType());
     }
 
+    public boolean isResourceTypeJsonGeneral() {
+        return DfFreeGenResourceType.JSON_GENERAL.equals(_resource.getResourceType());
+    }
+
     public boolean isResourceTypeJsonKey() {
         return DfFreeGenResourceType.JSON_KEY.equals(_resource.getResourceType());
     }
@@ -80,6 +84,10 @@ public class DfFreeGenRequest {
 
     public boolean isResourceTypeElasticsearch() {
         return DfFreeGenResourceType.ELASTICSEARCH.equals(_resource.getResourceType());
+    }
+
+    public boolean isResourceTypeSwagger() {
+        return DfFreeGenResourceType.SWAGGER.equals(_resource.getResourceType());
     }
 
     public boolean isResourceTypeMailFlute() {
@@ -144,7 +152,8 @@ public class DfFreeGenRequest {
     // -----------------------------------------------------
     //                                              Resource
     //                                              --------
-    public DfFreeGenResource getResource() { // not null (basically unneeded to be called from template)
+    public DfFreeGenResource getResource() { // not null
+        // basically unneeded to be called from template but it may be used for resolveBaseDir()
         return _resource;
     }
 

@@ -14,7 +14,7 @@
 ## governing permissions and limitations under the License.
 ##
 <!DOCTYPE html>
-<html>
+<html lang="en"> <!-- main language (to avoid HTML validator) -->
 <head>
     <meta charset="UTF-8" />
     <title>${table.tableMap.appName} lastadoc</title>
@@ -171,10 +171,15 @@ table.child, table.child td, table.child th {
     padding-left: 4px;
     padding-right: 4px;
 }
+
+/* page top */
+.pagetop {
+    text-align: right
+}
     </style>
 </head>
 <body>
-<div style="position:fixed; width:95%"><div align="right"><a href="#top">▲Page Top</a></div></div>
+<div style="position:fixed; width:95%"><div class="pagetop"><a href="#top">▲Page Top</a></div></div>
 <h1>lastadoc for ${table.tableMap.appName}</h1>
 <div class="navilinkarea">
 #set ($linkDelimiter = "")

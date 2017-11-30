@@ -29,7 +29,8 @@ ${table.aliasExpression}${table.tableDispName}
 #set ($hasDefaultValue = $table.hasDefaultValueExceptAutoIncrement())
 #set ($hasColumnComment = $table.hasColumnComment())
 #set ($canBeColumnNullObject = $table.canBeColumnNullObject())
-<table>
+<input type="hidden" value="${table.tableDbName}">
+<table class="tablecontent">
 	<thead>
 	<tr>
 		<th class="rownumhead">No.</th>
@@ -50,9 +51,7 @@ ${table.aliasExpression}${table.tableDispName}
 		<th>ForeignTable</th>
 		<th>ReferrerTable</th>
 		<th>Classification</th>
-#if ($hasColumnComment)
 		<th>ColumnComment</th>
-#end
 		<th>PropertyName</th>
 		<th>${table.database.targetLanguageInitCap}Type</th>
 #if ($canBeColumnNullObject)
@@ -72,7 +71,7 @@ ${table.aliasExpression}${table.tableDispName}
 #if ($isAliasDelimiterInDbCommentValid)
 		<td class="${col.schemaHtmlColumnAliasCssClass}">${col.alias}</td>
 #end
-		<td#if ($col.hasSchemaHtmlColumnNameCssClass()) class="${col.schemaHtmlColumnNameCssClass}"#end id="${col.columnIdForSchemaHtml}">${col.name}</td>
+		<td class="${col.schemaHtmlColumnNameCssClass} columnnamecell" id="${col.columnIdForSchemaHtml}">${col.name}</td>
 		<td class="typecell">${col.dbTypeExpression}</td>
 		<td class="sizecell">#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end</td>
 #if ($hasDefaultValue)
@@ -81,9 +80,7 @@ ${table.aliasExpression}${table.tableDispName}
 		<td class="relcell">${col.foreignTableNameCommaStringWithHtmlHref}&nbsp;</td>
 		<td class="relcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
 		<td class="relcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}Cls">${col.classificationName}</a>#else &nbsp;#end</td>
-#if ($hasColumnComment)
-		<td class="commentcell">#if ($col.hasComment()) ${col.commentForSchemaHtml}#else &nbsp;#end</td>
-#end
+		<td class="commentcell"><pre>#if ($col.hasComment())${col.commentForSchemaHtmlPre}#else&nbsp;#end</pre></td>
 		<td class="subcell">${col.javaBeansRulePropertyName}</td>
 		<td class="subcell">${col.javaNativeRemovedPackage}</td>
 #if ($canBeColumnNullObject)

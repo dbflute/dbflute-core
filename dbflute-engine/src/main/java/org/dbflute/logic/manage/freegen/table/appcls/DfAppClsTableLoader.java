@@ -144,7 +144,9 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
         }).collect(Collectors.toList()));
         optionMap.put("hasRefCls", hasRefCls);
         optionMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
-        return new DfFreeGenMetaData(optionMap, clsTheme, Collections.emptyList());
+
+        // #for_now can be flexible? (table name is unused?)
+        return DfFreeGenMetaData.asOnlyOne(optionMap, clsTheme, Collections.emptyList());
     }
 
     protected boolean isElementMapClassificationTop(Map<String, Object> elementMap) {

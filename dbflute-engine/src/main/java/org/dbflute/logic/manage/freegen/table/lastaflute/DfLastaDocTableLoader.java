@@ -139,7 +139,7 @@ public class DfLastaDocTableLoader implements DfFreeGenTableLoader {
             }
         }
         prepareSchemaHtmlLink(optionMap);
-        return new DfFreeGenMetaData(optionMap, "unused", columnList);
+        return DfFreeGenMetaData.asOnlyOne(optionMap, "unused", columnList);
     }
 
     protected List<Map<String, Object>> prepareColumnList(DfLastaInfo lastaInfo) {
