@@ -126,6 +126,7 @@ package org.apache.torque.engine.database.model;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
+
 import java.io.File;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -152,6 +153,7 @@ import org.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.core.DfDatabaseNameMapping;
+import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlProcedure;
 import org.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.dbflute.logic.generate.exdirect.DfCopyrightResolver;
@@ -190,6 +192,7 @@ import org.xml.sax.Attributes;
 /**
  * A class for holding application data structures. <br>
  * DBFlute treats all tables containing other schema's as one database object.
+ *
  * @author modified by jflute (originated in Apache Torque)
  */
 public class Database {
@@ -197,7 +200,9 @@ public class Database {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** The logger instance for this class. (NotNull) */
+    /**
+     * The logger instance for this class. (NotNull)
+     */
     private static final Logger _log = LoggerFactory.getLogger(Database.class);
 
     // ===================================================================================
@@ -246,8 +251,15 @@ public class Database {
     // -----------------------------------------------------
     //                                         ParameterBean
     //                                         -------------
-    /** The meta data of parameter bean. */
+    /**
+     * The meta data of parameter bean.
+     */
     protected Map<String, DfPmbMetaData> _pmbMetaDataMap; // when sql2entity only
+
+    // -----------------------------------------------------
+    //                                      Decomment Pickup
+    //                                      ----------------
+    protected DfDecoMapPickup _embeddedPickup;
 
     // -----------------------------------------------------
     //                                                 Other
@@ -320,6 +332,7 @@ public class Database {
 
     /**
      * Get the table by the table DB name.
+     *
      * @param tableDbName The DB name of the table to find. (NullAllowed: when e.g. Sql2Entity's related table)
      * @return The found table object. (NullAllowed: when not found)
      */
@@ -355,7 +368,8 @@ public class Database {
 
     /**
      * Add table from attributes of SchemaXML.
-     * @param attrib The attributes of SchemaXML. (NotNull)
+     *
+     * @param attrib        The attributes of SchemaXML. (NotNull)
      * @param readingFilter The filter of object. (NullAllowed)
      * @return The instance of added table. (NullAllowed: if null, means the table was filtered)
      */
@@ -2393,6 +2407,10 @@ public class Database {
         return getProperties().getDocumentProperties().getSchemaHtmlJavaScriptLink();
     }
 
+    public DfDecoMapPickup getEmbeddedPickup() {
+        return _embeddedPickup;
+    }
+
     // -----------------------------------------------------
     //                                           HistoryHtml
     //                                           -----------
@@ -2934,5 +2952,9 @@ public class Database {
 
     public void setSkipDeleteOldClass(boolean skipDeleteOldClass) {
         _skipDeleteOldClass = skipDeleteOldClass;
+    }
+
+    public void setEmbeddedPickup(DfDecoMapPickup _embeddedPickup) {
+        this._embeddedPickup = _embeddedPickup;
     }
 }

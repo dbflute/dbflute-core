@@ -977,22 +977,52 @@ searcher.init();
 <script>
 /**
  * @author deco
+ * @author cabos
  */
 function Decomment() {
 	// setup from dbflute if decomment pickup exists
-	this.embeddedPickup = {};
-	// store of comment info
-	// object structure
-	// {
-	//   tableName: {
-	//     propertyName: propertyValue,
-	//     columns: {
-	//       columnName: {
-	//         propetyName: propertyValue
-	//       }, { ... }
-	//     }
-	//   }, { ... }
-	// }
+	this.embeddedPickup = {
+		'tables': [
+#foreach($table in $database.embeddedPickup.tableList)
+				#if ($velocityCount > 1),#end {
+				'tableName': '$!{table.tableName}'
+				, 'properties': [
+#foreach($property in $table.propertyList)
+						#if ($velocityCount > 1),#end {
+						'decomment': '${property.decomment}'
+						, 'databaseComment': '$!{property.databaseComment}'
+						, 'commentVersion': $!{property.commentVersion}
+						, 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'$!{author}'#end]
+						, 'pieceCode': '$!{property.pieceCode}'
+						, 'pieceDatatime': '$!{property.pieceDatetime}'
+						, 'previousPieces': [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
+					}
+#end
+				]
+				, 'columns': [
+#foreach($column in $table.columnList)
+						#if ($velocityCount > 1),#end {
+						'columnName': '${column.columnName}'
+						, 'properties': [
+#foreach($property in $column.propertyList)
+								#if ($velocityCount > 1),#end {
+								'decomment': '${property.decomment}'
+								, 'databaseComment': '$!{property.databaseComment}'
+								, 'commentVersion': $!{property.commentVersion}
+								, 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'$!{author}'#end]
+								, 'pieceCode': '$!{property.pieceCode}'
+								, 'pieceDatatime': '$!{property.pieceDatetime}'
+								, 'previousPieces': [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
+							}
+#end
+						]
+					}
+#end
+				]
+			]
+		}
+#end
+	}
 	this.pickupStore = {
 #foreach ($table in $database.tableDisplaySortedList)
 ## decomment uses display name so fix later

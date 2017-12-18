@@ -133,6 +133,8 @@ import org.apache.velocity.context.Context;
 import org.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
+import org.dbflute.logic.doc.decomment.DfDecommentPickupProcess;
 import org.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.dbflute.logic.doc.spolicy.DfSPolicyChecker;
 import org.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
@@ -149,6 +151,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The DBFlute task generating documentations, SchemaHTML, HistoryHTML and so on.
  * @author modified by jflute (originated in Apache Torque)
+ * @author modified by cabos (originated in Apache Torque)
  */
 public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
@@ -163,6 +166,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                           =========
     protected String _varyingArg;
     protected boolean _syncCheckGhastlyTragedy;
+    protected DfDecoMapPickup _decoMapPickup;
 
     // ===================================================================================
     //                                                                           Beginning
@@ -256,7 +260,19 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _selector.selectHistoryHtml(); // regular
         _selector.selectPropertiesHtml(); // option
         _selector.selectLastaDocHtml(); // option
+        processDecommentPickup();
         fireVelocityProcess();
+    }
+
+    // -----------------------------------------------------
+    //                                       pickupDecomment
+    //                                       ---------------
+    protected void processDecommentPickup() {
+        _decoMapPickup = createDecommentPickupProcess().pickupDecomment(".");
+    }
+
+    protected DfDecommentPickupProcess createDecommentPickupProcess() {
+        return new DfDecommentPickupProcess();
     }
 
     // -----------------------------------------------------
@@ -375,6 +391,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             _schemaData = AppData.createAsEmpty(); // not to depends on JDBC task
         } else { // normally here
             super.initializeSchemaData();
+            _schemaData.getDatabase().setEmbeddedPickup(_decoMapPickup);
         }
     }
 
