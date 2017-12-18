@@ -47,16 +47,17 @@ public class DfDecoMapTablePart {
         List<Map<String, Object>> columnMapList = (List<Map<String, Object>>) tablePartMap.get("columnList");
         List<DfDecoMapPropertyPart> propertyList = propertyMapList.stream().map(DfDecoMapPropertyPart::new).collect(Collectors.toList());
         this.propertyList.addAll(propertyList);
-        List<DfDecoMapColumnPart> columnList = columnMapList.stream().map(map -> new DfDecoMapColumnPart(map)).collect(Collectors.toList());
+        List<DfDecoMapColumnPart> columnList = columnMapList.stream().map(DfDecoMapColumnPart::new).collect(Collectors.toList());
         this.columnList.addAll(columnList);
     }
 
     public Map<String, Object> convertPickupMap() {
-        Map<String, List<Map<String, Object>>> columnMap = columnList.stream()
-            .collect(Collectors.toMap(column -> column.getColumnName(), column -> column.convertToMap(), (c1, c2) -> c1));
-
+        List<Map<String, Object>> columnMapList = columnList.stream().map(DfDecoMapColumnPart::convertToMap).collect(Collectors.toList());
+        List<Map<String, Object>> propertyMapList = propertyList.stream().map(DfDecoMapPropertyPart::convertToMap).collect(Collectors.toList());
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put(tableName, columnMap);
+        map.put("tableName", tableName);
+        map.put("propertyList", propertyMapList);
+        map.put("columnList", columnMapList);
         return map;
     }
 

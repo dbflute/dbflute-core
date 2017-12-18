@@ -97,7 +97,7 @@ public class DfDecoMapPropertyPart {
     }
 
     public void addAllPreviousPieces(Collection<String> previousPieces) {
-        Set<String> previousSet = new LinkedHashSet<>(this.authorList);
+        Set<String> previousSet = new LinkedHashSet<>(this.previousPieceList);
         previousSet.addAll(previousPieces);
         this.previousPieceList = new ArrayList<>(previousSet);
     }

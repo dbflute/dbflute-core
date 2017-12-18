@@ -16,6 +16,7 @@
 package org.dbflute.infra.doc.decomment.parts;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,8 +48,13 @@ public class DfDecoMapColumnPart {
     }
 
     // done cabos convertToMap()? by jflute (2017/11/11)
-    public List<Map<String, Object>> convertToMap() {
-        return propertyList.stream().map(property -> property.convertToMap()).collect(Collectors.toList());
+    public Map<String, Object> convertToMap() {
+        List<Map<String, Object>> propertyMapList =
+                propertyList.stream().map(DfDecoMapPropertyPart::convertToMap).collect(Collectors.toList());
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("columnName", columnName);
+        map.put("propertyList", propertyMapList);
+        return map;
     }
 
     // ===================================================================================

@@ -37,6 +37,7 @@ public class DfDecoMapPickup {
     //                                                                          Definition
     //                                                                          ==========
     private static final String DECO_MAP_KEY = "tableList";
+    public static final String DEFAULT_FORMAT_VERSION = "1.0";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -52,6 +53,7 @@ public class DfDecoMapPickup {
     public DfDecoMapPickup() {
         this.decoMap = new LinkedHashMap<>();
         this.decoMap.put(DECO_MAP_KEY, new ArrayList<>()); // avoid null pointer exception
+        this.formatVersion = DEFAULT_FORMAT_VERSION;
     }
 
     // ===================================================================================
@@ -106,12 +108,17 @@ public class DfDecoMapPickup {
     //     }
     // }
     public Map<String, Object> convertToMap() {
-        final Map<String, Map<String, Object>> convertedDecoMap = this.getTableList()
+        final List<Map<String, Object>> convertedTableList = this.getTableList()
             .stream()
-            .collect(Collectors.toMap(tablePart -> tablePart.getTableName(), tablePart -> tablePart.convertPickupMap(), (c1, c2) -> c1));
+            .map(DfDecoMapTablePart::convertPickupMap)
+            .collect(Collectors.toList());
+
+        final Map<String, List<Map<String, Object>>> convertedDecoMap = new LinkedHashMap<>();
+        convertedDecoMap.put("tableList", convertedTableList);
 
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("formatVersion", formatVersion);
+        map.put("pickupDatetime", pickupDatetime);
         map.put("decoMap", convertedDecoMap);
         return map;
     }
