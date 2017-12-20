@@ -974,6 +974,7 @@ Incremental.prototype.util = {
 var searcher = new Incremental(document.getElementById('incremental-search-field'), document.getElementById('table-list-body'));
 searcher.init();
 </script>
+#macro(escape $str)$str.replaceAll("'", "\\'")#end
 <script>
 /**
  * @author deco
@@ -981,47 +982,47 @@ searcher.init();
  */
 function Decomment() {
 	// setup from dbflute if decomment pickup exists
-	this.embeddedPickup = {
-		'tables': [
+    this.embeddedPickup = {
+        'tables': [
 #foreach($table in $database.embeddedPickup.tableList)
 				#if ($velocityCount > 1),#end {
-				'tableName': '$!{table.tableName}'
-				, 'properties': [
+                'tableName': '#escape($!{table.tableName})'
+                , 'properties': [
 #foreach($property in $table.propertyList)
 						#if ($velocityCount > 1),#end {
-						'decomment': '${property.decomment}'
-						, 'databaseComment': '$!{property.databaseComment}'
-						, 'commentVersion': $!{property.commentVersion}
-						, 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'$!{author}'#end]
-						, 'pieceCode': '$!{property.pieceCode}'
-						, 'pieceDatatime': '$!{property.pieceDatetime}'
-						, 'previousPieces': [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
-					}
+                        'decomment': '#escape($!{property.decomment})'
+                        , 'databaseComment': '#escape($!{property.databaseComment})'
+                        , 'commentVersion': $!{property.commentVersion}
+                        , 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'#escape($!{author})'#end]
+                        , 'pieceCode': '$!{property.pieceCode}'
+                        , 'pieceDatatime': '$!{property.pieceDatetime}'
+                        , 'previousPieces': [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
+                    }
 #end
-				]
-				, 'columns': [
+                ]
+                , 'columns': [
 #foreach($column in $table.columnList)
 						#if ($velocityCount > 1),#end {
-						'columnName': '${column.columnName}'
-						, 'properties': [
+                        'columnName': '#escape($!{column.columnName})'
+                        , 'properties': [
 #foreach($property in $column.propertyList)
 								#if ($velocityCount > 1),#end {
-								'decomment': '${property.decomment}'
-								, 'databaseComment': '$!{property.databaseComment}'
-								, 'commentVersion': $!{property.commentVersion}
-								, 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'$!{author}'#end]
-								, 'pieceCode': '$!{property.pieceCode}'
-								, 'pieceDatatime': '$!{property.pieceDatetime}'
-								, 'previousPieces': [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
-							}
+                                'decomment': '#escape($!{property.decomment})'
+                                , 'databaseComment': '#escape($!{property.databaseComment})'
+                                , 'commentVersion': $!{property.commentVersion}
+                                , 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'#escape($!{author})'#end]
+                                , 'pieceCode': '$!{property.pieceCode}'
+                                , 'pieceDatatime': '$!{property.pieceDatetime}'
+                                , 'previousPieces': [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
+                            }
 #end
-						]
-					}
+                        ]
+                    }
 #end
-				]
-			]
-		}
+                ]
+            }
 #end
+        ]}
 	}
 	this.pickupStore = {
 #foreach ($table in $database.tableDisplaySortedList)
