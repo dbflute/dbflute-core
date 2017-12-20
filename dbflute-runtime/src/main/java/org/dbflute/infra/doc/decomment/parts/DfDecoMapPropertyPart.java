@@ -15,8 +15,6 @@
  */
 package org.dbflute.infra.doc.decomment.parts;
 
-import org.dbflute.helper.HandyDate;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.dbflute.helper.HandyDate;
 
 /**
  * @author cabos
@@ -51,7 +51,7 @@ public class DfDecoMapPropertyPart {
         this.pieceDatetime = new HandyDate((String) propertyMap.get("pieceDatetime")).getLocalDateTime();
         this.pieceOwner = (String) propertyMap.get("pieceOwner");
         this.previousPieceList =
-            ((List<?>) propertyMap.get("previousPieceList")).stream().map(obj -> (String) obj).collect(Collectors.toList());
+                ((List<?>) propertyMap.get("previousPieceList")).stream().map(obj -> (String) obj).collect(Collectors.toList());
         this.commentVersion = Long.valueOf((String) propertyMap.get("commentVersion"));
         this.authorList = ((List<?>) propertyMap.get("authorList")).stream().map(obj -> (String) obj).collect(Collectors.toList());
     }
@@ -129,6 +129,7 @@ public class DfDecoMapPropertyPart {
         map.put("decomment", this.decomment);
         map.put("databaseComment", this.databaseComment);
         map.put("pieceCode", this.pieceCode);
+        map.put("pieceOwner", this.pieceOwner);
         map.put("pieceDatetime", this.pieceDatetime);
         map.put("previousPieceList", this.previousPieceList);
         map.put("commentVersion", this.commentVersion);
