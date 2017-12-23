@@ -32,7 +32,7 @@ public class DfDecommentPickupProcess {
     public DfDecoMapPickup pickupDecomment(String clientPath) {
         List<DfDecoMapPiece> pieceList = readPieceList(clientPath);
         OptionalThing<DfDecoMapPickup> optPickup = readPickup(clientPath);
-        DfDecoMapPickup mergedPickup = mergeDecoMap(pieceList, optPickup);
+        DfDecoMapPickup mergedPickup = mergeDecoMap(optPickup, pieceList);
         writePickup(clientPath, mergedPickup);
         deletePiece(clientPath);
         return mergedPickup;
@@ -46,7 +46,7 @@ public class DfDecommentPickupProcess {
         return _decoMapFile.readPickup(clientPath);
     }
 
-    private DfDecoMapPickup mergeDecoMap(List<DfDecoMapPiece> pieceList, OptionalThing<DfDecoMapPickup> optPickup) {
+    private DfDecoMapPickup mergeDecoMap(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieceList) {
         return _decoMapFile.merge(optPickup, pieceList);
     }
 
