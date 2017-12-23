@@ -974,7 +974,7 @@ Incremental.prototype.util = {
 var searcher = new Incremental(document.getElementById('incremental-search-field'), document.getElementById('table-list-body'));
 searcher.init();
 </script>
-#macro(escape $str)$str.replaceAll("'", "\\'")#end
+#macro(escape $str)$!str.replaceAll("'", "\\'")#end
 <script>
 /**
  * @author deco
