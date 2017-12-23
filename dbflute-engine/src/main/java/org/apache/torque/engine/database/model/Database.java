@@ -192,17 +192,15 @@ import org.xml.sax.Attributes;
 /**
  * A class for holding application data structures. <br>
  * DBFlute treats all tables containing other schema's as one database object.
- *
  * @author modified by jflute (originated in Apache Torque)
+ * @author contributed by cabos at sheraton
  */
 public class Database {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /**
-     * The logger instance for this class. (NotNull)
-     */
+    /** The logger instance for this class. (NotNull) */
     private static final Logger _log = LoggerFactory.getLogger(Database.class);
 
     // ===================================================================================
@@ -251,9 +249,7 @@ public class Database {
     // -----------------------------------------------------
     //                                         ParameterBean
     //                                         -------------
-    /**
-     * The meta data of parameter bean.
-     */
+    /** The meta data of parameter bean. */
     protected Map<String, DfPmbMetaData> _pmbMetaDataMap; // when sql2entity only
 
     // -----------------------------------------------------
@@ -332,7 +328,6 @@ public class Database {
 
     /**
      * Get the table by the table DB name.
-     *
      * @param tableDbName The DB name of the table to find. (NullAllowed: when e.g. Sql2Entity's related table)
      * @return The found table object. (NullAllowed: when not found)
      */
@@ -368,8 +363,7 @@ public class Database {
 
     /**
      * Add table from attributes of SchemaXML.
-     *
-     * @param attrib        The attributes of SchemaXML. (NotNull)
+     * @param attrib The attributes of SchemaXML. (NotNull)
      * @param readingFilter The filter of object. (NullAllowed)
      * @return The instance of added table. (NullAllowed: if null, means the table was filtered)
      */
@@ -2954,7 +2948,7 @@ public class Database {
         _skipDeleteOldClass = skipDeleteOldClass;
     }
 
-    public void setEmbeddedPickup(DfDecoMapPickup _embeddedPickup) {
-        this._embeddedPickup = _embeddedPickup;
+    public void setEmbeddedPickup(DfDecoMapPickup embeddedPickup) {
+        this._embeddedPickup = embeddedPickup;
     }
 }
