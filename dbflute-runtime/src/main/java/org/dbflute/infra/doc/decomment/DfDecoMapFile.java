@@ -138,6 +138,9 @@ public class DfDecoMapFile {
         try {
             Map<String, Object> map = mapListFile.readMap(Files.newInputStream(path));
             return mappingToDecoMapPiece(map);
+        } catch (RuntimeException e) {
+            throwDecoMapReadFailureException(path.toString(), e);
+            return null; // unreachable
         } catch (IOException e) {
             throwDecoMapReadFailureException(path.toString(), e);
             return null; // unreachable
@@ -248,6 +251,9 @@ public class DfDecoMapFile {
         try {
             Map<String, Object> map = mapListFile.readMap(Files.newInputStream(path));
             return mappingToDecoMapPickup(map);
+        } catch (RuntimeException e) {
+            throwDecoMapReadFailureException(path.toString(), e);
+            return null; // unreachable
         } catch (IOException e) {
             throwDecoMapReadFailureException(path.toString(), e);
             return null; // unreachable
