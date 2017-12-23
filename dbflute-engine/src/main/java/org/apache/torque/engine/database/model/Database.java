@@ -192,7 +192,7 @@ import org.xml.sax.Attributes;
  * A class for holding application data structures. <br>
  * DBFlute treats all tables containing other schema's as one database object.
  * @author modified by jflute (originated in Apache Torque)
- * @author contributed by cabos at sheraton
+ * @author contributed by cabos at maihama sheraton hotel
  */
 public class Database {
 

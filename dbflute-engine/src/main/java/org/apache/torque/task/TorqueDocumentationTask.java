@@ -151,7 +151,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The DBFlute task generating documentations, SchemaHTML, HistoryHTML and so on.
  * @author modified by jflute (originated in Apache Torque)
- * @author contributed by cabos at sheraton
+ * @author contributed by cabos at maihama sheraton hotel
  */
 public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
