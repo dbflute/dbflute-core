@@ -126,7 +126,6 @@ package org.apache.torque.engine.database.model;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.io.File;
 import java.sql.SQLException;
 import java.sql.Timestamp;
