@@ -974,39 +974,70 @@ Incremental.prototype.util = {
 var searcher = new Incremental(document.getElementById('incremental-search-field'), document.getElementById('table-list-body'));
 searcher.init();
 </script>
+#macro(escape $str)$str.replaceAll("'", "\\'")#end
 <script>
 /**
  * @author deco
+ * @author cabos
  */
 function Decomment() {
 	// setup from dbflute if decomment pickup exists
-	this.embeddedPickup = {};
-	// store of comment info
-	// object structure
-	// {
-	//   tableName: {
-	//     propertyName: propertyValue,
-	//     columns: {
-	//       columnName: {
-	//         propetyName: propertyValue
-	//       }, { ... }
-	//     }
-	//   }, { ... }
-	// }
+	this.embeddedPickup = {
+		'tables': [
+#foreach($table in $database.embeddedPickup.tableList)
+				#if ($velocityCount > 1),#end {
+				'tableName': '#escape($!{table.tableName})'
+				, 'properties': [
+#foreach($property in $table.propertyList)
+						#if ($velocityCount > 1),#end {
+						'decomment': '#escape($!{property.decomment})'
+						, 'databaseComment': '#escape($!{property.databaseComment})'
+						, 'commentVersion': $!{property.commentVersion}
+						, 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'#escape($!{author})'#end]
+						, 'pieceCode': '$!{property.pieceCode}'
+						, 'pieceDatatime': '$!{property.pieceDatetime}'
+						, 'previousPieces': [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
+					}
+#end
+				]
+				, 'columns': [
+#foreach($column in $table.columnList)
+						#if ($velocityCount > 1),#end {
+						'columnName': '#escape($!{column.columnName})'
+						, 'properties': [
+#foreach($property in $column.propertyList)
+								#if ($velocityCount > 1),#end {
+								'decomment': '#escape($!{property.decomment})'
+								, 'databaseComment': '#escape($!{property.databaseComment})'
+								, 'commentVersion': $!{property.commentVersion}
+								, 'authors': [#foreach($author in $property.authorList)#if ($velocityCount > 1),#end'#escape($!{author})'#end]
+								, 'pieceCode': '$!{property.pieceCode}'
+								, 'pieceDatatime': '$!{property.pieceDatetime}'
+								, 'previousPieces': [#foreach($pieceCode in $property.previousPieceList)#if ($velocityCount > 1),#end'$!{pieceCode}'#end]
+							}
+#end
+						]
+					}
+#end
+				]
+			}
+#end
+		]}
+	}
 	this.pickupStore = {
-	#foreach ($table in $database.tableDisplaySortedList)
-	## decomment uses display name so fix later
+#foreach ($table in $database.tableDisplaySortedList)
+## decomment uses display name so fix later
 		#if ($velocityCount > 1), #end'${table.tableDbName}': {
 			'databaseComment': '${table.commentForSchemaHtml}'
 			, 'columns': {
-	#foreach ($col in $table.columns)
+#foreach ($col in $table.columns)
 				#if ($velocityCount > 1), #end'${col.name}': {
 					'databaseComment': '${col.commentForSchemaHtml}'
 				}
-	#end
+#end
 			}
 		}
-	#end
+#end
 	}
 }
 Decomment.prototype = {
@@ -1340,7 +1371,9 @@ Decomment.prototype = {
 		var columnMap = this.getColumnMapInfoFromStore(tableName, columnName);
 		if (columnMap !== null) {
 			var previousComment = columnMap['previousWholeComment'];
-			return previousComment.trim() !== decomment.trim();
+			if (previousComment) {
+				return previousComment.trim() !== decomment.trim();
+			}
 		}
 		return decomment.trim().length != 0;
 	},

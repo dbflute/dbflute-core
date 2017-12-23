@@ -47,7 +47,7 @@ public interface ConditionOption {
      * @return The list of specified column. (NotNull, EmptyAllowed)
      */
     List<SpecifiedColumn> getCompoundColumnList();
-    
+
     /**
      * Does the option treat null as empty when compounding columns?
      * @return The determination, true or false.

@@ -458,7 +458,7 @@ public abstract class ConditionKey implements Serializable {
         final String connected = stringConnector.connect(realNameList.toArray());
         return ColumnRealName.create(null, new ColumnSqlName(connected));
     }
-    
+
     protected ColumnRealName doResolveCompoundColumnOption(ConditionOption option, ColumnRealName columnRealName) {
         if (option.isNullCompoundedAsEmpty()) {
             return toColumnRealName("coalesce(" + columnRealName + ",\'\')");
