@@ -33,7 +33,9 @@ public class DfDecommentPickupProcess {
         List<DfDecoMapPiece> pieceList = readPieceList(clientPath);
         OptionalThing<DfDecoMapPickup> optPickup = readPickup(clientPath);
         DfDecoMapPickup mergedPickup = mergeDecoMap(optPickup, pieceList);
-        writePickup(clientPath, mergedPickup);
+        if (!mergedPickup.getTableList().isEmpty()) { // not to make empty file if no decomments
+            writePickup(clientPath, mergedPickup);
+        }
         deletePiece(clientPath);
         return mergedPickup;
     }
