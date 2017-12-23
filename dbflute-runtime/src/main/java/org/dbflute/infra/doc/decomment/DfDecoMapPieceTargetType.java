@@ -15,12 +15,7 @@
  */
 package org.dbflute.infra.doc.decomment;
 
-import org.dbflute.exception.ClassificationNotFoundException;
-import org.dbflute.jdbc.Classification;
-import org.dbflute.jdbc.ClassificationCodeType;
-import org.dbflute.jdbc.ClassificationMeta;
-import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
-import org.dbflute.optional.OptionalThing;
+import static org.dbflute.util.DfTypeUtil.emptyStrings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +28,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.dbflute.util.DfTypeUtil.emptyStrings;
+import org.dbflute.exception.ClassificationNotFoundException;
+import org.dbflute.jdbc.Classification;
+import org.dbflute.jdbc.ClassificationCodeType;
+import org.dbflute.jdbc.ClassificationMeta;
+import org.dbflute.jdbc.ClassificationUndefinedHandlingType;
+import org.dbflute.optional.OptionalThing;
 
 /**
  * target type of decomment piece

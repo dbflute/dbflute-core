@@ -15,8 +15,6 @@
  */
 package org.dbflute.infra.doc.decomment;
 
-import org.dbflute.helper.mapstring.MapListString;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +23,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.dbflute.helper.mapstring.MapListString;
 
 /**
  * @author hakiba

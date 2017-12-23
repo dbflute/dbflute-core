@@ -317,8 +317,7 @@ public class DfDecoMapFile {
         doWritePiece(pieceMapPath, decoMapPiece);
     }
 
-    protected String buildPieceFileName(String tableName, String columnName, String owner,
-            String pieceCode) { // e.g decomment-piece-TABLE_NAME-COLUMN_NAME-20170316-123456-789-jflute-FE893L1.dfmap
+    protected String buildPieceFileName(String tableName, String columnName, String owner, String pieceCode) { // e.g decomment-piece-TABLE_NAME-COLUMN_NAME-20170316-123456-789-jflute-FE893L1.dfmap
         return "decomment-piece-" + tableName + "-" + columnName + "-" + getCurrentDateStr() + "-" + filterOwner(owner) + "-" + pieceCode
                 + ".dfmap";
     }
@@ -465,10 +464,9 @@ public class DfDecoMapFile {
             return pickup.getTableList().stream().flatMap(table -> {
                 Stream<String> previousTablePieceStream =
                         table.getPropertyList().stream().flatMap(property -> property.getPreviousPieceList().stream());
-                Stream<String> previousColumnPieceStream = table.getColumnList()
-                        .stream()
-                        .flatMap(column -> column.getPropertyList().stream())
-                        .flatMap(property -> property.getPreviousPieceList().stream());
+                Stream<String> previousColumnPieceStream =
+                        table.getColumnList().stream().flatMap(column -> column.getPropertyList().stream()).flatMap(
+                                property -> property.getPreviousPieceList().stream());
                 Stream<String> tablePieceStream = table.getPropertyList().stream().map(property -> property.getPieceCode());
                 Stream<String> columnPieceStream = table.getColumnList()
                         .stream()

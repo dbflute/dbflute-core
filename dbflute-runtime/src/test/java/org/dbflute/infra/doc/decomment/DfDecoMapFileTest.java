@@ -15,6 +15,8 @@
  */
 package org.dbflute.infra.doc.decomment;
 
+import static org.dbflute.system.DBFluteSystem.currentLocalDateTime;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -23,8 +25,6 @@ import java.util.List;
 
 import org.dbflute.optional.OptionalThing;
 import org.dbflute.unit.RuntimeTestCase;
-
-import static org.dbflute.system.DBFluteSystem.currentLocalDateTime;
 
 /**
  * @author hakiba
@@ -66,7 +66,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
     }
 
     private DfDecoMapPiece preparePiece(String tableName, String columnName, String author, long commentVersion,
-                                        LocalDateTime decommentDateTime) {
+            LocalDateTime decommentDateTime) {
         DfDecoMapPiece piece = new DfDecoMapPiece();
         piece.setFormatVersion("1.0");
         piece.setTableName(tableName);
