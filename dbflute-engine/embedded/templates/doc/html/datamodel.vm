@@ -1174,9 +1174,10 @@ Decomment.prototype = {
 		var previousPieces = [];
 		var authors = [];
 		var commentVersion = 0;
+		var that = this;
 		Array.prototype.forEach.call(properties, function (property) {
 			if (property['databaseComment'] != null && databaseComment != null && !isDatabaseCommentConflict) {
-				isDatabaseCommentConflict = databaseComment.replace('<br>', '\n') != property['databaseComment'];
+				isDatabaseCommentConflict = that.escapeNewlineCharacter(databaseComment) != property['databaseComment'];
 			}
 			decomments.push(property["decomment"]);
 			if (property['pieceCode'] != null) {
@@ -1229,9 +1230,10 @@ Decomment.prototype = {
 		var previousPieces = [];
 		var authors = [];
 		var commentVersion = 0;
+		var that = this;
 		Array.prototype.forEach.call(properties, function (property) {
 			if (property['databaseComment'] != null && databaseComment != null && !isDatabaseCommentConflict) {
-				isDatabaseCommentConflict = databaseComment.replace('<br>', '\n') != property['databaseComment'];
+				isDatabaseCommentConflict = that.escapeNewlineCharacter(databaseComment) != property['databaseComment'];
 			}
 			decomments.push(property["decomment"]);
 			if (property['pieceCode'] != null) {
@@ -1315,7 +1317,7 @@ Decomment.prototype = {
 	buildDisplayCommentFromServer: function(commentMap) {
 		var result = "";
 		if (commentMap['isDatabaseCommentConflict']) {
-			result = commentMap['databaseComment'].replace('<br>', '\n') + '\n(from database comment)\n\n======\n\n';
+			result = this.escapeInputText(commentMap['databaseComment']) + '\n(from database comment)\n\n======\n\n';
 		}
 		result += commentMap['decomments'].join('\n\n=======\n\n');
 		return result;
@@ -1415,7 +1417,7 @@ Decomment.prototype = {
 	 * @param {Object} commentMap - Commnet objedt of table or column
 	 * @returns {Boolean} comment is conflict
 	 */
-	isCommentConflict: function(commentMap) { 
+	isCommentConflict: function(commentMap) {
 		if (commentMap === null) {
 			return false;
 		}
@@ -1624,7 +1626,7 @@ Decomment.prototype = {
 	 * @return {Object} Request body
 	 */
 	buildCommentRequestParams: function (tableName, columnName, decomment) {
-		var commentMap = this.getCommentMapFromStore(tableName);
+		var commentMap = this.getCommentMapFromStore(tableName, columnName);
 		var databaseComment;
 		var targetType = columnName == null ? 'TABLE' : 'COLUMN';
 		if (commentMap !== null) {
@@ -1633,7 +1635,7 @@ Decomment.prototype = {
 			var commentVersion = commentMap['commentVersion'];
 			databaseComment = commentMap['databaseComment'];
 			if (databaseComment) {
-				databaseComment = databaseComment.replace('<br>', '\n');
+				databaseComment = this.escapeNewlineCharacter(databaseComment);
 			}
 		}
 
@@ -1670,6 +1672,14 @@ Decomment.prototype = {
 				'>': '&gt;',
 			}[match]
 		});
+	},
+
+	/**
+	 * Escape newline character of text
+	 * @param {String} string - text
+	 */
+	escapeNewlineCharacter: function (string) {
+		return string.split('<br>').join('\n')
 	},
 
 	/**
