@@ -15,9 +15,6 @@
  */
 package org.dbflute.infra.doc.decomment;
 
-import org.dbflute.helper.mapstring.MapListString;
-import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +22,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.dbflute.helper.mapstring.MapListString;
+import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
 
 /**
  * @author hakiba
@@ -108,10 +108,8 @@ public class DfDecoMapPickup {
     //     }
     // }
     public Map<String, Object> convertToMap() {
-        final List<Map<String, Object>> convertedTableList = this.getTableList()
-            .stream()
-            .map(DfDecoMapTablePart::convertPickupMap)
-            .collect(Collectors.toList());
+        final List<Map<String, Object>> convertedTableList =
+                this.getTableList().stream().map(DfDecoMapTablePart::convertPickupMap).collect(Collectors.toList());
 
         final Map<String, List<Map<String, Object>>> convertedDecoMap = new LinkedHashMap<>();
         convertedDecoMap.put("tableList", convertedTableList);
