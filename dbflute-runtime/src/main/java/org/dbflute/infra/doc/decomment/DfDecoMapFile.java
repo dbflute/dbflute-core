@@ -326,9 +326,11 @@ public class DfDecoMapFile {
         String owner = decoMapPiece.getPieceOwner();
         String pieceCode = decoMapPiece.getPieceCode();
         if (decoMapPiece.getTargetType() == DfDecoMapPieceTargetType.Table) {
+            // e.g. decomment-piece-MEMBER-20171015-161718-199-jflute-HF7ELSE.dfmap
             return "decomment-piece-" + tableName + "-" + getCurrentDateStr() + "-" + filterOwner(owner) + "-" + pieceCode
                     + ".dfmap";
         } else if (decoMapPiece.getTargetType() == DfDecoMapPieceTargetType.Column) {
+            // e.g. decomment-piece-MEMBER-MEMBER_NAME-20171015-161718-199-jflute-HF7ELSE.dfmap
             return "decomment-piece-" + tableName + "-" + columnName + "-" + getCurrentDateStr() + "-" + filterOwner(owner)
                     + "-" + pieceCode + ".dfmap";
         }
@@ -451,7 +453,7 @@ public class DfDecoMapFile {
     protected void throwIllegalTargetTypeException(DfDecoMapPiece decoMapPiece) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Deco map piece target type is illegal");
-        br.addItem("Target typ");
+        br.addItem("Target type");
         br.addElement(decoMapPiece.getTargetType());
         br.addItem("DecoMapPiece");
         br.addElement(decoMapPiece);
