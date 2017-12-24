@@ -307,19 +307,35 @@ public class DfDecoMapFile {
      */
     public void writePiece(String clientDirPath, DfDecoMapPiece decoMapPiece) {
         assertClientDirPath(clientDirPath);
-        String tableName = decoMapPiece.getTableName();
-        String columnName = decoMapPiece.getColumnName();
-        String owner = decoMapPiece.getPieceOwner();
-        String pieceCode = decoMapPiece.getPieceCode();
-        String pieceMapPath = buildPieceDirPath(clientDirPath) + buildPieceFileName(tableName, columnName, owner, pieceCode);
+        String pieceMapPath = buildPieceDirPath(clientDirPath) + buildPieceFileName(decoMapPiece);
         // done cabos remove 'df' from variable name by jflute (2017/08/10)
         // done cabos make and throw PhysicalCabosException (application exception) see ClientNotFoundException by jflute (2017/08/10)
         doWritePiece(pieceMapPath, decoMapPiece);
     }
 
-    protected String buildPieceFileName(String tableName, String columnName, String owner, String pieceCode) { // e.g decomment-piece-TABLE_NAME-COLUMN_NAME-20170316-123456-789-jflute-FE893L1.dfmap
-        return "decomment-piece-" + tableName + "-" + columnName + "-" + getCurrentDateStr() + "-" + filterOwner(owner) + "-" + pieceCode
-                + ".dfmap";
+    /**
+     * Build piece file name for piece map file<br>
+     * e.g. table decomment : decomment-piece-TABLE_NAME-20171224-143000-123-owner-ABCDEFG.dfmap <br>
+     * e.g. column decomment : decomment-piece-TABLE_NAME-COLUMN_NAME-20171224-143000-123-owner-ABCDEFG.dfmap <br>
+     * @param decoMapPiece Decoment piece map (NotNull)
+     * @return piece file name
+     */
+    protected String buildPieceFileName(DfDecoMapPiece decoMapPiece) {
+        String tableName = decoMapPiece.getTableName();
+        String columnName = decoMapPiece.getColumnName();
+        String owner = decoMapPiece.getPieceOwner();
+        String pieceCode = decoMapPiece.getPieceCode();
+        if (decoMapPiece.getTargetType() == DfDecoMapPieceTargetType.Table) {
+            // e.g. decomment-piece-MEMBER-20171015-161718-199-jflute-HF7ELSE.dfmap
+            return "decomment-piece-" + tableName + "-" + getCurrentDateStr() + "-" + filterOwner(owner) + "-" + pieceCode
+                    + ".dfmap";
+        } else if (decoMapPiece.getTargetType() == DfDecoMapPieceTargetType.Column) {
+            // e.g. decomment-piece-MEMBER-MEMBER_NAME-20171015-161718-199-jflute-HF7ELSE.dfmap
+            return "decomment-piece-" + tableName + "-" + columnName + "-" + getCurrentDateStr() + "-" + filterOwner(owner)
+                    + "-" + pieceCode + ".dfmap";
+        }
+        throwIllegalTargetTypeException(decoMapPiece);
+        return null; // unreachable
     }
 
     protected String filterOwner(String owner) {
@@ -432,6 +448,17 @@ public class DfDecoMapFile {
         br.addElement(decoMap);
         final String msg = br.buildExceptionMessage();
         throw new DfDecoMapFileWriteFailureException(msg, cause);
+    }
+
+    protected void throwIllegalTargetTypeException(DfDecoMapPiece decoMapPiece) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Deco map piece target type is illegal");
+        br.addItem("Target type");
+        br.addElement(decoMapPiece.getTargetType());
+        br.addItem("DecoMapPiece");
+        br.addElement(decoMapPiece);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalArgumentException(msg);
     }
 
     // ===================================================================================
