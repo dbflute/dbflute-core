@@ -86,13 +86,17 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
     // ===================================================================================
     //                                                                           file name
     //                                                                           =========
-    public void test_buildPieceFileName() throws Exception {
+    public void test_buildPieceFileName_tableDecomment() throws Exception {
         // ## Arrange ##
+        final String currentDateStr = "20171224-100000-123";
         final String sampleTableName = "EBISU_GARDEN_PLACE";
-        final String sampleColumnName = "PLAZA";
         final String sampleAuthor = "cabos";
         final String samplePieceCode = "FE893L1";
-        final String currentDateStr = "2999/12/31";
+        final DfDecoMapPiece piece = new DfDecoMapPiece();
+        piece.setTableName(sampleTableName);
+        piece.setPieceOwner(sampleAuthor);
+        piece.setPieceCode(samplePieceCode);
+        piece.setTargetType(DfDecoMapPieceTargetType.Table);
         DfDecoMapFile decoMapFile = new DfDecoMapFile() {
             @Override
             protected String getCurrentDateStr() {
@@ -101,13 +105,46 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         };
 
         // e.g decomment-piece-TABLE_NAME-20170316-123456-789-authorName.dfmap
-        final String expFileName = "decomment-piece-" + sampleTableName + "-" + sampleColumnName + "-" + currentDateStr + "-" + sampleAuthor
+        final String expFileName = "decomment-piece-" + sampleTableName + "-" + currentDateStr + "-" + sampleAuthor
                 + "-" + samplePieceCode + ".dfmap";
 
         // ## Act ##
-        final String fileName = decoMapFile.buildPieceFileName(sampleTableName, sampleColumnName, sampleAuthor, samplePieceCode);
+        final String fileName = decoMapFile.buildPieceFileName(piece);
 
         // ## Assert ##
+        log("expFileName : {} , fileName : {}", expFileName, fileName);
+        assertEquals(fileName, expFileName);
+    }
+
+    public void test_buildPieceFileName_columnDecomment() throws Exception {
+        // ## Arrange ##
+        final String currentDateStr = "20171224-100000-123";
+        final String sampleTableName = "EBISU_GARDEN_PLACE";
+        final String sampleColumnName = "PLAZA";
+        final String sampleAuthor = "cabos";
+        final String samplePieceCode = "FE893L1";
+        final DfDecoMapPiece piece = new DfDecoMapPiece();
+        piece.setTableName(sampleTableName);
+        piece.setColumnName(sampleColumnName);
+        piece.setPieceOwner(sampleAuthor);
+        piece.setPieceCode(samplePieceCode);
+        piece.setTargetType(DfDecoMapPieceTargetType.Column);
+        DfDecoMapFile decoMapFile = new DfDecoMapFile() {
+            @Override
+            protected String getCurrentDateStr() {
+                return currentDateStr;
+            }
+        };
+
+        // e.g decomment-piece-TABLE_NAME-20170316-123456-789-authorName.dfmap
+        final String expFileName = "decomment-piece-" + sampleTableName + "-" + sampleColumnName + "-" + currentDateStr
+                + "-" + sampleAuthor + "-" + samplePieceCode + ".dfmap";
+
+        // ## Act ##
+        final String fileName = decoMapFile.buildPieceFileName(piece);
+
+        // ## Assert ##
+        log("expFileName : {} , fileName : {}", expFileName, fileName);
         assertEquals(fileName, expFileName);
     }
 
