@@ -1624,7 +1624,7 @@ Decomment.prototype = {
 	 * @return {Object} Request body
 	 */
 	buildCommentRequestParams: function (tableName, columnName, decomment) {
-		var commentMap = this.getCommentMapFromStore(tableName);
+		var commentMap = this.getCommentMapFromStore(tableName, columnName);
 		var databaseComment;
 		var targetType = columnName == null ? 'TABLE' : 'COLUMN';
 		if (commentMap !== null) {
