@@ -1,0 +1,15 @@
+map:{
+    ; formatVersion = 1.0
+    ; merged = false
+    ; tableName = MEMBER
+    ; columnName = BIRTHDATE
+    ; targetType = COLUMN
+    ; decomment = my name is deco
+    ; databaseComment = hakiba in database
+    ; commentVersion = 0
+    ; authorList = list:{ deco }
+    ; pieceCode = DE000000
+    ; pieceDatetime = 2017-11-10T00:00:00.000
+    ; pieceOwner = deco
+    ; previousPieceList = list:{}
+}

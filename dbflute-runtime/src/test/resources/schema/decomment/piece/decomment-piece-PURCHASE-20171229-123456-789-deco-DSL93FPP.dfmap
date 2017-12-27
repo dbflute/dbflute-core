@@ -1,0 +1,15 @@
+map:{
+    ; formatVersion = 1.0
+    ; merged = false
+    ; tableName = PURCHASE
+    ; columnName = null
+    ; targetType = TABLE
+    ; decomment = member's purchase
+    ; databaseComment = null
+    ; commentVersion = 0
+    ; authorList = list:{ deco }
+    ; pieceCode = DSL93FPP
+    ; pieceDatetime = 2017-12-30T12:34:56.789
+    ; pieceOwner = deco
+    ; previousPieceList = list:{}
+}
