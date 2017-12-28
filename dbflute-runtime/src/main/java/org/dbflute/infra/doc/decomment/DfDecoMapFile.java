@@ -481,9 +481,9 @@ public class DfDecoMapFile {
     public DfDecoMapPickup merge(OptionalThing<DfDecoMapPickup> pickupOpt, List<DfDecoMapPiece> pieces) {
         Set<String> pieceCodeSet = extractAllMergedPieceCode(pickupOpt, pieces);
         List<DfDecoMapPiece> filteredPieces = filterPieces(pieces, pieceCodeSet);
-        DfDecoMapPickup pickUp = pickupOpt.orElse(new DfDecoMapPickup());
-        doMerge(filteredPieces, pickUp);
-        return pickUp;
+        DfDecoMapPickup filteredPickup = filterPickupPropertyList(pickupOpt, pieceCodeSet);
+        doMerge(filteredPieces, filteredPickup);
+        return filteredPickup;
     }
 
     private Set<String> extractAllMergedPieceCode(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieces) {
@@ -494,13 +494,7 @@ public class DfDecoMapFile {
                 Stream<String> previousColumnPieceStream =
                         table.getColumnList().stream().flatMap(column -> column.getPropertyList().stream()).flatMap(
                                 property -> property.getPreviousPieceList().stream());
-                Stream<String> tablePieceStream = table.getPropertyList().stream().map(property -> property.getPieceCode());
-                Stream<String> columnPieceStream = table.getColumnList()
-                        .stream()
-                        .flatMap(column -> column.getPropertyList().stream())
-                        .map(property -> property.getPieceCode());
-                return Stream.concat(Stream.concat(Stream.concat(previousTablePieceStream, previousColumnPieceStream), tablePieceStream),
-                        columnPieceStream);
+                return Stream.concat(previousTablePieceStream, previousColumnPieceStream);
             });
         }).orElse(Stream.empty());
         Stream<String> previousPieceCodeStream = pieces.stream().flatMap(piece -> piece.getPreviousPieceList().stream());
@@ -509,6 +503,26 @@ public class DfDecoMapFile {
 
     private List<DfDecoMapPiece> filterPieces(List<DfDecoMapPiece> pieces, Set<String> pieceCodeSet) {
         return pieces.stream().filter(piece -> !pieceCodeSet.contains(piece.getPieceCode())).collect(Collectors.toList());
+    }
+
+    private DfDecoMapPickup filterPickupPropertyList(OptionalThing<DfDecoMapPickup> optPickup, Set<String> pieceCodeSet) {
+        return optPickup.map(pickup -> {
+            pickup.getTableList().forEach(table -> {
+                filterTablePropertyList(table, pieceCodeSet);
+                table.getColumnList().forEach(column -> {
+                    filterColumnPropertyList(column, pieceCodeSet);
+                });
+            });
+            return pickup;
+        }).orElseGet(() -> new DfDecoMapPickup());
+    }
+
+    private void filterTablePropertyList(DfDecoMapTablePart table, Set<String> pieceCodeSet) {
+        pieceCodeSet.forEach(pieceCode -> table.removeProperty(pieceCode));
+    }
+
+    private void filterColumnPropertyList(DfDecoMapColumnPart column, Set<String> pieceCodeSet) {
+        pieceCodeSet.forEach(pieceCode -> column.removeProperty(pieceCode));
     }
 
     protected void doMerge(List<DfDecoMapPiece> filteredPieces, DfDecoMapPickup pickUp) {
