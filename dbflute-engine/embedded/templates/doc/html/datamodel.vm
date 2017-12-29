@@ -1499,7 +1499,7 @@ Decomment.prototype = {
 			var isConflict = that.isCommentConflict(commentMap);
 			var commentInfo;
 			if (columnName) {
-				var columnNameOfTable = columnName + " of " + tableName;
+				var columnNameOfTable = tableName + "." + columnName;
 				columnInfo = isConflict ? columnNameOfTable + " ... but now in CONFLICT!" : columnNameOfTable;
 			} else {
 				columnInfo = isConflict ? tableName + " ... but now in CONFLICT!" : tableName;
