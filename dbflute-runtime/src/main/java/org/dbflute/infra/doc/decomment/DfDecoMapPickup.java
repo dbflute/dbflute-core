@@ -18,6 +18,7 @@ package org.dbflute.infra.doc.decomment;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,17 +44,21 @@ public class DfDecoMapPickup {
     //                                                                           Attribute
     //                                                                           =========
     // done cabos add pickupDatetime by jflute (2017/11/11)
-    protected String formatVersion;
+    protected final String formatVersion;
     protected LocalDateTime pickupDatetime;
-    protected Map<String, List<DfDecoMapTablePart>> decoMap;
+    protected final Map<String, List<DfDecoMapTablePart>> decoMap;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfDecoMapPickup() {
+        this(DEFAULT_FORMAT_VERSION);
+    }
+
+    public DfDecoMapPickup(String formatVersion) {
         this.decoMap = new LinkedHashMap<>();
         this.decoMap.put(DECO_MAP_KEY, new ArrayList<>()); // avoid null pointer exception
-        this.formatVersion = DEFAULT_FORMAT_VERSION;
+        this.formatVersion = formatVersion;
     }
 
     // ===================================================================================
@@ -137,10 +142,6 @@ public class DfDecoMapPickup {
         return formatVersion;
     }
 
-    public void setFormatVersion(String formatVersion) {
-        this.formatVersion = formatVersion;
-    }
-
     public LocalDateTime getPickupDatetime() {
         return pickupDatetime;
     }
@@ -150,7 +151,7 @@ public class DfDecoMapPickup {
     }
 
     public List<DfDecoMapTablePart> getTableList() {
-        return decoMap.get(DECO_MAP_KEY);
+        return Collections.unmodifiableList(decoMap.get(DECO_MAP_KEY));
     }
 
     public void addTable(DfDecoMapTablePart table) {

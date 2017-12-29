@@ -44,6 +44,7 @@ import org.dbflute.infra.doc.decomment.parts.DfDecoMapPropertyPart;
 import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
 import org.dbflute.optional.OptionalThing;
 import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfTypeUtil;
 
 // done cabos DfDecoMapFile by jflute (2017/07/27)
 // done cabos add copyright in source file header like this class to classes of infra.doc.decomment by jflute (2017/11/11)
@@ -262,8 +263,9 @@ public class DfDecoMapFile {
 
     private DfDecoMapPickup mappingToDecoMapPickup(Map<String, Object> map) {
         String formatVersion = (String) map.getOrDefault("formatVersion", DfDecoMapPickup.DEFAULT_FORMAT_VERSION);
-        DfDecoMapPickup pickup = new DfDecoMapPickup();
-        pickup.setFormatVersion(formatVersion);
+        LocalDateTime pickupDatetime = DfTypeUtil.toLocalDateTime(map.get("pickupDatetime"));
+        DfDecoMapPickup pickup = new DfDecoMapPickup(formatVersion);
+        pickup.setPickupDatetime(pickupDatetime);
 
         @SuppressWarnings("unchecked")
         Map<String, List<Map<String, Object>>> decoMap =
@@ -570,19 +572,13 @@ public class DfDecoMapFile {
                 });
             }
         });
-        pickUp.setPickupDatetime(LocalDateTime.now());
+        pickUp.setPickupDatetime(getCurrentLocalDateTime());
     }
 
     private DfDecoMapPropertyPart mappingPieceToProperty(DfDecoMapPiece piece) {
-        DfDecoMapPropertyPart property = new DfDecoMapPropertyPart();
-        property.setDecomment(piece.getDecomment());
-        property.setDatabaseComment(piece.getDatabaseComment());
-        property.setCommentVersion(piece.getCommentVersion());
-        property.addAllAuthors(piece.getAuthorList());
-        property.setPieceCode(piece.getPieceCode());
-        property.setPieceDatetime(piece.getPieceDatetime());
-        property.setPieceOwner(piece.getPieceOwner());
-        property.addAllPreviousPieces(piece.getPreviousPieceList());
+        DfDecoMapPropertyPart property = new DfDecoMapPropertyPart(piece.getDecomment(), piece.getDatabaseComment(),
+                piece.getPieceCode(), piece.getPieceDatetime(), piece.getPieceOwner(), piece.getPreviousPieceList(),
+                piece.getCommentVersion(), piece.getAuthorList());
         return property;
     }
 
