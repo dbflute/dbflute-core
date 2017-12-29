@@ -163,9 +163,10 @@ public class DfDecoMapPickup {
     }
 
     private List<DfDecoMapTablePart> getDecoMapTablePartList() {
-        if (decoMap.get(DECO_MAP_KEY) == null) {
+        List<DfDecoMapTablePart> decoMapTablePartList = decoMap.get(DECO_MAP_KEY);
+        if (decoMapTablePartList == null) {
             throw new IllegalStateException("decoMap table list is not exists");
         }
-        return decoMap.get(DECO_MAP_KEY);
+        return decoMapTablePartList;
     }
 }
