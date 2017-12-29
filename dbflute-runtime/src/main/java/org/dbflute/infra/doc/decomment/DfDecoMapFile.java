@@ -470,9 +470,9 @@ public class DfDecoMapFile {
      * <br>
      * <b>Logic:</b>
      * <ol>
+     *     <li>Add PropertyList each table or column</li>
      *     <li>Filter already merged piece. <br>
      *         (If piece was already merged, Either previousPieceList(previous piece code) contains it's piece code)</li>
-     *     <li>Add PropertyList each table or column</li>
      * </ol>
      * @param pickupOpt Decoment pickup map (NotNull: If pickup map file not exists, Empty allowed)
      * @param pieces Decoment piece map (NotNull: If piece map file not exists, Empty allowed)
@@ -480,10 +480,10 @@ public class DfDecoMapFile {
      */
     public DfDecoMapPickup merge(OptionalThing<DfDecoMapPickup> pickupOpt, List<DfDecoMapPiece> pieces) {
         Set<String> pieceCodeSet = extractAllMergedPieceCode(pickupOpt, pieces);
-        List<DfDecoMapPiece> filteredPieces = filterPieces(pieces, pieceCodeSet);
-        DfDecoMapPickup filteredPickup = filterPickupPropertyList(pickupOpt, pieceCodeSet);
-        doMerge(filteredPieces, filteredPickup);
-        return filteredPickup;
+        DfDecoMapPickup pickup = pickupOpt.orElse(new DfDecoMapPickup());
+        doMerge(pieces, pickup);
+        filterMergedProperties(pickup, pieceCodeSet);
+        return pickup;
     }
 
     private Set<String> extractAllMergedPieceCode(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieces) {
@@ -501,20 +501,13 @@ public class DfDecoMapFile {
         return Stream.concat(pickupPieceCodeStream, previousPieceCodeStream).collect(Collectors.toSet());
     }
 
-    private List<DfDecoMapPiece> filterPieces(List<DfDecoMapPiece> pieces, Set<String> pieceCodeSet) {
-        return pieces.stream().filter(piece -> !pieceCodeSet.contains(piece.getPieceCode())).collect(Collectors.toList());
-    }
-
-    private DfDecoMapPickup filterPickupPropertyList(OptionalThing<DfDecoMapPickup> optPickup, Set<String> pieceCodeSet) {
-        return optPickup.map(pickup -> {
-            pickup.getTableList().forEach(table -> {
-                filterTablePropertyList(table, pieceCodeSet);
-                table.getColumnList().forEach(column -> {
-                    filterColumnPropertyList(column, pieceCodeSet);
-                });
+    private void filterMergedProperties(DfDecoMapPickup pickup, Set<String> pieceCodeSet) {
+        pickup.getTableList().forEach(table -> {
+            filterTablePropertyList(table, pieceCodeSet);
+            table.getColumnList().forEach(column -> {
+                filterColumnPropertyList(column, pieceCodeSet);
             });
-            return pickup;
-        }).orElseGet(() -> new DfDecoMapPickup());
+        });
     }
 
     private void filterTablePropertyList(DfDecoMapTablePart table, Set<String> pieceCodeSet) {
