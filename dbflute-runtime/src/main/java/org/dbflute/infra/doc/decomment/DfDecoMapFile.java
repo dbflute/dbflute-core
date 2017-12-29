@@ -15,18 +15,6 @@
  */
 package org.dbflute.infra.doc.decomment;
 
-import org.dbflute.helper.HandyDate;
-import org.dbflute.helper.mapstring.MapListFile;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.infra.doc.decomment.exception.DfDecoMapFileReadFailureException;
-import org.dbflute.infra.doc.decomment.exception.DfDecoMapFileWriteFailureException;
-import org.dbflute.infra.doc.decomment.parts.DfDecoMapColumnPart;
-import org.dbflute.infra.doc.decomment.parts.DfDecoMapPropertyPart;
-import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
-import org.dbflute.optional.OptionalThing;
-import org.dbflute.util.DfStringUtil;
-import org.dbflute.util.DfTypeUtil;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,6 +33,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.dbflute.helper.HandyDate;
+import org.dbflute.helper.mapstring.MapListFile;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.infra.doc.decomment.exception.DfDecoMapFileReadFailureException;
+import org.dbflute.infra.doc.decomment.exception.DfDecoMapFileWriteFailureException;
+import org.dbflute.infra.doc.decomment.parts.DfDecoMapColumnPart;
+import org.dbflute.infra.doc.decomment.parts.DfDecoMapPropertyPart;
+import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
+import org.dbflute.optional.OptionalThing;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfTypeUtil;
 
 // done cabos DfDecoMapFile by jflute (2017/07/27)
 // done cabos add copyright in source file header like this class to classes of infra.doc.decomment by jflute (2017/11/11)
@@ -157,14 +157,15 @@ public class DfDecoMapFile {
         String decomment = (String) map.get("decomment");
         String databaseComment = (String) map.get("databaseComment");
         Long commentVersion = Long.valueOf(map.get("commentVersion").toString());
+        @SuppressWarnings("unchecked")
         List<String> authorList = (List<String>) map.get("authorList");
         String pieceCode = (String) map.get("pieceCode");
         LocalDateTime pieceDatetime = new HandyDate((String) map.get("pieceDatetime")).getLocalDateTime();
         String pieceOwner = (String) map.get("pieceOwner");
+        @SuppressWarnings("unchecked")
         List<String> previousPieceList = (List<String>) map.get("previousPieceList");
-        DfDecoMapPiece piece = new DfDecoMapPiece(tableName, columnName, targetType, decomment, databaseComment,
-                commentVersion, authorList, pieceCode, pieceDatetime, pieceOwner, previousPieceList);
-        return piece;
+        return new DfDecoMapPiece(formatVersion, tableName, columnName, targetType, decomment, databaseComment, commentVersion, authorList,
+                pieceCode, pieceDatetime, pieceOwner, previousPieceList);
     }
 
     // -----------------------------------------------------
@@ -254,6 +255,7 @@ public class DfDecoMapFile {
         DfDecoMapPickup pickup = new DfDecoMapPickup(formatVersion);
         pickup.setPickupDatetime(pickupDatetime);
 
+        @SuppressWarnings("unchecked")
         Map<String, List<Map<String, Object>>> decoMap =
                 (Map<String, List<Map<String, Object>>>) map.getOrDefault("decoMap", new LinkedHashMap<>());
         if (decoMap.isEmpty()) {
@@ -315,12 +317,11 @@ public class DfDecoMapFile {
         String pieceCode = decoMapPiece.getPieceCode();
         if (decoMapPiece.getTargetType() == DfDecoMapPieceTargetType.Table) {
             // e.g. decomment-piece-MEMBER-20171015-161718-199-jflute-HF7ELSE.dfmap
-            return "decomment-piece-" + tableName + "-" + getCurrentDateStr() + "-" + filterOwner(owner) + "-" + pieceCode
-                    + ".dfmap";
+            return "decomment-piece-" + tableName + "-" + getCurrentDateStr() + "-" + filterOwner(owner) + "-" + pieceCode + ".dfmap";
         } else if (decoMapPiece.getTargetType() == DfDecoMapPieceTargetType.Column) {
             // e.g. decomment-piece-MEMBER-MEMBER_NAME-20171015-161718-199-jflute-HF7ELSE.dfmap
-            return "decomment-piece-" + tableName + "-" + columnName + "-" + getCurrentDateStr() + "-" + filterOwner(owner)
-                    + "-" + pieceCode + ".dfmap";
+            return "decomment-piece-" + tableName + "-" + columnName + "-" + getCurrentDateStr() + "-" + filterOwner(owner) + "-"
+                    + pieceCode + ".dfmap";
         }
         throwIllegalTargetTypeException(decoMapPiece);
         return null; // unreachable
@@ -562,9 +563,9 @@ public class DfDecoMapFile {
     }
 
     private DfDecoMapPropertyPart mappingPieceToProperty(DfDecoMapPiece piece) {
-        DfDecoMapPropertyPart property = new DfDecoMapPropertyPart(piece.getDecomment(), piece.getDatabaseComment(),
-                piece.getPieceCode(), piece.getPieceDatetime(), piece.getPieceOwner(), piece.getPreviousPieceList(),
-                piece.getCommentVersion(), piece.getAuthorList());
+        DfDecoMapPropertyPart property =
+                new DfDecoMapPropertyPart(piece.getDecomment(), piece.getDatabaseComment(), piece.getPieceCode(), piece.getPieceDatetime(),
+                        piece.getPieceOwner(), piece.getPreviousPieceList(), piece.getCommentVersion(), piece.getAuthorList());
         return property;
     }
 

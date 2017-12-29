@@ -20,7 +20,6 @@ import org.dbflute.infra.doc.decomment.parts.DfDecoMapPropertyPart;
 import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
 import org.dbflute.optional.OptionalThing;
 import org.dbflute.unit.RuntimeTestCase;
-import org.dbflute.util.DfTypeUtil;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,50 +40,6 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
     //                                                                          Definition
     //                                                                          ==========
     private static final String TEST_RESOURCES_PATH = "/src/test/resources";
-
-    // ===================================================================================
-    //                                                                               Read
-    //                                                                              ======
-    public void test_readPickup() throws Exception {
-        // ## Arrange ##
-        final DfDecoMapFile decoMapFile = new DfDecoMapFile();
-
-        // ## Act ##
-        OptionalThing<DfDecoMapPickup> optPickup = decoMapFile.readPickup(buildTestResourcePath());
-
-        // ## Assert ##
-        assertTrue(optPickup.isPresent());
-        DfDecoMapPickup pickup = optPickup.get();
-
-        assertEquals(pickup.getFormatVersion(), "1.0");
-        assertEquals(pickup.getPickupDatetime(), DfTypeUtil.toLocalDateTime("2017-11-09T09:09:09.009"));
-        {
-            DfDecoMapTablePart member = extractPickupTableAsOne(pickup, "MEMBER");
-            assertEquals(0, member.getPropertyList().size());
-            assertEquals(1, member.getColumnList().size());
-            {
-                DfDecoMapColumnPart memberName = extractPickupColumnAsOne(member, "MEMBER_NAME");
-                assertEquals(1, memberName.getPropertyList().size());
-                assertEquals("cabos", memberName.getPropertyList().get(0).getPieceOwner());
-            }
-        }
-        {
-            DfDecoMapTablePart login = extractPickupTableAsOne(pickup, "MEMBER_LOGIN");
-            assertEquals(1, login.getPropertyList().size());
-            assertEquals("cabos", login.getPropertyList().get(0).getPieceOwner());
-            assertEquals(2, login.getColumnList().size());
-            {
-                DfDecoMapColumnPart memberName = extractPickupColumnAsOne(login, "LOGIN_DATETIME");
-                assertEquals(1, memberName.getPropertyList().size());
-                assertEquals("hakiba", memberName.getPropertyList().get(0).getPieceOwner());
-            }
-            {
-                DfDecoMapColumnPart memberName = extractPickupColumnAsOne(login, "LOGIN_MEMBER_STATUS_CODE");
-                assertEquals(2, memberName.getPropertyList().size());
-                assertEquals("deco", memberName.getPropertyList().get(0).getPieceOwner());
-            }
-        }
-    }
 
     // ===================================================================================
     //                                                                               Merge
@@ -138,7 +93,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         final String tableName = "MEMBER_LOGIN";
         final String pieceCode = "NEWPIECE";
         final String author = "borderman";
-        final OptionalThing<DfDecoMapPickup> optPickup = decoMapFile.readPickup(buildTestResourcePath());
+        final OptionalThing<DfDecoMapPickup> optPickup = decoMapFile.readPickup(getProjectDir().getPath() + TEST_RESOURCES_PATH);
         final DfDecoMapTablePart table = extractPickupTableAsOne(optPickup.get(), tableName);
         final List<String> pieceCodeList = table.getPropertyList().stream().flatMap(property -> property.getPreviousPieceList().stream()).collect(Collectors.toList());
         pieceCodeList.addAll(table.getPropertyList().stream().map(property -> property.getPieceCode()).collect(Collectors.toList()));
@@ -166,8 +121,8 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
     public void test_merge_AllTestPiecesAndPickupAtResources() throws Exception {
         // ## Arrange ##
         final DfDecoMapFile decoMapFile = new DfDecoMapFile();
-        final List<DfDecoMapPiece> pieceList = decoMapFile.readPieceList(buildTestResourcePath());
-        final OptionalThing<DfDecoMapPickup> optPickUp = decoMapFile.readPickup(buildTestResourcePath());
+        final List<DfDecoMapPiece> pieceList = decoMapFile.readPieceList(getProjectDir().getPath() + TEST_RESOURCES_PATH);
+        final OptionalThing<DfDecoMapPickup> optPickUp = decoMapFile.readPickup(getProjectDir().getPath() + TEST_RESOURCES_PATH);
 
         // ## Act ##
         final DfDecoMapPickup mergedPickUp = decoMapFile.merge(optPickUp, pieceList);
@@ -299,9 +254,8 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
     //                                          ------------
     private DfDecoMapPiece preparePiece(DfDecoMapPieceTargetType type, String tableName, String columnName,
                                         String author, String pieceCode, List<String> previousPieceList) {
-        return new DfDecoMapPiece(tableName, columnName, type, "decomment",
-                "decomment does't mean database comment, means deco chan comment", 1L, Collections.singletonList(author),
-                pieceCode, currentLocalDateTime(), author, previousPieceList);
+        DfDecoMapPiece piece = new DfDecoMapPiece("1.0", tableName, columnName, type, "decomment", "decomment does't mean database comment, means deco chan comment", 1L, Collections.singletonList(author), pieceCode, currentLocalDateTime(), author, previousPieceList);
+        return piece;
     }
 
     private DfDecoMapTablePart extractPickupTableAsOne(DfDecoMapPickup pickup, String tableName) {
@@ -317,9 +271,5 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
                 .filter(column -> column.getColumnName().equals(columnName)).collect(Collectors.toList());
         assertHasOnlyOneElement(columnList);
         return columnList.get(0);
-    }
-
-    private String buildTestResourcePath() {
-        return getProjectDir().getPath() + TEST_RESOURCES_PATH;
     }
 }

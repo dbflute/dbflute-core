@@ -31,14 +31,9 @@ import java.util.Map;
 public class DfDecoMapPiece {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final String DEFAULT_FORMAT_VERSION = "1.0";
-
-    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String formatVersion = DEFAULT_FORMAT_VERSION;
+    protected final String formatVersion;
     protected final String tableName;
     protected final String columnName;
     protected final DfDecoMapPieceTargetType targetType;
@@ -54,11 +49,10 @@ public class DfDecoMapPiece {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-
-
-    public DfDecoMapPiece(String tableName, String columnName, DfDecoMapPieceTargetType targetType, String decomment,
+    public DfDecoMapPiece(String formatVersion, String tableName, String columnName, DfDecoMapPieceTargetType targetType, String decomment,
                           String databaseComment, Long commentVersion, List<String> authorList, String pieceCode,
                           LocalDateTime pieceDatetime, String pieceOwner, List<String> previousPieceList) {
+        this.formatVersion = formatVersion;
         this.tableName = tableName;
         this.columnName = columnName;
         this.targetType = targetType;
