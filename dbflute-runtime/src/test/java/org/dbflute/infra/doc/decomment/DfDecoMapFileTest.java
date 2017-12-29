@@ -15,11 +15,7 @@
  */
 package org.dbflute.infra.doc.decomment;
 
-import org.dbflute.infra.doc.decomment.parts.DfDecoMapColumnPart;
-import org.dbflute.infra.doc.decomment.parts.DfDecoMapPropertyPart;
-import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
-import org.dbflute.optional.OptionalThing;
-import org.dbflute.unit.RuntimeTestCase;
+import static org.dbflute.system.DBFluteSystem.currentLocalDateTime;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,11 +24,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.dbflute.system.DBFluteSystem.currentLocalDateTime;
+import org.dbflute.infra.doc.decomment.parts.DfDecoMapColumnPart;
+import org.dbflute.infra.doc.decomment.parts.DfDecoMapPropertyPart;
+import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
+import org.dbflute.optional.OptionalThing;
+import org.dbflute.unit.RuntimeTestCase;
 
 /**
  * @author hakiba
  * @author cabos
+ * @author jflute
  */
 public class DfDecoMapFileTest extends RuntimeTestCase {
 
@@ -48,9 +49,9 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         // ## Arrange ##
         final DfDecoMapFile decoMapFile = new DfDecoMapFile();
         final OptionalThing<DfDecoMapPickup> optPickup = OptionalThing.empty(); // not exists pickup
-        final DfDecoMapPiece piece1 = preparePiece(DfDecoMapPieceTargetType.Column,"MEMBER", "MEMBER_NAME", "hakiba", "SAMPLEPI", Collections.emptyList());
-        final DfDecoMapPiece piece2 = preparePiece(DfDecoMapPieceTargetType.Column,"MEMBER", "MEMBER_STATUS", "cabos", "ECECODED", Collections.emptyList());
-        final DfDecoMapPiece piece3 = preparePiece(DfDecoMapPieceTargetType.Column,"PURCHASE", "PURCHASE_PRODUCT", "cabos", "AYOOOOO", Collections.emptyList());
+        final DfDecoMapPiece piece1 = preparePieceColumn("MEMBER", "MEMBER_NAME", "hakiba", "SAMPLEPI");
+        final DfDecoMapPiece piece2 = preparePieceColumn("MEMBER", "MEMBER_STATUS", "cabos", "ECECODED");
+        final DfDecoMapPiece piece3 = preparePieceColumn("PURCHASE", "PURCHASE_PRODUCT", "cabos", "AYOOOOO");
         final List<DfDecoMapPiece> pieceList = Arrays.asList(piece1, piece2, piece3);
 
         // ## Act ##
@@ -95,9 +96,10 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         final String author = "borderman";
         final OptionalThing<DfDecoMapPickup> optPickup = decoMapFile.readPickup(getProjectDir().getPath() + TEST_RESOURCES_PATH);
         final DfDecoMapTablePart table = extractPickupTableAsOne(optPickup.get(), tableName);
-        final List<String> pieceCodeList = table.getPropertyList().stream().flatMap(property -> property.getPreviousPieceList().stream()).collect(Collectors.toList());
+        final List<String> pieceCodeList =
+                table.getPropertyList().stream().flatMap(property -> property.getPreviousPieceList().stream()).collect(Collectors.toList());
         pieceCodeList.addAll(table.getPropertyList().stream().map(property -> property.getPieceCode()).collect(Collectors.toList()));
-        final DfDecoMapPiece piece = preparePiece(DfDecoMapPieceTargetType.Table, tableName, null, author, pieceCode, pieceCodeList);
+        final DfDecoMapPiece piece = preparePieceTable(tableName, author, pieceCode, pieceCodeList);
 
         // ## Act ##
         DfDecoMapPickup mergedPickUp = decoMapFile.merge(optPickup, Collections.singletonList(piece));
@@ -178,8 +180,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         final String sampleTableName = "EBISU_GARDEN_PLACE";
         final String sampleAuthor = "cabos";
         final String samplePieceCode = "FE893L1";
-        DfDecoMapPiece piece = preparePiece(DfDecoMapPieceTargetType.Table, sampleTableName, null, sampleAuthor,
-                samplePieceCode, Collections.emptyList());
+        DfDecoMapPiece piece = preparePieceTable(sampleTableName, sampleAuthor, samplePieceCode);
         DfDecoMapFile decoMapFile = new DfDecoMapFile() {
             @Override
             protected String getCurrentDateStr() {
@@ -188,8 +189,8 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         };
 
         // e.g decomment-piece-TABLE_NAME-20170316-123456-789-authorName.dfmap
-        final String expFileName = "decomment-piece-" + sampleTableName + "-" + currentDateStr + "-" + sampleAuthor
-                + "-" + samplePieceCode + ".dfmap";
+        final String expFileName =
+                "decomment-piece-" + sampleTableName + "-" + currentDateStr + "-" + sampleAuthor + "-" + samplePieceCode + ".dfmap";
 
         // ## Act ##
         final String fileName = decoMapFile.buildPieceFileName(piece);
@@ -206,8 +207,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         final String sampleColumnName = "PLAZA";
         final String sampleAuthor = "cabos";
         final String samplePieceCode = "FE893L1";
-        DfDecoMapPiece piece = preparePiece(DfDecoMapPieceTargetType.Column, sampleTableName, sampleColumnName, sampleAuthor, samplePieceCode,
-                Collections.emptyList());
+        DfDecoMapPiece piece = preparePieceColumn(sampleTableName, sampleColumnName, sampleAuthor, samplePieceCode);
         DfDecoMapFile decoMapFile = new DfDecoMapFile() {
             @Override
             protected String getCurrentDateStr() {
@@ -216,8 +216,8 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         };
 
         // e.g decomment-piece-TABLE_NAME-20170316-123456-789-authorName.dfmap
-        final String expFileName = "decomment-piece-" + sampleTableName + "-" + sampleColumnName + "-" + currentDateStr
-                + "-" + sampleAuthor + "-" + samplePieceCode + ".dfmap";
+        final String expFileName = "decomment-piece-" + sampleTableName + "-" + sampleColumnName + "-" + currentDateStr + "-" + sampleAuthor
+                + "-" + samplePieceCode + ".dfmap";
 
         // ## Act ##
         final String fileName = decoMapFile.buildPieceFileName(piece);
@@ -252,10 +252,28 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
     // -----------------------------------------------------
     //                                          Assist Logic
     //                                          ------------
-    private DfDecoMapPiece preparePiece(DfDecoMapPieceTargetType type, String tableName, String columnName,
-                                        String author, String pieceCode, List<String> previousPieceList) {
-        DfDecoMapPiece piece = new DfDecoMapPiece(tableName, columnName, type, "decomment", "decomment does't mean database comment, means deco chan comment", 1L, Collections.singletonList(author), pieceCode, currentLocalDateTime(), author, previousPieceList);
-        return piece;
+    private DfDecoMapPiece preparePieceColumn(String tableName, String columnName, String author, String pieceCode) {
+        return preparePieceColumn(tableName, columnName, author, pieceCode, Collections.emptyList());
+    }
+
+    private DfDecoMapPiece preparePieceColumn(String tableName, String columnName, String author, String pieceCode,
+            List<String> previousPieceList) {
+        return doPreparePiece(DfDecoMapPieceTargetType.Column, tableName, columnName, author, pieceCode, previousPieceList);
+    }
+
+    private DfDecoMapPiece preparePieceTable(String tableName, String author, String pieceCode) {
+        return preparePieceTable(tableName, author, pieceCode, Collections.emptyList());
+    }
+
+    private DfDecoMapPiece preparePieceTable(String tableName, String author, String pieceCode, List<String> previousPieceList) {
+        return doPreparePiece(DfDecoMapPieceTargetType.Table, tableName, null, author, pieceCode, previousPieceList);
+    }
+
+    private DfDecoMapPiece doPreparePiece(DfDecoMapPieceTargetType type, String tableName, String columnName, String author,
+            String pieceCode, List<String> previousPieceList) {
+        return new DfDecoMapPiece("1.0", tableName, columnName, type, "decomment",
+                "decomment does't mean database comment, means deco chan comment", 1L, Collections.singletonList(author), pieceCode,
+                currentLocalDateTime(), author, previousPieceList);
     }
 
     private DfDecoMapTablePart extractPickupTableAsOne(DfDecoMapPickup pickup, String tableName) {
@@ -267,8 +285,8 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
     }
 
     private DfDecoMapColumnPart extractPickupColumnAsOne(DfDecoMapTablePart table, String columnName) {
-        List<DfDecoMapColumnPart> columnList = table.getColumnList().stream()
-                .filter(column -> column.getColumnName().equals(columnName)).collect(Collectors.toList());
+        List<DfDecoMapColumnPart> columnList =
+                table.getColumnList().stream().filter(column -> column.getColumnName().equals(columnName)).collect(Collectors.toList());
         assertHasOnlyOneElement(columnList);
         return columnList.get(0);
     }
