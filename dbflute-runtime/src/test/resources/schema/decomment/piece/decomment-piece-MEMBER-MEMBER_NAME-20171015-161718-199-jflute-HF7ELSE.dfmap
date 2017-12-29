@@ -1,0 +1,15 @@
+map:{
+    ; formatVersion = 1.0
+    ; merged = false
+    ; tableName = MEMBER
+    ; columnName = MEMBER_NAME
+    ; targetType = COLUMN
+    ; decomment = sea mystic land oneman
+    ; databaseComment = sea mystic
+    ; commentVersion = 1
+    ; authorList = list:{ cabos ; hakiba ; deco ; jflute }
+    ; pieceCode = HF7ELSE
+    ; pieceDatetime = 2017-10-15T16:17:18.199
+    ; pieceOwner = jflute
+    ; previousPieceList = list:{ FE893L1 }
+}

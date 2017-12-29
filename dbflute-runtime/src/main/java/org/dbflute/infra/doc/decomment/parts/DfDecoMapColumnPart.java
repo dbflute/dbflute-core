@@ -31,7 +31,7 @@ public class DfDecoMapColumnPart {
     //                                                                           Attribute
     //                                                                           =========
     protected String columnName;
-    protected List<DfDecoMapPropertyPart> propertyList = new ArrayList<>();
+    protected Map<String, DfDecoMapPropertyPart> propertyMap = new LinkedHashMap<>();
 
     // ===================================================================================
     //                                                                           Converter
@@ -43,14 +43,15 @@ public class DfDecoMapColumnPart {
     public DfDecoMapColumnPart(Map<String, Object> columnPartMap) {
         this.columnName = (String) columnPartMap.get("columnName");
         List<Map<String, Object>> propertyMapList = (List<Map<String, Object>>) columnPartMap.get("propertyList");
-        List<DfDecoMapPropertyPart> propertyList = propertyMapList.stream().map(DfDecoMapPropertyPart::new).collect(Collectors.toList());
-        this.propertyList.addAll(propertyList);
+        propertyMapList.stream().map(DfDecoMapPropertyPart::new).forEach(property -> {
+            propertyMap.put(property.getPieceCode(), property);
+        });
     }
 
     // done cabos convertToMap()? by jflute (2017/11/11)
     public Map<String, Object> convertToMap() {
-        List<Map<String, Object>> propertyMapList =
-                propertyList.stream().map(DfDecoMapPropertyPart::convertToMap).collect(Collectors.toList());
+        List<Map<String, Object>> propertyMapList = propertyMap.values().stream().map(DfDecoMapPropertyPart::convertToMap)
+                .collect(Collectors.toList());
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("columnName", columnName);
         map.put("propertyList", propertyMapList);
@@ -69,10 +70,16 @@ public class DfDecoMapColumnPart {
     }
 
     public List<DfDecoMapPropertyPart> getPropertyList() {
-        return this.propertyList;
+        return new ArrayList<>(this.propertyMap.values());
     }
 
     public void addProperty(DfDecoMapPropertyPart property) {
-        this.propertyList.add(property);
+        this.propertyMap.put(property.getPieceCode(), property);
+    }
+
+    public void removeProperty(String pieceCode) {
+        if (pieceCode != null) {
+            propertyMap.remove(pieceCode);
+        }
     }
 }

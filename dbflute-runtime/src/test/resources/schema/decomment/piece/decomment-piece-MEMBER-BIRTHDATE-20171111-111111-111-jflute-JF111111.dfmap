@@ -1,0 +1,15 @@
+map:{
+    ; formatVersion = 1.0
+    ; merged = false
+    ; tableName = MEMBER
+    ; columnName = BIRTHDATE
+    ; targetType = COLUMN
+    ; decomment = my name is jflute
+    ; databaseComment = hakiba in database
+    ; commentVersion = 0
+    ; authorList = list:{ jflute }
+    ; pieceCode = JF111111
+    ; pieceDatetime = 2017-11-11T11:11:11.111
+    ; pieceOwner = cabos
+    ; previousPieceList = list:{}
+}

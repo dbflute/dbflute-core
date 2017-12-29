@@ -1,0 +1,15 @@
+map:{
+    ; formatVersion = 1.0
+    ; merged = false
+    ; tableName = PURCHASE
+    ; columnName = PURCHASE_DATETIME
+    ; targetType = COLUMN
+    ; decomment = boys and girls, be jflute
+    ; databaseComment = null
+    ; commentVersion = 0
+    ; authorList = list:{ jflute }
+    ; pieceCode = TYUFSEFQ
+    ; pieceDatetime = 2017-12-29T12:34:56.789
+    ; pieceOwner = jflute
+    ; previousPieceList = list:{}
+}
