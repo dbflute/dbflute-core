@@ -432,7 +432,7 @@ ${linkDelimiter} <a href="${selector.getNeighborhoodSchemaHtmlPath($schemaHtmlKe
 #end
 		<td class="relcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
 		<td class="relcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
-		<td class="commentcell ${table.tableIdForSchemaHtml}_comment"><pre>#if ($table.hasComment()) ${table.commentForSchemaHtmlPre}#else &nbsp;#end</pre></td>
+		<td class="commentcell ${table.tableIdForSchemaHtml}_comment"><pre>#if($table.hasComment())${table.commentForSchemaHtmlPre}#else&nbsp;#end</pre></td>
 		<td class="subcell">${table.javaName}</td>
 	</tr>
 #set ($rownum = $rownum + 1)
@@ -496,7 +496,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 #if ($database.hasClassificationAlias($classificationName))
 				<td>#if ($classificationElement.hasAlias())${classificationElement.alias}#else &nbsp;#end</td>
 #end
-				<td class="commentcell">#if ($classificationElement.hasCommentDisp())${classificationElement.commentForSchemaHtml}#else &nbsp;#end</td>
+				<td class="commentcell">#if($classificationElement.hasCommentDisp())${classificationElement.commentForSchemaHtml}#else&nbsp;#end</td>
 #foreach ($group in $classificationTop.groupList)
 				<td class="flgcell">#if ($classificationElement.isGroup($group.groupName))o#else &nbsp;#end</td>
 #end
