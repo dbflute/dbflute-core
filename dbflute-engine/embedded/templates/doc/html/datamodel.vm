@@ -304,12 +304,14 @@ dl.procedurelist dd.column pre {
 	background-color: rgba(0, 0, 0, 0.5);
 }
 .decommentmodalcontent {
+	position: relative;
 	z-index: 10;
 	width: 50%;
 	margin: 0 auto;
 	border: 1px solid #999999;
 	padding: 15px;
 	background-color: #ffffff;
+	border-radius: 4px;
 }
 .decommentmodalcontent p {
 	font-size: 14px;
@@ -320,9 +322,30 @@ dl.procedurelist dd.column pre {
 	margin-top: 10px;
 	font-size: 12px;
 }
-.decommentmodalbtn {
+.decommentmodal-ok-btn {
 	margin: 10px 5px 0 0;
 	padding: 5px 10px;
+	border-radius: 4px;
+}
+.decommentmodal-close-btn {
+	position: absolute;
+	margin-left: 10px;
+	padding: 0;
+	right: 10px;
+	top: 5px;
+	cursor: pointer;
+	width: 28px;
+	height: 28px;
+	border: 0;
+	border-radius: 50%;
+	color: #657786;
+	font-size: 14px;
+	line-height: 24px;
+	text-align: center;
+	transition: box-shadow .15s ease-in-out;
+}
+.decommentmodal-close-btn:hover {
+	background-color: #eed;
 }
 	</style>
 #end
@@ -609,10 +632,10 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 <!-- Only used by dbflute intro http://dbflute.seasar.org/ja/manual/function/helper/intro/index.html -->
 <div id="decomment-modal" class="decommentmodal">
 	<div class="decommentmodalcontent">
+		<button id="decomment-close" class="decommentmodal-close-btn"><span>x</span></button>
 		<p>Input the new column comment of <span id="decomment-modal-column-info"></span></p>
-		<textarea id="decomment-input" class="decommentinput" rows="5" tabindex="1"></textarea>
-		<button id="decomment-cancel" class="decommentmodalbtn" tabindex="3">Cancel</button>
-		<button id="decomment-ok" class="decommentmodalbtn" tabindex="2">OK</button>
+		<textarea id="decomment-input" class="decommentinput" rows="5"></textarea>
+		<button id="decomment-ok" class="decommentmodal-ok-btn">OK</button>
 	</div>
 </div>
 <script>
@@ -1510,7 +1533,7 @@ Decomment.prototype = {
 			inputElement.value = that.extractPreviousComment(commentElement);
 			inputElement.focus();
 
-			document.getElementById("decomment-cancel").onclick = function () {
+			document.getElementById("decomment-close").onclick = function () {
 				modalElement.style.display = "none";
 			};
 
