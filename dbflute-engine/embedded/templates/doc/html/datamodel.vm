@@ -1177,7 +1177,7 @@ Decomment.prototype = {
 		var that = this;
 		Array.prototype.forEach.call(properties, function (property) {
 			if (property['databaseComment'] != null && databaseComment != null && !isDatabaseCommentConflict) {
-				isDatabaseCommentConflict = that.escapeNewlineCharacter(databaseComment) != property['databaseComment'];
+				isDatabaseCommentConflict = that.escapeNewlineCharacter(databaseComment) != that.escapeNewlineCharacter(property['databaseComment']);
 			}
 			decomments.push(property["decomment"]);
 			if (property['pieceCode'] != null) {
@@ -1233,7 +1233,7 @@ Decomment.prototype = {
 		var that = this;
 		Array.prototype.forEach.call(properties, function (property) {
 			if (property['databaseComment'] != null && databaseComment != null && !isDatabaseCommentConflict) {
-				isDatabaseCommentConflict = that.escapeNewlineCharacter(databaseComment) != property['databaseComment'];
+				isDatabaseCommentConflict = that.escapeNewlineCharacter(databaseComment) != that.escapeNewlineCharacter(property['databaseComment']);
 			}
 			decomments.push(property["decomment"]);
 			if (property['pieceCode'] != null) {
