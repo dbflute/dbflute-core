@@ -1317,7 +1317,7 @@ Decomment.prototype = {
 	buildDisplayCommentFromServer: function(commentMap) {
 		var result = "";
 		if (commentMap['isDatabaseCommentConflict']) {
-			result = this.escapeInputText(commentMap['databaseComment']) + '\n(from database comment)\n\n======\n\n';
+			result = this.escapeInputText(commentMap['databaseComment']) + '\n(from database comment)\n\n=======\n\n';
 		}
 		result += commentMap['decomments'].join('\n\n=======\n\n');
 		return result;
