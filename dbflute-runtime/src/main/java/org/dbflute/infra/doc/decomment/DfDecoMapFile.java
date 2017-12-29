@@ -15,6 +15,18 @@
  */
 package org.dbflute.infra.doc.decomment;
 
+import org.dbflute.helper.HandyDate;
+import org.dbflute.helper.mapstring.MapListFile;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.infra.doc.decomment.exception.DfDecoMapFileReadFailureException;
+import org.dbflute.infra.doc.decomment.exception.DfDecoMapFileWriteFailureException;
+import org.dbflute.infra.doc.decomment.parts.DfDecoMapColumnPart;
+import org.dbflute.infra.doc.decomment.parts.DfDecoMapPropertyPart;
+import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
+import org.dbflute.optional.OptionalThing;
+import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfTypeUtil;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,18 +45,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.dbflute.helper.HandyDate;
-import org.dbflute.helper.mapstring.MapListFile;
-import org.dbflute.helper.message.ExceptionMessageBuilder;
-import org.dbflute.infra.doc.decomment.exception.DfDecoMapFileReadFailureException;
-import org.dbflute.infra.doc.decomment.exception.DfDecoMapFileWriteFailureException;
-import org.dbflute.infra.doc.decomment.parts.DfDecoMapColumnPart;
-import org.dbflute.infra.doc.decomment.parts.DfDecoMapPropertyPart;
-import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
-import org.dbflute.optional.OptionalThing;
-import org.dbflute.util.DfStringUtil;
-import org.dbflute.util.DfTypeUtil;
 
 // done cabos DfDecoMapFile by jflute (2017/07/27)
 // done cabos add copyright in source file header like this class to classes of infra.doc.decomment by jflute (2017/11/11)
@@ -149,7 +149,6 @@ public class DfDecoMapFile {
     }
 
     // done hakiba cast check by hakiba (2017/07/29)
-    @SuppressWarnings("unchecked")
     private DfDecoMapPiece mappingToDecoMapPiece(Map<String, Object> map) {
         String formatVersion = (String) map.get("formatVersion");
         String tableName = (String) map.get("tableName");
@@ -163,20 +162,8 @@ public class DfDecoMapFile {
         LocalDateTime pieceDatetime = new HandyDate((String) map.get("pieceDatetime")).getLocalDateTime();
         String pieceOwner = (String) map.get("pieceOwner");
         List<String> previousPieceList = (List<String>) map.get("previousPieceList");
-
-        DfDecoMapPiece piece = new DfDecoMapPiece();
-        piece.setFormatVersion(formatVersion);
-        piece.setTableName(tableName);
-        piece.setColumnName(columnName);
-        piece.setTargetType(targetType);
-        piece.setDecomment(decomment);
-        piece.setDatabaseComment(databaseComment);
-        piece.setCommentVersion(commentVersion);
-        piece.addAllAuthors(authorList);
-        piece.setPieceCode(pieceCode);
-        piece.setPieceDatetime(pieceDatetime);
-        piece.setPieceOwner(pieceOwner);
-        piece.addAllPreviousPieces(previousPieceList);
+        DfDecoMapPiece piece = new DfDecoMapPiece(tableName, columnName, targetType, decomment, databaseComment,
+                commentVersion, authorList, pieceCode, pieceDatetime, pieceOwner, previousPieceList);
         return piece;
     }
 
@@ -267,7 +254,6 @@ public class DfDecoMapFile {
         DfDecoMapPickup pickup = new DfDecoMapPickup(formatVersion);
         pickup.setPickupDatetime(pickupDatetime);
 
-        @SuppressWarnings("unchecked")
         Map<String, List<Map<String, Object>>> decoMap =
                 (Map<String, List<Map<String, Object>>>) map.getOrDefault("decoMap", new LinkedHashMap<>());
         if (decoMap.isEmpty()) {
