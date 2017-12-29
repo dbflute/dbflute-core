@@ -538,8 +538,7 @@ public class DfDecoMapFile {
                     return table;
                 }).orElseGet(() -> {
                     // not exists other table decoment
-                    DfDecoMapTablePart table = new DfDecoMapTablePart();
-                    table.setTableName(piece.getTableName());
+                    DfDecoMapTablePart table = new DfDecoMapTablePart(piece.getTableName());
                     table.addProperty(property);
                     pickUp.addTable(table);
                     return table;
@@ -560,8 +559,7 @@ public class DfDecoMapFile {
                             })
                             .orElseGet(() -> {
                                 // not exists column comment
-                                DfDecoMapColumnPart column = new DfDecoMapColumnPart();
-                                column.setColumnName(piece.getColumnName());
+                                DfDecoMapColumnPart column = new DfDecoMapColumnPart(piece.getColumnName());
                                 column.addProperty(property);
                                 table.addColumn(column);
                                 return column;
@@ -569,12 +567,10 @@ public class DfDecoMapFile {
                     return table;
                 }).orElseGet(() -> {
                     // not exists table and column decoment
-                    DfDecoMapColumnPart column = new DfDecoMapColumnPart();
-                    column.setColumnName(piece.getColumnName());
+                    DfDecoMapColumnPart column = new DfDecoMapColumnPart(piece.getColumnName());
                     column.addProperty(property);
 
-                    DfDecoMapTablePart table = new DfDecoMapTablePart();
-                    table.setTableName(piece.getTableName());
+                    DfDecoMapTablePart table = new DfDecoMapTablePart(piece.getTableName());
                     table.addColumn(column);
                     pickUp.addTable(table);
                     return table;
