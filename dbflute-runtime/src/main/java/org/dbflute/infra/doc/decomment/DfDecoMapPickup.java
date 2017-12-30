@@ -57,7 +57,7 @@ public class DfDecoMapPickup {
 
     public DfDecoMapPickup(String formatVersion) {
         this.decoMap = new LinkedHashMap<>();
-        this.decoMap.put(DECO_MAP_KEY, new ArrayList<>()); // avoid null pointer exception
+        this.decoMap.put(DECO_MAP_KEY, new ArrayList<>()); // always exists decoMap table list
         this.formatVersion = formatVersion;
     }
 
@@ -151,14 +151,22 @@ public class DfDecoMapPickup {
     }
 
     public List<DfDecoMapTablePart> getTableList() {
-        return Collections.unmodifiableList(decoMap.get(DECO_MAP_KEY));
+        return Collections.unmodifiableList(getDecoMapTablePartList());
     }
 
     public void addTable(DfDecoMapTablePart table) {
-        decoMap.get(DECO_MAP_KEY).add(table);
+        getDecoMapTablePartList().add(table);
     }
 
     public void addAllTables(Collection<DfDecoMapTablePart> tables) {
-        decoMap.get(DECO_MAP_KEY).addAll(tables);
+        getDecoMapTablePartList().addAll(tables);
+    }
+
+    private List<DfDecoMapTablePart> getDecoMapTablePartList() {
+        List<DfDecoMapTablePart> decoMapTablePartList = decoMap.get(DECO_MAP_KEY);
+        if (decoMapTablePartList == null) {
+            throw new IllegalStateException("decoMap table list is not exists");
+        }
+        return decoMapTablePartList;
     }
 }
