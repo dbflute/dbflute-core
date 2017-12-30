@@ -1003,11 +1003,11 @@ function Decomment() {
 	this.embeddedPickup = {
 		'tables': [
 #foreach($table in $database.embeddedPickup.tableList)
-				#if ($velocityCount > 1),#end {
+			#if ($velocityCount > 1), #end{
 				'tableName': '#escape($!{table.tableName})'
 				, 'properties': [
 #foreach($property in $table.propertyList)
-						#if ($velocityCount > 1),#end {
+						#if ($velocityCount > 1), #end{
 						'decomment': '#escape($!{property.decomment})'
 						, 'databaseComment': '#escape($!{property.databaseComment})'
 						, 'commentVersion': $!{property.commentVersion}
@@ -1020,7 +1020,7 @@ function Decomment() {
 				]
 				, 'columns': [
 #foreach($column in $table.columnList)
-						#if ($velocityCount > 1),#end {
+					#if ($velocityCount > 1),#end {
 						'columnName': '#escape($!{column.columnName})'
 						, 'properties': [
 #foreach($property in $column.propertyList)
@@ -1040,7 +1040,8 @@ function Decomment() {
 				]
 			}
 #end
-		]}
+		]
+	}
 	this.pickupStore = {
 #foreach ($table in $database.tableDisplaySortedList)
 ## decomment uses display name so fix later
