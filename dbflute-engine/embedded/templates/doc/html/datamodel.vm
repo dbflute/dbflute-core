@@ -632,7 +632,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 <!-- Only used by dbflute intro http://dbflute.seasar.org/ja/manual/function/helper/intro/index.html -->
 <div id="decomment-modal" class="decommentmodal">
 	<div class="decommentmodalcontent">
-		<button id="decomment-close" class="decommentmodal-close-btn"><span>x</span></button>
+		<div id="decomment-close" class="decommentmodal-close-btn"><span>x</span></div>
 		<p>Input the new column comment of <span id="decomment-modal-column-info"></span></p>
 		<textarea id="decomment-input" class="decommentinput" rows="5"></textarea>
 		<button id="decomment-ok" class="decommentmodal-ok-btn">OK</button>
