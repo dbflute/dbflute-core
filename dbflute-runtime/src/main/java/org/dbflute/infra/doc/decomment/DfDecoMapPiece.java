@@ -31,6 +31,11 @@ import java.util.Map;
 public class DfDecoMapPiece {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String DEFAULT_FORMAT_VERSION = "1.0";
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final String formatVersion;
