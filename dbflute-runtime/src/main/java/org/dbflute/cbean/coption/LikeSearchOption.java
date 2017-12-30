@@ -333,10 +333,10 @@ public class LikeSearchOption extends SimpleStringOption implements FilteringBin
     public void compoundsNullAsEmpty() {
         _nullCompoundedAsEmpty = true;
     }
-    
+
     @Override
     public boolean isNullCompoundedAsEmpty() {
-      return _nullCompoundedAsEmpty;
+        return _nullCompoundedAsEmpty;
     }
 
     public void clearCompoundColumn() {

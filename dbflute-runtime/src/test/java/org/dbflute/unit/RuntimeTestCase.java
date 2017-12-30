@@ -15,11 +15,13 @@
  */
 package org.dbflute.unit;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,14 +29,17 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.dbflute.cbean.result.PagingResultBean;
 import org.dbflute.hook.AccessContext;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.unit.markhere.MarkHereManager;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfResourceUtil;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfTypeUtil;
+import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +79,24 @@ public abstract class RuntimeTestCase extends TestCase {
     protected void xreserveShowTitle() {
         // lazy-logging (no logging test case, no title)
         _xreservedTitle = "<<< " + xgetCaseDisp() + " >>>";
+    }
+
+    protected String xgetCaseDisp() {
+        return getClass().getSimpleName() + "." + getName() + "()";
+    }
+
+    @Override
+    protected void runTest() throws Throwable {
+        try {
+            super.runTest();
+            postTest();
+        } catch (Throwable e) { // to record in application log
+            log("Failed to finish the test: " + xgetCaseDisp(), e);
+            throw e;
+        }
+    }
+
+    protected void postTest() {
     }
 
     @Override
@@ -628,13 +651,13 @@ public abstract class RuntimeTestCase extends TestCase {
     //                                                                      Logging Helper
     //                                                                      ==============
     /**
-     * Log the messages. <br />
+     * Log the messages. <br>
      * If you set an exception object to the last element, it shows stack traces.
      * <pre>
      * Member member = ...;
      * <span style="color: #FD4747">log</span>(member.getMemberName(), member.getBirthdate());
      * <span style="color: #3F7E5E">// -&gt; Stojkovic, 1965/03/03</span>
-     * 
+     *
      * Exception e = ...;
      * <span style="color: #FD4747">log</span>(member.getMemberName(), member.getBirthdate(), e);
      * <span style="color: #3F7E5E">// -&gt; Stojkovic, 1965/03/03</span>
@@ -656,9 +679,14 @@ public abstract class RuntimeTestCase extends TestCase {
         }
         final StringBuilder sb = new StringBuilder();
         int index = 0;
+        int skipCount = 0;
         for (Object msg : msgs) {
             if (index == arrayLength - 1 && cause != null) { // last loop and it is cause
                 break;
+            }
+            if (skipCount > 0) { // already resolved as variable
+                --skipCount; // until count zero
+                continue;
             }
             if (sb.length() > 0) {
                 sb.append(", ");
@@ -669,7 +697,26 @@ public abstract class RuntimeTestCase extends TestCase {
             } else if (msg instanceof Date) {
                 appended = toString(msg, "yyyy/MM/dd");
             } else {
-                appended = msg != null ? msg.toString() : null;
+                String strMsg = msg != null ? msg.toString() : null;
+                int nextIndex = index + 1;
+                skipCount = 0; // just in case
+                while (strMsg != null && strMsg.contains("{}")) {
+                    if (arrayLength <= nextIndex) {
+                        break;
+                    }
+                    final Object nextObj = msgs[nextIndex];
+                    final String replacement;
+                    if (nextObj != null) {
+                        // escape two special characters of replaceFirst() to avoid illegal group reference
+                        replacement = Srl.replace(Srl.replace(nextObj.toString(), "\\", "\\\\"), "$", "\\$");
+                    } else {
+                        replacement = "null";
+                    }
+                    strMsg = strMsg.replaceFirst("\\{\\}", replacement);
+                    ++skipCount;
+                    ++nextIndex;
+                }
+                appended = strMsg;
             }
             sb.append(appended);
             ++index;
@@ -875,10 +922,9 @@ public abstract class RuntimeTestCase extends TestCase {
         return "\n";
     }
 
-    protected String xgetCaseDisp() {
-        return getClass().getSimpleName() + "." + getName() + "()";
-    }
-
+    // ===================================================================================
+    //                                                                         Cannon-ball
+    //                                                                         ===========
     /**
      * Sleep the current thread.
      * @param millis The millisecond to sleep.
@@ -890,5 +936,40 @@ public abstract class RuntimeTestCase extends TestCase {
             String msg = "Failed to sleep but I want to sleep here...Zzz...";
             throw new IllegalStateException(msg, e);
         }
+    }
+
+    // ===================================================================================
+    //                                                                          Filesystem
+    //                                                                          ==========
+    /**
+     * Get the directory object of the (application or Eclipse) project.
+     * @return The file object of the directory. (NotNull)
+     */
+    protected File getProjectDir() { // you can override
+        final Set<String> markSet = defineProjectDirMarkSet();
+        for (File dir = getTestCaseBuildDir(); dir != null; dir = dir.getParentFile()) {
+            if (dir.isDirectory()) {
+                if (Arrays.stream(dir.listFiles()).anyMatch(file -> markSet.contains(file.getName()))) {
+                    return dir;
+                }
+            }
+        }
+        throw new IllegalStateException("Not found the project dir marks: " + markSet);
+    }
+
+    /**
+     * Define the marks of the (application or Eclipse) project.
+     * @return the set of mark file name for the project. (NotNull)
+     */
+    protected Set<String> defineProjectDirMarkSet() {
+        return DfCollectionUtil.newHashSet("build.xml", "pom.xml", "build.gradle", ".project", ".idea");
+    }
+
+    /**
+     * Get the directory object of the build for the test case. (default: target/test-classes)
+     * @return The file object of the directory. (NotNull)
+     */
+    protected File getTestCaseBuildDir() {
+        return DfResourceUtil.getBuildDir(getClass()); // target/test-classes
     }
 }

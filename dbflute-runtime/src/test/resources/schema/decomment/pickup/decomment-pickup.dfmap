@@ -1,0 +1,86 @@
+map:{
+    ; formatVersion = 1.0
+    ; pickupDatetime = 2017-11-09T09:09:09.009
+    ; decoMap = map:{
+        ; tableList = list:{
+            ; map:{
+                ; tableName = MEMBER
+                ; propertyList = list:{}
+                ; columnList = list:{
+                    ; map:{
+                        ; columnName = MEMBER_NAME
+                        ; propertyList = list:{
+                            ; map:{
+                                ; decomment = this column's value is always null ...??  DO NOT BE SILLY!!!
+                                ; databaseComment = sea mystic
+                                ; commentVersion = 1
+                                ; authorList = list:{ hakiba ; cabos }
+                                ; pieceCode = DELMBNM1
+                                ; pieceDatetime = 2017-11-05T00:38:13.645
+                                ; pieceOwner = cabos
+                                ; previousPieceList = list:{ DELMBNM2 }
+                            }
+                        }
+                    }
+                }
+            }
+            ; map:{
+                ; tableName = MEMBER_LOGIN
+                ; propertyList = list:{
+                    ; map:{
+                        ; decomment = my name is cabos
+                        ; databaseComment = login history of member
+                        ; commentVersion = 1
+                        ; authorList = list:{ cabos }
+                        ; pieceCode = LOGIN123
+                        ; pieceDatetime = 2017-11-05T00:38:13.645
+                        ; pieceOwner = cabos
+                        ; previousPieceList = list:{}
+                    }
+                }
+                ; columnList = list:{
+                    ; map:{
+                        ; columnName = LOGIN_DATETIME
+                        ; propertyList = list:{
+                            ; map:{
+                                ; decomment = my name is hakiba
+                                ; databaseComment = null
+                                ; commentVersion = 1
+                                ; authorList = list:{ hakiba }
+                                ; pieceCode = LOGIN456
+                                ; pieceDatetime = 2017-11-05T00:38:13.645
+                                ; pieceOwner = hakiba
+                                ; previousPieceList = list:{}
+                            }
+                        }
+                    }
+                    ; map:{
+                        ; columnName = LOGIN_MEMBER_STATUS_CODE
+                        ; propertyList = list:{
+                            ; map:{
+                                ; decomment = my name is deco
+                                ; databaseComment = null
+                                ; commentVersion = 1
+                                ; authorList = list:{ deco }
+                                ; pieceCode = LOGIN789
+                                ; pieceDatetime = 2017-11-05T00:38:13.645
+                                ; pieceOwner = deco
+                                ; previousPieceList = list:{}
+                            }
+                            ; map:{
+                                ; decomment = my name is cabos
+                                ; databaseComment = null
+                                ; commentVersion = 1
+                                ; authorList = list:{ cabos }
+                                ; pieceCode = LOGIN800
+                                ; pieceDatetime = 2017-11-06T06:36:16.646
+                                ; pieceOwner = cabos
+                                ; previousPieceList = list:{}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

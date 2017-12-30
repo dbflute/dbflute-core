@@ -152,6 +152,7 @@ import org.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
 import org.dbflute.infra.core.DfDatabaseNameMapping;
+import org.dbflute.infra.doc.decomment.DfDecoMapPickup;
 import org.dbflute.logic.doc.schemahtml.DfSchemaHtmlProcedure;
 import org.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.dbflute.logic.generate.exdirect.DfCopyrightResolver;
@@ -191,6 +192,7 @@ import org.xml.sax.Attributes;
  * A class for holding application data structures. <br>
  * DBFlute treats all tables containing other schema's as one database object.
  * @author modified by jflute (originated in Apache Torque)
+ * @author contributed by cabos at maihama sheraton hotel
  */
 public class Database {
 
@@ -248,6 +250,11 @@ public class Database {
     //                                         -------------
     /** The meta data of parameter bean. */
     protected Map<String, DfPmbMetaData> _pmbMetaDataMap; // when sql2entity only
+
+    // -----------------------------------------------------
+    //                                      Decomment Pickup
+    //                                      ----------------
+    protected DfDecoMapPickup _embeddedPickup;
 
     // -----------------------------------------------------
     //                                                 Other
@@ -2393,6 +2400,10 @@ public class Database {
         return getProperties().getDocumentProperties().getSchemaHtmlJavaScriptLink();
     }
 
+    public DfDecoMapPickup getEmbeddedPickup() {
+        return _embeddedPickup;
+    }
+
     // -----------------------------------------------------
     //                                           HistoryHtml
     //                                           -----------
@@ -2934,5 +2945,9 @@ public class Database {
 
     public void setSkipDeleteOldClass(boolean skipDeleteOldClass) {
         _skipDeleteOldClass = skipDeleteOldClass;
+    }
+
+    public void setEmbeddedPickup(DfDecoMapPickup embeddedPickup) {
+        this._embeddedPickup = embeddedPickup;
     }
 }
