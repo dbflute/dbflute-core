@@ -133,6 +133,97 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         }
     }
 
+    public void test_merge_pieceCodeCheck() throws Exception {
+        // ## Arrange ##
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile();
+        final OptionalThing<DfDecoMapPickup> optPickup = OptionalThing.empty(); // not exists pickup
+        final String tableName = "MEMBER";
+        final String columnName = "MEMBER_NAME";
+        final DfDecoMapPiece piece1 = preparePieceColumn(tableName, columnName, "deco", "SAMPLEPI", Arrays.asList("SAVEACTI", "ON00000"));
+        final DfDecoMapPiece piece2 = preparePieceColumn(tableName, columnName, "hakiba", "ECECODED", Collections.singletonList("SAMPLEPI"));
+        final DfDecoMapPiece piece3 = preparePieceColumn(tableName, columnName, "cabos", "AYOOOOO", Collections.singletonList("ECECODED"));
+        final DfDecoMapPiece piece4 = preparePieceColumn(tableName, columnName, "jflute", "SLEEPY00", Collections.singletonList("AYOOOOO"));
+        final List<DfDecoMapPiece> pieceList = Arrays.asList(piece1, piece2, piece3, piece4);
+
+        // ## Act ##
+        final DfDecoMapPickup result = decoMapFile.merge(optPickup, pieceList);
+
+        // ## Assert ##
+        assertNotNull(result);
+        log(result);
+
+        {
+            DfDecoMapTablePart member = extractPickupTableAsOne(result, tableName);
+            assertEquals(0, member.getPropertyList().size());
+            assertEquals(1, member.getColumnList().size());
+            {
+                DfDecoMapColumnPart memberName = extractPickupColumnAsOne(member, columnName);
+                assertEquals(1, memberName.getPropertyList().size());
+                {
+                    DfDecoMapPropertyPart property = memberName.getPropertyList().get(0);
+                    assertEquals("jflute", property.getPieceOwner());
+                    assertEquals("SLEEPY00", property.getPieceCode());
+                    assertEquals(property.getPreviousPieceList().size(), 5);
+                    assertTrue(property.getPreviousPieceList().containsAll(Arrays.asList("SAMPLEPI", "SAVEACTI", "ON00000", "ECECODED", "AYOOOOO")));
+                    assertEquals(property.getAuthorList().size(), 4);
+                    assertTrue(property.getAuthorList().containsAll(Arrays.asList("deco", "hakiba", "cabos", "jflute")));
+                }
+            }
+        }
+    }
+
+    public void test_merge_pieceCodeConflictCheck() throws Exception {
+        // ## Arrange ##
+        final DfDecoMapFile decoMapFile = new DfDecoMapFile();
+        final OptionalThing<DfDecoMapPickup> optPickup = OptionalThing.empty(); // not exists pickup
+        final String tableName = "MEMBER";
+        final String columnName = "MEMBER_NAME";
+        final DfDecoMapPiece piece1 = preparePieceColumn(tableName, columnName, "deco", "SAMPLEPI", Arrays.asList("SAVEACTI", "ON00000"));
+        final DfDecoMapPiece piece2 = preparePieceColumn(tableName, columnName, "hakiba", "ECECODED", Collections.singletonList("SAMPLEPI"));
+        final DfDecoMapPiece piece3 = preparePieceColumn(tableName, columnName, "hakiba", "SAMPLE01", Collections.singletonList("ECECODED"));
+        final DfDecoMapPiece piece4 = preparePieceColumn(tableName, columnName, "cabos", "AYOOOOO", Collections.singletonList("SAMPLEPI"));
+        final DfDecoMapPiece piece5 = preparePieceColumn(tableName, columnName, "cabos", "SAMPLE02", Collections.singletonList("AYOOOOO"));
+        final List<DfDecoMapPiece> pieceList = Arrays.asList(piece1, piece2, piece3, piece4, piece5);
+
+        // ## Act ##
+        final DfDecoMapPickup result = decoMapFile.merge(optPickup, pieceList);
+
+        // ## Assert ##
+        assertNotNull(result);
+        log(result);
+
+        {
+            DfDecoMapTablePart member = extractPickupTableAsOne(result, tableName);
+            assertEquals(0, member.getPropertyList().size());
+            assertEquals(1, member.getColumnList().size());
+            {
+                DfDecoMapColumnPart memberName = extractPickupColumnAsOne(member, columnName);
+                assertEquals(2, memberName.getPropertyList().size());
+                {
+                    DfDecoMapPropertyPart property = memberName.getPropertyList().get(0);
+                    assertEquals("hakiba", property.getPieceOwner());
+                    assertEquals("SAMPLE01", property.getPieceCode());
+                    assertEquals(property.getPreviousPieceList().size(), 4);
+                    assertTrue(property.getPreviousPieceList().containsAll(Arrays.asList("SAMPLEPI", "SAVEACTI", "ON00000", "ECECODED")));
+                    assertFalse(property.getPreviousPieceList().contains("AYOOOOO"));
+                    assertEquals(property.getAuthorList().size(), 2);
+                    assertTrue(property.getAuthorList().containsAll(Arrays.asList("deco", "hakiba")));
+                }
+                {
+                    DfDecoMapPropertyPart property = memberName.getPropertyList().get(1);
+                    assertEquals("cabos", property.getPieceOwner());
+                    assertEquals("SAMPLE02", property.getPieceCode());
+                    assertEquals(property.getPreviousPieceList().size(), 4);
+                    assertTrue(property.getPreviousPieceList().containsAll(Arrays.asList("SAMPLEPI", "SAVEACTI", "ON00000", "AYOOOOO")));
+                    assertFalse(property.getPreviousPieceList().contains("ECECODED"));
+                    assertEquals(property.getAuthorList().size(), 2);
+                    assertTrue(property.getAuthorList().containsAll(Arrays.asList("deco", "cabos")));
+                }
+
+            }
+        }
+    }
+
     public void test_merge_OverwritePickupByPiece() {
         // ## Arrange ##
         final DfDecoMapFile decoMapFile = new DfDecoMapFile();

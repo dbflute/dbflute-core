@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -469,8 +470,10 @@ public class DfDecoMapFile {
      */
     public DfDecoMapPickup merge(OptionalThing<DfDecoMapPickup> pickupOpt, List<DfDecoMapPiece> pieces) {
         Set<String> pieceCodeSet = extractAllMergedPieceCode(pickupOpt, pieces);
+        Map<String, List<String>> previousPieceListMap = createPreviousPieceListMap(pickupOpt, pieces);
+        Map<String, List<String>> authorListMap = createAuthorListMap(pickupOpt, pieces);
         DfDecoMapPickup pickup = pickupOpt.orElse(new DfDecoMapPickup());
-        doMerge(pieces, pickup);
+        doMerge(pieces, pickup, authorListMap, previousPieceListMap);
         filterMergedProperties(pickup, pieceCodeSet);
         return pickup;
     }
@@ -490,6 +493,38 @@ public class DfDecoMapFile {
         return Stream.concat(pickupPieceCodeStream, previousPieceCodeStream).collect(Collectors.toSet());
     }
 
+    private Map<String, List<String>> createPreviousPieceListMap(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieces) {
+        Map<String, List<String>> previousPieceMap = new HashMap<>();
+        pieces.forEach(piece -> {
+            previousPieceMap.put(piece.getPieceCode(), piece.getPreviousPieceList());
+        });
+        optPickup.ifPresent(pickup -> {
+            pickup.getTableList().forEach(table -> {
+                table.getPropertyList()
+                        .forEach(property -> previousPieceMap.put(property.getPieceCode(), property.getPreviousPieceList()));
+                table.getColumnList().stream().flatMap(column -> column.getPropertyList().stream())
+                        .forEach(property -> previousPieceMap.put(property.getPieceCode(), property.getPreviousPieceList()));
+            });
+        });
+        return previousPieceMap;
+    }
+
+    private Map<String, List<String>> createAuthorListMap(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieces) {
+        Map<String, List<String>> codeAuthorMap = new HashMap<>();
+        pieces.forEach(piece -> {
+            codeAuthorMap.put(piece.getPieceCode(), piece.getAuthorList());
+        });
+        optPickup.ifPresent(pickup -> {
+            pickup.getTableList().forEach(table -> {
+                table.getPropertyList()
+                        .forEach(property -> codeAuthorMap.put(property.getPieceCode(), property.getAuthorList()));
+                table.getColumnList().stream().flatMap(column -> column.getPropertyList().stream())
+                        .forEach(property -> codeAuthorMap.put(property.getPieceCode(), property.getAuthorList()));
+            });
+        });
+        return codeAuthorMap;
+    }
+
     private void filterMergedProperties(DfDecoMapPickup pickup, Set<String> pieceCodeSet) {
         pickup.getTableList().forEach(table -> {
             filterTablePropertyList(table, pieceCodeSet);
@@ -507,9 +542,10 @@ public class DfDecoMapFile {
         pieceCodeSet.forEach(pieceCode -> column.removeProperty(pieceCode));
     }
 
-    protected void doMerge(List<DfDecoMapPiece> filteredPieces, DfDecoMapPickup pickUp) {
-        filteredPieces.forEach(piece -> {
-            DfDecoMapPropertyPart property = mappingPieceToProperty(piece);
+    protected void doMerge(List<DfDecoMapPiece> pieces, DfDecoMapPickup pickUp, Map<String, List<String>> codeAuthorListMap,
+                           Map<String, List<String>> codePreviousPieceCodeListMap) {
+        pieces.forEach(piece -> {
+            DfDecoMapPropertyPart property = mappingPieceToProperty(piece, codeAuthorListMap, codePreviousPieceCodeListMap);
 
             if (piece.getTargetType() == DfDecoMapPieceTargetType.Table) { // table decomment
                 List<DfDecoMapTablePart> tableList = pickUp.getTableList();
@@ -562,11 +598,33 @@ public class DfDecoMapFile {
         pickUp.setPickupDatetime(getCurrentLocalDateTime());
     }
 
-    private DfDecoMapPropertyPart mappingPieceToProperty(DfDecoMapPiece piece) {
-        DfDecoMapPropertyPart property =
-                new DfDecoMapPropertyPart(piece.getDecomment(), piece.getDatabaseComment(), piece.getPieceCode(), piece.getPieceDatetime(),
-                        piece.getPieceOwner(), piece.getPreviousPieceList(), piece.getCommentVersion(), piece.getAuthorList());
-        return property;
+    private DfDecoMapPropertyPart mappingPieceToProperty(DfDecoMapPiece piece, Map<String, List<String>> authorListMap,
+                                                         Map<String, List<String>> previousPieceMap) {
+        String pieceCode = piece.getPieceCode();
+        List<String> previousCodeList = extractPreviousPieceList(pieceCode, previousPieceMap);
+        List<String> authorList = extractAuthorList(pieceCode, previousCodeList, authorListMap);
+        return new DfDecoMapPropertyPart(piece.getDecomment(), piece.getDatabaseComment(), pieceCode, piece.getPieceDatetime(),
+                piece.getPieceOwner(), previousCodeList, piece.getCommentVersion(), authorList);
+    }
+
+    private List<String> extractPreviousPieceList(String pieceCode, Map<String, List<String>> previousPieceMap) {
+        List<String> previousCodeList = new ArrayList<>();
+        List<String> partCodeList = previousPieceMap.getOrDefault(pieceCode, Collections.emptyList());
+        if (partCodeList.isEmpty()) {
+            return previousCodeList;
+        }
+        previousCodeList.addAll(partCodeList);
+        partCodeList.forEach(code -> {
+            previousCodeList.addAll(extractPreviousPieceList(code, previousPieceMap));
+        });
+        return previousCodeList.stream().distinct().collect(Collectors.toList());
+    }
+
+    private List<String> extractAuthorList(String pieceCode, List<String> previousPieceList, Map<String, List<String>> authorListMap) {
+        List<String> authorList = new ArrayList<>();
+        authorList.addAll(authorListMap.get(pieceCode));
+        previousPieceList.forEach(previousPiece -> authorList.addAll(authorListMap.getOrDefault(previousPiece, Collections.emptyList())));
+        return authorList.stream().distinct().collect(Collectors.toList());
     }
 
     // ===================================================================================

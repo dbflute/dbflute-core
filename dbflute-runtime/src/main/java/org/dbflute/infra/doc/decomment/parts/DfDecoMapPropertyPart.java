@@ -46,9 +46,12 @@ public class DfDecoMapPropertyPart {
         this.pieceCode = pieceCode;
         this.pieceDatetime = pieceDatetime;
         this.pieceOwner = pieceOwner;
-        this.previousPieceList = previousPieceList;
+        this.previousPieceList = previousPieceList.stream().distinct().collect(Collectors.toList());
         this.commentVersion = commentVersion;
-        this.authorList = authorList;
+        this.authorList = authorList.stream().distinct().collect(Collectors.toList());
+        if (!this.authorList.contains(pieceOwner)) {
+            this.authorList.add(pieceOwner);
+        }
     }
 
     public DfDecoMapPropertyPart(Map<String, Object> propertyMap) {
@@ -58,9 +61,12 @@ public class DfDecoMapPropertyPart {
         this.pieceDatetime = new HandyDate((String) propertyMap.get("pieceDatetime")).getLocalDateTime();
         this.pieceOwner = (String) propertyMap.get("pieceOwner");
         this.previousPieceList =
-                ((List<?>) propertyMap.get("previousPieceList")).stream().map(obj -> (String) obj).collect(Collectors.toList());
+                ((List<?>) propertyMap.get("previousPieceList")).stream().map(obj -> (String) obj).distinct().collect(Collectors.toList());
         this.commentVersion = Long.valueOf((String) propertyMap.get("commentVersion"));
-        this.authorList = ((List<?>) propertyMap.get("authorList")).stream().map(obj -> (String) obj).collect(Collectors.toList());
+        this.authorList = ((List<?>) propertyMap.get("authorList")).stream().map(obj -> (String) obj).distinct().collect(Collectors.toList());
+        if (!this.authorList.contains(pieceOwner)) {
+            this.authorList.add(pieceOwner);
+        }
     }
 
     public String getDecomment() {

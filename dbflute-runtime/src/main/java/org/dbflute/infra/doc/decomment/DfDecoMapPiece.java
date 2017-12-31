@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author hakiba
@@ -64,11 +65,14 @@ public class DfDecoMapPiece {
         this.decomment = decomment;
         this.databaseComment = databaseComment;
         this.commentVersion = commentVersion;
-        this.authorList = authorList;
+        this.authorList = authorList.stream().distinct().collect(Collectors.toList());
         this.pieceCode = pieceCode;
         this.pieceDatetime = pieceDatetime;
         this.pieceOwner = pieceOwner;
-        this.previousPieceList = previousPieceList;
+        this.previousPieceList = previousPieceList.stream().distinct().collect(Collectors.toList());
+        if (!this.authorList.contains(pieceOwner)) {
+            this.authorList.add(pieceOwner);
+        }
     }
 
     // done cabos move to before accessor by jflute (2017/08/10)
