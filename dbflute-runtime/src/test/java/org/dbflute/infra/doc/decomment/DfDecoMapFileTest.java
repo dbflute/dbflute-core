@@ -133,7 +133,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         }
     }
 
-    public void test_merge_pieceCodeCheck() throws Exception {
+    public void test_merge_noConflict() throws Exception {
         // ## Arrange ##
         final DfDecoMapFile decoMapFile = new DfDecoMapFile();
         final OptionalThing<DfDecoMapPickup> optPickup = OptionalThing.empty(); // not exists pickup
@@ -178,7 +178,7 @@ public class DfDecoMapFileTest extends RuntimeTestCase {
         }
     }
 
-    public void test_merge_pieceCodeConflictCheck() throws Exception {
+    public void test_merge_conflict() throws Exception {
         // ## Arrange ##
         final DfDecoMapFile decoMapFile = new DfDecoMapFile();
         final OptionalThing<DfDecoMapPickup> optPickup = OptionalThing.empty(); // not exists pickup
