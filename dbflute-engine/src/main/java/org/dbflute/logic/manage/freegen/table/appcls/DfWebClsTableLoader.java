@@ -66,7 +66,6 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
     // }
     @Override
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> optionMap = mapProp.getOptionMap();
         final String resourceFile = resource.getResourceFile();
         final Map<String, Object> webclsMap;
         try {
@@ -113,6 +112,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
                 hasRefCls = true;
             }
         }
+        final Map<String, Object> optionMap = mapProp.getOptionMap();
         final String clsTheme = "webcls";
         optionMap.put("clsTheme", clsTheme);
         optionMap.put("classificationTopList", topList);
