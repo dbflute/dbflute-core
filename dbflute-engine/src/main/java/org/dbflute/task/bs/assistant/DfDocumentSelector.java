@@ -136,111 +136,19 @@ public class DfDocumentSelector {
     }
 
     // ===================================================================================
-    //                                                              Schema History Request
-    //                                                              ======================
-    public void loadSchemaHistoryAsCore() { // for HistoryHtml
-        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsCore();
-        doLoadSchemaHistory(schemaHistory);
-    }
-
-    public void loadSchemaHistoryAsSchemaSyncCheck() { // for SchemaSyncCheck
-        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(getSchemaSyncCheckDiffMapFile());
-        doLoadSchemaHistory(schemaHistory);
-    }
-
-    public void loadSchemaHistoryAsAlterCheck() { // for AlterCheck
-        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(getAlterCheckDiffMapFile());
-        doLoadSchemaHistory(schemaHistory);
-    }
-
-    protected void doLoadSchemaHistory(DfSchemaHistory schemaHistory) {
-        _log.info("...Loading schema history");
-        _schemaHistory = schemaHistory;
-        _schemaHistory.loadHistory();
-        if (existsSchemaHistory()) {
-            _log.info(" -> found history: count=" + getSchemaDiffList().size());
-        } else {
-            _log.info(" -> no history");
-        }
-    }
-
-    public boolean existsSchemaHistory() {
-        return _schemaHistory != null && _schemaHistory.existsHistory();
-    }
-
-    public List<DfSchemaDiff> getSchemaDiffList() {
-        return _schemaHistory.getSchemaDiffList();
-    }
-
-    // ===================================================================================
-    //                                                             Properties HTML Request
-    //                                                             =======================
-    /**
-     * Load requests for properties HTML. <br>
-     * If no property, do nothing.
-     */
-    public void loadPropertiesHtmlRequest() {
-        _propHtmlManager = new DfPropHtmlManager();
-        _propHtmlManager.loadRequest();
-    }
-
-    public boolean existsPropertiesHtmlRequest() {
-        return _propHtmlManager != null && _propHtmlManager.existsRequest();
-    }
-
-    public DfPropHtmlManager getPropertiesHtmlManager() {
-        return _propHtmlManager;
-    }
-
-    // ===================================================================================
-    //                                                                    LastaDoc Request
-    //                                                                    ================
-    public boolean existsLastaDocHtml() {
-        return !getLastaDocHtmlNameList().isEmpty();
-    }
-
-    // ===================================================================================
-    //                                                                         File System
+    //                                                                         Schema HTML
     //                                                                         ===========
+    // -----------------------------------------------------
+    //                                           File System
+    //                                           -----------
     public String getSchemaHtmlFileName() {
         final String projectName = getProjectName();
         return getDocumentProperties().getSchemaHtmlFileName(projectName);
     }
 
-    public String getHistoryHtmlFileName() {
-        final String projectName = getProjectName();
-        return getDocumentProperties().getHistoryHtmlFileName(projectName);
-    }
-
-    public String getSchemaSyncCheckResultFileName() {
-        return getDocumentProperties().getSchemaSyncCheckResultFileName();
-    }
-
-    public String getAlterCheckResultFileName() {
-        return getReplaceSchemaProperties().getMigrationAlterCheckResultFileName();
-    }
-
-    public String getPropertiesHtmlFileName() {
-        final String projectName = getProjectName();
-        return getDocumentProperties().getPropertiesHtmlFileName(projectName);
-    }
-
-    public List<String> getLastaDocHtmlNameList() {
-        if (cachedLastaDocNameList != null) {
-            return cachedLastaDocNameList;
-        }
-        final String[] docList = new File(getLastaDocOutputDirectory()).list(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.startsWith("lastadoc-") && name.endsWith(".html");
-            }
-        });
-        cachedLastaDocNameList = docList != null ? Arrays.asList(docList) : DfCollectionUtil.emptyList();
-        return cachedLastaDocNameList;
-    }
-
-    // ===================================================================================
-    //                                                                         Sister Link
-    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                           Sister Link
+    //                                           -----------
     public boolean isSchemaHtmlToHistoryHtmlLink() {
         return !isSuppressSchemaHtmlToSisterLink() && isHistoryHtml() && existsSchemaHistory();
     }
@@ -251,22 +159,6 @@ public class DfDocumentSelector {
 
     public boolean isSchemaHtmlToLastaDocLink() {
         return !isSuppressSchemaHtmlToSisterLink() && isLastaDocHtml() && existsLastaDocHtml();
-    }
-
-    public boolean isHistoryHtmlToSchemaHtmlLink() {
-        return !isSuppressHistoryHtmlToSisterLink() && isSchemaHtml(); // SchemaHtml always exists
-    }
-
-    public boolean isHistoryHtmlToPropertiesHtmlLink() {
-        return !isSuppressHistoryHtmlToSisterLink() && isPropertiesHtml() && existsPropertiesHtmlRequest();
-    }
-
-    public boolean isPropertiesHtmlToSchemaHtmlLink() {
-        return !isSuppressPropertiesHtmlToSisterLink() && isSchemaHtml(); // SchemaHtml always exists
-    }
-
-    public boolean isPropertiesHtmlToHistoryHtmlLink() {
-        return !isSuppressPropertiesHtmlToSisterLink() && isHistoryHtml() && existsSchemaHistory();
     }
 
     // -----------------------------------------------------
@@ -316,11 +208,76 @@ public class DfDocumentSelector {
     }
 
     // ===================================================================================
-    //                                                                              Design
-    //                                                                              ======
+    //                                                                      Schema History
+    //                                                                      ==============
     // -----------------------------------------------------
-    //                                           HistoryHTML
+    //                                         Basic Process
+    //                                         -------------
+    public void loadSchemaHistoryAsCore() { // for HistoryHtml
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsCore();
+        doLoadSchemaHistory(schemaHistory);
+    }
+
+    public void loadSchemaHistoryAsSchemaSyncCheck() { // for SchemaSyncCheck
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(getSchemaSyncCheckDiffMapFile());
+        doLoadSchemaHistory(schemaHistory);
+    }
+
+    public void loadSchemaHistoryAsAlterCheck() { // for AlterCheck
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(getAlterCheckDiffMapFile());
+        doLoadSchemaHistory(schemaHistory);
+    }
+
+    protected void doLoadSchemaHistory(DfSchemaHistory schemaHistory) {
+        _log.info("...Loading schema history");
+        _schemaHistory = schemaHistory;
+        _schemaHistory.loadHistory();
+        if (existsSchemaHistory()) {
+            _log.info(" -> found history: count=" + getSchemaDiffList().size());
+        } else {
+            _log.info(" -> no history");
+        }
+    }
+
+    public boolean existsSchemaHistory() {
+        return _schemaHistory != null && _schemaHistory.existsHistory();
+    }
+
+    public List<DfSchemaDiff> getSchemaDiffList() {
+        return _schemaHistory.getSchemaDiffList();
+    }
+
+    // -----------------------------------------------------
+    //                                           File System
     //                                           -----------
+    public String getHistoryHtmlFileName() {
+        final String projectName = getProjectName();
+        return getDocumentProperties().getHistoryHtmlFileName(projectName);
+    }
+
+    public String getSchemaSyncCheckResultFileName() {
+        return getDocumentProperties().getSchemaSyncCheckResultFileName();
+    }
+
+    public String getAlterCheckResultFileName() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckResultFileName();
+    }
+
+    // -----------------------------------------------------
+    //                                           Sister Link
+    //                                           -----------
+    public boolean isHistoryHtmlToSchemaHtmlLink() {
+        return !isSuppressHistoryHtmlToSisterLink() && isSchemaHtml(); // SchemaHtml always exists
+    }
+
+    public boolean isHistoryHtmlToPropertiesHtmlLink() {
+        return !isSuppressHistoryHtmlToSisterLink() && isPropertiesHtml() && existsPropertiesHtmlRequest();
+    }
+
+    // -----------------------------------------------------
+    //                                                Design
+    //                                                ------
+    // HistoryHTML only uses the determinations via selector... (others use $database) by jflute
     public boolean isHistoryHtmlStyleSheetEmbedded() {
         return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlStyleSheetEmbedded();
     }
@@ -351,6 +308,74 @@ public class DfDocumentSelector {
 
     public String getHistoryHtmlJavaScriptLink() {
         return getDocumentProperties().getHistoryHtmlJavaScriptLink();
+    }
+
+    // ===================================================================================
+    //                                                                     Properties HTML
+    //                                                                     ===============
+    // -----------------------------------------------------
+    //                                         Basic Process
+    //                                         -------------
+    /**
+     * Load requests for properties HTML. <br>
+     * If no property, do nothing.
+     */
+    public void loadPropertiesHtmlRequest() {
+        _propHtmlManager = new DfPropHtmlManager();
+        _propHtmlManager.loadRequest();
+    }
+
+    public boolean existsPropertiesHtmlRequest() {
+        return _propHtmlManager != null && _propHtmlManager.existsRequest();
+    }
+
+    public DfPropHtmlManager getPropertiesHtmlManager() {
+        return _propHtmlManager;
+    }
+
+    // -----------------------------------------------------
+    //                                           File System
+    //                                           -----------
+    public String getPropertiesHtmlFileName() {
+        final String projectName = getProjectName();
+        return getDocumentProperties().getPropertiesHtmlFileName(projectName);
+    }
+
+    // -----------------------------------------------------
+    //                                           Sister Link
+    //                                           -----------
+    public boolean isPropertiesHtmlToSchemaHtmlLink() {
+        return !isSuppressPropertiesHtmlToSisterLink() && isSchemaHtml(); // SchemaHtml always exists
+    }
+
+    public boolean isPropertiesHtmlToHistoryHtmlLink() {
+        return !isSuppressPropertiesHtmlToSisterLink() && isHistoryHtml() && existsSchemaHistory();
+    }
+
+    // ===================================================================================
+    //                                                                            LastaDoc
+    //                                                                            ========
+    // -----------------------------------------------------
+    //                                         Basic Process
+    //                                         -------------
+    public boolean existsLastaDocHtml() {
+        return !getLastaDocHtmlNameList().isEmpty();
+    }
+
+    // -----------------------------------------------------
+    //                                           File System
+    //                                           -----------
+    public List<String> getLastaDocHtmlNameList() {
+        if (cachedLastaDocNameList != null) {
+            return cachedLastaDocNameList;
+        }
+        final String[] docList = new File(getLastaDocOutputDirectory()).list(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.startsWith("lastadoc-") && name.endsWith(".html");
+            }
+        });
+        cachedLastaDocNameList = docList != null ? Arrays.asList(docList) : DfCollectionUtil.emptyList();
+        return cachedLastaDocNameList;
     }
 
     // ===================================================================================
