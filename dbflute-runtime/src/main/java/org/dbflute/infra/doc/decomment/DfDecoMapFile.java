@@ -113,10 +113,8 @@ public class DfDecoMapFile {
     // }
     // done cabos I just noticed that this should be readPieceList()... by jflute (2017/11/18)
     // done cabos write javadoc by jflute (2017/11/18)
-
     /**
      * Read all decomment piece map file in "clientDirPath/schema/decomment/piece/".
-     *
      * @param clientDirPath The path of DBFlute client directory (NotNull)
      * @return List of all decomment piece map (NotNull: If piece map file not exists, returns empty list)
      */
@@ -160,10 +158,12 @@ public class DfDecoMapFile {
         String decomment = (String) map.get("decomment");
         String databaseComment = (String) map.get("databaseComment");
         Long commentVersion = Long.valueOf(map.get("commentVersion").toString());
+        @SuppressWarnings("unchecked")
         List<String> authorList = (List<String>) map.get("authorList");
         String pieceCode = (String) map.get("pieceCode");
         LocalDateTime pieceDatetime = new HandyDate((String) map.get("pieceDatetime")).getLocalDateTime();
         String pieceOwner = (String) map.get("pieceOwner");
+        @SuppressWarnings("unchecked")
         List<String> previousPieceList = (List<String>) map.get("previousPieceList");
         return new DfDecoMapPiece(formatVersion, tableName, columnName, targetType, decomment, databaseComment, commentVersion, authorList,
                 pieceCode, pieceDatetime, pieceOwner, previousPieceList);
@@ -221,10 +221,8 @@ public class DfDecoMapFile {
     //     }
     // }
     // done hakiba sub tag comment by jflute (2017/08/17)
-
     /**
      * Read decomment pickup map file at "clientDirPath/schema/decomment/pickup/decomment-pickup.dfmap".
-     *
      * @param clientDirPath The path of DBFlute client directory (NotNull)
      * @return pickup decomment map (NotNull: If pickup map file not exists, returns empty)
      */
@@ -235,8 +233,7 @@ public class DfDecoMapFile {
             // done hakiba null pointer so use optional thing and stream empty by jflute (2017/10/05)
             return OptionalThing.empty();
         }
-        return OptionalThing.ofNullable(doReadPickup(Paths.get(filePath)), () -> {
-        });
+        return OptionalThing.ofNullable(doReadPickup(Paths.get(filePath)), () -> {});
     }
 
     private DfDecoMapPickup doReadPickup(Path path) {
@@ -259,6 +256,7 @@ public class DfDecoMapFile {
         DfDecoMapPickup pickup = new DfDecoMapPickup(formatVersion);
         pickup.setPickupDatetime(pickupDatetime);
 
+        @SuppressWarnings("unchecked")
         Map<String, List<Map<String, Object>>> decoMap =
                 (Map<String, List<Map<String, Object>>>) map.getOrDefault("decoMap", new LinkedHashMap<>());
         if (decoMap.isEmpty()) {
@@ -293,12 +291,10 @@ public class DfDecoMapFile {
     // -----------------------------------------------------
     //                                                 Piece
     //                                                 -----
-
     /**
      * Write single decomment piece map file at "clientDirPath/schema/decomment/piece".
-     *
      * @param clientDirPath The path of DBFlute client directory (NotNull)
-     * @param decoMapPiece  Decoment piece map (NotNull)
+     * @param decoMapPiece Decoment piece map (NotNull)
      */
     public void writePiece(String clientDirPath, DfDecoMapPiece decoMapPiece) {
         assertClientDirPath(clientDirPath);
@@ -312,7 +308,6 @@ public class DfDecoMapFile {
      * Build piece file name for piece map file<br>
      * e.g. table decomment : decomment-piece-TABLE_NAME-20171224-143000-123-owner-ABCDEFG.dfmap <br>
      * e.g. column decomment : decomment-piece-TABLE_NAME-COLUMN_NAME-20171224-143000-123-owner-ABCDEFG.dfmap <br>
-     *
      * @param decoMapPiece Decoment piece map (NotNull)
      * @return piece file name
      */
@@ -466,13 +461,13 @@ public class DfDecoMapFile {
      * <br>
      * <b>Logic:</b>
      * <ol>
-     * <li>Add PropertyList each table or column</li>
-     * <li>Filter already merged piece. <br>
-     * (If piece was already merged, Either previousPieceList(previous piece code) contains it's piece code)</li>
+     *     <li>Add PropertyList each table or column</li>
+     *     <li>Filter already merged piece. <br>
+     *         (If piece was already merged, Either previousPieceList(previous piece code) contains it's piece code)</li>
      * </ol>
      *
      * @param pickupOpt Decoment pickup map (NotNull: If pickup map file not exists, Empty allowed)
-     * @param pieces    Decoment piece map (NotNull: If piece map file not exists, Empty allowed)
+     * @param pieces Decoment piece map (NotNull: If piece map file not exists, Empty allowed)
      * @return pickup decomment map (NotNull)
      */
     public DfDecoMapPickup merge(OptionalThing<DfDecoMapPickup> pickupOpt, List<DfDecoMapPiece> pieces) {
