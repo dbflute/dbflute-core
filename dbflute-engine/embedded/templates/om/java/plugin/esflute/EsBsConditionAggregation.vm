@@ -15,9 +15,9 @@ import org.elasticsearch.search.aggregations.bucket.global.GlobalAggregationBuil
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.HistogramAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.missing.MissingAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.range.IpRangeAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.range.date.DateRangeAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.range.ip.IpRangeAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.sampler.SamplerAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.significant.SignificantTermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
@@ -206,16 +206,16 @@ public abstract class Bs${table.camelizedName}CA extends EsAbstractConditionAggr
         }
     }
 
-    public void set${column.capCamelName}_PercentileRanks() {
-        set${column.capCamelName}_PercentileRanks(null);
+    public void set${column.capCamelName}_PercentileRanks(double[] values) {
+        set${column.capCamelName}_PercentileRanks(values, null);
     }
 
-    public void set${column.capCamelName}_PercentileRanks(ConditionOptionCall<PercentileRanksAggregationBuilder> opLambda) {
-        set${column.capCamelName}_PercentileRanks("${column.name}", opLambda);
+    public void set${column.capCamelName}_PercentileRanks(double[] values, ConditionOptionCall<PercentileRanksAggregationBuilder> opLambda) {
+        set${column.capCamelName}_PercentileRanks("${column.name}", values, opLambda);
     }
 
-    public void set${column.capCamelName}_PercentileRanks(String name, ConditionOptionCall<PercentileRanksAggregationBuilder> opLambda) {
-        PercentileRanksAggregationBuilder builder = regPercentileRanksA(name, "${column.name}");
+    public void set${column.capCamelName}_PercentileRanks(String name, double[] values, ConditionOptionCall<PercentileRanksAggregationBuilder> opLambda) {
+        PercentileRanksAggregationBuilder builder = regPercentileRanksA(name, "${column.name}", values);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
