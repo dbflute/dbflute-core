@@ -455,7 +455,6 @@ public class DfDecoMapFile {
     //                                                                               Merge
     //                                                                               =====
     // done (by cabos) hakiba write unit test by jflute (2017/09/21)
-
     /**
      * merge piece map and pickup map with previous piece code clue to go on.<br>
      * <br>
@@ -465,7 +464,6 @@ public class DfDecoMapFile {
      *     <li>Filter already merged piece. <br>
      *         (If piece was already merged, Either previousPieceList(previous piece code) contains it's piece code)</li>
      * </ol>
-     *
      * @param pickupOpt Decoment pickup map (NotNull: If pickup map file not exists, Empty allowed)
      * @param pieces Decoment piece map (NotNull: If piece map file not exists, Empty allowed)
      * @return pickup decomment map (NotNull)
