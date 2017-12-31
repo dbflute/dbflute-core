@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,8 +113,10 @@ public class DfDecoMapFile {
     // }
     // done cabos I just noticed that this should be readPieceList()... by jflute (2017/11/18)
     // done cabos write javadoc by jflute (2017/11/18)
+
     /**
      * Read all decomment piece map file in "clientDirPath/schema/decomment/piece/".
+     *
      * @param clientDirPath The path of DBFlute client directory (NotNull)
      * @return List of all decomment piece map (NotNull: If piece map file not exists, returns empty list)
      */
@@ -157,12 +160,10 @@ public class DfDecoMapFile {
         String decomment = (String) map.get("decomment");
         String databaseComment = (String) map.get("databaseComment");
         Long commentVersion = Long.valueOf(map.get("commentVersion").toString());
-        @SuppressWarnings("unchecked")
         List<String> authorList = (List<String>) map.get("authorList");
         String pieceCode = (String) map.get("pieceCode");
         LocalDateTime pieceDatetime = new HandyDate((String) map.get("pieceDatetime")).getLocalDateTime();
         String pieceOwner = (String) map.get("pieceOwner");
-        @SuppressWarnings("unchecked")
         List<String> previousPieceList = (List<String>) map.get("previousPieceList");
         return new DfDecoMapPiece(formatVersion, tableName, columnName, targetType, decomment, databaseComment, commentVersion, authorList,
                 pieceCode, pieceDatetime, pieceOwner, previousPieceList);
@@ -220,8 +221,10 @@ public class DfDecoMapFile {
     //     }
     // }
     // done hakiba sub tag comment by jflute (2017/08/17)
+
     /**
      * Read decomment pickup map file at "clientDirPath/schema/decomment/pickup/decomment-pickup.dfmap".
+     *
      * @param clientDirPath The path of DBFlute client directory (NotNull)
      * @return pickup decomment map (NotNull: If pickup map file not exists, returns empty)
      */
@@ -232,7 +235,8 @@ public class DfDecoMapFile {
             // done hakiba null pointer so use optional thing and stream empty by jflute (2017/10/05)
             return OptionalThing.empty();
         }
-        return OptionalThing.ofNullable(doReadPickup(Paths.get(filePath)), () -> {});
+        return OptionalThing.ofNullable(doReadPickup(Paths.get(filePath)), () -> {
+        });
     }
 
     private DfDecoMapPickup doReadPickup(Path path) {
@@ -255,7 +259,6 @@ public class DfDecoMapFile {
         DfDecoMapPickup pickup = new DfDecoMapPickup(formatVersion);
         pickup.setPickupDatetime(pickupDatetime);
 
-        @SuppressWarnings("unchecked")
         Map<String, List<Map<String, Object>>> decoMap =
                 (Map<String, List<Map<String, Object>>>) map.getOrDefault("decoMap", new LinkedHashMap<>());
         if (decoMap.isEmpty()) {
@@ -290,10 +293,12 @@ public class DfDecoMapFile {
     // -----------------------------------------------------
     //                                                 Piece
     //                                                 -----
+
     /**
      * Write single decomment piece map file at "clientDirPath/schema/decomment/piece".
+     *
      * @param clientDirPath The path of DBFlute client directory (NotNull)
-     * @param decoMapPiece Decoment piece map (NotNull)
+     * @param decoMapPiece  Decoment piece map (NotNull)
      */
     public void writePiece(String clientDirPath, DfDecoMapPiece decoMapPiece) {
         assertClientDirPath(clientDirPath);
@@ -307,6 +312,7 @@ public class DfDecoMapFile {
      * Build piece file name for piece map file<br>
      * e.g. table decomment : decomment-piece-TABLE_NAME-20171224-143000-123-owner-ABCDEFG.dfmap <br>
      * e.g. column decomment : decomment-piece-TABLE_NAME-COLUMN_NAME-20171224-143000-123-owner-ABCDEFG.dfmap <br>
+     *
      * @param decoMapPiece Decoment piece map (NotNull)
      * @return piece file name
      */
@@ -454,23 +460,27 @@ public class DfDecoMapFile {
     //                                                                               Merge
     //                                                                               =====
     // done (by cabos) hakiba write unit test by jflute (2017/09/21)
+
     /**
      * merge piece map and pickup map with previous piece code clue to go on.<br>
      * <br>
      * <b>Logic:</b>
      * <ol>
-     *     <li>Add PropertyList each table or column</li>
-     *     <li>Filter already merged piece. <br>
-     *         (If piece was already merged, Either previousPieceList(previous piece code) contains it's piece code)</li>
+     * <li>Add PropertyList each table or column</li>
+     * <li>Filter already merged piece. <br>
+     * (If piece was already merged, Either previousPieceList(previous piece code) contains it's piece code)</li>
      * </ol>
+     *
      * @param pickupOpt Decoment pickup map (NotNull: If pickup map file not exists, Empty allowed)
-     * @param pieces Decoment piece map (NotNull: If piece map file not exists, Empty allowed)
+     * @param pieces    Decoment piece map (NotNull: If piece map file not exists, Empty allowed)
      * @return pickup decomment map (NotNull)
      */
     public DfDecoMapPickup merge(OptionalThing<DfDecoMapPickup> pickupOpt, List<DfDecoMapPiece> pieces) {
         Set<String> pieceCodeSet = extractAllMergedPieceCode(pickupOpt, pieces);
+        Map<String, List<String>> previousPieceListMap = createPreviousPieceListMap(pickupOpt, pieces);
+        Map<String, List<String>> authorListMap = createAuthorListMap(pickupOpt, pieces);
         DfDecoMapPickup pickup = pickupOpt.orElse(new DfDecoMapPickup());
-        doMerge(pieces, pickup);
+        doMerge(pieces, pickup, authorListMap, previousPieceListMap);
         filterMergedProperties(pickup, pieceCodeSet);
         return pickup;
     }
@@ -490,6 +500,38 @@ public class DfDecoMapFile {
         return Stream.concat(pickupPieceCodeStream, previousPieceCodeStream).collect(Collectors.toSet());
     }
 
+    private Map<String, List<String>> createPreviousPieceListMap(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieces) {
+        Map<String, List<String>> previousPieceMap = new HashMap<>();
+        pieces.forEach(piece -> {
+            previousPieceMap.put(piece.getPieceCode(), piece.getPreviousPieceList());
+        });
+        optPickup.ifPresent(pickup -> {
+            pickup.getTableList().forEach(table -> {
+                table.getPropertyList()
+                        .forEach(property -> previousPieceMap.put(property.getPieceCode(), property.getPreviousPieceList()));
+                table.getColumnList().stream().flatMap(column -> column.getPropertyList().stream())
+                        .forEach(property -> previousPieceMap.put(property.getPieceCode(), property.getPreviousPieceList()));
+            });
+        });
+        return previousPieceMap;
+    }
+
+    private Map<String, List<String>> createAuthorListMap(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieces) {
+        Map<String, List<String>> codeAuthorMap = new HashMap<>();
+        pieces.forEach(piece -> {
+            codeAuthorMap.put(piece.getPieceCode(), piece.getAuthorList());
+        });
+        optPickup.ifPresent(pickup -> {
+            pickup.getTableList().forEach(table -> {
+                table.getPropertyList()
+                        .forEach(property -> codeAuthorMap.put(property.getPieceCode(), property.getAuthorList()));
+                table.getColumnList().stream().flatMap(column -> column.getPropertyList().stream())
+                        .forEach(property -> codeAuthorMap.put(property.getPieceCode(), property.getAuthorList()));
+            });
+        });
+        return codeAuthorMap;
+    }
+
     private void filterMergedProperties(DfDecoMapPickup pickup, Set<String> pieceCodeSet) {
         pickup.getTableList().forEach(table -> {
             filterTablePropertyList(table, pieceCodeSet);
@@ -507,9 +549,10 @@ public class DfDecoMapFile {
         pieceCodeSet.forEach(pieceCode -> column.removeProperty(pieceCode));
     }
 
-    protected void doMerge(List<DfDecoMapPiece> filteredPieces, DfDecoMapPickup pickUp) {
-        filteredPieces.forEach(piece -> {
-            DfDecoMapPropertyPart property = mappingPieceToProperty(piece);
+    protected void doMerge(List<DfDecoMapPiece> pieces, DfDecoMapPickup pickUp, Map<String, List<String>> codeAuthorListMap,
+                           Map<String, List<String>> codePreviousPieceCodeListMap) {
+        pieces.forEach(piece -> {
+            DfDecoMapPropertyPart property = mappingPieceToProperty(piece, codeAuthorListMap, codePreviousPieceCodeListMap);
 
             if (piece.getTargetType() == DfDecoMapPieceTargetType.Table) { // table decomment
                 List<DfDecoMapTablePart> tableList = pickUp.getTableList();
@@ -562,11 +605,33 @@ public class DfDecoMapFile {
         pickUp.setPickupDatetime(getCurrentLocalDateTime());
     }
 
-    private DfDecoMapPropertyPart mappingPieceToProperty(DfDecoMapPiece piece) {
-        DfDecoMapPropertyPart property =
-                new DfDecoMapPropertyPart(piece.getDecomment(), piece.getDatabaseComment(), piece.getPieceCode(), piece.getPieceDatetime(),
-                        piece.getPieceOwner(), piece.getPreviousPieceList(), piece.getCommentVersion(), piece.getAuthorList());
-        return property;
+    private DfDecoMapPropertyPart mappingPieceToProperty(DfDecoMapPiece piece, Map<String, List<String>> authorListMap,
+                                                         Map<String, List<String>> previousPieceMap) {
+        String pieceCode = piece.getPieceCode();
+        List<String> previousCodeList = extractPreviousPieceList(pieceCode, previousPieceMap);
+        List<String> authorList = extractAuthorList(pieceCode, previousCodeList, authorListMap);
+        return new DfDecoMapPropertyPart(piece.getDecomment(), piece.getDatabaseComment(), pieceCode, piece.getPieceDatetime(),
+                piece.getPieceOwner(), previousCodeList, piece.getCommentVersion(), authorList);
+    }
+
+    private List<String> extractPreviousPieceList(String pieceCode, Map<String, List<String>> previousPieceMap) {
+        List<String> previousCodeList = new ArrayList<>();
+        List<String> partCodeList = previousPieceMap.getOrDefault(pieceCode, Collections.emptyList());
+        if (partCodeList.isEmpty()) {
+            return previousCodeList;
+        }
+        previousCodeList.addAll(partCodeList);
+        partCodeList.forEach(code -> {
+            previousCodeList.addAll(extractPreviousPieceList(code, previousPieceMap));
+        });
+        return previousCodeList.stream().distinct().collect(Collectors.toList());
+    }
+
+    private List<String> extractAuthorList(String pieceCode, List<String> previousPieceList, Map<String, List<String>> authorListMap) {
+        List<String> authorList = new ArrayList<>();
+        authorList.addAll(authorListMap.get(pieceCode));
+        previousPieceList.forEach(previousPiece -> authorList.addAll(authorListMap.getOrDefault(previousPiece, Collections.emptyList())));
+        return authorList.stream().distinct().collect(Collectors.toList());
     }
 
     // ===================================================================================
