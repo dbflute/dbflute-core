@@ -71,7 +71,7 @@ public class DfElasticsearchLoadingAgent {
     //     ; package = org.dbflute...
     //     ; className = unused
     // }
-    // ; tableMap = map:{
+    // ; optionMap = map:{
     //     ; tablePath = .fess_config -> mappings -> map
     //     ; mappingMap = map:{
     //         ; type = map:{

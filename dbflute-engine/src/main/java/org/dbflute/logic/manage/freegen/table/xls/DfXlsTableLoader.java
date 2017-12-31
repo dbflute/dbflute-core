@@ -61,7 +61,7 @@ public class DfXlsTableLoader implements DfFreeGenTableLoader {
     //     ; package = org.dbflute...
     //     ; className = FooDto
     // }
-    // ; tableMap = map:{
+    // ; optionMap = map:{
     //     ; sheetName = [sheet-name]
     //     ; rowBeginNumber = 3
     //     ; columnMap = map:{
@@ -75,6 +75,7 @@ public class DfXlsTableLoader implements DfFreeGenTableLoader {
     //         }
     //     }
     // }
+    @Override
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> tableMap = mapProp.getOptionMap();
         final Map<String, Map<String, String>> mappingMap = mapProp.getMappingMap();

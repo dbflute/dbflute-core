@@ -66,7 +66,7 @@ public class DfJsonSchemaLoadingAgent {
     //     ; package = org.dbflute...
     //     ; className = unused
     // }
-    // ; tableMap = map:{
+    // ; optionMap = map:{
     //     ; tablePath = map
     //     ; mappingMap = map:{
     //         ; type = map:{

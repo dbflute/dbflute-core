@@ -578,7 +578,7 @@ public final class DfLastaFluteFreeGenReflector {
         pathMap.put("outputMap", outputMap);
         outputMap.put("outputDirectory", "$$baseDir$$/java");
         outputMap.put("package", filterOverridden(_mylastaPackage + ".webcls", lastafluteMap, appName, "webcls", "package"));
-        outputMap.put("templateFile", "LaWebCDef.vm");
+        outputMap.put("templateFile", "LaAppCDef.vm");
         outputMap.put("className", filterOverridden("WebCDef", lastafluteMap, appName, "webcls", "className"));
         final Map<String, Object> tableMap = createTableMap();
         pathMap.put("tableMap", tableMap);
