@@ -217,7 +217,7 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
      * }, Member.<span style="color: #CC4747">ALIAS_purchaseCount</span>);
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -236,7 +236,7 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
      * }, Member.<span style="color: #CC4747">ALIAS_productKindCount</span>);
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -255,7 +255,7 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
      * }, Member.<span style="color: #CC4747">ALIAS_latestPurchaseDatetime</span>);
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -274,7 +274,7 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
      * }, Member.<span style="color: #CC4747">ALIAS_firstPurchaseDatetime</span>);
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -293,7 +293,7 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
      * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceSummary</span>);
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -312,7 +312,7 @@ class ScrHpSDRFunction[REFERRER_CB <: ConditionBean, LOCAL_CQ <: ConditionQuery]
      *         subCB.query().setPaymentCompleteFlg_Equal_True(); <span style="color: #3F7E5E">// referrer condition</span>
      *     }
      * }, Member.<span style="color: #CC4747">ALIAS_purchasePriceAverage</span>);
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
@@ -356,7 +356,7 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
@@ -375,7 +375,7 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
@@ -394,7 +394,7 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
@@ -413,7 +413,7 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
@@ -432,7 +432,7 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
@@ -451,7 +451,7 @@ class ScrHpQDRFunction[CB <: ConditionBean](function: HpQDRFunction[CB]) {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * }).<span style="color: #CC4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param optionCall The callback for option for DerivedReferrer. e.g. you can use a coalesce function. (NotNull)
      * @return The parameter for comparing with scalar. (NotNull)
@@ -492,7 +492,7 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
      *     }
      * }).equal(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     def equal(value: PARAMETER): Unit = { parameter.equal(value) }
 
@@ -508,7 +508,7 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
      *     }
      * }).notEqual(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     def notEqual(value: PARAMETER): Unit = { parameter.notEqual(value) }
 
@@ -524,7 +524,7 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
      *     }
      * }).greaterThan(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     def greaterThan(value: PARAMETER): Unit = { parameter.greaterThan(value) }
 
@@ -540,7 +540,7 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
      *     }
      * }).lessThan(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     def lessThan(value: PARAMETER): Unit = { parameter.lessThan(value) }
 
@@ -556,7 +556,7 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
      *     }
      * }).greaterEqual(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     def greaterEqual(value: PARAMETER): Unit = { parameter.greaterEqual(value) }
 
@@ -572,13 +572,13 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
      *     }
      * }).lessEqual(123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param value The value of parameter for the specified column. (NotNull) 
+     * @param value The value of parameter for the specified column. (NotNull)
      */
     def lessEqual(value: PARAMETER): Unit = { parameter.lessEqual(value) }
 
     /**
      * Set up the operand 'isNull' and the value of parameter. <br>
-     * The type of the parameter should be same as the type of target column. 
+     * The type of the parameter should be same as the type of target column.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
@@ -592,7 +592,7 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
 
     /**
      * Set up the operand 'isNull' and the value of parameter. <br>
-     * The type of the parameter should be same as the type of target column. 
+     * The type of the parameter should be same as the type of target column.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
      *     protected void query(PurchaseCB subCB) {
@@ -616,8 +616,8 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
      *     }
      * }).between(53, 123); <span style="color: #3F7E5E">// This parameter should be Integer!</span>
      * </pre>
-     * @param fromValue The 'from' value of parameter for the specified column. (NotNull) 
-     * @param toValue The 'to' value of parameter for the specified column. (NotNull) 
+     * @param fromValue The 'from' value of parameter for the specified column. (NotNull)
+     * @param toValue The 'to' value of parameter for the specified column. (NotNull)
      */
     def between(fromValue: PARAMETER, toValue: PARAMETER): Unit = { parameter.between(fromValue, toValue) }
 
@@ -634,8 +634,8 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
      * }).dateFromTo(toTimestamp("2012/03/05"), toTimestamp("2012/03/07"));
      * <span style="color: #3F7E5E">// PURCHASE_DATE between 2012/03/05 00:00:00 and 2012/03/07 23:59:59.999</span>
      * </pre>
-     * @param fromDate The 'from' date of parameter for the specified column. (NullAllowed: if null, from-date condition is ignored) 
-     * @param toDate The 'to' date of parameter for the specified column. (NullAllowed: if null, to-date condition is ignored) 
+     * @param fromDate The 'from' date of parameter for the specified column. (NullAllowed: if null, from-date condition is ignored)
+     * @param toDate The 'to' date of parameter for the specified column. (NullAllowed: if null, to-date condition is ignored)
      */
     def dateFromTo(fromDate: Date, toDate: Date): Unit = { parameter.dateFromTo(fromDate, toDate) }
 
@@ -652,8 +652,8 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
      * }).fromTo(toTimestamp("2012/02/05"), toTimestamp("2012/04/07"), new FromToOption().compareAsMonth());
      * <span style="color: #3F7E5E">// PURCHASE_DATE between 2012/02/01 00:00:00 and 2012/04/30 23:59:59.999</span>
      * </pre>
-     * @param fromDate The 'from' date of parameter for the specified column. (NullAllowed: if null, from-date condition is ignored) 
-     * @param toDate The 'to' date of parameter for the specified column. (NullAllowed: if null, to-date condition is ignored) 
+     * @param fromDate The 'from' date of parameter for the specified column. (NullAllowed: if null, from-date condition is ignored)
+     * @param toDate The 'to' date of parameter for the specified column. (NullAllowed: if null, to-date condition is ignored)
      * @param option The option of from-to. (NotNull)
      */
     def fromTo(fromDate: Date, toDate: Date)(optionCall: (FromToOption) => Unit): Unit = { parameter.fromTo(fromDate, toDate, callbackFTOP(optionCall)) }
@@ -674,7 +674,7 @@ class ScrHpQDRParameter[CB <: ConditionBean, PARAMETER](parameter: HpQDRParamete
 /* _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
 
 /**
- * The function for scalar select. 
+ * The function for scalar select.
  * @param <CB> The type of condition-bean.
  * @param <RESULT> The type of result for scalar select
  * @author ${database.classAuthor}
@@ -822,7 +822,7 @@ class ScrHpSSQFunction[CB <: ConditionBean](function: HpSSQFunction[CB]) {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
@@ -837,7 +837,7 @@ class ScrHpSSQFunction[CB <: ConditionBean](function: HpSSQFunction[CB]) {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
@@ -852,7 +852,7 @@ class ScrHpSSQFunction[CB <: ConditionBean](function: HpSSQFunction[CB]) {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
@@ -867,7 +867,7 @@ class ScrHpSSQFunction[CB <: ConditionBean](function: HpSSQFunction[CB]) {
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
      * });
-     * </pre> 
+     * </pre>
      * @param subQuery The sub query of myself. (NotNull)
      * @return The decorator of ScalarCondition. e.g. you can use partition-by. (NotNull)
      */
@@ -946,7 +946,7 @@ class ScrColumnCalculator(calculator: ColumnCalculator) {
      *  ManualOrderBean mob = new ManualOrderBean
      *  mob.<span style="color: #CC4747">plus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
-     * 
+     *
      * e.g. ColumnQuery: ... > PURCHASE_PRICE + PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
@@ -979,7 +979,7 @@ class ScrColumnCalculator(calculator: ColumnCalculator) {
      *  ManualOrderBean mob = new ManualOrderBean
      *  mob.<span style="color: #CC4747">minus</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
-     * 
+     *
      * e.g. ColumnQuery: ... > PURCHASE_PRICE - PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
@@ -1012,7 +1012,7 @@ class ScrColumnCalculator(calculator: ColumnCalculator) {
      *  ManualOrderBean mob = new ManualOrderBean
      *  mob.<span style="color: #CC4747">multiply</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
-     * 
+     *
      * e.g. ColumnQuery: ... > PURCHASE_PRICE * PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {
@@ -1045,7 +1045,7 @@ class ScrColumnCalculator(calculator: ColumnCalculator) {
      *  ManualOrderBean mob = new ManualOrderBean
      *  mob.<span style="color: #CC4747">divide</span>(cb.<span style="color: #CC4747">dreamCruiseCB()</span>.specify().columnPurchaseCount());
      *  cb.query().addOrderBy_PurchasePrice_Asc().withManualOrder(mob);
-     * 
+     *
      * e.g. ColumnQuery: ... > PURCHASE_PRICE / PURCHASE_COUNT
      *  PurchaseCB cb = new PurchaseCB();
      *  cb.columnQuery(new SpecifyQuery() {

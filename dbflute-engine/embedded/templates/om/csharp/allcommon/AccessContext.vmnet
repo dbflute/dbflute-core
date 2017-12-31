@@ -29,7 +29,7 @@ namespace ${glPackageBaseCommon} {
             return (Thread.GetData(_accessContextSlot) != null);
         }
 
-		public static DateTime? GetAccessTimestampOnThread() {
+        public static DateTime? GetAccessTimestampOnThread() {
             if (IsExistAccessContextOnThread()) {
                 ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
                 DateTime? accessTimestamp = userContextOnThread.AccessTimestamp;
@@ -38,9 +38,9 @@ namespace ${glPackageBaseCommon} {
                 }
             }
             return DateTime.Now; // as Default
-		}
+        }
 
-		public static String GetAccessUserOnThread() {
+        public static String GetAccessUserOnThread() {
             if (IsExistAccessContextOnThread()) {
                 ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
                 String accessUser = userContextOnThread.AccessUser;
@@ -55,9 +55,9 @@ namespace ${glPackageBaseCommon} {
                 msg = "The AccessContext was not found on thread!";
             }
             throw new SystemException(msg);
-		}
-		
-		public static String GetAccessProcessOnThread() {
+        }
+
+        public static String GetAccessProcessOnThread() {
             if (IsExistAccessContextOnThread()) {
                 ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
                 String accessProcess = userContextOnThread.AccessProcess;
@@ -72,9 +72,9 @@ namespace ${glPackageBaseCommon} {
                 msg = "The AccessContext was not found on thread!";
             }
             throw new SystemException(msg);
-		}
-		
-		public static String GetAccessModuleOnThread() {
+        }
+
+        public static String GetAccessModuleOnThread() {
             if (IsExistAccessContextOnThread()) {
                 ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
                 String accessModule = userContextOnThread.AccessModule;
@@ -89,9 +89,9 @@ namespace ${glPackageBaseCommon} {
                 msg = "The AccessContext was not found on thread!";
             }
             throw new SystemException(msg);
-		}
+        }
 
-		public static Object GetAccessValueOnThread(String key) {
+        public static Object GetAccessValueOnThread(String key) {
             if (IsExistAccessContextOnThread()) {
                 ${glAccessContext} userContextOnThread = GetAccessContextOnThread();
                 IDictionary<String, Object> accessValueMap = userContextOnThread.AccessValueMap;
@@ -107,8 +107,8 @@ namespace ${glPackageBaseCommon} {
                 msg = "The AccessContext was not found on thread: key=" + key;
             }
             throw new SystemException(msg);
-		}
-		
+        }
+
         protected DateTime? _accessTimestamp;
         protected String _accessUser;
         protected String _accessProcess;
@@ -116,29 +116,29 @@ namespace ${glPackageBaseCommon} {
 
         protected IDictionary<String, Object> _accessValueMap;
 
-		public DateTime? AccessTimestamp {
-		    get { return _accessTimestamp; }
-			set { _accessTimestamp = value; }
-		}
+        public DateTime? AccessTimestamp {
+            get { return _accessTimestamp; }
+            set { _accessTimestamp = value; }
+        }
 
-		public String AccessUser {
-		    get { return _accessUser; }
-			set { _accessUser = value; }
-		}
+        public String AccessUser {
+            get { return _accessUser; }
+            set { _accessUser = value; }
+        }
 
-		public String AccessProcess {
-		    get { return _accessProcess; }
-			set { _accessProcess = value; }
-		}
+        public String AccessProcess {
+            get { return _accessProcess; }
+            set { _accessProcess = value; }
+        }
 
-		public String AccessModule {
-		    get { return _accessModule; }
-			set { _accessModule = value; }
-		}
+        public String AccessModule {
+            get { return _accessModule; }
+            set { _accessModule = value; }
+        }
 
-		public IDictionary<String, Object> AccessValueMap {
-		    get { return _accessValueMap; }
-		}
+        public IDictionary<String, Object> AccessValueMap {
+            get { return _accessValueMap; }
+        }
         public void RegisterAccessValue(String key, Object value) {
             if (_accessValueMap == null) {
                 _accessValueMap = new Dictionary<String, Object>();

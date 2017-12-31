@@ -138,7 +138,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         protected virtual bool IsContainsLineSeparatorInSql() {
             return Sql != null ? Sql.Contains(GetLineSeparator()) : false;
         }
-        
+
         protected virtual ${glInternalSqlLog} CreateInternalSqlLog(String displaySql, Object[] args, Type[] argTypes) {
             ${glInternalSqlLog} sqlLog = new ${glInternalSqlLog}();
             sqlLog.RawSql = this.Sql;
@@ -177,7 +177,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
             return displaySql;
         }
-        
+
         // ===============================================================================
         //                                                               ADO.NET Delegator
         //                                                               =================
@@ -337,7 +337,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             //     ThrowEntityAlreadyExistsException(e, cmd, resource);
             // }
             if (e is ${glDangerousResultSizeException}) {
-                throw e; // because SQLException on C# is runtime exception 
+                throw e; // because SQLException on C# is runtime exception
             }
             ThrowSQLFailureException(e, cmd, displaySql);
         }

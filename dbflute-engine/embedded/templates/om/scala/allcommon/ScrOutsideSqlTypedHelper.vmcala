@@ -268,7 +268,7 @@ class ScrOutsideSqlTypedBasicExecutor[BEHAVIOR](executor: OutsideSqlBasicExecuto
      * </pre>
      * You don't need to use pagingBean's isPaging() method on your 'Parameter Comment'.
      * <pre>
-     * e.g. ManualPaging and MySQL 
+     * e.g. ManualPaging and MySQL
      * select member.MEMBER_ID
      *      , member.MEMBER_NAME
      *      , memberStatus.MEMBER_STATUS_NAME
@@ -572,7 +572,7 @@ class ScrOutsideSqlTypedAutoPagingExecutor[BEHAVIOR](executor: OutsideSqlAutoPag
      * </pre>
      * You don't need to use pagingBean's isPaging() method on your 'Parameter Comment'.
      * <pre>
-     * e.g. ManualPaging and MySQL 
+     * e.g. ManualPaging and MySQL
      * select member.MEMBER_ID
      *      , member.MEMBER_NAME
      *      , memberStatus.MEMBER_STATUS_NAME

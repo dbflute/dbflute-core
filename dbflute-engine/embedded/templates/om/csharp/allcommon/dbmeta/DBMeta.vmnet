@@ -120,7 +120,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                           Entity Property Setup
         //                                                           =====================
-		bool HasEntityPropertySetupper(String propertyName);
+        bool HasEntityPropertySetupper(String propertyName);
         void SetupEntityProperty(String propertyName, Object entity, Object value);
     }
 

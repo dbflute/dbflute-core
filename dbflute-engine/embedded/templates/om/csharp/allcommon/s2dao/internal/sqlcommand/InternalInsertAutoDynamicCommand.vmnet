@@ -13,7 +13,7 @@ using ${glPackageBaseCommonS2DaoInternalSqlHandler};
 namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
     public class ${glInternalInsertAutoDynamicCommand} : AbstractSqlCommand {
-		
+
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
@@ -68,8 +68,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             types.CopyTo(propertyTypes, 0);
             return propertyTypes;
         }
-		
-        protected virtual ${glInternalAbstractAutoHandler} CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, 
+
+        protected virtual ${glInternalAbstractAutoHandler} CreateAutoHandler(IDataSource dataSource, ICommandFactory commandFactory,
             IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
             return new ${glInternalInsertAutoHandler}(dataSource, commandFactory, beanMetaData, propertyTypes);
         }
@@ -144,5 +144,5 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         {
             get { return _propertyNames; }
         }
-	}
+    }
 }

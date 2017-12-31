@@ -12,7 +12,7 @@ namespace ${glPackageBaseCommonException} {
         protected int? _batchUpdateCount;
         public ${glBatchEntityAlreadyUpdatedException}(Object bean, int rows, int? batchUpdateCount)
         : base(bean, rows) { this._batchUpdateCount = batchUpdateCount; }
-        
+
         public int? BatchUpdateCount { get { return _batchUpdateCount; } }
     }
 }

@@ -15,9 +15,9 @@ namespace ${glPackageBaseCommonJavaLike} {
         int size();
         bool isEmpty();
         void clear();
-		Iterator<ELEMENT> iterator();
+        Iterator<ELEMENT> iterator();
         ICollection<ELEMENT> getCollection();
-		String toString();
+        String toString();
     }
 
     public interface NgCollection {
@@ -36,8 +36,8 @@ namespace ${glPackageBaseCommonJavaLike} {
     //                                                                                ====
     public interface List<ELEMENT> : Collection<ELEMENT> {
         ELEMENT get(int index);
-		ELEMENT set(int index, ELEMENT element);
-		ELEMENT remove(int index);
+        ELEMENT set(int index, ELEMENT element);
+        ELEMENT remove(int index);
         List<ELEMENT> subList(int fromIndex, int toIndex);
         IList<ELEMENT> getList();
     }
@@ -79,9 +79,9 @@ namespace ${glPackageBaseCommonJavaLike} {
             return result;
         }
         public ELEMENT remove(int index) {
-		    ELEMENT result = _res[index]; 
+            ELEMENT result = _res[index];
             _res.Remove(result);
-			return result;
+            return result;
         }
         public bool remove(ELEMENT element) {
             return _res.Remove(element);
@@ -153,18 +153,18 @@ namespace ${glPackageBaseCommonJavaLike} {
         public override String ToString() {
             return toString();
         }
-		public String toString() {
-		    StringBuilder sb = new StringBuilder();
-		    sb.append("{");
-		    int index = 0;
-		    foreach (ELEMENT element in this) {
-		        if (index > 0) { sb.append("{"); }
-		        sb.append(element);
-		        ++index;
-		    }
-		    sb.append("}");
-		    return sb.toString();
-		}
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            int index = 0;
+            foreach (ELEMENT element in this) {
+                if (index > 0) { sb.append("{"); }
+                sb.append(element);
+                ++index;
+            }
+            sb.append("}");
+            return sb.toString();
+        }
     }
 
     // ===================================================================================
@@ -261,18 +261,18 @@ namespace ${glPackageBaseCommonJavaLike} {
         public override String ToString() {
             return toString();
         }
-		public String toString() {
-		    StringBuilder sb = new StringBuilder();
-		    sb.append("{");
-		    int index = 0;
-		    foreach (ELEMENT element in this) {
-		        if (index > 0) { sb.append("{"); }
-		        sb.append(element);
-		        ++index;
-		    }
-		    sb.append("}");
-		    return sb.toString();
-		}
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            int index = 0;
+            foreach (ELEMENT element in this) {
+                if (index > 0) { sb.append("{"); }
+                sb.append(element);
+                ++index;
+            }
+            sb.append("}");
+            return sb.toString();
+        }
     }
 
     [System.Serializable]
@@ -366,34 +366,34 @@ namespace ${glPackageBaseCommonJavaLike} {
         public override String ToString() {
             return toString();
         }
-		public String toString() {
-		    StringBuilder sb = new StringBuilder();
-		    sb.append("{");
-		    int index = 0;
-		    foreach (ELEMENT element in this) {
-		        if (index > 0) { sb.append("{"); }
-		        sb.append(element);
-		        ++index;
-		    }
-		    sb.append("}");
-		    return sb.toString();
-		}
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            int index = 0;
+            foreach (ELEMENT element in this) {
+                if (index > 0) { sb.append("{"); }
+                sb.append(element);
+                ++index;
+            }
+            sb.append("}");
+            return sb.toString();
+        }
     }
 
     // ===================================================================================
     //                                                                                 Map
     //                                                                                 ===
     public interface Map<KEY, VALUE> {
-		VALUE get(KEY key);
+        VALUE get(KEY key);
         VALUE put(KEY key, VALUE value);
         VALUE remove(KEY obj);
-		int size();
-		bool isEmpty();
-		void clear();
+        int size();
+        bool isEmpty();
+        void clear();
         bool containsKey(KEY key);
-		Set<KEY> keySet();
-		Collection<VALUE> values();
-		Set<Entry<KEY, VALUE>> entrySet();
+        Set<KEY> keySet();
+        Collection<VALUE> values();
+        Set<Entry<KEY, VALUE>> entrySet();
     }
 
     public interface NgMap {
@@ -405,19 +405,19 @@ namespace ${glPackageBaseCommonJavaLike} {
 
     [System.Serializable]
     public class HashMap<KEY, VALUE> : Map<KEY, VALUE>, NgMap {
-		protected IDictionary<KEY, VALUE> _res = new Dictionary<KEY, VALUE>();
+        protected IDictionary<KEY, VALUE> _res = new Dictionary<KEY, VALUE>();
         public VALUE get(KEY key) {
             return _res.ContainsKey(key) ? _res[key] : default(VALUE);
         }
         public VALUE put(KEY key, VALUE value) {
             VALUE result = default(VALUE);
-		    if (_res.ContainsKey(key)) {
+            if (_res.ContainsKey(key)) {
                 result = _res[key];
-			    _res.Remove(key);
-			}
-			_res.Add(key, value);
+                _res.Remove(key);
+            }
+            _res.Add(key, value);
             return result;
-		}
+        }
         public VALUE remove(KEY key) {
             VALUE result = default(VALUE);
             if (_res.ContainsKey(key)) {
@@ -426,7 +426,7 @@ namespace ${glPackageBaseCommonJavaLike} {
             }
             return result;
         }
-		public int size() {
+        public int size() {
             return _res.Count;
         }
         public bool isEmpty() {
@@ -474,22 +474,22 @@ namespace ${glPackageBaseCommonJavaLike} {
         public bool containsKeyAsNg(Object key) {
             return containsKey((KEY)key);
         }
-		public override String ToString() {
-		    return ToString();
-		}
-		public String toString() {
-		    StringBuilder sb = new StringBuilder();
-		    sb.append("{");
-		    int index = 0;
-		    Set<Entry<KEY, VALUE>> entrySet = this.entrySet();
-		    foreach (Entry<KEY, VALUE> entry in entrySet) {
-		        if (index > 0) { sb.append("{"); }
-		        sb.append(entry.toString());
-		        ++index;
-		    }
-		    sb.append("}");
-		    return sb.toString();
-		}
+        public override String ToString() {
+            return ToString();
+        }
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            int index = 0;
+            Set<Entry<KEY, VALUE>> entrySet = this.entrySet();
+            foreach (Entry<KEY, VALUE> entry in entrySet) {
+                if (index > 0) { sb.append("{"); }
+                sb.append(entry.toString());
+                ++index;
+            }
+            sb.append("}");
+            return sb.toString();
+        }
     }
 
     [System.Serializable]
@@ -565,22 +565,22 @@ namespace ${glPackageBaseCommonJavaLike} {
         public bool containsKeyAsNg(Object key) {
             return containsKey((KEY)key);
         }
-		public override String ToString() {
-		    return ToString();
-		}
-		public String toString() {
-		    StringBuilder sb = new StringBuilder();
-		    sb.append("{");
-		    int index = 0;
-		    Set<Entry<KEY, VALUE>> entrySet = this.entrySet();
-		    foreach (Entry<KEY, VALUE> entry in entrySet) {
-		        if (index > 0) { sb.append("{"); }
-		        sb.append(entry.toString());
-		        ++index;
-		    }
-		    sb.append("}");
-		    return sb.toString();
-		}
+        public override String ToString() {
+            return ToString();
+        }
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            int index = 0;
+            Set<Entry<KEY, VALUE>> entrySet = this.entrySet();
+            foreach (Entry<KEY, VALUE> entry in entrySet) {
+                if (index > 0) { sb.append("{"); }
+                sb.append(entry.toString());
+                ++index;
+            }
+            sb.append("}");
+            return sb.toString();
+        }
     }
 
     [System.Serializable]

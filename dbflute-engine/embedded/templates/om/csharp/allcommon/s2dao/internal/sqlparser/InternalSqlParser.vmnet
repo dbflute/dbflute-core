@@ -21,7 +21,7 @@ using ${glPackageBaseCommonUtil};
 namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
 
     public class ${glInternalSqlParser} : ISqlParser {
-	
+
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
@@ -106,12 +106,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                     ParseCommentBindVariable();
                 }
             } else if (comment != null && 0 < comment.Length) {
-    			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    	        // [UnderReview]: Should I resolve bind character on scope comment(normal comment)?
-    		    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-				String before = _tokenizer.Before; // for Hint Clause of Database
-				Peek().AddChild(new SqlNode(before.Substring(before.LastIndexOf("/*"))));
-			}
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // [UnderReview]: Should I resolve bind character on scope comment(normal comment)?
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                String before = _tokenizer.Before; // for Hint Clause of Database
+                Peek().AddChild(new SqlNode(before.Substring(before.LastIndexOf("/*"))));
+            }
         }
 
         protected void ParseIf() {
@@ -179,7 +179,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "* * * * * * * * * */";
             throw new ${glEndCommentNotFoundException}(msg);
         }
-	
+
         protected void ParseElse() {
             INode parent = Peek();
             if (!(parent is InternalIfNode)) {
@@ -260,31 +260,31 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         private static bool IsEndComment(string content) {
             return content != null && "END".Equals(content);
         }
-		
-	
-    	// ===============================================================================
+
+
+        // ===============================================================================
         //                                                                         Convert
         //                                                                         =======
-    	public static String ConvertTwoWaySql2DisplaySql(String twoWaySql, Object arg) {
-    	    String[] argNames = new String[]{"pmb"};
-    	    Type[] argTypes = new Type[]{arg.GetType()};
-    	    Object[] args = new Object[]{arg};
-    		return ConvertTwoWaySql2DisplaySql(twoWaySql, argNames, argTypes, args);
-    	}
-    	
-    	public static String ConvertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames, Type[] argTypes, Object[] args) {
+        public static String ConvertTwoWaySql2DisplaySql(String twoWaySql, Object arg) {
+            String[] argNames = new String[]{"pmb"};
+            Type[] argTypes = new Type[]{arg.GetType()};
+            Object[] args = new Object[]{arg};
+            return ConvertTwoWaySql2DisplaySql(twoWaySql, argNames, argTypes, args);
+        }
+
+        public static String ConvertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames, Type[] argTypes, Object[] args) {
             ICommandContext context;
-    		{
+            {
                 ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql, false);
                 INode node = parser.Parse();
                 ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
                 context = creator.CreateCommandContext(args);
                 node.Accept(context);
-    		}
+            }
             String preparedSql = context.Sql;
-    		return ${glInternalBindVariableUtil}.GetCompleteSql(preparedSql, context.BindVariables);
-    	}
-	
+            return ${glInternalBindVariableUtil}.GetCompleteSql(preparedSql, context.BindVariables);
+        }
+
         // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============
@@ -320,13 +320,13 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             valueAndType.TargetType = type;
             SetupValueAndType(valueAndType);
 
-			if (_blockNullParameter && valueAndType.TargetValue == null) {
-			    ThrowBindOrEmbeddedParameterNullValueException(valueAndType);
-			}
-			if (!IsInScope()) {
-			    // Main Root
-				ctx.AddSql(valueAndType.TargetValue, valueAndType.TargetType, _expression.Replace('.', '_'));
-			} else {
+            if (_blockNullParameter && valueAndType.TargetValue == null) {
+                ThrowBindOrEmbeddedParameterNullValueException(valueAndType);
+            }
+            if (!IsInScope()) {
+                // Main Root
+                ctx.AddSql(valueAndType.TargetValue, valueAndType.TargetType, _expression.Replace('.', '_'));
+            } else {
                 if (typeof(System.Collections.IList).IsAssignableFrom(valueAndType.TargetType)) {
                     System.Collections.IList list = valueAndType.TargetValue as System.Collections.IList;
                     Array array = new Object[list.Count];
@@ -337,7 +337,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                 } else {
                     ctx.AddSql(valueAndType.TargetValue, valueAndType.TargetType, _expression.Replace('.', '_'));
                 }
-			}
+            }
             if (valueAndType.IsValidRearOption()) {
                 ctx.AddSql(valueAndType.BuildRearOptionOnSql());
             }
@@ -347,15 +347,15 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             InternalValueAndTypeSetuper setupper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, true);
             setupper.SetupValueAndType(valueAndType);
         }
-		
-		protected void ThrowBindOrEmbeddedParameterNullValueException(InternalValueAndType valueAndType) {
-		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullValueException(_expression, valueAndType.TargetType, _specifiedSql, true);
-		}
-		
-		protected bool IsInScope() {
-		    return _testValue != null && _testValue.StartsWith("(") && _testValue.EndsWith(")");
-		}
-		
+
+        protected void ThrowBindOrEmbeddedParameterNullValueException(InternalValueAndType valueAndType) {
+            ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullValueException(_expression, valueAndType.TargetType, _specifiedSql, true);
+        }
+
+        protected bool IsInScope() {
+            return _testValue != null && _testValue.StartsWith("(") && _testValue.EndsWith(")");
+        }
+
         protected void BindArray(ICommandContext ctx, object arrayArg) {
             if (arrayArg == null) {
                 return;
@@ -363,42 +363,42 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             object[] array = arrayArg as object[];
             int length = array.Length;
             if (length == 0) {
-			    ThrowBindOrEmbeddedParameterEmptyListException();
-			}
+                ThrowBindOrEmbeddedParameterEmptyListException();
+            }
             Type type = null;
             for (int i = 0; i < length; ++i) {
                 Object currentElement = array[i];
                 if (currentElement != null) {
-				    type = currentElement.GetType();
-					break;
-				}
+                    type = currentElement.GetType();
+                    break;
+                }
             }
-			if (type == null) {
-			    ThrowBindOrEmbeddedParameterNullOnlyListException();
-			}
+            if (type == null) {
+                ThrowBindOrEmbeddedParameterNullOnlyListException();
+            }
             ctx.AddSql("(");
-			int bindCount = 0;
+            int bindCount = 0;
             for (int i = 0; i < length; ++i) {
-				Object currentElement = array[i];
-				if (currentElement != null) {
-					++bindCount;
-				    if (bindCount == 1) {// FirstElement!
-					    ctx.AddSql(currentElement, type, _expression + bindCount);
-					} else {
-					    ctx.AppendSql(currentElement, type, _expression + bindCount);
-					}
-				}
+                Object currentElement = array[i];
+                if (currentElement != null) {
+                    ++bindCount;
+                    if (bindCount == 1) {// FirstElement!
+                        ctx.AddSql(currentElement, type, _expression + bindCount);
+                    } else {
+                        ctx.AppendSql(currentElement, type, _expression + bindCount);
+                    }
+                }
             }
             ctx.AddSql(")");
         }
-		
-		protected void ThrowBindOrEmbeddedParameterEmptyListException() {
-		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, true);
-		}
-		
-		protected void ThrowBindOrEmbeddedParameterNullOnlyListException() {
-		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, true);
-		}
+
+        protected void ThrowBindOrEmbeddedParameterEmptyListException() {
+            ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, true);
+        }
+
+        protected void ThrowBindOrEmbeddedParameterNullOnlyListException() {
+            ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, true);
+        }
     }
 
     // -----------------------------------------------------
@@ -406,7 +406,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
     //                                     -----------------
     public class InternalEmbeddedValueNode : AbstractNode {
         protected String _expression;
-		protected String _testValue;
+        protected String _testValue;
         protected String[] _names;
         protected String _specifiedSql;
         protected bool _blockNullParameter;
@@ -427,20 +427,20 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             valueAndType.TargetValue = value;
             valueAndType.TargetType = type;
             SetupValueAndType(valueAndType);
-			
-			if (_blockNullParameter && valueAndType.TargetValue == null) {
-			    ThrowBindOrEmbeddedParameterNullValueException(valueAndType);
-			}
-			if (!IsInScope()) {
-			    // Main Root
-		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	            // [UnderReview]: Should I make an original exception instead of this exception?
-		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+            if (_blockNullParameter && valueAndType.TargetValue == null) {
+                ThrowBindOrEmbeddedParameterNullValueException(valueAndType);
+            }
+            if (!IsInScope()) {
+                // Main Root
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // [UnderReview]: Should I make an original exception instead of this exception?
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // if (valueAndType.TargetValue != null && valueAndType.TargetValue.ToString().IndexOf("?") > -1) {
                 //     throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
                 // }
                 ctx.AddSql(valueAndType.TargetValue.ToString());
-			} else {
+            } else {
                 if (IsInScope() && typeof(System.Collections.IList).IsAssignableFrom(valueAndType.TargetType)) {
                     System.Collections.IList list = valueAndType.TargetValue as System.Collections.IList;
                     Array array = new Object[list.Count];
@@ -449,15 +449,15 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                 } else if (IsInScope() && valueAndType.TargetType.IsArray) {
                     EmbedArray(ctx, valueAndType.TargetValue);
                 } else {
-    		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    	            // [UnderReview]: Should I make an original exception instead of this exception?
-    		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                    // [UnderReview]: Should I make an original exception instead of this exception?
+                    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                     // if (valueAndType.TargetValue != null && valueAndType.TargetValue.ToString().IndexOf("?") > -1) {
                     //     throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
                     // }
                     ctx.AddSql(valueAndType.TargetValue.ToString());
                 }
-			}
+            }
             if (valueAndType.IsValidRearOption()) {
                 ctx.AddSql(valueAndType.BuildRearOptionOnSql());
             }
@@ -467,15 +467,15 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             InternalValueAndTypeSetuper setupper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, false);
             setupper.SetupValueAndType(valueAndType);
         }
-		
-		protected void ThrowBindOrEmbeddedParameterNullValueException(InternalValueAndType valueAndType) {
-		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullValueException(_expression, valueAndType.TargetType, _specifiedSql, false);
-		}
-		
-		protected bool IsInScope() {
-		    return _testValue != null && _testValue.StartsWith("(") && _testValue.EndsWith(")");
-		}
-		
+
+        protected void ThrowBindOrEmbeddedParameterNullValueException(InternalValueAndType valueAndType) {
+            ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullValueException(_expression, valueAndType.TargetType, _specifiedSql, false);
+        }
+
+        protected bool IsInScope() {
+            return _testValue != null && _testValue.StartsWith("(") && _testValue.EndsWith(")");
+        }
+
         protected void EmbedArray(ICommandContext ctx, object arrayArg) {
             if (arrayArg == null) {
                 return;
@@ -483,31 +483,31 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             object[] array = arrayArg as object[];
             int length = array.Length;
             if (length == 0) {
-			    ThrowBindOrEmbeddedParameterEmptyListException();
-			}
+                ThrowBindOrEmbeddedParameterEmptyListException();
+            }
             String quote = null;
             for (int i = 0; i < length; ++i) {
                 Object currentElement = array[i];
                 if (currentElement != null) {
-				    quote = !IsNumeric(currentElement) ? "'" : "";
-					break;
-				}
+                    quote = !IsNumeric(currentElement) ? "'" : "";
+                    break;
+                }
             }
-			if (quote == null) {
-			    ThrowBindOrEmbeddedParameterNullOnlyListException();
-			}
-			bool existsValidElements = false;
+            if (quote == null) {
+                ThrowBindOrEmbeddedParameterNullOnlyListException();
+            }
+            bool existsValidElements = false;
             ctx.AddSql("(");
             for (int i = 0; i < length; ++i) {
-				Object currentElement = array[i];
-				if (currentElement != null) {
-					if (!existsValidElements) {
+                Object currentElement = array[i];
+                if (currentElement != null) {
+                    if (!existsValidElements) {
                         ctx.AddSql(quote + currentElement + quote);
-				        existsValidElements = true;
-					} else {
-					    ctx.AddSql(", " + quote + currentElement + quote);
-					}
-				}
+                        existsValidElements = true;
+                    } else {
+                        ctx.AddSql(", " + quote + currentElement + quote);
+                    }
+                }
             }
             ctx.AddSql(")");
         }
@@ -524,14 +524,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             isNum = Double.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
             return isNum;
         }
-		
-		protected void ThrowBindOrEmbeddedParameterEmptyListException() {
-		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
-		}
-		
-		protected void ThrowBindOrEmbeddedParameterNullOnlyListException() {
-		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, false);
-		}
+
+        protected void ThrowBindOrEmbeddedParameterEmptyListException() {
+            ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
+        }
+
+        protected void ThrowBindOrEmbeddedParameterNullOnlyListException() {
+            ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, false);
+        }
     }
 
     // -----------------------------------------------------
@@ -656,12 +656,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         protected ${glLikeSearchOption} GetLikeSearchOption(Type type, String currentName, Object resourceBean) {
             PropertyInfo pi = type.GetProperty(currentName + "InternalLikeSearchOption");
             ${glLikeSearchOption} option = (${glLikeSearchOption})pi.GetValue(resourceBean, null);
-			if (option == null) {
-			    ThrowLikeSearchOptionNotFoundException(resourceBean, currentName);
-			}
-			if (option.isSplit()) {
-			    ThrowOutsideSqlLikeSearchOptionSplitUnsupportedException(option, resourceBean, currentName);
-			}
+            if (option == null) {
+                ThrowLikeSearchOptionNotFoundException(resourceBean, currentName);
+            }
+            if (option.isSplit()) {
+                ThrowOutsideSqlLikeSearchOptionSplitUnsupportedException(option, resourceBean, currentName);
+            }
             return option;
         }
 
@@ -672,8 +672,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + GetLineSeparator();
             msg = msg + "[Advice]" + GetLineSeparator();
             msg = msg + "Please confirm your method call:"  + GetLineSeparator();
-			String beanName = resourceBean.GetType().Name;
-			String methodName = "Set" + InitCap(currentName) + "_LikeSearch(value, likeSearchOption);";
+            String beanName = resourceBean.GetType().Name;
+            String methodName = "Set" + InitCap(currentName) + "_LikeSearch(value, likeSearchOption);";
             msg = msg + "    " + beanName + "." + methodName + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Target ParameterBean]" + GetLineSeparator() + resourceBean + GetLineSeparator();
@@ -738,11 +738,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             return ${glSimpleSystemUtil}.GetLineSeparator();
         }
     }
-	
+
     // -----------------------------------------------------
     //                                    Exception Provider
     //                                    ------------------
-	public class ParameterCommentExceptionProvider {
+    public class ParameterCommentExceptionProvider {
         public static void ThrowBindOrEmbeddedParameterNullValueException(String expression, Type targetType, String specifiedSql, bool bind) {
             String msg = "Look! Read the message below." + GetLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
@@ -758,7 +758,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + GetLineSeparator();
             msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
             msg = msg + GetLineSeparator();
-			msg = msg + "[Parameter Property Type]" + GetLineSeparator() + targetType + GetLineSeparator();
+            msg = msg + "[Parameter Property Type]" + GetLineSeparator() + targetType + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
             msg = msg + "* * * * * * * * * */";
@@ -768,7 +768,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                 throw new ${glEmbeddedValueParameterNullValueException}(msg);
             }
         }
-		
+
         public static void ThrowBindOrEmbeddedParameterEmptyListException(String expression, String specifiedSql, bool bind) {
             String msg = "Look! Read the message below." + GetLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
@@ -792,7 +792,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "* * * * * * * * * */";
             throw new IllegalArgumentException(msg);
         }
-		
+
         public static void ThrowBindOrEmbeddedParameterNullOnlyListException(String expression, String specifiedSql, bool bind) {
             String msg = "Look! Read the message below." + GetLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
@@ -818,13 +818,13 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "* * * * * * * * * */";
             throw new IllegalArgumentException(msg);
         }
-		
-		
+
+
         protected static String GetLineSeparator() {
             return ${glSimpleSystemUtil}.GetLineSeparator();
         }
-	}
-	
+    }
+
     // -----------------------------------------------------
     //                                                IfNode
     //                                                ------
@@ -892,7 +892,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "[Advice]" + GetLineSeparator();
             msg = msg + "Please confirm the existence of your property on your arguments." + GetLineSeparator();
             msg = msg + "And confirm the IF comment of your specified SQL." + GetLineSeparator();
-			msg = msg + "  --> For example, correct IF comment is as below:" + GetLineSeparator();
+            msg = msg + "  --> For example, correct IF comment is as below:" + GetLineSeparator();
             msg = msg + "        /*IF pmb.XxxId != null*/XXX_ID = .../*END*/" + GetLineSeparator();
             msg = msg + "        /*IF pmb.Paging*/.../*END*/" + GetLineSeparator();
             msg = msg + GetLineSeparator();

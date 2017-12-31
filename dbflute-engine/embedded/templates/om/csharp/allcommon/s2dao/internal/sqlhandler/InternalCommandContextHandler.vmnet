@@ -18,7 +18,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         //                                                                       Attribute
         //                                                                       =========
         protected ICommandContext commandContext;
-    
+
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========

@@ -37,7 +37,7 @@ namespace ${glPackageBaseCommonHelper} {
         //                                                                                   ========
         /**
          * Generate map from map-string.
-         * 
+         *
          * @param mapString Map-string (NotNull)
          * @return Generated map. (NotNull)
          */
@@ -45,7 +45,7 @@ namespace ${glPackageBaseCommonHelper} {
 
         /**
          * Generate map from list-string. {Implement}
-         * 
+         *
          * @param listString List-string (NotNull)
          * @return Generated list. (NotNull)
          */

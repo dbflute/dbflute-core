@@ -30,5 +30,5 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         protected override void SetupPropertyTypes(string[] propertyNames) {
             SetupUpdatePropertyTypes(propertyNames);
         }
-	}
+    }
 }

@@ -101,7 +101,7 @@ namespace ${glPackageBaseCommonHelper} {
                 builder.AppendFormat("{0}{1}{2} {3}", _columnNames[i], _msEqual, valueArray[i], _msDelimiter);
             }
 
-            return String.Format("{0}{1}", _regDelimiter.Replace(builder.ToString(), ""),  _msEndBrace); 
+            return String.Format("{0}{1}", _regDelimiter.Replace(builder.ToString(), ""),  _msEndBrace);
         }
 
         protected void AssertStringComponent() {

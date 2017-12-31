@@ -13,7 +13,7 @@ public interface ${glConditionQuery} {
     //                                                                          ==========
     String getTableDbName();
     String getTableSqlName();
-	
+
     // ===================================================================================
     //                                                                  Important Accessor
     //                                                                  ==================
@@ -24,10 +24,10 @@ public interface ${glConditionQuery} {
     int xgetNestLevel();
     int xgetNextNestLevel();
     bool isBaseQuery();
-	String xgetForeignPropertyName();
+    String xgetForeignPropertyName();
     String xgetRelationPath();
     String xgetLocationBase();
-	
+
     // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================

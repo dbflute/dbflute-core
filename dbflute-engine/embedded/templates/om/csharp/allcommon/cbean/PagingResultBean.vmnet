@@ -82,7 +82,7 @@ namespace ${glPackageBaseCommonCBean} {
             }
             return _pageGroupBean;
         }
-    
+
         protected void AssertPageGroupValid() {
             if (_pageGroupOption == null) {
                 String msg = "The pageGroupOption should not be null. Please call setPageGroupOption().";
@@ -124,7 +124,7 @@ namespace ${glPackageBaseCommonCBean} {
             }
             return _pageRangeBean;
         }
-    
+
         protected void AssertPageRangeValid() {
             if (_pageRangeOption == null) {
                 String msg = "The pageRangeOption should not be null. Please call setPageRangeOption().";

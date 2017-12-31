@@ -18,7 +18,7 @@
 <lucy-config>
     <!-- The components of Behavior. -->
 #foreach ($table in $database.behaviorTableList)
-	<component name="${table.behaviorApComponentName}" class="${table.extendedBehaviorApFullClassName}">
+    <component name="${table.behaviorApComponentName}" class="${table.extendedBehaviorApFullClassName}">
         <inject method="setBehaviorCommandInvoker">${database.behaviorCommandInvokerComponentName}</inject>
         <inject method="setBehaviorSelector">${database.behaviorSelectorComponentName}</inject>
 #if ($table.isWritable())

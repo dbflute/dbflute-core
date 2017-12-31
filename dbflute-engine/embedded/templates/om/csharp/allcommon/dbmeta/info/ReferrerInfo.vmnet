@@ -78,7 +78,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         public String BuildInitCapPropertyName() {
             return InitCap(this.referrerPropertyName);
         }
-        
+
         // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============
@@ -89,7 +89,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected static PropertyInfo FindProperty(Type clazz, String propertyName, Type[] argTypes) {
             return clazz.GetProperty(propertyName, argTypes);
         }
-        
+
         protected void AssertObjectNotNull(String variableName, Object value) {
             if (variableName == null) {
                 String msg = "The value should not be null: variableName=" + variableName + " value=" + value;

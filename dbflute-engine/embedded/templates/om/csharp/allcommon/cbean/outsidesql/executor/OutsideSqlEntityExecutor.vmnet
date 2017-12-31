@@ -88,8 +88,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             _outsideSqlOption.DynamicBinding();
             return this;
         }
-	
-    	// ===============================================================================
+
+        // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============
         protected static String GetLineSeparator() {

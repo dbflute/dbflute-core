@@ -220,106 +220,106 @@ namespace ${glPackageBaseCommonCBean} {
             throw new IllegalStateException(msg);
         }
 
-	    // -----------------------------------------------------
-	    //                                       Scalar SubQuery
-	    //                                       ---------------
-	    public static void ThrowScalarSubQueryInvalidForeignSpecificationException(String foreignPropertyName) {
-	        String msg = "Look! Read the message below." + ln();
-	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-	        msg = msg + "You specified a foreign table column in spite of derived-query!" + ln();
-	        msg = msg + ln();
-	        msg = msg + "[Advice]" + ln();
-	        msg = msg + "You should specified a local table column at condition-bean for derived-query." + ln();
-	        msg = msg + "  For example:" + ln();
-	        msg = msg + "    (x):" + ln();
-	        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-	        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-	        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
-	        msg = msg + "        public void query(MemberCB subCB) {" + ln();
-	        msg = msg + "            subCB.specify().specifyMemberStatusName().columnDisplayOrder(); // *No!" + ln();
-	        msg = msg + "        }" + ln();
-	        msg = msg + "    });" + ln();
-	        msg = msg + "    - - - - - - - - - -/" + ln();
-	        msg = msg + ln();
-	        msg = msg + "    (o):" + ln();
-	        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-	        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-	        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
-	        msg = msg + "        public void query(MemberCB subCB) {" + ln();
-	        msg = msg + "            subCB.specify().columnMemberBirthday();// *Point!" + ln();
-	        msg = msg + "        }" + ln();
-	        msg = msg + "    });" + ln();
-	        msg = msg + "    - - - - - - - - - -/" + ln();
-	        msg = msg + ln();
-	        msg = msg + "[Specified Foreign Property]" + ln() + foreignPropertyName + ln();
-	        msg = msg + "* * * * * * * * * */";
-	        throw new IllegalStateException(msg);
-	    }
-	
-	    public static void ThrowScalarSubQueryInvalidColumnSpecificationException(String function) {
-	        String msg = "Look! Read the message below." + ln();
-	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-	        msg = msg + "The specified the column for derived-referrer was Invalid!" + ln();
-	        msg = msg + ln();
-	        msg = msg + "[Advice]" + ln();
-	        msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
-	        msg = msg + " (If your function is count(), the target column should be primary key.)" + ln();
-	        msg = msg + "  For example:" + ln();
-	        msg = msg + "    (x):" + ln();
-	        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-	        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-	        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
-	        msg = msg + "        public void query(MemberCB subCB) {" + ln();
-	        msg = msg + "            // *No! It's empty!" + ln();
-	        msg = msg + "        }" + ln();
-	        msg = msg + "    });" + ln();
-	        msg = msg + "    - - - - - - - - - -/" + ln();
-	        msg = msg + ln();
-	        msg = msg + "    (x):" + ln();
-	        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-	        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-	        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
-	        msg = msg + "        public void query(MemberCB subCB) {" + ln();
-	        msg = msg + "            subCB.specify().columnMemberBirthday();" + ln();
-	        msg = msg + "            subCB.specify().columnMemberName(); // *No! It's duplicated!" + ln();
-	        msg = msg + "        }" + ln();
-	        msg = msg + "    });" + ln();
-	        msg = msg + "    - - - - - - - - - -/" + ln();
-	        msg = msg + ln();
-	        msg = msg + "    (o):" + ln();
-	        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-	        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-	        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
-	        msg = msg + "        public void query(MemberCB subCB) {" + ln();
-	        msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + ln();
-	        msg = msg + "        }" + ln();
-	        msg = msg + "    });" + ln();
-	        msg = msg + "    - - - - - - - - - -/" + ln();
-	        msg = msg + ln();
-	        msg = msg + "[Function Method]" + ln() + xconvertFunctionToMethod(function) + ln();
-	        msg = msg + "* * * * * * * * * */";
-	        throw new IllegalStateException(msg);
-	    }
-	
-	    public static void ThrowScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName,
-	            Type deriveColumnType) {
-	        String msg = "Look! Read the message below." + ln();
-	        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-	        msg = msg + "The type of the specified the column unmatched with the function!" + ln();
-	        msg = msg + ln();
-	        msg = msg + "[Advice]" + ln();
-	        msg = msg + "You should confirm the list as follow:" + ln();
-	        msg = msg + "    max()   : String, Number, Date" + ln();
-	        msg = msg + "    min()   : String, Number, Date" + ln();
-	        msg = msg + "    sum()   : Number" + ln();
-	        msg = msg + "    avg()   : Number" + ln();
-	        msg = msg + ln();
-	        msg = msg + "[Function Method]" + ln() + xconvertFunctionToMethod(function) + ln();
-	        msg = msg + ln();
-	        msg = msg + "[Derive Column]" + ln() + deriveColumnName + "(" + deriveColumnType.Name + ")" + ln();
-	        msg = msg + "* * * * * * * * * */";
-	        throw new IllegalStateException(msg);
-	    }
+        // -----------------------------------------------------
+        //                                       Scalar SubQuery
+        //                                       ---------------
+        public static void ThrowScalarSubQueryInvalidForeignSpecificationException(String foreignPropertyName) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "You specified a foreign table column in spite of derived-query!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "You should specified a local table column at condition-bean for derived-query." + ln();
+            msg = msg + "  For example:" + ln();
+            msg = msg + "    (x):" + ln();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+            msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+            msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
+            msg = msg + "        public void query(MemberCB subCB) {" + ln();
+            msg = msg + "            subCB.specify().specifyMemberStatusName().columnDisplayOrder(); // *No!" + ln();
+            msg = msg + "        }" + ln();
+            msg = msg + "    });" + ln();
+            msg = msg + "    - - - - - - - - - -/" + ln();
+            msg = msg + ln();
+            msg = msg + "    (o):" + ln();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+            msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+            msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
+            msg = msg + "        public void query(MemberCB subCB) {" + ln();
+            msg = msg + "            subCB.specify().columnMemberBirthday();// *Point!" + ln();
+            msg = msg + "        }" + ln();
+            msg = msg + "    });" + ln();
+            msg = msg + "    - - - - - - - - - -/" + ln();
+            msg = msg + ln();
+            msg = msg + "[Specified Foreign Property]" + ln() + foreignPropertyName + ln();
+            msg = msg + "* * * * * * * * * */";
+            throw new IllegalStateException(msg);
+        }
+
+        public static void ThrowScalarSubQueryInvalidColumnSpecificationException(String function) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "The specified the column for derived-referrer was Invalid!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
+            msg = msg + " (If your function is count(), the target column should be primary key.)" + ln();
+            msg = msg + "  For example:" + ln();
+            msg = msg + "    (x):" + ln();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+            msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+            msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
+            msg = msg + "        public void query(MemberCB subCB) {" + ln();
+            msg = msg + "            // *No! It's empty!" + ln();
+            msg = msg + "        }" + ln();
+            msg = msg + "    });" + ln();
+            msg = msg + "    - - - - - - - - - -/" + ln();
+            msg = msg + ln();
+            msg = msg + "    (x):" + ln();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+            msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+            msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
+            msg = msg + "        public void query(MemberCB subCB) {" + ln();
+            msg = msg + "            subCB.specify().columnMemberBirthday();" + ln();
+            msg = msg + "            subCB.specify().columnMemberName(); // *No! It's duplicated!" + ln();
+            msg = msg + "        }" + ln();
+            msg = msg + "    });" + ln();
+            msg = msg + "    - - - - - - - - - -/" + ln();
+            msg = msg + ln();
+            msg = msg + "    (o):" + ln();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+            msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+            msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
+            msg = msg + "        public void query(MemberCB subCB) {" + ln();
+            msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + ln();
+            msg = msg + "        }" + ln();
+            msg = msg + "    });" + ln();
+            msg = msg + "    - - - - - - - - - -/" + ln();
+            msg = msg + ln();
+            msg = msg + "[Function Method]" + ln() + xconvertFunctionToMethod(function) + ln();
+            msg = msg + "* * * * * * * * * */";
+            throw new IllegalStateException(msg);
+        }
+
+        public static void ThrowScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName,
+                Type deriveColumnType) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "The type of the specified the column unmatched with the function!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "You should confirm the list as follow:" + ln();
+            msg = msg + "    max()   : String, Number, Date" + ln();
+            msg = msg + "    min()   : String, Number, Date" + ln();
+            msg = msg + "    sum()   : Number" + ln();
+            msg = msg + "    avg()   : Number" + ln();
+            msg = msg + ln();
+            msg = msg + "[Function Method]" + ln() + xconvertFunctionToMethod(function) + ln();
+            msg = msg + ln();
+            msg = msg + "[Derive Column]" + ln() + deriveColumnName + "(" + deriveColumnType.Name + ")" + ln();
+            msg = msg + "* * * * * * * * * */";
+            throw new IllegalStateException(msg);
+        }
 
         // -----------------------------------------------------
         //                                       Function Helper
@@ -345,14 +345,14 @@ namespace ${glPackageBaseCommonCBean} {
             String twoWaySql = cb.SqlClause.getClause();
             return ${glInternalSqlParser}.ConvertTwoWaySql2DisplaySql(twoWaySql, cb);
         }
-    
+
         // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============
         private static String ln() {
             return ${glSimpleSystemUtil}.GetLineSeparator();
         }
-        
+
         private static String initCap(String str) {
             return ${glSimpleStringUtil}.InitCap(str);
         }

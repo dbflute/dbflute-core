@@ -193,12 +193,12 @@ object ${glDBMetaInstanceHandler} extends DBMetaProvider {
 
     protected def removeSchemaIfExists(name: String): String = {
         val dotLastIndex: Integer = name.lastIndexOf(".");
-        return if (dotLastIndex >= 0) { name.substring(dotLastIndex + ".".length()) } else { name }; 
+        return if (dotLastIndex >= 0) { name.substring(dotLastIndex + ".".length()) } else { name };
     }
 
     protected def extractSchemaIfExists(name: String): String = {
         val dotLastIndex: Integer = name.lastIndexOf(".");
-        return if (dotLastIndex >= 0) { name.substring(0, dotLastIndex) } else { null }; 
+        return if (dotLastIndex >= 0) { name.substring(0, dotLastIndex) } else { null };
     }
 
     protected def strip(name: String): String = {

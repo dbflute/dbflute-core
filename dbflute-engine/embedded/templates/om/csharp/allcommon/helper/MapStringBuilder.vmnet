@@ -53,7 +53,7 @@ namespace ${glPackageBaseCommonHelper} {
     public class DifferentDelimiterCountException : ApplicationException {
         protected String[] _columnNames;
         protected String[] _values;
-        public DifferentDelimiterCountException(String msg, String[] columnNames, String[] values) 
+        public DifferentDelimiterCountException(String msg, String[] columnNames, String[] values)
         : base(msg) {
             _columnNames = columnNames;
             _values = values;

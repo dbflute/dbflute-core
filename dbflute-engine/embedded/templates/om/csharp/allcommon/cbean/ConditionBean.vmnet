@@ -30,7 +30,7 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                             ===================
         ${glConditionBean} AddOrderBy_PK_Asc();
         ${glConditionBean} AddOrderBy_PK_Desc();
-		
+
         // ===============================================================================
         //                                                                           Query
         //                                                                           =====
@@ -68,15 +68,15 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                     Display SQL
         //                                                                     ===========
-    	String ToDisplaySql();
+        String ToDisplaySql();
 
         // ===============================================================================
         //                                                      Basic Status Determination
         //                                                      ==========================
-    	bool HasWhereClause();
-    	bool HasOrderByClause();
+        bool HasWhereClause();
+        bool HasOrderByClause();
         bool HasUnionQueryOrUnionAllQuery();
-        
+
         // ===============================================================================
         //                                                              Query Synchronizer
         //                                                              ==================

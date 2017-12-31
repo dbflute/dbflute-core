@@ -34,7 +34,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         public ${glListResultBean}<ENTITY> SelectList<ENTITY>(String path, Object pmb) {
             IList<ENTITY> resultList = ToGenericList<ENTITY>(_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), typeof(ENTITY)));
             return new ${glResultBeanBuilder}<ENTITY>(_tableDbName).BuildListResultBean(resultList);
-            
+
         }
 #else
         public IList<ENTITY> SelectList<ENTITY>(String path, Object pmb) {
@@ -110,7 +110,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
             if (_dynamicBinding) {
                 option.DynamicBinding();
             }
-			option.TableDbName = _tableDbName;
+            option.TableDbName = _tableDbName;
             return option;
         }
     }

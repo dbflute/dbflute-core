@@ -12,10 +12,10 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     public ${myClassName}(String tableName)
         : base(tableName) {}
 
-	protected override OrderByNullsSetupper createOrderByNullsSetupper() {
-	    return new OrderByNullsSetupperByCaseWhen();
-	}
-	
+    protected override OrderByNullsSetupper createOrderByNullsSetupper() {
+        return new OrderByNullsSetupperByCaseWhen();
+    }
+
     protected override void doFetchFirst() {
     }
 

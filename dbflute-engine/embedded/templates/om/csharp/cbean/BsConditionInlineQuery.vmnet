@@ -38,27 +38,27 @@ namespace ${glPackageCIQ} {
         public override void reflectRelationOnUnionQuery(${glConditionQuery} baseQueryAsSuper, ${glConditionQuery} unionQueryAsSuper) {
             throw new UnsupportedOperationException("InlineQuery must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper);
         }
-    
+
         protected override void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
             regIQ(key, value, cvalue, colName);
         }
-    
+
         protected override void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                                                         , String colName, ${glConditionOption} option) {
             regIQ(key, value, cvalue, colName, option);
         }
-    
+
         protected override void registerWhereClause(String whereClause) {
             registerInlineWhereClause(whereClause);
         }
-    
+
         protected override String getInScopeSubQueryRealColumnName(String columnName) {
             if (_onClause) {
                 throw new UnsupportedOperationException("InScopeSubQuery of on-clause is unsupported");
             }
             return _onClause ? xgetAliasName() + "." + columnName : columnName;
         }
-    
+
         protected override void registerExistsSubQuery(${glConditionQuery} subQuery
                                      , String columnName, String relatedColumnName, String propertyName) {
             throw new UnsupportedOperationException("Sorry! ExistsSubQuery at inline view is unsupported. So please use InScopeSubQyery.");

@@ -22,9 +22,9 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-	protected ${glStatementConfig} _defaultStatementConfig;
-	protected bool _queryLogLevelInfo;
-	protected bool _executeStatusLogLevelInfo;
+    protected ${glStatementConfig} _defaultStatementConfig;
+    protected bool _queryLogLevelInfo;
+    protected bool _executeStatusLogLevelInfo;
 #if ($database.isOutsideSqlPackageValid())
     protected String _outsideSqlPackage = "${database.outsideSqlPackage}";
 #else
@@ -58,8 +58,8 @@ public class ${myClassName} {
 #end
     protected AdditionalAssembly _additionalAssemblyProvider;
     protected FileSystemPath _fileSystemPathResolver;
-	protected bool _internalDebug;
-	protected bool _locked = true; // at first locked
+    protected bool _internalDebug;
+    protected bool _locked = true; // at first locked
 
     // ===================================================================================
     //                                                                         Constructor
@@ -86,253 +86,253 @@ public class ${myClassName} {
             return _defaultStatementConfig;
         }
         set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting defaultStatementConfig: " + value);
-		    }
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting defaultStatementConfig: " + value);
+            }
             _defaultStatementConfig = value;
         }
     }
-	
+
     // ===================================================================================
     //                                                                Query Log Level Info
     //                                                                ====================
-	public bool IsQueryLogLevelInfo {
-	    get {
-	        return _queryLogLevelInfo;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting queryLogLevelInfo: " + value);
-		    }
-	        _queryLogLevelInfo = value;
-		}
-	}
-	
+    public bool IsQueryLogLevelInfo {
+        get {
+            return _queryLogLevelInfo;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting queryLogLevelInfo: " + value);
+            }
+            _queryLogLevelInfo = value;
+        }
+    }
+
     // ===================================================================================
     //                                                              Execute Log Level Info
     //                                                              ======================
-	public bool IsExecuteStatusLogLevelInfo {
-	    get {
-	        return _executeStatusLogLevelInfo;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting executeStatusLogLevelInfo: " + value);
-		    }
-	        _executeStatusLogLevelInfo = value;
-		}
-	}
-	
+    public bool IsExecuteStatusLogLevelInfo {
+        get {
+            return _executeStatusLogLevelInfo;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting executeStatusLogLevelInfo: " + value);
+            }
+            _executeStatusLogLevelInfo = value;
+        }
+    }
+
     // ===================================================================================
     //                                                                  OutsideSql Package
     //                                                                  ==================
-	public String OutsideSqlPackage {
-	    get {
-	        return _outsideSqlPackage;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting outsideSqlPackage: " + value);
-		    }
-	        _outsideSqlPackage = value;
-		}
-	}
+    public String OutsideSqlPackage {
+        get {
+            return _outsideSqlPackage;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting outsideSqlPackage: " + value);
+            }
+            _outsideSqlPackage = value;
+        }
+    }
 
     // ===================================================================================
     //                                                                          Value Type
     //                                                                          ==========
-	public void RegisterBasicValueType(Type keyType, IValueType valueType) {
-	    AssertNotLocked();
-		if (_log.IsInfoEnabled) {
-		    _log.Info("...Registering basic valueType: keyType=" + keyType + " valueType=" + valueType);
-		}
-	    ValueTypes.RegisterValueType(keyType, valueType);
-	}
+    public void RegisterBasicValueType(Type keyType, IValueType valueType) {
+        AssertNotLocked();
+        if (_log.IsInfoEnabled) {
+            _log.Info("...Registering basic valueType: keyType=" + keyType + " valueType=" + valueType);
+        }
+        ValueTypes.RegisterValueType(keyType, valueType);
+    }
 
     // ===================================================================================
     //                                                                 DB Parameter Parser
     //                                                                 ===================
-	public IDbParameterParser DbParameterParser { // CSharp only
-	    get {
-	        return _dbParameterParser;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting dbParameterParser: " + value);
-		    }
-	        _dbParameterParser = value;
-		}
-	}
+    public IDbParameterParser DbParameterParser { // CSharp only
+        get {
+            return _dbParameterParser;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting dbParameterParser: " + value);
+            }
+            _dbParameterParser = value;
+        }
+    }
 
     // ===================================================================================
     //                                                              Omit Directory Package
     //                                                              ======================
-	public String OmitDirectoryPackage { // CSharp only
-	    get {
-	        return _omitDirectoryPackage;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting omitDirectoryPackage: " + value);
-		    }
-	        _omitDirectoryPackage = value;
-		}
-	}
+    public String OmitDirectoryPackage { // CSharp only
+        get {
+            return _omitDirectoryPackage;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting omitDirectoryPackage: " + value);
+            }
+            _omitDirectoryPackage = value;
+        }
+    }
 
     // ===================================================================================
     //                                                                     Default Package
     //                                                                     ===============
-	public String DefaultPackage { // CSharp only
-	    get {
-	        return _defaultPackage;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting defaultPackage: " + value);
-		    }
-	        _defaultPackage = value;
-		}
-	}
+    public String DefaultPackage { // CSharp only
+        get {
+            return _defaultPackage;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting defaultPackage: " + value);
+            }
+            _defaultPackage = value;
+        }
+    }
 
     // ===================================================================================
     //                                                          Omit Resource Path Package
     //                                                          ==========================
-	public String OmitResourcePathPackage { // CSharp only
-	    get {
-	        return _omitResourcePathPackage;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting omitResourcePathPackage: " + value);
-		    }
-	        _omitResourcePathPackage = value;
-		}
-	}
+    public String OmitResourcePathPackage { // CSharp only
+        get {
+            return _omitResourcePathPackage;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting omitResourcePathPackage: " + value);
+            }
+            _omitResourcePathPackage = value;
+        }
+    }
 
     // ===================================================================================
     //                                                              Flat Directory Package
     //                                                              ======================
-	public String FlatDirectoryPackage { // CSharp only
-	    get {
-	        return _flatDirectoryPackage;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting flatDirectoryPackage: " + value);
-		    }
-	        _flatDirectoryPackage = value;
-		}
-	}
+    public String FlatDirectoryPackage { // CSharp only
+        get {
+            return _flatDirectoryPackage;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting flatDirectoryPackage: " + value);
+            }
+            _flatDirectoryPackage = value;
+        }
+    }
 
     // ===================================================================================
     //                                                       Omit File System Path Package
     //                                                       =============================
-	public String OmitFileSystemPathPackage { // CSharp only
-	    get {
-	        return _omitFileSystemPathPackage;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting omitFileSystemPathPackage: " + value);
-		    }
-	        _omitFileSystemPathPackage = value;
-		}
-	}
+    public String OmitFileSystemPathPackage { // CSharp only
+        get {
+            return _omitFileSystemPathPackage;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting omitFileSystemPathPackage: " + value);
+            }
+            _omitFileSystemPathPackage = value;
+        }
+    }
 
     // ===================================================================================
     //                                                        Additional Assembly Provider
     //                                                        ============================
-	public AdditionalAssembly AdditionalAssemblyProvider { // CSharp only
-	    get {
-	        return _additionalAssemblyProvider;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting additionalAssemblyProvider: " + value);
-		    }
-	        _additionalAssemblyProvider = value;
-		}
-	}
+    public AdditionalAssembly AdditionalAssemblyProvider { // CSharp only
+        get {
+            return _additionalAssemblyProvider;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting additionalAssemblyProvider: " + value);
+            }
+            _additionalAssemblyProvider = value;
+        }
+    }
 
     // ===================================================================================
     //                                                           File System Path Resolver
     //                                                           =========================
-	public FileSystemPath FileSystemPathResolver { // CSharp only
-	    get {
-	        return _fileSystemPathResolver;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting fileSystemPathResolver: " + value);
-		    }
-	        _fileSystemPathResolver = value;
-		}
-	}
+    public FileSystemPath FileSystemPathResolver { // CSharp only
+        get {
+            return _fileSystemPathResolver;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting fileSystemPathResolver: " + value);
+            }
+            _fileSystemPathResolver = value;
+        }
+    }
 
     // ===================================================================================
     //                                                                      Internal Debug
     //                                                                      ==============
-	public bool IsInternalDebug {
-	    get {
-	        return _internalDebug;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting internalDebug: " + value);
-		    }
-	        _internalDebug = value;
-		}
-	}
+    public bool IsInternalDebug {
+        get {
+            return _internalDebug;
+        }
+        set {
+            AssertNotLocked();
+            if (_log.IsInfoEnabled) {
+                _log.Info("...Setting internalDebug: " + value);
+            }
+            _internalDebug = value;
+        }
+    }
 
     // ===================================================================================
     //                                                                         Config Lock
     //                                                                         ===========
-	public bool IsLocked {
-	    get {
-	        return _locked;
-		}
-	}
-	
-	public void Lock() {
+    public bool IsLocked {
+        get {
+            return _locked;
+        }
+    }
+
+    public void Lock() {
         if (_locked) {
             return;
         }
-		if (_log.IsInfoEnabled) {
-		    _log.Info("...Locking the config of dbflute");
-		}
-	    _locked = true;
-	}
-	
-	public void Unlock() {
+        if (_log.IsInfoEnabled) {
+            _log.Info("...Locking the config of dbflute");
+        }
+        _locked = true;
+    }
+
+    public void Unlock() {
         if (!_locked) {
             return;
         }
-		if (_log.IsInfoEnabled) {
-		    _log.Info("...Unlocking the config of dbflute");
-		}
-	    _locked = false;
-	}
-	
-	protected void AssertNotLocked() {
-	    if (!IsLocked) {
-		    return;
-		}
-		String msg = "The configuration of dbflute is locked.";
-		throw new SystemException(msg);
-	}
+        if (_log.IsInfoEnabled) {
+            _log.Info("...Unlocking the config of dbflute");
+        }
+        _locked = false;
+    }
+
+    protected void AssertNotLocked() {
+        if (!IsLocked) {
+            return;
+        }
+        String msg = "The configuration of dbflute is locked.";
+        throw new SystemException(msg);
+    }
 }
 
 }

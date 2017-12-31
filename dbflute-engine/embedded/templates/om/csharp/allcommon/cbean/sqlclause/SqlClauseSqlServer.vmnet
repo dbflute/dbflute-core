@@ -25,10 +25,10 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         base.appendSelectHint(sb);
     }
 
-	protected override OrderByNullsSetupper createOrderByNullsSetupper() {
-	    return new OrderByNullsSetupperByCaseWhen();
-	}
-	
+    protected override OrderByNullsSetupper createOrderByNullsSetupper() {
+        return new OrderByNullsSetupperByCaseWhen();
+    }
+
     protected override void doFetchFirst() {
         if (this.isFetchSizeSupported()) {
             _fetchFirstSelectHint = " top " + this.getFetchSize();

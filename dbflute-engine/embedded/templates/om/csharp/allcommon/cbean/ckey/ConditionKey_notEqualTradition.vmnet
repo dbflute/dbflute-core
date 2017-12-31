@@ -10,5 +10,5 @@ public class ${myClassName} : ${glConditionKey}NotEqual {
         return "!="; // DBFlute has used for a long time
     }
 }
-	
+
 }

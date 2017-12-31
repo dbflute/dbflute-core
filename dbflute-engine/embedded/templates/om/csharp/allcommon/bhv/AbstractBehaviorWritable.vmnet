@@ -210,7 +210,7 @@ namespace ${glPackageBaseCommonBhv} {
             InjectSequenceToPrimaryKeyIfNeeds(targetEntity);
             SetupCommonColumnOfInsertIfNeeds(targetEntity);
         }
-		
+
         protected void InjectSequenceToPrimaryKeyIfNeeds(${glEntity} entity) {
             ${glDBMeta} dbmeta = entity.DBMeta;
             if (!dbmeta.HasSequence || dbmeta.HasCompoundPrimaryKey || entity.HasPrimaryKeyValue) {

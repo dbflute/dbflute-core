@@ -22,7 +22,7 @@ namespace ${glPackageBaseCommonJavaLike} {
             return new JString(a.getString() + b.getString());
         }
     }
-	
+
     public class StringBuilder {
         System.Text.StringBuilder _res;
         public StringBuilder() {

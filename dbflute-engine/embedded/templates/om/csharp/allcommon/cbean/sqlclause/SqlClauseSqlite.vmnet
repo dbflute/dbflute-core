@@ -22,14 +22,14 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     // ===================================================================================
     //                                                                    OrderBy Override
     //                                                                    ================
-	protected override OrderByNullsSetupper createOrderByNullsSetupper() {
-	    return new OrderByNullsSetupperByCaseWhen();
-	}
+    protected override OrderByNullsSetupper createOrderByNullsSetupper() {
+        return new OrderByNullsSetupperByCaseWhen();
+    }
 
     // ===================================================================================
     //                                                                 FetchScope Override
     //                                                                 ===================
-	protected override void doFetchFirst() {
+    protected override void doFetchFirst() {
         doFetchPage();
     }
 
@@ -68,5 +68,5 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
 }
-	
+
 }

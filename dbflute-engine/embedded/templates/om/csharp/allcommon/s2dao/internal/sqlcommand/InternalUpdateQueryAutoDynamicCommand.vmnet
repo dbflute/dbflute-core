@@ -48,7 +48,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
         handler.LoggingMessageSqlArgs = context.BindVariables;
         return handler.Execute(args);
     }
-    
+
     protected ${glConditionBean} extractConditionBeanWithCheck(Object[] args) {
         assertArgument(args);
         Object fisrtArg = args[0];
@@ -59,7 +59,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
         }
         return (${glConditionBean}) fisrtArg;
     }
-    
+
     protected ${glEntity} extractEntityWithCheck(Object[] args) {
         assertArgument(args);
         Object secondArg = args[1];
@@ -70,7 +70,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
         }
         return (${glEntity}) secondArg;
     }
-	
+
     protected void assertArgument(Object[] args) {
         if (args == null || args.Length <= 1) {
             String msg = "The arguments should have two argument! But:";
@@ -78,7 +78,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
             throw new IllegalArgumentException(msg);
         }
     }
-    
+
     protected ${glInternalCommandContextHandler} createCommandContextHandler(ICommandContext context) {
         return new ${glInternalCommandContextHandler}(dataSource, commandFactory, context);
     }
@@ -134,7 +134,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
         }
         return context;
     }
-	
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

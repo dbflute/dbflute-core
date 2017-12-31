@@ -12,9 +12,9 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     public ${myClassName}(String tableName)
         : base(tableName) {}
 
-	protected override bool isJoinInParentheses() {
-	    return true; // needs to join in parentheses at MS Access
-	}
+    protected override bool isJoinInParentheses() {
+        return true; // needs to join in parentheses at MS Access
+    }
 
     public override void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
             Map<String, String> joinOnMap, String fixedCondition, FixedConditionResolver fixedConditionResolver) {
@@ -28,10 +28,10 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         }
     }
 
-	protected override OrderByNullsSetupper createOrderByNullsSetupper() {
-	    return new OrderByNullsSetupperByCaseWhen();
-	}
-	
+    protected override OrderByNullsSetupper createOrderByNullsSetupper() {
+        return new OrderByNullsSetupperByCaseWhen();
+    }
+
     protected override void doFetchFirst() {
     }
 

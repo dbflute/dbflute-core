@@ -26,10 +26,10 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     //                                                                Main Clause Override
     //                                                                ====================
     protected override String prepareUnionClause(String selectClause) {
-	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	    // Remove select-hint comment from select clause of union
-		// for fetch-scope with union().
-	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Remove select-hint comment from select clause of union
+        // for fetch-scope with union().
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         selectClause = replaceString(selectClause, SELECT_HINT, "");
         return base.prepareUnionClause(selectClause);
     }
@@ -90,7 +90,7 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     protected override String createFromHint() {
         return "";
     }
-	
+
     protected override String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
@@ -118,5 +118,5 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         return 1000;
     }
 }
-	
+
 }

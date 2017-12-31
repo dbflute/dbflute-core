@@ -273,11 +273,11 @@ ${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}
     }
 
     protected def isEmptyStringParameterAllowed(): Boolean = {
-	    return ${glDBFluteConfig}.isEmptyStringParameterAllowed();
+        return ${glDBFluteConfig}.isEmptyStringParameterAllowed();
     }
 
     protected def convertEmptyToNull(value: String): String = {
-	    return ParameterUtil.convertEmptyToNull(value);
+        return ParameterUtil.convertEmptyToNull(value);
     }
 
     protected def handleShortChar(propertyName: String, value: String, size: Integer): String = {

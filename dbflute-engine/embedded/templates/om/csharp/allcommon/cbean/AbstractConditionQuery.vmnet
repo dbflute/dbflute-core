@@ -39,15 +39,15 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     protected static readonly ${glConditionValue} DUMMY_CONDITION_VALUE = new ${glConditionValue}();
     protected static readonly Object DUMMY_OBJECT = new Object();
-	protected static readonly String CQ_PROPERTY = "ConditionQuery";
-	
+    protected static readonly String CQ_PROPERTY = "ConditionQuery";
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected readonly ${glSqlClause} _sqlClause;
     protected readonly String _aliasName;
     protected readonly int _nestLevel;
-	protected int _subQueryLevel;
+    protected int _subQueryLevel;
 
     // -----------------------------------------------------
     //                                          Foreign Info
@@ -59,7 +59,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                                Inline
     //                                                ------
-	protected bool _onClause;
+    protected bool _onClause;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -123,7 +123,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return buildRealColumnName(xgetAliasName(), toColumnSqlName(columnDbName));
     }
 
-	protected String buildRealColumnName(String aliasName, String columnDbName) {
+    protected String buildRealColumnName(String aliasName, String columnDbName) {
         return aliasName + "." + columnDbName;
     }
 
@@ -153,9 +153,9 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                                Inline
     //                                                ------
-	public void xsetOnClause(bool onClause) {
-	    _onClause = onClause;
-	}
+    public void xsetOnClause(bool onClause) {
+        _onClause = onClause;
+    }
 
     // -----------------------------------------------------
     //                                              Location
@@ -198,7 +198,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         xgetSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, xgetRelationPath());
         xgetSqlClause().registerSelectedForeignInfo(callback.Invoke().xgetRelationPath(), foreignPropertyName);
     }
-    
+
     public delegate ${glConditionQuery} NssCall(); // Very Internal
 
     // ===================================================================================
@@ -235,13 +235,13 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected Map<String, ${glConditionQuery}> _unionQueryMap;
 
     public Map<String, ${glConditionQuery}> getUnionQueryMap() {// for Internal
-		if (_unionQueryMap == null) {
-		    _unionQueryMap = new LinkedHashMap<String, ${glConditionQuery}>();
-		}
+        if (_unionQueryMap == null) {
+            _unionQueryMap = new LinkedHashMap<String, ${glConditionQuery}>();
+        }
         return _unionQueryMap;
     }
 
-	public Map<String, ${glConditionQuery}> UnionQueryMap {// for SQL-Comment
+    public Map<String, ${glConditionQuery}> UnionQueryMap {// for SQL-Comment
         get { return getUnionQueryMap(); }
     }
 
@@ -252,13 +252,13 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected Map<String, ${glConditionQuery}> _unionAllQueryMap;
 
     public Map<String, ${glConditionQuery}> getUnionAllQueryMap() {// for Internal
-		if (_unionAllQueryMap == null) {
-		    _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQuery}>();
-		}
+        if (_unionAllQueryMap == null) {
+            _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQuery}>();
+        }
         return _unionAllQueryMap;
     }
 
-	public Map<String, ${glConditionQuery}> UnionAllQueryMap {// for SQL-Comment
+    public Map<String, ${glConditionQuery}> UnionAllQueryMap {// for SQL-Comment
         get { return getUnionAllQueryMap(); }
     }
 
@@ -276,7 +276,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         unionQueryMap.put(key, unionQuery);
         registerUnionQuery(unionQuery, unionAll, (unionAll ? "UnionAllQueryMap" : "UnionQueryMap") + "." + key);// If CSharp, The property of 'Union' should be 'InitCap'.
     }
-	
+
     abstract public void reflectRelationOnUnionQuery(${glConditionQuery} baseQueryAsSuper, ${glConditionQuery} unionQueryAsSuper);
 
     public bool hasUnionQueryOrUnionAllQuery() {
@@ -284,12 +284,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     public List<${glConditionQuery}> getUnionQueryList() {
-		if (_unionQueryMap == null) { return new ArrayList<${glConditionQuery}>(); }
+        if (_unionQueryMap == null) { return new ArrayList<${glConditionQuery}>(); }
         return new ArrayList<${glConditionQuery}>(_unionQueryMap.values());
     }
 
     public List<${glConditionQuery}> getUnionAllQueryList() {
-		if (_unionAllQueryMap == null) { return new ArrayList<${glConditionQuery}>(); }
+        if (_unionAllQueryMap == null) { return new ArrayList<${glConditionQuery}>(); }
         return new ArrayList<${glConditionQuery}>(_unionAllQueryMap.values());
     }
 
@@ -305,8 +305,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
     }
-	
-	protected virtual void regQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName, ${glConditionOption} option) {
+
+    protected virtual void regQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName, ${glConditionOption} option) {
         if (!isValidQuery(key, value, cvalue, colName)) {
             return;
         }
@@ -407,7 +407,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
     }
 
-    static bool isConditionKeyInScope(${glConditionKey} key) { // default scope for test 
+    static bool isConditionKeyInScope(${glConditionKey} key) { // default scope for test
         return typeof(${glConditionKey}InScope).IsAssignableFrom(key.GetType());
     }
 
@@ -464,7 +464,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             }
         }
     }
-	
+
     // -----------------------------------------------------
     //                                      LikeSearch Query
     //                                      ----------------
@@ -501,7 +501,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         // - - - - - - - - -
         throw new UnsupportedOperationException("The method 'splitByXxx()' have been unsupported yet!");
     }
-    
+
     protected virtual bool xsuppressEscape() { // for override
         return false; // as default
     }
@@ -553,7 +553,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         if (isBaseQuery()) {
             xgetSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
         } else {
-			xgetSqlClause().registerOuterJoinInlineWhereClause(xgetAliasName(), colName, key, cvalue, option, _onClause);
+            xgetSqlClause().registerOuterJoinInlineWhereClause(xgetAliasName(), colName, key, cvalue, option, _onClause);
         }
     }
 
@@ -629,9 +629,9 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         registerWhereClause(clause);
     }
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // *Unsupport ExistsSubQuery as inline because it's so dangerous.
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     protected virtual String getExistsSubQueryRealColumnName(String columnName) {
         return toColumnRealName(columnName);
@@ -639,12 +639,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     protected virtual String getExistsSubQueryClause(${glConditionQuery} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
-		int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
-		String tableAliasName = subQuery.xgetSqlClause().getBasePointAliasName();
+        int subQueryLevel = subQuery.xgetSqlClause().getSubQueryLevel();
+        String tableAliasName = subQuery.xgetSqlClause().getBasePointAliasName();
         String selectClause = "select " + tableAliasName + "." + relatedColumnName;
         String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                        , selectClause, tableAliasName, realColumnName);
-		return selectClause + " " + fromWhereClause;
+        return selectClause + " " + fromWhereClause;
     }
 
     // [DBFlute-0.7.9]
@@ -695,7 +695,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 throw new NotSupportedException(msg);
             }
             String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
-            String selectClause = "select " + tableAliasName + "." + primaryKeyName 
+            String selectClause = "select " + tableAliasName + "." + primaryKeyName
                                      + ", " + tableAliasName + "." + relatedColumnName
                                      + ", " + tableAliasName + "." + deriveColumnName;
             String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
@@ -764,7 +764,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         public SpecifyDerivedReferrerInvalidColumnSpecificationException(String msg) : base(msg) {
         }
     }
-    
+
     protected void assertSpecifyDerivedReferrerColumnType(String function, ${glConditionQuery} subQuery, String deriveColumnName) {
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(subQuery.getTableDbName());
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
@@ -852,7 +852,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 throw new UnsupportedOperationException(msg);
             }
             String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
-            String selectClause = "select " + tableAliasName + "." + primaryKeyName 
+            String selectClause = "select " + tableAliasName + "." + primaryKeyName
                                      + ", " + tableAliasName + "." + relatedColumnName
                                      + ", " + tableAliasName + "." + deriveColumnName;
             String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
@@ -921,7 +921,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         public QDRFunction(QDRSetupper<CB> setupper) {
             _setupper = setupper;
         }
-        
+
         /**
          * Set up the sub query of referrer for the scalar 'count'.
          * <pre>
@@ -931,14 +931,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
+         * </pre>
+         * @param subQuery The sub query of referrer. (NotNull)
          * @return The parameter for comparing with scalar. (NotNull)
          */
         public QDRParameter<CB, int> Count(${glSubQuery}<CB> subQuery) {
             return new QDRParameter<CB, int>("count", subQuery, _setupper);
         }
-        
+
         /**
          * Set up the sub query of referrer for the scalar 'count(with distinct)'.
          * <pre>
@@ -948,8 +948,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
+         * </pre>
+         * @param subQuery The sub query of referrer. (NotNull)
          * @return The parameter for comparing with scalar. (NotNull)
          */
         public QDRParameter<CB, int> CountDistinct(${glSubQuery}<CB> subQuery) {
@@ -965,14 +965,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
+         * </pre>
+         * @param subQuery The sub query of referrer. (NotNull)
          * @return The parameter for comparing with scalar. (NotNull)
          */
         public QDRParameter<CB, Object> Max(${glSubQuery}<CB> subQuery) {
             return new QDRParameter<CB, Object>("max", subQuery, _setupper);
         }
-        
+
         /**
          * Set up the sub query of referrer for the scalar 'min'.
          * <pre>
@@ -982,14 +982,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
+         * </pre>
+         * @param subQuery The sub query of referrer. (NotNull)
          * @return The parameter for comparing with scalar. (NotNull)
          */
         public QDRParameter<CB, Object> Min(${glSubQuery}<CB> subQuery) {
             return new QDRParameter<CB, Object>("min", subQuery, _setupper);
         }
-        
+
         /**
          * Set up the sub query of referrer for the scalar 'sum'.
          * <pre>
@@ -999,14 +999,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
+         * </pre>
+         * @param subQuery The sub query of referrer. (NotNull)
          * @return The parameter for comparing with scalar. (NotNull)
          */
         public QDRParameter<CB, Object> Sum(${glSubQuery}<CB> subQuery) {
             return new QDRParameter<CB, Object>("sum", subQuery, _setupper);
         }
-        
+
         /**
          * Set up the sub query of referrer for the scalar 'avg'.
          * <pre>
@@ -1016,8 +1016,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
+         * </pre>
+         * @param subQuery The sub query of referrer. (NotNull)
          * @return The parameter for comparing with scalar. (NotNull)
          */
         public QDRParameter<CB, Object> Avg(${glSubQuery}<CB> subQuery) {
@@ -1042,7 +1042,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
         /**
          * Set up the operand 'equal' and the value of parameter. <br>
-         * The type of the parameter should be same as the type of target column. 
+         * The type of the parameter should be same as the type of target column.
          * <pre>
          * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
          *     public void query(PurchaseCB subCB) {
@@ -1050,16 +1050,16 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * }).equal(123); // This parameter should be Integer!
-         * </pre> 
-         * @param value The value of parameter. (NotNull) 
+         * </pre>
+         * @param value The value of parameter. (NotNull)
          */
         public void Equal(PARAMETER value) {
             _setupper.Invoke(_function, _subQuery, "=", value);
         }
-        
+
         /**
          * Set up the operand 'greaterThan' and the value of parameter. <br>
-         * The type of the parameter should be same as the type of target column. 
+         * The type of the parameter should be same as the type of target column.
          * <pre>
          * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
          *     public void query(PurchaseCB subCB) {
@@ -1067,16 +1067,16 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * }).greaterThan(123); // This parameter should be Integer!
-         * </pre> 
-         * @param value The value of parameter. (NotNull) 
+         * </pre>
+         * @param value The value of parameter. (NotNull)
          */
         public void GreaterThan(PARAMETER value) {
             _setupper.Invoke(_function, _subQuery, ">", value);
         }
-        
+
         /**
          * Set up the operand 'lessThan' and the value of parameter. <br>
-         * The type of the parameter should be same as the type of target column. 
+         * The type of the parameter should be same as the type of target column.
          * <pre>
          * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
          *     public void query(PurchaseCB subCB) {
@@ -1084,16 +1084,16 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * }).lessThan(123); // This parameter should be Integer!
-         * </pre> 
-         * @param value The value of parameter. (NotNull) 
+         * </pre>
+         * @param value The value of parameter. (NotNull)
          */
         public void LessThan(PARAMETER value) {
             _setupper.Invoke(_function, _subQuery, "<", value);
         }
-        
+
         /**
          * Set up the operand 'greaterEqual' and the value of parameter. <br>
-         * The type of the parameter should be same as the type of target column. 
+         * The type of the parameter should be same as the type of target column.
          * <pre>
          * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
          *     public void query(PurchaseCB subCB) {
@@ -1101,16 +1101,16 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * }).greaterEqual(123); // This parameter should be Integer!
-         * </pre> 
-         * @param value The value of parameter. (NotNull) 
+         * </pre>
+         * @param value The value of parameter. (NotNull)
          */
         public void GreaterEqual(PARAMETER value) {
             _setupper.Invoke(_function, _subQuery, ">=", value);
         }
-        
+
         /**
          * Set up the operand 'lessEqual' and the value of parameter. <br>
-         * The type of the parameter should be same as the type of target column. 
+         * The type of the parameter should be same as the type of target column.
          * <pre>
          * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
          *     public void query(PurchaseCB subCB) {
@@ -1118,8 +1118,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * }).lessEqual(123); // This parameter should be Integer!
-         * </pre> 
-         * @param value The value of parameter. (NotNull) 
+         * </pre>
+         * @param value The value of parameter. (NotNull)
          */
         public void LessEqual(PARAMETER value) {
             _setupper.Invoke(_function, _subQuery, "<=", value);
@@ -1133,7 +1133,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected void registerScalarSubQuery(String function, ${glConditionQuery} subQuery
                                         , String propertyName, String operand) {
         assertObjectNotNull("ScalarSubQuery(" + propertyName + ")", subQuery);
-        
+
         // Get the specified column before it disappears at sub-query making.
         String deriveRealColumnName;
         {
@@ -1232,8 +1232,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * });
-         * </pre> 
-         * @param subQuery The sub query of myself. (NotNull) 
+         * </pre>
+         * @param subQuery The sub query of myself. (NotNull)
          */
         public void Max(${glSubQuery}<CB> subQuery) {
             _setupper.Invoke("max", subQuery);
@@ -1248,8 +1248,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * });
-         * </pre> 
-         * @param subQuery The sub query of myself. (NotNull) 
+         * </pre>
+         * @param subQuery The sub query of myself. (NotNull)
          */
         public void Min(${glSubQuery}<CB> subQuery) {
             _setupper.Invoke("min", subQuery);
@@ -1264,8 +1264,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * });
-         * </pre> 
-         * @param subQuery The sub query of myself. (NotNull) 
+         * </pre>
+         * @param subQuery The sub query of myself. (NotNull)
          */
         public void Sum(${glSubQuery}<CB> subQuery) {
             _setupper.Invoke("sum", subQuery);
@@ -1280,8 +1280,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
          * });
-         * </pre> 
-         * @param subQuery The sub query of myself. (NotNull) 
+         * </pre>
+         * @param subQuery The sub query of myself. (NotNull)
          */
         public void Avg(${glSubQuery}<CB> subQuery) {
             _setupper.Invoke("avg", subQuery);
@@ -1302,14 +1302,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                                                      , String tableAliasName) {
         String fromWhereClause = subQuery.xgetSqlClause().getClauseFromWhereWithUnionTemplate();
 
-        // Resolve the location path for the condition-query of sub-query. 
+        // Resolve the location path for the condition-query of sub-query.
         fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + xgetLocationBase(propertyName) + ".");
 
-		// Replace template marks. These are very important!
-		fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionSelectClauseMark(), selectClause);
-		fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionWhereClauseMark(), "");
-		fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionWhereFirstConditionMark(), "");
-		return fromWhereClause;
+        // Replace template marks. These are very important!
+        fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionSelectClauseMark(), selectClause);
+        fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionWhereClauseMark(), "");
+        fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getUnionWhereFirstConditionMark(), "");
+        return fromWhereClause;
     }
 
     protected String buildCorrelationSubQueryFromWhereClause(${glConditionQuery} subQuery
@@ -1320,12 +1320,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                                                            , String realColumnName) {
         String fromWhereClause = subQuery.xgetSqlClause().getClauseFromWhereWithWhereUnionTemplate();
 
-        // Resolve the location path for the condition-query of sub-query. 
+        // Resolve the location path for the condition-query of sub-query.
         fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + xgetLocationBase(propertyName) + ".");
 
         String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
         String firstConditionAfter = ln() + "   and ";
-        
+
         // Replace template marks. These are very important!
         fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getWhereClauseMark(), "where " + joinCondition);
         fromWhereClause = replaceString(fromWhereClause, subQuery.xgetSqlClause().getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
@@ -1378,7 +1378,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);
         xgetSqlClause().registerWhereClause(toColumnRealName(colName), key, cvalue, option);
     }
-	
+
     protected virtual void registerWhereClause(String whereClause) {
         xgetSqlClause().registerWhereClause(whereClause);
     }
@@ -1396,28 +1396,28 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                           -----------
     public void registerUnionQuery(${glConditionQuery} unionQuery, bool unionAll, String unionQueryPropertyName) {
         String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
-		
-		// At the future, building SQL will be moved to sqlClause.
+
+        // At the future, building SQL will be moved to sqlClause.
         xgetSqlClause().registerUnionQuery(unionQueryClause, unionAll);
     }
 
     protected String getUnionQuerySql(${glConditionQuery} unionQuery, String unionQueryPropertyName) {
-	    String fromClause = unionQuery.xgetSqlClause().getFromClause();
-		String whereClause = unionQuery.xgetSqlClause().getWhereClause();
-		String unionQueryClause;
-		if (whereClause.Trim().Length <= 0) {
-		    unionQueryClause = fromClause + " " + xgetSqlClause().getUnionWhereClauseMark();
-		} else {
-		    int whereIndex = whereClause.IndexOf("where ");
-		    if (whereIndex < 0) {
-				String msg = "The whereClause should have 'where' string: " + whereClause;
-			    throw new IllegalStateException(msg);
-			}
-			int clauseIndex = whereIndex + "where ".Length;
-			String mark = xgetSqlClause().getUnionWhereFirstConditionMark();
-			String markedClause = whereClause.Substring(0, clauseIndex) + mark + whereClause.Substring(clauseIndex);
-			unionQueryClause = fromClause + " " + markedClause;
-		}
+        String fromClause = unionQuery.xgetSqlClause().getFromClause();
+        String whereClause = unionQuery.xgetSqlClause().getWhereClause();
+        String unionQueryClause;
+        if (whereClause.Trim().Length <= 0) {
+            unionQueryClause = fromClause + " " + xgetSqlClause().getUnionWhereClauseMark();
+        } else {
+            int whereIndex = whereClause.IndexOf("where ");
+            if (whereIndex < 0) {
+                String msg = "The whereClause should have 'where' string: " + whereClause;
+                throw new IllegalStateException(msg);
+            }
+            int clauseIndex = whereIndex + "where ".Length;
+            String mark = xgetSqlClause().getUnionWhereFirstConditionMark();
+            String markedClause = whereClause.Substring(0, clauseIndex) + mark + whereClause.Substring(clauseIndex);
+            unionQueryClause = fromClause + " " + markedClause;
+        }
         String oldStr = "." + CQ_PROPERTY + ".";
         String newStr = "." + CQ_PROPERTY + "." + unionQueryPropertyName + ".";
         return replaceString(unionQueryClause, oldStr, newStr); // Very Important!
@@ -1446,13 +1446,13 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
-	public void WithNullsFirst() {// is User Public!
-	    xgetSqlClause().addNullsFirstToPreviousOrderBy();
-	}
-	
-	public void WithNullsLast() {// is User Public!
-	    xgetSqlClause().addNullsLastToPreviousOrderBy();
-	}
+    public void WithNullsFirst() {// is User Public!
+        xgetSqlClause().addNullsFirstToPreviousOrderBy();
+    }
+
+    public void WithNullsLast() {// is User Public!
+        xgetSqlClause().addNullsLastToPreviousOrderBy();
+    }
 
     protected void registerSpecifiedDerivedOrderBy_Asc(String aliasName) {
         if (!xgetSqlClause().hasSpecifiedDeriveSubQuery(aliasName)) {
@@ -1528,14 +1528,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return xgetSqlClause().resolveJoinAliasName(relationPath, nestLevel);
     }
 
-	protected String resolveNextRelationPath(String tableName, String relationPropertyName) {
-	    int relationNo = xgetSqlClause().resolveRelationNo(tableName, relationPropertyName);
+    protected String resolveNextRelationPath(String tableName, String relationPropertyName) {
+        int relationNo = xgetSqlClause().resolveRelationNo(tableName, relationPropertyName);
         String nextRelationPath = "_" + relationNo;
         if (_relationPath != null) {
             nextRelationPath = _relationPath + nextRelationPath;
         }
-		return nextRelationPath;
-	}
+        return nextRelationPath;
+    }
 
     // ===================================================================================
     //                                                                 Reflection Invoking
@@ -1699,7 +1699,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     private String filterRemoveEmptyString(String value) {
         return ((value != null && !"".Equals(value)) ? value : null);
     }
-    
+
     protected ${glLikeSearchOption} cLSOP() {
         return new ${glLikeSearchOption}().LikePrefix();
     }
@@ -1712,13 +1712,13 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         if (col == null) {
             return null;
         }
-		if (col is System.Collections.IList) {
-		    return filterRemoveNullOrEmptyValueFromList((System.Collections.IList)col);
-		}
-		System.Collections.IList resultList = new System.Collections.ArrayList();
-		foreach (PROPERTY_TYPE value in col) {
-		    resultList.Add(value);
-		}
+        if (col is System.Collections.IList) {
+            return filterRemoveNullOrEmptyValueFromList((System.Collections.IList)col);
+        }
+        System.Collections.IList resultList = new System.Collections.ArrayList();
+        foreach (PROPERTY_TYPE value in col) {
+            resultList.Add(value);
+        }
         return filterRemoveNullOrEmptyValueFromList(resultList);
     }
 
@@ -1727,17 +1727,17 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             return null;
         }
         System.Collections.IList newList = new System.Collections.ArrayList();
-		foreach (Object element in ls) {
-			if (element == null) {
-			    continue;
-			}
-			if (element is String) {
+        foreach (Object element in ls) {
+            if (element == null) {
+                continue;
+            }
+            if (element is String) {
                 if ("".Equals((String)element)) {
                     continue;
                 }
             }
-		    newList.Add(element);
-		}
+            newList.Add(element);
+        }
         return newList;
     }
 
@@ -1749,26 +1749,26 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected String replaceString(String text, String fromText, String toText) {
-	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
+        return ${glSimpleStringUtil}.Replace(text, fromText, toText);
     }
 
     protected String initCap(String str) {
-	    return ${glSimpleStringUtil}.InitCap(str);
+        return ${glSimpleStringUtil}.InitCap(str);
     }
 
     protected String initUncap(String str) {
-	    return ${glSimpleStringUtil}.InitUncap(str);
+        return ${glSimpleStringUtil}.InitUncap(str);
     }
 
     protected String convertObjectArrayToStringView(Object[] objArray) {
-	    return ${glTraceViewUtil}.ConvertObjectArrayToStringView(objArray);
+        return ${glTraceViewUtil}.ConvertObjectArrayToStringView(objArray);
     }
 
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------
     protected void assertObjectNotNull(String variableName, Object value) {
-	    ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
+        ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
     }
 
     protected void assertColumnName(String columnName) {
@@ -1805,16 +1805,16 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                         Assert String
     //                                         -------------
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-	    ${glSimpleAssertUtil}.AssertStringNotNullAndNotTrimmedEmpty(variableName, value);
+        ${glSimpleAssertUtil}.AssertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
-	
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     public override String ToString() {
         return GetType().Name + ":{aliasName=" + _aliasName + ", nestLevel=" + _nestLevel
-		     + ", subQueryLevel=" + _subQueryLevel + ", foreignPropertyName=" + _foreignPropertyName
-			 + ", relationPath=" + _relationPath + ", onClause=" + _onClause + "}";
+             + ", subQueryLevel=" + _subQueryLevel + ", foreignPropertyName=" + _foreignPropertyName
+             + ", relationPath=" + _relationPath + ", onClause=" + _onClause + "}";
     }
 }
 

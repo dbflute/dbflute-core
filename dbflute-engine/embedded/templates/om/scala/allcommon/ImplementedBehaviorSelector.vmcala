@@ -204,33 +204,33 @@ class ${glImplementedBehaviorSelector} extends BehaviorSelector {
         assertObjectNotNull("_container", _container);
 #if ($database.isTargetContainerSeasar())
         try {
-		    return (COMPONENT)_container.getComponent(componentType).asInstanceOf[COMPONENT];
-		} catch { // Normally it doesn't come.
-		    case e: ComponentNotFoundRuntimeException => {
-		        val component: COMPONENT = try {
-		            // for HotDeploy Mode
-    		        component = _container.getRoot().getComponent(componentType).asInstanceOf[COMPONENT];
-	    	    } catch (ComponentNotFoundRuntimeException ignored) {
-	    	        case ignored: ComponentNotFoundRuntimeException => {
-		                throw e;
-		            }
-		        }
-    		    _container = _container.getRoot(); // Change container.
-	    	    return component;
-		    }
-		}
+            return (COMPONENT)_container.getComponent(componentType).asInstanceOf[COMPONENT];
+        } catch { // Normally it doesn't come.
+            case e: ComponentNotFoundRuntimeException => {
+                val component: COMPONENT = try {
+                    // for HotDeploy Mode
+                    component = _container.getRoot().getComponent(componentType).asInstanceOf[COMPONENT];
+                } catch (ComponentNotFoundRuntimeException ignored) {
+                    case ignored: ComponentNotFoundRuntimeException => {
+                        throw e;
+                    }
+                }
+                _container = _container.getRoot(); // Change container.
+                return component;
+            }
+        }
 #end
 #if ($database.isTargetContainerSpring())
-		return _container.getBean(replace(initUncap(toClassTitle(componentType)), "${database.dollar}", "")).asInstanceOf[COMPONENT];
+        return _container.getBean(replace(initUncap(toClassTitle(componentType)), "${database.dollar}", "")).asInstanceOf[COMPONENT];
 #end
 #if ($database.isTargetContainerLucy())
-		return _container.get(initUncap(toClassTitle(componentType))).asInstanceOf[COMPONENT];
+        return _container.get(initUncap(toClassTitle(componentType))).asInstanceOf[COMPONENT];
 #end
 #if ($database.isTargetContainerGuice())
-		return _container.getInstance(componentType);
+        return _container.getInstance(componentType);
 #end
 #if ($database.isTargetContainerSlim3())
-		return _container.lookup(toClassTitle(componentType));
+        return _container.lookup(toClassTitle(componentType));
 #end
 #if ($database.isTargetContainerCDI())
         var result: COMPONENT = null;

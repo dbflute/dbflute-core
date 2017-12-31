@@ -56,5 +56,5 @@ public abstract class ${myClassName} : ${glConditionKey} {
         throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }
-	
+
 }

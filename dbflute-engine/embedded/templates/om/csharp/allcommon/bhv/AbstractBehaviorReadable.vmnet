@@ -115,10 +115,10 @@ namespace ${glPackageBaseCommonBhv} {
 
         protected void AssertEntitySelectedAsOne<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntity} {
             if (ls == null || ls.Count == 0) {
-				ThrowEntityAlreadyDeletedException(searchKey4Log);
+                ThrowEntityAlreadyDeletedException(searchKey4Log);
             }
             if (ls.Count != 1) {
-			    ThrowEntityDuplicatedException("" + ls.Count, searchKey4Log, null);
+                ThrowEntityDuplicatedException("" + ls.Count, searchKey4Log, null);
             }
         }
 
@@ -173,12 +173,12 @@ namespace ${glPackageBaseCommonBhv} {
          * @param <REFERRER_ENTITY> The type of referrer entity.
          * @param localEntityList The list of local entity. (NotNull)
          * @param loadReferrerOption The option of loadReferrer. (NotNull)
-         * @param callback The internal call-back of loadReferrer. (NotNull) 
+         * @param callback The internal call-back of loadReferrer. (NotNull)
          */
         protected virtual void HelpLoadReferrerInternally<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>(
                                                IList<LOCAL_ENTITY> localEntityList
                                              , ${glLoadReferrerOption}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
-                                             , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) 
+                                             , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback)
                      where LOCAL_ENTITY : ${glEntity}
                      where REFERRER_CB : ${glConditionBean}
                      where REFERRER_ENTITY : ${glEntity} {
@@ -194,12 +194,12 @@ namespace ${glPackageBaseCommonBhv} {
          * @param <REFERRER_ENTITY> The type of referrer entity.
          * @param localEntityList The list of local entity. (NotNull)
          * @param loadReferrerOption The option of loadReferrer. (NotNull)
-         * @param callback The internal call-back of loadReferrer. (NotNull) 
+         * @param callback The internal call-back of loadReferrer. (NotNull)
          */
         protected virtual void DoHelpLoadReferrerInternally<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY>(
                                                IList<LOCAL_ENTITY> localEntityList
                                              , ${glLoadReferrerOption}<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
-                                             , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) 
+                                             , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback)
                      where LOCAL_ENTITY : ${glEntity}
                      where REFERRER_CB : ${glConditionBean}
                      where REFERRER_ENTITY : ${glEntity} {
@@ -325,7 +325,7 @@ namespace ${glPackageBaseCommonBhv} {
             PK getFKVal(REFERRER_ENTITY entity); // getForeignKeyValue()
             void setlcEt(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity); // setLocalEntity()
         }
-    
+
         protected ${glBehaviorSelector} xgetBSFLR() { // GetBehaviorSelectorForLoadReferrer() as Internal
             AssertBehaviorSelectorNotNull("loadReferrer");
             return this.BehaviorSelector;
@@ -348,7 +348,7 @@ namespace ${glPackageBaseCommonBhv} {
                 throw new SystemException(msg);
             }
         }
-    
+
         protected IList<ELEMENT> xnewLRLs<ELEMENT>(ELEMENT element) { // newLoadReferrerList() as Internal
             System.Collections.Generic.IList<ELEMENT> ls = new System.Collections.Generic.List<ELEMENT>(1);
             ls.Add(element);

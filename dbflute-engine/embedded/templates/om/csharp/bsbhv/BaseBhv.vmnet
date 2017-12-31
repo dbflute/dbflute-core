@@ -46,7 +46,7 @@ namespace ${glPackageExtendedBhv} {
         //                                                                     ===========
         public ${myClassName}() {
         }
-        
+
         // ===============================================================================
         //                                                                Initialized Mark
         //                                                                ================
@@ -139,7 +139,7 @@ namespace ${glPackageExtendedBhv} {
             ${table.primaryKeyArgsAssertStringCSharp}
             ${myConditionBeanClassName} cb = NewMyConditionBean();
             ${table.primaryKeyArgsConditionSetupStringCSharp}
-            return cb;            
+            return cb;
         }
 #end
         #endregion

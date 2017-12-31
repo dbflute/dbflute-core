@@ -67,18 +67,18 @@ public interface ${glEntityDefinedCommonColumn} extends ${glEntity} {
 #end
 
     /**
-	 * Enable common column auto set up. {for after disable because the default is enabled}
-	 */
+     * Enable common column auto set up. {for after disable because the default is enabled}
+     */
     public void enableCommonColumnAutoSetup();
 
     /**
-	 * Disable common column auto set up.
-	 */
+     * Disable common column auto set up.
+     */
     public void disableCommonColumnAutoSetup();
-	
+
     /**
-	 * Can the entity set up common column by auto?
-	 * @return The determination, true or false.
-	 */
-	public boolean canCommonColumnAutoSetup();
+     * Can the entity set up common column by auto?
+     * @return The determination, true or false.
+     */
+    public boolean canCommonColumnAutoSetup();
 }

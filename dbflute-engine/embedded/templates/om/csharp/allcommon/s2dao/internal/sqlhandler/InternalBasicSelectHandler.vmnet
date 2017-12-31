@@ -23,11 +23,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         //                                                                     Constructor
         //                                                                     ===========
         public ${glInternalBasicSelectHandler}(IDataSource dataSource
-			                                 , String sql
-										     , IDataReaderHandler dataReaderHandler
-											 , ICommandFactory commandFactory
-											 , IDataReaderFactory dataReaderFactory)
-			: base(dataSource, sql, commandFactory) {
+                                             , String sql
+                                             , IDataReaderHandler dataReaderHandler
+                                             , ICommandFactory commandFactory
+                                             , IDataReaderFactory dataReaderFactory)
+            : base(dataSource, sql, commandFactory) {
             DataReaderHandler = dataReaderHandler;
             DataReaderFactory = dataReaderFactory;
         }

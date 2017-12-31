@@ -53,14 +53,14 @@ namespace ${glPackageBaseCommonCBean} {
             this._paging = paging;
         }
 
-		public void Paging(int pageSize, int pageNumber) {
-		    FetchFirst(pageSize);
-		    FetchPage(pageNumber);
-		}
+        public void Paging(int pageSize, int pageNumber) {
+            FetchFirst(pageSize);
+            FetchPage(pageNumber);
+        }
 
         public void DisablePagingReSelect() { _canPagingReSelect = false; }
         public virtual bool CanPagingReSelect { get { return _canPagingReSelect; } }
-        
+
         // -------------------------------------------------
         //                                     Fetch Setting
         //                                     -------------

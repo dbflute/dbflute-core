@@ -40,7 +40,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected String[] _insertPrefixes;
         protected String[] _updatePrefixes;
         protected String[] _deletePrefixes;
-		protected Map<Type, IBeanMetaData> _beanMetaDataCacheMap = new HashMap<Type, IBeanMetaData>();
+        protected Map<Type, IBeanMetaData> _beanMetaDataCacheMap = new HashMap<Type, IBeanMetaData>();
 
         // ===============================================================================
         //                                                                     Constructor
@@ -101,7 +101,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (_deletePrefixes != null) {
                 dmd.DeletePrefixes = _deletePrefixes;
             }
-			dmd.BeanMetaDataCacheMap = _beanMetaDataCacheMap;
+            dmd.BeanMetaDataCacheMap = _beanMetaDataCacheMap;
             dmd.Initialize();
             return dmd;
         }
@@ -404,12 +404,12 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
-		public static ${glDBMeta} FindCachedDBMeta(Object row) {
-		    return DBMetaCacheHandler.FindDBMeta(row);
+        public static ${glDBMeta} FindCachedDBMeta(Object row) {
+            return DBMetaCacheHandler.FindDBMeta(row);
         }
 
-		public static ${glDBMeta} FindCachedDBMeta(Type rowType, String tableName) {
-		    return DBMetaCacheHandler.FindDBMeta(rowType, tableName);
+        public static ${glDBMeta} FindCachedDBMeta(Type rowType, String tableName) {
+            return DBMetaCacheHandler.FindDBMeta(rowType, tableName);
         }
 
         protected override string FindColumnName(IList columnNames, string columnName) {
@@ -434,23 +434,23 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 
-	public class DBMetaCacheHandler {
-	    protected static readonly String DBMETA_CACHE_KEY = "df:DBMetaCache";
-		
-		public static ${glDBMeta} FindDBMeta(Object row) {
-		    if (!(row is ${glEntity})) {
-			    return null;
-			}
-			${glEntity} entity = (${glEntity})row;
+    public class DBMetaCacheHandler {
+        protected static readonly String DBMETA_CACHE_KEY = "df:DBMetaCache";
+
+        public static ${glDBMeta} FindDBMeta(Object row) {
+            if (!(row is ${glEntity})) {
+                return null;
+            }
+            ${glEntity} entity = (${glEntity})row;
             ${glDBMeta} dbmeta = FindCachedDBMeta(entity.GetType());
-			if (dbmeta != null) {
-			    return dbmeta;
-			}
+            if (dbmeta != null) {
+                return dbmeta;
+            }
             dbmeta = entity.DBMeta;
             CacheDBMeta(entity, dbmeta);
-		    return dbmeta;
+            return dbmeta;
         }
-        
+
         public static ${glDBMeta} FindDBMeta(Type rowType, String tableName) {
             ${glDBMeta} dbmeta = FindCachedDBMeta(rowType);
             if (dbmeta != null) {
@@ -476,21 +476,21 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             return null;
         }
-        
+
         protected static void CacheDBMeta(${glEntity} entity, ${glDBMeta} dbmeta) {
             CacheDBMeta(entity.GetType(), dbmeta);
         }
-        
+
         protected static void CacheDBMeta(Type type, ${glDBMeta} dbmeta) {
             System.Collections.Generic.IDictionary<Type, ${glDBMeta}> dbmetaCache = FindDBMetaCache();
             dbmetaCache.Add(type, dbmeta);
         }
-        
+
         protected static System.Collections.Generic.IDictionary<Type, ${glDBMeta}> FindDBMetaCache() {
             return (System.Collections.Generic.IDictionary<Type, ${glDBMeta}>)${glInternalMapContext}.GetObject(DBMETA_CACHE_KEY);
         }
-	}
-	
+    }
+
     public class InternalRelationRowCreator : RelationRowCreatorImpl {
 
         protected override void SetupRelationKeyValue(RelationRowCreationResource res) {
@@ -583,14 +583,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             if (value != null) {
                 res.IncrementValidValueCount();
-				${glDBMeta} dbmeta = FindDBMeta(res.Row);
-				String propertyName = pt.PropertyName;
-				if (dbmeta != null && dbmeta.HasEntityPropertySetupper(propertyName)) {
-				    dbmeta.SetupEntityProperty(propertyName, res.Row, value);
-			    } else {
+                ${glDBMeta} dbmeta = FindDBMeta(res.Row);
+                String propertyName = pt.PropertyName;
+                if (dbmeta != null && dbmeta.HasEntityPropertySetupper(propertyName)) {
+                    dbmeta.SetupEntityProperty(propertyName, res.Row, value);
+                } else {
                     PropertyInfo pd = pt.PropertyInfo;
                     pd.SetValue(res.Row, value, null);
-				}
+                }
             }
         }
 
@@ -613,12 +613,12 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
-		protected ${glDBMeta} FindDBMeta(Object row) {
-		    return InternalRowCreator.FindCachedDBMeta(row);
+        protected ${glDBMeta} FindDBMeta(Object row) {
+            return InternalRowCreator.FindCachedDBMeta(row);
         }
 
         protected override void SetupPropertyCache(RelationRowCreationResource res) {
-            // - - - - - - - - - - - 
+            // - - - - - - - - - - -
             // Recursive Call Point!
             // - - - - - - - - - - -
             res.InitializePropertyCacheElement();

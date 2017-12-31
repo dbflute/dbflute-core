@@ -53,10 +53,10 @@ public class ${myClassName} : ${glConditionKey} {
         conditionValue.NotInScope = ((System.Collections.IList)value);
         conditionValue.setNotInScopeLocation(location);
     }
-	
+
     protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
         throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }
-	
+
 }

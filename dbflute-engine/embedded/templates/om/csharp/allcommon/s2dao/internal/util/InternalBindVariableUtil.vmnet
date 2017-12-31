@@ -12,21 +12,21 @@ using Seasar.Extension.ADO.Impl;
 namespace ${glPackageBaseCommonS2DaoInternalUtil} {
 
     public class ${glInternalBindVariableUtil} {
-    
-    	// ===============================================================================
+
+        // ===============================================================================
         //                                                                      Definition
         //                                                                      ==========
         protected static readonly IDbParameterParser _parser = new BasicDbParameterParser();
         protected static readonly string sqlLogDateFormat = "yyyy-MM-dd";
         protected static readonly string sqlLogDateTimeFormat = "yyyy-MM-dd HH.mm.ss";
-		
-    	// ===============================================================================
+
+        // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
         private ${glInternalBindVariableUtil}() {
         }
 
-    	// ===============================================================================
+        // ===============================================================================
         //                                                                     CompleteSql
         //                                                                     ===========
         public static String GetCompleteSql(String sql, Object[] args) {
@@ -83,5 +83,5 @@ namespace ${glPackageBaseCommonS2DaoInternalUtil} {
                 return "'" + bindVariable + "'";
             }
         }
-	}
+    }
 }

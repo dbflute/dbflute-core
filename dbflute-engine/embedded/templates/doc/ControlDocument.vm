@@ -28,7 +28,7 @@ $database.initializeClassificationDeployment()
 #end
 
 ## - - - - - - - - - - - - - - - - - - - -
-## Loading HTML resource before generation 
+## Loading HTML resource before generation
 ##  o because it might be used others
 ##  o but only sister HTMLs
 ## - - - - - - - - - - - - - - - - - - - -

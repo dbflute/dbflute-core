@@ -23,7 +23,7 @@ namespace ${myExtendedDaoPackageName} {
     [S2Dao(typeof(${database.S2DaoSettingClass}))]
     [Bean(typeof(${myExtendedObjectClassName}))]
     public partial interface ${myClassName} : ${InterfaceName} {
-		void InitializeDaoMetaData(String methodName);// Very Internal Method!
+        void InitializeDaoMetaData(String methodName);// Very Internal Method!
 
         int SelectCount(${myConditionBeanClassName} cb);
         IList<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb);

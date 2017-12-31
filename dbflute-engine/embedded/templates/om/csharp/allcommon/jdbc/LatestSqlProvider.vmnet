@@ -12,6 +12,6 @@ namespace ${glPackageBaseCommonJdbc} {
     public interface ${glLatestSqlProvider} {
         String GetDisplaySql();
         IList<String> ExtractDisplaySqlList();
-	    void ClearSqlCache();
+        void ClearSqlCache();
     }
 }

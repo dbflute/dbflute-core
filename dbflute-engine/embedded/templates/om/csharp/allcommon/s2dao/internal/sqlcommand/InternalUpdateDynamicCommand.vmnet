@@ -28,5 +28,5 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             handler.LoggingMessageSqlArgs = bindVariables;
             return handler.Execute(bindVariables, ctx.BindVariableTypes);
         }
-	}
+    }
 }

@@ -11,7 +11,7 @@ namespace ${glPackageBaseCommonHelper}
             get { return "\n"; }
         }
 
-        public   string DEFAULT_MAP_MARK 
+        public   string DEFAULT_MAP_MARK
         {
             get
             {
@@ -19,7 +19,7 @@ namespace ${glPackageBaseCommonHelper}
             }
         }
 
-        public   string DEFAULT_LIST_MARK 
+        public   string DEFAULT_LIST_MARK
         {
             get
             {
@@ -27,7 +27,7 @@ namespace ${glPackageBaseCommonHelper}
             }
         }
 
-        public   string DEFAULT_DELIMITER 
+        public   string DEFAULT_DELIMITER
         {
             get
             {
@@ -35,7 +35,7 @@ namespace ${glPackageBaseCommonHelper}
             }
         }
 
-        public   string DEFAULT_START_BRACE 
+        public   string DEFAULT_START_BRACE
         {
             get
             {
@@ -43,7 +43,7 @@ namespace ${glPackageBaseCommonHelper}
             }
         }
 
-        public   string DEFAULT_END_BRACE 
+        public   string DEFAULT_END_BRACE
         {
             get
             {
@@ -51,7 +51,7 @@ namespace ${glPackageBaseCommonHelper}
             }
         }
 
-        public   string DEFAULT_EQUAL 
+        public   string DEFAULT_EQUAL
         {
             get
             {
@@ -132,7 +132,7 @@ namespace ${glPackageBaseCommonHelper}
         //                                                                                   ========
         /**
          * Generate map from map-string. {Implement}
-         * 
+         *
          * @param mapString Map-string (NotNull)
          * @return Generated map. (NotNull)
          */
@@ -161,7 +161,7 @@ namespace ${glPackageBaseCommonHelper}
 
         /**
          * Generate map from list-string. {Implement}
-         * 
+         *
          * @param listString List-string (NotNull)
          * @return Generated list. (NotNull)
          */
@@ -236,7 +236,7 @@ namespace ${glPackageBaseCommonHelper}
                 int endBraceIndex = _remainderString.IndexOf(_endBrace);
                 assertEndBracekIndex(_remainderString, endBraceIndex, _topString, currentMap);
 
-                // If delimiter exists and delimiter is closer than end brace, 
+                // If delimiter exists and delimiter is closer than end brace,
                 // Everything from the head of the present remainder string to the delimiter becomes map value.
                 //   ex) value1,key2=value2}
                 if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex)
@@ -297,7 +297,7 @@ namespace ${glPackageBaseCommonHelper}
                 int endBraceIndex = _remainderString.IndexOf(_endBrace);
                 assertEndBraceIndex(_remainderString, endBraceIndex, _topString, currentList);
 
-                // If delimiter exists and delimiter is closer than end brace, 
+                // If delimiter exists and delimiter is closer than end brace,
                 // Everything from the head of the present remainder string to the delimiter becomes list value.
                 //   ex) value1,value2,value3}
                 if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex)
@@ -420,7 +420,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # prefixString --> " + prefixString;
                 throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
-            
+
             _remainderString = _remainderString.Substring(prefixString.Length);
             removeBothSideSpaceAndTabAndNewLine();
         }
@@ -878,7 +878,7 @@ namespace ${glPackageBaseCommonHelper}
 
         /**
          * Get count that target string exist in the base string.
-         * 
+         *
          * @param targetString �Ώە�����
          * @param delimiter �f���~�^
          * @return �c��̕�����Ɋ܂܂�Ă���f���~�^�̐�

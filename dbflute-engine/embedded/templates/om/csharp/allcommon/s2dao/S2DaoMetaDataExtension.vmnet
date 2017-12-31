@@ -53,7 +53,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             _annotationReader = AnnotationReaderFactory.CreateDaoAnnotationReader(_daoType);
             _beanType = _annotationReader.GetBeanType();
             _dbms = GetDbms(_dataSource);
-            
+
             // Initialize bean-meta-data!
             BeanMetaDataCacheHandler handler = new BeanMetaDataCacheHandler(_beanMetaDataCacheMap);
             _beanMetaData = handler.FindOrCreateCachedMetaIfNeeds(_beanType, _annotationReaderFactory, _dbMetaData, _dbms);
@@ -234,7 +234,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected override AbstractSqlCommand CreateInsertAutoDynamicCommand(MethodInfo methodInfo, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
             return new ${glInternalInsertAutoDynamicCommand}(dataSource, commandFactory, beanMetaData, propertyNames);
         }
-        
+
         protected override void SetupUpdateMethodByAuto(MethodInfo mi) {
             if (IsFirstArgumentConditionBean(mi)) {
                 ISqlCommand cmd = new ${glInternalUpdateQueryAutoDynamicCommand}(_dataSource, _commandFactory);
@@ -272,7 +272,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             cmd.IsCheckSingleRowUpdate = !IsNonstrictMethod(method);
             return cmd;
         }
-        
+
         // -------------------------------------------------
         //                                     Common Helper
         //                                     -------------
@@ -579,7 +579,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected override IRelationRowCreator CreateRelationRowCreator() {
             return new InternalRelationRowCreator();
         }
-        
+
         // ===============================================================================
         //                                                               ADO.NET Delegator
         //                                                               =================
@@ -618,7 +618,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
     public class BeanMetaDataDBFluteDBMetaExtension : BeanMetaDataImpl {
         protected ${glPackageBaseCommonJavaLike}.List<IPropertyType> _primaryKeyList = new ${glPackageBaseCommonJavaLike}.ArrayList<IPropertyType>();
-        public BeanMetaDataDBFluteDBMetaExtension() 
+        public BeanMetaDataDBFluteDBMetaExtension()
             : base() {
         }
         protected override void SetupProperty(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
@@ -764,18 +764,18 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
     }
-    
+
     public class BeanMetaDataCacheExtension : BeanMetaDataDBFluteDBMetaExtension {
         protected Map<Type, IBeanMetaData> _metaMap;
         protected int _nestNo;
-        
-        public BeanMetaDataCacheExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
+
+        public BeanMetaDataCacheExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation)
             : base() {
             this.BeanType = beanType;
             this._relation = relation;
             this.AnnotationReaderFactory = annotationReaderFactory;
         }
-        
+
         public override void Initialize(IDatabaseMetaData dbMetaData, IDbms dbms) {
             if (_metaMap != null) {
                 BeanMetaDataCacheHandler handler = new BeanMetaDataCacheHandler(_metaMap);
@@ -807,7 +807,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             bmdExt.Initialize(dbMetaData, dbms);
             return bmdExt;
         }
-        
+
         public Map<Type, IBeanMetaData> MetaMap {
             get { return _metaMap; }
             set { _metaMap = value; }
@@ -819,7 +819,7 @@ namespace ${glPackageBaseCommonS2Dao} {
     }
 
     public class BeanMetaDataForUpdateNonConcurrency : BeanMetaDataDBFluteDBMetaExtension {
-        public BeanMetaDataForUpdateNonConcurrency(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
+        public BeanMetaDataForUpdateNonConcurrency(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation)
             : base() {
             this.BeanType = beanType;
             this._relation = relation;

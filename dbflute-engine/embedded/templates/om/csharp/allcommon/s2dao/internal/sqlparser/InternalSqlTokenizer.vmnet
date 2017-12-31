@@ -13,9 +13,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         BIND_VARIABLE = 3,
         EOF = 4,
     }
-	
+
     public class ${glInternalSqlTokenizer} {
-	
+
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
@@ -201,8 +201,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         protected void ParseComment() {
             int commentEndPos = _sql.IndexOf("*/", _position);
             if (commentEndPos < 0) {
-				ThrowEndCommentNotFoundException(_sql.Substring(_position));
-			}
+                ThrowEndCommentNotFoundException(_sql.Substring(_position));
+            }
             _token = _sql.Substring(_position, (commentEndPos - _position));
             _nextTokenType = InternalTokenType.SQL;
             _position = commentEndPos + 2;
@@ -265,7 +265,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             }
             return index;
         }
-		
+
 
         // ===============================================================================
         //                                                                  General Helper

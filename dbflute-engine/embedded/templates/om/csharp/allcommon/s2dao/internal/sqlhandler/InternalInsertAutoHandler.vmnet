@@ -18,7 +18,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         public ${glInternalInsertAutoHandler}(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
             : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
         }
-		
+
         // ===============================================================================
         //                                                                        Override
         //                                                                        ========

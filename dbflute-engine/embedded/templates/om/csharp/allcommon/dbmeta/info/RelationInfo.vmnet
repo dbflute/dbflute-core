@@ -5,7 +5,7 @@ using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonDBMetaInfo} {
-    
+
     public interface ${myClassName} {
 
         String RelationPropertyName { get; }

@@ -51,7 +51,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         protected static ${glDBMeta} GetDBMeta(String className) {
-			Type clazz = ForName(className, AppDomain.CurrentDomain.GetAssemblies());
+            Type clazz = ForName(className, AppDomain.CurrentDomain.GetAssemblies());
             if (clazz == null) {
                 String msg = "The className was not found: " + className + " assemblys=";
                 msg = msg + Seasar.Framework.Util.ToStringUtil.ToString(AppDomain.CurrentDomain.GetAssemblies());
@@ -207,7 +207,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                     Assert Object
         //                                     -------------
         protected static void AssertObjectNotNull(String variableName, Object value) {
-		    ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
+            ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
         }
 
         // -------------------------------------------------

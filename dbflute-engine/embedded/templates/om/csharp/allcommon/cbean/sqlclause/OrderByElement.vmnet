@@ -27,11 +27,11 @@ public class ${myClassName} {
     /** The value of ascDesc. */
     protected String _ascDesc = "asc";
 
-	/** The setupper of order-by nulls. */
-	protected OrderByNullsSetupper _orderByNullsSetupper;
-	
-	/** Is nulls ordered first? */
-	protected bool _nullsFirst;
+    /** The setupper of order-by nulls. */
+    protected OrderByNullsSetupper _orderByNullsSetupper;
+
+    /** Is nulls ordered first? */
+    protected bool _nullsFirst;
 
     // ===================================================================================
     //                                                                         Main Method
@@ -107,13 +107,13 @@ public class ${myClassName} {
         }
         StringBuilder sb = new StringBuilder();
         sb.append(getColumnFullName()).append(" ").append(_ascDesc);
-		if (_orderByNullsSetupper != null) {
-		    return _orderByNullsSetupper.setup(getColumnFullName(), sb.toString(), _nullsFirst);
-		} else {
+        if (_orderByNullsSetupper != null) {
+            return _orderByNullsSetupper.setup(getColumnFullName(), sb.toString(), _nullsFirst);
+        } else {
             return sb.toString();
-		}
+        }
     }
-	
+
     public String getElementClause(Map<String, String> selectClauseRealColumnAliasMap) {
         if (selectClauseRealColumnAliasMap == null) {
             String msg = "The argument[selectClauseRealColumnAliasMap] should not be null.";
@@ -130,11 +130,11 @@ public class ${myClassName} {
             throw new IllegalStateException(msg + " But the map is " + selectClauseRealColumnAliasMap);
         }
         sb.append(columnAlias).append(" ").append(_ascDesc);
-		if (_orderByNullsSetupper != null) {
-		    return _orderByNullsSetupper.setup(columnAlias, sb.toString(), _nullsFirst);
-		} else {
+        if (_orderByNullsSetupper != null) {
+            return _orderByNullsSetupper.setup(columnAlias, sb.toString(), _nullsFirst);
+        } else {
             return sb.toString();
-		}
+        }
     }
 
     // ===================================================================================
@@ -149,10 +149,10 @@ public class ${myClassName} {
         sb.append(" ascDesc=").append(_ascDesc);
         return sb.toString();
     }
-	
+
     // ===================================================================================
     //                                                                            Accessor
-    //                                                                            ========	
+    //                                                                            ========
     public String getAliasName() {
         return _aliasName;
     }
@@ -185,7 +185,7 @@ public class ${myClassName} {
     }
     public void setOrderByNullsSetupper(OrderByNullsSetupper value, bool nullsFirst) {
         _orderByNullsSetupper = value;
-		_nullsFirst = nullsFirst;
+        _nullsFirst = nullsFirst;
     }
 }
 

@@ -47,5 +47,5 @@ public class ${myClassName} : ${glConditionKey} {
         conditionValue.setNotLikeSearch((String)value, (${glLikeSearchOption})option).setNotLikeSearchLocation(location);
     }
 }
-	
+
 }

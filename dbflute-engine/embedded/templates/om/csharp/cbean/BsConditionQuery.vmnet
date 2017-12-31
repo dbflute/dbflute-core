@@ -26,7 +26,7 @@ namespace ${glPackageBaseCQ} {
             _inlineQuery.xsetOnClause(false);
             return _inlineQuery;
         }
-        
+
         public ${myConditionInlineQueryClassName} On() {
             if (isBaseQuery()) { throw new UnsupportedOperationException("Unsupported onClause of Base Table!"); }
             ${myConditionInlineQueryClassName} inlineQuery = Inline();
@@ -421,7 +421,7 @@ namespace ${glPackageBaseCQ} {
 #end
 
         }
-    
+
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignCQClassName = "${glProjectPrefix}${fk.foreignTable.JavaName}${glConditionQueryInitialName}")
 #set ($dynamicFixedConditionArgs = "")
@@ -527,16 +527,16 @@ namespace ${glPackageBaseCQ} {
 #end
 #if ($table.hasSinglePrimaryKey())
 
-	    // ===============================================================================
-	    //                                                                 Scalar SubQuery
-	    //                                                                 ===============
-	    protected Map<String, ${myConditionQueryClassName}> _scalarSubQueryMap;
-	    public Map<String, ${myConditionQueryClassName}> ScalarSubQuery { get { return _scalarSubQueryMap; } }
-	    public override String keepScalarSubQuery(${myConditionQueryClassName} subQuery) {
-	        if (_scalarSubQueryMap == null) { _scalarSubQueryMap = new LinkedHashMap<String, ${myConditionQueryClassName}>(); }
-	        String key = "subQueryMapKey" + (_scalarSubQueryMap.size() + 1);
-	        _scalarSubQueryMap.put(key, subQuery); return "ScalarSubQuery." + key;
-	    }
+        // ===============================================================================
+        //                                                                 Scalar SubQuery
+        //                                                                 ===============
+        protected Map<String, ${myConditionQueryClassName}> _scalarSubQueryMap;
+        public Map<String, ${myConditionQueryClassName}> ScalarSubQuery { get { return _scalarSubQueryMap; } }
+        public override String keepScalarSubQuery(${myConditionQueryClassName} subQuery) {
+            if (_scalarSubQueryMap == null) { _scalarSubQueryMap = new LinkedHashMap<String, ${myConditionQueryClassName}>(); }
+            String key = "subQueryMapKey" + (_scalarSubQueryMap.size() + 1);
+            _scalarSubQueryMap.put(key, subQuery); return "ScalarSubQuery." + key;
+        }
 
         // ===============================================================================
         //                                                         Myself InScope SubQuery

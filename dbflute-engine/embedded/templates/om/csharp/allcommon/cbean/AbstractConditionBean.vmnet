@@ -21,7 +21,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected bool _canPagingReSelect = true;
         private Map<String, Object> _freeParameterMap;
         private ${glUnionQuery}<${glConditionBean}> _unionQuerySynchronizer;
-    
+
         // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
         protected bool _forUnion;
         protected bool _forExistsReferrer;
@@ -260,7 +260,7 @@ namespace ${glPackageBaseCommonCBean} {
         public void Configure(${glStatementConfig} statementConfig) {
             _statementConfig = statementConfig;
         }
-    
+
         public ${glStatementConfig} StatementConfig { get {
             return _statementConfig;
         }}
@@ -284,7 +284,7 @@ namespace ${glPackageBaseCommonCBean} {
         public virtual String ToDisplaySql() {
             return ${glConditionBeanContext}.ConvertConditionBean2DisplaySql(this);
         }
-    
+
         // [DBFlute-0.8.9.2]
         // ===============================================================================
         //                                                      Basic Status Determination
@@ -444,14 +444,14 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "* * * * * * * * * */" + ln();
             throw new IllegalStateException(msg);
         }
-    
+
         // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============
         protected String initCap(String str) {
             return ${glSimpleStringUtil}.InitCap(str);
         }
-    
+
         protected String ln() {
             return ${glSimpleSystemUtil}.GetLineSeparator();
         }
@@ -664,8 +664,8 @@ namespace ${glPackageBaseCommonCBean} {
     }
 
     public interface HpSpQyCall<CQ> where CQ : ${glConditionQuery} {
-        bool has(); 
-        CQ qy(); 
+        bool has();
+        CQ qy();
     }
 
     public class HpColQyOperand<CB> where CB : ${glConditionBean} {
@@ -707,12 +707,12 @@ namespace ${glPackageBaseCommonCBean} {
         public SpecifyColumnNotSetupSelectColumnException(String msg) : base(msg) {
         }
     }
-    
+
     public class DerivedReferrerInvalidForeignSpecificationException : SystemException {
         public DerivedReferrerInvalidForeignSpecificationException(String msg) : base(msg) {
         }
     }
-    
+
     public class ScalarSelectInvalidForeignSpecificationException : SystemException {
         public ScalarSelectInvalidForeignSpecificationException(String msg) : base(msg) {
         }
@@ -855,12 +855,12 @@ namespace ${glPackageBaseCommonCBean} {
 
     public delegate void RAQSetupper<REFERRER_CB, LOCAL_CQ>(String function, ${glSubQuery}<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName)
             where REFERRER_CB : ${glConditionBean} where LOCAL_CQ : ${glConditionQuery};
-    
+
     public class DerivedReferrerInvalidAliasNameException : SystemException {
         public DerivedReferrerInvalidAliasNameException(String msg) : base(msg) {
         }
     }
-    
+
     public class DerivedReferrerEntityPropertyNotFoundException : SystemException {
         public DerivedReferrerEntityPropertyNotFoundException(String msg) : base(msg) {
         }

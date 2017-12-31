@@ -46,7 +46,7 @@ public class ${myClassName} : ${glSimpleStringOption} {
         DoLikeAutoEscape();
         return this;
     }
-    
+
     protected virtual void DoLikeAutoEscape() {
         Escape();
     }

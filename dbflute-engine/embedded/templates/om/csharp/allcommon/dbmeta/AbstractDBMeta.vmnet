@@ -95,12 +95,12 @@ namespace ${glPackageBaseCommonDBMeta} {
             uniqueColumnInfoList.add(uniqueColumnInfo);
             return cpui(uniqueColumnInfoList);
         }
-    
+
         protected ${glUniqueInfo} cpui(List<${glColumnInfo}> uniqueColumnInfoList) { // createPrimaryUniqueInfo()
             ${glUniqueInfo} uniqueInfo = new ${glUniqueInfo}(this, uniqueColumnInfoList, true);
             return uniqueInfo;
         }
-    
+
         // ===============================================================================
         //                                                                   Relation Info
         //                                                                   =============
@@ -315,12 +315,12 @@ namespace ${glPackageBaseCommonDBMeta} {
             _entityPropertySetupperMap.put(columnName.ToLower(), setupper);
             _entityPropertySetupperMap.put(propertyName.ToLower(), setupper);
         }
-        
+
         // ===============================================================================
         //                                                                   Assist Helper
         //                                                                   =============
 //        protected abstract void checkDowncast(${glEntity} entity);
-// 
+//
 //        protected String helpGettingColumnStringValue(Object value) {
 //            if (value instanceof java.sql.Timestamp) {
 //                return (value != null ? helpFormatingTimestamp((java.sql.Timestamp)value) : "");

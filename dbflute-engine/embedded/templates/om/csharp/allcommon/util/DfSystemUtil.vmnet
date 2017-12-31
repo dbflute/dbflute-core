@@ -12,11 +12,11 @@ public class ${glDfSystemUtil} {
     public static String getLineSeparator() {
         // /- - - - - - - - - - - - - - - - - - - - - -
         // Because 'CR + LF' caused many trouble!
-		// And Now 'LF' have little trouble. 
-		// 
+        // And Now 'LF' have little trouble.
+        //
         // return Environment.NewLine;
         // - - - - - - - - - -/
-		return "\n";
+        return "\n";
     }
 }
 

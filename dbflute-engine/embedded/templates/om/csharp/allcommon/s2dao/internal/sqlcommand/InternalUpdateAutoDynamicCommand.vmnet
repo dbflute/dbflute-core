@@ -16,8 +16,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         // ===============================================================================
         //                                                                      Definition
         //                                                                      ==========
-	    protected const int NO_UPDATE = 0;
-	
+        protected const int NO_UPDATE = 0;
+
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
@@ -55,7 +55,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
 
             return i;
         }
-		
+
         protected virtual IPropertyType[] CreateTargetPropertyTypes(IBeanMetaData bmd, object bean, string[] propertyNames) {
             IList types = new ArrayList();
             String timestampPropertyName = bmd.TimestampPropertyName;
@@ -70,8 +70,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             types.CopyTo(propertyTypes, 0);
             return propertyTypes;
         }
-		
-        protected virtual ${glInternalAbstractAutoHandler} CreateInternalAutoHandler(IDataSource dataSource, ICommandFactory commandFactory, 
+
+        protected virtual ${glInternalAbstractAutoHandler} CreateInternalAutoHandler(IDataSource dataSource, ICommandFactory commandFactory,
             IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) {
             ${glInternalUpdateAutoHandler} handler = new ${glInternalUpdateAutoHandler}(dataSource, commandFactory, beanMetaData, propertyTypes);
             handler.VersionNoAutoIncrementOnMemory = _versionNoAutoIncrementOnMemory;
@@ -152,7 +152,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             if (value is INullable && ((INullable)value).IsNull) {
                 return false;
             }
-			return true;
+            return true;
         }
 
         protected virtual bool CanExecute(object bean, IBeanMetaData bmd, IPropertyType[] propertyTypes, string[] propertyNames) {
@@ -161,7 +161,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             }
             return true;
         }
-		
+
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
@@ -181,5 +181,5 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
             get { return checkSingleRowUpdate; }
             set { checkSingleRowUpdate = value; }
         }
-	}
+    }
 }

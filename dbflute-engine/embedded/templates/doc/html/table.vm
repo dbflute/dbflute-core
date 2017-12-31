@@ -29,62 +29,62 @@ ${table.aliasExpression}${table.tableDispName}
 #set ($canBeColumnNullObject = $table.canBeColumnNullObject())
 <input type="hidden" value="${table.tableDbName}">
 <table class="tablecontent">
-	<thead>
-	<tr>
-		<th class="rownumhead">No.</th>
-		<th>PK</th>
-		<th>ID</th>
-		<th>UQ</th>
-		<th>IX</th>
-		<th>Not<br />Null</th>
+    <thead>
+    <tr>
+        <th class="rownumhead">No.</th>
+        <th>PK</th>
+        <th>ID</th>
+        <th>UQ</th>
+        <th>IX</th>
+        <th>Not<br />Null</th>
 #if ($isAliasDelimiterInDbCommentValid)
-		<th>Alias</th>
+        <th>Alias</th>
 #end
-		<th>Name</th>
-		<th>Type</th>
-		<th>Size</th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Size</th>
 #if ($hasDefaultValue)
-		<th>Default</th>
+        <th>Default</th>
 #end
-		<th>ForeignTable</th>
-		<th>ReferrerTable</th>
-		<th>Classification</th>
-		<th>ColumnComment</th>
-		<th>PropertyName</th>
-		<th>${table.database.targetLanguageInitCap}Type</th>
+        <th>ForeignTable</th>
+        <th>ReferrerTable</th>
+        <th>Classification</th>
+        <th>ColumnComment</th>
+        <th>PropertyName</th>
+        <th>${table.database.targetLanguageInitCap}Type</th>
 #if ($canBeColumnNullObject)
-		<th>NullObj</th>
+        <th>NullObj</th>
 #end
-	</tr>
-	</thead>
+    </tr>
+    </thead>
 #set ($rownum = 1)
 #foreach ($col in $table.columns)
-	<tr>
-		<td class="rownumcell">${rownum}</td>
-		<td class="flgcell#if ($col.isAdditionalPrimaryKey()) additionalpk#end"${col.primaryKeyTitleForSchemaHtml}>${col.primaryKeyMarkForSchemaHtml}</td>
-		<td class="flgcell">#if ($col.isIdentityOrSequence())o#else &nbsp;#end</td>
-		<td class="flgcell#if ($col.isUniqueAllAdditional()) additionalpk#end"${col.uniqueKeyTitleForSchemaHtml}>${col.uniqueKeyMarkForSchemaHtml}</td>
-		<td class="flgcell"${col.indexTitleForSchemaHtml}>${col.indexMarkForSchemaHtml}</td>
-		<td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>
+    <tr>
+        <td class="rownumcell">${rownum}</td>
+        <td class="flgcell#if ($col.isAdditionalPrimaryKey()) additionalpk#end"${col.primaryKeyTitleForSchemaHtml}>${col.primaryKeyMarkForSchemaHtml}</td>
+        <td class="flgcell">#if ($col.isIdentityOrSequence())o#else &nbsp;#end</td>
+        <td class="flgcell#if ($col.isUniqueAllAdditional()) additionalpk#end"${col.uniqueKeyTitleForSchemaHtml}>${col.uniqueKeyMarkForSchemaHtml}</td>
+        <td class="flgcell"${col.indexTitleForSchemaHtml}>${col.indexMarkForSchemaHtml}</td>
+        <td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>
 #if ($isAliasDelimiterInDbCommentValid)
-		<td class="${col.schemaHtmlColumnAliasCssClass}">${col.alias}</td>
+        <td class="${col.schemaHtmlColumnAliasCssClass}">${col.alias}</td>
 #end
-		<td class="${col.schemaHtmlColumnNameCssClass} columnnamecell" id="${col.columnIdForSchemaHtml}">${col.name}</td>
-		<td class="typecell">${col.dbTypeExpression}</td>
-		<td class="sizecell">#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end</td>
+        <td class="${col.schemaHtmlColumnNameCssClass} columnnamecell" id="${col.columnIdForSchemaHtml}">${col.name}</td>
+        <td class="typecell">${col.dbTypeExpression}</td>
+        <td class="sizecell">#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end</td>
 #if ($hasDefaultValue)
-		<td class="defvalcell">#if ($col.hasDefaultValueExceptAutoIncrement()) ${col.defaultValue}#else &nbsp;#end</td>
+        <td class="defvalcell">#if ($col.hasDefaultValueExceptAutoIncrement()) ${col.defaultValue}#else &nbsp;#end</td>
 #end
-		<td class="relcell">${col.foreignTableNameCommaStringWithHtmlHref}&nbsp;</td>
-		<td class="relcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
-		<td class="relcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}Cls">${col.classificationName}</a>#else &nbsp;#end</td>
-		<td class="commentcell"><pre>#if ($col.hasComment())${col.commentForSchemaHtmlPre}#else&nbsp;#end</pre></td>
-		<td class="subcell">${col.javaBeansRulePropertyName}</td>
-		<td class="subcell">${col.javaNativeRemovedPackage}</td>
+        <td class="relcell">${col.foreignTableNameCommaStringWithHtmlHref}&nbsp;</td>
+        <td class="relcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
+        <td class="relcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}Cls">${col.classificationName}</a>#else &nbsp;#end</td>
+        <td class="commentcell"><pre>#if ($col.hasComment())${col.commentForSchemaHtmlPre}#else&nbsp;#end</pre></td>
+        <td class="subcell">${col.javaBeansRulePropertyName}</td>
+        <td class="subcell">${col.javaNativeRemovedPackage}</td>
 #if ($canBeColumnNullObject)
-		<td class="flgcell">#if ($col.canBeColumnNullObject())o#else &nbsp;#end</td>
+        <td class="flgcell">#if ($col.canBeColumnNullObject())o#else &nbsp;#end</td>
 #end
-	</tr>
+    </tr>
 #set ($rownum = $rownum + 1)
 #end
 </table>

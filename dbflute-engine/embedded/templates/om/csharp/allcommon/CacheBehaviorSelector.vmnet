@@ -49,7 +49,7 @@ namespace ${glPackageBaseCommon} {
                 _log.Info("= = = = = = = = = =/ [" + ${glTraceViewUtil}.ConvertToPerformanceView(before.Value, after) + "]");
             }
         }
-    
+
         // ===============================================================================
         //                                                                  Implementation
         //                                                                  ==============

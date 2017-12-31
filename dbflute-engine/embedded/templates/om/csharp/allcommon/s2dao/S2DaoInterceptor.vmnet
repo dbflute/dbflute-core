@@ -38,17 +38,17 @@ namespace ${glPackageBaseCommonS2Dao} {
         public ${glDaoInterceptor}(IDaoMetaDataFactory daoMetaDataFactory) {
             _daoMetaDataFactory = daoMetaDataFactory;
         }
-		
+
         // ===============================================================================
         //                                                              Execute Status Log
         //                                                              ==================
         protected void Log(String msg) {
             ${glXLog}.Log(msg);
-    	}
-    	
+        }
+
         protected bool IsLogEnabled() {
-    	    return ${glXLog}.IsLogEnabled();
-    	}
+            return ${glXLog}.IsLogEnabled();
+        }
 
         // ===============================================================================
         //                                                                          Invoke
@@ -68,7 +68,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return invocation.Proceed();
             }
             bool logEnabled = IsLogEnabled();
-        
+
             // - - - - - - - - - - - - -
             // Initialize DAO meta data
             // - - - - - - - - - - - - -
@@ -96,7 +96,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (logEnabled) {
                     beforeCmd = DateTime.Now;
                 }
-				cmd = FindSqlCommand(invocation);
+                cmd = FindSqlCommand(invocation);
                 if (logEnabled) {
                     DateTime afterCmd = DateTime.Now;
                     if (!afterCmd.Equals(beforeCmd.Value)) {
@@ -107,7 +107,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (IsLogEnabled()) {
                     LogInvocation(invocation);
                 }
-			}
+            }
 
             ${glSqlResultHandler} sqlResultHandler = GetSqlResultHander();
             bool existsSqlResultHandler = sqlResultHandler != null;
@@ -250,7 +250,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     Log("path: " + outsideSqlContext.OutsideSqlPath);
                 } else {
                     Log("path: " + GetOutsideSqlPath(args));
-				}
+                }
                 Log("option: " + GetOutsideSqlOption(args));
             }
         }
@@ -306,7 +306,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected String BuildSimpleExpressionFromDaoName(String name) {
-    		return InvokeNameStringUtil.removeBasePrefixFromSimpleClassName(name);
+            return InvokeNameStringUtil.removeBasePrefixFromSimpleClassName(name);
         }
 
         protected void LogPath(IMethodInvocation invocation, StackTrace stackTrace, InvokeNameExtractingResult behaviorResult) {
@@ -477,7 +477,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     break; // End
                 }
                 if (method.DeclaringType == null) {
-                    break; // If you use WCF, it may return null. 
+                    break; // If you use WCF, it may return null.
                 }
                 String className = method.DeclaringType.Name; // This is simple class name at CSharp.
                 String methodName = method.Name;
@@ -486,7 +486,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     break;
                 }
                 if (className.StartsWith("System.")) { // This is system package of CSharp.
-                    if (onTarget) { // But the class name is simple so this 'if' statement is waste... 
+                    if (onTarget) { // But the class name is simple so this 'if' statement is waste...
                         break;
                     }
                     continue;
@@ -619,7 +619,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     if (ret == null) {
                         Log(daoResultPrefix + "(null)]");
                     } else {
-					    System.Collections.IList ls = (System.Collections.IList)ret;
+                        System.Collections.IList ls = (System.Collections.IList)ret;
                         if (ls.Count == 0) {
                             Log(daoResultPrefix + "(0)]");
                         } else if (ls.Count == 1) {
@@ -676,11 +676,11 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return;
             }
         }
-	
-    	protected bool IsSpecifiedOutsideSql(IMethodInvocation invocation) {
-    	    return typeof(${glOutsideSqlDao}).IsAssignableFrom(GetComponentDef(invocation).ComponentType);
-    	}
-		
+
+        protected bool IsSpecifiedOutsideSql(IMethodInvocation invocation) {
+            return typeof(${glOutsideSqlDao}).IsAssignableFrom(GetComponentDef(invocation).ComponentType);
+        }
+
         // - - - - - - - - - -
         //              Select
         //               - - -
@@ -704,13 +704,13 @@ namespace ${glPackageBaseCommonS2Dao} {
             outsideSqlContext.ParameterBean = pmb;
             outsideSqlContext.ResultType = resultType;
             outsideSqlContext.MethodName = invocation.Method.Name;
-			outsideSqlContext.StatementConfig = option.StatementConfig;
-			outsideSqlContext.TableDbName = option.TableDbName;
+            outsideSqlContext.StatementConfig = option.StatementConfig;
+            outsideSqlContext.TableDbName = option.TableDbName;
             outsideSqlContext.IsDynamicBinding = option.IsDynamicBinding;
             outsideSqlContext.IsOffsetByCursorForcedly = option.IsAutoPaging;
             outsideSqlContext.IsLimitByCursorForcedly = option.IsAutoPaging;
             outsideSqlContext.IsAutoPagingLogging = autoPagingLogging; // for logging
-			outsideSqlContext.SetupBehaviorQueryPathIfNeeds();
+            outsideSqlContext.SetupBehaviorQueryPathIfNeeds();
             ${glOutsideSqlContext}.SetOutsideSqlContextOnThread(outsideSqlContext);
 
             // Set up fetchNarrowingBean.
@@ -737,8 +737,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             outsideSqlContext.ParameterBean = pmb;
             outsideSqlContext.MethodName = invocation.Method.Name;
             outsideSqlContext.StatementConfig = option.StatementConfig;
-			outsideSqlContext.TableDbName = option.TableDbName;
-			outsideSqlContext.SetupBehaviorQueryPathIfNeeds();
+            outsideSqlContext.TableDbName = option.TableDbName;
+            outsideSqlContext.SetupBehaviorQueryPathIfNeeds();
             ${glOutsideSqlContext}.SetOutsideSqlContextOnThread(outsideSqlContext);
 
             // Set up fetchNarrowingBean.
@@ -748,16 +748,16 @@ namespace ${glPackageBaseCommonS2Dao} {
         // - - - - - - - - - -
         //              Common
         //               - - -
-    	protected String GetOutsideSqlPath(Object[] args) {
+        protected String GetOutsideSqlPath(Object[] args) {
             return (String)args[0];
-    	}
-    	protected Object GetOutsideSqlParameterBean(Object[] args) {
+        }
+        protected Object GetOutsideSqlParameterBean(Object[] args) {
             return args[1];
-    	}
-    	protected ${glOutsideSqlOption} GetOutsideSqlOption(Object[] args) {
+        }
+        protected ${glOutsideSqlOption} GetOutsideSqlOption(Object[] args) {
             return (${glOutsideSqlOption})args[2];
-    	}
-	
+        }
+
         protected void SetupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOption} option) {
             if (pmb == null || !${glFetchNarrowingBeanContext}.IsTheTypeFetchNarrowingBean(pmb.GetType())) {
                 return;
@@ -777,7 +777,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (outsideSqlContext != null) {
                 return null; // Because it has already finished setting up fetchNarrowingBean for outsideSql here.
             }
-			
+
             ${glConditionBean} cb = null;
             {
                 Object[] args = invocation.Arguments;
@@ -877,7 +877,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             return ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
         }
-        
+
         protected bool IsSpecifiedOutsideSql() {
             ${glOutsideSqlContext} outsideSqlContext = GetOutsideSqlContext();
             return outsideSqlContext != null && outsideSqlContext.IsSpecifiedOutsideSql;

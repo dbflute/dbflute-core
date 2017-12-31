@@ -291,7 +291,7 @@ class ${myClassName}(referrerQuery: ConditionQuery, sqlClause: SqlClause, aliasN
 #end
 #end
 #if ($col.isAvailableOrderByAsc())
-    /** 
+    /**
      * Add order-by as ascend. <br>
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @return this. (NotNull)

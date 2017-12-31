@@ -41,7 +41,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
         int rows = handler.Execute(args);
         return rows;
     }
-    
+
     protected ${glConditionBean} extractConditionBeanWithCheck(Object[] args) {
         if (args == null || args.Length == 0) {
             String msg = "The arguments should have one argument! But:";
@@ -56,7 +56,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
         }
         return (${glConditionBean}) fisrtArg;
     }
-    
+
     protected ${glInternalCommandContextHandler} createCommandContextHandler(ICommandContext context) {
         return new ${glInternalCommandContextHandler}(dataSource, commandFactory, context);
     }
@@ -64,7 +64,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
     protected String buildQueryDeleteTwoWaySql(${glConditionBean} cb) {
         return cb.SqlClause.getClauseQueryDelete();
     }
-    
+
     protected ICommandContext createCommandContext(String twoWaySql, String[] argNames, Type[] argTypes, Object[] args) {
         ICommandContext context;
         {
@@ -76,7 +76,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
         }
         return context;
     }
-	
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

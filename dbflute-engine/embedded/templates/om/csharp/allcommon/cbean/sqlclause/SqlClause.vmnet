@@ -56,7 +56,7 @@ public interface ${myClassName} {
     void changeToInnerJoin(String aliasName);
     ${glSqlClause} makeInnerJoinEffective();
     ${glSqlClause} backToOuterJoin();
-    
+
     // ===================================================================================
     //                                                                               Where
     //                                                                               =====
@@ -92,14 +92,14 @@ public interface ${myClassName} {
     ${myClassName} clearOrderBy();
     ${myClassName} ignoreOrderBy();
     ${myClassName} makeOrderByEffective();
-    
+
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (NullAllowed)
      * @param ascOrDesc Is it ascend or descend?
      */
     void registerOrderBy(String orderByProperty, String registeredOrderByProperty, bool ascOrDesc);
-    
+
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (NullAllowed)
@@ -110,7 +110,7 @@ public interface ${myClassName} {
     void addNullsFirstToPreviousOrderBy();
     void addNullsLastToPreviousOrderBy();
     bool hasOrderByClause();
-    
+
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====

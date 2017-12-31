@@ -76,8 +76,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
                     builder.Append("}");
                 }
             }
-            
+
             return builder.ToString();
         }
-	}
+    }
 }

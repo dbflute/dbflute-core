@@ -25,7 +25,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
         int Execute(String path, Object pmb, ${glOutsideSqlOption} option);
 
-		// Not implemented yet!
+        // Not implemented yet!
         // int[] batchExecute(String path, List<Object> pmb, ${glOutsideSqlOption} option);
 
         // [DBFlute-0.8.0]

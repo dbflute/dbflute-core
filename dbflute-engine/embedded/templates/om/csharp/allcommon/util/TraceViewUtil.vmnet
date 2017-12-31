@@ -33,7 +33,7 @@ namespace ${glPackageBaseCommonUtil} {
             }
             return sb.ToString();
         }
-        
+
         public static string ToStringView(object target) {
             if (target == null) {
                 return "null";
@@ -134,6 +134,6 @@ namespace ${glPackageBaseCommonUtil} {
 
             return buf.ToString();
         }
-        
+
     }
 }

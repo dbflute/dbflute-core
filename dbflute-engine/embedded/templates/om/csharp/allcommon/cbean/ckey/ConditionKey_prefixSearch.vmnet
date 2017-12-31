@@ -49,10 +49,10 @@ public class ${myClassName} : ${glConditionKey} {
         conditionValue.PrefixSearch = (value != null ? value + getWildCard() : null);
         conditionValue.setPrefixSearchLocation(location);
     }
-	
+
     protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
         throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }
-	
+
 }

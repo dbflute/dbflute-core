@@ -9,7 +9,7 @@ namespace ${glPackageBaseCommonCBean} {
 
 /**
  * FetchNarrowing-Bean context. (referring to s2pager)
- * 
+ *
  * @author ${database.classAuthor}
  */
     public static class ${glFetchNarrowingBeanContext} {
@@ -19,7 +19,7 @@ namespace ${glPackageBaseCommonCBean} {
 
         /**
          * Get fetch-narrowing-bean context on thread.
-         * 
+         *
          * @return FetchNarrowing-bean. (NullAllowed)
          */
         public static ${glFetchNarrowingBean} GetFetchNarrowingBeanOnThread() {
@@ -28,7 +28,7 @@ namespace ${glPackageBaseCommonCBean} {
 
         /**
          * Set fetch-narrowing-bean context on thread.
-         * 
+         *
          * @param ${glAttachedCBArgsVariableName} FetchNarrowing-bean. (NotNull)
          */
         public static void SetFetchNarrowingBeanOnThread(${glFetchNarrowingBean} ${glAttachedCBArgsVariableName}) {
@@ -48,7 +48,7 @@ namespace ${glPackageBaseCommonCBean} {
 
         /**
          * Is existing fetch-narrowing-bean context on thread?
-         * 
+         *
          * @return The determination, true or false.
          */
         public static bool IsExistFetchNarrowingBeanOnThread() {
@@ -57,7 +57,7 @@ namespace ${glPackageBaseCommonCBean} {
 
         /**
          * Is the argument fetch-narrowing-bean?
-         * 
+         *
          * @param dtoInstance Dto instance.
          * @return The determination, true or false.
          */
@@ -71,7 +71,7 @@ namespace ${glPackageBaseCommonCBean} {
 
         /**
          * Is the type fetch-narrowing-bean?
-         * 
+         *
          * @param dtoClass DtoClass.
          * @return The determination, true or false.
          */

@@ -22,7 +22,7 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     // ===================================================================================
     //                                                                 FetchScope Override
     //                                                                 ===================
-	protected override void doFetchFirst() {
+    protected override void doFetchFirst() {
         doFetchPage();
     }
 
@@ -61,5 +61,5 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
 }
-	
+
 }

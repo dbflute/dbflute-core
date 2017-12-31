@@ -10,5 +10,5 @@ public class ${myClassName} : ${glConditionKey}NotEqual {
         return "<>"; // is SQL standard operand
     }
 }
-	
+
 }

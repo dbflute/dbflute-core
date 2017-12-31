@@ -34,14 +34,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (sqlLogRegistry == null) {
                 return new List<String>();
             }
-	        IList<String> sqlList = new List<String>();
-	        foreach (${glInternalSqlLog} sqlLog in sqlLogRegistry.SqlLogList) {
-	            sqlList.Add(sqlLog.CompleteSql);
-	        }
-	        return sqlList;
-	    }
+            IList<String> sqlList = new List<String>();
+            foreach (${glInternalSqlLog} sqlLog in sqlLogRegistry.SqlLogList) {
+                sqlList.Add(sqlLog.CompleteSql);
+            }
+            return sqlList;
+        }
 
-    	public void ClearSqlCache() {
+        public void ClearSqlCache() {
             ${glInternalSqlLogRegistry} sqlLogRegistry = Find${glInternalSqlLogRegistry}();
             if (sqlLogRegistry == null) {
                 return;
@@ -49,7 +49,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             sqlLogRegistry.Clear();
         }
 
-    	protected ${glInternalSqlLogRegistry} Find${glInternalSqlLogRegistry}() {
+        protected ${glInternalSqlLogRegistry} Find${glInternalSqlLogRegistry}() {
             return ${glInternalSqlLogRegistryLocator}.Instance;
         }
     }

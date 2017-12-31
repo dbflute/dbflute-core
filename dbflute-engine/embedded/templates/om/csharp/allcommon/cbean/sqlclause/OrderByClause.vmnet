@@ -37,30 +37,30 @@ public class ${myClassName} {
         }
     }
 
-	public void addNullsFirstToPreviousOrderByElement(OrderByNullsSetupper filter) {
-	    if (_orderByList.isEmpty()) {
-		    return;
-		}
-		${glOrderByElement} last = _orderByList.get(_orderByList.size() - 1);
-		last.setOrderByNullsSetupper(filter, true);
-	}
-	
-	public void addNullsLastToPreviousOrderByElement(OrderByNullsSetupper filter) {
-	    if (_orderByList.isEmpty()) {
-		    return;
-		}
-		${glOrderByElement} last = _orderByList.get(_orderByList.size() - 1);
-		last.setOrderByNullsSetupper(filter, false);
-	}
+    public void addNullsFirstToPreviousOrderByElement(OrderByNullsSetupper filter) {
+        if (_orderByList.isEmpty()) {
+            return;
+        }
+        ${glOrderByElement} last = _orderByList.get(_orderByList.size() - 1);
+        last.setOrderByNullsSetupper(filter, true);
+    }
+
+    public void addNullsLastToPreviousOrderByElement(OrderByNullsSetupper filter) {
+        if (_orderByList.isEmpty()) {
+            return;
+        }
+        ${glOrderByElement} last = _orderByList.get(_orderByList.size() - 1);
+        last.setOrderByNullsSetupper(filter, false);
+    }
 
     public List<${glOrderByElement}> getOrderByList() {
         return _orderByList;
     }
 
     public String getOrderByClause() {
-	    return getOrderByClause(null);
+        return getOrderByClause(null);
     }
-	
+
     public String getOrderByClause(Map<String, String> selectClauseRealColumnAliasMap) {
         if (_orderByList.isEmpty()) {
             return "";
@@ -70,11 +70,11 @@ public class ${myClassName} {
         for (Iterator<${glOrderByElement}> ite = _orderByList.iterator(); ite.hasNext(); ) {
             ${glOrderByElement} element = ite.next();
             sb.append(delimiter);
-			if (selectClauseRealColumnAliasMap != null) {
-			    sb.append(element.getElementClause(selectClauseRealColumnAliasMap));
-			} else {
-			    sb.append(element.getElementClause());
-			}
+            if (selectClauseRealColumnAliasMap != null) {
+                sb.append(element.getElementClause(selectClauseRealColumnAliasMap));
+            } else {
+                sb.append(element.getElementClause());
+            }
         }
         sb.delete(0, delimiter.Length).insert(0, "order by ");
         return sb.toString();

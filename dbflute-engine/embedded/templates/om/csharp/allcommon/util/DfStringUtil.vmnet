@@ -68,8 +68,8 @@ public class Srl {
     public static String replace(String text, String fromText, String toText) {
         if(text == null || fromText == null || toText == null) {
             return null;
-		}
-		return text.Replace(fromText, toText);
+        }
+        return text.Replace(fromText, toText);
     }
 
     // ===================================================================================
@@ -120,7 +120,7 @@ public class Srl {
      * returns the index of ".bar"
      * </pre>
      * @param str The target string. (NotNull)
-     * @param delimiters The array of delimiters. (NotNull) 
+     * @param delimiters The array of delimiters. (NotNull)
      * @return The information of index. (NullAllowed: if delimiter not found)
      */
     public static IndexOfInfo indexOfFirst(String str, params String[] delimiters) {
@@ -134,7 +134,7 @@ public class Srl {
      * returns the index of "ar/baz..."
      * </pre>
      * @param str The target string. (NotNull)
-     * @param delimiters The array of delimiters. (NotNull) 
+     * @param delimiters The array of delimiters. (NotNull)
      * @return The information of index. (NullAllowed: if delimiter not found)
      */
     public static IndexOfInfo indexOfFirstIgnoreCase(String str, params String[] delimiters) {
@@ -152,7 +152,7 @@ public class Srl {
      * returns the index of ".qux"
      * </pre>
      * @param str The target string. (NotNull)
-     * @param delimiters The array of delimiters. (NotNull) 
+     * @param delimiters The array of delimiters. (NotNull)
      * @return The information of index. (NullAllowed: if delimiter not found)
      */
     public static IndexOfInfo indexOfLast(String str, params String[] delimiters) {
@@ -166,7 +166,7 @@ public class Srl {
      * returns the index of "ux"
      * </pre>
      * @param str The target string. (NotNull)
-     * @param delimiters The array of delimiters. (NotNull) 
+     * @param delimiters The array of delimiters. (NotNull)
      * @return The information of index. (NullAllowed: if delimiter not found)
      */
     public static IndexOfInfo indexOfLastIgnoreCase(String str, params String[] delimiters) {

@@ -22,7 +22,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         //                                                                      ==========
         /** The logger instance for this class. (NotNull) */
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        
+
         // ===============================================================================
         //                                                                    Thread Local
         //                                                                    ============
@@ -98,7 +98,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         protected Type _resultType;
 
         protected String _methodName;
-        
+
         protected ${glStatementConfig} _statementConfig;
 
         protected String _tableDbName;
@@ -122,7 +122,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             sql = ReplaceOutsideSqlBindCharacterOnLineComment(sql);
             return ReplaceOldStypePagingDeterminationForCompatible(sql);
         }
-        
+
         protected String ReplaceOldStypePagingDeterminationForCompatible(String sql) {
             return sql.Replace("/*IF pmb.Paging*/", "/*IF pmb.IsPaging*/");
         }
@@ -153,7 +153,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                     sb.Append(line).Append(lineSeparator);
                     continue;
                 }
-                
+
                 if (_log.IsDebugEnabled) {
                     _log.Debug("...Replacing bind character on line comment: " + lineComment);
                 }
@@ -162,7 +162,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             }
             return sb.ToString();
         }
-    
+
         public String ReadOutsideSql(String sqlFileEncoding, String dbmsSuffix) { // Non Filtered
             String standardPath = _outsideSqlPath.Replace("/", "."); // Replacing is required for CSharp!
             String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
@@ -209,7 +209,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                         return text;
                     }
 
-                    // Re-try after resolving path for the assembly of result type. 
+                    // Re-try after resolving path for the assembly of result type.
                     String resolvedStandardPath = ResolvePathForResultTypeAssembly(standardPath, asm, additionalAssembly);
                     String resolvedDbmsPath = ResolvePathForResultTypeAssembly(dbmsPath, asm, additionalAssembly);
                     text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, resolvedStandardPath, resolvedDbmsPath, additionalAssembly);
@@ -226,7 +226,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             ThrowOutsideSqlNotFoundException(standardPath);
             return null; // Unreachable!
         }
-        
+
         protected String ReadOutsideSql(String sqlFileEncoding, String dbmsSuffix
                                       , String standardPath, String dbmsPath, Assembly asm) {
             if (IsExistResource(dbmsPath, asm)) {
@@ -258,7 +258,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             String asmResultTypeRootName = System.IO.Path.GetFileNameWithoutExtension(asmResultType.Location);
             return path.Replace(asmDbfluteRootName, asmResultTypeRootName);
         }
-  
+
         // ===============================================================================
         //                                                                     Set up Path
         //                                                                     ===========
@@ -461,7 +461,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             get { return _offsetByCursorForcedly; }
             set { this._offsetByCursorForcedly = value; }
         }
-        
+
         public bool IsLimitByCursorForcedly {
             get { return _limitByCursorForcedly; }
             set { this._limitByCursorForcedly = value; }

@@ -110,7 +110,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
             ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
             String finalClause = SetupRealClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList);
-        
+
             ${glInternalBasicSelectHandler} selectHandler = CreateBasicSelectHandler(finalClause, this.dataReaderHandler);
             Object[] bindVariableArray = new Object[bindVariableList.Count];
             bindVariableList.CopyTo(bindVariableArray, 0);
@@ -286,11 +286,11 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             return realClause;
         }
-    
+
         protected ${glInternalBasicSelectHandler} CreateBasicSelectHandler(String realSql, IDataReaderHandler specifiedDataReaderHandler) {
             return new ${glInternalBasicSelectHandler}(DataSource, realSql, specifiedDataReaderHandler, CommandFactory, dataReaderFactory);
         }
-        
+
         // ===============================================================================
         //                                                                   Assist Helper
         //                                                                   =============
@@ -330,7 +330,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected String ReplaceString(String text, String fromText, String toText) {
             return ${glSimpleStringUtil}.Replace(text, fromText, toText);
         }
-        
+
         protected class DataReaderCursol : IDataReaderHandler {
             protected ${glPackageBaseCommonJdbc}.${glCursorHandler} _cursorHandler;
             public DataReaderCursol(${glPackageBaseCommonJdbc}.${glCursorHandler} cursorHandler) {

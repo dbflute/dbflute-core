@@ -54,12 +54,12 @@ public class ${myClassName} : ${glConditionOption} {
         // value = getJapaneseOptionPartsAgent().generateRealValue(value);
         return value;
     }
-	
+
     // =====================================================================================
     //                                                                        General Helper
     //                                                                        ==============
     protected String replaceString(String text, String fromText, String toText) {
-	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
+        return ${glSimpleStringUtil}.Replace(text, fromText, toText);
     }
 }
 

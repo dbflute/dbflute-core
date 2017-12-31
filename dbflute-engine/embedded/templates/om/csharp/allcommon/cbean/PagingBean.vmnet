@@ -26,7 +26,7 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                  Paging Setting
         //                                                                  ==============
-		void Paging(int pageSize, int pageNumber);
+        void Paging(int pageSize, int pageNumber);
         void XSetPaging(bool paging); // Very Internal!
 
         void DisablePagingReSelect();

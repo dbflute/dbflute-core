@@ -34,7 +34,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         public ${glInternalAbstractAutoHandler}(IDataSource dataSource, ICommandFactory commandFactory,
             IBeanMetaData beanMetaData, IPropertyType[] propertyTypes) : base(dataSource, null, commandFactory) {
             // The property of Sql is treated as lazy setting at this class!
-            DataSource = dataSource;// This is for this new method! 
+            DataSource = dataSource;// This is for this new method!
             _beanMetaData = beanMetaData;
             _propertyTypes = propertyTypes;
         }

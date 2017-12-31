@@ -25,7 +25,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         public ${glInternalUpdateAutoHandler}(IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, IPropertyType[] propertyTypes)
             : base(dataSource, commandFactory, beanMetaData, propertyTypes) {
         }
-		
+
         // ===============================================================================
         //                                                                        Override
         //                                                                        ========
@@ -45,7 +45,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         protected virtual ${glEntityAlreadyUpdatedException} CreateEntityAlreadyUpdatedException(Object bean, int rows) {
             return new ${glEntityAlreadyUpdatedException}(bean, rows);
         }
-        
+
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========

@@ -16,7 +16,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         //                                                                      Definition
         //                                                                      ==========
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-		
+
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
@@ -121,6 +121,6 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlCommand} {
         {
             get { return _propertyNames; }
         }
-		
-	}
+
+    }
 }

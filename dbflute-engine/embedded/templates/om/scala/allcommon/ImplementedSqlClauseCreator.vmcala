@@ -30,22 +30,22 @@ class ${glImplementedSqlClauseCreator} extends SqlClauseCreator {
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
-	/**
-	 * Create SQL clause. {for condition-bean}
-	 * @param cb Condition-bean. (NotNull) 
-	 * @return SQL clause. (NotNull)
-	 */
+    /**
+     * Create SQL clause. {for condition-bean}
+     * @param cb Condition-bean. (NotNull)
+     * @return SQL clause. (NotNull)
+     */
     def createSqlClause(cb: ConditionBean): SqlClause = {
         val tableDbName: String = cb.getTableDbName();
-		val sqlClause: SqlClause = createSqlClause(tableDbName);
+        val sqlClause: SqlClause = createSqlClause(tableDbName);
         return sqlClause;
     }
 
-	/**
-	 * Create SQL clause.
-	 * @param tableDbName The DB name of table. (NotNull) 
-	 * @return SQL clause. (NotNull)
-	 */
+    /**
+     * Create SQL clause.
+     * @param tableDbName The DB name of table. (NotNull)
+     * @return SQL clause. (NotNull)
+     */
     def createSqlClause(tableDbName: String): SqlClause = {
         val sqlClause: SqlClause = doCreateSqlClause(tableDbName);
         setupSqlClauseOption(sqlClause);
@@ -182,30 +182,30 @@ class ${glImplementedSqlClauseCreator} extends SqlClauseCreator {
     //                                                                       Determination
     //                                                                       =============
     protected def isCurrentDBDef(currentDBDef: DBDef): Boolean = {
-	    return ${glDBCurrent}.isCurrentDBDef(currentDBDef);
+        return ${glDBCurrent}.isCurrentDBDef(currentDBDef);
     }
 
     protected def isInnerJoinAutoDetect(): Boolean = {
-	    return ${glDBFluteConfig}.isInnerJoinAutoDetect();
+        return ${glDBFluteConfig}.isInnerJoinAutoDetect();
     }
 
     protected def isThatsBadTimingDetect(): Boolean = {
-	    return ${glDBFluteConfig}.isThatsBadTimingDetect();
+        return ${glDBFluteConfig}.isThatsBadTimingDetect();
     }
 
     protected def isNullOrEmptyQueryAllowed(): Boolean = {
-	    return ${glDBFluteConfig}.isNullOrEmptyQueryAllowed();
+        return ${glDBFluteConfig}.isNullOrEmptyQueryAllowed();
     }
 
     protected def isEmptyStringQueryAllowed(): Boolean = {
-	    return ${glDBFluteConfig}.isEmptyStringQueryAllowed();
+        return ${glDBFluteConfig}.isEmptyStringQueryAllowed();
     }
 
     protected def isOverridingQueryAllowed(): Boolean = {
-	    return ${glDBFluteConfig}.isOverridingQueryAllowed();
+        return ${glDBFluteConfig}.isOverridingQueryAllowed();
     }
 
     protected def isDisableSelectIndex(): Boolean = {
-	    return ${glDBFluteConfig}.isDisableSelectIndex();
+        return ${glDBFluteConfig}.isDisableSelectIndex();
     }
 }

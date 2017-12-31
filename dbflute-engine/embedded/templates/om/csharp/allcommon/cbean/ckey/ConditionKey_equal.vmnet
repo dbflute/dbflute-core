@@ -40,7 +40,7 @@ public class ${myClassName} : ${glConditionKey} {
         Object valueObject = value.Equal;
         conditionList.add(buildBindClause(columnName, value.getEqualLocation()));
     }
-	
+
     protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValue} value, ${glConditionOption} option) {
         throw new UnsupportedOperationException("doAddWhereClause with condition-option is unsupported!!!");
     }
@@ -49,10 +49,10 @@ public class ${myClassName} : ${glConditionKey} {
         conditionValue.Equal = value;
         conditionValue.setEqualLocation(location);
     }
-	
+
     protected override void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option) {
         throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }
-	
+
 }

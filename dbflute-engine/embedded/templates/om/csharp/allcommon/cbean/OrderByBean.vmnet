@@ -18,30 +18,30 @@ namespace ${glPackageBaseCommonCBean} {
 
         /**
          * Clear order-by.
-         * 
+         *
          * @return this. (NotNull)
          */
         ${glOrderByBean} ClearOrderBy();
 
-	    /**
-	     * Ignore order-by.
-	     * 
-	     * @return this. (NotNull)
-	     */
+        /**
+         * Ignore order-by.
+         *
+         * @return this. (NotNull)
+         */
         ${glOrderByBean} IgnoreOrderBy();
 
-	    /**
-	     * Make order-by effective.
-	     * 
-	     * @return this. (NotNull)
-	     */
+        /**
+         * Make order-by effective.
+         *
+         * @return this. (NotNull)
+         */
         ${glOrderByBean} MakeOrderByEffective();
 
-	    /**
-	     * Get order-by clause.
-	     * 
-	     * @return Order-by clause. (NotNull)
-	     */
-	    String OrderByClause { get; }
+        /**
+         * Get order-by clause.
+         *
+         * @return Order-by clause. (NotNull)
+         */
+        String OrderByClause { get; }
     }
 }

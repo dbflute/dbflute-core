@@ -315,7 +315,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         if (isSelectClauseTypeCountOrScalar() && !hasUnionQuery()) {
             return buildSelectClauseCountOrScalar(getBasePointAliasName());
         }
-        // /- - - - - - - - - - - - - - - - - - - - - - - - 
+        // /- - - - - - - - - - - - - - - - - - - - - - - -
         // The type of select clause is COLUMNS since here.
         // - - - - - - - - - -/
         StringBuilder sb = new StringBuilder();
@@ -339,7 +339,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         foreach (${glColumnInfo} columnInfo in columnInfoList) {
             String columnDbName = columnInfo.ColumnDbName;
             String columnSqlName = columnInfo.ColumnSqlName;
-            
+
             // [DBFlute-0.7.4]
             if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnDbName)) {
                 if (isSelectClauseTypeCountOrScalar() && hasUnionQuery()) {
@@ -376,7 +376,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             sb.append(realColumnName).append(" as ").append(onQueryName);
             _selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
         }
-        
+
         // Columns of foreign tables.
         Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
         foreach (String tableAliasName in tableAliasNameSet) {
@@ -418,7 +418,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             foreach (String deriveSubQuery in deriveSubQuerySet) {
                 sb.append(ln()).append("     ");
                 sb.append(", ").append(deriveSubQuery);
-                
+
                 // [DBFlute-0.8.3]
                 int beginIndex = deriveSubQuery.LastIndexOf(" as ");
                 if (beginIndex >= 0) { // basically true
@@ -753,7 +753,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                                            , String localRelationPath) {
         _selectedSelectColumnMap.put(foreignTableAliasName, createSelectedSelectColumnInfo(foreignTableAliasName, localTableName, foreignPropertyName, localRelationPath));
     }
-    
+
     protected Map<String, SelectedSelectColumnInfo> createSelectedSelectColumnInfo(String foreignTableAliasName
                                                                                  , String localTableName
                                                                                  , String foreignPropertyName
@@ -1535,25 +1535,25 @@ public abstract class ${myClassName} : ${glSqlClause} {
             throw new RuntimeException(msg, e);
         }
     }
-    
+
     public virtual void addNullsFirstToPreviousOrderBy() {
         _orderByClause.addNullsFirstToPreviousOrderByElement(createOrderByNullsSetupper());
     }
-    
+
     public virtual void addNullsLastToPreviousOrderBy() {
         _orderByClause.addNullsLastToPreviousOrderByElement(createOrderByNullsSetupper());
     }
-    
+
     protected virtual OrderByNullsSetupper createOrderByNullsSetupper() {// As Default
         return new OrderByNullsSetupperBySupported();
     }
-    
+
     protected class OrderByNullsSetupperBySupported : OrderByNullsSetupper {
         public String setup(String columnName, String orderByElementClause, bool nullsFirst) {
             return orderByElementClause + " nulls " + (nullsFirst ? "first" : "last");
         }
     }
-    
+
     protected virtual OrderByNullsSetupper createOrderByNullsSetupperByCaseWhen() {// Helper For Nulls Unsupported Database
         return new OrderByNullsSetupperByCaseWhen();
     }
@@ -1584,7 +1584,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     protected void addUnionQueryInfo(UnionQueryInfo unionQueryInfo) {
         if (_unionQueryInfoList == null) {
-            _unionQueryInfoList = new ArrayList<UnionQueryInfo>(); 
+            _unionQueryInfoList = new ArrayList<UnionQueryInfo>();
         }
         _unionQueryInfoList.add(unionQueryInfo);
     }
@@ -1801,7 +1801,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         return this;
     }
-    
+
     public virtual bool isFetchStartIndexSupported() {
         return true; // Default
     }
@@ -1834,7 +1834,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                                                                Lock
     //                                                                                ====
     public abstract ${glSqlClause} lockForUpdate();
-    
+
     // ===================================================================================
     //                                                                    Table Alias Info
     //                                                                    ================
@@ -1862,23 +1862,23 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public String getWhereClauseMark() {
         return "#df:whereClause#";
     }
-    
+
     public String getWhereFirstConditionMark() {
         return "#df:whereFirstCondition#";
     }
-    
+
     public String getUnionSelectClauseMark() {
         return "#df:unionSelectClause#";
     }
-    
+
     public String getUnionWhereClauseMark() {
         return "#df:unionWhereClause#";
     }
-    
+
     public String getUnionWhereFirstConditionMark() {
         return "#df:unionWhereFirstCondition#";
     }
-    
+
 //    // =====================================================================================
 //    //                                                            Where Clause Simple Filter
 //    //                                                            ==========================
@@ -1903,7 +1903,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
 //        }
 //        return clauseElement;
 //    }
-    
+
     // =====================================================================================
     //                                                                 Selected Foreign Info
     //                                                                 =====================
@@ -1946,7 +1946,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected String getSubQueryEndMarkPrefix() {
         return "--df:SubQueryEnd#";
     }
-    
+
     protected String getSubQueryIdentityTerminal() {
         return "#IdentityTerminal#";
     }
@@ -2016,7 +2016,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             }
         }
         String filteredSql = mainSb.toString();
-        
+
         if (throughBegin) {
             String msg = "End Mark Not Found!";
             msg = msg + ln() + "[Current SubQueryIdentity]" + ln();
@@ -2037,7 +2037,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         return filteredSql;
     }
-    
+
     protected String buildSpaceBar(int size) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < size; i++) {
@@ -2161,7 +2161,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         int index = 0;
         // It is guaranteed that the map has one or more elements.
         foreach (String columnName in columnParameterMap.keySet()) {
-            String parameter = columnParameterMap.get(columnName); 
+            String parameter = columnParameterMap.get(columnName);
             if (index == 0) {
                 sb.append("   set ").append(columnName).append(" = ").append(parameter).append(ln());
             } else {
@@ -2204,12 +2204,12 @@ public abstract class ${myClassName} : ${glSqlClause} {
         String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
         String selectClause = "select " + aliasName + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
-        
+
         // Replace template marks. These are very important!
         fromWhereClause = replaceString(fromWhereClause, getUnionSelectClauseMark(), selectClause);
         fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
         fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
-        
+
         if (isUpdateSubQueryUseLocalTableSupported()) {
             String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
             StringBuilder sb = new StringBuilder();
@@ -2276,7 +2276,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     protected ${glDBMeta} findDBMeta(String tableDbName) {
-        return ${glDBMetaInstanceHandler}.FindDBMeta(tableDbName); 
+        return ${glDBMetaInstanceHandler}.FindDBMeta(tableDbName);
     }
 
     // ===================================================================================
@@ -2293,7 +2293,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected String toStringView(Object obj) {
         return ${glTraceViewUtil}.ToStringView(obj);
     }
-    
+
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------
@@ -2307,7 +2307,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         ${glSimpleAssertUtil}.AssertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
-    
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============

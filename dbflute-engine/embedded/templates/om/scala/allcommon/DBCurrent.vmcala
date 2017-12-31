@@ -45,13 +45,13 @@ object ${glDBCurrent} {
     //                                                                       Current DBDef
     //                                                                       =============
     def initializeCurrentDBDef(currentDBDef: DBDef): Unit = {
-	    if (_log.isInfoEnabled()) {
-		    _log.info("...Setting currentDBDef: " + currentDBDef);
-		}
-		if (currentDBDef == null) {
-		    val msg: String = "The argument 'currentDBDef' should not be null!";
-		    throw new IllegalArgumentException(msg);
-		}
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting currentDBDef: " + currentDBDef);
+        }
+        if (currentDBDef == null) {
+            val msg: String = "The argument 'currentDBDef' should not be null!";
+            throw new IllegalArgumentException(msg);
+        }
         _currentDBDef = currentDBDef;
     }
 
@@ -60,6 +60,6 @@ object ${glDBCurrent} {
     }
 
     def isCurrentDBDef(currentDBDef: DBDef): Boolean = {
-	    return _currentDBDef.equals(currentDBDef);
+        return _currentDBDef.equals(currentDBDef);
     }
 }
