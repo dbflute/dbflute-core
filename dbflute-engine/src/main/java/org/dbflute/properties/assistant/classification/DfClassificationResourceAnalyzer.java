@@ -122,9 +122,9 @@ public class DfClassificationResourceAnalyzer {
             final List<DfClassificationTop> classificationTopList = analyze(lineList);
             if (!classificationTopList.isEmpty()) {
                 for (DfClassificationTop top : classificationTopList) {
-                    _log.info("    " + top.getClassificationName() + ", " + top.getTopCommentDisp() + ", "
-                            + top.isCheckClassificationCode() + ", " + top.getUndefinedHandlingType() + ", " + top.isCheckImplicitSet()
-                            + ", " + top.isCheckSelectedClassification() + ", " + top.isForceClassificationSetting());
+                    _log.info("    " + top.getClassificationName() + ", " + top.getTopCommentDisp() + ", " + top.isCheckClassificationCode()
+                            + ", " + top.getUndefinedHandlingType() + ", " + top.isCheckImplicitSet() + ", "
+                            + top.isCheckSelectedClassification() + ", " + top.isForceClassificationSetting());
                 }
             } else {
                 _log.info(" -> no classification in resource file");
@@ -405,6 +405,11 @@ public class DfClassificationResourceAnalyzer {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(topComment)) {
             classificationTop.setTopComment(topComment);
         }
+        setupClassificationTopOption(classificationTop);
+        return classificationTop;
+    }
+
+    protected void setupClassificationTopOption(DfClassificationTop classificationTop) {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         classificationTop.setCheckClassificationCode(prop.isPlainCheckClassificationCode());
         classificationTop.setUndefinedHandlingType(prop.getClassificationUndefinedHandlingType());
@@ -412,7 +417,6 @@ public class DfClassificationResourceAnalyzer {
         //classificationTop.setCheckImplicitSet(false);
         classificationTop.setCheckSelectedClassification(prop.isCheckSelectedClassification());
         classificationTop.setForceClassificationSetting(prop.isForceClassificationSetting());
-        return classificationTop;
     }
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {

@@ -20,9 +20,6 @@ import static org.dbflute.properties.assistant.classification.DfClassificationRe
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dbflute.properties.assistant.classification.DfClassificationElement;
-import org.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer;
-import org.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.dbflute.unit.EngineTestCase;
 
 /**
@@ -31,9 +28,15 @@ import org.dbflute.unit.EngineTestCase;
  */
 public class DfClassificationResourceAnalyzerTest extends EngineTestCase {
 
-    public void test_analuze_by_lineList() {
+    public void test_analyze_by_lineList() {
         // ## Arrange ##
-        final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
+        final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer() {
+            @Override
+            protected void setupClassificationTopOption(DfClassificationTop classificationTop) {
+                // because of little adjustment properties
+                //super.setupClassificationTopOption(classificationTop);
+            }
+        };
         final List<String> lineList = new ArrayList<String>();
         lineList.add("<encoding=\"UTF-8\"/>");
         lineList.add("AAAAAAAAAAAA");

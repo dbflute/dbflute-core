@@ -268,7 +268,7 @@ public class DfTableXlsReaderTest extends EngineTestCase {
 
         public DfTableXlsReaderEmpty(Map<String, String> tableNameMap, Map<String, List<String>> notTrimTableColumnMap,
                 Map<String, List<String>> stringEmptyTableColumnMap, Pattern skipSheetPattern) {
-            super(null, tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap, skipSheetPattern, false);
+            super(new File("/tmp/dummy.xls"), tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap, skipSheetPattern, false);
         }
 
         @Override
