@@ -136,8 +136,8 @@ public class DfDocumentSelector {
     }
 
     // ===================================================================================
-    //                                                                      Schema History
-    //                                                                      ==============
+    //                                                              Schema History Request
+    //                                                              ======================
     public void loadSchemaHistoryAsCore() { // for HistoryHtml
         final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsCore();
         doLoadSchemaHistory(schemaHistory);
@@ -173,8 +173,8 @@ public class DfDocumentSelector {
     }
 
     // ===================================================================================
-    //                                                                  Properties Request
-    //                                                                  ==================
+    //                                                             Properties HTML Request
+    //                                                             =======================
     /**
      * Load requests for properties HTML. <br>
      * If no property, do nothing.
@@ -193,28 +193,15 @@ public class DfDocumentSelector {
     }
 
     // ===================================================================================
-    //                                                                   LastsaDoc Request
-    //                                                                   =================
+    //                                                                    LastaDoc Request
+    //                                                                    ================
     public boolean existsLastaDocHtml() {
         return !getLastaDocHtmlNameList().isEmpty();
     }
 
-    public List<String> getLastaDocHtmlNameList() {
-        if (cachedLastaDocNameList != null) {
-            return cachedLastaDocNameList;
-        }
-        final String[] docList = new File(getLastaDocOutputDirectory()).list(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.startsWith("lastadoc-") && name.endsWith(".html");
-            }
-        });
-        cachedLastaDocNameList = docList != null ? Arrays.asList(docList) : DfCollectionUtil.emptyList();
-        return cachedLastaDocNameList;
-    }
-
     // ===================================================================================
-    //                                                                           File Name
-    //                                                                           =========
+    //                                                                         File System
+    //                                                                         ===========
     public String getSchemaHtmlFileName() {
         final String projectName = getProjectName();
         return getDocumentProperties().getSchemaHtmlFileName(projectName);
@@ -236,6 +223,19 @@ public class DfDocumentSelector {
     public String getPropertiesHtmlFileName() {
         final String projectName = getProjectName();
         return getDocumentProperties().getPropertiesHtmlFileName(projectName);
+    }
+
+    public List<String> getLastaDocHtmlNameList() {
+        if (cachedLastaDocNameList != null) {
+            return cachedLastaDocNameList;
+        }
+        final String[] docList = new File(getLastaDocOutputDirectory()).list(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.startsWith("lastadoc-") && name.endsWith(".html");
+            }
+        });
+        cachedLastaDocNameList = docList != null ? Arrays.asList(docList) : DfCollectionUtil.emptyList();
+        return cachedLastaDocNameList;
     }
 
     // ===================================================================================
