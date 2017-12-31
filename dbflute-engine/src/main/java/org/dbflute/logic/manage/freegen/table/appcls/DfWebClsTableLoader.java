@@ -43,22 +43,10 @@ import org.dbflute.properties.assistant.classification.DfRefClsElement;
 import org.dbflute.util.Srl;
 
 /**
- * basically use AppCls, this is the sub function.
+ * basically use WebCls, this is the sub function.
  * @author jflute
  */
 public class DfWebClsTableLoader implements DfFreeGenTableLoader {
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected final boolean docProcess;
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public DfWebClsTableLoader(boolean docProcess) {
-        this.docProcess = docProcess;
-    }
 
     // ===================================================================================
     //                                                                          Load Table
@@ -69,17 +57,16 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
     //     ; resourceFile = ../../../dockside_webcls.properties
     // }
     // ; outputMap = map:{
-    //     ; templateFile = LaWebCDef.vm
+    //     ; templateFile = LaAppCDef.vm
     //     ; outputDirectory = $$baseDir$$/java
     //     ; package = org.dbflute...
     //     ; className = unused
     // }
-    // ; tableMap = map:{
+    // ; optionMap = map:{
     // }
+    @Override
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> optionMap = mapProp.getOptionMap();
-        final String resourceFile =
-                this.docProcess ? (String) mapProp.getOptionMap().get("webclsResourceFile") : resource.getResourceFile();
+        final String resourceFile = resource.getResourceFile();
         final Map<String, Object> webclsMap;
         try {
             webclsMap = new MapListFile().readMap(new FileInputStream(resourceFile));
@@ -125,13 +112,16 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
                 hasRefCls = true;
             }
         }
+        final Map<String, Object> optionMap = mapProp.getOptionMap();
+        final String clsTheme = "webcls";
+        optionMap.put("clsTheme", clsTheme);
         optionMap.put("classificationTopList", topList);
         optionMap.put("classificationNameList", topList.stream().map(top -> {
             return top.getClassificationName();
         }).collect(Collectors.toList()));
         optionMap.put("hasRefCls", hasRefCls);
         optionMap.put("allcommonPackage", getBasicProperties().getBaseCommonPackage());
-        return DfFreeGenMetaData.asOnlyOne(optionMap, "webcls", Collections.emptyList());
+        return DfFreeGenMetaData.asOnlyOne(optionMap, clsTheme, Collections.emptyList());
     }
 
     protected boolean isElementMapClassificationTop(Map<String, Object> elementMap) {

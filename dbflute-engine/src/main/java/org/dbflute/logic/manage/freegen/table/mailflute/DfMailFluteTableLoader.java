@@ -106,13 +106,14 @@ public class DfMailFluteTableLoader implements DfFreeGenTableLoader {
     //     ; package = org.dbflute...
     //     ; className = unused
     // }
-    // ; tableMap = map:{
+    // ; optionMap = map:{
     //     ; targetDir = $$baseDir$$/resources/mail
     //     ; targetExt = .dfmail
     //     ; targetKeyword =
     //     ; exceptPathList = list:{ contain:/mail/common/ }
     //     ; isConventionSuffix = false
     // }
+    @Override
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> tableMap = mapProp.getOptionMap();
         final String targetDir = resource.resolveBaseDir((String) tableMap.get(deriveTableMapKey("targetDir")));

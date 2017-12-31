@@ -103,7 +103,7 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
     //     ; package = org.dbflute...
     //     ; className = unused
     // }
-    // ; tableMap = map:{
+    // ; optionMap = map:{
     //     ; targetDir = $$baseDir$$/resources
     //     ; targetExt = .dfpm
     //     ; targetKeyword =
@@ -111,6 +111,7 @@ public class DfPmFileTableLoader implements DfFreeGenTableLoader {
     //     ; targetSuffix = Bean
     //     ; isConventionSuffix = false
     // }
+    @Override
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
         final Map<String, Object> tableMap = mapProp.getOptionMap();
         final String targetDir = resource.resolveBaseDir((String) tableMap.get(deriveTableMapKey("targetDir")));
