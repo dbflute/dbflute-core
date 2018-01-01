@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -22,9 +22,7 @@ ${table.aliasExpression}${table.tableDispName}
 &nbsp;<span class="bqpcount"><a href="${database.sharp}${table.tableIdForSchemaHtml}_sql">(outsideSql=${table.behaviorQueryPathList.size()})</a></span>
 #end
 </h2>
-#if ($table.hasComment())
-<p class="tablecomment">${table.commentForSchemaHtml}</p>
-#end
+<div class="tablecomment ${table.tableDbName}_comment" data-name="${table.tableDbName}"><pre>${table.commentForSchemaHtmlPre}</pre></div>
 #set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
 #set ($hasDefaultValue = $table.hasDefaultValueExceptAutoIncrement())
 #set ($hasColumnComment = $table.hasColumnComment())

@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-#if ($table.tableMap.jobDocMetaList && $table.tableMap.jobDocMetaList.size() > 0)
+#if ($jobDocMetaList && $jobDocMetaList.size() > 0)
 <h2 id="lastadoc_job">job</h2>
 <table>
     <thead>
@@ -38,7 +38,7 @@
     </tr>
     </thead>
     <tbody id="job-list-body">
-#foreach ($jobDocMeta in $table.tableMap.jobDocMetaList)
+#foreach ($jobDocMeta in $jobDocMetaList)
     <tr>
         <td class="rowcellnum">${foreach.count}</td>
         <td class="rowcell">$!manager.htmlEscape($jobDocMeta.cronExp)</td>
@@ -59,7 +59,7 @@
     </tbody>
 </table>
 
-#foreach ($jobDocMeta in $table.tableMap.jobDocMetaList)
+#foreach ($jobDocMeta in $jobDocMetaList)
 <h3 id="$manager.htmlEscape($jobDocMeta.jobKey)">
 $manager.htmlEscape($jobDocMeta.jobKey)
 </h3>

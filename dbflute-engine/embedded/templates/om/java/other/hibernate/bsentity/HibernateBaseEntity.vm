@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -52,28 +52,28 @@ import ${myExtendedEntityPackageName}.${referrerEntityClassName};
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
- * 
+ *
  * [column]
  *     ${table.columnNameCommaString}
- * 
+ *
  * [sequence]
  *     ${table.definedSequenceName}
- * 
+ *
  * [identity]
  *     ${table.identityColumnName}
- * 
+ *
  * [version-no]
  *     ${table.versionNoColumnName}
- * 
+ *
  * [foreign-table]
  *     ${table.foreignTableNameCommaString}
- * 
+ *
  * [referrer-table]
  *     ${table.referrerTableNameCommaString}
- * 
+ *
  * [foreign-property]
  *     ${table.foreignPropertyNameCommaString}
- * 
+ *
  * [referrer-property]
  *     ${table.referrerPropertyNameCommaString}
  * </pre>
@@ -111,7 +111,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #end
     @Column(name="${col.name}")
     protected ${col.javaNative} ${col.uncapitalisedJavaName};
-    
+
 #end
 #end
 #if ($table.hasAllCommonColumn())
@@ -370,7 +370,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     public void disableCommonColumnAutoSetup() {
         _canCommonColumnAutoSetup = false;
     }
-    
+
     /**
      * Can the entity set up common column by auto?
      * @return The determination, true or false.

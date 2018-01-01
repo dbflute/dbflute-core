@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ public enum DfFreeGenResourceType {
         tableLoaderMap.put(DfFreeGenResourceType.MAIL_FLUTE, new DfMailFluteTableLoader(false));
         tableLoaderMap.put(DfFreeGenResourceType.PM_FILE, new DfPmFileTableLoader(false));
         tableLoaderMap.put(DfFreeGenResourceType.LASTA_DOC, new DfLastaDocTableLoader());
-        tableLoaderMap.put(DfFreeGenResourceType.APP_CLS, new DfAppClsTableLoader(false));
-        tableLoaderMap.put(DfFreeGenResourceType.WEB_CLS, new DfWebClsTableLoader(false));
+        tableLoaderMap.put(DfFreeGenResourceType.APP_CLS, new DfAppClsTableLoader());
+        tableLoaderMap.put(DfFreeGenResourceType.WEB_CLS, new DfWebClsTableLoader());
     }
 }

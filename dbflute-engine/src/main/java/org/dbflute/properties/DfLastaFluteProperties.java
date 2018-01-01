@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9,16 +9,20 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
 package org.dbflute.properties;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.dbflute.exception.DfIllegalPropertySettingException;
 import org.dbflute.logic.generate.language.DfLanguageDependency;
@@ -35,6 +39,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
 
+    private static final String LASTADOC_HTML_PREFIX = "lastadoc-";
+    private static final String LASTADOC_HTML_SUFFIX = ".html";
     private static final Logger _log = LoggerFactory.getLogger(DfLastaFluteProperties.class);
 
     // ===================================================================================
@@ -214,6 +220,31 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
         return getDocumentProperties().getDocumentOutputDirectory();
     }
 
+    public List<String> getLastaDocHtmlNameList() {
+        return findExistingLastaDocHtmlNameList(getLastaDocOutputDirectory());
+    }
+
+    public List<String> getLastaDocHtmlPathList() {
+        final String outputDir = getLastaDocOutputDirectory();
+        final List<String> htmlNameList = findExistingLastaDocHtmlNameList(outputDir);
+        return htmlNameList.stream().map(name -> outputDir + "/" + name).collect(Collectors.toList());
+    }
+
+    public String buildLastaDocHtmlPath(String appName) {
+        return getLastaDocOutputDirectory() + "/" + buildLastaDocHtmlName(appName);
+    }
+
+    public String buildLastaDocHtmlName(String appName) {
+        return LASTADOC_HTML_PREFIX + appName + LASTADOC_HTML_SUFFIX;
+    }
+
+    protected List<String> findExistingLastaDocHtmlNameList(String outputDir) {
+        final String[] docList = new File(outputDir).list((dir, name) -> {
+            return name.startsWith(LASTADOC_HTML_PREFIX) && name.endsWith(LASTADOC_HTML_SUFFIX);
+        });
+        return docList != null ? Arrays.asList(docList) : Collections.emptyList();
+    }
+
     public boolean isSuppressLastaDocSchemaHtmlLink() {
         return isProperty("isSuppressLastaDocSchemaHtmlLink", false, getLastafluteMap());
     }
@@ -224,6 +255,14 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
 
     public boolean isLastaDocGradleGeared() {
         return isProperty("isLastaDocGradleGeared", false, getLastafluteMap());
+    }
+
+    public String getLastaDocHtmlMarkFreeGenDocNaviLink() {
+        return "<!-- df:markFreeGenDocNaviLink -->";
+    }
+
+    public String getLastaDocHtmlMarkFreeGenDocBody() {
+        return "<!-- df:markFreeGenDocBody -->";
     }
 
     // ===================================================================================

@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -158,7 +158,7 @@ public class ${glDBFluteConfig} {
 
         if (isCurrentDBDef(DBDef.Oracle)) {
             // date formatting has two points:
-            //   o the DATE type of Oracle has seconds  
+            //   o the DATE type of Oracle has seconds
             //   o it uses a date literal of Oracle
 #if ($database.needsDateTreatedAsLocalDateTime())
             _logDatePattern = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
@@ -826,7 +826,7 @@ public class ${glDBFluteConfig} {
         if (_log.isInfoEnabled()) {
             _log.info("...Using fullTextSearchOperand: Default");
         }
-        _fullTextSearchOperand = org.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.FULL_TEXT_SEARCH; 
+        _fullTextSearchOperand = org.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.FULL_TEXT_SEARCH;
     }
 
     public void useOldFullTextSearchOperand() {
@@ -834,7 +834,7 @@ public class ${glDBFluteConfig} {
         if (_log.isInfoEnabled()) {
             _log.info("...Using fullTextSearchOperand: Old");
         }
-        _fullTextSearchOperand = org.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.OLD_FULL_TEXT_SEARCH; 
+        _fullTextSearchOperand = org.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.OLD_FULL_TEXT_SEARCH;
     }
 #end
 #end
@@ -859,7 +859,7 @@ public class ${glDBFluteConfig} {
     //                                                                          ==========
     /**
      * Register the basic value type. <br>
-     * This setting is shared per DBMS in the same class loader. 
+     * This setting is shared per DBMS in the same class loader.
      * @param keyType The type as key. (NotNull)
      * @param valueType The basic value type. (NotNull)
      */

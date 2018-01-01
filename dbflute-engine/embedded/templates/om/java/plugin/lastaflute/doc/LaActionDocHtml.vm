@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
+#if ($actionDocMetaList && $actionDocMetaList.size() > 0)
 <h2 id="lastadoc_action">action</h2>
-#if ($table.tableMap.actionDocMetaList)
 <table>
     <thead>
     <tr>
@@ -33,7 +33,7 @@
     </tr>
     </thead>
     <tbody id="action-list-body">
-#foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
+#foreach ($actionDocMeta in $actionDocMetaList)
     <tr>
         <td class="rowcellnum">${foreach.count}</td>
         <td class="rowcell"><a href="#$manager.htmlEscapeAsId($actionDocMeta.url)::$manager.htmlEscapeAsId($actionDocMeta.methodName)">$manager.htmlEscape($actionDocMeta.url)</a></td>
@@ -57,7 +57,7 @@
     </tbody>
 </table>
 
-#foreach ($actionDocMeta in $table.tableMap.actionDocMetaList)
+#foreach ($actionDocMeta in $actionDocMetaList)
 <h3 id="$manager.htmlEscapeAsId($actionDocMeta.url)::$manager.htmlEscapeAsId($actionDocMeta.methodName)">
 $manager.htmlEscape($actionDocMeta.url)
 </h3>

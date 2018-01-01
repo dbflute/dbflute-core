@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -67,18 +67,18 @@ public interface ${glEntityDefinedCommonColumn} extends ${glEntity} {
 #end
 
     /**
-	 * Enable common column auto set up. {for after disable because the default is enabled}
-	 */
+     * Enable common column auto set up. {for after disable because the default is enabled}
+     */
     public void enableCommonColumnAutoSetup();
 
     /**
-	 * Disable common column auto set up.
-	 */
+     * Disable common column auto set up.
+     */
     public void disableCommonColumnAutoSetup();
-	
+
     /**
-	 * Can the entity set up common column by auto?
-	 * @return The determination, true or false.
-	 */
-	public boolean canCommonColumnAutoSetup();
+     * Can the entity set up common column by auto?
+     * @return The determination, true or false.
+     */
+    public boolean canCommonColumnAutoSetup();
 }

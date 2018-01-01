@@ -1,3 +1,27 @@
+# common
 /target
+/build
+/bin
+.DS_Store
+
+# IntelliJ IDEA
+/.idea/artifacts
+/.idea/libraries
+/.idea/modules
+/.idea/compiler.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/workspace.xml
+/*.iml
+/out
+
+# Gradle
+/.gradle
+
+# DBFlute
+/dbflute-intro.*
+/mydbflute/intro_resources
+
+# project
 /release.properties
 /pom.xml.releaseBackup

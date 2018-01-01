@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -245,7 +245,7 @@ public interface ${glCDef} extends Classification {
 #foreach ($refClsElement in $classificationTop.refClsElementList)
 
         /**
-         * @param dbCls The DB classification to find. (NullAllowed: if null, returns empty) 
+         * @param dbCls The DB classification to find. (NullAllowed: if null, returns empty)
          * @return The the app classification corresponding to the DB classification. (NotNull, EmptyAllowed: when null specified, not found)
          */
         public static OptionalThing<${classificationName}> fromDBCls(${refClsElement.classificationType} dbCls) {

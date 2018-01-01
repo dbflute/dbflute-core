@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -201,28 +201,28 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
         assertObjectNotNull("_container", _container);
 #if ($database.isTargetContainerSeasar())
         try {
-		    return (COMPONENT)_container.getComponent(componentType);
-		} catch (ComponentNotFoundRuntimeException e) { // normally it doesn't come.
-		    final COMPONENT component;
-		    try {
-		        component = (COMPONENT)_container.getRoot().getComponent(componentType); // retry for HotDeploy mode
-		    } catch (ComponentNotFoundRuntimeException ignored) {
-		        throw e;
-		    }
-		    _container = _container.getRoot(); // change container
-		    return component;
-		}
+            return (COMPONENT)_container.getComponent(componentType);
+        } catch (ComponentNotFoundRuntimeException e) { // normally it doesn't come.
+            final COMPONENT component;
+            try {
+                component = (COMPONENT)_container.getRoot().getComponent(componentType); // retry for HotDeploy mode
+            } catch (ComponentNotFoundRuntimeException ignored) {
+                throw e;
+            }
+            _container = _container.getRoot(); // change container
+            return component;
+        }
 #end
 #if ($database.isTargetContainerSpring())
 #if ($database.isDBFluteBeansGeneratedAsJavaConfig())
-		return _container.getBean(componentType);
+        return _container.getBean(componentType);
 #else
         // component name in XML cannot contain dollar
-		return (COMPONENT)_container.getBean(replace(initUncap(toClassTitle(componentType)), "${database.dollar}", ""));
+        return (COMPONENT)_container.getBean(replace(initUncap(toClassTitle(componentType)), "${database.dollar}", ""));
 #end
 #end
 #if ($database.isTargetContainerGuice())
-		return _container.getInstance(componentType);
+        return _container.getInstance(componentType);
 #end
 #if ($database.isTargetContainerCDI())
         COMPONENT result = null;
@@ -237,17 +237,17 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #end
 #if ($database.isTargetContainerLastaDi())
         try {
-		    return _container.getComponent(componentType);
-		} catch (ComponentNotFoundException e) { // normally it doesn't come.
-		    final COMPONENT component;
-		    try {
-		        component = _container.getRoot().getComponent(componentType); // retry for HotDeploy mode
-		    } catch (ComponentNotFoundException ignored) {
-		        throw e;
-		    }
-		    _container = _container.getRoot(); // change container
-		    return component;
-		}
+            return _container.getComponent(componentType);
+        } catch (ComponentNotFoundException e) { // normally it doesn't come.
+            final COMPONENT component;
+            try {
+                component = _container.getRoot().getComponent(componentType); // retry for HotDeploy mode
+            } catch (ComponentNotFoundException ignored) {
+                throw e;
+            }
+            _container = _container.getRoot(); // change container
+            return component;
+        }
 #end
     }
 
