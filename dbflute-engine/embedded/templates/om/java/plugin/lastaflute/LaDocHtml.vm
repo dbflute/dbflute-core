@@ -224,6 +224,7 @@ to ${app.appName}
 #if ($table.tableMap.namedclsList.size() > 0)
     | <a href="#lastadoc_namedcls">to namedcls</a>
 #end
+$manager.getLastaDocHtmlMarkFreeGenDocNaviLink()
 </p>
 </div>
 
@@ -241,5 +242,6 @@ $generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "app
 $generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "appclsMap", $namedclsMap)
 #end
 #end
+$manager.getLastaDocHtmlMarkFreeGenDocBody()
 </body>
 </html>
