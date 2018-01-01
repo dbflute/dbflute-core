@@ -92,7 +92,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                 if (isElementMapClassificationTop(elementMap)) {
                     classificationTop.acceptClassificationTopBasicItemMap(elementMap);
 
-                    // pickup from DfClassificationProperties@processClassificationTopFromLiteralIfNeedss()
+                    // pickup from DfClassificationProperties@processClassificationTopFromLiteralIfNeeds()
                     classificationTop.putGroupingAll(clsProp.getElementMapGroupingMap(elementMap));
                     classificationTop.putDeprecatedAll(clsProp.getElementMapDeprecatedMap(elementMap));
                 } else {
