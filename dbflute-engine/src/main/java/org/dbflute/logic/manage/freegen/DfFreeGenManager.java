@@ -16,6 +16,7 @@
 package org.dbflute.logic.manage.freegen;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.script.ScriptEngine;
@@ -27,6 +28,7 @@ import org.dbflute.friends.velocity.DfGenerator;
 import org.dbflute.properties.DfAllClassCopyrightProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfLastaFluteProperties;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +111,13 @@ public class DfFreeGenManager {
     }
 
     // ===================================================================================
+    //                                                                            LastaDoc
+    //                                                                            ========
+    public List<String> getLastaDocHtmlPathList() {
+        return getLastaFluteProperties().getLastaDocHtmlPathList();
+    }
+
+    // ===================================================================================
     //                                                                      Resolve Helper
     //                                                                      ==============
     public String htmlEscape(String text) { // made from lasta-doc
@@ -173,6 +182,10 @@ public class DfFreeGenManager {
 
     protected DfAllClassCopyrightProperties getAllClassCopyrightProperties() {
         return getProperties().getAllClassCopyrightProperties();
+    }
+
+    protected DfLastaFluteProperties getLastaFluteProperties() {
+        return getProperties().getLastaFluteProperties();
     }
 
     protected DfBuildProperties getProperties() {
