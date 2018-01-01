@@ -15,9 +15,6 @@
  */
 package org.dbflute.task.bs.assistant;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.Arrays;
 import java.util.List;
 
 import org.dbflute.DfBuildProperties;
@@ -28,7 +25,6 @@ import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
 import org.dbflute.properties.DfLastaFluteProperties;
 import org.dbflute.properties.DfReplaceSchemaProperties;
-import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -369,12 +365,7 @@ public class DfDocumentSelector {
         if (cachedLastaDocNameList != null) {
             return cachedLastaDocNameList;
         }
-        final String[] docList = new File(getLastaDocOutputDirectory()).list(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.startsWith("lastadoc-") && name.endsWith(".html");
-            }
-        });
-        cachedLastaDocNameList = docList != null ? Arrays.asList(docList) : DfCollectionUtil.emptyList();
+        cachedLastaDocNameList = getLastaFluteProperties().getLastaDocHtmlNameList();
         return cachedLastaDocNameList;
     }
 

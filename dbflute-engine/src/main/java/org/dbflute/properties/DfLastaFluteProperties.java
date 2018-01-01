@@ -221,8 +221,7 @@ public final class DfLastaFluteProperties extends DfAbstractHelperProperties {
     }
 
     public List<String> getLastaDocHtmlNameList() {
-        final String outputDir = getLastaDocOutputDirectory();
-        return findExistingLastaDocHtmlNameList(outputDir);
+        return findExistingLastaDocHtmlNameList(getLastaDocOutputDirectory());
     }
 
     public List<String> getLastaDocHtmlPathList() {
