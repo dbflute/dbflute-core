@@ -43,7 +43,9 @@ import org.dbflute.properties.assistant.classification.DfRefClsElement;
 import org.dbflute.util.Srl;
 
 /**
- * basically use WebCls, this is the sub function.
+ * Very similar to AppCls, this WebCls is web-only CDef. <br>
+ * Historically WebCls first, but it needs more general classification. <br>
+ * This class is almost only for compatibility, so silent maintenance.
  * @author jflute
  */
 public class DfWebClsTableLoader implements DfFreeGenTableLoader {
@@ -66,6 +68,9 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
     // }
     @Override
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        // very similar to AppCls but no recycle because of silent maintenance
+        // _/_/_/_/_/_/_/_/_/_/
         final String resourceFile = resource.getResourceFile();
         final Map<String, Object> webclsMap;
         try {
@@ -77,6 +82,7 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
         }
         Map<String, DfClassificationTop> dbClsMap = null; // lazy load because it might be unused
         boolean hasRefCls = false;
+        final DfClassificationProperties clsProp = getClassificationProperties();
         final DfClassificationLiteralArranger literalArranger = new DfClassificationLiteralArranger();
         final List<DfClassificationTop> topList = new ArrayList<DfClassificationTop>();
         for (Entry<String, Object> entry : webclsMap.entrySet()) {
@@ -90,6 +96,10 @@ public class DfWebClsTableLoader implements DfFreeGenTableLoader {
             for (Map<String, Object> elementMap : elementMapList) {
                 if (isElementMapClassificationTop(elementMap)) {
                     classificationTop.acceptClassificationTopBasicItemMap(elementMap);
+
+                    // pickup from DfClassificationProperties@processClassificationTopFromLiteralIfNeeds()
+                    classificationTop.putGroupingAll(clsProp.getElementMapGroupingMap(elementMap));
+                    classificationTop.putDeprecatedAll(clsProp.getElementMapDeprecatedMap(elementMap));
                 } else {
                     if (isElementMapRefCls(elementMap)) {
                         assertRefClsOnlyOne(classificationName, refClsElement, elementMap, resource);
