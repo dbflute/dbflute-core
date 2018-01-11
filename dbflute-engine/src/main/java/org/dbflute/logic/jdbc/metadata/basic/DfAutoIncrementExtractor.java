@@ -158,7 +158,12 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
         br.addElement("DBFlute executes the SQL to get auto-increment meta data.");
         br.addElement("The table might not exist on your schema. Or the schema");
         br.addElement("to be set at 'dfprop' might be mistake in the first place.");
-        br.addElement("(and other points can be causes, for example, authentication)");
+        br.addElement("");
+        br.addElement("And other points can be causes");
+        br.addElement(" e.g. reservation word, authentication, ...");
+        br.addElement("If your primary key of the table is reservation word in the DBMS,");
+        br.addElement("set quatation settings 'quoteColumnNameList' of littleAdjustmentMap.dfprop.");
+        br.addElement("");
         br.addElement("So check your settings and environments.");
         br.addItem("Table");
         br.addElement(tableInfo.getTableFullQualifiedName());
