@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -192,7 +192,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      *     <span style="color: #3F7E5E">// called if present, or exception</span>
      *     ... = <span style="color: #553000">${myEntityVariableName}</span>.get...
      * });
-     * 
+     *
      * <span style="color: #3F7E5E">// if it might be no data, ...</span>
      * <span style="color: #0000C0">${myEntityVariableName}Bhv</span>.<span style="color: #CC4747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #553000">cb</span>.query().set...
@@ -247,13 +247,13 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * <pre>
      * ${myConditionBeanClassName} cb = <span style="color: #70226C">new</span> ${myConditionBeanClassName}();
      * cb.query().set...
-     * 
+     *
      * <span style="color: #3F7E5E">// if the data always exists as your business rule</span>
      * <span style="color: #0000C0">${myEntityVariableName}Bhv</span>.<span style="color: #DD4747">selectEntity</span>(cb)}).<span style="color: #CC4747">alwaysPresent</span>(${myEntityVariableName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #3F7E5E">// called if present, or exception</span>
      *     ... = ${myEntityVariableName}.get...
      * });
-     * 
+     *
      * <span style="color: #3F7E5E">// if it might be no data, ...</span>
      * <span style="color: #0000C0">${myEntityVariableName}Bhv</span>.<span style="color: #CC4747">selectEntity</span>(cb).<span style="color: #CC4747">ifPresent</span>(${myEntityVariableName} <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #3F7E5E">// called if present</span>
@@ -1872,8 +1872,8 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
     /**
      * Prepare the all facade executor of outside-SQL to execute it.
      * <pre>
-     * <span style="color: #3F7E5E">// main style</span> 
-     * ${myEntityVariableName}Bhv.outideSql().selectEntity(pmb); <span style="color: #3F7E5E">// optional</span> 
+     * <span style="color: #3F7E5E">// main style</span>
+     * ${myEntityVariableName}Bhv.outideSql().selectEntity(pmb); <span style="color: #3F7E5E">// optional</span>
      * ${myEntityVariableName}Bhv.outideSql().selectList(pmb); <span style="color: #3F7E5E">// ListResultBean</span>
      * ${myEntityVariableName}Bhv.outideSql().selectPage(pmb); <span style="color: #3F7E5E">// PagingResultBean</span>
      * ${myEntityVariableName}Bhv.outideSql().selectPagedListOnly(pmb); <span style="color: #3F7E5E">// ListResultBean</span>
@@ -1881,7 +1881,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * ${myEntityVariableName}Bhv.outideSql().execute(pmb); <span style="color: #3F7E5E">// int (updated count)</span>
      * ${myEntityVariableName}Bhv.outideSql().call(pmb); <span style="color: #3F7E5E">// void (pmb has OUT parameters)</span>
      *
-     * <span style="color: #3F7E5E">// traditional style</span> 
+     * <span style="color: #3F7E5E">// traditional style</span>
      * ${myEntityVariableName}Bhv.outideSql().traditionalStyle().selectEntity(path, pmb, entityType);
      * ${myEntityVariableName}Bhv.outideSql().traditionalStyle().selectList(path, pmb, entityType);
      * ${myEntityVariableName}Bhv.outideSql().traditionalStyle().selectPage(path, pmb, entityType);
@@ -1889,7 +1889,7 @@ public abstract class ${myClassName} extends ${table.baseBehaviorExtendsClassNam
      * ${myEntityVariableName}Bhv.outideSql().traditionalStyle().selectCursor(path, pmb, handler);
      * ${myEntityVariableName}Bhv.outideSql().traditionalStyle().execute(path, pmb);
      *
-     * <span style="color: #3F7E5E">// options</span> 
+     * <span style="color: #3F7E5E">// options</span>
      * ${myEntityVariableName}Bhv.outideSql().removeBlockComment().selectList()
      * ${myEntityVariableName}Bhv.outideSql().removeLineComment().selectList()
      * ${myEntityVariableName}Bhv.outideSql().formatSql().selectList()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,21 +43,10 @@ import org.dbflute.properties.assistant.classification.DfRefClsElement;
 import org.dbflute.util.Srl;
 
 /**
+ * basically use AppCls, this is the sub function.
  * @author jflute
  */
 public class DfAppClsTableLoader implements DfFreeGenTableLoader {
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected final boolean docProcess;
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public DfAppClsTableLoader(boolean docProcess) {
-        this.docProcess = docProcess;
-    }
 
     // ===================================================================================
     //                                                                          Load Table
@@ -68,25 +57,16 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
     //     ; resourceFile = ../../../dockside_appcls.properties
     // }
     // ; outputMap = map:{
+    //     ; templateFile = LaAppCDef.vm
     //     ; outputDirectory = $$baseDir$$/java
     //     ; package = org.dbflute...
-    //     ; templateFile = LaAppCDef.vm
     //     ; className = unused
     // }
     // ; optionMap = map:{
     // }
+    @Override
     public DfFreeGenMetaData loadTable(String requestName, DfFreeGenResource resource, DfFreeGenMapProp mapProp) {
-        final Map<String, Object> optionMap = mapProp.getOptionMap();
-        final String clsTheme = (String) optionMap.getOrDefault("clsTheme", "appcls");
-        final String resourceFile;
-        if (docProcess) {
-            resourceFile = (String) optionMap.get(clsTheme + "ResourceFile");
-            if (resourceFile == null) { // no way
-                throw new IllegalStateException("Not found the resource file for clsTheme: " + clsTheme + ", " + optionMap.keySet());
-            }
-        } else {
-            resourceFile = resource.getResourceFile();
-        }
+        final String resourceFile = resource.getResourceFile();
         final Map<String, Object> appClsMap;
         try {
             appClsMap = new MapListFile().readMap(new FileInputStream(resourceFile));
@@ -112,7 +92,7 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                 if (isElementMapClassificationTop(elementMap)) {
                     classificationTop.acceptClassificationTopBasicItemMap(elementMap);
 
-                    // pickup from DfClassificationProperties@processClassificationTopFromLiteralIfNeedss()
+                    // pickup from DfClassificationProperties@processClassificationTopFromLiteralIfNeeds()
                     classificationTop.putGroupingAll(clsProp.getElementMapGroupingMap(elementMap));
                     classificationTop.putDeprecatedAll(clsProp.getElementMapDeprecatedMap(elementMap));
                 } else {
@@ -137,6 +117,8 @@ public class DfAppClsTableLoader implements DfFreeGenTableLoader {
                 hasRefCls = true;
             }
         }
+        final Map<String, Object> optionMap = mapProp.getOptionMap();
+        final String clsTheme = (String) optionMap.getOrDefault("clsTheme", "appcls");
         optionMap.put("clsTheme", clsTheme);
         optionMap.put("classificationTopList", topList);
         optionMap.put("classificationNameList", topList.stream().map(top -> {

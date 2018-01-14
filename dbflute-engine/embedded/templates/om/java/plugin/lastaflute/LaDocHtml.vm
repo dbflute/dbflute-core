@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -150,7 +150,7 @@ td {
     color: #444;
 }
 .flgcell {
-	text-align: center;
+    text-align: center;
 }
 
 /* inner table */
@@ -224,20 +224,24 @@ to ${app.appName}
 #if ($table.tableMap.namedclsList.size() > 0)
     | <a href="#lastadoc_namedcls">to namedcls</a>
 #end
+$manager.getLastaDocHtmlMarkFreeGenDocNaviLink()
 </p>
 </div>
 
-$generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtml.vm", null, "mailList", $table.tableMap.actionDocMetaList)
-$generator.parse("om/java/plugin/lastaflute/doc/LaJobDocHtml.vm", null, "mailList", $table.tableMap.jobDocMetaList)
+$generator.parse("om/java/plugin/lastaflute/doc/LaActionDocHtml.vm", null, "actionDocMetaList", $table.tableMap.actionDocMetaList)
+$generator.parse("om/java/plugin/lastaflute/doc/LaJobDocHtml.vm", null, "jobDocMetaList", $table.tableMap.jobDocMetaList)
 $generator.parse("om/java/plugin/lastaflute/doc/LaMailFluteDocHtml.vm", null, "mailList", $table.tableMap.mailList)
 $generator.parse("om/java/plugin/lastaflute/doc/LaPmTemplateDocHtml.vm", null, "templateList", $table.tableMap.templateList)
 $generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "appclsMap", $table.tableMap.appclsMap)
-$generator.parse("om/java/plugin/lastaflute/doc/LaWebCDefDocHtml.vm", null, "webclsMap", $table.tableMap.webclsMap)
+#if ($table.tableMap.webclsMap)
+$generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "appclsMap", $table.tableMap.webclsMap)
+#end
 #if ($table.tableMap.namedclsList.size() > 0)
 <span id="lastadoc_namedcls"></span> <!-- only for id handling -->
 #foreach ($namedclsMap in $table.tableMap.namedclsList)
 $generator.parse("om/java/plugin/lastaflute/doc/LaAppCDefDocHtml.vm", null, "appclsMap", $namedclsMap)
 #end
 #end
+$manager.getLastaDocHtmlMarkFreeGenDocBody()
 </body>
 </html>

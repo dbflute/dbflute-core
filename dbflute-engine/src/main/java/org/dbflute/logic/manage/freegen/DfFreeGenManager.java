@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9,13 +9,14 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
 package org.dbflute.logic.manage.freegen;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.script.ScriptEngine;
@@ -27,6 +28,7 @@ import org.dbflute.friends.velocity.DfGenerator;
 import org.dbflute.properties.DfAllClassCopyrightProperties;
 import org.dbflute.properties.DfBasicProperties;
 import org.dbflute.properties.DfDocumentProperties;
+import org.dbflute.properties.DfLastaFluteProperties;
 import org.dbflute.util.Srl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +111,21 @@ public class DfFreeGenManager {
     }
 
     // ===================================================================================
+    //                                                                            LastaDoc
+    //                                                                            ========
+    public List<String> getLastaDocHtmlPathList() {
+        return getLastaFluteProperties().getLastaDocHtmlPathList();
+    }
+
+    public String getLastaDocHtmlMarkFreeGenDocNaviLink() {
+        return getLastaFluteProperties().getLastaDocHtmlMarkFreeGenDocNaviLink();
+    }
+
+    public String getLastaDocHtmlMarkFreeGenDocBody() {
+        return getLastaFluteProperties().getLastaDocHtmlMarkFreeGenDocBody();
+    }
+
+    // ===================================================================================
     //                                                                      Resolve Helper
     //                                                                      ==============
     public String htmlEscape(String text) { // made from lasta-doc
@@ -173,6 +190,10 @@ public class DfFreeGenManager {
 
     protected DfAllClassCopyrightProperties getAllClassCopyrightProperties() {
         return getProperties().getAllClassCopyrightProperties();
+    }
+
+    protected DfLastaFluteProperties getLastaFluteProperties() {
+        return getProperties().getLastaFluteProperties();
     }
 
     protected DfBuildProperties getProperties() {

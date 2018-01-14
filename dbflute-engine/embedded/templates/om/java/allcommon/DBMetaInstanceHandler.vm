@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -195,12 +195,12 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
 
     protected static String removeSchemaIfExists(String name) {
         int dotLastIndex = name.lastIndexOf(".");
-        return dotLastIndex >= 0 ? name.substring(dotLastIndex + ".".length()) : name; 
+        return dotLastIndex >= 0 ? name.substring(dotLastIndex + ".".length()) : name;
     }
 
     protected static String extractSchemaIfExists(String name) {
         int dotLastIndex = name.lastIndexOf(".");
-        return dotLastIndex >= 0 ? name.substring(0, dotLastIndex) : null; 
+        return dotLastIndex >= 0 ? name.substring(0, dotLastIndex) : null;
     }
 
     protected static String strip(String name) {

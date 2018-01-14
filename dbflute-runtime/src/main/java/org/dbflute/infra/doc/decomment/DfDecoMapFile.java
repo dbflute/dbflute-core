@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import org.dbflute.infra.doc.decomment.parts.DfDecoMapPropertyPart;
 import org.dbflute.infra.doc.decomment.parts.DfDecoMapTablePart;
 import org.dbflute.optional.OptionalThing;
 import org.dbflute.util.DfStringUtil;
+import org.dbflute.util.DfTypeUtil;
 
 // done cabos DfDecoMapFile by jflute (2017/07/27)
 // done cabos add copyright in source file header like this class to classes of infra.doc.decomment by jflute (2017/11/11)
@@ -148,7 +149,6 @@ public class DfDecoMapFile {
     }
 
     // done hakiba cast check by hakiba (2017/07/29)
-    @SuppressWarnings("unchecked")
     private DfDecoMapPiece mappingToDecoMapPiece(Map<String, Object> map) {
         String formatVersion = (String) map.get("formatVersion");
         String tableName = (String) map.get("tableName");
@@ -157,26 +157,15 @@ public class DfDecoMapFile {
         String decomment = (String) map.get("decomment");
         String databaseComment = (String) map.get("databaseComment");
         Long commentVersion = Long.valueOf(map.get("commentVersion").toString());
+        @SuppressWarnings("unchecked")
         List<String> authorList = (List<String>) map.get("authorList");
         String pieceCode = (String) map.get("pieceCode");
         LocalDateTime pieceDatetime = new HandyDate((String) map.get("pieceDatetime")).getLocalDateTime();
         String pieceOwner = (String) map.get("pieceOwner");
+        @SuppressWarnings("unchecked")
         List<String> previousPieceList = (List<String>) map.get("previousPieceList");
-
-        DfDecoMapPiece piece = new DfDecoMapPiece();
-        piece.setFormatVersion(formatVersion);
-        piece.setTableName(tableName);
-        piece.setColumnName(columnName);
-        piece.setTargetType(targetType);
-        piece.setDecomment(decomment);
-        piece.setDatabaseComment(databaseComment);
-        piece.setCommentVersion(commentVersion);
-        piece.addAllAuthors(authorList);
-        piece.setPieceCode(pieceCode);
-        piece.setPieceDatetime(pieceDatetime);
-        piece.setPieceOwner(pieceOwner);
-        piece.addAllPreviousPieces(previousPieceList);
-        return piece;
+        return new DfDecoMapPiece(formatVersion, tableName, columnName, targetType, decomment, databaseComment, commentVersion, authorList,
+                pieceCode, pieceDatetime, pieceOwner, previousPieceList);
     }
 
     // -----------------------------------------------------
@@ -262,8 +251,9 @@ public class DfDecoMapFile {
 
     private DfDecoMapPickup mappingToDecoMapPickup(Map<String, Object> map) {
         String formatVersion = (String) map.getOrDefault("formatVersion", DfDecoMapPickup.DEFAULT_FORMAT_VERSION);
-        DfDecoMapPickup pickup = new DfDecoMapPickup();
-        pickup.setFormatVersion(formatVersion);
+        LocalDateTime pickupDatetime = DfTypeUtil.toLocalDateTime(map.get("pickupDatetime"));
+        DfDecoMapPickup pickup = new DfDecoMapPickup(formatVersion);
+        pickup.setPickupDatetime(pickupDatetime);
 
         @SuppressWarnings("unchecked")
         Map<String, List<Map<String, Object>>> decoMap =
@@ -327,12 +317,11 @@ public class DfDecoMapFile {
         String pieceCode = decoMapPiece.getPieceCode();
         if (decoMapPiece.getTargetType() == DfDecoMapPieceTargetType.Table) {
             // e.g. decomment-piece-MEMBER-20171015-161718-199-jflute-HF7ELSE.dfmap
-            return "decomment-piece-" + tableName + "-" + getCurrentDateStr() + "-" + filterOwner(owner) + "-" + pieceCode
-                    + ".dfmap";
+            return "decomment-piece-" + tableName + "-" + getCurrentDateStr() + "-" + filterOwner(owner) + "-" + pieceCode + ".dfmap";
         } else if (decoMapPiece.getTargetType() == DfDecoMapPieceTargetType.Column) {
             // e.g. decomment-piece-MEMBER-MEMBER_NAME-20171015-161718-199-jflute-HF7ELSE.dfmap
-            return "decomment-piece-" + tableName + "-" + columnName + "-" + getCurrentDateStr() + "-" + filterOwner(owner)
-                    + "-" + pieceCode + ".dfmap";
+            return "decomment-piece-" + tableName + "-" + columnName + "-" + getCurrentDateStr() + "-" + filterOwner(owner) + "-"
+                    + pieceCode + ".dfmap";
         }
         throwIllegalTargetTypeException(decoMapPiece);
         return null; // unreachable
@@ -470,9 +459,9 @@ public class DfDecoMapFile {
      * <br>
      * <b>Logic:</b>
      * <ol>
+     *     <li>Add PropertyList each table or column</li>
      *     <li>Filter already merged piece. <br>
      *         (If piece was already merged, Either previousPieceList(previous piece code) contains it's piece code)</li>
-     *     <li>Add PropertyList each table or column</li>
      * </ol>
      * @param pickupOpt Decoment pickup map (NotNull: If pickup map file not exists, Empty allowed)
      * @param pieces Decoment piece map (NotNull: If piece map file not exists, Empty allowed)
@@ -480,10 +469,10 @@ public class DfDecoMapFile {
      */
     public DfDecoMapPickup merge(OptionalThing<DfDecoMapPickup> pickupOpt, List<DfDecoMapPiece> pieces) {
         Set<String> pieceCodeSet = extractAllMergedPieceCode(pickupOpt, pieces);
-        List<DfDecoMapPiece> filteredPieces = filterPieces(pieces, pieceCodeSet);
-        DfDecoMapPickup filteredPickup = filterPickupPropertyList(pickupOpt, pieceCodeSet);
-        doMerge(filteredPieces, filteredPickup);
-        return filteredPickup;
+        DfDecoMapPickup pickup = pickupOpt.orElse(new DfDecoMapPickup());
+        doMerge(pieces, pickup);
+        filterMergedProperties(pickup, pieceCodeSet);
+        return pickup;
     }
 
     private Set<String> extractAllMergedPieceCode(OptionalThing<DfDecoMapPickup> optPickup, List<DfDecoMapPiece> pieces) {
@@ -491,9 +480,10 @@ public class DfDecoMapFile {
             return pickup.getTableList().stream().flatMap(table -> {
                 Stream<String> previousTablePieceStream =
                         table.getPropertyList().stream().flatMap(property -> property.getPreviousPieceList().stream());
-                Stream<String> previousColumnPieceStream =
-                        table.getColumnList().stream().flatMap(column -> column.getPropertyList().stream()).flatMap(
-                                property -> property.getPreviousPieceList().stream());
+                Stream<String> previousColumnPieceStream = table.getColumnList()
+                        .stream()
+                        .flatMap(column -> column.getPropertyList().stream())
+                        .flatMap(property -> property.getPreviousPieceList().stream());
                 return Stream.concat(previousTablePieceStream, previousColumnPieceStream);
             });
         }).orElse(Stream.empty());
@@ -501,20 +491,13 @@ public class DfDecoMapFile {
         return Stream.concat(pickupPieceCodeStream, previousPieceCodeStream).collect(Collectors.toSet());
     }
 
-    private List<DfDecoMapPiece> filterPieces(List<DfDecoMapPiece> pieces, Set<String> pieceCodeSet) {
-        return pieces.stream().filter(piece -> !pieceCodeSet.contains(piece.getPieceCode())).collect(Collectors.toList());
-    }
-
-    private DfDecoMapPickup filterPickupPropertyList(OptionalThing<DfDecoMapPickup> optPickup, Set<String> pieceCodeSet) {
-        return optPickup.map(pickup -> {
-            pickup.getTableList().forEach(table -> {
-                filterTablePropertyList(table, pieceCodeSet);
-                table.getColumnList().forEach(column -> {
-                    filterColumnPropertyList(column, pieceCodeSet);
-                });
+    private void filterMergedProperties(DfDecoMapPickup pickup, Set<String> pieceCodeSet) {
+        pickup.getTableList().forEach(table -> {
+            filterTablePropertyList(table, pieceCodeSet);
+            table.getColumnList().forEach(column -> {
+                filterColumnPropertyList(column, pieceCodeSet);
             });
-            return pickup;
-        }).orElseGet(() -> new DfDecoMapPickup());
+        });
     }
 
     private void filterTablePropertyList(DfDecoMapTablePart table, Set<String> pieceCodeSet) {
@@ -525,8 +508,8 @@ public class DfDecoMapFile {
         pieceCodeSet.forEach(pieceCode -> column.removeProperty(pieceCode));
     }
 
-    protected void doMerge(List<DfDecoMapPiece> filteredPieces, DfDecoMapPickup pickUp) {
-        filteredPieces.forEach(piece -> {
+    protected void doMerge(List<DfDecoMapPiece> pieces, DfDecoMapPickup pickUp) {
+        pieces.forEach(piece -> {
             DfDecoMapPropertyPart property = mappingPieceToProperty(piece);
 
             if (piece.getTargetType() == DfDecoMapPieceTargetType.Table) { // table decomment
@@ -538,8 +521,7 @@ public class DfDecoMapFile {
                     return table;
                 }).orElseGet(() -> {
                     // not exists other table decoment
-                    DfDecoMapTablePart table = new DfDecoMapTablePart();
-                    table.setTableName(piece.getTableName());
+                    DfDecoMapTablePart table = new DfDecoMapTablePart(piece.getTableName());
                     table.addProperty(property);
                     pickUp.addTable(table);
                     return table;
@@ -560,8 +542,7 @@ public class DfDecoMapFile {
                             })
                             .orElseGet(() -> {
                                 // not exists column comment
-                                DfDecoMapColumnPart column = new DfDecoMapColumnPart();
-                                column.setColumnName(piece.getColumnName());
+                                DfDecoMapColumnPart column = new DfDecoMapColumnPart(piece.getColumnName());
                                 column.addProperty(property);
                                 table.addColumn(column);
                                 return column;
@@ -569,32 +550,23 @@ public class DfDecoMapFile {
                     return table;
                 }).orElseGet(() -> {
                     // not exists table and column decoment
-                    DfDecoMapColumnPart column = new DfDecoMapColumnPart();
-                    column.setColumnName(piece.getColumnName());
+                    DfDecoMapColumnPart column = new DfDecoMapColumnPart(piece.getColumnName());
                     column.addProperty(property);
 
-                    DfDecoMapTablePart table = new DfDecoMapTablePart();
-                    table.setTableName(piece.getTableName());
+                    DfDecoMapTablePart table = new DfDecoMapTablePart(piece.getTableName());
                     table.addColumn(column);
                     pickUp.addTable(table);
                     return table;
                 });
             }
         });
-        pickUp.setPickupDatetime(LocalDateTime.now());
+        pickUp.setPickupDatetime(getCurrentLocalDateTime());
     }
 
     private DfDecoMapPropertyPart mappingPieceToProperty(DfDecoMapPiece piece) {
-        DfDecoMapPropertyPart property = new DfDecoMapPropertyPart();
-        property.setDecomment(piece.getDecomment());
-        property.setDatabaseComment(piece.getDatabaseComment());
-        property.setCommentVersion(piece.getCommentVersion());
-        property.addAllAuthors(piece.getAuthorList());
-        property.setPieceCode(piece.getPieceCode());
-        property.setPieceDatetime(piece.getPieceDatetime());
-        property.setPieceOwner(piece.getPieceOwner());
-        property.addAllPreviousPieces(piece.getPreviousPieceList());
-        return property;
+        String pieceCode = piece.getPieceCode();
+        return new DfDecoMapPropertyPart(piece.getDecomment(), piece.getDatabaseComment(), pieceCode, piece.getPieceDatetime(),
+                piece.getPieceOwner(), piece.getPreviousPieceList(), piece.getCommentVersion(), piece.getAuthorList());
     }
 
     // ===================================================================================

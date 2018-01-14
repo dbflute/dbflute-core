@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.dbflute.infra.doc.decomment;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,24 +37,28 @@ public class DfDecoMapPickup {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final String DECO_MAP_KEY = "tableList";
     public static final String DEFAULT_FORMAT_VERSION = "1.0";
+    private static final String DECO_MAP_KEY = "tableList";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     // done cabos add pickupDatetime by jflute (2017/11/11)
-    protected String formatVersion;
+    protected final String formatVersion;
     protected LocalDateTime pickupDatetime;
-    protected Map<String, List<DfDecoMapTablePart>> decoMap;
+    protected final Map<String, List<DfDecoMapTablePart>> decoMap;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfDecoMapPickup() {
+        this(DEFAULT_FORMAT_VERSION);
+    }
+
+    public DfDecoMapPickup(String formatVersion) {
         this.decoMap = new LinkedHashMap<>();
-        this.decoMap.put(DECO_MAP_KEY, new ArrayList<>()); // avoid null pointer exception
-        this.formatVersion = DEFAULT_FORMAT_VERSION;
+        this.decoMap.put(DECO_MAP_KEY, new ArrayList<>()); // always exists decoMap table list
+        this.formatVersion = formatVersion;
     }
 
     // ===================================================================================
@@ -137,10 +142,6 @@ public class DfDecoMapPickup {
         return formatVersion;
     }
 
-    public void setFormatVersion(String formatVersion) {
-        this.formatVersion = formatVersion;
-    }
-
     public LocalDateTime getPickupDatetime() {
         return pickupDatetime;
     }
@@ -150,14 +151,22 @@ public class DfDecoMapPickup {
     }
 
     public List<DfDecoMapTablePart> getTableList() {
-        return decoMap.get(DECO_MAP_KEY);
+        return Collections.unmodifiableList(getDecoMapTablePartList());
     }
 
     public void addTable(DfDecoMapTablePart table) {
-        decoMap.get(DECO_MAP_KEY).add(table);
+        getDecoMapTablePartList().add(table);
     }
 
     public void addAllTables(Collection<DfDecoMapTablePart> tables) {
-        decoMap.get(DECO_MAP_KEY).addAll(tables);
+        getDecoMapTablePartList().addAll(tables);
+    }
+
+    private List<DfDecoMapTablePart> getDecoMapTablePartList() {
+        List<DfDecoMapTablePart> decoMapTablePartList = decoMap.get(DECO_MAP_KEY);
+        if (decoMapTablePartList == null) {
+            throw new IllegalStateException("decoMap table list is not exists");
+        }
+        return decoMapTablePartList;
     }
 }

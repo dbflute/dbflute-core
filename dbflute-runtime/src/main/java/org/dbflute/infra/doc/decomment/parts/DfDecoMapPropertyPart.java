@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,43 @@
  */
 package org.dbflute.infra.doc.decomment.parts;
 
+import org.dbflute.helper.HandyDate;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.dbflute.helper.HandyDate;
 
 /**
  * @author cabos
  */
 public class DfDecoMapPropertyPart {
 
-    protected String decomment;
-    protected String databaseComment;
-    protected String pieceCode;
-    protected LocalDateTime pieceDatetime;
-    protected String pieceOwner;
-    protected List<String> previousPieceList = new ArrayList<>();
-    protected long commentVersion;
-    protected List<String> authorList = new ArrayList<>();
+    protected final String decomment;
+    protected final String databaseComment;
+    protected final String pieceCode;
+    protected final LocalDateTime pieceDatetime;
+    protected final String pieceOwner;
+    protected final List<String> previousPieceList;
+    protected final Long commentVersion;
+    protected final List<String> authorList;
 
-    public DfDecoMapPropertyPart() {
+    public DfDecoMapPropertyPart(String decomment, String databaseComment, String pieceCode, LocalDateTime pieceDatetime,
+                                 String pieceOwner, List<String> previousPieceList, long commentVersion,
+                                 List<String> authorList) {
+        this.decomment = decomment;
+        this.databaseComment = databaseComment;
+        this.pieceCode = pieceCode;
+        this.pieceDatetime = pieceDatetime;
+        this.pieceOwner = pieceOwner;
+        this.previousPieceList = previousPieceList.stream().distinct().collect(Collectors.toList());
+        this.commentVersion = commentVersion;
+        this.authorList = authorList.stream().distinct().collect(Collectors.toList());
+        if (!this.authorList.contains(pieceOwner)) {
+            this.authorList.add(pieceOwner);
+        }
     }
 
     public DfDecoMapPropertyPart(Map<String, Object> propertyMap) {
@@ -51,29 +61,20 @@ public class DfDecoMapPropertyPart {
         this.pieceDatetime = new HandyDate((String) propertyMap.get("pieceDatetime")).getLocalDateTime();
         this.pieceOwner = (String) propertyMap.get("pieceOwner");
         this.previousPieceList =
-                ((List<?>) propertyMap.get("previousPieceList")).stream().map(obj -> (String) obj).collect(Collectors.toList());
+                ((List<?>) propertyMap.get("previousPieceList")).stream().map(obj -> (String) obj).distinct().collect(Collectors.toList());
         this.commentVersion = Long.valueOf((String) propertyMap.get("commentVersion"));
-        this.authorList = ((List<?>) propertyMap.get("authorList")).stream().map(obj -> (String) obj).collect(Collectors.toList());
+        this.authorList = ((List<?>) propertyMap.get("authorList")).stream().map(obj -> (String) obj).distinct().collect(Collectors.toList());
+        if (!this.authorList.contains(pieceOwner)) {
+            this.authorList.add(pieceOwner);
+        }
     }
 
     public String getDecomment() {
         return decomment;
     }
 
-    public void setDecomment(String decomment) {
-        this.decomment = decomment;
-    }
-
     public String getDatabaseComment() {
         return databaseComment;
-    }
-
-    public void setDatabaseComment(String databaseComment) {
-        this.databaseComment = databaseComment;
-    }
-
-    public void setPieceCode(String pieceCode) {
-        this.pieceCode = pieceCode;
     }
 
     public String getPieceCode() {
@@ -84,44 +85,20 @@ public class DfDecoMapPropertyPart {
         return pieceDatetime;
     }
 
-    public void setPieceDatetime(LocalDateTime pieceDatetime) {
-        this.pieceDatetime = pieceDatetime;
-    }
-
-    public void setPieceOwner(String pieceOwner) {
-        this.pieceOwner = pieceOwner;
-    }
-
     public String getPieceOwner() {
         return pieceOwner;
     }
 
-    public void addAllPreviousPieces(Collection<String> previousPieces) {
-        Set<String> previousSet = new LinkedHashSet<>(this.previousPieceList);
-        previousSet.addAll(previousPieces);
-        this.previousPieceList = new ArrayList<>(previousSet);
-    }
-
     public List<String> getPreviousPieceList() {
-        return previousPieceList;
+        return Collections.unmodifiableList(previousPieceList);
     }
 
-    public long getCommentVersion() {
+    public Long getCommentVersion() {
         return commentVersion;
     }
 
-    public void setCommentVersion(long commentVersion) {
-        this.commentVersion = commentVersion;
-    }
-
     public List<String> getAuthorList() {
-        return authorList;
-    }
-
-    public void addAllAuthors(Collection<String> authors) {
-        Set<String> authorSet = new LinkedHashSet<>(this.authorList);
-        authorSet.addAll(authors);
-        this.authorList = new ArrayList<>(authors);
+        return Collections.unmodifiableList(authorList);
     }
 
     public Map<String, Object> convertToMap() {

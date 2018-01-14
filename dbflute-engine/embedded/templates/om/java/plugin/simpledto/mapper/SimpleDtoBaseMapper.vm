@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -50,28 +50,28 @@ import ${myExtendedDtoMapperPackageName}.*;
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
- * 
+ *
  * [column]
  *     ${table.columnNameCommaString}
- * 
+ *
  * [sequence]
  *     ${table.definedSequenceName}
- * 
+ *
  * [identity]
  *     ${table.identityColumnName}
- * 
+ *
  * [version-no]
  *     ${table.versionNoColumnName}
- * 
+ *
  * [foreign-table]
  *     ${table.foreignTableNameCommaString}
- * 
+ *
  * [referrer-table]
  *     ${table.referrerTableNameCommaString}
- * 
+ *
  * [foreign-property]
  *     ${table.foreignPropertyNameCommaString}
- * 
+ *
  * [referrer-property]
  *     ${table.referrerPropertyNameCommaString}
  * </pre>
@@ -502,7 +502,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
     /**
      * Does the mapping to an entity contain null values? (when no property is modified) <br>
      * Default is true that means a setter is called if the value is null.
-     * But this method is valid only when no property is modified. 
+     * But this method is valid only when no property is modified.
      * @return The determination, true or false.
      */
     protected boolean isMappingToEntityContainsNull() { // for extension

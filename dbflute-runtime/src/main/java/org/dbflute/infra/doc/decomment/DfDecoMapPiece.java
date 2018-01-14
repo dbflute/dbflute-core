@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,14 @@
  */
 package org.dbflute.infra.doc.decomment;
 
+import org.dbflute.helper.mapstring.MapListString;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.dbflute.helper.mapstring.MapListString;
+import java.util.stream.Collectors;
 
 /**
  * @author hakiba
@@ -36,23 +34,46 @@ public class DfDecoMapPiece {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final String DEFAULT_FORMAT_VERSION = "1.0";
+    public static final String DEFAULT_FORMAT_VERSION = "1.0";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String formatVersion = DEFAULT_FORMAT_VERSION;
-    protected String tableName;
-    protected String columnName;
-    protected DfDecoMapPieceTargetType targetType;
-    protected String decomment;
-    protected String databaseComment;
-    protected Long commentVersion;
-    protected List<String> authorList = new ArrayList<>();
-    protected String pieceCode;
-    protected LocalDateTime pieceDatetime;
-    protected String pieceOwner;
-    protected List<String> previousPieceList = new ArrayList<>();
+    protected final String formatVersion;
+    protected final String tableName;
+    protected final String columnName;
+    protected final DfDecoMapPieceTargetType targetType;
+    protected final String decomment;
+    protected final String databaseComment;
+    protected final Long commentVersion;
+    protected final List<String> authorList;
+    protected final String pieceCode;
+    protected final LocalDateTime pieceDatetime;
+    protected final String pieceOwner;
+    protected final List<String> previousPieceList;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfDecoMapPiece(String formatVersion, String tableName, String columnName, DfDecoMapPieceTargetType targetType, String decomment,
+                          String databaseComment, Long commentVersion, List<String> authorList, String pieceCode,
+                          LocalDateTime pieceDatetime, String pieceOwner, List<String> previousPieceList) {
+        this.formatVersion = formatVersion;
+        this.tableName = tableName;
+        this.columnName = columnName;
+        this.targetType = targetType;
+        this.decomment = decomment;
+        this.databaseComment = databaseComment;
+        this.commentVersion = commentVersion;
+        this.authorList = authorList.stream().distinct().collect(Collectors.toList());
+        this.pieceCode = pieceCode;
+        this.pieceDatetime = pieceDatetime;
+        this.pieceOwner = pieceOwner;
+        this.previousPieceList = previousPieceList.stream().distinct().collect(Collectors.toList());
+        if (!this.authorList.contains(pieceOwner)) {
+            this.authorList.add(pieceOwner);
+        }
+    }
 
     // done cabos move to before accessor by jflute (2017/08/10)
     // ===================================================================================
@@ -122,106 +143,47 @@ public class DfDecoMapPiece {
         return formatVersion;
     }
 
-    public void setFormatVersion(String formatVersion) {
-        this.formatVersion = formatVersion;
-    }
-
     public String getTableName() {
         return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
     }
 
     public String getColumnName() {
         return columnName;
     }
 
-    public void setColumnName(String columnName) {
-        this.columnName = columnName;
-    }
-
     public DfDecoMapPieceTargetType getTargetType() {
         return targetType;
-    }
-
-    public void setTargetType(DfDecoMapPieceTargetType targetType) {
-        this.targetType = targetType;
     }
 
     public String getDecomment() {
         return decomment;
     }
 
-    public void setDecomment(String decomment) {
-        this.decomment = decomment;
-    }
-
     public String getDatabaseComment() {
         return databaseComment;
-    }
-
-    public void setDatabaseComment(String databaseComment) {
-        this.databaseComment = databaseComment;
     }
 
     public Long getCommentVersion() {
         return commentVersion;
     }
 
-    public void setCommentVersion(Long commentVersion) {
-        this.commentVersion = commentVersion;
-    }
-
     public List<String> getAuthorList() {
-        return authorList;
-    }
-
-    public void addAuthor(String author) {
-        // done cabos use LinkedHashSet to keep order by jflute (2017/09/07)
-        Set<String> authorSet = new LinkedHashSet<>(this.authorList);
-        authorSet.add(author);
-        this.authorList = new ArrayList<>(authorSet);
-    }
-
-    public void addAllAuthors(Collection<String> authors) {
-        Set<String> authorSet = new LinkedHashSet<>(this.authorList);
-        authorSet.addAll(authors);
-        this.authorList = new ArrayList<>(authorSet);
+        return Collections.unmodifiableList(authorList);
     }
 
     public String getPieceCode() {
         return pieceCode;
     }
 
-    public void setPieceCode(String pieceCode) {
-        this.pieceCode = pieceCode;
-    }
-
     public LocalDateTime getPieceDatetime() {
         return pieceDatetime;
-    }
-
-    public void setPieceDatetime(LocalDateTime pieceDatetime) {
-        this.pieceDatetime = pieceDatetime;
     }
 
     public String getPieceOwner() {
         return pieceOwner;
     }
 
-    public void setPieceOwner(String pieceOwner) {
-        this.pieceOwner = pieceOwner;
-    }
-
     public List<String> getPreviousPieceList() {
-        return previousPieceList;
-    }
-
-    public void addAllPreviousPieces(Collection<String> previousPieces) {
-        Set<String> previousSet = new LinkedHashSet<>(this.authorList);
-        previousSet.addAll(previousPieces);
-        this.previousPieceList = new ArrayList<>(previousPieces);
+        return Collections.unmodifiableList(previousPieceList);
     }
 }
